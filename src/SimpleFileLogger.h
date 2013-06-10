@@ -48,12 +48,16 @@ namespace Logger {
     outputDir_("./Output/") {
     
         boost::filesystem::path dir(outputDir_);
-        if(!boost::filesystem::create_directory(dir)) {
-            std::cout << "Error: Cannot create the output directory " + outputDir_ << std::endl;  
-            exit(EXIT_FAILURE);        
-        }  
-    }
-
+		if(!boost::filesystem::exists(dir)) {
+			if(!boost::filesystem::create_directory(dir)) {
+				std::cout << "Error: Cannot create the output directory " + outputDir_ << std::endl;  
+				exit(EXIT_FAILURE);        
+			}  
+			std::cout << "Created output directory " + dir.string() << std::endl;
+		}
+		else std::cout << "Using " +  dir.string() + " as output directory\n";
+	}
+	
 
     template <typename NMSmodelT>
     void SimpleFileLogger<NMSmodelT>::addLog(LogID logID) {

@@ -4,7 +4,6 @@
 
 ADD_LIBRARY(xmlInput STATIC
   NMSmodel.cxx
-  simulatedAnnealing.cxx
   execution.cxx
   ExecutionXmlReader.cpp
 )
