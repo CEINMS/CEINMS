@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:annotation>
+    <xs:documentation xml:lang="en"/>
+  </xs:annotation>
+  <xs:complexType name="SimulatedAnnealingType">
+    <xs:sequence>
+      <xs:element name="noEpsilon" type="xs:int"/>
+      <xs:element name="rt" type="xs:double"/>
+      <xs:element name="T" type="xs:double"/>
+      <xs:element name="NS" type="xs:int"/>
+      <xs:element name="NT" type="xs:int"/>
+      <xs:element name="epsilon" type="xs:double"/>
+      <xs:element name="maxNoEval" type="xs:int"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="AlgorithmType">
+    <xs:choice>
+      <xs:element name="simulatedAnnealing" type="SimulatedAnnealingType"/>
+    </xs:choice>
+  </xs:complexType>
+  <xs:complexType name="OpenLoopType"/>
+  <xs:complexType name="TypeType">
+    <xs:choice>
+      <xs:element name="openLoop" type="OpenLoopType"/>
+    </xs:choice>
+  </xs:complexType>
+  <xs:complexType name="TendonElementType"/>
+  <xs:complexType name="TendonType">
+    <xs:choice>
+      <xs:element name="stiff" type="TendonElementType"/>
+      <xs:element name="elastic" type="TendonElementType"/>
+      <xs:element name="elasticBiSec" type="TendonElementType"/>
+    </xs:choice>
+  </xs:complexType>
+  <xs:complexType name="ActivationElementType"/>
+  <xs:complexType name="ActivationType">
+    <xs:choice>
+      <xs:element name="exponential" type="ActivationElementType"/>
+      <xs:element name="piecewise" type="ActivationElementType"/>
+    </xs:choice>
+  </xs:complexType>
+  <xs:complexType name="NMSModelType">
+    <xs:sequence>
+      <xs:element name="type" type="TypeType"/>
+      <xs:element name="tendon" type="TendonType"/>
+      <xs:element name="activation" type="ActivationType"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:simpleType name="TrialSetType">
+    <xs:list itemType="xs:string"/>
+  </xs:simpleType>
+  <xs:complexType name="ObjectiveFunctionElementType"/>
+  <xs:complexType name="ObjectiveFunctionType">
+    <xs:choice>
+      <xs:element name="minimizeTorqueError" type="ObjectiveFunctionElementType"/>
+    </xs:choice>
+  </xs:complexType>
+  <xs:simpleType name="DoFsType">
+    <xs:list itemType="xs:string"/>
+  </xs:simpleType>
+  <xs:complexType name="HardCodedParametersSelectionType"/>
+  
+  <xs:simpleType name="TwoDoublesType">
+    <xs:list itemType="xs:double"/>
+  </xs:simpleType>
+  
+  <xs:complexType name="RangeType">
+    <xs:sequence>
+       <xs:element name="range" type="TwoDoublesType"/>
+    </xs:sequence>
+  </xs:complexType>
+  
+  <xs:simpleType name="MuscleListType">
+    <xs:list itemType="xs:string"/>
+  </xs:simpleType>
+  <xs:complexType name="MuscleGroupsType">
+    <xs:sequence>
+      <xs:element minOccurs="1" maxOccurs="unbounded" name="muscles" type="MuscleListType"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="ParameterType">
+    <xs:sequence>
+      <xs:element name="name" type="xs:string"/>
+      <xs:element name="muscleGroups" minOccurs="0" type="MuscleGroupsType"/>
+      <xs:choice>
+        <xs:element name="absolute" type="RangeType"/>
+        <xs:element name="relativeToSubjectValue" type="RangeType"/>
+      </xs:choice>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="parameterSetType">
+    <xs:sequence>
+      <xs:element minOccurs="1" maxOccurs="unbounded" name="parameter" type="ParameterType"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="StepType">
+    <xs:sequence>
+      <xs:element name="dofs" type="DoFsType"/>
+      <xs:element name="objectiveFunction" type="ObjectiveFunctionType"/>
+      <xs:choice>
+        <xs:element name="strengthCoefficients_ShapeFactor_C1_C2_TendonSLackLength_single" type="HardCodedParametersSelectionType"/>
+        <xs:element name="parameterSet" type="parameterSetType"/>
+      </xs:choice>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="CalibrationStepsType">
+    <xs:sequence>
+      <xs:element minOccurs="1" maxOccurs="unbounded" name="step" type="StepType"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="CalibrationType">
+    <xs:sequence>
+      <xs:element name="algorithm" type="AlgorithmType"/>
+      <xs:element name="NMSmodel" type="NMSModelType"/>
+      <xs:element minOccurs="0" name="samplingFrequency" type="xs:int"/>
+      <xs:element name="calibrationSteps" type="CalibrationStepsType"/>
+      <xs:element name="trialSet" type="TrialSetType"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="calibration" type="CalibrationType"/>
+</xs:schema>
