@@ -405,19 +405,19 @@
   <dofSet>
     <dof>
       <name>R_hip_aa</name>
-      <mtuNameSequence>addbrev_r addlong_r addmag1_r addmag2_r addmag3_r bicfemlh_r gmax1_r gmax2_r gmax3_r gmed1_r gmed2_r gmed3_r gmin1_r gmin2_r gmin3_r gra_r illiacus_r psoas_r recfem_r sar_r semimem_r semiten_r tfl_r</mtuNameSequence>
+      <mtuNameSet>addbrev_r addlong_r addmag1_r addmag2_r addmag3_r bicfemlh_r gmax1_r gmax2_r gmax3_r gmed1_r gmed2_r gmed3_r gmin1_r gmin2_r gmin3_r gra_r illiacus_r psoas_r recfem_r sar_r semimem_r semiten_r tfl_r</mtuNameSet>
     </dof>
     <dof>
       <name>R_hip_fe</name>
-      <mtuNameSequence>addbrev_r addlong_r addmag1_r addmag2_r addmag3_r bicfemlh_r gmax1_r gmax2_r gmax3_r gmed1_r gmed2_r gmed3_r gmin1_r gmin2_r gmin3_r gra_r illiacus_r psoas_r recfem_r sar_r semimem_r semiten_r tfl_r</mtuNameSequence>
+      <mtuNameSet>addbrev_r addlong_r addmag1_r addmag2_r addmag3_r bicfemlh_r gmax1_r gmax2_r gmax3_r gmed1_r gmed2_r gmed3_r gmin1_r gmin2_r gmin3_r gra_r illiacus_r psoas_r recfem_r sar_r semimem_r semiten_r tfl_r</mtuNameSet>
     </dof>
     <dof>
       <name>R_knee_fe</name>
-      <mtuNameSequence>bicfemlh_r bicfemsh_r gaslat_r gasmed_r gra_r recfem_r sar_r semimem_r semiten_r tfl_r vasint_r vaslat_r vasmed_r</mtuNameSequence>
+      <mtuNameSet>bicfemlh_r bicfemsh_r gaslat_r gasmed_r gra_r recfem_r sar_r semimem_r semiten_r tfl_r vasint_r vaslat_r vasmed_r</mtuNameSet>
     </dof>
     <dof>
       <name>R_ankle_fe</name>
-      <mtuNameSequence>gaslat_r gasmed_r perbrev_r perlong_r perter_r sol_r tibant_r</mtuNameSequence>
+      <mtuNameSet>gaslat_r gasmed_r perbrev_r perlong_r perter_r sol_r tibant_r</mtuNameSet>
     </dof>
   </dofSet>
   <calibrationInfo>
