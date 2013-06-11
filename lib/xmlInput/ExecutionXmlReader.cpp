@@ -8,8 +8,16 @@ using std::cout;
 using std::endl;
 
 ExecutionXmlReader::ExecutionXmlReader(const string& filename)
-:executionPointer_(execution(filename)), runMode_(0) {
+:runMode_(0) {
     
+    try {
+        std::auto_ptr<ExecutionType> executionPointer(execution(filename));
+        executionPointer_ = executionPointer;
+    }  
+    catch (const xml_schema::exception& e) {
+        cout << e << endl;
+        exit(EXIT_FAILURE);
+    }
     readXml();
 }
 

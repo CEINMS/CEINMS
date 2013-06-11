@@ -4,6 +4,7 @@ INCLUDE_DIRECTORIES(
   ${CMAKE_SOURCE_DIR}/lib/NMSmodel
   ${CMAKE_SOURCE_DIR}/lib/NMSmodel/Tendon
   ${CMAKE_SOURCE_DIR}/lib/NMSmodel/Activation
+  ${CMAKE_SOURCE_DIR}/lib/OdeInt
 )
 
 SET(Tendon_SOURCES

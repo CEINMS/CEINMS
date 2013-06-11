@@ -1,7 +1,7 @@
 #include "ElasticTendon.h"
 #include "StiffTendon.h"
-#include "./odeint/Odeint.h"
-#include "./odeint/StepperDopr5.h"
+#include "Odeint.h"
+#include "StepperDopr5.h"
 #include <iostream>
 using std::cout;
 using std::endl;
