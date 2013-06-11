@@ -15,6 +15,7 @@ public:
     void getMusclesToPredict(std::vector<std::string>& musclesToPredict);
     void getMusclesToTrack(std::vector<std::string>& musclesToTrack);
     void getHybridWeightings(double& alpha, double& beta, double& gamma);
+	void getAnnealingParameters(unsigned& nt, unsigned& ns, double& rt, double& t, unsigned& maxNoEval, double& epsilon, unsigned& noEpsilon) const;
     
 private:
     void readXml();

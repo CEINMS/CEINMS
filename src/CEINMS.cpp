@@ -68,15 +68,13 @@ void printHeader() {
     
 void printAuthors() {
     
-    time_t now = time(0);
-    tm *gmtm = gmtime(&now);
+    time_t now = std::time(0);
+    tm *gmtm = std::gmtime(&now);
     cout << "Copyright (C) " << gmtm->tm_year+1900 << endl;
-    cout << "David LLoyd, Monica Reggiani, Massimo Sartori, Claudio Pizzolato\n\n";
+    cout << "David Lloyd, Monica Reggiani, Massimo Sartori, Claudio Pizzolato\n\n";
 }
     
- 
- 
- 
+
 int main(int argc, char** argv) {
  
     printHeader();
@@ -101,7 +99,7 @@ int main(int argc, char** argv) {
  
     string configurationFile(argv[1]);
     try {
-        std::auto_ptr<NMSmodelType> subjectPointer (subject (configurationFile));
+        std::auto_ptr<SubjectType> subjectPointer (subject (configurationFile));
     }  
     catch (const xml_schema::exception& e) {
         cout << e << endl;
@@ -187,10 +185,16 @@ int main(int argc, char** argv) {
             executionCfg.getMusclesToTrack(toTrack);
             errorMinimizer.setMusclesNamesWithEmgToPredict(toPredict);
             errorMinimizer.setMusclesNamesWithEmgToTrack(toTrack);
+			double rt, t, epsilon;
+			unsigned noEpsilon, ns, nt, maxNoEval;
+			executionCfg.getAnnealingParameters(nt, ns, rt, t, maxNoEval, epsilon, noEpsilon);
+			errorMinimizer.setAnnealingParameters(nt, ns, rt, t, maxNoEval, epsilon, noEpsilon);
             ModelEvaluationHybrid<MyNMSmodel, MyErrorMinimizer> consumer(mySubject, errorMinimizer);
             runThreads(consumer, emgProducer, lmtMaProducer, externalTorqueProducer);
             break;
         } 
+
+
         default:
             std::cout << "Implementation not available yet. Verify you XML configuration file\n";
             break;

@@ -63,6 +63,20 @@ namespace Hybrid {
         currentDofNames_ = dofs;
     }
     
+
+	template<typename NMSmodelT>
+    void ErrorMinimizerAnnealing<NMSmodelT>::setAnnealingParameters(unsigned nt, unsigned ns, double rt, double t, unsigned maxNoEval, double epsilon, unsigned noEpsilon) {
+
+		nt_ = nt;
+		ns_ = ns;
+		rt_ = rt;
+		t_ = t;
+		maxNoEval_ = maxNoEval;
+		epsilon_ = epsilon;
+		noEpsilon_ = noEpsilon;
+	}
+
+
     template <typename NMSmodelT>
     void ErrorMinimizerAnnealing<NMSmodelT>::minimize() {
         
@@ -93,6 +107,7 @@ namespace Hybrid {
                       musclesNamesWithEmgToPredict_, 
                       weightings_, 
                       staticComputation);
+		siman.setAnnealingParameters(nt_, ns_, rt_, t_, maxNoEval_, epsilon_, noEpsilon_);
         std::cout << siman;
         siman.optimize();
         

@@ -38,221 +38,245 @@
 
 #include <xsd/cxx/pre.hxx>
 
-#include "NMSmodel.hxx"
+#include "subject.hxx"
 
-// MuscleType
+// MTUType
 // 
 
-const MuscleType::name_type& MuscleType::
+const MTUType::name_type& MTUType::
 name () const
 {
   return this->name_.get ();
 }
 
-MuscleType::name_type& MuscleType::
+MTUType::name_type& MTUType::
 name ()
 {
   return this->name_.get ();
 }
 
-void MuscleType::
+void MTUType::
 name (const name_type& x)
 {
   this->name_.set (x);
 }
 
-void MuscleType::
+void MTUType::
 name (::std::auto_ptr< name_type > x)
 {
   this->name_.set (x);
 }
 
-const MuscleType::C1_type& MuscleType::
-C1 () const
+const MTUType::emDelay_optional& MTUType::
+emDelay () const
 {
-  return this->C1_.get ();
+  return this->emDelay_;
 }
 
-MuscleType::C1_type& MuscleType::
-C1 ()
+MTUType::emDelay_optional& MTUType::
+emDelay ()
 {
-  return this->C1_.get ();
+  return this->emDelay_;
 }
 
-void MuscleType::
-C1 (const C1_type& x)
+void MTUType::
+emDelay (const emDelay_type& x)
 {
-  this->C1_.set (x);
+  this->emDelay_.set (x);
 }
 
-const MuscleType::C2_type& MuscleType::
-C2 () const
+void MTUType::
+emDelay (const emDelay_optional& x)
 {
-  return this->C2_.get ();
+  this->emDelay_ = x;
 }
 
-MuscleType::C2_type& MuscleType::
-C2 ()
+const MTUType::c1_type& MTUType::
+c1 () const
 {
-  return this->C2_.get ();
+  return this->c1_.get ();
 }
 
-void MuscleType::
-C2 (const C2_type& x)
+MTUType::c1_type& MTUType::
+c1 ()
 {
-  this->C2_.set (x);
+  return this->c1_.get ();
 }
 
-const MuscleType::shapeFactor_type& MuscleType::
+void MTUType::
+c1 (const c1_type& x)
+{
+  this->c1_.set (x);
+}
+
+const MTUType::c2_type& MTUType::
+c2 () const
+{
+  return this->c2_.get ();
+}
+
+MTUType::c2_type& MTUType::
+c2 ()
+{
+  return this->c2_.get ();
+}
+
+void MTUType::
+c2 (const c2_type& x)
+{
+  this->c2_.set (x);
+}
+
+const MTUType::shapeFactor_type& MTUType::
 shapeFactor () const
 {
   return this->shapeFactor_.get ();
 }
 
-MuscleType::shapeFactor_type& MuscleType::
+MTUType::shapeFactor_type& MTUType::
 shapeFactor ()
 {
   return this->shapeFactor_.get ();
 }
 
-void MuscleType::
+void MTUType::
 shapeFactor (const shapeFactor_type& x)
 {
   this->shapeFactor_.set (x);
 }
 
-const MuscleType::optimalFiberLength_type& MuscleType::
-optimalFiberLength () const
+const MTUType::optimalFibreLength_type& MTUType::
+optimalFibreLength () const
 {
-  return this->optimalFiberLength_.get ();
+  return this->optimalFibreLength_.get ();
 }
 
-MuscleType::optimalFiberLength_type& MuscleType::
-optimalFiberLength ()
+MTUType::optimalFibreLength_type& MTUType::
+optimalFibreLength ()
 {
-  return this->optimalFiberLength_.get ();
+  return this->optimalFibreLength_.get ();
 }
 
-void MuscleType::
-optimalFiberLength (const optimalFiberLength_type& x)
+void MTUType::
+optimalFibreLength (const optimalFibreLength_type& x)
 {
-  this->optimalFiberLength_.set (x);
+  this->optimalFibreLength_.set (x);
 }
 
-const MuscleType::pennationAngle_type& MuscleType::
+const MTUType::pennationAngle_type& MTUType::
 pennationAngle () const
 {
   return this->pennationAngle_.get ();
 }
 
-MuscleType::pennationAngle_type& MuscleType::
+MTUType::pennationAngle_type& MTUType::
 pennationAngle ()
 {
   return this->pennationAngle_.get ();
 }
 
-void MuscleType::
+void MTUType::
 pennationAngle (const pennationAngle_type& x)
 {
   this->pennationAngle_.set (x);
 }
 
-const MuscleType::tendonSlackLength_type& MuscleType::
+const MTUType::tendonSlackLength_type& MTUType::
 tendonSlackLength () const
 {
   return this->tendonSlackLength_.get ();
 }
 
-MuscleType::tendonSlackLength_type& MuscleType::
+MTUType::tendonSlackLength_type& MTUType::
 tendonSlackLength ()
 {
   return this->tendonSlackLength_.get ();
 }
 
-void MuscleType::
+void MTUType::
 tendonSlackLength (const tendonSlackLength_type& x)
 {
   this->tendonSlackLength_.set (x);
 }
 
-const MuscleType::maxIsometricForce_type& MuscleType::
+const MTUType::maxIsometricForce_type& MTUType::
 maxIsometricForce () const
 {
   return this->maxIsometricForce_.get ();
 }
 
-MuscleType::maxIsometricForce_type& MuscleType::
+MTUType::maxIsometricForce_type& MTUType::
 maxIsometricForce ()
 {
   return this->maxIsometricForce_.get ();
 }
 
-void MuscleType::
+void MTUType::
 maxIsometricForce (const maxIsometricForce_type& x)
 {
   this->maxIsometricForce_.set (x);
 }
 
-const MuscleType::strengthCoefficient_type& MuscleType::
+const MTUType::strengthCoefficient_type& MTUType::
 strengthCoefficient () const
 {
   return this->strengthCoefficient_.get ();
 }
 
-MuscleType::strengthCoefficient_type& MuscleType::
+MTUType::strengthCoefficient_type& MTUType::
 strengthCoefficient ()
 {
   return this->strengthCoefficient_.get ();
 }
 
-void MuscleType::
+void MTUType::
 strengthCoefficient (const strengthCoefficient_type& x)
 {
   this->strengthCoefficient_.set (x);
 }
 
 
-// MusclesType
+// MTUSetType
 // 
 
-const MusclesType::muscle_sequence& MusclesType::
-muscle () const
+const MTUSetType::mtu_sequence& MTUSetType::
+mtu () const
 {
-  return this->muscle_;
+  return this->mtu_;
 }
 
-MusclesType::muscle_sequence& MusclesType::
-muscle ()
+MTUSetType::mtu_sequence& MTUSetType::
+mtu ()
 {
-  return this->muscle_;
+  return this->mtu_;
 }
 
-void MusclesType::
-muscle (const muscle_sequence& s)
+void MTUSetType::
+mtu (const mtu_sequence& s)
 {
-  this->muscle_ = s;
+  this->mtu_ = s;
 }
 
 
-// MuscleSequenceType
+// MTUNameSetType
 //
 
-MuscleSequenceType::
-MuscleSequenceType ()
+MTUNameSetType::
+MTUNameSetType ()
 : ::xsd::cxx::tree::list< ::xml_schema::string, char > ( ::xml_schema::flags (0), this)
 {
 }
 
-MuscleSequenceType::
-MuscleSequenceType (size_type n, const ::xml_schema::string& x)
+MTUNameSetType::
+MTUNameSetType (size_type n, const ::xml_schema::string& x)
 : ::xsd::cxx::tree::list< ::xml_schema::string, char > (n, x, this)
 {
 }
 
-MuscleSequenceType::
-MuscleSequenceType (const MuscleSequenceType& o,
-                    ::xml_schema::flags f,
-                    ::xml_schema::container* c)
+MTUNameSetType::
+MTUNameSetType (const MTUNameSetType& o,
+                ::xml_schema::flags f,
+                ::xml_schema::container* c)
 : ::xml_schema::simple_type (o, f, c),
   ::xsd::cxx::tree::list< ::xml_schema::string, char > (o, f, this)
 {
@@ -285,50 +309,242 @@ name (::std::auto_ptr< name_type > x)
   this->name_.set (x);
 }
 
-const DoFType::muscleSequence_type& DoFType::
-muscleSequence () const
+const DoFType::mtuNameSet_type& DoFType::
+mtuNameSet () const
 {
-  return this->muscleSequence_.get ();
+  return this->mtuNameSet_.get ();
 }
 
-DoFType::muscleSequence_type& DoFType::
-muscleSequence ()
+DoFType::mtuNameSet_type& DoFType::
+mtuNameSet ()
 {
-  return this->muscleSequence_.get ();
-}
-
-void DoFType::
-muscleSequence (const muscleSequence_type& x)
-{
-  this->muscleSequence_.set (x);
+  return this->mtuNameSet_.get ();
 }
 
 void DoFType::
-muscleSequence (::std::auto_ptr< muscleSequence_type > x)
+mtuNameSet (const mtuNameSet_type& x)
 {
-  this->muscleSequence_.set (x);
+  this->mtuNameSet_.set (x);
+}
+
+void DoFType::
+mtuNameSet (::std::auto_ptr< mtuNameSet_type > x)
+{
+  this->mtuNameSet_.set (x);
 }
 
 
-// DoFsType
+// CalibrationSequenceType
+//
+
+CalibrationSequenceType::
+CalibrationSequenceType ()
+: ::xsd::cxx::tree::list< ::xml_schema::string, char > ( ::xml_schema::flags (0), this)
+{
+}
+
+CalibrationSequenceType::
+CalibrationSequenceType (size_type n, const ::xml_schema::string& x)
+: ::xsd::cxx::tree::list< ::xml_schema::string, char > (n, x, this)
+{
+}
+
+CalibrationSequenceType::
+CalibrationSequenceType (const CalibrationSequenceType& o,
+                         ::xml_schema::flags f,
+                         ::xml_schema::container* c)
+: ::xml_schema::simple_type (o, f, c),
+  ::xsd::cxx::tree::list< ::xml_schema::string, char > (o, f, this)
+{
+}
+
+// CalibratedType
 // 
 
-const DoFsType::DoF_sequence& DoFsType::
-DoF () const
+const CalibratedType::startSubjectFile_type& CalibratedType::
+startSubjectFile () const
 {
-  return this->DoF_;
+  return this->startSubjectFile_.get ();
 }
 
-DoFsType::DoF_sequence& DoFsType::
-DoF ()
+CalibratedType::startSubjectFile_type& CalibratedType::
+startSubjectFile ()
 {
-  return this->DoF_;
+  return this->startSubjectFile_.get ();
 }
 
-void DoFsType::
-DoF (const DoF_sequence& s)
+void CalibratedType::
+startSubjectFile (const startSubjectFile_type& x)
 {
-  this->DoF_ = s;
+  this->startSubjectFile_.set (x);
+}
+
+void CalibratedType::
+startSubjectFile (::std::auto_ptr< startSubjectFile_type > x)
+{
+  this->startSubjectFile_.set (x);
+}
+
+const CalibratedType::calibrationSequence_type& CalibratedType::
+calibrationSequence () const
+{
+  return this->calibrationSequence_.get ();
+}
+
+CalibratedType::calibrationSequence_type& CalibratedType::
+calibrationSequence ()
+{
+  return this->calibrationSequence_.get ();
+}
+
+void CalibratedType::
+calibrationSequence (const calibrationSequence_type& x)
+{
+  this->calibrationSequence_.set (x);
+}
+
+void CalibratedType::
+calibrationSequence (::std::auto_ptr< calibrationSequence_type > x)
+{
+  this->calibrationSequence_.set (x);
+}
+
+
+// UncalibratedType
+// 
+
+const UncalibratedType::subjectID_type& UncalibratedType::
+subjectID () const
+{
+  return this->subjectID_.get ();
+}
+
+UncalibratedType::subjectID_type& UncalibratedType::
+subjectID ()
+{
+  return this->subjectID_.get ();
+}
+
+void UncalibratedType::
+subjectID (const subjectID_type& x)
+{
+  this->subjectID_.set (x);
+}
+
+void UncalibratedType::
+subjectID (::std::auto_ptr< subjectID_type > x)
+{
+  this->subjectID_.set (x);
+}
+
+const UncalibratedType::additionalInfo_type& UncalibratedType::
+additionalInfo () const
+{
+  return this->additionalInfo_.get ();
+}
+
+UncalibratedType::additionalInfo_type& UncalibratedType::
+additionalInfo ()
+{
+  return this->additionalInfo_.get ();
+}
+
+void UncalibratedType::
+additionalInfo (const additionalInfo_type& x)
+{
+  this->additionalInfo_.set (x);
+}
+
+void UncalibratedType::
+additionalInfo (::std::auto_ptr< additionalInfo_type > x)
+{
+  this->additionalInfo_.set (x);
+}
+
+
+// CalibrationInfoType
+// 
+
+const CalibrationInfoType::uncalibrated_optional& CalibrationInfoType::
+uncalibrated () const
+{
+  return this->uncalibrated_;
+}
+
+CalibrationInfoType::uncalibrated_optional& CalibrationInfoType::
+uncalibrated ()
+{
+  return this->uncalibrated_;
+}
+
+void CalibrationInfoType::
+uncalibrated (const uncalibrated_type& x)
+{
+  this->uncalibrated_.set (x);
+}
+
+void CalibrationInfoType::
+uncalibrated (const uncalibrated_optional& x)
+{
+  this->uncalibrated_ = x;
+}
+
+void CalibrationInfoType::
+uncalibrated (::std::auto_ptr< uncalibrated_type > x)
+{
+  this->uncalibrated_.set (x);
+}
+
+const CalibrationInfoType::calibrated_optional& CalibrationInfoType::
+calibrated () const
+{
+  return this->calibrated_;
+}
+
+CalibrationInfoType::calibrated_optional& CalibrationInfoType::
+calibrated ()
+{
+  return this->calibrated_;
+}
+
+void CalibrationInfoType::
+calibrated (const calibrated_type& x)
+{
+  this->calibrated_.set (x);
+}
+
+void CalibrationInfoType::
+calibrated (const calibrated_optional& x)
+{
+  this->calibrated_ = x;
+}
+
+void CalibrationInfoType::
+calibrated (::std::auto_ptr< calibrated_type > x)
+{
+  this->calibrated_.set (x);
+}
+
+
+// DoFSetType
+// 
+
+const DoFSetType::dof_sequence& DoFSetType::
+dof () const
+{
+  return this->dof_;
+}
+
+DoFSetType::dof_sequence& DoFSetType::
+dof ()
+{
+  return this->dof_;
+}
+
+void DoFSetType::
+dof (const dof_sequence& s)
+{
+  this->dof_ = s;
 }
 
 
@@ -432,161 +648,204 @@ yPoints (::std::auto_ptr< yPoints_type > x)
 }
 
 
-// MuscleDefaultType
+// MTUDefaultType
 // 
 
-const MuscleDefaultType::percentageChange_type& MuscleDefaultType::
+const MTUDefaultType::emDelay_type& MTUDefaultType::
+emDelay () const
+{
+  return this->emDelay_.get ();
+}
+
+MTUDefaultType::emDelay_type& MTUDefaultType::
+emDelay ()
+{
+  return this->emDelay_.get ();
+}
+
+void MTUDefaultType::
+emDelay (const emDelay_type& x)
+{
+  this->emDelay_.set (x);
+}
+
+const MTUDefaultType::percentageChange_type& MTUDefaultType::
 percentageChange () const
 {
   return this->percentageChange_.get ();
 }
 
-MuscleDefaultType::percentageChange_type& MuscleDefaultType::
+MTUDefaultType::percentageChange_type& MTUDefaultType::
 percentageChange ()
 {
   return this->percentageChange_.get ();
 }
 
-void MuscleDefaultType::
+void MTUDefaultType::
 percentageChange (const percentageChange_type& x)
 {
   this->percentageChange_.set (x);
 }
 
-const MuscleDefaultType::damping_type& MuscleDefaultType::
+const MTUDefaultType::damping_type& MTUDefaultType::
 damping () const
 {
   return this->damping_.get ();
 }
 
-MuscleDefaultType::damping_type& MuscleDefaultType::
+MTUDefaultType::damping_type& MTUDefaultType::
 damping ()
 {
   return this->damping_.get ();
 }
 
-void MuscleDefaultType::
+void MTUDefaultType::
 damping (const damping_type& x)
 {
   this->damping_.set (x);
 }
 
-const MuscleDefaultType::Curve_sequence& MuscleDefaultType::
-Curve () const
+const MTUDefaultType::curve_sequence& MTUDefaultType::
+curve () const
 {
-  return this->Curve_;
+  return this->curve_;
 }
 
-MuscleDefaultType::Curve_sequence& MuscleDefaultType::
-Curve ()
+MTUDefaultType::curve_sequence& MTUDefaultType::
+curve ()
 {
-  return this->Curve_;
+  return this->curve_;
 }
 
-void MuscleDefaultType::
-Curve (const Curve_sequence& s)
+void MTUDefaultType::
+curve (const curve_sequence& s)
 {
-  this->Curve_ = s;
+  this->curve_ = s;
 }
 
 
-// NMSmodelType
+// SubjectType
 // 
 
-const NMSmodelType::muscleDefault_type& NMSmodelType::
-muscleDefault () const
+const SubjectType::mtuDefault_type& SubjectType::
+mtuDefault () const
 {
-  return this->muscleDefault_.get ();
+  return this->mtuDefault_.get ();
 }
 
-NMSmodelType::muscleDefault_type& NMSmodelType::
-muscleDefault ()
+SubjectType::mtuDefault_type& SubjectType::
+mtuDefault ()
 {
-  return this->muscleDefault_.get ();
+  return this->mtuDefault_.get ();
 }
 
-void NMSmodelType::
-muscleDefault (const muscleDefault_type& x)
+void SubjectType::
+mtuDefault (const mtuDefault_type& x)
 {
-  this->muscleDefault_.set (x);
+  this->mtuDefault_.set (x);
 }
 
-void NMSmodelType::
-muscleDefault (::std::auto_ptr< muscleDefault_type > x)
+void SubjectType::
+mtuDefault (::std::auto_ptr< mtuDefault_type > x)
 {
-  this->muscleDefault_.set (x);
+  this->mtuDefault_.set (x);
 }
 
-const NMSmodelType::muscles_type& NMSmodelType::
-muscles () const
+const SubjectType::mtuSet_type& SubjectType::
+mtuSet () const
 {
-  return this->muscles_.get ();
+  return this->mtuSet_.get ();
 }
 
-NMSmodelType::muscles_type& NMSmodelType::
-muscles ()
+SubjectType::mtuSet_type& SubjectType::
+mtuSet ()
 {
-  return this->muscles_.get ();
+  return this->mtuSet_.get ();
 }
 
-void NMSmodelType::
-muscles (const muscles_type& x)
+void SubjectType::
+mtuSet (const mtuSet_type& x)
 {
-  this->muscles_.set (x);
+  this->mtuSet_.set (x);
 }
 
-void NMSmodelType::
-muscles (::std::auto_ptr< muscles_type > x)
+void SubjectType::
+mtuSet (::std::auto_ptr< mtuSet_type > x)
 {
-  this->muscles_.set (x);
+  this->mtuSet_.set (x);
 }
 
-const NMSmodelType::DoFs_type& NMSmodelType::
-DoFs () const
+const SubjectType::dofSet_type& SubjectType::
+dofSet () const
 {
-  return this->DoFs_.get ();
+  return this->dofSet_.get ();
 }
 
-NMSmodelType::DoFs_type& NMSmodelType::
-DoFs ()
+SubjectType::dofSet_type& SubjectType::
+dofSet ()
 {
-  return this->DoFs_.get ();
+  return this->dofSet_.get ();
 }
 
-void NMSmodelType::
-DoFs (const DoFs_type& x)
+void SubjectType::
+dofSet (const dofSet_type& x)
 {
-  this->DoFs_.set (x);
+  this->dofSet_.set (x);
 }
 
-void NMSmodelType::
-DoFs (::std::auto_ptr< DoFs_type > x)
+void SubjectType::
+dofSet (::std::auto_ptr< dofSet_type > x)
 {
-  this->DoFs_.set (x);
+  this->dofSet_.set (x);
+}
+
+const SubjectType::calibrationInfo_type& SubjectType::
+calibrationInfo () const
+{
+  return this->calibrationInfo_.get ();
+}
+
+SubjectType::calibrationInfo_type& SubjectType::
+calibrationInfo ()
+{
+  return this->calibrationInfo_.get ();
+}
+
+void SubjectType::
+calibrationInfo (const calibrationInfo_type& x)
+{
+  this->calibrationInfo_.set (x);
+}
+
+void SubjectType::
+calibrationInfo (::std::auto_ptr< calibrationInfo_type > x)
+{
+  this->calibrationInfo_.set (x);
 }
 
 
 #include <xsd/cxx/xml/dom/parsing-source.hxx>
 
-// MuscleType
+// MTUType
 //
 
-MuscleType::
-MuscleType (const name_type& name,
-            const C1_type& C1,
-            const C2_type& C2,
-            const shapeFactor_type& shapeFactor,
-            const optimalFiberLength_type& optimalFiberLength,
-            const pennationAngle_type& pennationAngle,
-            const tendonSlackLength_type& tendonSlackLength,
-            const maxIsometricForce_type& maxIsometricForce,
-            const strengthCoefficient_type& strengthCoefficient)
+MTUType::
+MTUType (const name_type& name,
+         const c1_type& c1,
+         const c2_type& c2,
+         const shapeFactor_type& shapeFactor,
+         const optimalFibreLength_type& optimalFibreLength,
+         const pennationAngle_type& pennationAngle,
+         const tendonSlackLength_type& tendonSlackLength,
+         const maxIsometricForce_type& maxIsometricForce,
+         const strengthCoefficient_type& strengthCoefficient)
 : ::xml_schema::type (),
   name_ (name, ::xml_schema::flags (), this),
-  C1_ (C1, ::xml_schema::flags (), this),
-  C2_ (C2, ::xml_schema::flags (), this),
+  emDelay_ (::xml_schema::flags (), this),
+  c1_ (c1, ::xml_schema::flags (), this),
+  c2_ (c2, ::xml_schema::flags (), this),
   shapeFactor_ (shapeFactor, ::xml_schema::flags (), this),
-  optimalFiberLength_ (optimalFiberLength, ::xml_schema::flags (), this),
+  optimalFibreLength_ (optimalFibreLength, ::xml_schema::flags (), this),
   pennationAngle_ (pennationAngle, ::xml_schema::flags (), this),
   tendonSlackLength_ (tendonSlackLength, ::xml_schema::flags (), this),
   maxIsometricForce_ (maxIsometricForce, ::xml_schema::flags (), this),
@@ -594,16 +853,17 @@ MuscleType (const name_type& name,
 {
 }
 
-MuscleType::
-MuscleType (const MuscleType& x,
-            ::xml_schema::flags f,
-            ::xml_schema::container* c)
+MTUType::
+MTUType (const MTUType& x,
+         ::xml_schema::flags f,
+         ::xml_schema::container* c)
 : ::xml_schema::type (x, f, c),
   name_ (x.name_, f, this),
-  C1_ (x.C1_, f, this),
-  C2_ (x.C2_, f, this),
+  emDelay_ (x.emDelay_, f, this),
+  c1_ (x.c1_, f, this),
+  c2_ (x.c2_, f, this),
   shapeFactor_ (x.shapeFactor_, f, this),
-  optimalFiberLength_ (x.optimalFiberLength_, f, this),
+  optimalFibreLength_ (x.optimalFibreLength_, f, this),
   pennationAngle_ (x.pennationAngle_, f, this),
   tendonSlackLength_ (x.tendonSlackLength_, f, this),
   maxIsometricForce_ (x.maxIsometricForce_, f, this),
@@ -611,16 +871,17 @@ MuscleType (const MuscleType& x,
 {
 }
 
-MuscleType::
-MuscleType (const ::xercesc::DOMElement& e,
-            ::xml_schema::flags f,
-            ::xml_schema::container* c)
+MTUType::
+MTUType (const ::xercesc::DOMElement& e,
+         ::xml_schema::flags f,
+         ::xml_schema::container* c)
 : ::xml_schema::type (e, f | ::xml_schema::flags::base, c),
   name_ (f, this),
-  C1_ (f, this),
-  C2_ (f, this),
+  emDelay_ (f, this),
+  c1_ (f, this),
+  c2_ (f, this),
   shapeFactor_ (f, this),
-  optimalFiberLength_ (f, this),
+  optimalFibreLength_ (f, this),
   pennationAngle_ (f, this),
   tendonSlackLength_ (f, this),
   maxIsometricForce_ (f, this),
@@ -633,7 +894,7 @@ MuscleType (const ::xercesc::DOMElement& e,
   }
 }
 
-void MuscleType::
+void MTUType::
 parse (::xsd::cxx::xml::dom::parser< char >& p,
        ::xml_schema::flags f)
 {
@@ -657,24 +918,35 @@ parse (::xsd::cxx::xml::dom::parser< char >& p,
       }
     }
 
-    // C1
+    // emDelay
     //
-    if (n.name () == "C1" && n.namespace_ ().empty ())
+    if (n.name () == "emDelay" && n.namespace_ ().empty ())
     {
-      if (!C1_.present ())
+      if (!this->emDelay_)
       {
-        this->C1_.set (C1_traits::create (i, f, this));
+        this->emDelay_.set (emDelay_traits::create (i, f, this));
         continue;
       }
     }
 
-    // C2
+    // c1
     //
-    if (n.name () == "C2" && n.namespace_ ().empty ())
+    if (n.name () == "c1" && n.namespace_ ().empty ())
     {
-      if (!C2_.present ())
+      if (!c1_.present ())
       {
-        this->C2_.set (C2_traits::create (i, f, this));
+        this->c1_.set (c1_traits::create (i, f, this));
+        continue;
+      }
+    }
+
+    // c2
+    //
+    if (n.name () == "c2" && n.namespace_ ().empty ())
+    {
+      if (!c2_.present ())
+      {
+        this->c2_.set (c2_traits::create (i, f, this));
         continue;
       }
     }
@@ -690,13 +962,13 @@ parse (::xsd::cxx::xml::dom::parser< char >& p,
       }
     }
 
-    // optimalFiberLength
+    // optimalFibreLength
     //
-    if (n.name () == "optimalFiberLength" && n.namespace_ ().empty ())
+    if (n.name () == "optimalFibreLength" && n.namespace_ ().empty ())
     {
-      if (!optimalFiberLength_.present ())
+      if (!optimalFibreLength_.present ())
       {
-        this->optimalFiberLength_.set (optimalFiberLength_traits::create (i, f, this));
+        this->optimalFibreLength_.set (optimalFibreLength_traits::create (i, f, this));
         continue;
       }
     }
@@ -755,17 +1027,17 @@ parse (::xsd::cxx::xml::dom::parser< char >& p,
       "");
   }
 
-  if (!C1_.present ())
+  if (!c1_.present ())
   {
     throw ::xsd::cxx::tree::expected_element< char > (
-      "C1",
+      "c1",
       "");
   }
 
-  if (!C2_.present ())
+  if (!c2_.present ())
   {
     throw ::xsd::cxx::tree::expected_element< char > (
-      "C2",
+      "c2",
       "");
   }
 
@@ -776,10 +1048,10 @@ parse (::xsd::cxx::xml::dom::parser< char >& p,
       "");
   }
 
-  if (!optimalFiberLength_.present ())
+  if (!optimalFibreLength_.present ())
   {
     throw ::xsd::cxx::tree::expected_element< char > (
-      "optimalFiberLength",
+      "optimalFibreLength",
       "");
   }
 
@@ -812,43 +1084,43 @@ parse (::xsd::cxx::xml::dom::parser< char >& p,
   }
 }
 
-MuscleType* MuscleType::
+MTUType* MTUType::
 _clone (::xml_schema::flags f,
         ::xml_schema::container* c) const
 {
-  return new class MuscleType (*this, f, c);
+  return new class MTUType (*this, f, c);
 }
 
-MuscleType::
-~MuscleType ()
+MTUType::
+~MTUType ()
 {
 }
 
-// MusclesType
+// MTUSetType
 //
 
-MusclesType::
-MusclesType ()
+MTUSetType::
+MTUSetType ()
 : ::xml_schema::type (),
-  muscle_ (::xml_schema::flags (), this)
+  mtu_ (::xml_schema::flags (), this)
 {
 }
 
-MusclesType::
-MusclesType (const MusclesType& x,
-             ::xml_schema::flags f,
-             ::xml_schema::container* c)
+MTUSetType::
+MTUSetType (const MTUSetType& x,
+            ::xml_schema::flags f,
+            ::xml_schema::container* c)
 : ::xml_schema::type (x, f, c),
-  muscle_ (x.muscle_, f, this)
+  mtu_ (x.mtu_, f, this)
 {
 }
 
-MusclesType::
-MusclesType (const ::xercesc::DOMElement& e,
-             ::xml_schema::flags f,
-             ::xml_schema::container* c)
+MTUSetType::
+MTUSetType (const ::xercesc::DOMElement& e,
+            ::xml_schema::flags f,
+            ::xml_schema::container* c)
 : ::xml_schema::type (e, f | ::xml_schema::flags::base, c),
-  muscle_ (f, this)
+  mtu_ (f, this)
 {
   if ((f & ::xml_schema::flags::base) == 0)
   {
@@ -857,7 +1129,7 @@ MusclesType (const ::xercesc::DOMElement& e,
   }
 }
 
-void MusclesType::
+void MTUSetType::
 parse (::xsd::cxx::xml::dom::parser< char >& p,
        ::xml_schema::flags f)
 {
@@ -867,14 +1139,14 @@ parse (::xsd::cxx::xml::dom::parser< char >& p,
     const ::xsd::cxx::xml::qualified_name< char > n (
       ::xsd::cxx::xml::dom::name< char > (i));
 
-    // muscle
+    // mtu
     //
-    if (n.name () == "muscle" && n.namespace_ ().empty ())
+    if (n.name () == "mtu" && n.namespace_ ().empty ())
     {
-      ::std::auto_ptr< muscle_type > r (
-        muscle_traits::create (i, f, this));
+      ::std::auto_ptr< mtu_type > r (
+        mtu_traits::create (i, f, this));
 
-      this->muscle_.push_back (r);
+      this->mtu_.push_back (r);
       continue;
     }
 
@@ -882,58 +1154,58 @@ parse (::xsd::cxx::xml::dom::parser< char >& p,
   }
 }
 
-MusclesType* MusclesType::
+MTUSetType* MTUSetType::
 _clone (::xml_schema::flags f,
         ::xml_schema::container* c) const
 {
-  return new class MusclesType (*this, f, c);
+  return new class MTUSetType (*this, f, c);
 }
 
-MusclesType::
-~MusclesType ()
+MTUSetType::
+~MTUSetType ()
 {
 }
 
-// MuscleSequenceType
+// MTUNameSetType
 //
 
-MuscleSequenceType::
-MuscleSequenceType (const ::xercesc::DOMElement& e,
-                    ::xml_schema::flags f,
-                    ::xml_schema::container* c)
+MTUNameSetType::
+MTUNameSetType (const ::xercesc::DOMElement& e,
+                ::xml_schema::flags f,
+                ::xml_schema::container* c)
 : ::xml_schema::simple_type (e, f, c),
   ::xsd::cxx::tree::list< ::xml_schema::string, char > (e, f, this)
 {
 }
 
-MuscleSequenceType::
-MuscleSequenceType (const ::xercesc::DOMAttr& a,
-                    ::xml_schema::flags f,
-                    ::xml_schema::container* c)
+MTUNameSetType::
+MTUNameSetType (const ::xercesc::DOMAttr& a,
+                ::xml_schema::flags f,
+                ::xml_schema::container* c)
 : ::xml_schema::simple_type (a, f, c),
   ::xsd::cxx::tree::list< ::xml_schema::string, char > (a, f, this)
 {
 }
 
-MuscleSequenceType::
-MuscleSequenceType (const ::std::string& s,
-                    const ::xercesc::DOMElement* e,
-                    ::xml_schema::flags f,
-                    ::xml_schema::container* c)
+MTUNameSetType::
+MTUNameSetType (const ::std::string& s,
+                const ::xercesc::DOMElement* e,
+                ::xml_schema::flags f,
+                ::xml_schema::container* c)
 : ::xml_schema::simple_type (s, e, f, c),
   ::xsd::cxx::tree::list< ::xml_schema::string, char > (s, e, f, this)
 {
 }
 
-MuscleSequenceType* MuscleSequenceType::
+MTUNameSetType* MTUNameSetType::
 _clone (::xml_schema::flags f,
         ::xml_schema::container* c) const
 {
-  return new class MuscleSequenceType (*this, f, c);
+  return new class MTUNameSetType (*this, f, c);
 }
 
-MuscleSequenceType::
-~MuscleSequenceType ()
+MTUNameSetType::
+~MTUNameSetType ()
 {
 }
 
@@ -942,10 +1214,10 @@ MuscleSequenceType::
 
 DoFType::
 DoFType (const name_type& name,
-         const muscleSequence_type& muscleSequence)
+         const mtuNameSet_type& mtuNameSet)
 : ::xml_schema::type (),
   name_ (name, ::xml_schema::flags (), this),
-  muscleSequence_ (muscleSequence, ::xml_schema::flags (), this)
+  mtuNameSet_ (mtuNameSet, ::xml_schema::flags (), this)
 {
 }
 
@@ -955,7 +1227,7 @@ DoFType (const DoFType& x,
          ::xml_schema::container* c)
 : ::xml_schema::type (x, f, c),
   name_ (x.name_, f, this),
-  muscleSequence_ (x.muscleSequence_, f, this)
+  mtuNameSet_ (x.mtuNameSet_, f, this)
 {
 }
 
@@ -965,7 +1237,7 @@ DoFType (const ::xercesc::DOMElement& e,
          ::xml_schema::container* c)
 : ::xml_schema::type (e, f | ::xml_schema::flags::base, c),
   name_ (f, this),
-  muscleSequence_ (f, this)
+  mtuNameSet_ (f, this)
 {
   if ((f & ::xml_schema::flags::base) == 0)
   {
@@ -998,16 +1270,16 @@ parse (::xsd::cxx::xml::dom::parser< char >& p,
       }
     }
 
-    // muscleSequence
+    // mtuNameSet
     //
-    if (n.name () == "muscleSequence" && n.namespace_ ().empty ())
+    if (n.name () == "mtuNameSet" && n.namespace_ ().empty ())
     {
-      ::std::auto_ptr< muscleSequence_type > r (
-        muscleSequence_traits::create (i, f, this));
+      ::std::auto_ptr< mtuNameSet_type > r (
+        mtuNameSet_traits::create (i, f, this));
 
-      if (!muscleSequence_.present ())
+      if (!mtuNameSet_.present ())
       {
-        this->muscleSequence_.set (r);
+        this->mtuNameSet_.set (r);
         continue;
       }
     }
@@ -1022,10 +1294,10 @@ parse (::xsd::cxx::xml::dom::parser< char >& p,
       "");
   }
 
-  if (!muscleSequence_.present ())
+  if (!mtuNameSet_.present ())
   {
     throw ::xsd::cxx::tree::expected_element< char > (
-      "muscleSequence",
+      "mtuNameSet",
       "");
   }
 }
@@ -1042,31 +1314,78 @@ DoFType::
 {
 }
 
-// DoFsType
+// CalibrationSequenceType
 //
 
-DoFsType::
-DoFsType ()
+CalibrationSequenceType::
+CalibrationSequenceType (const ::xercesc::DOMElement& e,
+                         ::xml_schema::flags f,
+                         ::xml_schema::container* c)
+: ::xml_schema::simple_type (e, f, c),
+  ::xsd::cxx::tree::list< ::xml_schema::string, char > (e, f, this)
+{
+}
+
+CalibrationSequenceType::
+CalibrationSequenceType (const ::xercesc::DOMAttr& a,
+                         ::xml_schema::flags f,
+                         ::xml_schema::container* c)
+: ::xml_schema::simple_type (a, f, c),
+  ::xsd::cxx::tree::list< ::xml_schema::string, char > (a, f, this)
+{
+}
+
+CalibrationSequenceType::
+CalibrationSequenceType (const ::std::string& s,
+                         const ::xercesc::DOMElement* e,
+                         ::xml_schema::flags f,
+                         ::xml_schema::container* c)
+: ::xml_schema::simple_type (s, e, f, c),
+  ::xsd::cxx::tree::list< ::xml_schema::string, char > (s, e, f, this)
+{
+}
+
+CalibrationSequenceType* CalibrationSequenceType::
+_clone (::xml_schema::flags f,
+        ::xml_schema::container* c) const
+{
+  return new class CalibrationSequenceType (*this, f, c);
+}
+
+CalibrationSequenceType::
+~CalibrationSequenceType ()
+{
+}
+
+// CalibratedType
+//
+
+CalibratedType::
+CalibratedType (const startSubjectFile_type& startSubjectFile,
+                const calibrationSequence_type& calibrationSequence)
 : ::xml_schema::type (),
-  DoF_ (::xml_schema::flags (), this)
+  startSubjectFile_ (startSubjectFile, ::xml_schema::flags (), this),
+  calibrationSequence_ (calibrationSequence, ::xml_schema::flags (), this)
 {
 }
 
-DoFsType::
-DoFsType (const DoFsType& x,
-          ::xml_schema::flags f,
-          ::xml_schema::container* c)
+CalibratedType::
+CalibratedType (const CalibratedType& x,
+                ::xml_schema::flags f,
+                ::xml_schema::container* c)
 : ::xml_schema::type (x, f, c),
-  DoF_ (x.DoF_, f, this)
+  startSubjectFile_ (x.startSubjectFile_, f, this),
+  calibrationSequence_ (x.calibrationSequence_, f, this)
 {
 }
 
-DoFsType::
-DoFsType (const ::xercesc::DOMElement& e,
-          ::xml_schema::flags f,
-          ::xml_schema::container* c)
+CalibratedType::
+CalibratedType (const ::xercesc::DOMElement& e,
+                ::xml_schema::flags f,
+                ::xml_schema::container* c)
 : ::xml_schema::type (e, f | ::xml_schema::flags::base, c),
-  DoF_ (f, this)
+  startSubjectFile_ (f, this),
+  calibrationSequence_ (f, this)
 {
   if ((f & ::xml_schema::flags::base) == 0)
   {
@@ -1075,7 +1394,7 @@ DoFsType (const ::xercesc::DOMElement& e,
   }
 }
 
-void DoFsType::
+void CalibratedType::
 parse (::xsd::cxx::xml::dom::parser< char >& p,
        ::xml_schema::flags f)
 {
@@ -1085,14 +1404,310 @@ parse (::xsd::cxx::xml::dom::parser< char >& p,
     const ::xsd::cxx::xml::qualified_name< char > n (
       ::xsd::cxx::xml::dom::name< char > (i));
 
-    // DoF
+    // startSubjectFile
     //
-    if (n.name () == "DoF" && n.namespace_ ().empty ())
+    if (n.name () == "startSubjectFile" && n.namespace_ ().empty ())
     {
-      ::std::auto_ptr< DoF_type > r (
-        DoF_traits::create (i, f, this));
+      ::std::auto_ptr< startSubjectFile_type > r (
+        startSubjectFile_traits::create (i, f, this));
 
-      this->DoF_.push_back (r);
+      if (!startSubjectFile_.present ())
+      {
+        this->startSubjectFile_.set (r);
+        continue;
+      }
+    }
+
+    // calibrationSequence
+    //
+    if (n.name () == "calibrationSequence" && n.namespace_ ().empty ())
+    {
+      ::std::auto_ptr< calibrationSequence_type > r (
+        calibrationSequence_traits::create (i, f, this));
+
+      if (!calibrationSequence_.present ())
+      {
+        this->calibrationSequence_.set (r);
+        continue;
+      }
+    }
+
+    break;
+  }
+
+  if (!startSubjectFile_.present ())
+  {
+    throw ::xsd::cxx::tree::expected_element< char > (
+      "startSubjectFile",
+      "");
+  }
+
+  if (!calibrationSequence_.present ())
+  {
+    throw ::xsd::cxx::tree::expected_element< char > (
+      "calibrationSequence",
+      "");
+  }
+}
+
+CalibratedType* CalibratedType::
+_clone (::xml_schema::flags f,
+        ::xml_schema::container* c) const
+{
+  return new class CalibratedType (*this, f, c);
+}
+
+CalibratedType::
+~CalibratedType ()
+{
+}
+
+// UncalibratedType
+//
+
+UncalibratedType::
+UncalibratedType (const subjectID_type& subjectID,
+                  const additionalInfo_type& additionalInfo)
+: ::xml_schema::type (),
+  subjectID_ (subjectID, ::xml_schema::flags (), this),
+  additionalInfo_ (additionalInfo, ::xml_schema::flags (), this)
+{
+}
+
+UncalibratedType::
+UncalibratedType (const UncalibratedType& x,
+                  ::xml_schema::flags f,
+                  ::xml_schema::container* c)
+: ::xml_schema::type (x, f, c),
+  subjectID_ (x.subjectID_, f, this),
+  additionalInfo_ (x.additionalInfo_, f, this)
+{
+}
+
+UncalibratedType::
+UncalibratedType (const ::xercesc::DOMElement& e,
+                  ::xml_schema::flags f,
+                  ::xml_schema::container* c)
+: ::xml_schema::type (e, f | ::xml_schema::flags::base, c),
+  subjectID_ (f, this),
+  additionalInfo_ (f, this)
+{
+  if ((f & ::xml_schema::flags::base) == 0)
+  {
+    ::xsd::cxx::xml::dom::parser< char > p (e, true, false);
+    this->parse (p, f);
+  }
+}
+
+void UncalibratedType::
+parse (::xsd::cxx::xml::dom::parser< char >& p,
+       ::xml_schema::flags f)
+{
+  for (; p.more_elements (); p.next_element ())
+  {
+    const ::xercesc::DOMElement& i (p.cur_element ());
+    const ::xsd::cxx::xml::qualified_name< char > n (
+      ::xsd::cxx::xml::dom::name< char > (i));
+
+    // subjectID
+    //
+    if (n.name () == "subjectID" && n.namespace_ ().empty ())
+    {
+      ::std::auto_ptr< subjectID_type > r (
+        subjectID_traits::create (i, f, this));
+
+      if (!subjectID_.present ())
+      {
+        this->subjectID_.set (r);
+        continue;
+      }
+    }
+
+    // additionalInfo
+    //
+    if (n.name () == "additionalInfo" && n.namespace_ ().empty ())
+    {
+      ::std::auto_ptr< additionalInfo_type > r (
+        additionalInfo_traits::create (i, f, this));
+
+      if (!additionalInfo_.present ())
+      {
+        this->additionalInfo_.set (r);
+        continue;
+      }
+    }
+
+    break;
+  }
+
+  if (!subjectID_.present ())
+  {
+    throw ::xsd::cxx::tree::expected_element< char > (
+      "subjectID",
+      "");
+  }
+
+  if (!additionalInfo_.present ())
+  {
+    throw ::xsd::cxx::tree::expected_element< char > (
+      "additionalInfo",
+      "");
+  }
+}
+
+UncalibratedType* UncalibratedType::
+_clone (::xml_schema::flags f,
+        ::xml_schema::container* c) const
+{
+  return new class UncalibratedType (*this, f, c);
+}
+
+UncalibratedType::
+~UncalibratedType ()
+{
+}
+
+// CalibrationInfoType
+//
+
+CalibrationInfoType::
+CalibrationInfoType ()
+: ::xml_schema::type (),
+  uncalibrated_ (::xml_schema::flags (), this),
+  calibrated_ (::xml_schema::flags (), this)
+{
+}
+
+CalibrationInfoType::
+CalibrationInfoType (const CalibrationInfoType& x,
+                     ::xml_schema::flags f,
+                     ::xml_schema::container* c)
+: ::xml_schema::type (x, f, c),
+  uncalibrated_ (x.uncalibrated_, f, this),
+  calibrated_ (x.calibrated_, f, this)
+{
+}
+
+CalibrationInfoType::
+CalibrationInfoType (const ::xercesc::DOMElement& e,
+                     ::xml_schema::flags f,
+                     ::xml_schema::container* c)
+: ::xml_schema::type (e, f | ::xml_schema::flags::base, c),
+  uncalibrated_ (f, this),
+  calibrated_ (f, this)
+{
+  if ((f & ::xml_schema::flags::base) == 0)
+  {
+    ::xsd::cxx::xml::dom::parser< char > p (e, true, false);
+    this->parse (p, f);
+  }
+}
+
+void CalibrationInfoType::
+parse (::xsd::cxx::xml::dom::parser< char >& p,
+       ::xml_schema::flags f)
+{
+  for (; p.more_elements (); p.next_element ())
+  {
+    const ::xercesc::DOMElement& i (p.cur_element ());
+    const ::xsd::cxx::xml::qualified_name< char > n (
+      ::xsd::cxx::xml::dom::name< char > (i));
+
+    // uncalibrated
+    //
+    if (n.name () == "uncalibrated" && n.namespace_ ().empty ())
+    {
+      ::std::auto_ptr< uncalibrated_type > r (
+        uncalibrated_traits::create (i, f, this));
+
+      if (!this->uncalibrated_)
+      {
+        this->uncalibrated_.set (r);
+        continue;
+      }
+    }
+
+    // calibrated
+    //
+    if (n.name () == "calibrated" && n.namespace_ ().empty ())
+    {
+      ::std::auto_ptr< calibrated_type > r (
+        calibrated_traits::create (i, f, this));
+
+      if (!this->calibrated_)
+      {
+        this->calibrated_.set (r);
+        continue;
+      }
+    }
+
+    break;
+  }
+}
+
+CalibrationInfoType* CalibrationInfoType::
+_clone (::xml_schema::flags f,
+        ::xml_schema::container* c) const
+{
+  return new class CalibrationInfoType (*this, f, c);
+}
+
+CalibrationInfoType::
+~CalibrationInfoType ()
+{
+}
+
+// DoFSetType
+//
+
+DoFSetType::
+DoFSetType ()
+: ::xml_schema::type (),
+  dof_ (::xml_schema::flags (), this)
+{
+}
+
+DoFSetType::
+DoFSetType (const DoFSetType& x,
+            ::xml_schema::flags f,
+            ::xml_schema::container* c)
+: ::xml_schema::type (x, f, c),
+  dof_ (x.dof_, f, this)
+{
+}
+
+DoFSetType::
+DoFSetType (const ::xercesc::DOMElement& e,
+            ::xml_schema::flags f,
+            ::xml_schema::container* c)
+: ::xml_schema::type (e, f | ::xml_schema::flags::base, c),
+  dof_ (f, this)
+{
+  if ((f & ::xml_schema::flags::base) == 0)
+  {
+    ::xsd::cxx::xml::dom::parser< char > p (e, true, false);
+    this->parse (p, f);
+  }
+}
+
+void DoFSetType::
+parse (::xsd::cxx::xml::dom::parser< char >& p,
+       ::xml_schema::flags f)
+{
+  for (; p.more_elements (); p.next_element ())
+  {
+    const ::xercesc::DOMElement& i (p.cur_element ());
+    const ::xsd::cxx::xml::qualified_name< char > n (
+      ::xsd::cxx::xml::dom::name< char > (i));
+
+    // dof
+    //
+    if (n.name () == "dof" && n.namespace_ ().empty ())
+    {
+      ::std::auto_ptr< dof_type > r (
+        dof_traits::create (i, f, this));
+
+      this->dof_.push_back (r);
       continue;
     }
 
@@ -1100,15 +1715,15 @@ parse (::xsd::cxx::xml::dom::parser< char >& p,
   }
 }
 
-DoFsType* DoFsType::
+DoFSetType* DoFSetType::
 _clone (::xml_schema::flags f,
         ::xml_schema::container* c) const
 {
-  return new class DoFsType (*this, f, c);
+  return new class DoFSetType (*this, f, c);
 }
 
-DoFsType::
-~DoFsType ()
+DoFSetType::
+~DoFSetType ()
 {
 }
 
@@ -1285,38 +1900,42 @@ CurveType::
 {
 }
 
-// MuscleDefaultType
+// MTUDefaultType
 //
 
-MuscleDefaultType::
-MuscleDefaultType (const percentageChange_type& percentageChange,
-                   const damping_type& damping)
+MTUDefaultType::
+MTUDefaultType (const emDelay_type& emDelay,
+                const percentageChange_type& percentageChange,
+                const damping_type& damping)
 : ::xml_schema::type (),
+  emDelay_ (emDelay, ::xml_schema::flags (), this),
   percentageChange_ (percentageChange, ::xml_schema::flags (), this),
   damping_ (damping, ::xml_schema::flags (), this),
-  Curve_ (::xml_schema::flags (), this)
+  curve_ (::xml_schema::flags (), this)
 {
 }
 
-MuscleDefaultType::
-MuscleDefaultType (const MuscleDefaultType& x,
-                   ::xml_schema::flags f,
-                   ::xml_schema::container* c)
+MTUDefaultType::
+MTUDefaultType (const MTUDefaultType& x,
+                ::xml_schema::flags f,
+                ::xml_schema::container* c)
 : ::xml_schema::type (x, f, c),
+  emDelay_ (x.emDelay_, f, this),
   percentageChange_ (x.percentageChange_, f, this),
   damping_ (x.damping_, f, this),
-  Curve_ (x.Curve_, f, this)
+  curve_ (x.curve_, f, this)
 {
 }
 
-MuscleDefaultType::
-MuscleDefaultType (const ::xercesc::DOMElement& e,
-                   ::xml_schema::flags f,
-                   ::xml_schema::container* c)
+MTUDefaultType::
+MTUDefaultType (const ::xercesc::DOMElement& e,
+                ::xml_schema::flags f,
+                ::xml_schema::container* c)
 : ::xml_schema::type (e, f | ::xml_schema::flags::base, c),
+  emDelay_ (f, this),
   percentageChange_ (f, this),
   damping_ (f, this),
-  Curve_ (f, this)
+  curve_ (f, this)
 {
   if ((f & ::xml_schema::flags::base) == 0)
   {
@@ -1325,7 +1944,7 @@ MuscleDefaultType (const ::xercesc::DOMElement& e,
   }
 }
 
-void MuscleDefaultType::
+void MTUDefaultType::
 parse (::xsd::cxx::xml::dom::parser< char >& p,
        ::xml_schema::flags f)
 {
@@ -1334,6 +1953,17 @@ parse (::xsd::cxx::xml::dom::parser< char >& p,
     const ::xercesc::DOMElement& i (p.cur_element ());
     const ::xsd::cxx::xml::qualified_name< char > n (
       ::xsd::cxx::xml::dom::name< char > (i));
+
+    // emDelay
+    //
+    if (n.name () == "emDelay" && n.namespace_ ().empty ())
+    {
+      if (!emDelay_.present ())
+      {
+        this->emDelay_.set (emDelay_traits::create (i, f, this));
+        continue;
+      }
+    }
 
     // percentageChange
     //
@@ -1357,18 +1987,25 @@ parse (::xsd::cxx::xml::dom::parser< char >& p,
       }
     }
 
-    // Curve
+    // curve
     //
-    if (n.name () == "Curve" && n.namespace_ ().empty ())
+    if (n.name () == "curve" && n.namespace_ ().empty ())
     {
-      ::std::auto_ptr< Curve_type > r (
-        Curve_traits::create (i, f, this));
+      ::std::auto_ptr< curve_type > r (
+        curve_traits::create (i, f, this));
 
-      this->Curve_.push_back (r);
+      this->curve_.push_back (r);
       continue;
     }
 
     break;
+  }
+
+  if (!emDelay_.present ())
+  {
+    throw ::xsd::cxx::tree::expected_element< char > (
+      "emDelay",
+      "");
   }
 
   if (!percentageChange_.present ())
@@ -1386,62 +2023,68 @@ parse (::xsd::cxx::xml::dom::parser< char >& p,
   }
 }
 
-MuscleDefaultType* MuscleDefaultType::
+MTUDefaultType* MTUDefaultType::
 _clone (::xml_schema::flags f,
         ::xml_schema::container* c) const
 {
-  return new class MuscleDefaultType (*this, f, c);
+  return new class MTUDefaultType (*this, f, c);
 }
 
-MuscleDefaultType::
-~MuscleDefaultType ()
+MTUDefaultType::
+~MTUDefaultType ()
 {
 }
 
-// NMSmodelType
+// SubjectType
 //
 
-NMSmodelType::
-NMSmodelType (const muscleDefault_type& muscleDefault,
-              const muscles_type& muscles,
-              const DoFs_type& DoFs)
+SubjectType::
+SubjectType (const mtuDefault_type& mtuDefault,
+             const mtuSet_type& mtuSet,
+             const dofSet_type& dofSet,
+             const calibrationInfo_type& calibrationInfo)
 : ::xml_schema::type (),
-  muscleDefault_ (muscleDefault, ::xml_schema::flags (), this),
-  muscles_ (muscles, ::xml_schema::flags (), this),
-  DoFs_ (DoFs, ::xml_schema::flags (), this)
+  mtuDefault_ (mtuDefault, ::xml_schema::flags (), this),
+  mtuSet_ (mtuSet, ::xml_schema::flags (), this),
+  dofSet_ (dofSet, ::xml_schema::flags (), this),
+  calibrationInfo_ (calibrationInfo, ::xml_schema::flags (), this)
 {
 }
 
-NMSmodelType::
-NMSmodelType (::std::auto_ptr< muscleDefault_type >& muscleDefault,
-              ::std::auto_ptr< muscles_type >& muscles,
-              ::std::auto_ptr< DoFs_type >& DoFs)
+SubjectType::
+SubjectType (::std::auto_ptr< mtuDefault_type >& mtuDefault,
+             ::std::auto_ptr< mtuSet_type >& mtuSet,
+             ::std::auto_ptr< dofSet_type >& dofSet,
+             ::std::auto_ptr< calibrationInfo_type >& calibrationInfo)
 : ::xml_schema::type (),
-  muscleDefault_ (muscleDefault, ::xml_schema::flags (), this),
-  muscles_ (muscles, ::xml_schema::flags (), this),
-  DoFs_ (DoFs, ::xml_schema::flags (), this)
+  mtuDefault_ (mtuDefault, ::xml_schema::flags (), this),
+  mtuSet_ (mtuSet, ::xml_schema::flags (), this),
+  dofSet_ (dofSet, ::xml_schema::flags (), this),
+  calibrationInfo_ (calibrationInfo, ::xml_schema::flags (), this)
 {
 }
 
-NMSmodelType::
-NMSmodelType (const NMSmodelType& x,
-              ::xml_schema::flags f,
-              ::xml_schema::container* c)
+SubjectType::
+SubjectType (const SubjectType& x,
+             ::xml_schema::flags f,
+             ::xml_schema::container* c)
 : ::xml_schema::type (x, f, c),
-  muscleDefault_ (x.muscleDefault_, f, this),
-  muscles_ (x.muscles_, f, this),
-  DoFs_ (x.DoFs_, f, this)
+  mtuDefault_ (x.mtuDefault_, f, this),
+  mtuSet_ (x.mtuSet_, f, this),
+  dofSet_ (x.dofSet_, f, this),
+  calibrationInfo_ (x.calibrationInfo_, f, this)
 {
 }
 
-NMSmodelType::
-NMSmodelType (const ::xercesc::DOMElement& e,
-              ::xml_schema::flags f,
-              ::xml_schema::container* c)
+SubjectType::
+SubjectType (const ::xercesc::DOMElement& e,
+             ::xml_schema::flags f,
+             ::xml_schema::container* c)
 : ::xml_schema::type (e, f | ::xml_schema::flags::base, c),
-  muscleDefault_ (f, this),
-  muscles_ (f, this),
-  DoFs_ (f, this)
+  mtuDefault_ (f, this),
+  mtuSet_ (f, this),
+  dofSet_ (f, this),
+  calibrationInfo_ (f, this)
 {
   if ((f & ::xml_schema::flags::base) == 0)
   {
@@ -1450,7 +2093,7 @@ NMSmodelType (const ::xercesc::DOMElement& e,
   }
 }
 
-void NMSmodelType::
+void SubjectType::
 parse (::xsd::cxx::xml::dom::parser< char >& p,
        ::xml_schema::flags f)
 {
@@ -1460,44 +2103,58 @@ parse (::xsd::cxx::xml::dom::parser< char >& p,
     const ::xsd::cxx::xml::qualified_name< char > n (
       ::xsd::cxx::xml::dom::name< char > (i));
 
-    // muscleDefault
+    // mtuDefault
     //
-    if (n.name () == "muscleDefault" && n.namespace_ ().empty ())
+    if (n.name () == "mtuDefault" && n.namespace_ ().empty ())
     {
-      ::std::auto_ptr< muscleDefault_type > r (
-        muscleDefault_traits::create (i, f, this));
+      ::std::auto_ptr< mtuDefault_type > r (
+        mtuDefault_traits::create (i, f, this));
 
-      if (!muscleDefault_.present ())
+      if (!mtuDefault_.present ())
       {
-        this->muscleDefault_.set (r);
+        this->mtuDefault_.set (r);
         continue;
       }
     }
 
-    // muscles
+    // mtuSet
     //
-    if (n.name () == "muscles" && n.namespace_ ().empty ())
+    if (n.name () == "mtuSet" && n.namespace_ ().empty ())
     {
-      ::std::auto_ptr< muscles_type > r (
-        muscles_traits::create (i, f, this));
+      ::std::auto_ptr< mtuSet_type > r (
+        mtuSet_traits::create (i, f, this));
 
-      if (!muscles_.present ())
+      if (!mtuSet_.present ())
       {
-        this->muscles_.set (r);
+        this->mtuSet_.set (r);
         continue;
       }
     }
 
-    // DoFs
+    // dofSet
     //
-    if (n.name () == "DoFs" && n.namespace_ ().empty ())
+    if (n.name () == "dofSet" && n.namespace_ ().empty ())
     {
-      ::std::auto_ptr< DoFs_type > r (
-        DoFs_traits::create (i, f, this));
+      ::std::auto_ptr< dofSet_type > r (
+        dofSet_traits::create (i, f, this));
 
-      if (!DoFs_.present ())
+      if (!dofSet_.present ())
       {
-        this->DoFs_.set (r);
+        this->dofSet_.set (r);
+        continue;
+      }
+    }
+
+    // calibrationInfo
+    //
+    if (n.name () == "calibrationInfo" && n.namespace_ ().empty ())
+    {
+      ::std::auto_ptr< calibrationInfo_type > r (
+        calibrationInfo_traits::create (i, f, this));
+
+      if (!calibrationInfo_.present ())
+      {
+        this->calibrationInfo_.set (r);
         continue;
       }
     }
@@ -1505,37 +2162,44 @@ parse (::xsd::cxx::xml::dom::parser< char >& p,
     break;
   }
 
-  if (!muscleDefault_.present ())
+  if (!mtuDefault_.present ())
   {
     throw ::xsd::cxx::tree::expected_element< char > (
-      "muscleDefault",
+      "mtuDefault",
       "");
   }
 
-  if (!muscles_.present ())
+  if (!mtuSet_.present ())
   {
     throw ::xsd::cxx::tree::expected_element< char > (
-      "muscles",
+      "mtuSet",
       "");
   }
 
-  if (!DoFs_.present ())
+  if (!dofSet_.present ())
   {
     throw ::xsd::cxx::tree::expected_element< char > (
-      "DoFs",
+      "dofSet",
+      "");
+  }
+
+  if (!calibrationInfo_.present ())
+  {
+    throw ::xsd::cxx::tree::expected_element< char > (
+      "calibrationInfo",
       "");
   }
 }
 
-NMSmodelType* NMSmodelType::
+SubjectType* SubjectType::
 _clone (::xml_schema::flags f,
         ::xml_schema::container* c) const
 {
-  return new class NMSmodelType (*this, f, c);
+  return new class SubjectType (*this, f, c);
 }
 
-NMSmodelType::
-~NMSmodelType ()
+SubjectType::
+~SubjectType ()
 {
 }
 
@@ -1543,7 +2207,7 @@ NMSmodelType::
 #include <xsd/cxx/xml/sax/std-input-source.hxx>
 #include <xsd/cxx/tree/error-handler.hxx>
 
-::std::auto_ptr< ::NMSmodelType >
+::std::auto_ptr< ::SubjectType >
 subject (const ::std::string& u,
          ::xml_schema::flags f,
          const ::xml_schema::properties& p)
@@ -1560,14 +2224,14 @@ subject (const ::std::string& u,
 
   h.throw_if_failed< ::xsd::cxx::tree::parsing< char > > ();
 
-  ::std::auto_ptr< ::NMSmodelType > r (
+  ::std::auto_ptr< ::SubjectType > r (
     ::subject (
       d, f | ::xml_schema::flags::own_dom, p));
 
   return r;
 }
 
-::std::auto_ptr< ::NMSmodelType >
+::std::auto_ptr< ::SubjectType >
 subject (const ::std::string& u,
          ::xml_schema::error_handler& h,
          ::xml_schema::flags f,
@@ -1584,14 +2248,14 @@ subject (const ::std::string& u,
   if (!d.get ())
     throw ::xsd::cxx::tree::parsing< char > ();
 
-  ::std::auto_ptr< ::NMSmodelType > r (
+  ::std::auto_ptr< ::SubjectType > r (
     ::subject (
       d, f | ::xml_schema::flags::own_dom, p));
 
   return r;
 }
 
-::std::auto_ptr< ::NMSmodelType >
+::std::auto_ptr< ::SubjectType >
 subject (const ::std::string& u,
          ::xercesc::DOMErrorHandler& h,
          ::xml_schema::flags f,
@@ -1604,14 +2268,14 @@ subject (const ::std::string& u,
   if (!d.get ())
     throw ::xsd::cxx::tree::parsing< char > ();
 
-  ::std::auto_ptr< ::NMSmodelType > r (
+  ::std::auto_ptr< ::SubjectType > r (
     ::subject (
       d, f | ::xml_schema::flags::own_dom, p));
 
   return r;
 }
 
-::std::auto_ptr< ::NMSmodelType >
+::std::auto_ptr< ::SubjectType >
 subject (::std::istream& is,
          ::xml_schema::flags f,
          const ::xml_schema::properties& p)
@@ -1624,7 +2288,7 @@ subject (::std::istream& is,
   return ::subject (isrc, f, p);
 }
 
-::std::auto_ptr< ::NMSmodelType >
+::std::auto_ptr< ::SubjectType >
 subject (::std::istream& is,
          ::xml_schema::error_handler& h,
          ::xml_schema::flags f,
@@ -1638,7 +2302,7 @@ subject (::std::istream& is,
   return ::subject (isrc, h, f, p);
 }
 
-::std::auto_ptr< ::NMSmodelType >
+::std::auto_ptr< ::SubjectType >
 subject (::std::istream& is,
          ::xercesc::DOMErrorHandler& h,
          ::xml_schema::flags f,
@@ -1648,7 +2312,7 @@ subject (::std::istream& is,
   return ::subject (isrc, h, f, p);
 }
 
-::std::auto_ptr< ::NMSmodelType >
+::std::auto_ptr< ::SubjectType >
 subject (::std::istream& is,
          const ::std::string& sid,
          ::xml_schema::flags f,
@@ -1662,7 +2326,7 @@ subject (::std::istream& is,
   return ::subject (isrc, f, p);
 }
 
-::std::auto_ptr< ::NMSmodelType >
+::std::auto_ptr< ::SubjectType >
 subject (::std::istream& is,
          const ::std::string& sid,
          ::xml_schema::error_handler& h,
@@ -1677,7 +2341,7 @@ subject (::std::istream& is,
   return ::subject (isrc, h, f, p);
 }
 
-::std::auto_ptr< ::NMSmodelType >
+::std::auto_ptr< ::SubjectType >
 subject (::std::istream& is,
          const ::std::string& sid,
          ::xercesc::DOMErrorHandler& h,
@@ -1688,7 +2352,7 @@ subject (::std::istream& is,
   return ::subject (isrc, h, f, p);
 }
 
-::std::auto_ptr< ::NMSmodelType >
+::std::auto_ptr< ::SubjectType >
 subject (::xercesc::InputSource& i,
          ::xml_schema::flags f,
          const ::xml_schema::properties& p)
@@ -1701,14 +2365,14 @@ subject (::xercesc::InputSource& i,
 
   h.throw_if_failed< ::xsd::cxx::tree::parsing< char > > ();
 
-  ::std::auto_ptr< ::NMSmodelType > r (
+  ::std::auto_ptr< ::SubjectType > r (
     ::subject (
       d, f | ::xml_schema::flags::own_dom, p));
 
   return r;
 }
 
-::std::auto_ptr< ::NMSmodelType >
+::std::auto_ptr< ::SubjectType >
 subject (::xercesc::InputSource& i,
          ::xml_schema::error_handler& h,
          ::xml_schema::flags f,
@@ -1721,14 +2385,14 @@ subject (::xercesc::InputSource& i,
   if (!d.get ())
     throw ::xsd::cxx::tree::parsing< char > ();
 
-  ::std::auto_ptr< ::NMSmodelType > r (
+  ::std::auto_ptr< ::SubjectType > r (
     ::subject (
       d, f | ::xml_schema::flags::own_dom, p));
 
   return r;
 }
 
-::std::auto_ptr< ::NMSmodelType >
+::std::auto_ptr< ::SubjectType >
 subject (::xercesc::InputSource& i,
          ::xercesc::DOMErrorHandler& h,
          ::xml_schema::flags f,
@@ -1741,14 +2405,14 @@ subject (::xercesc::InputSource& i,
   if (!d.get ())
     throw ::xsd::cxx::tree::parsing< char > ();
 
-  ::std::auto_ptr< ::NMSmodelType > r (
+  ::std::auto_ptr< ::SubjectType > r (
     ::subject (
       d, f | ::xml_schema::flags::own_dom, p));
 
   return r;
 }
 
-::std::auto_ptr< ::NMSmodelType >
+::std::auto_ptr< ::SubjectType >
 subject (const ::xercesc::DOMDocument& d,
          ::xml_schema::flags f,
          const ::xml_schema::properties& p)
@@ -1758,7 +2422,7 @@ subject (const ::xercesc::DOMDocument& d,
     ::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument > c (
       static_cast< ::xercesc::DOMDocument* > (d.cloneNode (true)));
 
-    ::std::auto_ptr< ::NMSmodelType > r (
+    ::std::auto_ptr< ::SubjectType > r (
       ::subject (
         c, f | ::xml_schema::flags::own_dom, p));
 
@@ -1772,8 +2436,8 @@ subject (const ::xercesc::DOMDocument& d,
   if (n.name () == "subject" &&
       n.namespace_ () == "")
   {
-    ::std::auto_ptr< ::NMSmodelType > r (
-      ::xsd::cxx::tree::traits< ::NMSmodelType, char >::create (
+    ::std::auto_ptr< ::SubjectType > r (
+      ::xsd::cxx::tree::traits< ::SubjectType, char >::create (
         e, f, 0));
     return r;
   }
@@ -1785,7 +2449,7 @@ subject (const ::xercesc::DOMDocument& d,
     "");
 }
 
-::std::auto_ptr< ::NMSmodelType >
+::std::auto_ptr< ::SubjectType >
 subject (::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument >& d,
          ::xml_schema::flags f,
          const ::xml_schema::properties&)
@@ -1810,8 +2474,8 @@ subject (::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument >& d,
   if (n.name () == "subject" &&
       n.namespace_ () == "")
   {
-    ::std::auto_ptr< ::NMSmodelType > r (
-      ::xsd::cxx::tree::traits< ::NMSmodelType, char >::create (
+    ::std::auto_ptr< ::SubjectType > r (
+      ::xsd::cxx::tree::traits< ::SubjectType, char >::create (
         e, f, 0));
     return r;
   }
@@ -1828,7 +2492,7 @@ subject (::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument >& d,
 #include <xsd/cxx/xml/dom/serialization-source.hxx>
 
 void
-operator<< (::xercesc::DOMElement& e, const MuscleType& i)
+operator<< (::xercesc::DOMElement& e, const MTUType& i)
 {
   e << static_cast< const ::xml_schema::type& > (i);
 
@@ -1843,26 +2507,38 @@ operator<< (::xercesc::DOMElement& e, const MuscleType& i)
     s << i.name ();
   }
 
-  // C1
+  // emDelay
   //
+  if (i.emDelay ())
   {
     ::xercesc::DOMElement& s (
       ::xsd::cxx::xml::dom::create_element (
-        "C1",
+        "emDelay",
         e));
 
-    s << ::xml_schema::as_double(i.C1 ());
+    s << ::xml_schema::as_double(*i.emDelay ());
   }
 
-  // C2
+  // c1
   //
   {
     ::xercesc::DOMElement& s (
       ::xsd::cxx::xml::dom::create_element (
-        "C2",
+        "c1",
         e));
 
-    s << ::xml_schema::as_double(i.C2 ());
+    s << ::xml_schema::as_double(i.c1 ());
+  }
+
+  // c2
+  //
+  {
+    ::xercesc::DOMElement& s (
+      ::xsd::cxx::xml::dom::create_element (
+        "c2",
+        e));
+
+    s << ::xml_schema::as_double(i.c2 ());
   }
 
   // shapeFactor
@@ -1876,15 +2552,15 @@ operator<< (::xercesc::DOMElement& e, const MuscleType& i)
     s << ::xml_schema::as_double(i.shapeFactor ());
   }
 
-  // optimalFiberLength
+  // optimalFibreLength
   //
   {
     ::xercesc::DOMElement& s (
       ::xsd::cxx::xml::dom::create_element (
-        "optimalFiberLength",
+        "optimalFibreLength",
         e));
 
-    s << ::xml_schema::as_double(i.optimalFiberLength ());
+    s << ::xml_schema::as_double(i.optimalFibreLength ());
   }
 
   // pennationAngle
@@ -1933,19 +2609,19 @@ operator<< (::xercesc::DOMElement& e, const MuscleType& i)
 }
 
 void
-operator<< (::xercesc::DOMElement& e, const MusclesType& i)
+operator<< (::xercesc::DOMElement& e, const MTUSetType& i)
 {
   e << static_cast< const ::xml_schema::type& > (i);
 
-  // muscle
+  // mtu
   //
-  for (MusclesType::muscle_const_iterator
-       b (i.muscle ().begin ()), n (i.muscle ().end ());
+  for (MTUSetType::mtu_const_iterator
+       b (i.mtu ().begin ()), n (i.mtu ().end ());
        b != n; ++b)
   {
     ::xercesc::DOMElement& s (
       ::xsd::cxx::xml::dom::create_element (
-        "muscle",
+        "mtu",
         e));
 
     s << *b;
@@ -1953,20 +2629,20 @@ operator<< (::xercesc::DOMElement& e, const MusclesType& i)
 }
 
 void
-operator<< (::xercesc::DOMElement& e, const MuscleSequenceType& i)
+operator<< (::xercesc::DOMElement& e, const MTUNameSetType& i)
 {
   e << static_cast< const ::xsd::cxx::tree::list< ::xml_schema::string, char >& > (i);
 }
 
 void
-operator<< (::xercesc::DOMAttr& a, const MuscleSequenceType& i)
+operator<< (::xercesc::DOMAttr& a, const MTUNameSetType& i)
 {
   a << static_cast< const ::xsd::cxx::tree::list< ::xml_schema::string, char >& > (i);
 }
 
 void
 operator<< (::xml_schema::list_stream& l,
-            const MuscleSequenceType& i)
+            const MTUNameSetType& i)
 {
   l << static_cast< const ::xsd::cxx::tree::list< ::xml_schema::string, char >& > (i);
 }
@@ -1987,32 +2663,137 @@ operator<< (::xercesc::DOMElement& e, const DoFType& i)
     s << i.name ();
   }
 
-  // muscleSequence
+  // mtuNameSet
   //
   {
     ::xercesc::DOMElement& s (
       ::xsd::cxx::xml::dom::create_element (
-        "muscleSequence",
+        "mtuNameSet",
         e));
 
-    s << i.muscleSequence ();
+    s << i.mtuNameSet ();
   }
 }
 
 void
-operator<< (::xercesc::DOMElement& e, const DoFsType& i)
+operator<< (::xercesc::DOMElement& e, const CalibrationSequenceType& i)
+{
+  e << static_cast< const ::xsd::cxx::tree::list< ::xml_schema::string, char >& > (i);
+}
+
+void
+operator<< (::xercesc::DOMAttr& a, const CalibrationSequenceType& i)
+{
+  a << static_cast< const ::xsd::cxx::tree::list< ::xml_schema::string, char >& > (i);
+}
+
+void
+operator<< (::xml_schema::list_stream& l,
+            const CalibrationSequenceType& i)
+{
+  l << static_cast< const ::xsd::cxx::tree::list< ::xml_schema::string, char >& > (i);
+}
+
+void
+operator<< (::xercesc::DOMElement& e, const CalibratedType& i)
 {
   e << static_cast< const ::xml_schema::type& > (i);
 
-  // DoF
+  // startSubjectFile
   //
-  for (DoFsType::DoF_const_iterator
-       b (i.DoF ().begin ()), n (i.DoF ().end ());
+  {
+    ::xercesc::DOMElement& s (
+      ::xsd::cxx::xml::dom::create_element (
+        "startSubjectFile",
+        e));
+
+    s << i.startSubjectFile ();
+  }
+
+  // calibrationSequence
+  //
+  {
+    ::xercesc::DOMElement& s (
+      ::xsd::cxx::xml::dom::create_element (
+        "calibrationSequence",
+        e));
+
+    s << i.calibrationSequence ();
+  }
+}
+
+void
+operator<< (::xercesc::DOMElement& e, const UncalibratedType& i)
+{
+  e << static_cast< const ::xml_schema::type& > (i);
+
+  // subjectID
+  //
+  {
+    ::xercesc::DOMElement& s (
+      ::xsd::cxx::xml::dom::create_element (
+        "subjectID",
+        e));
+
+    s << i.subjectID ();
+  }
+
+  // additionalInfo
+  //
+  {
+    ::xercesc::DOMElement& s (
+      ::xsd::cxx::xml::dom::create_element (
+        "additionalInfo",
+        e));
+
+    s << i.additionalInfo ();
+  }
+}
+
+void
+operator<< (::xercesc::DOMElement& e, const CalibrationInfoType& i)
+{
+  e << static_cast< const ::xml_schema::type& > (i);
+
+  // uncalibrated
+  //
+  if (i.uncalibrated ())
+  {
+    ::xercesc::DOMElement& s (
+      ::xsd::cxx::xml::dom::create_element (
+        "uncalibrated",
+        e));
+
+    s << *i.uncalibrated ();
+  }
+
+  // calibrated
+  //
+  if (i.calibrated ())
+  {
+    ::xercesc::DOMElement& s (
+      ::xsd::cxx::xml::dom::create_element (
+        "calibrated",
+        e));
+
+    s << *i.calibrated ();
+  }
+}
+
+void
+operator<< (::xercesc::DOMElement& e, const DoFSetType& i)
+{
+  e << static_cast< const ::xml_schema::type& > (i);
+
+  // dof
+  //
+  for (DoFSetType::dof_const_iterator
+       b (i.dof ().begin ()), n (i.dof ().end ());
        b != n; ++b)
   {
     ::xercesc::DOMElement& s (
       ::xsd::cxx::xml::dom::create_element (
-        "DoF",
+        "dof",
         e));
 
     s << *b;
@@ -2078,9 +2859,20 @@ operator<< (::xercesc::DOMElement& e, const CurveType& i)
 }
 
 void
-operator<< (::xercesc::DOMElement& e, const MuscleDefaultType& i)
+operator<< (::xercesc::DOMElement& e, const MTUDefaultType& i)
 {
   e << static_cast< const ::xml_schema::type& > (i);
+
+  // emDelay
+  //
+  {
+    ::xercesc::DOMElement& s (
+      ::xsd::cxx::xml::dom::create_element (
+        "emDelay",
+        e));
+
+    s << ::xml_schema::as_double(i.emDelay ());
+  }
 
   // percentageChange
   //
@@ -2104,15 +2896,15 @@ operator<< (::xercesc::DOMElement& e, const MuscleDefaultType& i)
     s << ::xml_schema::as_double(i.damping ());
   }
 
-  // Curve
+  // curve
   //
-  for (MuscleDefaultType::Curve_const_iterator
-       b (i.Curve ().begin ()), n (i.Curve ().end ());
+  for (MTUDefaultType::curve_const_iterator
+       b (i.curve ().begin ()), n (i.curve ().end ());
        b != n; ++b)
   {
     ::xercesc::DOMElement& s (
       ::xsd::cxx::xml::dom::create_element (
-        "Curve",
+        "curve",
         e));
 
     s << *b;
@@ -2120,47 +2912,58 @@ operator<< (::xercesc::DOMElement& e, const MuscleDefaultType& i)
 }
 
 void
-operator<< (::xercesc::DOMElement& e, const NMSmodelType& i)
+operator<< (::xercesc::DOMElement& e, const SubjectType& i)
 {
   e << static_cast< const ::xml_schema::type& > (i);
 
-  // muscleDefault
+  // mtuDefault
   //
   {
     ::xercesc::DOMElement& s (
       ::xsd::cxx::xml::dom::create_element (
-        "muscleDefault",
+        "mtuDefault",
         e));
 
-    s << i.muscleDefault ();
+    s << i.mtuDefault ();
   }
 
-  // muscles
+  // mtuSet
   //
   {
     ::xercesc::DOMElement& s (
       ::xsd::cxx::xml::dom::create_element (
-        "muscles",
+        "mtuSet",
         e));
 
-    s << i.muscles ();
+    s << i.mtuSet ();
   }
 
-  // DoFs
+  // dofSet
   //
   {
     ::xercesc::DOMElement& s (
       ::xsd::cxx::xml::dom::create_element (
-        "DoFs",
+        "dofSet",
         e));
 
-    s << i.DoFs ();
+    s << i.dofSet ();
+  }
+
+  // calibrationInfo
+  //
+  {
+    ::xercesc::DOMElement& s (
+      ::xsd::cxx::xml::dom::create_element (
+        "calibrationInfo",
+        e));
+
+    s << i.calibrationInfo ();
   }
 }
 
 void
 subject (::std::ostream& o,
-         const ::NMSmodelType& s,
+         const ::SubjectType& s,
          const ::xml_schema::namespace_infomap& m,
          const ::std::string& e,
          ::xml_schema::flags f)
@@ -2182,7 +2985,7 @@ subject (::std::ostream& o,
 
 void
 subject (::std::ostream& o,
-         const ::NMSmodelType& s,
+         const ::SubjectType& s,
          ::xml_schema::error_handler& h,
          const ::xml_schema::namespace_infomap& m,
          const ::std::string& e,
@@ -2202,7 +3005,7 @@ subject (::std::ostream& o,
 
 void
 subject (::std::ostream& o,
-         const ::NMSmodelType& s,
+         const ::SubjectType& s,
          ::xercesc::DOMErrorHandler& h,
          const ::xml_schema::namespace_infomap& m,
          const ::std::string& e,
@@ -2219,7 +3022,7 @@ subject (::std::ostream& o,
 
 void
 subject (::xercesc::XMLFormatTarget& t,
-         const ::NMSmodelType& s,
+         const ::SubjectType& s,
          const ::xml_schema::namespace_infomap& m,
          const ::std::string& e,
          ::xml_schema::flags f)
@@ -2237,7 +3040,7 @@ subject (::xercesc::XMLFormatTarget& t,
 
 void
 subject (::xercesc::XMLFormatTarget& t,
-         const ::NMSmodelType& s,
+         const ::SubjectType& s,
          ::xml_schema::error_handler& h,
          const ::xml_schema::namespace_infomap& m,
          const ::std::string& e,
@@ -2253,7 +3056,7 @@ subject (::xercesc::XMLFormatTarget& t,
 
 void
 subject (::xercesc::XMLFormatTarget& t,
-         const ::NMSmodelType& s,
+         const ::SubjectType& s,
          ::xercesc::DOMErrorHandler& h,
          const ::xml_schema::namespace_infomap& m,
          const ::std::string& e,
@@ -2269,7 +3072,7 @@ subject (::xercesc::XMLFormatTarget& t,
 
 void
 subject (::xercesc::DOMDocument& d,
-         const ::NMSmodelType& s,
+         const ::SubjectType& s,
          ::xml_schema::flags)
 {
   ::xercesc::DOMElement& e (*d.getDocumentElement ());
@@ -2292,7 +3095,7 @@ subject (::xercesc::DOMDocument& d,
 }
 
 ::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument >
-subject (const ::NMSmodelType& s,
+subject (const ::SubjectType& s,
          const ::xml_schema::namespace_infomap& m,
          ::xml_schema::flags f)
 {

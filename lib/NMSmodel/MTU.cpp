@@ -19,7 +19,7 @@ inline double degrees (double r) {
 
 template<typename Activation, typename Tendon, CurveMode::Mode mode>
 MTU<Activation, Tendon, mode>::MTU() 
-:id_(""), c1_(0.), c2_(0.), shapeFactor_(0.), activation_(0.), 
+:id_(""), emDelay_(.0), c1_(0.), c2_(0.), shapeFactor_(0.), activation_(0.), 
 optimalFibreLength_(0.), pennationAngle_(0.), tendonSlackLength_(0.), 
 percentageChange_(0.), fibreLength_(0.), 
 fibreVelocity_(0.), damping_(0.), maxIsometricForce_(0.), time_(.0), timeScale_(0.),
@@ -28,7 +28,7 @@ strengthCoefficient_(0.), muscleForce_(0.)  { }
 
 template<typename Activation, typename Tendon, CurveMode::Mode mode>
 MTU<Activation, Tendon, mode>::MTU (std::string id)
-:id_(id), c1_(0.), c2_(0.), shapeFactor_(0.), activation_(0.), 
+:id_(id), emDelay_(.0), c1_(0.), c2_(0.), shapeFactor_(0.), activation_(0.), 
 optimalFibreLength_(0.), pennationAngle_(0.), tendonSlackLength_(0.), 
 percentageChange_(0.), fibreLength_(0.), 
 fibreVelocity_(0.), damping_(0.), maxIsometricForce_(0.), time_(.0), timeScale_(0.),
@@ -40,6 +40,7 @@ template<typename Activation, typename Tendon, CurveMode::Mode mode>
 MTU<Activation, Tendon, mode>::MTU (const MTU<Activation, Tendon, mode>& orig) {
    
     id_ = orig.id_;
+    emDelay_ = orig.emDelay_;
     activationDynamic_ = orig.activationDynamic_;
     activation_ = orig.activation_; 
     c1_ = orig.c1_;
@@ -63,6 +64,7 @@ MTU<Activation, Tendon, mode>::MTU (const MTU<Activation, Tendon, mode>& orig) {
     forceVelocityCurve_ = orig.forceVelocityCurve_;
     activeForceLengthCurve_ = orig.activeForceLengthCurve_;
     passiveForceLengthCurve_ = orig.passiveForceLengthCurve_;
+    tendonForceStrainCurve_ = orig.tendonForceStrainCurve_;
     
     timeScale_ = orig.timeScale_;
     time_ = orig.time_;
@@ -74,6 +76,7 @@ template<typename Activation, typename Tendon, CurveMode::Mode mode>
 MTU<Activation, Tendon, mode>& MTU<Activation, Tendon, mode>::operator=(const MTU<Activation, Tendon, mode>& orig) {
    
     id_ = orig.id_;
+    emDelay_ = orig.emDelay_;
     activationDynamic_ = orig.activationDynamic_;
     activation_ = orig.activation_; 
     c1_ = orig.c1_;
@@ -97,6 +100,7 @@ MTU<Activation, Tendon, mode>& MTU<Activation, Tendon, mode>::operator=(const MT
     forceVelocityCurve_ = orig.forceVelocityCurve_;
     activeForceLengthCurve_ = orig.activeForceLengthCurve_;
     passiveForceLengthCurve_ = orig.passiveForceLengthCurve_;
+    tendonForceStrainCurve_ = orig.tendonForceStrainCurve_;
     
     timeScale_ = orig.timeScale_;
     time_ = orig.time_;
@@ -314,6 +318,15 @@ void MTU<Activation, Tendon, mode>::setCurves(const CurveOffline& activeForceLen
 
 
 template<typename Activation, typename Tendon, CurveMode::Mode mode>
+void MTU<Activation, Tendon, mode>::setTendonForceStrainCurve(const CurveOffline& tendonForceStrainCurve) {
+        
+    tendonForceStrainCurve_ = tendonForceStrainCurve;
+    tendonDynamic_.setTendonForceStrainCurve(tendonForceStrainCurve);
+    resetState();
+}
+
+
+template<typename Activation, typename Tendon, CurveMode::Mode mode>
 void MTU<Activation, Tendon, mode>::setActivation(double activation) {
  
     activation_ = activation;
@@ -391,12 +404,13 @@ template<typename Activation, typename Tendon, CurveMode::Mode mode>
 std::ostream& operator<< (std::ostream& output, const MTU<Activation, Tendon, mode>& m)
 {
   output << "Name: " << m.id_  << endl; 
+  output << "emDelay: " << m.emDelay_ << endl;
   output << "C1: " << m.c1_ << " C2: " << m.c2_ << endl;
   output << "Shape Factor: " << m.shapeFactor_ << endl;
   output << "activeForceLength" << endl << m.activeForceLengthCurve_ << endl;
   output << "passiveForceLength" << endl << m.passiveForceLengthCurve_ << endl;
   output << "forceVelocity" << endl << m.forceVelocityCurve_ << endl;
-  output << "fibreLengthTrace" << endl << m.fibreLengthTrace_ << endl;
+  output << "tendonForceStrain " << endl << m.tendonForceStrainCurve_ << endl;
   output << "optimalFibreLength: " <<  m.optimalFibreLength_ << endl;
   output << "pennationAngle: " << m.pennationAngle_ << endl;
   output << "tendonSlackLength: " << m.tendonSlackLength_ << endl;
@@ -404,7 +418,6 @@ std::ostream& operator<< (std::ostream& output, const MTU<Activation, Tendon, mo
   output << "damping: " << m.damping_ << endl;
   output << "maxIsometricForce: " << m.maxIsometricForce_ << endl;
   output << "strengthCoefficient: " << m.strengthCoefficient_ << endl;
-  output << "muscleTendonForce: " << m.muscleForce_ << endl;
     // :TODO: valli a mettere anche nel costruttore di copia
     
   return output;

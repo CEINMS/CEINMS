@@ -43,7 +43,7 @@ using std::vector;
 //#include "SumMinObjectiveFunction.h"
 #include "SumMinObjectiveFunction_singleF.h"
 #include "simulatedAnnealing.hxx"
-
+#include "subject.hxx"
 //typedef ComputationMode_Default TComputationMode;
 //typedef ComputationMode_Fast TComputationMode;
 
@@ -147,7 +147,7 @@ int main(int argc, char** argv) {
   
     // just check that we have subject.xml and is formatted according to NMSmodel.xsd 
   try {
-    std::auto_ptr<NMSmodelType> subjectPointer (subject ( configurationFile.c_str() ) );
+    std::auto_ptr<SubjectType> subjectPointer (subject ( configurationFile.c_str() ) );
   }  
   catch (const xml_schema::exception& e) {
     cout << e << endl;

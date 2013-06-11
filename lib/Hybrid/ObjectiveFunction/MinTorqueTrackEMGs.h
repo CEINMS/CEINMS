@@ -16,7 +16,8 @@ namespace Hybrid {
         public:
             MinTorqueTrackEMGs( StaticComputationT& staticComputation,
                                     double epsilon, double nEpsilon, HybridWeightings hybridParameters);
-        
+			void   setEpsilon(double epsilon) { epsilon_ = epsilon;}
+			void   setNoEpsilon(unsigned noEpsilon) { nEpsilon_ = noEpsilon;}
             void   evalFp();
             bool   isFacceptable();
             void   updateF();

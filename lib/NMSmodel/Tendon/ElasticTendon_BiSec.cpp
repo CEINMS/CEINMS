@@ -248,6 +248,12 @@ void ElasticTendon_BiSec::setCurves(const CurveOffline& activeForceLengthCurve,
 }
 
 
+void ElasticTendon_BiSec::setTendonForceStrainCurve (const ElasticTendon_BiSec::CurveOffline& tendonForceStrainCurve) {
+    
+    tendonForceStrainCurve_ = tendonForceStrainCurve;
+}
+
+
 void ElasticTendon_BiSec::setStrengthCoefficient (double strengthCoefficient) {
     
     strengthCoefficient_ = strengthCoefficient;

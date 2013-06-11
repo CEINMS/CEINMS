@@ -34,14 +34,15 @@ class SimulatedAnnealingBase {
 public:
     
     SimulatedAnnealingBase () {}
-    SimulatedAnnealingBase (double nt, double ns, double rt, double t, double maxNoEval);
+    SimulatedAnnealingBase (unsigned nt, unsigned ns, double rt, double t, unsigned maxNoEval);
     SimulatedAnnealingBase( NMSmodelT& mySubject, 
                             std::vector<std::string>& muscleNamesWithEMGtoTrack,
                             std::vector<std::string>& muscleNamesWithEMGtoPredict,
                             const HybridWeightings hybridParameters,
                             StaticComputationT& staticComputation);
 
-    void optimize();
+	void setAnnealingParameters(unsigned nt, unsigned ns, double rt, double t, unsigned maxNoEval, double epsilon, unsigned noEpsilon);
+	void optimize();
     void getXopt(std::vector<double>& xOpt) const;
     
 //    friend class SimulatedAnnealingHybrid<NMSmodelT, Parameters, ObjectiveFunction, ComputationMode>;
@@ -64,11 +65,12 @@ protected:
     int                 noParameters_;
     
 //annealing parameters    
-    double              nt_;
-    double              ns_;
+    unsigned            nt_;
+    unsigned            ns_;
     double              rt_;
     double              t_;
-    int                 maxNoEval_;  
+    unsigned            maxNoEval_;  
+	
 };
 
 #include "SimulatedAnnealingBase.cpp"

@@ -749,6 +749,13 @@ void ElasticTendon<mode>::setCurves(const CurveOffline& activeForceLengthCurve,
 
 
 template <CurveMode::Mode mode>
+void ElasticTendon<mode>::setTendonForceStrainCurve ( const CurveOffline& tendonForceStrainCurve ) {
+
+    cout << "WARNING: Using default tendon force strain curve\n";
+}
+
+
+template <CurveMode::Mode mode>
 void ElasticTendon<mode>::setStrengthCoefficient (double strengthCoefficient) {
     
     strengthCoefficient_ = strengthCoefficient;

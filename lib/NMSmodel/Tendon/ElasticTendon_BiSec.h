@@ -44,6 +44,7 @@ public:
     void setCurves(const CurveOffline& activeForceLengthCurve, 
                    const CurveOffline& passiveForceLengthCurve, 
                    const CurveOffline& forceVelocityCurve);
+    void setTendonForceStrainCurve(const CurveOffline& tendonForceStrainCurve);
                    
     void pushState();
     void resetState();
