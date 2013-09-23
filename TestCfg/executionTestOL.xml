@@ -6,7 +6,7 @@
      </type>
 
      <tendon>
-          <stiff/>
+          <elasticBiSec/>
      </tendon>
 
      <activation>
