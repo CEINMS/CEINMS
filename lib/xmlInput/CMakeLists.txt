@@ -3,13 +3,15 @@
 #)
 
 ADD_LIBRARY(xmlInput STATIC
-  NMSmodel.cxx
+    subject.cxx
+#  NMSmodel.cxx
   execution.cxx
   ExecutionXmlReader.cpp
 )
 
 
 ADD_LIBRARY(xmlInputCalibration STATIC
-  NMSmodel.cxx
+#  NMSmodel.cxx
+  subject.cxx
   simulatedAnnealing.cxx
 )

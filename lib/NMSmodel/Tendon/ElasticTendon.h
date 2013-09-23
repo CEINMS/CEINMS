@@ -20,8 +20,8 @@ public:
           double strengthCoefficient,
           const CurveOffline& activeForceLengthCurve,
           const CurveOffline& passiveForceLengthCurve,
-          const CurveOffline& forceVelocityCurve
-        );   
+          const CurveOffline& forceVelocityCurve,
+          const CurveOffline& tendonForceStrainCurve);   
     virtual ~LDFM() {}
     
     
@@ -87,7 +87,8 @@ public:
                   double strengthCoefficient,
                   const CurveOffline& activeForceLengthCurve,
                   const CurveOffline& passiveForceLengthCurve, 
-                  const CurveOffline& forceVelocityCurve
+                  const CurveOffline& forceVelocityCurve,
+                  const CurveOffline& tendonForceStrainCurve
                  );
     virtual ~ElasticTendon();
 
@@ -109,7 +110,9 @@ public:
     void setTendonSlackLength(double tendonSlackLength);
     void setCurves(const CurveOffline& activeForceLengthCurve, 
                    const CurveOffline& passiveForceLengthCurve, 
-                   const CurveOffline& forceVelocityCurve);
+                   const CurveOffline& forceVelocityCurve,
+                   const CurveOffline& tendonForceStrainCurve);
+   
     void resetState();
     
 private:

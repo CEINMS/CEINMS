@@ -77,6 +77,8 @@ void ModelEvaluationOnline<NMSmodelT>::operator()() {
     }
 
 //END CHECK MUSCLES
+    double globalEmDelay = subject_.getGlobalEmDelay(); 
+    
 
 #ifdef LOG
   cout << "starting consume" << endl;
@@ -132,7 +134,7 @@ void ModelEvaluationOnline<NMSmodelT>::operator()() {
 
         do {
             getEmgFromShared(emgFromQueue);
-            emgTime = emgFromQueue.back();
+            emgTime = emgFromQueue.back() + globalEmDelay;
             emgFromQueue.pop_back();
             if(!emgFromQueue.empty()) {
                 //ROBA CHE DEVE FARE EMG

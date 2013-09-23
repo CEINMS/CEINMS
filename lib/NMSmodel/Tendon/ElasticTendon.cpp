@@ -41,7 +41,7 @@ public:
 };
 
 
-
+/*
 struct TendonSplinePoints {
 
     static void getX(vector<double>& x) {
@@ -89,6 +89,7 @@ struct TendonSplinePoints {
     }
     
 };
+*/
 
 LDFM::LDFM(double optimalFiberLength,
            double pennationAngle,
@@ -99,7 +100,8 @@ LDFM::LDFM(double optimalFiberLength,
            double strengthCoefficient, 
            const CurveOffline& activeForceLengthCurve, 
            const CurveOffline& passiveForceLengthCurve,
-           const CurveOffline& forceVelocityCurve):
+           const CurveOffline& forceVelocityCurve,
+           const CurveOffline& tendonForceStrainCurve):
 
 optimalFiberLength_(optimalFiberLength),
 pennationAngle_(pennationAngle),
@@ -111,6 +113,7 @@ strengthCoefficient_(strengthCoefficient),
 activeForceLengthCurve_(activeForceLengthCurve),
 passiveForceLengthCurve_(passiveForceLengthCurve),
 forceVelocityCurve_(forceVelocityCurve),
+tendonForceStrainCurve_(tendonForceStrainCurve),
 activation_(.0),
 muscleTendonLength_(.0),
 muscleTendonVelocity_(.0),
@@ -122,14 +125,8 @@ tendonLength_(.0),
 tendonVelocity_(.0), 
 tendonStiffness_(.0),
 optimalFiberLengthAtT_(.0)
+{ }
 
-{
-    vector<double> x,y;
-    TendonSplinePoints::getX(x);
-    TendonSplinePoints::getY(y);
-
-    tendonForceStrainCurve_.resetPointsWith(x, y);
-}
 
 double LDFM::computePennationAngle() const {
     
@@ -583,14 +580,7 @@ nLmt_(0),
 lmtTime_(.0),
 lmtTimeT1_(.0),
 id_("")
-{ 
-    
-    vector<double> x,y;
-    TendonSplinePoints::getX(x);
-    TendonSplinePoints::getY(y);
-
-    tendonForceStrainCurve_.resetPointsWith(x, y);
-}
+{  }
 
 
 template <CurveMode::Mode mode>
@@ -617,13 +607,7 @@ nLmt_(0),
 lmtTime_(.0),
 lmtTimeT1_(.0),
 id_(id)
-{ 
-    vector<double> x,y;
-    TendonSplinePoints::getX(x);
-    TendonSplinePoints::getY(y);
-
-    tendonForceStrainCurve_.resetPointsWith(x, y);
-}
+{ }
 
 
 template <CurveMode::Mode mode>
@@ -636,7 +620,8 @@ ElasticTendon<mode>::ElasticTendon (double optimalFiberLength,
                               double strengthCoefficient, 
                               const CurveOffline& activeForceLengthCurve, 
                               const CurveOffline& passiveForceLengthCurve, 
-                              const CurveOffline& forceVelocityCurve):
+                              const CurveOffline& forceVelocityCurve,
+                              const CurveOffline& tendonForceStrainCurve):
 
 optimalFiberLength_(optimalFiberLength),
 pennationAngle_(pennationAngle),
@@ -648,6 +633,7 @@ strengthCoefficient_(strengthCoefficient),
 activeForceLengthCurve_(activeForceLengthCurve),
 passiveForceLengthCurve_(passiveForceLengthCurve),
 forceVelocityCurve_(forceVelocityCurve),
+tendonForceStrainCurve_(tendonForceStrainCurve),
 muscleTendonLength_(0.0),
 muscleTendonLengthT1_(0.0),
 muscleTendonVelocity_(0.0),
@@ -663,14 +649,7 @@ nLmt_(0),
 lmtTime_(.0),
 lmtTimeT1_(.0),
 id_("")
-{   
-
-    vector<double> x,y;
-    TendonSplinePoints::getX(x);
-    TendonSplinePoints::getY(y);
-
-    tendonForceStrainCurve_.resetPointsWith(x, y);
-}
+{   }
 
 
 template <CurveMode::Mode mode>
@@ -739,13 +718,16 @@ void ElasticTendon<mode>::setParametersToComputeForces(double optimalFiberLength
 template <CurveMode::Mode mode>
 void ElasticTendon<mode>::setCurves(const CurveOffline& activeForceLengthCurve, 
                                     const CurveOffline& passiveForceLengthCurve, 
-                                    const CurveOffline& forceVelocityCurve) { 
+                                    const CurveOffline& forceVelocityCurve,
+                                    const CurveOffline& tendonForceStrainCurve) { 
                                   
     
     activeForceLengthCurve_  = activeForceLengthCurve;
     passiveForceLengthCurve_ = passiveForceLengthCurve;
     forceVelocityCurve_      = forceVelocityCurve;
+    tendonForceStrainCurve_  = tendonForceStrainCurve;
 };
+
 
 
 template <CurveMode::Mode mode>

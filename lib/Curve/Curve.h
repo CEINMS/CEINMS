@@ -64,7 +64,7 @@ public:
     double getFirstDerivative(double xValue) const;
     double getSecondDerivative(double xValue) const;
     friend std::ostream& operator<< <>(std::ostream& output, const Curve& c);
-    unsigned getSize();
+    bool empty() {return b_.empty();}
 private:
     void computeCoefficients();
 

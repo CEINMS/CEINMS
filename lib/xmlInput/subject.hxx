@@ -31,8 +31,8 @@
 // in the accompanying FLOSSE file.
 //
 
-#ifndef NMSMODEL_HXX
-#define NMSMODEL_HXX
+#ifndef CXX_________CFG_XSD_SUBJECT_HXX
+#define CXX_________CFG_XSD_SUBJECT_HXX
 
 // Begin prologue.
 //
@@ -247,15 +247,19 @@ namespace xml_schema
 
 // Forward declarations.
 //
-class MuscleType;
-class MusclesType;
-class MuscleSequenceType;
+class MTUType;
+class MTUSetType;
+class MTUNameSetType;
 class DoFType;
-class DoFsType;
+class CalibrationSequenceType;
+class CalibratedType;
+class UncalibratedType;
+class CalibrationInfoType;
+class DoFSetType;
 class PointsSequenceType;
 class CurveType;
-class MuscleDefaultType;
-class NMSmodelType;
+class MTUDefaultType;
+class SubjectType;
 
 #include <memory>    // std::auto_ptr
 #include <limits>    // std::numeric_limits
@@ -270,7 +274,7 @@ class NMSmodelType;
 
 #include <xsd/cxx/xml/dom/parsing-header.hxx>
 
-class MuscleType: public ::xml_schema::type
+class MTUType: public ::xml_schema::type
 {
   public:
   // name
@@ -290,33 +294,51 @@ class MuscleType: public ::xml_schema::type
   void
   name (::std::auto_ptr< name_type > p);
 
-  // C1
+  // emDelay
   // 
-  typedef ::xml_schema::double_ C1_type;
-  typedef ::xsd::cxx::tree::traits< C1_type, char, ::xsd::cxx::tree::schema_type::double_ > C1_traits;
+  typedef ::xml_schema::double_ emDelay_type;
+  typedef ::xsd::cxx::tree::optional< emDelay_type > emDelay_optional;
+  typedef ::xsd::cxx::tree::traits< emDelay_type, char, ::xsd::cxx::tree::schema_type::double_ > emDelay_traits;
 
-  const C1_type&
-  C1 () const;
+  const emDelay_optional&
+  emDelay () const;
 
-  C1_type&
-  C1 ();
+  emDelay_optional&
+  emDelay ();
 
   void
-  C1 (const C1_type& x);
-
-  // C2
-  // 
-  typedef ::xml_schema::double_ C2_type;
-  typedef ::xsd::cxx::tree::traits< C2_type, char, ::xsd::cxx::tree::schema_type::double_ > C2_traits;
-
-  const C2_type&
-  C2 () const;
-
-  C2_type&
-  C2 ();
+  emDelay (const emDelay_type& x);
 
   void
-  C2 (const C2_type& x);
+  emDelay (const emDelay_optional& x);
+
+  // c1
+  // 
+  typedef ::xml_schema::double_ c1_type;
+  typedef ::xsd::cxx::tree::traits< c1_type, char, ::xsd::cxx::tree::schema_type::double_ > c1_traits;
+
+  const c1_type&
+  c1 () const;
+
+  c1_type&
+  c1 ();
+
+  void
+  c1 (const c1_type& x);
+
+  // c2
+  // 
+  typedef ::xml_schema::double_ c2_type;
+  typedef ::xsd::cxx::tree::traits< c2_type, char, ::xsd::cxx::tree::schema_type::double_ > c2_traits;
+
+  const c2_type&
+  c2 () const;
+
+  c2_type&
+  c2 ();
+
+  void
+  c2 (const c2_type& x);
 
   // shapeFactor
   // 
@@ -332,19 +354,19 @@ class MuscleType: public ::xml_schema::type
   void
   shapeFactor (const shapeFactor_type& x);
 
-  // optimalFiberLength
+  // optimalFibreLength
   // 
-  typedef ::xml_schema::double_ optimalFiberLength_type;
-  typedef ::xsd::cxx::tree::traits< optimalFiberLength_type, char, ::xsd::cxx::tree::schema_type::double_ > optimalFiberLength_traits;
+  typedef ::xml_schema::double_ optimalFibreLength_type;
+  typedef ::xsd::cxx::tree::traits< optimalFibreLength_type, char, ::xsd::cxx::tree::schema_type::double_ > optimalFibreLength_traits;
 
-  const optimalFiberLength_type&
-  optimalFiberLength () const;
+  const optimalFibreLength_type&
+  optimalFibreLength () const;
 
-  optimalFiberLength_type&
-  optimalFiberLength ();
+  optimalFibreLength_type&
+  optimalFibreLength ();
 
   void
-  optimalFiberLength (const optimalFiberLength_type& x);
+  optimalFibreLength (const optimalFibreLength_type& x);
 
   // pennationAngle
   // 
@@ -404,30 +426,30 @@ class MuscleType: public ::xml_schema::type
 
   // Constructors.
   //
-  MuscleType (const name_type&,
-              const C1_type&,
-              const C2_type&,
-              const shapeFactor_type&,
-              const optimalFiberLength_type&,
-              const pennationAngle_type&,
-              const tendonSlackLength_type&,
-              const maxIsometricForce_type&,
-              const strengthCoefficient_type&);
+  MTUType (const name_type&,
+           const c1_type&,
+           const c2_type&,
+           const shapeFactor_type&,
+           const optimalFibreLength_type&,
+           const pennationAngle_type&,
+           const tendonSlackLength_type&,
+           const maxIsometricForce_type&,
+           const strengthCoefficient_type&);
 
-  MuscleType (const ::xercesc::DOMElement& e,
-              ::xml_schema::flags f = 0,
-              ::xml_schema::container* c = 0);
+  MTUType (const ::xercesc::DOMElement& e,
+           ::xml_schema::flags f = 0,
+           ::xml_schema::container* c = 0);
 
-  MuscleType (const MuscleType& x,
-              ::xml_schema::flags f = 0,
-              ::xml_schema::container* c = 0);
+  MTUType (const MTUType& x,
+           ::xml_schema::flags f = 0,
+           ::xml_schema::container* c = 0);
 
-  virtual MuscleType*
+  virtual MTUType*
   _clone (::xml_schema::flags f = 0,
           ::xml_schema::container* c = 0) const;
 
   virtual 
-  ~MuscleType ();
+  ~MTUType ();
 
   // Implementation.
   //
@@ -438,54 +460,55 @@ class MuscleType: public ::xml_schema::type
 
   protected:
   ::xsd::cxx::tree::one< name_type > name_;
-  ::xsd::cxx::tree::one< C1_type > C1_;
-  ::xsd::cxx::tree::one< C2_type > C2_;
+  emDelay_optional emDelay_;
+  ::xsd::cxx::tree::one< c1_type > c1_;
+  ::xsd::cxx::tree::one< c2_type > c2_;
   ::xsd::cxx::tree::one< shapeFactor_type > shapeFactor_;
-  ::xsd::cxx::tree::one< optimalFiberLength_type > optimalFiberLength_;
+  ::xsd::cxx::tree::one< optimalFibreLength_type > optimalFibreLength_;
   ::xsd::cxx::tree::one< pennationAngle_type > pennationAngle_;
   ::xsd::cxx::tree::one< tendonSlackLength_type > tendonSlackLength_;
   ::xsd::cxx::tree::one< maxIsometricForce_type > maxIsometricForce_;
   ::xsd::cxx::tree::one< strengthCoefficient_type > strengthCoefficient_;
 };
 
-class MusclesType: public ::xml_schema::type
+class MTUSetType: public ::xml_schema::type
 {
   public:
-  // muscle
+  // mtu
   // 
-  typedef ::MuscleType muscle_type;
-  typedef ::xsd::cxx::tree::sequence< muscle_type > muscle_sequence;
-  typedef muscle_sequence::iterator muscle_iterator;
-  typedef muscle_sequence::const_iterator muscle_const_iterator;
-  typedef ::xsd::cxx::tree::traits< muscle_type, char > muscle_traits;
+  typedef ::MTUType mtu_type;
+  typedef ::xsd::cxx::tree::sequence< mtu_type > mtu_sequence;
+  typedef mtu_sequence::iterator mtu_iterator;
+  typedef mtu_sequence::const_iterator mtu_const_iterator;
+  typedef ::xsd::cxx::tree::traits< mtu_type, char > mtu_traits;
 
-  const muscle_sequence&
-  muscle () const;
+  const mtu_sequence&
+  mtu () const;
 
-  muscle_sequence&
-  muscle ();
+  mtu_sequence&
+  mtu ();
 
   void
-  muscle (const muscle_sequence& s);
+  mtu (const mtu_sequence& s);
 
   // Constructors.
   //
-  MusclesType ();
+  MTUSetType ();
 
-  MusclesType (const ::xercesc::DOMElement& e,
-               ::xml_schema::flags f = 0,
-               ::xml_schema::container* c = 0);
+  MTUSetType (const ::xercesc::DOMElement& e,
+              ::xml_schema::flags f = 0,
+              ::xml_schema::container* c = 0);
 
-  MusclesType (const MusclesType& x,
-               ::xml_schema::flags f = 0,
-               ::xml_schema::container* c = 0);
+  MTUSetType (const MTUSetType& x,
+              ::xml_schema::flags f = 0,
+              ::xml_schema::container* c = 0);
 
-  virtual MusclesType*
+  virtual MTUSetType*
   _clone (::xml_schema::flags f = 0,
           ::xml_schema::container* c = 0) const;
 
   virtual 
-  ~MusclesType ();
+  ~MTUSetType ();
 
   // Implementation.
   //
@@ -495,46 +518,46 @@ class MusclesType: public ::xml_schema::type
          ::xml_schema::flags);
 
   protected:
-  muscle_sequence muscle_;
+  mtu_sequence mtu_;
 };
 
-class MuscleSequenceType: public ::xml_schema::simple_type,
+class MTUNameSetType: public ::xml_schema::simple_type,
   public ::xsd::cxx::tree::list< ::xml_schema::string, char >
 {
   public:
-  MuscleSequenceType ();
+  MTUNameSetType ();
 
-  MuscleSequenceType (size_type n, const ::xml_schema::string& x);
+  MTUNameSetType (size_type n, const ::xml_schema::string& x);
 
   template < typename I >
-  MuscleSequenceType (const I& begin, const I& end)
+  MTUNameSetType (const I& begin, const I& end)
   : ::xsd::cxx::tree::list< ::xml_schema::string, char > (begin, end, this)
   {
   }
 
-  MuscleSequenceType (const ::xercesc::DOMElement& e,
-                      ::xml_schema::flags f = 0,
-                      ::xml_schema::container* c = 0);
+  MTUNameSetType (const ::xercesc::DOMElement& e,
+                  ::xml_schema::flags f = 0,
+                  ::xml_schema::container* c = 0);
 
-  MuscleSequenceType (const ::xercesc::DOMAttr& a,
-                      ::xml_schema::flags f = 0,
-                      ::xml_schema::container* c = 0);
+  MTUNameSetType (const ::xercesc::DOMAttr& a,
+                  ::xml_schema::flags f = 0,
+                  ::xml_schema::container* c = 0);
 
-  MuscleSequenceType (const ::std::string& s,
-                      const ::xercesc::DOMElement* e,
-                      ::xml_schema::flags f = 0,
-                      ::xml_schema::container* c = 0);
+  MTUNameSetType (const ::std::string& s,
+                  const ::xercesc::DOMElement* e,
+                  ::xml_schema::flags f = 0,
+                  ::xml_schema::container* c = 0);
 
-  MuscleSequenceType (const MuscleSequenceType& x,
-                      ::xml_schema::flags f = 0,
-                      ::xml_schema::container* c = 0);
+  MTUNameSetType (const MTUNameSetType& x,
+                  ::xml_schema::flags f = 0,
+                  ::xml_schema::container* c = 0);
 
-  virtual MuscleSequenceType*
+  virtual MTUNameSetType*
   _clone (::xml_schema::flags f = 0,
           ::xml_schema::container* c = 0) const;
 
   virtual 
-  ~MuscleSequenceType ();
+  ~MTUNameSetType ();
 };
 
 class DoFType: public ::xml_schema::type
@@ -557,27 +580,27 @@ class DoFType: public ::xml_schema::type
   void
   name (::std::auto_ptr< name_type > p);
 
-  // muscleSequence
+  // mtuNameSet
   // 
-  typedef ::MuscleSequenceType muscleSequence_type;
-  typedef ::xsd::cxx::tree::traits< muscleSequence_type, char > muscleSequence_traits;
+  typedef ::MTUNameSetType mtuNameSet_type;
+  typedef ::xsd::cxx::tree::traits< mtuNameSet_type, char > mtuNameSet_traits;
 
-  const muscleSequence_type&
-  muscleSequence () const;
+  const mtuNameSet_type&
+  mtuNameSet () const;
 
-  muscleSequence_type&
-  muscleSequence ();
-
-  void
-  muscleSequence (const muscleSequence_type& x);
+  mtuNameSet_type&
+  mtuNameSet ();
 
   void
-  muscleSequence (::std::auto_ptr< muscleSequence_type > p);
+  mtuNameSet (const mtuNameSet_type& x);
+
+  void
+  mtuNameSet (::std::auto_ptr< mtuNameSet_type > p);
 
   // Constructors.
   //
   DoFType (const name_type&,
-           const muscleSequence_type&);
+           const mtuNameSet_type&);
 
   DoFType (const ::xercesc::DOMElement& e,
            ::xml_schema::flags f = 0,
@@ -603,47 +626,104 @@ class DoFType: public ::xml_schema::type
 
   protected:
   ::xsd::cxx::tree::one< name_type > name_;
-  ::xsd::cxx::tree::one< muscleSequence_type > muscleSequence_;
+  ::xsd::cxx::tree::one< mtuNameSet_type > mtuNameSet_;
 };
 
-class DoFsType: public ::xml_schema::type
+class CalibrationSequenceType: public ::xml_schema::simple_type,
+  public ::xsd::cxx::tree::list< ::xml_schema::string, char >
 {
   public:
-  // DoF
-  // 
-  typedef ::DoFType DoF_type;
-  typedef ::xsd::cxx::tree::sequence< DoF_type > DoF_sequence;
-  typedef DoF_sequence::iterator DoF_iterator;
-  typedef DoF_sequence::const_iterator DoF_const_iterator;
-  typedef ::xsd::cxx::tree::traits< DoF_type, char > DoF_traits;
+  CalibrationSequenceType ();
 
-  const DoF_sequence&
-  DoF () const;
+  CalibrationSequenceType (size_type n, const ::xml_schema::string& x);
 
-  DoF_sequence&
-  DoF ();
+  template < typename I >
+  CalibrationSequenceType (const I& begin, const I& end)
+  : ::xsd::cxx::tree::list< ::xml_schema::string, char > (begin, end, this)
+  {
+  }
 
-  void
-  DoF (const DoF_sequence& s);
+  CalibrationSequenceType (const ::xercesc::DOMElement& e,
+                           ::xml_schema::flags f = 0,
+                           ::xml_schema::container* c = 0);
 
-  // Constructors.
-  //
-  DoFsType ();
+  CalibrationSequenceType (const ::xercesc::DOMAttr& a,
+                           ::xml_schema::flags f = 0,
+                           ::xml_schema::container* c = 0);
 
-  DoFsType (const ::xercesc::DOMElement& e,
-            ::xml_schema::flags f = 0,
-            ::xml_schema::container* c = 0);
+  CalibrationSequenceType (const ::std::string& s,
+                           const ::xercesc::DOMElement* e,
+                           ::xml_schema::flags f = 0,
+                           ::xml_schema::container* c = 0);
 
-  DoFsType (const DoFsType& x,
-            ::xml_schema::flags f = 0,
-            ::xml_schema::container* c = 0);
+  CalibrationSequenceType (const CalibrationSequenceType& x,
+                           ::xml_schema::flags f = 0,
+                           ::xml_schema::container* c = 0);
 
-  virtual DoFsType*
+  virtual CalibrationSequenceType*
   _clone (::xml_schema::flags f = 0,
           ::xml_schema::container* c = 0) const;
 
   virtual 
-  ~DoFsType ();
+  ~CalibrationSequenceType ();
+};
+
+class CalibratedType: public ::xml_schema::type
+{
+  public:
+  // startSubjectFile
+  // 
+  typedef ::xml_schema::string startSubjectFile_type;
+  typedef ::xsd::cxx::tree::traits< startSubjectFile_type, char > startSubjectFile_traits;
+
+  const startSubjectFile_type&
+  startSubjectFile () const;
+
+  startSubjectFile_type&
+  startSubjectFile ();
+
+  void
+  startSubjectFile (const startSubjectFile_type& x);
+
+  void
+  startSubjectFile (::std::auto_ptr< startSubjectFile_type > p);
+
+  // calibrationSequence
+  // 
+  typedef ::CalibrationSequenceType calibrationSequence_type;
+  typedef ::xsd::cxx::tree::traits< calibrationSequence_type, char > calibrationSequence_traits;
+
+  const calibrationSequence_type&
+  calibrationSequence () const;
+
+  calibrationSequence_type&
+  calibrationSequence ();
+
+  void
+  calibrationSequence (const calibrationSequence_type& x);
+
+  void
+  calibrationSequence (::std::auto_ptr< calibrationSequence_type > p);
+
+  // Constructors.
+  //
+  CalibratedType (const startSubjectFile_type&,
+                  const calibrationSequence_type&);
+
+  CalibratedType (const ::xercesc::DOMElement& e,
+                  ::xml_schema::flags f = 0,
+                  ::xml_schema::container* c = 0);
+
+  CalibratedType (const CalibratedType& x,
+                  ::xml_schema::flags f = 0,
+                  ::xml_schema::container* c = 0);
+
+  virtual CalibratedType*
+  _clone (::xml_schema::flags f = 0,
+          ::xml_schema::container* c = 0) const;
+
+  virtual 
+  ~CalibratedType ();
 
   // Implementation.
   //
@@ -653,7 +733,203 @@ class DoFsType: public ::xml_schema::type
          ::xml_schema::flags);
 
   protected:
-  DoF_sequence DoF_;
+  ::xsd::cxx::tree::one< startSubjectFile_type > startSubjectFile_;
+  ::xsd::cxx::tree::one< calibrationSequence_type > calibrationSequence_;
+};
+
+class UncalibratedType: public ::xml_schema::type
+{
+  public:
+  // subjectID
+  // 
+  typedef ::xml_schema::string subjectID_type;
+  typedef ::xsd::cxx::tree::traits< subjectID_type, char > subjectID_traits;
+
+  const subjectID_type&
+  subjectID () const;
+
+  subjectID_type&
+  subjectID ();
+
+  void
+  subjectID (const subjectID_type& x);
+
+  void
+  subjectID (::std::auto_ptr< subjectID_type > p);
+
+  // additionalInfo
+  // 
+  typedef ::xml_schema::string additionalInfo_type;
+  typedef ::xsd::cxx::tree::traits< additionalInfo_type, char > additionalInfo_traits;
+
+  const additionalInfo_type&
+  additionalInfo () const;
+
+  additionalInfo_type&
+  additionalInfo ();
+
+  void
+  additionalInfo (const additionalInfo_type& x);
+
+  void
+  additionalInfo (::std::auto_ptr< additionalInfo_type > p);
+
+  // Constructors.
+  //
+  UncalibratedType (const subjectID_type&,
+                    const additionalInfo_type&);
+
+  UncalibratedType (const ::xercesc::DOMElement& e,
+                    ::xml_schema::flags f = 0,
+                    ::xml_schema::container* c = 0);
+
+  UncalibratedType (const UncalibratedType& x,
+                    ::xml_schema::flags f = 0,
+                    ::xml_schema::container* c = 0);
+
+  virtual UncalibratedType*
+  _clone (::xml_schema::flags f = 0,
+          ::xml_schema::container* c = 0) const;
+
+  virtual 
+  ~UncalibratedType ();
+
+  // Implementation.
+  //
+  protected:
+  void
+  parse (::xsd::cxx::xml::dom::parser< char >&,
+         ::xml_schema::flags);
+
+  protected:
+  ::xsd::cxx::tree::one< subjectID_type > subjectID_;
+  ::xsd::cxx::tree::one< additionalInfo_type > additionalInfo_;
+};
+
+class CalibrationInfoType: public ::xml_schema::type
+{
+  public:
+  // uncalibrated
+  // 
+  typedef ::UncalibratedType uncalibrated_type;
+  typedef ::xsd::cxx::tree::optional< uncalibrated_type > uncalibrated_optional;
+  typedef ::xsd::cxx::tree::traits< uncalibrated_type, char > uncalibrated_traits;
+
+  const uncalibrated_optional&
+  uncalibrated () const;
+
+  uncalibrated_optional&
+  uncalibrated ();
+
+  void
+  uncalibrated (const uncalibrated_type& x);
+
+  void
+  uncalibrated (const uncalibrated_optional& x);
+
+  void
+  uncalibrated (::std::auto_ptr< uncalibrated_type > p);
+
+  // calibrated
+  // 
+  typedef ::CalibratedType calibrated_type;
+  typedef ::xsd::cxx::tree::optional< calibrated_type > calibrated_optional;
+  typedef ::xsd::cxx::tree::traits< calibrated_type, char > calibrated_traits;
+
+  const calibrated_optional&
+  calibrated () const;
+
+  calibrated_optional&
+  calibrated ();
+
+  void
+  calibrated (const calibrated_type& x);
+
+  void
+  calibrated (const calibrated_optional& x);
+
+  void
+  calibrated (::std::auto_ptr< calibrated_type > p);
+
+  // Constructors.
+  //
+  CalibrationInfoType ();
+
+  CalibrationInfoType (const ::xercesc::DOMElement& e,
+                       ::xml_schema::flags f = 0,
+                       ::xml_schema::container* c = 0);
+
+  CalibrationInfoType (const CalibrationInfoType& x,
+                       ::xml_schema::flags f = 0,
+                       ::xml_schema::container* c = 0);
+
+  virtual CalibrationInfoType*
+  _clone (::xml_schema::flags f = 0,
+          ::xml_schema::container* c = 0) const;
+
+  virtual 
+  ~CalibrationInfoType ();
+
+  // Implementation.
+  //
+  protected:
+  void
+  parse (::xsd::cxx::xml::dom::parser< char >&,
+         ::xml_schema::flags);
+
+  protected:
+  uncalibrated_optional uncalibrated_;
+  calibrated_optional calibrated_;
+};
+
+class DoFSetType: public ::xml_schema::type
+{
+  public:
+  // dof
+  // 
+  typedef ::DoFType dof_type;
+  typedef ::xsd::cxx::tree::sequence< dof_type > dof_sequence;
+  typedef dof_sequence::iterator dof_iterator;
+  typedef dof_sequence::const_iterator dof_const_iterator;
+  typedef ::xsd::cxx::tree::traits< dof_type, char > dof_traits;
+
+  const dof_sequence&
+  dof () const;
+
+  dof_sequence&
+  dof ();
+
+  void
+  dof (const dof_sequence& s);
+
+  // Constructors.
+  //
+  DoFSetType ();
+
+  DoFSetType (const ::xercesc::DOMElement& e,
+              ::xml_schema::flags f = 0,
+              ::xml_schema::container* c = 0);
+
+  DoFSetType (const DoFSetType& x,
+              ::xml_schema::flags f = 0,
+              ::xml_schema::container* c = 0);
+
+  virtual DoFSetType*
+  _clone (::xml_schema::flags f = 0,
+          ::xml_schema::container* c = 0) const;
+
+  virtual 
+  ~DoFSetType ();
+
+  // Implementation.
+  //
+  protected:
+  void
+  parse (::xsd::cxx::xml::dom::parser< char >&,
+         ::xml_schema::flags);
+
+  protected:
+  dof_sequence dof_;
 };
 
 class PointsSequenceType: public ::xml_schema::simple_type,
@@ -783,9 +1059,23 @@ class CurveType: public ::xml_schema::type
   ::xsd::cxx::tree::one< yPoints_type > yPoints_;
 };
 
-class MuscleDefaultType: public ::xml_schema::type
+class MTUDefaultType: public ::xml_schema::type
 {
   public:
+  // emDelay
+  // 
+  typedef ::xml_schema::double_ emDelay_type;
+  typedef ::xsd::cxx::tree::traits< emDelay_type, char, ::xsd::cxx::tree::schema_type::double_ > emDelay_traits;
+
+  const emDelay_type&
+  emDelay () const;
+
+  emDelay_type&
+  emDelay ();
+
+  void
+  emDelay (const emDelay_type& x);
+
   // percentageChange
   // 
   typedef ::xml_schema::double_ percentageChange_type;
@@ -814,42 +1104,43 @@ class MuscleDefaultType: public ::xml_schema::type
   void
   damping (const damping_type& x);
 
-  // Curve
+  // curve
   // 
-  typedef ::CurveType Curve_type;
-  typedef ::xsd::cxx::tree::sequence< Curve_type > Curve_sequence;
-  typedef Curve_sequence::iterator Curve_iterator;
-  typedef Curve_sequence::const_iterator Curve_const_iterator;
-  typedef ::xsd::cxx::tree::traits< Curve_type, char > Curve_traits;
+  typedef ::CurveType curve_type;
+  typedef ::xsd::cxx::tree::sequence< curve_type > curve_sequence;
+  typedef curve_sequence::iterator curve_iterator;
+  typedef curve_sequence::const_iterator curve_const_iterator;
+  typedef ::xsd::cxx::tree::traits< curve_type, char > curve_traits;
 
-  const Curve_sequence&
-  Curve () const;
+  const curve_sequence&
+  curve () const;
 
-  Curve_sequence&
-  Curve ();
+  curve_sequence&
+  curve ();
 
   void
-  Curve (const Curve_sequence& s);
+  curve (const curve_sequence& s);
 
   // Constructors.
   //
-  MuscleDefaultType (const percentageChange_type&,
-                     const damping_type&);
+  MTUDefaultType (const emDelay_type&,
+                  const percentageChange_type&,
+                  const damping_type&);
 
-  MuscleDefaultType (const ::xercesc::DOMElement& e,
-                     ::xml_schema::flags f = 0,
-                     ::xml_schema::container* c = 0);
+  MTUDefaultType (const ::xercesc::DOMElement& e,
+                  ::xml_schema::flags f = 0,
+                  ::xml_schema::container* c = 0);
 
-  MuscleDefaultType (const MuscleDefaultType& x,
-                     ::xml_schema::flags f = 0,
-                     ::xml_schema::container* c = 0);
+  MTUDefaultType (const MTUDefaultType& x,
+                  ::xml_schema::flags f = 0,
+                  ::xml_schema::container* c = 0);
 
-  virtual MuscleDefaultType*
+  virtual MTUDefaultType*
   _clone (::xml_schema::flags f = 0,
           ::xml_schema::container* c = 0) const;
 
   virtual 
-  ~MuscleDefaultType ();
+  ~MTUDefaultType ();
 
   // Implementation.
   //
@@ -859,89 +1150,109 @@ class MuscleDefaultType: public ::xml_schema::type
          ::xml_schema::flags);
 
   protected:
+  ::xsd::cxx::tree::one< emDelay_type > emDelay_;
   ::xsd::cxx::tree::one< percentageChange_type > percentageChange_;
   ::xsd::cxx::tree::one< damping_type > damping_;
-  Curve_sequence Curve_;
+  curve_sequence curve_;
 };
 
-class NMSmodelType: public ::xml_schema::type
+class SubjectType: public ::xml_schema::type
 {
   public:
-  // muscleDefault
+  // mtuDefault
   // 
-  typedef ::MuscleDefaultType muscleDefault_type;
-  typedef ::xsd::cxx::tree::traits< muscleDefault_type, char > muscleDefault_traits;
+  typedef ::MTUDefaultType mtuDefault_type;
+  typedef ::xsd::cxx::tree::traits< mtuDefault_type, char > mtuDefault_traits;
 
-  const muscleDefault_type&
-  muscleDefault () const;
+  const mtuDefault_type&
+  mtuDefault () const;
 
-  muscleDefault_type&
-  muscleDefault ();
-
-  void
-  muscleDefault (const muscleDefault_type& x);
+  mtuDefault_type&
+  mtuDefault ();
 
   void
-  muscleDefault (::std::auto_ptr< muscleDefault_type > p);
+  mtuDefault (const mtuDefault_type& x);
 
-  // muscles
+  void
+  mtuDefault (::std::auto_ptr< mtuDefault_type > p);
+
+  // mtuSet
   // 
-  typedef ::MusclesType muscles_type;
-  typedef ::xsd::cxx::tree::traits< muscles_type, char > muscles_traits;
+  typedef ::MTUSetType mtuSet_type;
+  typedef ::xsd::cxx::tree::traits< mtuSet_type, char > mtuSet_traits;
 
-  const muscles_type&
-  muscles () const;
+  const mtuSet_type&
+  mtuSet () const;
 
-  muscles_type&
-  muscles ();
-
-  void
-  muscles (const muscles_type& x);
+  mtuSet_type&
+  mtuSet ();
 
   void
-  muscles (::std::auto_ptr< muscles_type > p);
+  mtuSet (const mtuSet_type& x);
 
-  // DoFs
+  void
+  mtuSet (::std::auto_ptr< mtuSet_type > p);
+
+  // dofSet
   // 
-  typedef ::DoFsType DoFs_type;
-  typedef ::xsd::cxx::tree::traits< DoFs_type, char > DoFs_traits;
+  typedef ::DoFSetType dofSet_type;
+  typedef ::xsd::cxx::tree::traits< dofSet_type, char > dofSet_traits;
 
-  const DoFs_type&
-  DoFs () const;
+  const dofSet_type&
+  dofSet () const;
 
-  DoFs_type&
-  DoFs ();
-
-  void
-  DoFs (const DoFs_type& x);
+  dofSet_type&
+  dofSet ();
 
   void
-  DoFs (::std::auto_ptr< DoFs_type > p);
+  dofSet (const dofSet_type& x);
+
+  void
+  dofSet (::std::auto_ptr< dofSet_type > p);
+
+  // calibrationInfo
+  // 
+  typedef ::CalibrationInfoType calibrationInfo_type;
+  typedef ::xsd::cxx::tree::traits< calibrationInfo_type, char > calibrationInfo_traits;
+
+  const calibrationInfo_type&
+  calibrationInfo () const;
+
+  calibrationInfo_type&
+  calibrationInfo ();
+
+  void
+  calibrationInfo (const calibrationInfo_type& x);
+
+  void
+  calibrationInfo (::std::auto_ptr< calibrationInfo_type > p);
 
   // Constructors.
   //
-  NMSmodelType (const muscleDefault_type&,
-                const muscles_type&,
-                const DoFs_type&);
+  SubjectType (const mtuDefault_type&,
+               const mtuSet_type&,
+               const dofSet_type&,
+               const calibrationInfo_type&);
 
-  NMSmodelType (::std::auto_ptr< muscleDefault_type >&,
-                ::std::auto_ptr< muscles_type >&,
-                ::std::auto_ptr< DoFs_type >&);
+  SubjectType (::std::auto_ptr< mtuDefault_type >&,
+               ::std::auto_ptr< mtuSet_type >&,
+               ::std::auto_ptr< dofSet_type >&,
+               ::std::auto_ptr< calibrationInfo_type >&);
 
-  NMSmodelType (const ::xercesc::DOMElement& e,
-                ::xml_schema::flags f = 0,
-                ::xml_schema::container* c = 0);
+  SubjectType (const ::xercesc::DOMElement& e,
+               ::xml_schema::flags f = 0,
+               ::xml_schema::container* c = 0);
 
-  NMSmodelType (const NMSmodelType& x,
-                ::xml_schema::flags f = 0,
-                ::xml_schema::container* c = 0);
+  SubjectType (const SubjectType& x,
+               ::xml_schema::flags f = 0,
+               ::xml_schema::container* c = 0);
 
-  virtual NMSmodelType*
+  virtual SubjectType*
   _clone (::xml_schema::flags f = 0,
           ::xml_schema::container* c = 0) const;
 
   virtual 
-  ~NMSmodelType ();
+  ~SubjectType ();
 
   // Implementation.
   //
@@ -951,9 +1262,10 @@ class NMSmodelType: public ::xml_schema::type
          ::xml_schema::flags);
 
   protected:
-  ::xsd::cxx::tree::one< muscleDefault_type > muscleDefault_;
-  ::xsd::cxx::tree::one< muscles_type > muscles_;
-  ::xsd::cxx::tree::one< DoFs_type > DoFs_;
+  ::xsd::cxx::tree::one< mtuDefault_type > mtuDefault_;
+  ::xsd::cxx::tree::one< mtuSet_type > mtuSet_;
+  ::xsd::cxx::tree::one< dofSet_type > dofSet_;
+  ::xsd::cxx::tree::one< calibrationInfo_type > calibrationInfo_;
 };
 
 #include <iosfwd>
@@ -965,18 +1277,18 @@ class NMSmodelType: public ::xml_schema::type
 // Parse a URI or a local file.
 //
 
-::std::auto_ptr< ::NMSmodelType >
+::std::auto_ptr< ::SubjectType >
 subject (const ::std::string& uri,
          ::xml_schema::flags f = 0,
          const ::xml_schema::properties& p = ::xml_schema::properties ());
 
-::std::auto_ptr< ::NMSmodelType >
+::std::auto_ptr< ::SubjectType >
 subject (const ::std::string& uri,
          ::xml_schema::error_handler& eh,
          ::xml_schema::flags f = 0,
          const ::xml_schema::properties& p = ::xml_schema::properties ());
 
-::std::auto_ptr< ::NMSmodelType >
+::std::auto_ptr< ::SubjectType >
 subject (const ::std::string& uri,
          ::xercesc::DOMErrorHandler& eh,
          ::xml_schema::flags f = 0,
@@ -985,37 +1297,37 @@ subject (const ::std::string& uri,
 // Parse std::istream.
 //
 
-::std::auto_ptr< ::NMSmodelType >
+::std::auto_ptr< ::SubjectType >
 subject (::std::istream& is,
          ::xml_schema::flags f = 0,
          const ::xml_schema::properties& p = ::xml_schema::properties ());
 
-::std::auto_ptr< ::NMSmodelType >
+::std::auto_ptr< ::SubjectType >
 subject (::std::istream& is,
          ::xml_schema::error_handler& eh,
          ::xml_schema::flags f = 0,
          const ::xml_schema::properties& p = ::xml_schema::properties ());
 
-::std::auto_ptr< ::NMSmodelType >
+::std::auto_ptr< ::SubjectType >
 subject (::std::istream& is,
          ::xercesc::DOMErrorHandler& eh,
          ::xml_schema::flags f = 0,
          const ::xml_schema::properties& p = ::xml_schema::properties ());
 
-::std::auto_ptr< ::NMSmodelType >
+::std::auto_ptr< ::SubjectType >
 subject (::std::istream& is,
          const ::std::string& id,
          ::xml_schema::flags f = 0,
          const ::xml_schema::properties& p = ::xml_schema::properties ());
 
-::std::auto_ptr< ::NMSmodelType >
+::std::auto_ptr< ::SubjectType >
 subject (::std::istream& is,
          const ::std::string& id,
          ::xml_schema::error_handler& eh,
          ::xml_schema::flags f = 0,
          const ::xml_schema::properties& p = ::xml_schema::properties ());
 
-::std::auto_ptr< ::NMSmodelType >
+::std::auto_ptr< ::SubjectType >
 subject (::std::istream& is,
          const ::std::string& id,
          ::xercesc::DOMErrorHandler& eh,
@@ -1025,18 +1337,18 @@ subject (::std::istream& is,
 // Parse xercesc::InputSource.
 //
 
-::std::auto_ptr< ::NMSmodelType >
+::std::auto_ptr< ::SubjectType >
 subject (::xercesc::InputSource& is,
          ::xml_schema::flags f = 0,
          const ::xml_schema::properties& p = ::xml_schema::properties ());
 
-::std::auto_ptr< ::NMSmodelType >
+::std::auto_ptr< ::SubjectType >
 subject (::xercesc::InputSource& is,
          ::xml_schema::error_handler& eh,
          ::xml_schema::flags f = 0,
          const ::xml_schema::properties& p = ::xml_schema::properties ());
 
-::std::auto_ptr< ::NMSmodelType >
+::std::auto_ptr< ::SubjectType >
 subject (::xercesc::InputSource& is,
          ::xercesc::DOMErrorHandler& eh,
          ::xml_schema::flags f = 0,
@@ -1045,12 +1357,12 @@ subject (::xercesc::InputSource& is,
 // Parse xercesc::DOMDocument.
 //
 
-::std::auto_ptr< ::NMSmodelType >
+::std::auto_ptr< ::SubjectType >
 subject (const ::xercesc::DOMDocument& d,
          ::xml_schema::flags f = 0,
          const ::xml_schema::properties& p = ::xml_schema::properties ());
 
-::std::auto_ptr< ::NMSmodelType >
+::std::auto_ptr< ::SubjectType >
 subject (::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument >& d,
          ::xml_schema::flags f = 0,
          const ::xml_schema::properties& p = ::xml_schema::properties ());
@@ -1064,26 +1376,45 @@ subject (::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument >& d,
 #include <xsd/cxx/xml/dom/auto-ptr.hxx>
 
 void
-operator<< (::xercesc::DOMElement&, const MuscleType&);
+operator<< (::xercesc::DOMElement&, const MTUType&);
 
 void
-operator<< (::xercesc::DOMElement&, const MusclesType&);
+operator<< (::xercesc::DOMElement&, const MTUSetType&);
 
 void
-operator<< (::xercesc::DOMElement&, const MuscleSequenceType&);
+operator<< (::xercesc::DOMElement&, const MTUNameSetType&);
 
 void
-operator<< (::xercesc::DOMAttr&, const MuscleSequenceType&);
+operator<< (::xercesc::DOMAttr&, const MTUNameSetType&);
 
 void
 operator<< (::xml_schema::list_stream&,
-            const MuscleSequenceType&);
+            const MTUNameSetType&);
 
 void
 operator<< (::xercesc::DOMElement&, const DoFType&);
 
 void
-operator<< (::xercesc::DOMElement&, const DoFsType&);
+operator<< (::xercesc::DOMElement&, const CalibrationSequenceType&);
+
+void
+operator<< (::xercesc::DOMAttr&, const CalibrationSequenceType&);
+
+void
+operator<< (::xml_schema::list_stream&,
+            const CalibrationSequenceType&);
+
+void
+operator<< (::xercesc::DOMElement&, const CalibratedType&);
+
+void
+operator<< (::xercesc::DOMElement&, const UncalibratedType&);
+
+void
+operator<< (::xercesc::DOMElement&, const CalibrationInfoType&);
+
+void
+operator<< (::xercesc::DOMElement&, const DoFSetType&);
 
 void
 operator<< (::xercesc::DOMElement&, const PointsSequenceType&);
@@ -1099,24 +1430,24 @@ void
 operator<< (::xercesc::DOMElement&, const CurveType&);
 
 void
-operator<< (::xercesc::DOMElement&, const MuscleDefaultType&);
+operator<< (::xercesc::DOMElement&, const MTUDefaultType&);
 
 void
-operator<< (::xercesc::DOMElement&, const NMSmodelType&);
+operator<< (::xercesc::DOMElement&, const SubjectType&);
 
 // Serialize to std::ostream.
 //
 
 void
 subject (::std::ostream& os,
-         const ::NMSmodelType& x, 
+         const ::SubjectType& x, 
          const ::xml_schema::namespace_infomap& m = ::xml_schema::namespace_infomap (),
          const ::std::string& e = "UTF-8",
          ::xml_schema::flags f = 0);
 
 void
 subject (::std::ostream& os,
-         const ::NMSmodelType& x, 
+         const ::SubjectType& x, 
          ::xml_schema::error_handler& eh,
          const ::xml_schema::namespace_infomap& m = ::xml_schema::namespace_infomap (),
          const ::std::string& e = "UTF-8",
@@ -1124,7 +1455,7 @@ subject (::std::ostream& os,
 
 void
 subject (::std::ostream& os,
-         const ::NMSmodelType& x, 
+         const ::SubjectType& x, 
          ::xercesc::DOMErrorHandler& eh,
          const ::xml_schema::namespace_infomap& m = ::xml_schema::namespace_infomap (),
          const ::std::string& e = "UTF-8",
@@ -1135,14 +1466,14 @@ subject (::std::ostream& os,
 
 void
 subject (::xercesc::XMLFormatTarget& ft,
-         const ::NMSmodelType& x, 
+         const ::SubjectType& x, 
          const ::xml_schema::namespace_infomap& m = ::xml_schema::namespace_infomap (),
          const ::std::string& e = "UTF-8",
          ::xml_schema::flags f = 0);
 
 void
 subject (::xercesc::XMLFormatTarget& ft,
-         const ::NMSmodelType& x, 
+         const ::SubjectType& x, 
          ::xml_schema::error_handler& eh,
          const ::xml_schema::namespace_infomap& m = ::xml_schema::namespace_infomap (),
          const ::std::string& e = "UTF-8",
@@ -1150,7 +1481,7 @@ subject (::xercesc::XMLFormatTarget& ft,
 
 void
 subject (::xercesc::XMLFormatTarget& ft,
-         const ::NMSmodelType& x, 
+         const ::SubjectType& x, 
          ::xercesc::DOMErrorHandler& eh,
          const ::xml_schema::namespace_infomap& m = ::xml_schema::namespace_infomap (),
          const ::std::string& e = "UTF-8",
@@ -1161,14 +1492,14 @@ subject (::xercesc::XMLFormatTarget& ft,
 
 void
 subject (::xercesc::DOMDocument& d,
-         const ::NMSmodelType& x,
+         const ::SubjectType& x,
          ::xml_schema::flags f = 0);
 
 // Serialize to a new xercesc::DOMDocument.
 //
 
 ::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument >
-subject (const ::NMSmodelType& x, 
+subject (const ::SubjectType& x, 
          const ::xml_schema::namespace_infomap& m = ::xml_schema::namespace_infomap (),
          ::xml_schema::flags f = 0);
 
@@ -1179,4 +1510,4 @@ subject (const ::NMSmodelType& x,
 //
 // End epilogue.
 
-#endif // NMSMODEL_HXX
+#endif // CXX_________CFG_XSD_SUBJECT_HXX

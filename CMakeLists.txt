@@ -33,7 +33,11 @@ include_directories(${XERCES_INCLUDE_DIR})
 #find_package(Eigen3 REQUIRED)
 #include_directories(${EIGEN3_INCLUDE_DIR})
 
-SUBDIRS(lib/xmlInput lib/NMSmodel lib/FileIO lib/Producers lib/Calibration src)
+add_subdirectory(lib/xmlInput) 
+add_subdirectory(lib/NMSmodel)
+add_subdirectory(lib/FileIO)
+add_subdirectory(lib/Producers)
+add_subdirectory(lib/Calibration src)
 
 set(dir ${CMAKE_CURRENT_SOURCE_DIR}/build)
 set(EXECUTABLE_OUTPUT_PATH ${dir} CACHE PATH "Build directory" FORCE)

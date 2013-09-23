@@ -12,7 +12,7 @@
 #define SetupDataStructure_
 
 #include <string>
-#include "NMSmodel.hxx"
+#include "subject.hxx"
 #include "Curve.h"
 
 template<typename NMSmodelT>
@@ -30,10 +30,11 @@ public:
 
 private:
     // Create the body structure from the Input
-    std::auto_ptr<NMSmodelType> subjectPointer;
+    std::auto_ptr<SubjectType> subjectPointer_;
     CurveOffline forceVelocityCurve_;
     CurveOffline activeForceLengthCurve_;
     CurveOffline passiveForceLengthCurve_;
+    CurveOffline tendonForceStrain_;
 };
 
 #include "SetupDataStructure.cpp"

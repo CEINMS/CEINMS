@@ -44,12 +44,13 @@ void ModelEvaluationOffline<NMSmodelT>::initOfflineCurve() {
 
     SyncTools::Shared::queueEmgMutex.unlock();
     
+    double globalEmDelay = subject_.getGlobalEmDelay(); 
     unsigned lmtCt = 0;
     double lmtTime = (allLmt.at(0)).back();
     double emgTime; 
     
     for(int emgCt = 0; emgCt < allEmg.size() - 1; ++emgCt) {
-        emgTime = (allEmg.at(emgCt)).back();
+        emgTime = (allEmg.at(emgCt)).back() + globalEmDelay;
         allEmg.at(emgCt).pop_back();
         subject_.setTime(emgTime);
         subject_.setEmgs(allEmg.at(emgCt));
@@ -133,6 +134,8 @@ void ModelEvaluationOffline<NMSmodelT>::operator()() {
 
 //END CHECK MUSCLES
 
+    double globalEmDelay = subject_.getGlobalEmDelay(); 
+
 #ifdef LOG
   cout << "starting consume" << endl;
 #endif
@@ -189,7 +192,7 @@ void ModelEvaluationOffline<NMSmodelT>::operator()() {
 
         do {
             getEmgFromShared(emgFromQueue);
-            emgTime = emgFromQueue.back();
+            emgTime = emgFromQueue.back() + globalEmDelay;
             emgFromQueue.pop_back();
             if(!emgFromQueue.empty()) {
                 //ROBA CHE DEVE FARE EMG
