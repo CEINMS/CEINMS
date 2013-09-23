@@ -306,22 +306,15 @@ void MTU<Activation, Tendon, mode>::updateFibreLengthTrace() {
 template<typename Activation, typename Tendon, CurveMode::Mode mode>
 void MTU<Activation, Tendon, mode>::setCurves(const CurveOffline& activeForceLengthCurve, 
                                               const CurveOffline& passiveForceLengthCurve, 
-                                              const CurveOffline& forceVelocityCurve) {
+                                              const CurveOffline& forceVelocityCurve,
+                                              const CurveOffline& tendonForceStrainCurve) {
     
     activeForceLengthCurve_  = activeForceLengthCurve;
     passiveForceLengthCurve_ = passiveForceLengthCurve;
     forceVelocityCurve_      = forceVelocityCurve;
-    
-    tendonDynamic_.setCurves(activeForceLengthCurve, passiveForceLengthCurve, forceVelocityCurve);
-    resetState();
-}
-
-
-template<typename Activation, typename Tendon, CurveMode::Mode mode>
-void MTU<Activation, Tendon, mode>::setTendonForceStrainCurve(const CurveOffline& tendonForceStrainCurve) {
-        
     tendonForceStrainCurve_ = tendonForceStrainCurve;
-    tendonDynamic_.setTendonForceStrainCurve(tendonForceStrainCurve);
+    
+    tendonDynamic_.setCurves(activeForceLengthCurve, passiveForceLengthCurve, forceVelocityCurve, tendonForceStrainCurve);
     resetState();
 }
 

@@ -139,6 +139,8 @@ public:
     void setMuscleForces(const std::vector<double>& muscleTendonForces);
     void getMomentArmsOnDof(std::vector<double>& momentArms, unsigned whichDof) const;
     
+    double getGlobalEmDelay() const; //NOTE: this will be replaced by singular muscles emdelay
+    
     friend class SetupDataStructure<NMSmodel<Activation, Tendon, mode> >;
     friend std::ostream& operator<< <> (std::ostream& output, const NMSmodel& b);
 

@@ -8,7 +8,7 @@ using std::cout;
 using std::endl;
 #include "ElasticTendon_BiSec.h"
 //#define DEEP_DEBUG
-#define DEBUG
+//#define DEBUG
 
 template <typename T> int sgn(T val) {
     return (T(0) < val) - (val < T(0));
@@ -34,7 +34,7 @@ public:
     return (degrees(asin(value)));
     }
 };
-
+/*
 
 struct TendonSplinePoints {
 
@@ -83,6 +83,7 @@ struct TendonSplinePoints {
     }
     
 };
+*/
 
 ElasticTendon_BiSec::ElasticTendon_BiSec():
 optimalFibreLength_(.0),
@@ -97,13 +98,7 @@ fibreLength_(0.0),
 fibreLengthT1_(0.0),
 activation_(0.0),
 id_("")
-{ 
-    vector<double> x,y;
-    TendonSplinePoints::getX(x);
-    TendonSplinePoints::getY(y);
-
-    tendonForceStrainCurve_.resetPointsWith(x, y);    
-}
+{ }
 
 
 ElasticTendon_BiSec::ElasticTendon_BiSec(std::string id):
@@ -118,14 +113,7 @@ muscleTendonLength_(0.0),
 fibreLength_(0.0),
 fibreLengthT1_(0.0),
 activation_(0.0),
-id_(id) { 
-
-    vector<double> x,y;
-    TendonSplinePoints::getX(x);
-    TendonSplinePoints::getY(y);
-
-    tendonForceStrainCurve_.resetPointsWith(x, y);
-}
+id_(id) { }
 
 
 ElasticTendon_BiSec::ElasticTendon_BiSec (double optimalFibreLength, 
@@ -137,7 +125,8 @@ ElasticTendon_BiSec::ElasticTendon_BiSec (double optimalFibreLength,
                               double strengthCoefficient, 
                               const CurveOffline& activeForceLengthCurve, 
                               const CurveOffline& passiveForceLengthCurve, 
-                              const CurveOffline& forceVelocityCurve):
+                              const CurveOffline& forceVelocityCurve,
+                              const CurveOffline& tendonForceStrainCurve):
 
 optimalFibreLength_(optimalFibreLength),
 pennationAngle_(pennationAngle),
@@ -149,18 +138,13 @@ strengthCoefficient_(strengthCoefficient),
 activeForceLengthCurve_(activeForceLengthCurve),
 passiveForceLengthCurve_(passiveForceLengthCurve),
 forceVelocityCurve_(forceVelocityCurve),
+tendonForceStrainCurve_(tendonForceStrainCurve),
 muscleTendonLength_(0.0),
 fibreLength_(0.0),
 fibreLengthT1_(0.0),
 activation_(0.0),
 id_("")
-{   
-    vector<double> x,y;
-    TendonSplinePoints::getX(x);
-    TendonSplinePoints::getY(y);
-
-    tendonForceStrainCurve_.resetPointsWith(x, y);
-}
+{   }
 
 
 ElasticTendon_BiSec::ElasticTendon_BiSec ( const ElasticTendon_BiSec& orig ) {
@@ -240,17 +224,13 @@ void ElasticTendon_BiSec::pushState() {
 
 void ElasticTendon_BiSec::setCurves(const CurveOffline& activeForceLengthCurve, 
                                           const CurveOffline& passiveForceLengthCurve, 
-                                          const CurveOffline& forceVelocityCurve) { 
+                                          const CurveOffline& forceVelocityCurve,
+                                          const CurveOffline& tendonForceStrainCurve) { 
                                   
     activeForceLengthCurve_  = activeForceLengthCurve;
     passiveForceLengthCurve_ = passiveForceLengthCurve;
     forceVelocityCurve_      = forceVelocityCurve;
-}
-
-
-void ElasticTendon_BiSec::setTendonForceStrainCurve (const ElasticTendon_BiSec::CurveOffline& tendonForceStrainCurve) {
-    
-    tendonForceStrainCurve_ = tendonForceStrainCurve;
+    tendonForceStrainCurve_  = tendonForceStrainCurve;
 }
 
 

@@ -80,6 +80,8 @@ void ModelEvaluationHybrid<NMSmodelT, ErrorMinimizerT>::operator()() {
 
 //END CHECK MUSCLES
 
+    double globalEmDelay = subject_.getGlobalEmDelay(); 
+
 #ifdef LOG
   cout << "starting consume" << endl;
 #endif
@@ -135,7 +137,7 @@ void ModelEvaluationHybrid<NMSmodelT, ErrorMinimizerT>::operator()() {
 
         do {
             getEmgFromShared(emgFromQueue);
-            emgTime = emgFromQueue.back();
+            emgTime = emgFromQueue.back() + globalEmDelay;
             emgFromQueue.pop_back();
             if(emgFromQueue.empty())
                 runCondition = false;

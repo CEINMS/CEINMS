@@ -894,6 +894,13 @@ double NMSmodel<Activation, Tendon, mode>::getMusclePenalty(vector<unsigned>& mu
 
 
 template <typename Activation, typename Tendon, CurveMode::Mode mode>
+double NMSmodel<Activation, Tendon, mode>::getGlobalEmDelay() const {
+  
+    return muscles_.begin()->getEmDelay();
+}
+
+
+template <typename Activation, typename Tendon, CurveMode::Mode mode>
 void NMSmodel<Activation, Tendon, mode>::getMusclesParameters(vector<MuscleParameters>& parameters) {
 
     parameters.clear();

@@ -94,9 +94,7 @@ void SetupDataStructure<NMSmodelT>::createMuscles(NMSmodelT& mySubject) {
         double tendonSlackLength = (*i).tendonSlackLength();
         double strengthCoefficient = (*i).strengthCoefficient();
         newMuscle.setParametersToComputeActivation(c1, c2, shapeFactor);
-        newMuscle.setCurves(activeForceLengthCurve_, passiveForceLengthCurve_, forceVelocityCurve_);
-        if(!tendonForceStrain_.empty())
-            newMuscle.setTendonForceStrainCurve(tendonForceStrain_);
+        newMuscle.setCurves(activeForceLengthCurve_, passiveForceLengthCurve_, forceVelocityCurve_, tendonForceStrain_);
         newMuscle.setParametersToComputeForces(optimalFiberLength, pennationAngle, 
                 tendonSlackLength, percentageChange, damping, maxIsometricForce, strengthCoefficient);
         newMuscle.setEmDelay(emDelay);
@@ -156,7 +154,7 @@ void SetupDataStructure<NMSmodelT>::writeXMLCalibratedFile(NMSmodelT& mySubject,
         mtuDefault.percentageChange(currentMuscle.getPercentageChange());
         mtuDefault.damping(currentMuscle.getDamping());
         mtuDefault.emDelay(currentMuscle.getEmDelay());
-        (*i).emDelay(currentMuscle.getEmDelay());
+      //  (*i).emDelay(currentMuscle.getEmDelay());
         //NOTE: single emDelay not available yet
         (*i).maxIsometricForce(currentMuscle.getMaxIsometricForce());
         (*i).strengthCoefficient(currentMuscle.getStrengthCoefficient());   

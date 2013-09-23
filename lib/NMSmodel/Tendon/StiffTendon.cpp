@@ -32,7 +32,8 @@ StiffTendon::StiffTendon (double optimalFibreLength,
                           double strengthCoefficient, 
                           const CurveOffline& activeForceLengthCurve, 
                           const CurveOffline& passiveForceLengthCurve, 
-                          const CurveOffline& forceVelocityCurve):
+                          const CurveOffline& forceVelocityCurve,
+                          const CurveOffline& tendonForceStrainCurve):
 optimalFibreLength_(optimalFibreLength),
 pennationAngle_(pennationAngle),
 tendonSlackLength_(tendonSlackLength),

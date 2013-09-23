@@ -19,8 +19,8 @@ public:
                    double strengthCoefficient,
                    const CurveOffline& activeForceLengthCurve,
                    const CurveOffline& passiveForceLengthCurve, 
-                   const CurveOffline& forceVelocityCurve
-                 );
+                   const CurveOffline& forceVelocityCurve,
+                   const CurveOffline& tendonForceStrainCurve);
     virtual ~ElasticTendon_BiSec() {}
     ElasticTendon_BiSec(const ElasticTendon_BiSec& orig);
     ElasticTendon_BiSec& operator=(const ElasticTendon_BiSec& orig);
@@ -43,8 +43,8 @@ public:
     void setTendonSlackLength(double tendonSlackLength);
     void setCurves(const CurveOffline& activeForceLengthCurve, 
                    const CurveOffline& passiveForceLengthCurve, 
-                   const CurveOffline& forceVelocityCurve);
-    void setTendonForceStrainCurve(const CurveOffline& tendonForceStrainCurve);
+                   const CurveOffline& forceVelocityCurve,
+                   const CurveOffline& tendonForceStrainCurve);
                    
     void pushState();
     void resetState();

@@ -60,8 +60,7 @@ public:
     double getEmg() const { return activationDynamic_.getEmg(); }
     double getPastEmg() const { return activationDynamic_.getPastEmg(); }
     double getNeuralActivation() const { return activationDynamic_.getNeuralActivation(); }
-    void   setCurves(const CurveOffline& activeForceLengthCurve, const CurveOffline& passiveForceLengthCurve, const CurveOffline& forceVelocityCurve);
-    void   setTendonForceStrainCurve(const CurveOffline& tendonForceLengthCurve);
+    void   setCurves(const CurveOffline& activeForceLengthCurve, const CurveOffline& passiveForceLengthCurve, const CurveOffline& forceVelocityCurve, const CurveOffline& tendonForceLengthCurve);
     void   setActivation(double activation); //recompute all the data that depend on activation
     double getActivation() const {return activation_;}
     void   setEmDelay(double emDelay) { emDelay_ = emDelay;}

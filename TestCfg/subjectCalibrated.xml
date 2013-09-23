@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <subject xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="subject.xsd">
   <mtuDefault>
-    <emDelay>0.10</emDelay>
+    <emDelay>0.0</emDelay>
     <percentageChange>0.15</percentageChange>
     <damping>0.1</damping>
     <curve>
@@ -21,14 +21,13 @@
     </curve>
     <curve>
       <name>tendonForceStrain</name>
-      <xPoints>-10 -1 -0.6 -0.3 -0.1 0 0.1 0.3 0.6 0.8 10</xPoints>
-      <yPoints>0 0 0.08 0.2 0.55 1 1.4 1.6 1.7 1.75 1.75</yPoints>
+      <xPoints>-10 -0.002 -0.001 0 0.00131 0.00281 0.00431 0.00581 0.00731 0.00881 0.0103 0.0118 0.0123 9.2 9.201 9.202 20</xPoints>
+      <yPoints>0 0 0 0 0.0108 0.0257 0.0435 0.0652 0.0915 0.123 0.161 0.208 0.227 345 345 345 345</yPoints>
     </curve>
   </mtuDefault>
   <mtuSet>
     <mtu>
       <name>addbrev_r</name>
-      <emDelay>0.20</emDelay>
       <c1>-0.990271392948656</c1>
       <c2>-0.988390984238687</c2>
       <shapeFactor>-0.00114684392999527</shapeFactor>

@@ -19,8 +19,8 @@ public:
                    double strengthCoefficient,
                    const CurveOffline& activeForceLengthCurve,
                    const CurveOffline& passiveForceLengthCurve, 
-                   const CurveOffline& forceVelocityCurve
-                 );
+                   const CurveOffline& forceVelocityCurve,
+                   const CurveOffline& tendonForceStrainCurve);
     virtual ~StiffTendon();
 
     
@@ -42,8 +42,8 @@ public:
     void setTendonSlackLength(double tendonSlackLength) { tendonSlackLength_ = tendonSlackLength; }
     void setCurves(const CurveOffline& activeForceLengthCurve, 
                    const CurveOffline& passiveForceLengthCurve, 
-                   const CurveOffline& forceVelocityCurve) { };
-    void setTendonForceStrainCurve(const CurveOffline& tendonForceStrainCurve) { };
+                   const CurveOffline& forceVelocityCurve,
+                   const CurveOffline& tendonForceStrainCurve) { };
                    
     void pushState() {};
     void resetState();
