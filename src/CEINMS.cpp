@@ -185,10 +185,10 @@ int main(int argc, char** argv) {
             executionCfg.getMusclesToTrack(toTrack);
             errorMinimizer.setMusclesNamesWithEmgToPredict(toPredict);
             errorMinimizer.setMusclesNamesWithEmgToTrack(toTrack);
-			double rt, t, epsilon;
-			unsigned noEpsilon, ns, nt, maxNoEval;
-			executionCfg.getAnnealingParameters(nt, ns, rt, t, maxNoEval, epsilon, noEpsilon);
-			errorMinimizer.setAnnealingParameters(nt, ns, rt, t, maxNoEval, epsilon, noEpsilon);
+            double rt, t, epsilon;
+            unsigned noEpsilon, ns, nt, maxNoEval;
+            executionCfg.getAnnealingParameters(nt, ns, rt, t, maxNoEval, epsilon, noEpsilon);
+            errorMinimizer.setAnnealingParameters(nt, ns, rt, t, maxNoEval, epsilon, noEpsilon);
             ModelEvaluationHybrid<MyNMSmodel, MyErrorMinimizer> consumer(mySubject, errorMinimizer);
             runThreads(consumer, emgProducer, lmtMaProducer, externalTorqueProducer);
             break;

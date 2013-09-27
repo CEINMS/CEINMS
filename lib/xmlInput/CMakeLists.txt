@@ -15,3 +15,8 @@ ADD_LIBRARY(xmlInputCalibration STATIC
   subject.cxx
   simulatedAnnealing.cxx
 )
+
+ADD_LIBRARY(xmlInputCalibrationTest STATIC
+    subject.cxx
+    calibration.cxx
+    CalibrationXmlReader.cpp)
