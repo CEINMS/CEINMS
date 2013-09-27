@@ -915,6 +915,7 @@ void NMSmodel<Activation, Tendon, mode>::getMusclesParameters(vector<MuscleParam
         parameters.at(i).setTendonSlackLength(muscles_.at(i).getTendonSlackLength());
         parameters.at(i).setMaxIsometricForce(muscles_.at(i).getMaxIsometricForce());
         parameters.at(i).setStrengthCoefficient(muscles_.at(i).getStrengthCoefficient());
+        parameters.at(i).setEmDelay(muscles_.at(i).getEmDelay());
     }
 }
 

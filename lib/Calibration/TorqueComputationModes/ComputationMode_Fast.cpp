@@ -74,7 +74,7 @@ void ComputationMode_Fast<NMSmodelT>::computeTorques(vector< vector< std::vector
         double lmtTime = trials_.at(ct).lmtTimeSteps_.at(k);
 
         for (int i = 0; i < trials_.at(ct).noEmgSteps_; ++i) {
-            double emgTime = trials_.at(ct).emgTimeSteps_.at(i);
+            double emgTime = trials_.at(ct).emgTimeSteps_.at(i) + subject_.getGlobalEmDelay();
             if(emgTime < lmtTime) 
                 subject_.setTime_emgs_updateActivations_pushState_selective(emgTime, trials_.at(ct).emgData_.at(i), musclesToUpdate_);
 
