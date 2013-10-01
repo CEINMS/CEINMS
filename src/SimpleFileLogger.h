@@ -1,3 +1,11 @@
+//__________________________________________________________________________
+// Author(s): Claudio Pizzolato - September 2013
+// email:  claudio.pizzolato@griffithuni.edu.au
+//
+// DO NOT REDISTRIBUTE WITHOUT PERMISSION
+//__________________________________________________________________________
+//
+
 #ifndef SimpleFileLogger_h
 #define SimpleFileLogger_h
 

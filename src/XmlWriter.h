@@ -1,5 +1,5 @@
 //__________________________________________________________________________
-// Author: Claudio Pizzolato, September 2013
+// Author: Claudio Pizzolato - September 2013
 // email:  claudio.pizzolato@griffithuni.edu.au
 //
 // DO NOT REDISTRIBUTE WITHOUT PERMISSION
