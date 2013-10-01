@@ -7,7 +7,7 @@
 class TrialData {
 public:
 
-  void crop( const double from, const double to);
+ // void crop( const double from, const double to);
   std::string id_; // OK
   int noMuscles_; // OK
   int noEmgSteps_; // OK
@@ -21,10 +21,11 @@ public:
   // each ma has a different matrix
   std::vector< std::vector < std::vector < double > > > maData_; // OK 
   unsigned int noTorqueSteps_;
+  std::vector< double > torqueTimeSteps_; // OK
   std::vector< std::vector < double > > torqueData_;
 };
 
 
-#include "TrialData.cpp"
+//#include "TrialData.cpp"
 
 #endif

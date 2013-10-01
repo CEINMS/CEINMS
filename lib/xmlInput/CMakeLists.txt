@@ -2,6 +2,8 @@
 #~/Programs/xerces-c-3.1.1/include/
 #)
 
+include_directories(../Calibration)
+
 ADD_LIBRARY(xmlInput STATIC
     subject.cxx
 #  NMSmodel.cxx

@@ -41,13 +41,28 @@ TARGET_LINK_LIBRARIES( CEINMS
 
 
 
-ADD_EXECUTABLE( calibrate_AllDof mainCalibrate_AllDof.cpp)
+# ADD_EXECUTABLE( calibrate_AllDof mainCalibrate_AllDof.cpp)
+# 
+# TARGET_LINK_LIBRARIES( calibrate_AllDof 
+#       xmlInputCalibration
+#       NMSmodel
+#       FileIO
+# #      Calibration
+# 	  ${XERCES_LIBRARY}
+# )
 
-TARGET_LINK_LIBRARIES( calibrate_AllDof 
-      xmlInputCalibration
+set(CEINMScalibrate_SOURCES
+    CEINMScalibration.cpp
+    ${CMAKE_SOURCE_DIR}/lib/Calibration/InputDataInterpreter.cpp
+    
+)
+    
+add_executable( CEINMScalibrate ${CEINMScalibrate_SOURCES})
+
+TARGET_LINK_LIBRARIES( CEINMScalibrate
+      xmlInputCalibrationTest
       NMSmodel
       FileIO
 #      Calibration
-	  ${XERCES_LIBRARY}
+      ${XERCES_LIBRARY}
 )
-

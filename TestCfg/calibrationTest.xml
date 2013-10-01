@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<calibration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="calibration.xsd">
+
+  <algorithm>
+      <simulatedAnnealing>
+      <noEpsilon>4</noEpsilon>
+      <rt>0.3</rt>
+      <T>20</T>
+      <NS>15</NS>
+      <NT>5</NT>
+      <epsilon>1.E-3</epsilon>
+      <maxNoEval>200000</maxNoEval>
+    </simulatedAnnealing>
+  </algorithm>
+
+  <NMSmodel>
+    <type>
+      <openLoop />
+    </type>
+
+    <tendon>
+      <stiff/>
+    </tendon>
+
+    <activation>
+      <exponential/>
+    </activation>
+  </NMSmodel>
+
+  <calibrationSteps>
+    <step>
+      <dofs>R_knee_fe</dofs> 
+      <objectiveFunction>
+        <minimizeTorqueError/>
+      </objectiveFunction>
+      <computationMode>
+	<fast/>
+      </computationMode> 
+      <strengthCoefficients_ShapeFactor_C1_C2_TendonSLackLength_single />
+    </step>
+	<step>
+      <dofs>R_knee_fe R_hip_fe</dofs> 
+      <objectiveFunction>
+        <minimizeTorqueError/>
+      </objectiveFunction>
+      <computationMode>
+	<fast/>
+      </computationMode> 
+      <strengthCoefficients_ShapeFactor_C1_C2_TendonSLackLength_single />
+    </step>
+  </calibrationSteps>
+
+  <trialSet>
+   _CrossOvers1_
+  </trialSet>
+
+
+</calibration>

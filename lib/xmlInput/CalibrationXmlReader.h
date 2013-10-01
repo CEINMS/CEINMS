@@ -9,14 +9,8 @@
 #include "NMSmodelConfig.h"
 #include "CalibrationCfg.h"
 #include "calibration.hxx"
+#include "SimulatedAnnealingParameters.h"
 
-
-struct SimulatedAnnealingParameters {
-    
-    int noEpsilon, NS, NT, maxNoEval;
-    double rt, T, epsilon;
-    
-};
 
 class Parameter {
     
@@ -62,7 +56,8 @@ public:
     CalibrationCfg::Step getStepCfg() const;
     
     void pushDofName(std::string& dofName);
-    void getDofNames(std::list<std::string>& dofNames);
+    void getDofNames(std::list<std::string>& dofNames) const;
+    void getDofNames(std::vector<std::string>& dofNames) const;
     
     void pushParameter(const Parameter& parameter);
     bool getParameterSet(ParameterSet& parameterSet) const;
@@ -86,8 +81,8 @@ public:
     NMSModelCfg::RunMode getNMSmodelRunMode() const;
     CalibrationCfg::OptimizationAlgorithm getOptimizationAlgorithm() const;
     void getOptimizationAlgorithmParameters(SimulatedAnnealingParameters& parameters) const;  //overload this function when adding new opt algorithms
-    bool popNextCalibrationStep(CalibrationCfg::Step& stepCfg, ParameterSet& parameterSet); 
-   
+    bool popNextCalibrationStep(CalibrationStep& calibrationStep); 
+    void getCalibrationTrials(std::list<std::string>& trials) const;
     friend std::ostream& operator<< (std::ostream& output, const CalibrationXmlReader& b);
     
 private:

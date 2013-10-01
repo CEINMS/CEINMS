@@ -24,7 +24,7 @@ using std::string;
 
 
 //#define LOG_SIMULATED_ANNEALING
-
+/*
 template <typename ParametersT, typename ObjectiveFunctionT,typename TorquesComputationT,typename NMSmodelT>
 SimulatedAnnealing<ParametersT, ObjectiveFunctionT, TorquesComputationT, NMSmodelT>
 ::SimulatedAnnealing(NMSmodelT& mySubject, 
@@ -58,6 +58,38 @@ objectiveFunction_(torquesComputation,  annealingPointer_->epsilon(), annealingP
     // :TODO: questo 1. fa cagare come seed fisso
     srand(1.);
 }
+*/
+template <typename ParametersT, typename ObjectiveFunctionT,typename TorquesComputationT,typename NMSmodelT>
+SimulatedAnnealing<ParametersT, ObjectiveFunctionT, TorquesComputationT, NMSmodelT>
+::SimulatedAnnealing(NMSmodelT& subject,
+                     std::vector<std::string> dofsList, 
+                     TorquesComputationT& torquesComputation,
+                     SimulatedAnnealingParameters simanParameters):
+parameters_(subject, dofsList),
+objectiveFunction_(torquesComputation,  simanParameters.epsilon, simanParameters.noEpsilon) 
+{
+    noParameters_ = parameters_.getNoParameters();
+    x_.resize(noParameters_);
+    parameters_.getStartingVectorParameters(x_);
+    parameters_.setUpperLowerBounds(upperBounds_, lowerBounds_);
+
+    xOpt_.resize(noParameters_);
+    v_.resize(noParameters_);
+    for (int i = 0; i < noParameters_; ++i)
+        v_.at(i) = (upperBounds_.at(i)-lowerBounds_.at(i))/2;    
+    xp_.resize(noParameters_);
+    noAccepted_.resize(noParameters_);
+
+    nt_        = simanParameters.NT;
+    ns_        = simanParameters.NS;
+    rt_        = simanParameters.rt; 
+    t_         = simanParameters.T;
+    maxNoEval_ = simanParameters.maxNoEval;  
+    srand(1.);
+}
+                     
+
+
 
 /*
 //constructor for hybrid annealing

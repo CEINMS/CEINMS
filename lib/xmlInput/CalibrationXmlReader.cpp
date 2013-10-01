@@ -71,6 +71,9 @@ void CalibrationXmlReader::readNMSmodelCfg() {
         
         CalibrationType::NMSmodel_type::type_type& myType(myModel.type());
         runMode_ += NMSModelCfg::OpenLoop;
+        
+        runMode_ += NMSModelCfg::Offline;
+        
     } catch (const xml_schema::exception& e) {
         cout << e << endl;
         exit(EXIT_FAILURE);
@@ -208,16 +211,14 @@ NMSModelCfg::RunMode CalibrationXmlReader::getNMSmodelRunMode() const {
 }
 
 
-bool CalibrationXmlReader::popNextCalibrationStep(CalibrationCfg::Step& stepCfg, ParameterSet& parameterSet) {
+bool CalibrationXmlReader::popNextCalibrationStep(CalibrationStep& calibrationStep) {
 
     if(calibrationSteps_.empty())
-        return 1;
+        return 0;
     
-    CalibrationStep calibrationStep(calibrationSteps_.front());
+    calibrationStep = calibrationSteps_.front();
     calibrationSteps_.pop_front();
-    stepCfg = calibrationStep.getStepCfg();
-    calibrationStep.getParameterSet(parameterSet);
-    return 0;
+    return 1;
 }
 
 
@@ -230,6 +231,12 @@ CalibrationCfg::OptimizationAlgorithm CalibrationXmlReader::getOptimizationAlgor
 void CalibrationXmlReader::getOptimizationAlgorithmParameters(SimulatedAnnealingParameters& parameters) const {
 
     parameters = simanParameters_;
+}
+
+
+void CalibrationXmlReader::getCalibrationTrials(std::list<string>& trials) const {
+
+    trials = calibrationTrials_;
 }
 
 
@@ -258,10 +265,17 @@ CalibrationCfg::Step CalibrationStep::getStepCfg() const {
 }
 
 
-void CalibrationStep::getDofNames(std::list< string >& dofNames) {
+void CalibrationStep::getDofNames(std::list< string >& dofNames) const {
 
     dofNames = dofNames_;
 }
+
+
+void CalibrationStep::getDofNames(std::vector< string >& dofNames) const {
+
+    dofNames.assign(dofNames_.begin(), dofNames_.end());
+}
+
 
 
 bool CalibrationStep::getParameterSet(ParameterSet& parameterSet) const {

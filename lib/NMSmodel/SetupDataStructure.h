@@ -27,7 +27,6 @@ public:
     void  createMuscles(NMSmodelT& mySubject);
     void  createDoFs(NMSmodelT& mySubject);
     void  writeXMLCalibratedFile(NMSmodelT& mySubject, const std::string& XMLfilename);
-
 private:
     // Create the body structure from the Input
     std::auto_ptr<SubjectType> subjectPointer_;

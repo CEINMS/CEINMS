@@ -14,8 +14,9 @@
 #include <vector>
 #include <iostream>
 //#include "NMSmodel.h"
+#include "SimulatedAnnealingParameters.h"
 
-#include "simulatedAnnealing.hxx"
+//#include "simulatedAnnealing.hxx"
 
 // This is implementation is from the paper
 // Global Optimization of Statistical Functions with Simulated Annealing
@@ -39,10 +40,16 @@ template <typename ParametersT, typename ObjectiveFunctionT,typename TorquesComp
 class SimulatedAnnealing {
 
 public:
-    SimulatedAnnealing(NMSmodelT& subject, 
+//     SimulatedAnnealing() {}
+//     SimulatedAnnealing(NMSmodelT& subject, 
+//                        std::vector<std::string> dofsList, 
+//                        const std::string& configurationFile, 
+//                        TorquesComputationT& torquesComputation);
+    SimulatedAnnealing(NMSmodelT& subject,
                        std::vector<std::string> dofsList, 
-                       const std::string& configurationFile, 
-                       TorquesComputationT& torquesComputation);
+                       TorquesComputationT& torquesComputation,
+                       SimulatedAnnealingParameters simanParameters); 
+                       
     //constructor for hybrid annealing
 /*    SimulatedAnnealing(NMSmodel<Activation, Tendon >& subject,
                        std::vector<std::string> dofsList, 

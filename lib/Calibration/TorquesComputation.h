@@ -33,6 +33,10 @@ class TorquesComputation {
                        const std::string& inputDataDirectory, 
                        const std::vector<std::string>& idTrials,
                        const std::vector<std::string>& dofsToCalibrate);
+    TorquesComputation(NMSmodelT& subject, 
+                       const std::vector<TrialData>& trials, 
+                       const std::vector<std::string>& dofsToCalibrate);
+    
     void resizeTorquesVector(std::vector< std::vector< std::vector< double > > >& torques);
     void resizeMusclesVector(std::vector< std::vector< std::vector< double > > >& musclesVector);
     void resizePenaltiesVector(std::vector< std::vector< double > >& penalties);
