@@ -1,3 +1,11 @@
+//__________________________________________________________________________
+// Author(s): Claudio Pizzolato - October 2013
+// email:  claudio.pizzolato@griffithuni.edu.au
+//
+// DO NOT REDISTRIBUTE WITHOUT PERMISSION
+//__________________________________________________________________________
+//
+
 #ifndef CalibrationXmlReader_h
 #define CalibrationXmlReader_h
 
@@ -10,40 +18,8 @@
 #include "CalibrationCfg.h"
 #include "calibration.hxx"
 #include "SimulatedAnnealingParameters.h"
+#include "Parameter.h"
 
-
-class Parameter {
-    
-public:   
-    enum Boundaries {
-        Absolute,
-        RelativeToSubjectValue
-    };
-    
-    enum Assignment {
-        Global,
-        Grouped,
-        Single
-    };
-    
-    typedef std::list<std::string> MuscleNames;
-    typedef std::list<MuscleNames> MuscleGroups;
-    
-
-    void setName(const std::string& name);
-    void setAssignment(Assignment assignment);
-    void pushMuscleGroup(const MuscleNames& group);
-    void setBoundariesType(Boundaries boundaries);
-    void setLowerAndUpperLimits(double lowerLimit, double upperLimit);
-    friend std::ostream& operator<< (std::ostream& output, const Parameter& b);
-private:
-    std::string name_;
-    MuscleGroups muscleGroups_;
-    Boundaries boundariesType_;
-    Assignment assignment_;
-    double lowerLimit_;
-    double upperLimit_;
-};
 
 typedef std::list<Parameter> ParameterSet ;
 

@@ -9,6 +9,7 @@
 #ifndef StrengthCoefficients_ShapeFactor_C1_C2_TendonSlackLength_single_h
 #define StrengthCoefficients_ShapeFactor_C1_C2_TendonSlackLength_single_h
 
+#include "ParametersToOptimize.h"
 #include <iostream>
 #include <string>
 #include <vector>
@@ -22,14 +23,14 @@ std::ostream& operator<< (std::ostream& output,
 
 
 template <typename NMSmodelT>
-class StrengthCoefficients_ShapeFactor_C1_C2_TendonSlackLength_single {
+class StrengthCoefficients_ShapeFactor_C1_C2_TendonSlackLength_single : public ParametersToOptimize {
 public:
     StrengthCoefficients_ShapeFactor_C1_C2_TendonSlackLength_single(NMSmodelT& subject, std::vector< std::string >& dofToCalibrate);
     // the number of parameters is strength coeffs (3) + tendon slack lengths (= no Muscles) + SlackLength + C1 + C2
     int getNoParameters() { return noParameters_; }
     void getStartingVectorParameters(std::vector<double>& x);
     void setVectorParameters(const std::vector<double>& x);
-    void setUpperLowerBounds(std::vector<double>& upperBounds, std::vector<double>& lowerBounds);
+    void getUpperLowerBounds(std::vector<double>& upperBounds, std::vector<double>& lowerBounds);
     friend std::ostream& operator<< <> (std::ostream& output, 
                   const StrengthCoefficients_ShapeFactor_C1_C2_TendonSlackLength_single& p);
 private:

@@ -1,5 +1,12 @@
-#include "CalibrationXmlReader.h"
+//__________________________________________________________________________
+// Author(s): Claudio Pizzolato - October 2013
+// email:  claudio.pizzolato@griffithuni.edu.au
+//
+// DO NOT REDISTRIBUTE WITHOUT PERMISSION
+//__________________________________________________________________________
+//
 
+#include "CalibrationXmlReader.h"
 
 #include <string>
 using std::string;
@@ -296,36 +303,6 @@ void CalibrationStep::pushDofName(string& dofName) {
 }
 
 
-void Parameter::setName(const string& name) {
-
-    name_ = name;
-}
-
-
-void Parameter::setAssignment(Parameter::Assignment assignment) {
-
-    assignment_ = assignment;
-}
-
-
-void Parameter::pushMuscleGroup(const Parameter::MuscleNames& group) {
-
-    muscleGroups_.push_back(group);
-}
-
-void Parameter::setBoundariesType(Parameter::Boundaries boundaries) {
-
-    boundariesType_ = boundaries;
-}
-
-
-void Parameter::setLowerAndUpperLimits(double lowerLimit, double upperLimit) {
-
-    lowerLimit_ = lowerLimit;
-    upperLimit_ = upperLimit;
-}
-
-
 std::ostream& operator<< (std::ostream& output, const CalibrationXmlReader& rhs) {
  
     output << "Calibration configuration\n";
@@ -403,51 +380,6 @@ std::ostream& operator<< (std::ostream& output, const CalibrationStep& rhs) {
     }    
     return output;
 }
-
-
-std::ostream& operator<< (std::ostream& output, const Parameter& rhs) {
-    
-    output << " ---- Parameter: " << rhs.name_ << std::endl;
-    switch(rhs.assignment_) {
-        case Parameter::Global:
-            output << " ---- Global\n";
-            break;
-        case Parameter::Grouped:
-            output << " ---- Grouped:\n";
-            for(typename Parameter::MuscleGroups::const_iterator mgIt = rhs.muscleGroups_.begin(); mgIt != rhs.muscleGroups_.end(); ++mgIt) {
-                output << " ----- Group: ";
-                for(typename Parameter::MuscleNames::const_iterator mIt = mgIt->begin(); mIt != mgIt->end(); ++mIt)
-                    output << *mIt << " ";
-                output << std::endl;
-            }        
-            break;
-        case Parameter::Single:
-            output << " ---- Single\n";
-            break;
-        default:
-            output << " ---- Not Found\n";
-            break;
-        
-    }
-    switch(rhs.boundariesType_) {
-        case (Parameter::Absolute):
-            output << " ----- Absolute Range ";
-            break;
-        case (Parameter::RelativeToSubjectValue):
-            output << " ----- Relative Range ";
-            break;
-        default:
-            output << " ----- Not Found\n";
-    }
-    output << rhs.lowerLimit_ << " " << rhs.upperLimit_ << std::endl;
-    return output;
-}
-
-//implementare tutti i metodi mancanti
-//compilare la classe
-//scrivere operator>> per verificare il parsing
-
-
 
 
 

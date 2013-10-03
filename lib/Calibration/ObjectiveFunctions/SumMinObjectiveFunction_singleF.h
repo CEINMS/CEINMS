@@ -1,15 +1,16 @@
 //__________________________________________________________________________
 // Author(s): Claudio Pizzolato, Monica Reggiani - September 2013
 // email:  claudio.pizzolato@griffithuni.edu.au
+//         monica.reggiani@gmail.com
 //
 // DO NOT REDISTRIBUTE WITHOUT PERMISSION
 //__________________________________________________________________________
 //
 
-
 #ifndef SumMinObjectiveFunction_singleF_h
 #define SumMinObjectiveFunction_singleF_h
 
+#include "ObjectiveFunction.h"
 #include <vector>
 /**
  *
@@ -22,7 +23,7 @@
  */
 
 template<typename TorquesComputationT>
-class SumMinObjectiveFunction_singleF {
+class SumMinObjectiveFunction_singleF : public ObjectiveFunction {
 public:
     SumMinObjectiveFunction_singleF(TorquesComputationT& torquesComputation, 
                                     double epsilon, 

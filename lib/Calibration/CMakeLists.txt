@@ -38,6 +38,7 @@ INCLUDE_DIRECTORIES(
   ${CMAKE_SOURCE_DIR}/lib/Curve
   ${CMAKE_SOURCE_DIR}/lib/FileIO
   ${CMAKE_SOURCE_DIR}/lib/Calibration
+  ${CMAKE_SOURCE_DIR}/lib/common
 )
 
 #ADD_LIBRARY(Calibration STATIC

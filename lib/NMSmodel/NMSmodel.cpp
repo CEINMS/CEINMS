@@ -547,6 +547,18 @@ void NMSmodel<Activation, Tendon, mode>::getTorques(vector<double>& torques) con
 
 
 template <typename Activation, typename Tendon, CurveMode::Mode mode>
+void NMSmodel<Activation, Tendon, mode>::getStrengthCoefficients(vector<double>& strengthCoefficients) const {
+    
+    strengthCoefficients.clear();
+    strengthCoefficients.reserve(muscles_.size());
+    vectorMTUconstItr muscleIt = muscles_.begin();
+    for (muscleIt = muscles_.begin(); muscleIt < muscles_.end(); ++muscleIt) 
+        strengthCoefficients.push_back(muscleIt->getStrengthCoefficient());
+}
+
+
+
+template <typename Activation, typename Tendon, CurveMode::Mode mode>
 void NMSmodel<Activation, Tendon, mode>::getTendonSlackLengths(vector<double>& tendonSlackLengths) const {
     
     tendonSlackLengths.clear();
@@ -769,6 +781,16 @@ void NMSmodel<Activation, Tendon, mode>::setStrengthCoefficientsBasedOnGroups(co
     for (unsigned int i = 0; i < values.size(); ++i)
         for (unsigned int j = 0; j < muscleGroups.at(i).size(); ++j)
             muscles_.at(muscleGroups.at(i).at(j)).setStrengthCoefficient(values.at(i));  
+}
+
+
+template <typename Activation, typename Tendon, CurveMode::Mode mode>
+void NMSmodel<Activation, Tendon, mode>::setStrengthCoefficients(const vector<double>& strengthCoefficients){
+ 
+    vectorMTUitr muscleIt = muscles_.begin();
+    vector<double>::const_iterator strengthCoefficientsIt = strengthCoefficients.begin();
+    for (muscleIt = muscles_.begin(); muscleIt < muscles_.end(); ++muscleIt, ++strengthCoefficientsIt) 
+        muscleIt->setStrengthCoefficient(*strengthCoefficientsIt);
 }
 
 
