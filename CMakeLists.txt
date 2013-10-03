@@ -37,7 +37,9 @@ add_subdirectory(lib/xmlInput)
 add_subdirectory(lib/NMSmodel)
 add_subdirectory(lib/FileIO)
 add_subdirectory(lib/Producers)
-add_subdirectory(lib/Calibration src)
+add_subdirectory(lib/Calibration)
+add_subdirectory(src)
+
 
 set(dir ${CMAKE_CURRENT_SOURCE_DIR}/build)
 set(EXECUTABLE_OUTPUT_PATH ${dir} CACHE PATH "Build directory" FORCE)
