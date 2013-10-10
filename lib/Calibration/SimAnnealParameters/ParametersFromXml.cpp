@@ -146,7 +146,7 @@ void ParametersFromXml<NMSmodelT>::getMuscleGroupIndex(const MuscleGroups& muscl
 }
    
 
-//NOTE: when using global o single parameters, only the calibrating dofs are being considered
+//NOTE: when using global o single parameters, only the calibrating dofs are considered
 template<typename NMSmodelT>
 void ParametersFromXml<NMSmodelT>::getMuscleGroupIndex(ParameterAssignment parameterAssignment, MuscleGroupsIdx& muscleGroupsIdx) {
 
