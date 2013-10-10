@@ -90,6 +90,7 @@ public:
     void setStrengthCoefficientsBasedOnGroups(
                 const std::vector<double>& values, 
                 const std::vector< std::vector< int > >& muscleGroups);
+    void setStrengthCoefficients(const std::vector<double>& strengthCoefficients);
     void setShapeFactor(double shapeFactor);
     void setShapeFactors(const std::vector<double>& shapeFactors);
     void setC1(double C1);
@@ -131,6 +132,7 @@ public:
     void getC1Coefficients(std::vector<double>& c1Coefficients) const;
     double getC2() const { return muscles_.at(0).getC2();}
     void getC2Coefficients(std::vector<double>& c2Coefficients) const;  
+    void getStrengthCoefficients(std::vector<double>& strengthCoefficients) const;
     void getTendonSlackLengths(std::vector<double>& tendonSlackLengths) const;
     void getMuscle(MTUtype& muscle, const std::string& muscleName);  
     double getMusclePenalty() const;

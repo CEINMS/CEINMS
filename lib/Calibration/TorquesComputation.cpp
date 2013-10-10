@@ -1,11 +1,12 @@
-// This is part of
-// NeuroMuscoloSkeletal Model Software (NMS)
-// Copyright (C) 2010 David Lloyd Massimo Sartori Monica Reggiani
+//__________________________________________________________________________
+// Author(s): Claudio Pizzolato, Monica Reggiani - September 2013
+// email:  claudio.pizzolato@griffithuni.edu.au
+//         monica.reggiani@gmail.com
 //
-// ?? Licenza ??
+// DO NOT REDISTRIBUTE WITHOUT PERMISSION
+//__________________________________________________________________________
 //
-// The authors may be contacted via:
-// email: massimo.sartori@gmail.com monica.reggiani@gmail.com
+
 
 #include "TrialData.h"
 
@@ -30,6 +31,18 @@ using std::endl;
 
 
 //#define DEBUG
+
+template <typename ComputationModeT, typename NMSmodelT>
+TorquesComputation<ComputationModeT, NMSmodelT>::TorquesComputation(NMSmodelT& subject,  
+                                                                    const std::vector<TrialData>& trials, 
+                                                                    const std::vector<std::string>& dofsToCalibrate)
+:subject_(subject), dofsToCalibrate_(dofsToCalibrate), computationMode_(subject), trials_(trials) 
+{
+    computationMode_.setTrials(trials_);
+}
+
+
+
 template <typename ComputationModeT, typename NMSmodelT>
 TorquesComputation<ComputationModeT, NMSmodelT>::TorquesComputation(NMSmodelT& subject, 
                        const std::string& inputDataDirectory, 
@@ -179,7 +192,7 @@ TorquesComputation<ComputationModeT, NMSmodelT>::TorquesComputation(NMSmodelT& s
         } // done with the k   
        
        //TODO: we have to move this from hard-coded to user defined.
-       trials_.at(i).crop(0.0, 1.0);
+     //  trials_.at(i).crop(0.0, 1.0);
         
     } // done with the trials
     subject_.getMusclesIndexFromDofs(musclesIndexList_, trials_.at(0).dofNames_);                       

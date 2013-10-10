@@ -1,11 +1,12 @@
-// This is part of
-// NeuroMuscoloSkeletal Model Software (NMS)
-// Copyright (C) 2010 David Lloyd Massimo Sartori Monica Reggiani
+//__________________________________________________________________________
+// Author(s): Claudio Pizzolato, Monica Reggiani - October 2013
+// email:  claudio.pizzolato@griffithuni.edu.au
+//         monica.reggiani@gmail.com
 //
-// ?? Licenza ??
+// DO NOT REDISTRIBUTE WITHOUT PERMISSION
+//__________________________________________________________________________
 //
-// The authors may be contacted via:
-// email: massimo.sartori@gmail.com monica.reggiani@gmail.com
+
 
 
 #include "SimulatedAnnealing.h"
@@ -25,21 +26,17 @@ using std::string;
 
 //#define LOG_SIMULATED_ANNEALING
 
-template <typename ParametersT, typename ObjectiveFunctionT,typename TorquesComputationT,typename NMSmodelT>
-SimulatedAnnealing<ParametersT, ObjectiveFunctionT, TorquesComputationT, NMSmodelT>
-::SimulatedAnnealing(NMSmodelT& mySubject, 
-                     vector<string> dofsList,
-                     const string& configurationFile, 
-                     TorquesComputationT& torquesComputation):
-    
-annealingPointer_(simulatedAnnealing(configurationFile.c_str())),
-parameters_(mySubject, dofsList),
-objectiveFunction_(torquesComputation,  annealingPointer_->epsilon(), annealingPointer_->noEpsilon())  {
-    
+
+template <typename ParametersT, typename ObjectiveFunctionT,typename TorquesComputationT>
+SimulatedAnnealing<ParametersT, ObjectiveFunctionT, TorquesComputationT>
+::SimulatedAnnealing(ParametersT& parametersPolicy, TorquesComputationT& torquesComputation, SimulatedAnnealingParameters simanParameters)
+:parameters_(parametersPolicy),
+objectiveFunction_(torquesComputation,  simanParameters.epsilon, simanParameters.noEpsilon) {
+     
     noParameters_ = parameters_.getNoParameters();
     x_.resize(noParameters_);
     parameters_.getStartingVectorParameters(x_);
-    parameters_.setUpperLowerBounds(upperBounds_, lowerBounds_);
+    parameters_.getUpperLowerBounds(upperBounds_, lowerBounds_);
 
     xOpt_.resize(noParameters_);
     v_.resize(noParameters_);
@@ -48,62 +45,18 @@ objectiveFunction_(torquesComputation,  annealingPointer_->epsilon(), annealingP
     xp_.resize(noParameters_);
     noAccepted_.resize(noParameters_);
 
-    // we setup the data for the simulated annealing based on the configurationFile
-    nt_        = annealingPointer_->NT();
-    ns_        = annealingPointer_->NS();
-    rt_        = annealingPointer_->rt(); 
-    t_         = annealingPointer_->T();
-    maxNoEval_ = annealingPointer_->maxNoEval();  
-
-    // :TODO: questo 1. fa cagare come seed fisso
+    nt_        = simanParameters.NT;
+    ns_        = simanParameters.NS;
+    rt_        = simanParameters.rt; 
+    t_         = simanParameters.T;
+    maxNoEval_ = simanParameters.maxNoEval;  
     srand(1.);
-}
-
-/*
-//constructor for hybrid annealing
-//TODO: remove hardcoded hybrid parameters
-template <template <typename, typename, bool> class Parameters, 
-          template <template <typename, typename, bool> class, typename, typename, bool> class ObjectiveFunction, 
-          template <typename, typename, bool> class ComputationMode,
-          typename Activation,
-          typename Tendon,
-          bool     safeCheck>
-SimulatedAnnealing<Parameters, ObjectiveFunction, ComputationMode,
-                   Activation, Tendon >::SimulatedAnnealing(NMSmodel<Activation, Tendon >& mySubject, 
-                                                                      vector<string>& muscleNamesWithEMGtoTrack,
-                                                                      vector<string>& muscleNamesWithEMGtoPredict,
-                                                                      const HybridParameters hybridParameters,
-                                                                      StaticTorquesComputation<ComputationMode, Activation, Tendon >& staticTorquesComputation):
-    parameters_(mySubject, muscleNamesWithEMGtoTrack, muscleNamesWithEMGtoPredict),
-    objectiveFunction_( staticTorquesComputation,  1.E-4, 8, hybridParameters) 
-{
     
-    noParameters_ = parameters_.getNoParameters();
-    x_.resize(noParameters_);
-    parameters_.getStartingVectorParameters(x_);
-    parameters_.setUpperLowerBounds(upperBounds_, lowerBounds_);
-
-    xOpt_.resize(noParameters_);
-    v_.resize(noParameters_);
-    for (int i = 0; i < noParameters_; ++i)
-        v_.at(i) = (upperBounds_.at(i)-lowerBounds_.at(i))/2;    
-    xp_.resize(noParameters_);
-    noAccepted_.resize(noParameters_);
-
-    // we setup the data for the simulated annealing based on the configurationFile
-        nt_        = 5;
-        ns_        = 20;
-        rt_        = 0.4;
-        t_         = 20;
-        maxNoEval_ = 200000000;
-
-    // :TODO: questo 1. fa cagare come seed fisso
-    srand(1.);
 }
 
-*/
-template <typename ParametersT, typename ObjectiveFunctionT,typename TorquesComputationT,typename NMSmodelT>
-void SimulatedAnnealing<ParametersT, ObjectiveFunctionT, TorquesComputationT, NMSmodelT>
+
+template <typename ParametersT, typename ObjectiveFunctionT,typename TorquesComputationT>
+void SimulatedAnnealing<ParametersT, ObjectiveFunctionT, TorquesComputationT>
 ::checkBounds(int k) {
     
     if((xp_.at(k) < lowerBounds_.at(k)) || 
@@ -112,8 +65,8 @@ void SimulatedAnnealing<ParametersT, ObjectiveFunctionT, TorquesComputationT, NM
 }
 
 
-template <typename ParametersT, typename ObjectiveFunctionT,typename TorquesComputationT,typename NMSmodelT>
-void SimulatedAnnealing<ParametersT, ObjectiveFunctionT, TorquesComputationT, NMSmodelT>
+template <typename ParametersT, typename ObjectiveFunctionT,typename TorquesComputationT>
+void SimulatedAnnealing<ParametersT, ObjectiveFunctionT, TorquesComputationT>
 ::optimize() {
 
     int noEval = 0;
@@ -269,9 +222,9 @@ void SimulatedAnnealing<ParametersT, ObjectiveFunctionT, TorquesComputationT, NM
 }
 
 
-template <typename ParametersT, typename ObjectiveFunctionT,typename TorquesComputationT,typename NMSmodelT>
+template <typename ParametersT, typename ObjectiveFunctionT,typename TorquesComputationT>
 std::ostream& operator<< (std::ostream& output, 
-                          const SimulatedAnnealing<ParametersT, ObjectiveFunctionT, TorquesComputationT, NMSmodelT>& sa)
+                          const SimulatedAnnealing<ParametersT, ObjectiveFunctionT, TorquesComputationT>& sa)
 {
     output << "NT:        " << sa.nt_ << endl;
     output << "NS:        " << sa.ns_ << endl;

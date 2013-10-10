@@ -1,11 +1,12 @@
-// This is part of
-// NeuroMuscoloSkeletal Model Software (NMS)
-// Copyright (C) 2010 David Lloyd Massimo Sartori Monica Reggiani
+//__________________________________________________________________________
+// Author(s): Claudio Pizzolato, Monica Reggiani - October 2013
+// email:  claudio.pizzolato@griffithuni.edu.au
+//         monica.reggiani@gmail.com
 //
-// ?? Licenza ??
+// DO NOT REDISTRIBUTE WITHOUT PERMISSION
+//__________________________________________________________________________
 //
-// The authors may be contacted via:
-// email: massimo.sartori@gmail.com monica.reggiani@gmail.com
+
 
 #ifndef SimulatedAnnealing_h
 #define SimulatedAnnealing_h
@@ -13,9 +14,7 @@
 #include <string>
 #include <vector>
 #include <iostream>
-//#include "NMSmodel.h"
-
-#include "simulatedAnnealing.hxx"
+#include "SimulatedAnnealingParameters.h"
 
 // This is implementation is from the paper
 // Global Optimization of Statistical Functions with Simulated Annealing
@@ -23,30 +22,23 @@
 // please refer to the papers for the meaning of the variables
 
 
-template <typename ParametersT, typename ObjectiveFunctionT,typename TorquesComputationT,typename NMSmodelT>
+template <typename ParametersT, typename ObjectiveFunctionT,typename TorquesComputationT>
 class SimulatedAnnealing;
 
 
-template <typename ParametersT, typename ObjectiveFunctionT,typename TorquesComputationT,typename NMSmodelT>
+template <typename ParametersT, typename ObjectiveFunctionT,typename TorquesComputationT>
 std::ostream& operator<< (std::ostream&, 
                           const SimulatedAnnealing<ParametersT, 
                                                    ObjectiveFunctionT, 
-                                                   TorquesComputationT, 
-                                                   NMSmodelT>& sa);
+                                                   TorquesComputationT>& sa);
 
 
-template <typename ParametersT, typename ObjectiveFunctionT,typename TorquesComputationT,typename NMSmodelT>
+template <typename ParametersT, typename ObjectiveFunctionT,typename TorquesComputationT>
 class SimulatedAnnealing {
 
 public:
-    SimulatedAnnealing(NMSmodelT& subject, 
-                       std::vector<std::string> dofsList, 
-                       const std::string& configurationFile, 
-                       TorquesComputationT& torquesComputation);
-    //constructor for hybrid annealing
-/*    SimulatedAnnealing(NMSmodel<Activation, Tendon >& subject,
-                       std::vector<std::string> dofsList, 
-                       StaticTorquesComputation<ComputationMode, Activation, Tendon >& staticTorquesComputation);*/
+    
+    SimulatedAnnealing(ParametersT& parametersPolicy, TorquesComputationT& torquesComputation, SimulatedAnnealingParameters simanParameters); 
     void optimize();
     friend std::ostream& operator<< <> (std::ostream& output, const SimulatedAnnealing& sa);
 

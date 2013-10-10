@@ -1,3 +1,11 @@
+//__________________________________________________________________________
+// Author(s): Claudio Pizzolato - October 2013
+// email:  claudio.pizzolato@griffithuni.edu.au
+//
+// DO NOT REDISTRIBUTE WITHOUT PERMISSION
+//__________________________________________________________________________
+//
+
 #define _USE_MATH_DEFINES
 #include <math.h>
 #include <vector>
@@ -7,12 +15,15 @@ using std::vector;
 using std::cout;
 using std::endl;
 #include "ElasticTendon_BiSec.h"
+#include <functional>
+#include <boost/concept_check.hpp>
+#include "../RootSolvers/WDBsolver.h"
 //#define DEEP_DEBUG
 //#define DEBUG
 
-template <typename T> int sgn(T val) {
-    return (T(0) < val) - (val < T(0));
-}
+// template <typename T> int sgn(T val) {
+//     return (T(0) < val) - (val < T(0));
+// }
 
 inline double radians (double d) {
 return d * M_PI / 180;
@@ -307,25 +318,29 @@ double ElasticTendon_BiSec::estimateFiberLengthBiSec(double tol, unsigned maxIte
             cout << fl << " " << evaluateForceError(fl) << endl;
         }
     }*/
-    do {
-        currentFibreLength = (minFibreLength + maxFibreLength)/2.;
-        double currentForceError = evaluateForceError(currentFibreLength);
-        if(fabs(currentForceError) < 0.001) {
-#ifdef DEBUG
-            cout << "currentForceError " << currentForceError << " tol " << tol << endl;
-#endif
-            runCondition = false;
-        }
-        if(sgn(currentForceError) == sgn(evaluateForceError(minFibreLength)))
-            minFibreLength = currentFibreLength;
-        else
-            maxFibreLength = currentFibreLength;
-        ++nIter;
-        if(nIter > maxIterations) {
-            runCondition = false;
-            cout << "warning, solution not found for " << id_ << std::endl;
-        }
-    } while(runCondition);
+  
+  /*
+    if(sgn(evaluateForceError(minFibreLength)) != sgn(evaluateForceError(maxFibreLength))) {
+        do {
+            currentFibreLength = (minFibreLength + maxFibreLength)/2.;
+            double currentForceError = evaluateForceError(currentFibreLength);
+            if(fabs(currentForceError) < 0.001) {
+    #ifdef DEBUG
+                cout << "currentForceError " << currentForceError << " tol " << tol << endl;
+    #endif
+                runCondition = false;
+            }
+            if(sgn(currentForceError) == sgn(evaluateForceError(minFibreLength)))
+                minFibreLength = currentFibreLength;
+            else
+                maxFibreLength = currentFibreLength;
+            ++nIter;
+            if(nIter > maxIterations) {
+                runCondition = false;
+   //         cout << "warning, solution not found for " << id_ << std::endl;
+            }
+        } while(runCondition);
+    }
 #ifdef DEBUG
     cout << "Error @ " << currentFibreLength << " " << currentFibreLength/optimalFibreLength_ << "OFL " 
          << evaluateForceError(currentFibreLength) 
@@ -333,12 +348,27 @@ double ElasticTendon_BiSec::estimateFiberLengthBiSec(double tol, unsigned maxIte
     double pennationAngleAtT = PennationAngle::compute(currentFibreLength, optimalFibreLength_, pennationAngle_);
     double tendonLength = muscleTendonLength_ - currentFibreLength*cos(radians(pennationAngleAtT)); 
     if (tendonLength < tendonSlackLength_)
-        cout << "WARNING tendonLength < tendonSlackLength_ " << tendonLength << " " << tendonSlackLength_ << endl;
+ //       cout << "WARNING tendonLength < tendonSlackLength_ " << tendonLength << " " << tendonSlackLength_ << endl;
 #endif
-    return currentFibreLength;    
+        
+        */
+    try {  
+        currentFibreLength = wdbSolve(*this, minFibreLength, maxFibreLength, tol);
+    } catch (...) {
+    
+        currentFibreLength = optimalFibreLength_;
+    }
+    
+    return currentFibreLength;
 
 }
 
+
+double ElasticTendon_BiSec::operator()(double fl) {
+
+    return evaluateForceError(fl);
+}
+ 
 
 double ElasticTendon_BiSec::evaluateForceError(double fiberLength) {
     

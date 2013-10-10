@@ -547,6 +547,18 @@ void NMSmodel<Activation, Tendon, mode>::getTorques(vector<double>& torques) con
 
 
 template <typename Activation, typename Tendon, CurveMode::Mode mode>
+void NMSmodel<Activation, Tendon, mode>::getStrengthCoefficients(vector<double>& strengthCoefficients) const {
+    
+    strengthCoefficients.clear();
+    strengthCoefficients.reserve(muscles_.size());
+    vectorMTUconstItr muscleIt = muscles_.begin();
+    for (muscleIt = muscles_.begin(); muscleIt < muscles_.end(); ++muscleIt) 
+        strengthCoefficients.push_back(muscleIt->getStrengthCoefficient());
+}
+
+
+
+template <typename Activation, typename Tendon, CurveMode::Mode mode>
 void NMSmodel<Activation, Tendon, mode>::getTendonSlackLengths(vector<double>& tendonSlackLengths) const {
     
     tendonSlackLengths.clear();
@@ -773,6 +785,16 @@ void NMSmodel<Activation, Tendon, mode>::setStrengthCoefficientsBasedOnGroups(co
 
 
 template <typename Activation, typename Tendon, CurveMode::Mode mode>
+void NMSmodel<Activation, Tendon, mode>::setStrengthCoefficients(const vector<double>& strengthCoefficients){
+ 
+    vectorMTUitr muscleIt = muscles_.begin();
+    vector<double>::const_iterator strengthCoefficientsIt = strengthCoefficients.begin();
+    for (muscleIt = muscles_.begin(); muscleIt < muscles_.end(); ++muscleIt, ++strengthCoefficientsIt) 
+        muscleIt->setStrengthCoefficient(*strengthCoefficientsIt);
+}
+
+
+template <typename Activation, typename Tendon, CurveMode::Mode mode>
 void NMSmodel<Activation, Tendon, mode>::setShapeFactor(double shapeFactor) {
 
     vectorMTUitr muscleIt = muscles_.begin();
@@ -915,6 +937,7 @@ void NMSmodel<Activation, Tendon, mode>::getMusclesParameters(vector<MuscleParam
         parameters.at(i).setTendonSlackLength(muscles_.at(i).getTendonSlackLength());
         parameters.at(i).setMaxIsometricForce(muscles_.at(i).getMaxIsometricForce());
         parameters.at(i).setStrengthCoefficient(muscles_.at(i).getStrengthCoefficient());
+        parameters.at(i).setEmDelay(muscles_.at(i).getEmDelay());
     }
 }
 

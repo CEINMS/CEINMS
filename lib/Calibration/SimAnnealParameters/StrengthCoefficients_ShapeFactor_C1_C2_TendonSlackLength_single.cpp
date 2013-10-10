@@ -1,11 +1,11 @@
-// This is part of
-// NeuroMuscoloSkeletal Model Software (NMS)
-// Copyright (C) 2010 David Lloyd Massimo Sartori Monica Reggiani
+//__________________________________________________________________________
+// Author(s): Claudio Pizzolato, Monica Reggiani - September 2013
+// email:  claudio.pizzolato@griffithuni.edu.au
+//         monica.reggiani@gmail.com
 //
-// ?? Licenza ??
+// DO NOT REDISTRIBUTE WITHOUT PERMISSION
+//__________________________________________________________________________
 //
-// The authors may be contacted via:
-// email: massimo.sartori@gmail.com monica.reggiani@gmail.com
 
 
 #include <iostream>
@@ -85,7 +85,7 @@ void StrengthCoefficients_ShapeFactor_C1_C2_TendonSlackLength_single<NMSmodelT>
 
 template <typename NMSmodelT>
 void StrengthCoefficients_ShapeFactor_C1_C2_TendonSlackLength_single<NMSmodelT>
-::setUpperLowerBounds(vector<double>& upperBounds, vector<double>& lowerBounds) {
+::getUpperLowerBounds(vector<double>& upperBounds, vector<double>& lowerBounds) {
        
   upperBounds.resize(noParameters_); 
   lowerBounds.resize(noParameters_);

@@ -98,7 +98,7 @@ void ComputationMode_Default<NMSmodelT>::computeTorques(vector< vector< std::vec
         
         int k = 0; // k is the index for lmt and ma data
         double lmtTime = trials_.at(ct).lmtTimeSteps_.at(k);
-        double emgTime = trials_.at(ct).emgTimeSteps_.at(0);
+        double emgTime = trials_.at(ct).emgTimeSteps_.at(0) + subject_.getGlobalEmDelay();
 
         
         // Let's start going through the EMG, lmt, and ma data...  

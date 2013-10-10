@@ -1,3 +1,12 @@
+//__________________________________________________________________________
+// Author(s): Claudio Pizzolato, Monica Reggiani - September 2013
+// email:  claudio.pizzolato@griffithuni.edu.au
+//
+// DO NOT REDISTRIBUTE WITHOUT PERMISSION
+//__________________________________________________________________________
+//
+
+
 #include "EMGFromFile.h"
 #include "LmtMaFromFile.h"
 #include "ExternalTorqueFromFile.h"
@@ -71,7 +80,9 @@ void printAuthors() {
     time_t now = std::time(0);
     tm *gmtm = std::gmtime(&now);
     cout << "Copyright (C) " << gmtm->tm_year+1900 << endl;
-    cout << "David Lloyd, Monica Reggiani, Massimo Sartori, Claudio Pizzolato\n\n";
+    cout << "Claudio Pizzolato, Monica Reggiani, David Lloyd, Massimo Sartori\n\n";
+    
+    cout << "Software developers: Claudio Pizzolato, Monica Reggiani\n";
 }
     
 
@@ -185,10 +196,10 @@ int main(int argc, char** argv) {
             executionCfg.getMusclesToTrack(toTrack);
             errorMinimizer.setMusclesNamesWithEmgToPredict(toPredict);
             errorMinimizer.setMusclesNamesWithEmgToTrack(toTrack);
-			double rt, t, epsilon;
-			unsigned noEpsilon, ns, nt, maxNoEval;
-			executionCfg.getAnnealingParameters(nt, ns, rt, t, maxNoEval, epsilon, noEpsilon);
-			errorMinimizer.setAnnealingParameters(nt, ns, rt, t, maxNoEval, epsilon, noEpsilon);
+            double rt, t, epsilon;
+            unsigned noEpsilon, ns, nt, maxNoEval;
+            executionCfg.getAnnealingParameters(nt, ns, rt, t, maxNoEval, epsilon, noEpsilon);
+            errorMinimizer.setAnnealingParameters(nt, ns, rt, t, maxNoEval, epsilon, noEpsilon);
             ModelEvaluationHybrid<MyNMSmodel, MyErrorMinimizer> consumer(mySubject, errorMinimizer);
             runThreads(consumer, emgProducer, lmtMaProducer, externalTorqueProducer);
             break;
