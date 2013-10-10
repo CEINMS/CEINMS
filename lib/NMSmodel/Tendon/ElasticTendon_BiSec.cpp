@@ -17,7 +17,7 @@ using std::endl;
 #include "ElasticTendon_BiSec.h"
 #include <functional>
 #include <boost/concept_check.hpp>
-#include "../RootSolvers/WDBsolver.h"
+#include "WDBsolver.h"
 //#define DEEP_DEBUG
 //#define DEBUG
 
