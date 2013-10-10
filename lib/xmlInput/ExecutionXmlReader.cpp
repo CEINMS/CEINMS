@@ -1,6 +1,13 @@
+//__________________________________________________________________________
+// Author(s): Claudio Pizzolato - October 2013
+// email:  claudio.pizzolato@griffithuni.edu.au
+//
+// DO NOT REDISTRIBUTE WITHOUT PERMISSION
+//__________________________________________________________________________
+//
+
+
 #include "ExecutionXmlReader.h"
-
-
 #include <string>
 using std::string;
 #include <iostream>

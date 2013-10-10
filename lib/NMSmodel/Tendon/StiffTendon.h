@@ -1,3 +1,13 @@
+//__________________________________________________________________________
+// Author(s): Claudio Pizzolato, Monica Reggiani, Massimo Sartori - October 2013
+// email:  claudio.pizzolato@griffithuni.edu.au
+//         monica.reggiani@gmail.com
+//         massimo.sartori@gmail.com
+//
+// DO NOT REDISTRIBUTE WITHOUT PERMISSION
+//__________________________________________________________________________
+//
+
 #ifndef StiffTendon_h
 #define StiffTendon_h
 #include "Curve.h"

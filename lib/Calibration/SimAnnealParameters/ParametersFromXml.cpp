@@ -7,7 +7,6 @@
 //
 
 
-//#include "ParametersFromXml.h"
 #include "Parameter.h"
 #include <iostream>
 #include <vector>
@@ -107,27 +106,7 @@ void ParametersFromXml<NMSmodelT>::getUpperLowerBounds(std::vector<double>& uppe
             upperBounds.insert(upperBounds.end(), it->second.size, it->second.upperLimit);
             lowerBounds.insert(lowerBounds.end(), it->second.size, it->second.lowerLimit);
         }
-    
-}
-}
-
-
-template<typename NMSmodelT>
-void ParametersFromXml<NMSmodelT>::test() {
-    
-    for(typename ParametersMap::const_iterator it(parameters_.begin()); it != parameters_.end(); ++it) {
-        std::cout << "Parameter " << it->second.name << std::endl;
-        for(unsigned i = 0; i < it->second.muscleGroups.size(); ++i){
-            for(unsigned j = 0; j < it->second.muscleGroups.at(i).size(); ++j)
-                std::cout << it->second.muscleGroups.at(i).at(j) << " ";
-            std::cout << std::endl;
-        }
-        
-        
-        
     }
-    
-    
 }
 
 

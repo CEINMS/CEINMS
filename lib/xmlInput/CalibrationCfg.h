@@ -1,3 +1,11 @@
+//__________________________________________________________________________
+// Author(s): Claudio Pizzolato - October 2013
+// email:  claudio.pizzolato@griffithuni.edu.au
+//
+// DO NOT REDISTRIBUTE WITHOUT PERMISSION
+//__________________________________________________________________________
+//
+
 #ifndef CalibrationCfg_h
 #define CalibrationCfg_h
 
@@ -32,7 +40,7 @@ namespace CalibrationCfg{
         MinimizeTorqueErrorStrengthCoefficients_ShapeFactor_C1_C2_TendonSlackLength_singleFast = 1120,
         
         MinimizeTorqueErrorParameterSetDefault = 1210,
-        MinimizeTorqueErrorParameterSetFastt = 1220,
+        MinimizeTorqueErrorParameterSetFast = 1220,
         
         Empty = -1
                  

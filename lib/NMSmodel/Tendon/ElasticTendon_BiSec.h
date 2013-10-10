@@ -1,3 +1,11 @@
+//__________________________________________________________________________
+// Author(s): Claudio Pizzolato - October 2013
+// email:  claudio.pizzolato@griffithuni.edu.au
+//
+// DO NOT REDISTRIBUTE WITHOUT PERMISSION
+//__________________________________________________________________________
+//
+
 #ifndef ElasticTendon_BiSec_h
 #define ElasticTendon_BiSec_h
 #include <string>
@@ -22,6 +30,7 @@ public:
                    const CurveOffline& forceVelocityCurve,
                    const CurveOffline& tendonForceStrainCurve);
     virtual ~ElasticTendon_BiSec() {}
+    double operator()(double fl);
     ElasticTendon_BiSec(const ElasticTendon_BiSec& orig);
     ElasticTendon_BiSec& operator=(const ElasticTendon_BiSec& orig);
     
@@ -64,8 +73,8 @@ public:
     void resetState();
     */
 private:
-    double estimateFiberLengthBiSec(double tol, unsigned maxIterations);
     double evaluateForceError(double fibreLength);
+    double estimateFiberLengthBiSec(double tol, unsigned maxIterations);
     double computeMuscleForce(double fibreLength);
     double computeTendonForce(double fibreLength);
     

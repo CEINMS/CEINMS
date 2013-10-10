@@ -1,10 +1,12 @@
 //__________________________________________________________________________
 // Author(s): Claudio Pizzolato, Monica Reggiani - September 2013
 // email:  claudio.pizzolato@griffithuni.edu.au
+//         monica.reggiani@gmail.com
 //
 // DO NOT REDISTRIBUTE WITHOUT PERMISSION
 //__________________________________________________________________________
 //
+
 
 #ifndef StrengthCoefficients_ShapeFactor_C1_C2_TendonSlackLength_single_h
 #define StrengthCoefficients_ShapeFactor_C1_C2_TendonSlackLength_single_h

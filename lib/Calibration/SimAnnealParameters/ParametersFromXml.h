@@ -29,7 +29,6 @@ public:
     void getStartingVectorParameters(std::vector<double>& x);
     void setVectorParameters(const std::vector<double>& x);
     void getUpperLowerBounds(std::vector<double>& upperBounds, std::vector<double>& lowerBounds);
-    void test();
     
 private:
 

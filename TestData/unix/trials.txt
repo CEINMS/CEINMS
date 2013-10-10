@@ -1,5 +1,5 @@
-noTrials: 6
-_CrossOvers6_
+noTrials: 1
+_CrossOvers1_
 _CrossOvers7_
 _SideStep1_
 _SideStep4_
