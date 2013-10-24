@@ -5,7 +5,7 @@
         <hybrid>
             <alpha> 1 </alpha>
               <beta> 2 </beta>
-              <gamma> 1 </gamma> 
+              <gamma> 3 </gamma> 
               <trackedMuscles> 
                                recfem_r vasmed_r vaslat_r vasint_r bicfemsh_r 
                                gmin1_r gmin2_r gmin3_r gmed1_r gmed2_r gmed3_r 

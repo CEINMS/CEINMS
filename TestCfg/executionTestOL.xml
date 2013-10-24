@@ -1,32 +1,18 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
 <execution xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="execution.xsd">
+
   <NMSmodel>
-     <type>
-        <openLoop/>
-     </type>
-
-     <tendon>
-          <elasticBiSec/>
-     </tendon>
-
-     <activation>
-          <exponential/>
-     </activation>
+    <type>
+      <openLoop/>
+    </type>
+    <tendon>
+      <elasticBiSec/>
+    </tendon>
+    <activation>
+      <piecewise/>
+    </activation>
   </NMSmodel>
 
-  <online/>
-
-  <samplingFrequency>
-  200
-  </samplingFrequency>
-
-  <elaboratedDoFs>
-     PugnoFotonico AlabardaSpaziale 
-  </elaboratedDoFs>
-
-  <logging>
-     <txt/>
-  </logging>
-
+  <offline/>
 
 </execution>
