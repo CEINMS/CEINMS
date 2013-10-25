@@ -118,9 +118,9 @@ int main(int ac, char** av){
     po::options_description desc("Allowed options");
     desc.add_options()
     ("help", "produce help message")
-    ("calibration_file,c", po::value<string>(&calibrationXmlFile),  "calibration xml file")
-    ("subject_file,s", po::value<string>(&uncalibratedSubjectXmlFile), "subject xml file that cointains the initial parameter values")
-    ("output_file,o", po::value<string>(&newCalibratedSubjectXmlFile)->default_value("calibratedSubject.xml"), "name of the calibrated subject file");
+    ("calibration,c", po::value<string>(&calibrationXmlFile),  "calibration xml file")
+    ("subject,s", po::value<string>(&uncalibratedSubjectXmlFile), "subject xml file that cointains the initial parameter values")
+    ("output,o", po::value<string>(&newCalibratedSubjectXmlFile)->default_value("calibratedSubject.xml"), "name of the calibrated subject file");
     
     po::variables_map vm;
     po::store(po::parse_command_line(ac, av, desc), vm);
