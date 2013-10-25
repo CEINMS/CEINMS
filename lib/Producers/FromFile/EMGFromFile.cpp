@@ -3,6 +3,7 @@
 #include "EMGDataFromFile.h"
 #include "EMGgeneratorFrom16To34.h"
 #include "EMGgeneratorFrom6To24.h"
+#include "EMGgeneratorFromXml.h"
 
 #include <string>
 using std::string;
@@ -49,7 +50,7 @@ void EMGFromFile::operator()()
 #ifdef LOG  
   cout << "\nReading..." << emgDataFilename << endl;
 #endif
-  EMGDataFromFile<EMGgeneratorFrom16To34> myEmgData(emgDataFilename);
+  EMGDataFromFile<EMGgeneratorFromXml> myEmgData(emgDataFilename);
   vector<string> emgMusclesNames;
   myEmgData.getMusclesNames(emgMusclesNames);
   setEMGMusclesNames(emgMusclesNames);

@@ -29,11 +29,11 @@ LINK_DIRECTORIES(
 
 
 
-ADD_EXECUTABLE( CEINMS  CEINMS.cpp ModelEvaluationBase.cpp)
+ADD_EXECUTABLE( CEINMS  CEINMS.cpp ModelEvaluationBase.cpp ${CMAKE_SOURCE_DIR}/lib/FileIO/EMGgenerator/EMGgeneratorFromXml.cpp)
 TARGET_LINK_LIBRARIES( CEINMS
+      FileIO
       xmlInput
       NMSmodel
-      FileIO
       Producers
       ${CMAKE_THREAD_LIBS_INIT}
       ${Boost_LIBRARIES}
@@ -42,7 +42,7 @@ TARGET_LINK_LIBRARIES( CEINMS
 
 
 set(CEINMScalibrate_SOURCES
-    CEINMScalibration.cpp
+    CEINMScalibration.cpp 
     ${CMAKE_SOURCE_DIR}/lib/Calibration/InputDataInterpreter.cpp
     
 )

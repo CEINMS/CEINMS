@@ -6,10 +6,10 @@
       <openLoop/>
     </type>
     <tendon>
-      <elasticBiSec/>
+      <stiff/>
     </tendon>
     <activation>
-      <piecewise/>
+      <exponential/>
     </activation>
   </NMSmodel>
 

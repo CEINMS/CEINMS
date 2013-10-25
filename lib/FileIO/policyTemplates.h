@@ -14,6 +14,7 @@
 #include "EMGgeneratorFrom10To13.h"
 #include "EMGgeneratorFrom16To34.h"
 #include "EMGgeneratorFrom6To24.h"
+#include "EMGgeneratorFromXml.h"
 
 
 template 
@@ -25,5 +26,9 @@ class EMGDataFromFile<EMGgeneratorFrom16To34>;
 
 template 
 class EMGDataFromFile<EMGgeneratorFrom6To24>;
+
+template 
+class EMGDataFromFile<EMGgeneratorFromXml>;
+
 
 #endif
