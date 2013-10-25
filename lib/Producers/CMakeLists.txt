@@ -10,13 +10,16 @@ SET(FileIO_SOURCES
   ${CMAKE_SOURCE_DIR}/lib/FileIO/EMGgenerator/EMGgeneratorFrom10To13.cpp
   ${CMAKE_SOURCE_DIR}/lib/FileIO/EMGgenerator/EMGgeneratorFrom16To34.cpp
   ${CMAKE_SOURCE_DIR}/lib/FileIO/EMGgenerator/EMGgeneratorFrom6To24.cpp
-)
+  ${CMAKE_SOURCE_DIR}/lib/FileIO/EMGgenerator/EMGgeneratorFromXml.cpp
+  ${CMAKE_SOURCE_DIR}/lib/xmlInput/emgGenerator.cxx
+  )
 
 INCLUDE_DIRECTORIES(
   ${CMAKE_SOURCE_DIR}/lib/FileIO
   ${CMAKE_SOURCE_DIR}/lib/FileIO/EMGgenerator
   ${CMAKE_SOURCE_DIR}/lib/Producers
   ${CMAKE_SOURCE_DIR}/lib/Producers/FromFile
+  ${CMAKE_SOURCE_DIR}/lib/xmlInput
 )
 
 ADD_LIBRARY(Producers STATIC

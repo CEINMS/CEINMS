@@ -32,7 +32,10 @@ using std::string;
 using std::cout;
 #include <vector>
 using std::vector;
+#include <stdlib.h>
 
+#include <boost/program_options.hpp>
+namespace po = boost::program_options;
 
 template<typename T1, typename T2, typename T3, typename T4>
 void runThreads(T1& t1, T2& t2, T3& t3, T4& t4) {
@@ -95,29 +98,46 @@ int main(int argc, char** argv) {
   cout << "Check configuration data...\n";
 #endif
   
+    string subjectFile;
+    string executionFile;
+    string inputDirectory;
+    string emgGeneratorFile;
+
+    int opt;
+    po::options_description desc("Allowed options");
+    desc.add_options()
+    ("help", "produce help message")
+    ("subject,s", po::value<string>(&subjectFile), "subject xml file that cointains the initial parameter values")
+    ("execution,x", po::value<string>(&executionFile),  "execution xml file")
+    ("input-dir,i", po::value<string>(&inputDirectory), "trial directory path")
+    ("emg-generator,eg", po::value<string>(&emgGeneratorFile)->default_value("cfg/xml/emgGenerator.xml"), "EMG mapping");
+    
+    po::variables_map vm;
+    po::store(po::parse_command_line(argc, argv, desc), vm);
+    po::notify(vm);    
+
+    if (vm.count("help") || argc < 7) {
+        cout << desc << "\n";
+        return 1;
+    }
     // check command line arguments... 
-  if ( argc != 4 ) {
-    cout << "Usage: CEINMS configurationFile DirFiles\n";
-    cout << "Ex: CEINMS subject.xml execution.xml inputDirectory/ \n";
-    exit(EXIT_FAILURE);
-  }
   
 
 
-    EMGFromFile emgProducer(argv[3]);
-    LmtMaFromFile lmtMaProducer(argv[3]);
-    ExternalTorqueFromFile externalTorqueProducer(argv[3]);
+    EMGFromFile emgProducer(inputDirectory);
+    LmtMaFromFile lmtMaProducer(inputDirectory);
+    ExternalTorqueFromFile externalTorqueProducer(inputDirectory);
  
-    string configurationFile(argv[1]);
+    
     try {
-        std::auto_ptr<SubjectType> subjectPointer (subject (configurationFile));
+        std::auto_ptr<SubjectType> subjectPointer (subject (subjectFile));
     }  
     catch (const xml_schema::exception& e) {
         cout << e << endl;
         exit(EXIT_FAILURE);
     }
     
-    ExecutionXmlReader executionCfg(argv[2]);             
+    ExecutionXmlReader executionCfg(executionFile);             
     
    NMSModelCfg::RunMode runMode = executionCfg.getRunMode();
    
@@ -127,7 +147,7 @@ int main(int argc, char** argv) {
         case NMSModelCfg::OpenLoopExponentialActivationStiffTendonOnline: {
             typedef NMSmodel<ExponentialActivation, StiffTendon, CurveMode::Online> MyNMSmodel;
             MyNMSmodel mySubject;
-            setupSubject(mySubject, configurationFile);
+            setupSubject(mySubject, subjectFile);
             ModelEvaluationOnline<MyNMSmodel> consumer(mySubject);
             runThreads(consumer, emgProducer, lmtMaProducer, externalTorqueProducer);
             break;
@@ -136,7 +156,7 @@ int main(int argc, char** argv) {
         case NMSModelCfg::OpenLoopExponentialActivationStiffTendonOffline: {
             typedef NMSmodel<ExponentialActivation, StiffTendon, CurveMode::Offline> MyNMSmodel;
             MyNMSmodel mySubject;
-            setupSubject(mySubject, configurationFile);
+            setupSubject(mySubject, subjectFile);
             ModelEvaluationOffline<MyNMSmodel> consumer(mySubject);
             runThreads(consumer, emgProducer, lmtMaProducer, externalTorqueProducer);
             break;
@@ -145,7 +165,7 @@ int main(int argc, char** argv) {
         case NMSModelCfg::OpenLoopExponentialActivationElasticTendonOnline: {
             typedef NMSmodel<ExponentialActivation, ElasticTendon<CurveMode::Online>, CurveMode::Online> MyNMSmodel;
             MyNMSmodel mySubject;
-            setupSubject(mySubject, configurationFile);
+            setupSubject(mySubject, subjectFile);
             ModelEvaluationOnline<MyNMSmodel> consumer(mySubject);
             runThreads(consumer, emgProducer, lmtMaProducer, externalTorqueProducer);
             break;
@@ -154,7 +174,7 @@ int main(int argc, char** argv) {
         case NMSModelCfg::OpenLoopExponentialActivationElasticTendonOffline: {
             typedef NMSmodel<ExponentialActivation, ElasticTendon<CurveMode::Offline>, CurveMode::Offline> MyNMSmodel;
             MyNMSmodel mySubject;
-            setupSubject(mySubject, configurationFile);
+            setupSubject(mySubject, subjectFile);
             ModelEvaluationOffline<MyNMSmodel> consumer(mySubject);
             runThreads(consumer, emgProducer, lmtMaProducer, externalTorqueProducer);
             break;
@@ -163,7 +183,7 @@ int main(int argc, char** argv) {
         case NMSModelCfg::OpenLoopExponentialActivationElasticTendonBiSecOnline: {
             typedef NMSmodel<ExponentialActivation, ElasticTendon_BiSec, CurveMode::Online> MyNMSmodel;
             MyNMSmodel mySubject;
-            setupSubject(mySubject, configurationFile);
+            setupSubject(mySubject, subjectFile);
             ModelEvaluationOnline<MyNMSmodel> consumer(mySubject);
             runThreads(consumer, emgProducer, lmtMaProducer, externalTorqueProducer);
             break;
@@ -172,7 +192,7 @@ int main(int argc, char** argv) {
         case NMSModelCfg::OpenLoopExponentialActivationElasticTendonBiSecOffline: {
             typedef NMSmodel<ExponentialActivation, ElasticTendon_BiSec, CurveMode::Offline> MyNMSmodel;
             MyNMSmodel mySubject;
-            setupSubject(mySubject, configurationFile);
+            setupSubject(mySubject, subjectFile);
             ModelEvaluationOffline<MyNMSmodel> consumer(mySubject);
             runThreads(consumer, emgProducer, lmtMaProducer, externalTorqueProducer);
             break;
@@ -182,7 +202,7 @@ int main(int argc, char** argv) {
         case NMSModelCfg::HybridExponentialActivationStiffTendonOnline: { 
             typedef NMSmodel<ExponentialActivation, StiffTendon, CurveMode::Online> MyNMSmodel;
             typedef Hybrid::ErrorMinimizerAnnealing<MyNMSmodel> MyErrorMinimizer;
-            SetupDataStructure<MyNMSmodel> setupData(configurationFile);
+            SetupDataStructure<MyNMSmodel> setupData(subjectFile);
             MyNMSmodel mySubject;
             setupData.createCurves();
             setupData.createMuscles(mySubject);
