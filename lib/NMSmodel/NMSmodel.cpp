@@ -1,11 +1,11 @@
-// This is part of
-// NeuroMuscoloSkeletal Model Software (NMS)
-// Copyright (C) 2010 David Lloyd Massimo Sartori Monica Reggiani
+//__________________________________________________________________________
+// Author(s): Claudio Pizzolato, Monica Reggiani - October 2013
+// email:  claudio.pizzolato@griffithuni.edu.au
+//         monica.reggiani@gmail.com
 //
-// ?? Licenza ??
+// DO NOT REDISTRIBUTE WITHOUT PERMISSION
+//__________________________________________________________________________
 //
-// The authors may be contacted via:
-// email: massimo.sartori@gmail.com monica.reggiani@gmail.com
 
 #include <iostream>
 using std::cout;
@@ -21,7 +21,7 @@ using std::string;
 #include <algorithm>
 
 //#define DEBUG
-
+#define CHECKS
 
 template <typename Activation, typename Tendon, CurveMode::Mode mode>
 void NMSmodel<Activation, Tendon, mode>::addMuscle(const MTUtype& muscle) {
@@ -102,6 +102,13 @@ void NMSmodel<Activation, Tendon, mode>::setTime(const double& time) {
 template <typename Activation, typename Tendon, CurveMode::Mode mode>
 void NMSmodel<Activation, Tendon, mode>::setEmgs(const std::vector<double>& currentEmgData) {
 
+#ifdef CHECKS
+	if(currentEmgData.size() != muscles_.size()) {
+		cout << "#EMGs != #muscles\n";
+		exit(EXIT_FAILURE);
+	}
+#endif
+
     vector<double>::const_iterator emgIt;
     vectorMTUitr muscleIt = muscles_.begin();
     for (emgIt = currentEmgData.begin(); emgIt < currentEmgData.end(); ++emgIt) {
@@ -149,6 +156,12 @@ void NMSmodel<Activation, Tendon, mode>::setTime_emgs_updateActivations_pushStat
 template <typename Activation, typename Tendon, CurveMode::Mode mode>
 void NMSmodel<Activation, Tendon, mode>::setMuscleTendonLengths(const vector<double>& currentLmtData) {
 
+#ifdef CHECKS
+	if(currentLmtData.size() != muscles_.size()) {
+		cout << "#LMTs != #muscles\n";
+		exit(EXIT_FAILURE);
+	}
+#endif
     vector<double>::const_iterator lmtIt;
     vectorMTUitr muscleIt = muscles_.begin();
     for (lmtIt = currentLmtData.begin(); lmtIt < currentLmtData.end(); ++lmtIt) {
@@ -615,6 +628,17 @@ void NMSmodel<Activation, Tendon, mode>::getMusclesIndexOnDof(vector<unsigned>& 
     } 
  }
 
+
+template <typename Activation, typename Tendon, CurveMode::Mode mode>
+void NMSmodel<Activation, Tendon, mode>::getMuscleNamesOnDofs(vector<vector<string> >& muscleNamesOnDofs) {
+
+	muscleNamesOnDofs.clear();
+	for(vectorDoFconstItr it(dofs_.begin()); it != dofs_.end(); ++it) {
+		vector<string> muscleNamesOnDof;
+		it->getMusclesNamesOnDof(muscleNamesOnDof);
+		muscleNamesOnDofs.push_back(muscleNamesOnDof);
+	}
+}
 
 template <typename Activation, typename Tendon, CurveMode::Mode mode>
 void NMSmodel<Activation, Tendon, mode>::getMusclesIndexFromLastDof(vector<unsigned int>& musclesIndexList, 

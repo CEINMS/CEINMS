@@ -79,6 +79,21 @@
 #include <xsd/cxx/tree/parsing/double.hxx>
 #include <xsd/cxx/tree/parsing/decimal.hxx>
 
+#include <xsd/cxx/xml/dom/serialization-header.hxx>
+#include <xsd/cxx/tree/serialization.hxx>
+#include <xsd/cxx/tree/serialization/byte.hxx>
+#include <xsd/cxx/tree/serialization/unsigned-byte.hxx>
+#include <xsd/cxx/tree/serialization/short.hxx>
+#include <xsd/cxx/tree/serialization/unsigned-short.hxx>
+#include <xsd/cxx/tree/serialization/int.hxx>
+#include <xsd/cxx/tree/serialization/unsigned-int.hxx>
+#include <xsd/cxx/tree/serialization/long.hxx>
+#include <xsd/cxx/tree/serialization/unsigned-long.hxx>
+#include <xsd/cxx/tree/serialization/boolean.hxx>
+#include <xsd/cxx/tree/serialization/float.hxx>
+#include <xsd/cxx/tree/serialization/double.hxx>
+#include <xsd/cxx/tree/serialization/decimal.hxx>
+
 namespace xml_schema
 {
   // anyType and anySimpleType.
@@ -174,6 +189,16 @@ namespace xml_schema
   typedef ::xsd::cxx::tree::entity< char, ncname > entity;
   typedef ::xsd::cxx::tree::entities< char, simple_type, entity > entities;
 
+  // Namespace information and list stream. Used in
+  // serialization functions.
+  //
+  typedef ::xsd::cxx::xml::dom::namespace_info< char > namespace_info;
+  typedef ::xsd::cxx::xml::dom::namespace_infomap< char > namespace_infomap;
+  typedef ::xsd::cxx::tree::list_stream< char > list_stream;
+  typedef ::xsd::cxx::tree::as_double< double_ > as_double;
+  typedef ::xsd::cxx::tree::as_decimal< decimal > as_decimal;
+  typedef ::xsd::cxx::tree::facet facet;
+
   // Flags and properties.
   //
   typedef ::xsd::cxx::tree::flags flags;
@@ -197,6 +222,7 @@ namespace xml_schema
   typedef ::xsd::cxx::tree::unexpected_enumerator< char > unexpected_enumerator;
   typedef ::xsd::cxx::tree::expected_text_content< char > expected_text_content;
   typedef ::xsd::cxx::tree::no_prefix_mapping< char > no_prefix_mapping;
+  typedef ::xsd::cxx::tree::serialization< char > serialization;
 
   // Error handler callback interface.
   //
@@ -221,33 +247,37 @@ namespace xml_schema
 
 // Forward declarations.
 //
-class SimulatedAnnealingType;
-class AlgorithmType;
-class OpenLoopType;
-class TypeType;
-class TendonElementType;
-class TendonType;
-class ActivationElementType;
-class ActivationType;
-class NMSModelType;
-class TrialSetType;
-class ObjectiveFunctionElementType;
-class ComputationModeElementType;
-class GlobalParameterType;
-class SingleParameterType;
-class ObjectiveFunctionType;
-class DoFsType;
-class HardCodedParametersSelectionType;
-class ComputationModeType;
-class TwoDoublesType;
-class RangeType;
-class MuscleListType;
-class MuscleGroupsType;
-class ParameterType;
-class parameterSetType;
-class StepType;
-class CalibrationStepsType;
-class CalibrationType;
+namespace CalibrationXsd
+{
+  class SimulatedAnnealingType;
+  class AlgorithmType;
+  class OpenLoopType;
+  class TypeType;
+  class TendonElementType;
+  class TendonType;
+  class ActivationElementType;
+  class ActivationType;
+  class NMSModelType;
+  class TrialSetType;
+  class ObjectiveFunctionElementType;
+  class ComputationModeElementType;
+  class GlobalParameterType;
+  class SingleParameterType;
+  class ObjectiveFunctionType;
+  class DoFsType;
+  class HardCodedParametersSelectionType;
+  class ComputationModeType;
+  class TwoDoublesType;
+  class RangeType;
+  class MuscleListType;
+  class MuscleGroupsType;
+  class ParameterType;
+  class parameterSetType;
+  class StepType;
+  class CalibrationStepsType;
+  class CalibrationType;
+}
+
 
 #include <memory>    // std::auto_ptr
 #include <limits>    // std::numeric_limits
@@ -262,1681 +292,1704 @@ class CalibrationType;
 
 #include <xsd/cxx/xml/dom/parsing-header.hxx>
 
-class SimulatedAnnealingType: public ::xml_schema::type
+namespace CalibrationXsd
 {
-  public:
-  // noEpsilon
-  // 
-  typedef ::xml_schema::int_ noEpsilon_type;
-  typedef ::xsd::cxx::tree::traits< noEpsilon_type, char > noEpsilon_traits;
-
-  const noEpsilon_type&
-  noEpsilon () const;
-
-  noEpsilon_type&
-  noEpsilon ();
-
-  void
-  noEpsilon (const noEpsilon_type& x);
-
-  // rt
-  // 
-  typedef ::xml_schema::double_ rt_type;
-  typedef ::xsd::cxx::tree::traits< rt_type, char, ::xsd::cxx::tree::schema_type::double_ > rt_traits;
-
-  const rt_type&
-  rt () const;
-
-  rt_type&
-  rt ();
-
-  void
-  rt (const rt_type& x);
-
-  // T
-  // 
-  typedef ::xml_schema::double_ T_type;
-  typedef ::xsd::cxx::tree::traits< T_type, char, ::xsd::cxx::tree::schema_type::double_ > T_traits;
-
-  const T_type&
-  T () const;
-
-  T_type&
-  T ();
-
-  void
-  T (const T_type& x);
-
-  // NS
-  // 
-  typedef ::xml_schema::int_ NS_type;
-  typedef ::xsd::cxx::tree::traits< NS_type, char > NS_traits;
-
-  const NS_type&
-  NS () const;
-
-  NS_type&
-  NS ();
-
-  void
-  NS (const NS_type& x);
-
-  // NT
-  // 
-  typedef ::xml_schema::int_ NT_type;
-  typedef ::xsd::cxx::tree::traits< NT_type, char > NT_traits;
-
-  const NT_type&
-  NT () const;
-
-  NT_type&
-  NT ();
-
-  void
-  NT (const NT_type& x);
-
-  // epsilon
-  // 
-  typedef ::xml_schema::double_ epsilon_type;
-  typedef ::xsd::cxx::tree::traits< epsilon_type, char, ::xsd::cxx::tree::schema_type::double_ > epsilon_traits;
-
-  const epsilon_type&
-  epsilon () const;
-
-  epsilon_type&
-  epsilon ();
-
-  void
-  epsilon (const epsilon_type& x);
-
-  // maxNoEval
-  // 
-  typedef ::xml_schema::int_ maxNoEval_type;
-  typedef ::xsd::cxx::tree::traits< maxNoEval_type, char > maxNoEval_traits;
-
-  const maxNoEval_type&
-  maxNoEval () const;
-
-  maxNoEval_type&
-  maxNoEval ();
-
-  void
-  maxNoEval (const maxNoEval_type& x);
-
-  // Constructors.
-  //
-  SimulatedAnnealingType (const noEpsilon_type&,
-                          const rt_type&,
-                          const T_type&,
-                          const NS_type&,
-                          const NT_type&,
-                          const epsilon_type&,
-                          const maxNoEval_type&);
-
-  SimulatedAnnealingType (const ::xercesc::DOMElement& e,
-                          ::xml_schema::flags f = 0,
-                          ::xml_schema::container* c = 0);
-
-  SimulatedAnnealingType (const SimulatedAnnealingType& x,
-                          ::xml_schema::flags f = 0,
-                          ::xml_schema::container* c = 0);
-
-  virtual SimulatedAnnealingType*
-  _clone (::xml_schema::flags f = 0,
-          ::xml_schema::container* c = 0) const;
-
-  virtual 
-  ~SimulatedAnnealingType ();
-
-  // Implementation.
-  //
-  protected:
-  void
-  parse (::xsd::cxx::xml::dom::parser< char >&,
-         ::xml_schema::flags);
-
-  protected:
-  ::xsd::cxx::tree::one< noEpsilon_type > noEpsilon_;
-  ::xsd::cxx::tree::one< rt_type > rt_;
-  ::xsd::cxx::tree::one< T_type > T_;
-  ::xsd::cxx::tree::one< NS_type > NS_;
-  ::xsd::cxx::tree::one< NT_type > NT_;
-  ::xsd::cxx::tree::one< epsilon_type > epsilon_;
-  ::xsd::cxx::tree::one< maxNoEval_type > maxNoEval_;
-};
-
-class AlgorithmType: public ::xml_schema::type
-{
-  public:
-  // simulatedAnnealing
-  // 
-  typedef ::SimulatedAnnealingType simulatedAnnealing_type;
-  typedef ::xsd::cxx::tree::traits< simulatedAnnealing_type, char > simulatedAnnealing_traits;
-
-  const simulatedAnnealing_type&
-  simulatedAnnealing () const;
-
-  simulatedAnnealing_type&
-  simulatedAnnealing ();
-
-  void
-  simulatedAnnealing (const simulatedAnnealing_type& x);
-
-  void
-  simulatedAnnealing (::std::auto_ptr< simulatedAnnealing_type > p);
-
-  // Constructors.
-  //
-  AlgorithmType (const simulatedAnnealing_type&);
-
-  AlgorithmType (::std::auto_ptr< simulatedAnnealing_type >&);
-
-  AlgorithmType (const ::xercesc::DOMElement& e,
-                 ::xml_schema::flags f = 0,
-                 ::xml_schema::container* c = 0);
-
-  AlgorithmType (const AlgorithmType& x,
-                 ::xml_schema::flags f = 0,
-                 ::xml_schema::container* c = 0);
-
-  virtual AlgorithmType*
-  _clone (::xml_schema::flags f = 0,
-          ::xml_schema::container* c = 0) const;
-
-  virtual 
-  ~AlgorithmType ();
-
-  // Implementation.
-  //
-  protected:
-  void
-  parse (::xsd::cxx::xml::dom::parser< char >&,
-         ::xml_schema::flags);
-
-  protected:
-  ::xsd::cxx::tree::one< simulatedAnnealing_type > simulatedAnnealing_;
-};
-
-class OpenLoopType: public ::xml_schema::type
-{
-  public:
-  // Constructors.
-  //
-  OpenLoopType ();
-
-  OpenLoopType (const ::xercesc::DOMElement& e,
-                ::xml_schema::flags f = 0,
-                ::xml_schema::container* c = 0);
-
-  OpenLoopType (const ::xercesc::DOMAttr& a,
-                ::xml_schema::flags f = 0,
-                ::xml_schema::container* c = 0);
-
-  OpenLoopType (const ::std::string& s,
-                const ::xercesc::DOMElement* e,
-                ::xml_schema::flags f = 0,
-                ::xml_schema::container* c = 0);
-
-  OpenLoopType (const OpenLoopType& x,
-                ::xml_schema::flags f = 0,
-                ::xml_schema::container* c = 0);
-
-  virtual OpenLoopType*
-  _clone (::xml_schema::flags f = 0,
-          ::xml_schema::container* c = 0) const;
-
-  virtual 
-  ~OpenLoopType ();
-};
-
-class TypeType: public ::xml_schema::type
-{
-  public:
-  // openLoop
-  // 
-  typedef ::OpenLoopType openLoop_type;
-  typedef ::xsd::cxx::tree::traits< openLoop_type, char > openLoop_traits;
-
-  const openLoop_type&
-  openLoop () const;
-
-  openLoop_type&
-  openLoop ();
-
-  void
-  openLoop (const openLoop_type& x);
-
-  void
-  openLoop (::std::auto_ptr< openLoop_type > p);
-
-  // Constructors.
-  //
-  TypeType (const openLoop_type&);
-
-  TypeType (const ::xercesc::DOMElement& e,
-            ::xml_schema::flags f = 0,
-            ::xml_schema::container* c = 0);
-
-  TypeType (const TypeType& x,
-            ::xml_schema::flags f = 0,
-            ::xml_schema::container* c = 0);
-
-  virtual TypeType*
-  _clone (::xml_schema::flags f = 0,
-          ::xml_schema::container* c = 0) const;
-
-  virtual 
-  ~TypeType ();
-
-  // Implementation.
-  //
-  protected:
-  void
-  parse (::xsd::cxx::xml::dom::parser< char >&,
-         ::xml_schema::flags);
-
-  protected:
-  ::xsd::cxx::tree::one< openLoop_type > openLoop_;
-};
-
-class TendonElementType: public ::xml_schema::type
-{
-  public:
-  // Constructors.
-  //
-  TendonElementType ();
-
-  TendonElementType (const ::xercesc::DOMElement& e,
-                     ::xml_schema::flags f = 0,
-                     ::xml_schema::container* c = 0);
-
-  TendonElementType (const ::xercesc::DOMAttr& a,
-                     ::xml_schema::flags f = 0,
-                     ::xml_schema::container* c = 0);
-
-  TendonElementType (const ::std::string& s,
-                     const ::xercesc::DOMElement* e,
-                     ::xml_schema::flags f = 0,
-                     ::xml_schema::container* c = 0);
-
-  TendonElementType (const TendonElementType& x,
-                     ::xml_schema::flags f = 0,
-                     ::xml_schema::container* c = 0);
-
-  virtual TendonElementType*
-  _clone (::xml_schema::flags f = 0,
-          ::xml_schema::container* c = 0) const;
-
-  virtual 
-  ~TendonElementType ();
-};
-
-class TendonType: public ::xml_schema::type
-{
-  public:
-  // stiff
-  // 
-  typedef ::TendonElementType stiff_type;
-  typedef ::xsd::cxx::tree::optional< stiff_type > stiff_optional;
-  typedef ::xsd::cxx::tree::traits< stiff_type, char > stiff_traits;
-
-  const stiff_optional&
-  stiff () const;
-
-  stiff_optional&
-  stiff ();
-
-  void
-  stiff (const stiff_type& x);
-
-  void
-  stiff (const stiff_optional& x);
-
-  void
-  stiff (::std::auto_ptr< stiff_type > p);
-
-  // elastic
-  // 
-  typedef ::TendonElementType elastic_type;
-  typedef ::xsd::cxx::tree::optional< elastic_type > elastic_optional;
-  typedef ::xsd::cxx::tree::traits< elastic_type, char > elastic_traits;
-
-  const elastic_optional&
-  elastic () const;
-
-  elastic_optional&
-  elastic ();
-
-  void
-  elastic (const elastic_type& x);
-
-  void
-  elastic (const elastic_optional& x);
-
-  void
-  elastic (::std::auto_ptr< elastic_type > p);
-
-  // elasticBiSec
-  // 
-  typedef ::TendonElementType elasticBiSec_type;
-  typedef ::xsd::cxx::tree::optional< elasticBiSec_type > elasticBiSec_optional;
-  typedef ::xsd::cxx::tree::traits< elasticBiSec_type, char > elasticBiSec_traits;
-
-  const elasticBiSec_optional&
-  elasticBiSec () const;
-
-  elasticBiSec_optional&
-  elasticBiSec ();
-
-  void
-  elasticBiSec (const elasticBiSec_type& x);
-
-  void
-  elasticBiSec (const elasticBiSec_optional& x);
-
-  void
-  elasticBiSec (::std::auto_ptr< elasticBiSec_type > p);
-
-  // Constructors.
-  //
-  TendonType ();
-
-  TendonType (const ::xercesc::DOMElement& e,
-              ::xml_schema::flags f = 0,
-              ::xml_schema::container* c = 0);
-
-  TendonType (const TendonType& x,
-              ::xml_schema::flags f = 0,
-              ::xml_schema::container* c = 0);
-
-  virtual TendonType*
-  _clone (::xml_schema::flags f = 0,
-          ::xml_schema::container* c = 0) const;
-
-  virtual 
-  ~TendonType ();
-
-  // Implementation.
-  //
-  protected:
-  void
-  parse (::xsd::cxx::xml::dom::parser< char >&,
-         ::xml_schema::flags);
-
-  protected:
-  stiff_optional stiff_;
-  elastic_optional elastic_;
-  elasticBiSec_optional elasticBiSec_;
-};
-
-class ActivationElementType: public ::xml_schema::type
-{
-  public:
-  // Constructors.
-  //
-  ActivationElementType ();
-
-  ActivationElementType (const ::xercesc::DOMElement& e,
-                         ::xml_schema::flags f = 0,
-                         ::xml_schema::container* c = 0);
-
-  ActivationElementType (const ::xercesc::DOMAttr& a,
-                         ::xml_schema::flags f = 0,
-                         ::xml_schema::container* c = 0);
-
-  ActivationElementType (const ::std::string& s,
-                         const ::xercesc::DOMElement* e,
-                         ::xml_schema::flags f = 0,
-                         ::xml_schema::container* c = 0);
-
-  ActivationElementType (const ActivationElementType& x,
-                         ::xml_schema::flags f = 0,
-                         ::xml_schema::container* c = 0);
-
-  virtual ActivationElementType*
-  _clone (::xml_schema::flags f = 0,
-          ::xml_schema::container* c = 0) const;
-
-  virtual 
-  ~ActivationElementType ();
-};
-
-class ActivationType: public ::xml_schema::type
-{
-  public:
-  // exponential
-  // 
-  typedef ::ActivationElementType exponential_type;
-  typedef ::xsd::cxx::tree::optional< exponential_type > exponential_optional;
-  typedef ::xsd::cxx::tree::traits< exponential_type, char > exponential_traits;
-
-  const exponential_optional&
-  exponential () const;
-
-  exponential_optional&
-  exponential ();
-
-  void
-  exponential (const exponential_type& x);
-
-  void
-  exponential (const exponential_optional& x);
-
-  void
-  exponential (::std::auto_ptr< exponential_type > p);
-
-  // piecewise
-  // 
-  typedef ::ActivationElementType piecewise_type;
-  typedef ::xsd::cxx::tree::optional< piecewise_type > piecewise_optional;
-  typedef ::xsd::cxx::tree::traits< piecewise_type, char > piecewise_traits;
-
-  const piecewise_optional&
-  piecewise () const;
-
-  piecewise_optional&
-  piecewise ();
-
-  void
-  piecewise (const piecewise_type& x);
-
-  void
-  piecewise (const piecewise_optional& x);
-
-  void
-  piecewise (::std::auto_ptr< piecewise_type > p);
-
-  // Constructors.
-  //
-  ActivationType ();
-
-  ActivationType (const ::xercesc::DOMElement& e,
-                  ::xml_schema::flags f = 0,
-                  ::xml_schema::container* c = 0);
-
-  ActivationType (const ActivationType& x,
-                  ::xml_schema::flags f = 0,
-                  ::xml_schema::container* c = 0);
-
-  virtual ActivationType*
-  _clone (::xml_schema::flags f = 0,
-          ::xml_schema::container* c = 0) const;
-
-  virtual 
-  ~ActivationType ();
-
-  // Implementation.
-  //
-  protected:
-  void
-  parse (::xsd::cxx::xml::dom::parser< char >&,
-         ::xml_schema::flags);
-
-  protected:
-  exponential_optional exponential_;
-  piecewise_optional piecewise_;
-};
-
-class NMSModelType: public ::xml_schema::type
-{
-  public:
-  // type
-  // 
-  typedef ::TypeType type_type;
-  typedef ::xsd::cxx::tree::traits< type_type, char > type_traits;
-
-  const type_type&
-  type () const;
-
-  type_type&
-  type ();
-
-  void
-  type (const type_type& x);
-
-  void
-  type (::std::auto_ptr< type_type > p);
-
-  // tendon
-  // 
-  typedef ::TendonType tendon_type;
-  typedef ::xsd::cxx::tree::traits< tendon_type, char > tendon_traits;
-
-  const tendon_type&
-  tendon () const;
-
-  tendon_type&
-  tendon ();
-
-  void
-  tendon (const tendon_type& x);
-
-  void
-  tendon (::std::auto_ptr< tendon_type > p);
-
-  // activation
-  // 
-  typedef ::ActivationType activation_type;
-  typedef ::xsd::cxx::tree::traits< activation_type, char > activation_traits;
-
-  const activation_type&
-  activation () const;
-
-  activation_type&
-  activation ();
-
-  void
-  activation (const activation_type& x);
-
-  void
-  activation (::std::auto_ptr< activation_type > p);
-
-  // Constructors.
-  //
-  NMSModelType (const type_type&,
-                const tendon_type&,
-                const activation_type&);
-
-  NMSModelType (::std::auto_ptr< type_type >&,
-                ::std::auto_ptr< tendon_type >&,
-                ::std::auto_ptr< activation_type >&);
-
-  NMSModelType (const ::xercesc::DOMElement& e,
-                ::xml_schema::flags f = 0,
-                ::xml_schema::container* c = 0);
-
-  NMSModelType (const NMSModelType& x,
-                ::xml_schema::flags f = 0,
-                ::xml_schema::container* c = 0);
-
-  virtual NMSModelType*
-  _clone (::xml_schema::flags f = 0,
-          ::xml_schema::container* c = 0) const;
-
-  virtual 
-  ~NMSModelType ();
-
-  // Implementation.
-  //
-  protected:
-  void
-  parse (::xsd::cxx::xml::dom::parser< char >&,
-         ::xml_schema::flags);
-
-  protected:
-  ::xsd::cxx::tree::one< type_type > type_;
-  ::xsd::cxx::tree::one< tendon_type > tendon_;
-  ::xsd::cxx::tree::one< activation_type > activation_;
-};
-
-class TrialSetType: public ::xml_schema::simple_type,
-  public ::xsd::cxx::tree::list< ::xml_schema::string, char >
-{
-  public:
-  TrialSetType ();
-
-  TrialSetType (size_type n, const ::xml_schema::string& x);
-
-  template < typename I >
-  TrialSetType (const I& begin, const I& end)
-  : ::xsd::cxx::tree::list< ::xml_schema::string, char > (begin, end, this)
+  class SimulatedAnnealingType: public ::xml_schema::type
   {
-  }
+    public:
+    // noEpsilon
+    // 
+    typedef ::xml_schema::int_ noEpsilon_type;
+    typedef ::xsd::cxx::tree::traits< noEpsilon_type, char > noEpsilon_traits;
 
-  TrialSetType (const ::xercesc::DOMElement& e,
+    const noEpsilon_type&
+    noEpsilon () const;
+
+    noEpsilon_type&
+    noEpsilon ();
+
+    void
+    noEpsilon (const noEpsilon_type& x);
+
+    // rt
+    // 
+    typedef ::xml_schema::double_ rt_type;
+    typedef ::xsd::cxx::tree::traits< rt_type, char, ::xsd::cxx::tree::schema_type::double_ > rt_traits;
+
+    const rt_type&
+    rt () const;
+
+    rt_type&
+    rt ();
+
+    void
+    rt (const rt_type& x);
+
+    // T
+    // 
+    typedef ::xml_schema::double_ T_type;
+    typedef ::xsd::cxx::tree::traits< T_type, char, ::xsd::cxx::tree::schema_type::double_ > T_traits;
+
+    const T_type&
+    T () const;
+
+    T_type&
+    T ();
+
+    void
+    T (const T_type& x);
+
+    // NS
+    // 
+    typedef ::xml_schema::int_ NS_type;
+    typedef ::xsd::cxx::tree::traits< NS_type, char > NS_traits;
+
+    const NS_type&
+    NS () const;
+
+    NS_type&
+    NS ();
+
+    void
+    NS (const NS_type& x);
+
+    // NT
+    // 
+    typedef ::xml_schema::int_ NT_type;
+    typedef ::xsd::cxx::tree::traits< NT_type, char > NT_traits;
+
+    const NT_type&
+    NT () const;
+
+    NT_type&
+    NT ();
+
+    void
+    NT (const NT_type& x);
+
+    // epsilon
+    // 
+    typedef ::xml_schema::double_ epsilon_type;
+    typedef ::xsd::cxx::tree::traits< epsilon_type, char, ::xsd::cxx::tree::schema_type::double_ > epsilon_traits;
+
+    const epsilon_type&
+    epsilon () const;
+
+    epsilon_type&
+    epsilon ();
+
+    void
+    epsilon (const epsilon_type& x);
+
+    // maxNoEval
+    // 
+    typedef ::xml_schema::int_ maxNoEval_type;
+    typedef ::xsd::cxx::tree::traits< maxNoEval_type, char > maxNoEval_traits;
+
+    const maxNoEval_type&
+    maxNoEval () const;
+
+    maxNoEval_type&
+    maxNoEval ();
+
+    void
+    maxNoEval (const maxNoEval_type& x);
+
+    // Constructors.
+    //
+    SimulatedAnnealingType (const noEpsilon_type&,
+                            const rt_type&,
+                            const T_type&,
+                            const NS_type&,
+                            const NT_type&,
+                            const epsilon_type&,
+                            const maxNoEval_type&);
+
+    SimulatedAnnealingType (const ::xercesc::DOMElement& e,
+                            ::xml_schema::flags f = 0,
+                            ::xml_schema::container* c = 0);
+
+    SimulatedAnnealingType (const SimulatedAnnealingType& x,
+                            ::xml_schema::flags f = 0,
+                            ::xml_schema::container* c = 0);
+
+    virtual SimulatedAnnealingType*
+    _clone (::xml_schema::flags f = 0,
+            ::xml_schema::container* c = 0) const;
+
+    virtual 
+    ~SimulatedAnnealingType ();
+
+    // Implementation.
+    //
+    protected:
+    void
+    parse (::xsd::cxx::xml::dom::parser< char >&,
+           ::xml_schema::flags);
+
+    protected:
+    ::xsd::cxx::tree::one< noEpsilon_type > noEpsilon_;
+    ::xsd::cxx::tree::one< rt_type > rt_;
+    ::xsd::cxx::tree::one< T_type > T_;
+    ::xsd::cxx::tree::one< NS_type > NS_;
+    ::xsd::cxx::tree::one< NT_type > NT_;
+    ::xsd::cxx::tree::one< epsilon_type > epsilon_;
+    ::xsd::cxx::tree::one< maxNoEval_type > maxNoEval_;
+  };
+
+  class AlgorithmType: public ::xml_schema::type
+  {
+    public:
+    // simulatedAnnealing
+    // 
+    typedef ::CalibrationXsd::SimulatedAnnealingType simulatedAnnealing_type;
+    typedef ::xsd::cxx::tree::traits< simulatedAnnealing_type, char > simulatedAnnealing_traits;
+
+    const simulatedAnnealing_type&
+    simulatedAnnealing () const;
+
+    simulatedAnnealing_type&
+    simulatedAnnealing ();
+
+    void
+    simulatedAnnealing (const simulatedAnnealing_type& x);
+
+    void
+    simulatedAnnealing (::std::auto_ptr< simulatedAnnealing_type > p);
+
+    // Constructors.
+    //
+    AlgorithmType (const simulatedAnnealing_type&);
+
+    AlgorithmType (::std::auto_ptr< simulatedAnnealing_type >&);
+
+    AlgorithmType (const ::xercesc::DOMElement& e,
+                   ::xml_schema::flags f = 0,
+                   ::xml_schema::container* c = 0);
+
+    AlgorithmType (const AlgorithmType& x,
+                   ::xml_schema::flags f = 0,
+                   ::xml_schema::container* c = 0);
+
+    virtual AlgorithmType*
+    _clone (::xml_schema::flags f = 0,
+            ::xml_schema::container* c = 0) const;
+
+    virtual 
+    ~AlgorithmType ();
+
+    // Implementation.
+    //
+    protected:
+    void
+    parse (::xsd::cxx::xml::dom::parser< char >&,
+           ::xml_schema::flags);
+
+    protected:
+    ::xsd::cxx::tree::one< simulatedAnnealing_type > simulatedAnnealing_;
+  };
+
+  class OpenLoopType: public ::xml_schema::type
+  {
+    public:
+    // Constructors.
+    //
+    OpenLoopType ();
+
+    OpenLoopType (const ::xercesc::DOMElement& e,
+                  ::xml_schema::flags f = 0,
+                  ::xml_schema::container* c = 0);
+
+    OpenLoopType (const ::xercesc::DOMAttr& a,
+                  ::xml_schema::flags f = 0,
+                  ::xml_schema::container* c = 0);
+
+    OpenLoopType (const ::std::string& s,
+                  const ::xercesc::DOMElement* e,
+                  ::xml_schema::flags f = 0,
+                  ::xml_schema::container* c = 0);
+
+    OpenLoopType (const OpenLoopType& x,
+                  ::xml_schema::flags f = 0,
+                  ::xml_schema::container* c = 0);
+
+    virtual OpenLoopType*
+    _clone (::xml_schema::flags f = 0,
+            ::xml_schema::container* c = 0) const;
+
+    virtual 
+    ~OpenLoopType ();
+  };
+
+  class TypeType: public ::xml_schema::type
+  {
+    public:
+    // openLoop
+    // 
+    typedef ::CalibrationXsd::OpenLoopType openLoop_type;
+    typedef ::xsd::cxx::tree::traits< openLoop_type, char > openLoop_traits;
+
+    const openLoop_type&
+    openLoop () const;
+
+    openLoop_type&
+    openLoop ();
+
+    void
+    openLoop (const openLoop_type& x);
+
+    void
+    openLoop (::std::auto_ptr< openLoop_type > p);
+
+    // Constructors.
+    //
+    TypeType (const openLoop_type&);
+
+    TypeType (const ::xercesc::DOMElement& e,
+              ::xml_schema::flags f = 0,
+              ::xml_schema::container* c = 0);
+
+    TypeType (const TypeType& x,
+              ::xml_schema::flags f = 0,
+              ::xml_schema::container* c = 0);
+
+    virtual TypeType*
+    _clone (::xml_schema::flags f = 0,
+            ::xml_schema::container* c = 0) const;
+
+    virtual 
+    ~TypeType ();
+
+    // Implementation.
+    //
+    protected:
+    void
+    parse (::xsd::cxx::xml::dom::parser< char >&,
+           ::xml_schema::flags);
+
+    protected:
+    ::xsd::cxx::tree::one< openLoop_type > openLoop_;
+  };
+
+  class TendonElementType: public ::xml_schema::type
+  {
+    public:
+    // Constructors.
+    //
+    TendonElementType ();
+
+    TendonElementType (const ::xercesc::DOMElement& e,
+                       ::xml_schema::flags f = 0,
+                       ::xml_schema::container* c = 0);
+
+    TendonElementType (const ::xercesc::DOMAttr& a,
+                       ::xml_schema::flags f = 0,
+                       ::xml_schema::container* c = 0);
+
+    TendonElementType (const ::std::string& s,
+                       const ::xercesc::DOMElement* e,
+                       ::xml_schema::flags f = 0,
+                       ::xml_schema::container* c = 0);
+
+    TendonElementType (const TendonElementType& x,
+                       ::xml_schema::flags f = 0,
+                       ::xml_schema::container* c = 0);
+
+    virtual TendonElementType*
+    _clone (::xml_schema::flags f = 0,
+            ::xml_schema::container* c = 0) const;
+
+    virtual 
+    ~TendonElementType ();
+  };
+
+  class TendonType: public ::xml_schema::type
+  {
+    public:
+    // stiff
+    // 
+    typedef ::CalibrationXsd::TendonElementType stiff_type;
+    typedef ::xsd::cxx::tree::optional< stiff_type > stiff_optional;
+    typedef ::xsd::cxx::tree::traits< stiff_type, char > stiff_traits;
+
+    const stiff_optional&
+    stiff () const;
+
+    stiff_optional&
+    stiff ();
+
+    void
+    stiff (const stiff_type& x);
+
+    void
+    stiff (const stiff_optional& x);
+
+    void
+    stiff (::std::auto_ptr< stiff_type > p);
+
+    // elastic
+    // 
+    typedef ::CalibrationXsd::TendonElementType elastic_type;
+    typedef ::xsd::cxx::tree::optional< elastic_type > elastic_optional;
+    typedef ::xsd::cxx::tree::traits< elastic_type, char > elastic_traits;
+
+    const elastic_optional&
+    elastic () const;
+
+    elastic_optional&
+    elastic ();
+
+    void
+    elastic (const elastic_type& x);
+
+    void
+    elastic (const elastic_optional& x);
+
+    void
+    elastic (::std::auto_ptr< elastic_type > p);
+
+    // elasticBiSec
+    // 
+    typedef ::CalibrationXsd::TendonElementType elasticBiSec_type;
+    typedef ::xsd::cxx::tree::optional< elasticBiSec_type > elasticBiSec_optional;
+    typedef ::xsd::cxx::tree::traits< elasticBiSec_type, char > elasticBiSec_traits;
+
+    const elasticBiSec_optional&
+    elasticBiSec () const;
+
+    elasticBiSec_optional&
+    elasticBiSec ();
+
+    void
+    elasticBiSec (const elasticBiSec_type& x);
+
+    void
+    elasticBiSec (const elasticBiSec_optional& x);
+
+    void
+    elasticBiSec (::std::auto_ptr< elasticBiSec_type > p);
+
+    // Constructors.
+    //
+    TendonType ();
+
+    TendonType (const ::xercesc::DOMElement& e,
                 ::xml_schema::flags f = 0,
                 ::xml_schema::container* c = 0);
 
-  TrialSetType (const ::xercesc::DOMAttr& a,
+    TendonType (const TendonType& x,
                 ::xml_schema::flags f = 0,
                 ::xml_schema::container* c = 0);
 
-  TrialSetType (const ::std::string& s,
-                const ::xercesc::DOMElement* e,
-                ::xml_schema::flags f = 0,
-                ::xml_schema::container* c = 0);
+    virtual TendonType*
+    _clone (::xml_schema::flags f = 0,
+            ::xml_schema::container* c = 0) const;
 
-  TrialSetType (const TrialSetType& x,
-                ::xml_schema::flags f = 0,
-                ::xml_schema::container* c = 0);
+    virtual 
+    ~TendonType ();
 
-  virtual TrialSetType*
-  _clone (::xml_schema::flags f = 0,
-          ::xml_schema::container* c = 0) const;
+    // Implementation.
+    //
+    protected:
+    void
+    parse (::xsd::cxx::xml::dom::parser< char >&,
+           ::xml_schema::flags);
 
-  virtual 
-  ~TrialSetType ();
-};
+    protected:
+    stiff_optional stiff_;
+    elastic_optional elastic_;
+    elasticBiSec_optional elasticBiSec_;
+  };
 
-class ObjectiveFunctionElementType: public ::xml_schema::type
-{
-  public:
-  // Constructors.
-  //
-  ObjectiveFunctionElementType ();
+  class ActivationElementType: public ::xml_schema::type
+  {
+    public:
+    // Constructors.
+    //
+    ActivationElementType ();
 
-  ObjectiveFunctionElementType (const ::xercesc::DOMElement& e,
+    ActivationElementType (const ::xercesc::DOMElement& e,
+                           ::xml_schema::flags f = 0,
+                           ::xml_schema::container* c = 0);
+
+    ActivationElementType (const ::xercesc::DOMAttr& a,
+                           ::xml_schema::flags f = 0,
+                           ::xml_schema::container* c = 0);
+
+    ActivationElementType (const ::std::string& s,
+                           const ::xercesc::DOMElement* e,
+                           ::xml_schema::flags f = 0,
+                           ::xml_schema::container* c = 0);
+
+    ActivationElementType (const ActivationElementType& x,
+                           ::xml_schema::flags f = 0,
+                           ::xml_schema::container* c = 0);
+
+    virtual ActivationElementType*
+    _clone (::xml_schema::flags f = 0,
+            ::xml_schema::container* c = 0) const;
+
+    virtual 
+    ~ActivationElementType ();
+  };
+
+  class ActivationType: public ::xml_schema::type
+  {
+    public:
+    // exponential
+    // 
+    typedef ::CalibrationXsd::ActivationElementType exponential_type;
+    typedef ::xsd::cxx::tree::optional< exponential_type > exponential_optional;
+    typedef ::xsd::cxx::tree::traits< exponential_type, char > exponential_traits;
+
+    const exponential_optional&
+    exponential () const;
+
+    exponential_optional&
+    exponential ();
+
+    void
+    exponential (const exponential_type& x);
+
+    void
+    exponential (const exponential_optional& x);
+
+    void
+    exponential (::std::auto_ptr< exponential_type > p);
+
+    // piecewise
+    // 
+    typedef ::CalibrationXsd::ActivationElementType piecewise_type;
+    typedef ::xsd::cxx::tree::optional< piecewise_type > piecewise_optional;
+    typedef ::xsd::cxx::tree::traits< piecewise_type, char > piecewise_traits;
+
+    const piecewise_optional&
+    piecewise () const;
+
+    piecewise_optional&
+    piecewise ();
+
+    void
+    piecewise (const piecewise_type& x);
+
+    void
+    piecewise (const piecewise_optional& x);
+
+    void
+    piecewise (::std::auto_ptr< piecewise_type > p);
+
+    // Constructors.
+    //
+    ActivationType ();
+
+    ActivationType (const ::xercesc::DOMElement& e,
+                    ::xml_schema::flags f = 0,
+                    ::xml_schema::container* c = 0);
+
+    ActivationType (const ActivationType& x,
+                    ::xml_schema::flags f = 0,
+                    ::xml_schema::container* c = 0);
+
+    virtual ActivationType*
+    _clone (::xml_schema::flags f = 0,
+            ::xml_schema::container* c = 0) const;
+
+    virtual 
+    ~ActivationType ();
+
+    // Implementation.
+    //
+    protected:
+    void
+    parse (::xsd::cxx::xml::dom::parser< char >&,
+           ::xml_schema::flags);
+
+    protected:
+    exponential_optional exponential_;
+    piecewise_optional piecewise_;
+  };
+
+  class NMSModelType: public ::xml_schema::type
+  {
+    public:
+    // type
+    // 
+    typedef ::CalibrationXsd::TypeType type_type;
+    typedef ::xsd::cxx::tree::traits< type_type, char > type_traits;
+
+    const type_type&
+    type () const;
+
+    type_type&
+    type ();
+
+    void
+    type (const type_type& x);
+
+    void
+    type (::std::auto_ptr< type_type > p);
+
+    // tendon
+    // 
+    typedef ::CalibrationXsd::TendonType tendon_type;
+    typedef ::xsd::cxx::tree::traits< tendon_type, char > tendon_traits;
+
+    const tendon_type&
+    tendon () const;
+
+    tendon_type&
+    tendon ();
+
+    void
+    tendon (const tendon_type& x);
+
+    void
+    tendon (::std::auto_ptr< tendon_type > p);
+
+    // activation
+    // 
+    typedef ::CalibrationXsd::ActivationType activation_type;
+    typedef ::xsd::cxx::tree::traits< activation_type, char > activation_traits;
+
+    const activation_type&
+    activation () const;
+
+    activation_type&
+    activation ();
+
+    void
+    activation (const activation_type& x);
+
+    void
+    activation (::std::auto_ptr< activation_type > p);
+
+    // Constructors.
+    //
+    NMSModelType (const type_type&,
+                  const tendon_type&,
+                  const activation_type&);
+
+    NMSModelType (::std::auto_ptr< type_type >&,
+                  ::std::auto_ptr< tendon_type >&,
+                  ::std::auto_ptr< activation_type >&);
+
+    NMSModelType (const ::xercesc::DOMElement& e,
+                  ::xml_schema::flags f = 0,
+                  ::xml_schema::container* c = 0);
+
+    NMSModelType (const NMSModelType& x,
+                  ::xml_schema::flags f = 0,
+                  ::xml_schema::container* c = 0);
+
+    virtual NMSModelType*
+    _clone (::xml_schema::flags f = 0,
+            ::xml_schema::container* c = 0) const;
+
+    virtual 
+    ~NMSModelType ();
+
+    // Implementation.
+    //
+    protected:
+    void
+    parse (::xsd::cxx::xml::dom::parser< char >&,
+           ::xml_schema::flags);
+
+    protected:
+    ::xsd::cxx::tree::one< type_type > type_;
+    ::xsd::cxx::tree::one< tendon_type > tendon_;
+    ::xsd::cxx::tree::one< activation_type > activation_;
+  };
+
+  class TrialSetType: public ::xml_schema::simple_type,
+    public ::xsd::cxx::tree::list< ::xml_schema::string, char >
+  {
+    public:
+    TrialSetType ();
+
+    TrialSetType (size_type n, const ::xml_schema::string& x);
+
+    template < typename I >
+    TrialSetType (const I& begin, const I& end)
+    : ::xsd::cxx::tree::list< ::xml_schema::string, char > (begin, end, this)
+    {
+    }
+
+    TrialSetType (const ::xercesc::DOMElement& e,
+                  ::xml_schema::flags f = 0,
+                  ::xml_schema::container* c = 0);
+
+    TrialSetType (const ::xercesc::DOMAttr& a,
+                  ::xml_schema::flags f = 0,
+                  ::xml_schema::container* c = 0);
+
+    TrialSetType (const ::std::string& s,
+                  const ::xercesc::DOMElement* e,
+                  ::xml_schema::flags f = 0,
+                  ::xml_schema::container* c = 0);
+
+    TrialSetType (const TrialSetType& x,
+                  ::xml_schema::flags f = 0,
+                  ::xml_schema::container* c = 0);
+
+    virtual TrialSetType*
+    _clone (::xml_schema::flags f = 0,
+            ::xml_schema::container* c = 0) const;
+
+    virtual 
+    ~TrialSetType ();
+  };
+
+  class ObjectiveFunctionElementType: public ::xml_schema::type
+  {
+    public:
+    // Constructors.
+    //
+    ObjectiveFunctionElementType ();
+
+    ObjectiveFunctionElementType (const ::xercesc::DOMElement& e,
+                                  ::xml_schema::flags f = 0,
+                                  ::xml_schema::container* c = 0);
+
+    ObjectiveFunctionElementType (const ::xercesc::DOMAttr& a,
+                                  ::xml_schema::flags f = 0,
+                                  ::xml_schema::container* c = 0);
+
+    ObjectiveFunctionElementType (const ::std::string& s,
+                                  const ::xercesc::DOMElement* e,
+                                  ::xml_schema::flags f = 0,
+                                  ::xml_schema::container* c = 0);
+
+    ObjectiveFunctionElementType (const ObjectiveFunctionElementType& x,
+                                  ::xml_schema::flags f = 0,
+                                  ::xml_schema::container* c = 0);
+
+    virtual ObjectiveFunctionElementType*
+    _clone (::xml_schema::flags f = 0,
+            ::xml_schema::container* c = 0) const;
+
+    virtual 
+    ~ObjectiveFunctionElementType ();
+  };
+
+  class ComputationModeElementType: public ::xml_schema::type
+  {
+    public:
+    // Constructors.
+    //
+    ComputationModeElementType ();
+
+    ComputationModeElementType (const ::xercesc::DOMElement& e,
                                 ::xml_schema::flags f = 0,
                                 ::xml_schema::container* c = 0);
 
-  ObjectiveFunctionElementType (const ::xercesc::DOMAttr& a,
+    ComputationModeElementType (const ::xercesc::DOMAttr& a,
                                 ::xml_schema::flags f = 0,
                                 ::xml_schema::container* c = 0);
 
-  ObjectiveFunctionElementType (const ::std::string& s,
+    ComputationModeElementType (const ::std::string& s,
                                 const ::xercesc::DOMElement* e,
                                 ::xml_schema::flags f = 0,
                                 ::xml_schema::container* c = 0);
 
-  ObjectiveFunctionElementType (const ObjectiveFunctionElementType& x,
+    ComputationModeElementType (const ComputationModeElementType& x,
                                 ::xml_schema::flags f = 0,
                                 ::xml_schema::container* c = 0);
 
-  virtual ObjectiveFunctionElementType*
-  _clone (::xml_schema::flags f = 0,
-          ::xml_schema::container* c = 0) const;
+    virtual ComputationModeElementType*
+    _clone (::xml_schema::flags f = 0,
+            ::xml_schema::container* c = 0) const;
 
-  virtual 
-  ~ObjectiveFunctionElementType ();
-};
+    virtual 
+    ~ComputationModeElementType ();
+  };
 
-class ComputationModeElementType: public ::xml_schema::type
-{
-  public:
-  // Constructors.
-  //
-  ComputationModeElementType ();
+  class GlobalParameterType: public ::xml_schema::type
+  {
+    public:
+    // Constructors.
+    //
+    GlobalParameterType ();
 
-  ComputationModeElementType (const ::xercesc::DOMElement& e,
-                              ::xml_schema::flags f = 0,
-                              ::xml_schema::container* c = 0);
-
-  ComputationModeElementType (const ::xercesc::DOMAttr& a,
-                              ::xml_schema::flags f = 0,
-                              ::xml_schema::container* c = 0);
-
-  ComputationModeElementType (const ::std::string& s,
-                              const ::xercesc::DOMElement* e,
-                              ::xml_schema::flags f = 0,
-                              ::xml_schema::container* c = 0);
-
-  ComputationModeElementType (const ComputationModeElementType& x,
-                              ::xml_schema::flags f = 0,
-                              ::xml_schema::container* c = 0);
-
-  virtual ComputationModeElementType*
-  _clone (::xml_schema::flags f = 0,
-          ::xml_schema::container* c = 0) const;
-
-  virtual 
-  ~ComputationModeElementType ();
-};
-
-class GlobalParameterType: public ::xml_schema::type
-{
-  public:
-  // Constructors.
-  //
-  GlobalParameterType ();
-
-  GlobalParameterType (const ::xercesc::DOMElement& e,
-                       ::xml_schema::flags f = 0,
-                       ::xml_schema::container* c = 0);
-
-  GlobalParameterType (const ::xercesc::DOMAttr& a,
-                       ::xml_schema::flags f = 0,
-                       ::xml_schema::container* c = 0);
-
-  GlobalParameterType (const ::std::string& s,
-                       const ::xercesc::DOMElement* e,
-                       ::xml_schema::flags f = 0,
-                       ::xml_schema::container* c = 0);
-
-  GlobalParameterType (const GlobalParameterType& x,
-                       ::xml_schema::flags f = 0,
-                       ::xml_schema::container* c = 0);
-
-  virtual GlobalParameterType*
-  _clone (::xml_schema::flags f = 0,
-          ::xml_schema::container* c = 0) const;
-
-  virtual 
-  ~GlobalParameterType ();
-};
-
-class SingleParameterType: public ::xml_schema::type
-{
-  public:
-  // Constructors.
-  //
-  SingleParameterType ();
-
-  SingleParameterType (const ::xercesc::DOMElement& e,
-                       ::xml_schema::flags f = 0,
-                       ::xml_schema::container* c = 0);
-
-  SingleParameterType (const ::xercesc::DOMAttr& a,
-                       ::xml_schema::flags f = 0,
-                       ::xml_schema::container* c = 0);
-
-  SingleParameterType (const ::std::string& s,
-                       const ::xercesc::DOMElement* e,
-                       ::xml_schema::flags f = 0,
-                       ::xml_schema::container* c = 0);
-
-  SingleParameterType (const SingleParameterType& x,
-                       ::xml_schema::flags f = 0,
-                       ::xml_schema::container* c = 0);
-
-  virtual SingleParameterType*
-  _clone (::xml_schema::flags f = 0,
-          ::xml_schema::container* c = 0) const;
-
-  virtual 
-  ~SingleParameterType ();
-};
-
-class ObjectiveFunctionType: public ::xml_schema::type
-{
-  public:
-  // minimizeTorqueError
-  // 
-  typedef ::ObjectiveFunctionElementType minimizeTorqueError_type;
-  typedef ::xsd::cxx::tree::traits< minimizeTorqueError_type, char > minimizeTorqueError_traits;
-
-  const minimizeTorqueError_type&
-  minimizeTorqueError () const;
-
-  minimizeTorqueError_type&
-  minimizeTorqueError ();
-
-  void
-  minimizeTorqueError (const minimizeTorqueError_type& x);
-
-  void
-  minimizeTorqueError (::std::auto_ptr< minimizeTorqueError_type > p);
-
-  // Constructors.
-  //
-  ObjectiveFunctionType (const minimizeTorqueError_type&);
-
-  ObjectiveFunctionType (const ::xercesc::DOMElement& e,
+    GlobalParameterType (const ::xercesc::DOMElement& e,
                          ::xml_schema::flags f = 0,
                          ::xml_schema::container* c = 0);
 
-  ObjectiveFunctionType (const ObjectiveFunctionType& x,
+    GlobalParameterType (const ::xercesc::DOMAttr& a,
                          ::xml_schema::flags f = 0,
                          ::xml_schema::container* c = 0);
 
-  virtual ObjectiveFunctionType*
-  _clone (::xml_schema::flags f = 0,
-          ::xml_schema::container* c = 0) const;
+    GlobalParameterType (const ::std::string& s,
+                         const ::xercesc::DOMElement* e,
+                         ::xml_schema::flags f = 0,
+                         ::xml_schema::container* c = 0);
 
-  virtual 
-  ~ObjectiveFunctionType ();
+    GlobalParameterType (const GlobalParameterType& x,
+                         ::xml_schema::flags f = 0,
+                         ::xml_schema::container* c = 0);
 
-  // Implementation.
-  //
-  protected:
-  void
-  parse (::xsd::cxx::xml::dom::parser< char >&,
-         ::xml_schema::flags);
+    virtual GlobalParameterType*
+    _clone (::xml_schema::flags f = 0,
+            ::xml_schema::container* c = 0) const;
 
-  protected:
-  ::xsd::cxx::tree::one< minimizeTorqueError_type > minimizeTorqueError_;
-};
+    virtual 
+    ~GlobalParameterType ();
+  };
 
-class DoFsType: public ::xml_schema::simple_type,
-  public ::xsd::cxx::tree::list< ::xml_schema::string, char >
-{
-  public:
-  DoFsType ();
-
-  DoFsType (size_type n, const ::xml_schema::string& x);
-
-  template < typename I >
-  DoFsType (const I& begin, const I& end)
-  : ::xsd::cxx::tree::list< ::xml_schema::string, char > (begin, end, this)
+  class SingleParameterType: public ::xml_schema::type
   {
-  }
+    public:
+    // Constructors.
+    //
+    SingleParameterType ();
 
-  DoFsType (const ::xercesc::DOMElement& e,
-            ::xml_schema::flags f = 0,
-            ::xml_schema::container* c = 0);
+    SingleParameterType (const ::xercesc::DOMElement& e,
+                         ::xml_schema::flags f = 0,
+                         ::xml_schema::container* c = 0);
 
-  DoFsType (const ::xercesc::DOMAttr& a,
-            ::xml_schema::flags f = 0,
-            ::xml_schema::container* c = 0);
+    SingleParameterType (const ::xercesc::DOMAttr& a,
+                         ::xml_schema::flags f = 0,
+                         ::xml_schema::container* c = 0);
 
-  DoFsType (const ::std::string& s,
-            const ::xercesc::DOMElement* e,
-            ::xml_schema::flags f = 0,
-            ::xml_schema::container* c = 0);
+    SingleParameterType (const ::std::string& s,
+                         const ::xercesc::DOMElement* e,
+                         ::xml_schema::flags f = 0,
+                         ::xml_schema::container* c = 0);
 
-  DoFsType (const DoFsType& x,
-            ::xml_schema::flags f = 0,
-            ::xml_schema::container* c = 0);
+    SingleParameterType (const SingleParameterType& x,
+                         ::xml_schema::flags f = 0,
+                         ::xml_schema::container* c = 0);
 
-  virtual DoFsType*
-  _clone (::xml_schema::flags f = 0,
-          ::xml_schema::container* c = 0) const;
+    virtual SingleParameterType*
+    _clone (::xml_schema::flags f = 0,
+            ::xml_schema::container* c = 0) const;
 
-  virtual 
-  ~DoFsType ();
-};
+    virtual 
+    ~SingleParameterType ();
+  };
 
-class HardCodedParametersSelectionType: public ::xml_schema::type
-{
-  public:
-  // Constructors.
-  //
-  HardCodedParametersSelectionType ();
-
-  HardCodedParametersSelectionType (const ::xercesc::DOMElement& e,
-                                    ::xml_schema::flags f = 0,
-                                    ::xml_schema::container* c = 0);
-
-  HardCodedParametersSelectionType (const ::xercesc::DOMAttr& a,
-                                    ::xml_schema::flags f = 0,
-                                    ::xml_schema::container* c = 0);
-
-  HardCodedParametersSelectionType (const ::std::string& s,
-                                    const ::xercesc::DOMElement* e,
-                                    ::xml_schema::flags f = 0,
-                                    ::xml_schema::container* c = 0);
-
-  HardCodedParametersSelectionType (const HardCodedParametersSelectionType& x,
-                                    ::xml_schema::flags f = 0,
-                                    ::xml_schema::container* c = 0);
-
-  virtual HardCodedParametersSelectionType*
-  _clone (::xml_schema::flags f = 0,
-          ::xml_schema::container* c = 0) const;
-
-  virtual 
-  ~HardCodedParametersSelectionType ();
-};
-
-class ComputationModeType: public ::xml_schema::type
-{
-  public:
-  // default
-  // 
-  typedef ::ComputationModeElementType default_type;
-  typedef ::xsd::cxx::tree::optional< default_type > default_optional;
-  typedef ::xsd::cxx::tree::traits< default_type, char > default_traits;
-
-  const default_optional&
-  default_ () const;
-
-  default_optional&
-  default_ ();
-
-  void
-  default_ (const default_type& x);
-
-  void
-  default_ (const default_optional& x);
-
-  void
-  default_ (::std::auto_ptr< default_type > p);
-
-  // fast
-  // 
-  typedef ::ComputationModeElementType fast_type;
-  typedef ::xsd::cxx::tree::optional< fast_type > fast_optional;
-  typedef ::xsd::cxx::tree::traits< fast_type, char > fast_traits;
-
-  const fast_optional&
-  fast () const;
-
-  fast_optional&
-  fast ();
-
-  void
-  fast (const fast_type& x);
-
-  void
-  fast (const fast_optional& x);
-
-  void
-  fast (::std::auto_ptr< fast_type > p);
-
-  // Constructors.
-  //
-  ComputationModeType ();
-
-  ComputationModeType (const ::xercesc::DOMElement& e,
-                       ::xml_schema::flags f = 0,
-                       ::xml_schema::container* c = 0);
-
-  ComputationModeType (const ComputationModeType& x,
-                       ::xml_schema::flags f = 0,
-                       ::xml_schema::container* c = 0);
-
-  virtual ComputationModeType*
-  _clone (::xml_schema::flags f = 0,
-          ::xml_schema::container* c = 0) const;
-
-  virtual 
-  ~ComputationModeType ();
-
-  // Implementation.
-  //
-  protected:
-  void
-  parse (::xsd::cxx::xml::dom::parser< char >&,
-         ::xml_schema::flags);
-
-  protected:
-  default_optional default__;
-  fast_optional fast_;
-};
-
-class TwoDoublesType: public ::xml_schema::simple_type,
-  public ::xsd::cxx::tree::list< ::xml_schema::double_, char, ::xsd::cxx::tree::schema_type::double_ >
-{
-  public:
-  TwoDoublesType ();
-
-  TwoDoublesType (size_type n, const ::xml_schema::double_& x);
-
-  template < typename I >
-  TwoDoublesType (const I& begin, const I& end)
-  : ::xsd::cxx::tree::list< ::xml_schema::double_, char, ::xsd::cxx::tree::schema_type::double_ > (begin, end, this)
+  class ObjectiveFunctionType: public ::xml_schema::type
   {
-  }
+    public:
+    // minimizeTorqueError
+    // 
+    typedef ::CalibrationXsd::ObjectiveFunctionElementType minimizeTorqueError_type;
+    typedef ::xsd::cxx::tree::traits< minimizeTorqueError_type, char > minimizeTorqueError_traits;
 
-  TwoDoublesType (const ::xercesc::DOMElement& e,
-                  ::xml_schema::flags f = 0,
-                  ::xml_schema::container* c = 0);
+    const minimizeTorqueError_type&
+    minimizeTorqueError () const;
 
-  TwoDoublesType (const ::xercesc::DOMAttr& a,
-                  ::xml_schema::flags f = 0,
-                  ::xml_schema::container* c = 0);
+    minimizeTorqueError_type&
+    minimizeTorqueError ();
 
-  TwoDoublesType (const ::std::string& s,
-                  const ::xercesc::DOMElement* e,
-                  ::xml_schema::flags f = 0,
-                  ::xml_schema::container* c = 0);
+    void
+    minimizeTorqueError (const minimizeTorqueError_type& x);
 
-  TwoDoublesType (const TwoDoublesType& x,
-                  ::xml_schema::flags f = 0,
-                  ::xml_schema::container* c = 0);
+    void
+    minimizeTorqueError (::std::auto_ptr< minimizeTorqueError_type > p);
 
-  virtual TwoDoublesType*
-  _clone (::xml_schema::flags f = 0,
-          ::xml_schema::container* c = 0) const;
+    // Constructors.
+    //
+    ObjectiveFunctionType (const minimizeTorqueError_type&);
 
-  virtual 
-  ~TwoDoublesType ();
-};
+    ObjectiveFunctionType (const ::xercesc::DOMElement& e,
+                           ::xml_schema::flags f = 0,
+                           ::xml_schema::container* c = 0);
 
-class RangeType: public ::xml_schema::type
-{
-  public:
-  // range
-  // 
-  typedef ::TwoDoublesType range_type;
-  typedef ::xsd::cxx::tree::traits< range_type, char > range_traits;
+    ObjectiveFunctionType (const ObjectiveFunctionType& x,
+                           ::xml_schema::flags f = 0,
+                           ::xml_schema::container* c = 0);
 
-  const range_type&
-  range () const;
+    virtual ObjectiveFunctionType*
+    _clone (::xml_schema::flags f = 0,
+            ::xml_schema::container* c = 0) const;
 
-  range_type&
-  range ();
+    virtual 
+    ~ObjectiveFunctionType ();
 
-  void
-  range (const range_type& x);
+    // Implementation.
+    //
+    protected:
+    void
+    parse (::xsd::cxx::xml::dom::parser< char >&,
+           ::xml_schema::flags);
 
-  void
-  range (::std::auto_ptr< range_type > p);
+    protected:
+    ::xsd::cxx::tree::one< minimizeTorqueError_type > minimizeTorqueError_;
+  };
 
-  // Constructors.
-  //
-  RangeType (const range_type&);
-
-  RangeType (const ::xercesc::DOMElement& e,
-             ::xml_schema::flags f = 0,
-             ::xml_schema::container* c = 0);
-
-  RangeType (const RangeType& x,
-             ::xml_schema::flags f = 0,
-             ::xml_schema::container* c = 0);
-
-  virtual RangeType*
-  _clone (::xml_schema::flags f = 0,
-          ::xml_schema::container* c = 0) const;
-
-  virtual 
-  ~RangeType ();
-
-  // Implementation.
-  //
-  protected:
-  void
-  parse (::xsd::cxx::xml::dom::parser< char >&,
-         ::xml_schema::flags);
-
-  protected:
-  ::xsd::cxx::tree::one< range_type > range_;
-};
-
-class MuscleListType: public ::xml_schema::simple_type,
-  public ::xsd::cxx::tree::list< ::xml_schema::string, char >
-{
-  public:
-  MuscleListType ();
-
-  MuscleListType (size_type n, const ::xml_schema::string& x);
-
-  template < typename I >
-  MuscleListType (const I& begin, const I& end)
-  : ::xsd::cxx::tree::list< ::xml_schema::string, char > (begin, end, this)
+  class DoFsType: public ::xml_schema::simple_type,
+    public ::xsd::cxx::tree::list< ::xml_schema::string, char >
   {
-  }
+    public:
+    DoFsType ();
 
-  MuscleListType (const ::xercesc::DOMElement& e,
-                  ::xml_schema::flags f = 0,
-                  ::xml_schema::container* c = 0);
+    DoFsType (size_type n, const ::xml_schema::string& x);
 
-  MuscleListType (const ::xercesc::DOMAttr& a,
-                  ::xml_schema::flags f = 0,
-                  ::xml_schema::container* c = 0);
+    template < typename I >
+    DoFsType (const I& begin, const I& end)
+    : ::xsd::cxx::tree::list< ::xml_schema::string, char > (begin, end, this)
+    {
+    }
 
-  MuscleListType (const ::std::string& s,
-                  const ::xercesc::DOMElement* e,
-                  ::xml_schema::flags f = 0,
-                  ::xml_schema::container* c = 0);
+    DoFsType (const ::xercesc::DOMElement& e,
+              ::xml_schema::flags f = 0,
+              ::xml_schema::container* c = 0);
 
-  MuscleListType (const MuscleListType& x,
-                  ::xml_schema::flags f = 0,
-                  ::xml_schema::container* c = 0);
+    DoFsType (const ::xercesc::DOMAttr& a,
+              ::xml_schema::flags f = 0,
+              ::xml_schema::container* c = 0);
 
-  virtual MuscleListType*
-  _clone (::xml_schema::flags f = 0,
-          ::xml_schema::container* c = 0) const;
+    DoFsType (const ::std::string& s,
+              const ::xercesc::DOMElement* e,
+              ::xml_schema::flags f = 0,
+              ::xml_schema::container* c = 0);
 
-  virtual 
-  ~MuscleListType ();
-};
+    DoFsType (const DoFsType& x,
+              ::xml_schema::flags f = 0,
+              ::xml_schema::container* c = 0);
 
-class MuscleGroupsType: public ::xml_schema::type
-{
-  public:
-  // muscles
-  // 
-  typedef ::MuscleListType muscles_type;
-  typedef ::xsd::cxx::tree::sequence< muscles_type > muscles_sequence;
-  typedef muscles_sequence::iterator muscles_iterator;
-  typedef muscles_sequence::const_iterator muscles_const_iterator;
-  typedef ::xsd::cxx::tree::traits< muscles_type, char > muscles_traits;
+    virtual DoFsType*
+    _clone (::xml_schema::flags f = 0,
+            ::xml_schema::container* c = 0) const;
 
-  const muscles_sequence&
-  muscles () const;
+    virtual 
+    ~DoFsType ();
+  };
 
-  muscles_sequence&
-  muscles ();
+  class HardCodedParametersSelectionType: public ::xml_schema::type
+  {
+    public:
+    // Constructors.
+    //
+    HardCodedParametersSelectionType ();
 
-  void
-  muscles (const muscles_sequence& s);
+    HardCodedParametersSelectionType (const ::xercesc::DOMElement& e,
+                                      ::xml_schema::flags f = 0,
+                                      ::xml_schema::container* c = 0);
 
-  // Constructors.
-  //
-  MuscleGroupsType ();
+    HardCodedParametersSelectionType (const ::xercesc::DOMAttr& a,
+                                      ::xml_schema::flags f = 0,
+                                      ::xml_schema::container* c = 0);
 
-  MuscleGroupsType (const ::xercesc::DOMElement& e,
+    HardCodedParametersSelectionType (const ::std::string& s,
+                                      const ::xercesc::DOMElement* e,
+                                      ::xml_schema::flags f = 0,
+                                      ::xml_schema::container* c = 0);
+
+    HardCodedParametersSelectionType (const HardCodedParametersSelectionType& x,
+                                      ::xml_schema::flags f = 0,
+                                      ::xml_schema::container* c = 0);
+
+    virtual HardCodedParametersSelectionType*
+    _clone (::xml_schema::flags f = 0,
+            ::xml_schema::container* c = 0) const;
+
+    virtual 
+    ~HardCodedParametersSelectionType ();
+  };
+
+  class ComputationModeType: public ::xml_schema::type
+  {
+    public:
+    // default
+    // 
+    typedef ::CalibrationXsd::ComputationModeElementType default_type;
+    typedef ::xsd::cxx::tree::optional< default_type > default_optional;
+    typedef ::xsd::cxx::tree::traits< default_type, char > default_traits;
+
+    const default_optional&
+    default_ () const;
+
+    default_optional&
+    default_ ();
+
+    void
+    default_ (const default_type& x);
+
+    void
+    default_ (const default_optional& x);
+
+    void
+    default_ (::std::auto_ptr< default_type > p);
+
+    // fast
+    // 
+    typedef ::CalibrationXsd::ComputationModeElementType fast_type;
+    typedef ::xsd::cxx::tree::optional< fast_type > fast_optional;
+    typedef ::xsd::cxx::tree::traits< fast_type, char > fast_traits;
+
+    const fast_optional&
+    fast () const;
+
+    fast_optional&
+    fast ();
+
+    void
+    fast (const fast_type& x);
+
+    void
+    fast (const fast_optional& x);
+
+    void
+    fast (::std::auto_ptr< fast_type > p);
+
+    // Constructors.
+    //
+    ComputationModeType ();
+
+    ComputationModeType (const ::xercesc::DOMElement& e,
+                         ::xml_schema::flags f = 0,
+                         ::xml_schema::container* c = 0);
+
+    ComputationModeType (const ComputationModeType& x,
+                         ::xml_schema::flags f = 0,
+                         ::xml_schema::container* c = 0);
+
+    virtual ComputationModeType*
+    _clone (::xml_schema::flags f = 0,
+            ::xml_schema::container* c = 0) const;
+
+    virtual 
+    ~ComputationModeType ();
+
+    // Implementation.
+    //
+    protected:
+    void
+    parse (::xsd::cxx::xml::dom::parser< char >&,
+           ::xml_schema::flags);
+
+    protected:
+    default_optional default__;
+    fast_optional fast_;
+  };
+
+  class TwoDoublesType: public ::xml_schema::simple_type,
+    public ::xsd::cxx::tree::list< ::xml_schema::double_, char, ::xsd::cxx::tree::schema_type::double_ >
+  {
+    public:
+    TwoDoublesType ();
+
+    TwoDoublesType (size_type n, const ::xml_schema::double_& x);
+
+    template < typename I >
+    TwoDoublesType (const I& begin, const I& end)
+    : ::xsd::cxx::tree::list< ::xml_schema::double_, char, ::xsd::cxx::tree::schema_type::double_ > (begin, end, this)
+    {
+    }
+
+    TwoDoublesType (const ::xercesc::DOMElement& e,
                     ::xml_schema::flags f = 0,
                     ::xml_schema::container* c = 0);
 
-  MuscleGroupsType (const MuscleGroupsType& x,
+    TwoDoublesType (const ::xercesc::DOMAttr& a,
                     ::xml_schema::flags f = 0,
                     ::xml_schema::container* c = 0);
 
-  virtual MuscleGroupsType*
-  _clone (::xml_schema::flags f = 0,
-          ::xml_schema::container* c = 0) const;
-
-  virtual 
-  ~MuscleGroupsType ();
-
-  // Implementation.
-  //
-  protected:
-  void
-  parse (::xsd::cxx::xml::dom::parser< char >&,
-         ::xml_schema::flags);
-
-  protected:
-  muscles_sequence muscles_;
-};
-
-class ParameterType: public ::xml_schema::type
-{
-  public:
-  // name
-  // 
-  typedef ::xml_schema::string name_type;
-  typedef ::xsd::cxx::tree::traits< name_type, char > name_traits;
-
-  const name_type&
-  name () const;
-
-  name_type&
-  name ();
-
-  void
-  name (const name_type& x);
-
-  void
-  name (::std::auto_ptr< name_type > p);
-
-  // muscleGroups
-  // 
-  typedef ::MuscleGroupsType muscleGroups_type;
-  typedef ::xsd::cxx::tree::optional< muscleGroups_type > muscleGroups_optional;
-  typedef ::xsd::cxx::tree::traits< muscleGroups_type, char > muscleGroups_traits;
-
-  const muscleGroups_optional&
-  muscleGroups () const;
-
-  muscleGroups_optional&
-  muscleGroups ();
-
-  void
-  muscleGroups (const muscleGroups_type& x);
-
-  void
-  muscleGroups (const muscleGroups_optional& x);
-
-  void
-  muscleGroups (::std::auto_ptr< muscleGroups_type > p);
-
-  // global
-  // 
-  typedef ::GlobalParameterType global_type;
-  typedef ::xsd::cxx::tree::optional< global_type > global_optional;
-  typedef ::xsd::cxx::tree::traits< global_type, char > global_traits;
-
-  const global_optional&
-  global () const;
-
-  global_optional&
-  global ();
-
-  void
-  global (const global_type& x);
-
-  void
-  global (const global_optional& x);
-
-  void
-  global (::std::auto_ptr< global_type > p);
-
-  // single
-  // 
-  typedef ::SingleParameterType single_type;
-  typedef ::xsd::cxx::tree::optional< single_type > single_optional;
-  typedef ::xsd::cxx::tree::traits< single_type, char > single_traits;
-
-  const single_optional&
-  single () const;
-
-  single_optional&
-  single ();
-
-  void
-  single (const single_type& x);
-
-  void
-  single (const single_optional& x);
-
-  void
-  single (::std::auto_ptr< single_type > p);
-
-  // absolute
-  // 
-  typedef ::RangeType absolute_type;
-  typedef ::xsd::cxx::tree::optional< absolute_type > absolute_optional;
-  typedef ::xsd::cxx::tree::traits< absolute_type, char > absolute_traits;
-
-  const absolute_optional&
-  absolute () const;
-
-  absolute_optional&
-  absolute ();
-
-  void
-  absolute (const absolute_type& x);
-
-  void
-  absolute (const absolute_optional& x);
-
-  void
-  absolute (::std::auto_ptr< absolute_type > p);
-
-  // relativeToSubjectValue
-  // 
-  typedef ::RangeType relativeToSubjectValue_type;
-  typedef ::xsd::cxx::tree::optional< relativeToSubjectValue_type > relativeToSubjectValue_optional;
-  typedef ::xsd::cxx::tree::traits< relativeToSubjectValue_type, char > relativeToSubjectValue_traits;
-
-  const relativeToSubjectValue_optional&
-  relativeToSubjectValue () const;
-
-  relativeToSubjectValue_optional&
-  relativeToSubjectValue ();
-
-  void
-  relativeToSubjectValue (const relativeToSubjectValue_type& x);
-
-  void
-  relativeToSubjectValue (const relativeToSubjectValue_optional& x);
-
-  void
-  relativeToSubjectValue (::std::auto_ptr< relativeToSubjectValue_type > p);
-
-  // Constructors.
-  //
-  ParameterType (const name_type&);
-
-  ParameterType (const ::xercesc::DOMElement& e,
-                 ::xml_schema::flags f = 0,
-                 ::xml_schema::container* c = 0);
-
-  ParameterType (const ParameterType& x,
-                 ::xml_schema::flags f = 0,
-                 ::xml_schema::container* c = 0);
-
-  virtual ParameterType*
-  _clone (::xml_schema::flags f = 0,
-          ::xml_schema::container* c = 0) const;
-
-  virtual 
-  ~ParameterType ();
-
-  // Implementation.
-  //
-  protected:
-  void
-  parse (::xsd::cxx::xml::dom::parser< char >&,
-         ::xml_schema::flags);
-
-  protected:
-  ::xsd::cxx::tree::one< name_type > name_;
-  muscleGroups_optional muscleGroups_;
-  global_optional global_;
-  single_optional single_;
-  absolute_optional absolute_;
-  relativeToSubjectValue_optional relativeToSubjectValue_;
-};
-
-class parameterSetType: public ::xml_schema::type
-{
-  public:
-  // parameter
-  // 
-  typedef ::ParameterType parameter_type;
-  typedef ::xsd::cxx::tree::sequence< parameter_type > parameter_sequence;
-  typedef parameter_sequence::iterator parameter_iterator;
-  typedef parameter_sequence::const_iterator parameter_const_iterator;
-  typedef ::xsd::cxx::tree::traits< parameter_type, char > parameter_traits;
-
-  const parameter_sequence&
-  parameter () const;
-
-  parameter_sequence&
-  parameter ();
-
-  void
-  parameter (const parameter_sequence& s);
-
-  // Constructors.
-  //
-  parameterSetType ();
-
-  parameterSetType (const ::xercesc::DOMElement& e,
+    TwoDoublesType (const ::std::string& s,
+                    const ::xercesc::DOMElement* e,
                     ::xml_schema::flags f = 0,
                     ::xml_schema::container* c = 0);
 
-  parameterSetType (const parameterSetType& x,
+    TwoDoublesType (const TwoDoublesType& x,
                     ::xml_schema::flags f = 0,
                     ::xml_schema::container* c = 0);
 
-  virtual parameterSetType*
-  _clone (::xml_schema::flags f = 0,
-          ::xml_schema::container* c = 0) const;
+    virtual TwoDoublesType*
+    _clone (::xml_schema::flags f = 0,
+            ::xml_schema::container* c = 0) const;
+
+    virtual 
+    ~TwoDoublesType ();
+  };
+
+  class RangeType: public ::xml_schema::type
+  {
+    public:
+    // range
+    // 
+    typedef ::CalibrationXsd::TwoDoublesType range_type;
+    typedef ::xsd::cxx::tree::traits< range_type, char > range_traits;
+
+    const range_type&
+    range () const;
+
+    range_type&
+    range ();
+
+    void
+    range (const range_type& x);
+
+    void
+    range (::std::auto_ptr< range_type > p);
+
+    // Constructors.
+    //
+    RangeType (const range_type&);
+
+    RangeType (const ::xercesc::DOMElement& e,
+               ::xml_schema::flags f = 0,
+               ::xml_schema::container* c = 0);
+
+    RangeType (const RangeType& x,
+               ::xml_schema::flags f = 0,
+               ::xml_schema::container* c = 0);
+
+    virtual RangeType*
+    _clone (::xml_schema::flags f = 0,
+            ::xml_schema::container* c = 0) const;
+
+    virtual 
+    ~RangeType ();
+
+    // Implementation.
+    //
+    protected:
+    void
+    parse (::xsd::cxx::xml::dom::parser< char >&,
+           ::xml_schema::flags);
+
+    protected:
+    ::xsd::cxx::tree::one< range_type > range_;
+  };
+
+  class MuscleListType: public ::xml_schema::simple_type,
+    public ::xsd::cxx::tree::list< ::xml_schema::string, char >
+  {
+    public:
+    MuscleListType ();
+
+    MuscleListType (size_type n, const ::xml_schema::string& x);
+
+    template < typename I >
+    MuscleListType (const I& begin, const I& end)
+    : ::xsd::cxx::tree::list< ::xml_schema::string, char > (begin, end, this)
+    {
+    }
+
+    MuscleListType (const ::xercesc::DOMElement& e,
+                    ::xml_schema::flags f = 0,
+                    ::xml_schema::container* c = 0);
+
+    MuscleListType (const ::xercesc::DOMAttr& a,
+                    ::xml_schema::flags f = 0,
+                    ::xml_schema::container* c = 0);
+
+    MuscleListType (const ::std::string& s,
+                    const ::xercesc::DOMElement* e,
+                    ::xml_schema::flags f = 0,
+                    ::xml_schema::container* c = 0);
+
+    MuscleListType (const MuscleListType& x,
+                    ::xml_schema::flags f = 0,
+                    ::xml_schema::container* c = 0);
+
+    virtual MuscleListType*
+    _clone (::xml_schema::flags f = 0,
+            ::xml_schema::container* c = 0) const;
+
+    virtual 
+    ~MuscleListType ();
+  };
+
+  class MuscleGroupsType: public ::xml_schema::type
+  {
+    public:
+    // muscles
+    // 
+    typedef ::CalibrationXsd::MuscleListType muscles_type;
+    typedef ::xsd::cxx::tree::sequence< muscles_type > muscles_sequence;
+    typedef muscles_sequence::iterator muscles_iterator;
+    typedef muscles_sequence::const_iterator muscles_const_iterator;
+    typedef ::xsd::cxx::tree::traits< muscles_type, char > muscles_traits;
 
-  virtual 
-  ~parameterSetType ();
+    const muscles_sequence&
+    muscles () const;
 
-  // Implementation.
-  //
-  protected:
-  void
-  parse (::xsd::cxx::xml::dom::parser< char >&,
-         ::xml_schema::flags);
+    muscles_sequence&
+    muscles ();
+
+    void
+    muscles (const muscles_sequence& s);
 
-  protected:
-  parameter_sequence parameter_;
-};
+    // Constructors.
+    //
+    MuscleGroupsType ();
 
-class StepType: public ::xml_schema::type
-{
-  public:
-  // dofs
-  // 
-  typedef ::DoFsType dofs_type;
-  typedef ::xsd::cxx::tree::traits< dofs_type, char > dofs_traits;
+    MuscleGroupsType (const ::xercesc::DOMElement& e,
+                      ::xml_schema::flags f = 0,
+                      ::xml_schema::container* c = 0);
 
-  const dofs_type&
-  dofs () const;
+    MuscleGroupsType (const MuscleGroupsType& x,
+                      ::xml_schema::flags f = 0,
+                      ::xml_schema::container* c = 0);
 
-  dofs_type&
-  dofs ();
+    virtual MuscleGroupsType*
+    _clone (::xml_schema::flags f = 0,
+            ::xml_schema::container* c = 0) const;
 
-  void
-  dofs (const dofs_type& x);
+    virtual 
+    ~MuscleGroupsType ();
 
-  void
-  dofs (::std::auto_ptr< dofs_type > p);
+    // Implementation.
+    //
+    protected:
+    void
+    parse (::xsd::cxx::xml::dom::parser< char >&,
+           ::xml_schema::flags);
 
-  // objectiveFunction
-  // 
-  typedef ::ObjectiveFunctionType objectiveFunction_type;
-  typedef ::xsd::cxx::tree::traits< objectiveFunction_type, char > objectiveFunction_traits;
+    protected:
+    muscles_sequence muscles_;
+  };
 
-  const objectiveFunction_type&
-  objectiveFunction () const;
+  class ParameterType: public ::xml_schema::type
+  {
+    public:
+    // name
+    // 
+    typedef ::xml_schema::string name_type;
+    typedef ::xsd::cxx::tree::traits< name_type, char > name_traits;
 
-  objectiveFunction_type&
-  objectiveFunction ();
+    const name_type&
+    name () const;
 
-  void
-  objectiveFunction (const objectiveFunction_type& x);
+    name_type&
+    name ();
 
-  void
-  objectiveFunction (::std::auto_ptr< objectiveFunction_type > p);
+    void
+    name (const name_type& x);
 
-  // computationMode
-  // 
-  typedef ::ComputationModeType computationMode_type;
-  typedef ::xsd::cxx::tree::traits< computationMode_type, char > computationMode_traits;
-
-  const computationMode_type&
-  computationMode () const;
-
-  computationMode_type&
-  computationMode ();
-
-  void
-  computationMode (const computationMode_type& x);
-
-  void
-  computationMode (::std::auto_ptr< computationMode_type > p);
-
-  // strengthCoefficients_ShapeFactor_C1_C2_TendonSLackLength_single
-  // 
-  typedef ::HardCodedParametersSelectionType strengthCoefficients_ShapeFactor_C1_C2_TendonSLackLength_single_type;
-  typedef ::xsd::cxx::tree::optional< strengthCoefficients_ShapeFactor_C1_C2_TendonSLackLength_single_type > strengthCoefficients_ShapeFactor_C1_C2_TendonSLackLength_single_optional;
-  typedef ::xsd::cxx::tree::traits< strengthCoefficients_ShapeFactor_C1_C2_TendonSLackLength_single_type, char > strengthCoefficients_ShapeFactor_C1_C2_TendonSLackLength_single_traits;
-
-  const strengthCoefficients_ShapeFactor_C1_C2_TendonSLackLength_single_optional&
-  strengthCoefficients_ShapeFactor_C1_C2_TendonSLackLength_single () const;
-
-  strengthCoefficients_ShapeFactor_C1_C2_TendonSLackLength_single_optional&
-  strengthCoefficients_ShapeFactor_C1_C2_TendonSLackLength_single ();
-
-  void
-  strengthCoefficients_ShapeFactor_C1_C2_TendonSLackLength_single (const strengthCoefficients_ShapeFactor_C1_C2_TendonSLackLength_single_type& x);
-
-  void
-  strengthCoefficients_ShapeFactor_C1_C2_TendonSLackLength_single (const strengthCoefficients_ShapeFactor_C1_C2_TendonSLackLength_single_optional& x);
-
-  void
-  strengthCoefficients_ShapeFactor_C1_C2_TendonSLackLength_single (::std::auto_ptr< strengthCoefficients_ShapeFactor_C1_C2_TendonSLackLength_single_type > p);
-
-  // parameterSet
-  // 
-  typedef ::parameterSetType parameterSet_type;
-  typedef ::xsd::cxx::tree::optional< parameterSet_type > parameterSet_optional;
-  typedef ::xsd::cxx::tree::traits< parameterSet_type, char > parameterSet_traits;
-
-  const parameterSet_optional&
-  parameterSet () const;
-
-  parameterSet_optional&
-  parameterSet ();
-
-  void
-  parameterSet (const parameterSet_type& x);
-
-  void
-  parameterSet (const parameterSet_optional& x);
-
-  void
-  parameterSet (::std::auto_ptr< parameterSet_type > p);
-
-  // Constructors.
-  //
-  StepType (const dofs_type&,
-            const objectiveFunction_type&,
-            const computationMode_type&);
-
-  StepType (const dofs_type&,
-            ::std::auto_ptr< objectiveFunction_type >&,
-            ::std::auto_ptr< computationMode_type >&);
-
-  StepType (const ::xercesc::DOMElement& e,
-            ::xml_schema::flags f = 0,
-            ::xml_schema::container* c = 0);
-
-  StepType (const StepType& x,
-            ::xml_schema::flags f = 0,
-            ::xml_schema::container* c = 0);
-
-  virtual StepType*
-  _clone (::xml_schema::flags f = 0,
-          ::xml_schema::container* c = 0) const;
-
-  virtual 
-  ~StepType ();
-
-  // Implementation.
-  //
-  protected:
-  void
-  parse (::xsd::cxx::xml::dom::parser< char >&,
-         ::xml_schema::flags);
-
-  protected:
-  ::xsd::cxx::tree::one< dofs_type > dofs_;
-  ::xsd::cxx::tree::one< objectiveFunction_type > objectiveFunction_;
-  ::xsd::cxx::tree::one< computationMode_type > computationMode_;
-  strengthCoefficients_ShapeFactor_C1_C2_TendonSLackLength_single_optional strengthCoefficients_ShapeFactor_C1_C2_TendonSLackLength_single_;
-  parameterSet_optional parameterSet_;
-};
-
-class CalibrationStepsType: public ::xml_schema::type
-{
-  public:
-  // step
-  // 
-  typedef ::StepType step_type;
-  typedef ::xsd::cxx::tree::sequence< step_type > step_sequence;
-  typedef step_sequence::iterator step_iterator;
-  typedef step_sequence::const_iterator step_const_iterator;
-  typedef ::xsd::cxx::tree::traits< step_type, char > step_traits;
-
-  const step_sequence&
-  step () const;
-
-  step_sequence&
-  step ();
-
-  void
-  step (const step_sequence& s);
-
-  // Constructors.
-  //
-  CalibrationStepsType ();
-
-  CalibrationStepsType (const ::xercesc::DOMElement& e,
-                        ::xml_schema::flags f = 0,
-                        ::xml_schema::container* c = 0);
-
-  CalibrationStepsType (const CalibrationStepsType& x,
-                        ::xml_schema::flags f = 0,
-                        ::xml_schema::container* c = 0);
-
-  virtual CalibrationStepsType*
-  _clone (::xml_schema::flags f = 0,
-          ::xml_schema::container* c = 0) const;
-
-  virtual 
-  ~CalibrationStepsType ();
+    void
+    name (::std::auto_ptr< name_type > p);
 
-  // Implementation.
-  //
-  protected:
-  void
-  parse (::xsd::cxx::xml::dom::parser< char >&,
-         ::xml_schema::flags);
-
-  protected:
-  step_sequence step_;
-};
-
-class CalibrationType: public ::xml_schema::type
-{
-  public:
-  // algorithm
-  // 
-  typedef ::AlgorithmType algorithm_type;
-  typedef ::xsd::cxx::tree::traits< algorithm_type, char > algorithm_traits;
-
-  const algorithm_type&
-  algorithm () const;
-
-  algorithm_type&
-  algorithm ();
-
-  void
-  algorithm (const algorithm_type& x);
-
-  void
-  algorithm (::std::auto_ptr< algorithm_type > p);
-
-  // NMSmodel
-  // 
-  typedef ::NMSModelType NMSmodel_type;
-  typedef ::xsd::cxx::tree::traits< NMSmodel_type, char > NMSmodel_traits;
-
-  const NMSmodel_type&
-  NMSmodel () const;
-
-  NMSmodel_type&
-  NMSmodel ();
-
-  void
-  NMSmodel (const NMSmodel_type& x);
-
-  void
-  NMSmodel (::std::auto_ptr< NMSmodel_type > p);
-
-  // samplingFrequency
-  // 
-  typedef ::xml_schema::int_ samplingFrequency_type;
-  typedef ::xsd::cxx::tree::optional< samplingFrequency_type > samplingFrequency_optional;
-  typedef ::xsd::cxx::tree::traits< samplingFrequency_type, char > samplingFrequency_traits;
-
-  const samplingFrequency_optional&
-  samplingFrequency () const;
-
-  samplingFrequency_optional&
-  samplingFrequency ();
-
-  void
-  samplingFrequency (const samplingFrequency_type& x);
-
-  void
-  samplingFrequency (const samplingFrequency_optional& x);
-
-  // calibrationSteps
-  // 
-  typedef ::CalibrationStepsType calibrationSteps_type;
-  typedef ::xsd::cxx::tree::traits< calibrationSteps_type, char > calibrationSteps_traits;
-
-  const calibrationSteps_type&
-  calibrationSteps () const;
-
-  calibrationSteps_type&
-  calibrationSteps ();
-
-  void
-  calibrationSteps (const calibrationSteps_type& x);
-
-  void
-  calibrationSteps (::std::auto_ptr< calibrationSteps_type > p);
-
-  // trialSet
-  // 
-  typedef ::TrialSetType trialSet_type;
-  typedef ::xsd::cxx::tree::traits< trialSet_type, char > trialSet_traits;
-
-  const trialSet_type&
-  trialSet () const;
-
-  trialSet_type&
-  trialSet ();
-
-  void
-  trialSet (const trialSet_type& x);
-
-  void
-  trialSet (::std::auto_ptr< trialSet_type > p);
-
-  // Constructors.
-  //
-  CalibrationType (const algorithm_type&,
-                   const NMSmodel_type&,
-                   const calibrationSteps_type&,
-                   const trialSet_type&);
-
-  CalibrationType (::std::auto_ptr< algorithm_type >&,
-                   ::std::auto_ptr< NMSmodel_type >&,
-                   ::std::auto_ptr< calibrationSteps_type >&,
-                   const trialSet_type&);
-
-  CalibrationType (const ::xercesc::DOMElement& e,
+    // muscleGroups
+    // 
+    typedef ::CalibrationXsd::MuscleGroupsType muscleGroups_type;
+    typedef ::xsd::cxx::tree::optional< muscleGroups_type > muscleGroups_optional;
+    typedef ::xsd::cxx::tree::traits< muscleGroups_type, char > muscleGroups_traits;
+
+    const muscleGroups_optional&
+    muscleGroups () const;
+
+    muscleGroups_optional&
+    muscleGroups ();
+
+    void
+    muscleGroups (const muscleGroups_type& x);
+
+    void
+    muscleGroups (const muscleGroups_optional& x);
+
+    void
+    muscleGroups (::std::auto_ptr< muscleGroups_type > p);
+
+    // global
+    // 
+    typedef ::CalibrationXsd::GlobalParameterType global_type;
+    typedef ::xsd::cxx::tree::optional< global_type > global_optional;
+    typedef ::xsd::cxx::tree::traits< global_type, char > global_traits;
+
+    const global_optional&
+    global () const;
+
+    global_optional&
+    global ();
+
+    void
+    global (const global_type& x);
+
+    void
+    global (const global_optional& x);
+
+    void
+    global (::std::auto_ptr< global_type > p);
+
+    // single
+    // 
+    typedef ::CalibrationXsd::SingleParameterType single_type;
+    typedef ::xsd::cxx::tree::optional< single_type > single_optional;
+    typedef ::xsd::cxx::tree::traits< single_type, char > single_traits;
+
+    const single_optional&
+    single () const;
+
+    single_optional&
+    single ();
+
+    void
+    single (const single_type& x);
+
+    void
+    single (const single_optional& x);
+
+    void
+    single (::std::auto_ptr< single_type > p);
+
+    // absolute
+    // 
+    typedef ::CalibrationXsd::RangeType absolute_type;
+    typedef ::xsd::cxx::tree::optional< absolute_type > absolute_optional;
+    typedef ::xsd::cxx::tree::traits< absolute_type, char > absolute_traits;
+
+    const absolute_optional&
+    absolute () const;
+
+    absolute_optional&
+    absolute ();
+
+    void
+    absolute (const absolute_type& x);
+
+    void
+    absolute (const absolute_optional& x);
+
+    void
+    absolute (::std::auto_ptr< absolute_type > p);
+
+    // relativeToSubjectValue
+    // 
+    typedef ::CalibrationXsd::RangeType relativeToSubjectValue_type;
+    typedef ::xsd::cxx::tree::optional< relativeToSubjectValue_type > relativeToSubjectValue_optional;
+    typedef ::xsd::cxx::tree::traits< relativeToSubjectValue_type, char > relativeToSubjectValue_traits;
+
+    const relativeToSubjectValue_optional&
+    relativeToSubjectValue () const;
+
+    relativeToSubjectValue_optional&
+    relativeToSubjectValue ();
+
+    void
+    relativeToSubjectValue (const relativeToSubjectValue_type& x);
+
+    void
+    relativeToSubjectValue (const relativeToSubjectValue_optional& x);
+
+    void
+    relativeToSubjectValue (::std::auto_ptr< relativeToSubjectValue_type > p);
+
+    // Constructors.
+    //
+    ParameterType (const name_type&);
+
+    ParameterType (const ::xercesc::DOMElement& e,
                    ::xml_schema::flags f = 0,
                    ::xml_schema::container* c = 0);
 
-  CalibrationType (const CalibrationType& x,
+    ParameterType (const ParameterType& x,
                    ::xml_schema::flags f = 0,
                    ::xml_schema::container* c = 0);
 
-  virtual CalibrationType*
-  _clone (::xml_schema::flags f = 0,
-          ::xml_schema::container* c = 0) const;
+    virtual ParameterType*
+    _clone (::xml_schema::flags f = 0,
+            ::xml_schema::container* c = 0) const;
 
-  virtual 
-  ~CalibrationType ();
+    virtual 
+    ~ParameterType ();
 
-  // Implementation.
-  //
-  protected:
-  void
-  parse (::xsd::cxx::xml::dom::parser< char >&,
-         ::xml_schema::flags);
+    // Implementation.
+    //
+    protected:
+    void
+    parse (::xsd::cxx::xml::dom::parser< char >&,
+           ::xml_schema::flags);
 
-  protected:
-  ::xsd::cxx::tree::one< algorithm_type > algorithm_;
-  ::xsd::cxx::tree::one< NMSmodel_type > NMSmodel_;
-  samplingFrequency_optional samplingFrequency_;
-  ::xsd::cxx::tree::one< calibrationSteps_type > calibrationSteps_;
-  ::xsd::cxx::tree::one< trialSet_type > trialSet_;
-};
+    protected:
+    ::xsd::cxx::tree::one< name_type > name_;
+    muscleGroups_optional muscleGroups_;
+    global_optional global_;
+    single_optional single_;
+    absolute_optional absolute_;
+    relativeToSubjectValue_optional relativeToSubjectValue_;
+  };
+
+  class parameterSetType: public ::xml_schema::type
+  {
+    public:
+    // parameter
+    // 
+    typedef ::CalibrationXsd::ParameterType parameter_type;
+    typedef ::xsd::cxx::tree::sequence< parameter_type > parameter_sequence;
+    typedef parameter_sequence::iterator parameter_iterator;
+    typedef parameter_sequence::const_iterator parameter_const_iterator;
+    typedef ::xsd::cxx::tree::traits< parameter_type, char > parameter_traits;
+
+    const parameter_sequence&
+    parameter () const;
+
+    parameter_sequence&
+    parameter ();
+
+    void
+    parameter (const parameter_sequence& s);
+
+    // Constructors.
+    //
+    parameterSetType ();
+
+    parameterSetType (const ::xercesc::DOMElement& e,
+                      ::xml_schema::flags f = 0,
+                      ::xml_schema::container* c = 0);
+
+    parameterSetType (const parameterSetType& x,
+                      ::xml_schema::flags f = 0,
+                      ::xml_schema::container* c = 0);
+
+    virtual parameterSetType*
+    _clone (::xml_schema::flags f = 0,
+            ::xml_schema::container* c = 0) const;
+
+    virtual 
+    ~parameterSetType ();
+
+    // Implementation.
+    //
+    protected:
+    void
+    parse (::xsd::cxx::xml::dom::parser< char >&,
+           ::xml_schema::flags);
+
+    protected:
+    parameter_sequence parameter_;
+  };
+
+  class StepType: public ::xml_schema::type
+  {
+    public:
+    // dofs
+    // 
+    typedef ::CalibrationXsd::DoFsType dofs_type;
+    typedef ::xsd::cxx::tree::traits< dofs_type, char > dofs_traits;
+
+    const dofs_type&
+    dofs () const;
+
+    dofs_type&
+    dofs ();
+
+    void
+    dofs (const dofs_type& x);
+
+    void
+    dofs (::std::auto_ptr< dofs_type > p);
+
+    // objectiveFunction
+    // 
+    typedef ::CalibrationXsd::ObjectiveFunctionType objectiveFunction_type;
+    typedef ::xsd::cxx::tree::traits< objectiveFunction_type, char > objectiveFunction_traits;
+
+    const objectiveFunction_type&
+    objectiveFunction () const;
+
+    objectiveFunction_type&
+    objectiveFunction ();
+
+    void
+    objectiveFunction (const objectiveFunction_type& x);
+
+    void
+    objectiveFunction (::std::auto_ptr< objectiveFunction_type > p);
+
+    // computationMode
+    // 
+    typedef ::CalibrationXsd::ComputationModeType computationMode_type;
+    typedef ::xsd::cxx::tree::traits< computationMode_type, char > computationMode_traits;
+
+    const computationMode_type&
+    computationMode () const;
+
+    computationMode_type&
+    computationMode ();
+
+    void
+    computationMode (const computationMode_type& x);
+
+    void
+    computationMode (::std::auto_ptr< computationMode_type > p);
+
+    // strengthCoefficients_ShapeFactor_C1_C2_TendonSLackLength_single
+    // 
+    typedef ::CalibrationXsd::HardCodedParametersSelectionType strengthCoefficients_ShapeFactor_C1_C2_TendonSLackLength_single_type;
+    typedef ::xsd::cxx::tree::optional< strengthCoefficients_ShapeFactor_C1_C2_TendonSLackLength_single_type > strengthCoefficients_ShapeFactor_C1_C2_TendonSLackLength_single_optional;
+    typedef ::xsd::cxx::tree::traits< strengthCoefficients_ShapeFactor_C1_C2_TendonSLackLength_single_type, char > strengthCoefficients_ShapeFactor_C1_C2_TendonSLackLength_single_traits;
+
+    const strengthCoefficients_ShapeFactor_C1_C2_TendonSLackLength_single_optional&
+    strengthCoefficients_ShapeFactor_C1_C2_TendonSLackLength_single () const;
+
+    strengthCoefficients_ShapeFactor_C1_C2_TendonSLackLength_single_optional&
+    strengthCoefficients_ShapeFactor_C1_C2_TendonSLackLength_single ();
+
+    void
+    strengthCoefficients_ShapeFactor_C1_C2_TendonSLackLength_single (const strengthCoefficients_ShapeFactor_C1_C2_TendonSLackLength_single_type& x);
+
+    void
+    strengthCoefficients_ShapeFactor_C1_C2_TendonSLackLength_single (const strengthCoefficients_ShapeFactor_C1_C2_TendonSLackLength_single_optional& x);
+
+    void
+    strengthCoefficients_ShapeFactor_C1_C2_TendonSLackLength_single (::std::auto_ptr< strengthCoefficients_ShapeFactor_C1_C2_TendonSLackLength_single_type > p);
+
+    // parameterSet
+    // 
+    typedef ::CalibrationXsd::parameterSetType parameterSet_type;
+    typedef ::xsd::cxx::tree::optional< parameterSet_type > parameterSet_optional;
+    typedef ::xsd::cxx::tree::traits< parameterSet_type, char > parameterSet_traits;
+
+    const parameterSet_optional&
+    parameterSet () const;
+
+    parameterSet_optional&
+    parameterSet ();
+
+    void
+    parameterSet (const parameterSet_type& x);
+
+    void
+    parameterSet (const parameterSet_optional& x);
+
+    void
+    parameterSet (::std::auto_ptr< parameterSet_type > p);
+
+    // Constructors.
+    //
+    StepType (const dofs_type&,
+              const objectiveFunction_type&,
+              const computationMode_type&);
+
+    StepType (const dofs_type&,
+              ::std::auto_ptr< objectiveFunction_type >&,
+              ::std::auto_ptr< computationMode_type >&);
+
+    StepType (const ::xercesc::DOMElement& e,
+              ::xml_schema::flags f = 0,
+              ::xml_schema::container* c = 0);
+
+    StepType (const StepType& x,
+              ::xml_schema::flags f = 0,
+              ::xml_schema::container* c = 0);
+
+    virtual StepType*
+    _clone (::xml_schema::flags f = 0,
+            ::xml_schema::container* c = 0) const;
+
+    virtual 
+    ~StepType ();
+
+    // Implementation.
+    //
+    protected:
+    void
+    parse (::xsd::cxx::xml::dom::parser< char >&,
+           ::xml_schema::flags);
+
+    protected:
+    ::xsd::cxx::tree::one< dofs_type > dofs_;
+    ::xsd::cxx::tree::one< objectiveFunction_type > objectiveFunction_;
+    ::xsd::cxx::tree::one< computationMode_type > computationMode_;
+    strengthCoefficients_ShapeFactor_C1_C2_TendonSLackLength_single_optional strengthCoefficients_ShapeFactor_C1_C2_TendonSLackLength_single_;
+    parameterSet_optional parameterSet_;
+  };
+
+  class CalibrationStepsType: public ::xml_schema::type
+  {
+    public:
+    // step
+    // 
+    typedef ::CalibrationXsd::StepType step_type;
+    typedef ::xsd::cxx::tree::sequence< step_type > step_sequence;
+    typedef step_sequence::iterator step_iterator;
+    typedef step_sequence::const_iterator step_const_iterator;
+    typedef ::xsd::cxx::tree::traits< step_type, char > step_traits;
+
+    const step_sequence&
+    step () const;
+
+    step_sequence&
+    step ();
+
+    void
+    step (const step_sequence& s);
+
+    // Constructors.
+    //
+    CalibrationStepsType ();
+
+    CalibrationStepsType (const ::xercesc::DOMElement& e,
+                          ::xml_schema::flags f = 0,
+                          ::xml_schema::container* c = 0);
+
+    CalibrationStepsType (const CalibrationStepsType& x,
+                          ::xml_schema::flags f = 0,
+                          ::xml_schema::container* c = 0);
+
+    virtual CalibrationStepsType*
+    _clone (::xml_schema::flags f = 0,
+            ::xml_schema::container* c = 0) const;
+
+    virtual 
+    ~CalibrationStepsType ();
+
+    // Implementation.
+    //
+    protected:
+    void
+    parse (::xsd::cxx::xml::dom::parser< char >&,
+           ::xml_schema::flags);
+
+    protected:
+    step_sequence step_;
+  };
+
+  class CalibrationType: public ::xml_schema::type
+  {
+    public:
+    // algorithm
+    // 
+    typedef ::CalibrationXsd::AlgorithmType algorithm_type;
+    typedef ::xsd::cxx::tree::traits< algorithm_type, char > algorithm_traits;
+
+    const algorithm_type&
+    algorithm () const;
+
+    algorithm_type&
+    algorithm ();
+
+    void
+    algorithm (const algorithm_type& x);
+
+    void
+    algorithm (::std::auto_ptr< algorithm_type > p);
+
+    // NMSmodel
+    // 
+    typedef ::CalibrationXsd::NMSModelType NMSmodel_type;
+    typedef ::xsd::cxx::tree::traits< NMSmodel_type, char > NMSmodel_traits;
+
+    const NMSmodel_type&
+    NMSmodel () const;
+
+    NMSmodel_type&
+    NMSmodel ();
+
+    void
+    NMSmodel (const NMSmodel_type& x);
+
+    void
+    NMSmodel (::std::auto_ptr< NMSmodel_type > p);
+
+    // samplingFrequency
+    // 
+    typedef ::xml_schema::int_ samplingFrequency_type;
+    typedef ::xsd::cxx::tree::optional< samplingFrequency_type > samplingFrequency_optional;
+    typedef ::xsd::cxx::tree::traits< samplingFrequency_type, char > samplingFrequency_traits;
+
+    const samplingFrequency_optional&
+    samplingFrequency () const;
+
+    samplingFrequency_optional&
+    samplingFrequency ();
+
+    void
+    samplingFrequency (const samplingFrequency_type& x);
+
+    void
+    samplingFrequency (const samplingFrequency_optional& x);
+
+    // calibrationSteps
+    // 
+    typedef ::CalibrationXsd::CalibrationStepsType calibrationSteps_type;
+    typedef ::xsd::cxx::tree::traits< calibrationSteps_type, char > calibrationSteps_traits;
+
+    const calibrationSteps_type&
+    calibrationSteps () const;
+
+    calibrationSteps_type&
+    calibrationSteps ();
+
+    void
+    calibrationSteps (const calibrationSteps_type& x);
+
+    void
+    calibrationSteps (::std::auto_ptr< calibrationSteps_type > p);
+
+    // trialsDirectory
+    // 
+    typedef ::xml_schema::string trialsDirectory_type;
+    typedef ::xsd::cxx::tree::traits< trialsDirectory_type, char > trialsDirectory_traits;
+
+    const trialsDirectory_type&
+    trialsDirectory () const;
+
+    trialsDirectory_type&
+    trialsDirectory ();
+
+    void
+    trialsDirectory (const trialsDirectory_type& x);
+
+    void
+    trialsDirectory (::std::auto_ptr< trialsDirectory_type > p);
+
+    // trialSet
+    // 
+    typedef ::CalibrationXsd::TrialSetType trialSet_type;
+    typedef ::xsd::cxx::tree::traits< trialSet_type, char > trialSet_traits;
+
+    const trialSet_type&
+    trialSet () const;
+
+    trialSet_type&
+    trialSet ();
+
+    void
+    trialSet (const trialSet_type& x);
+
+    void
+    trialSet (::std::auto_ptr< trialSet_type > p);
+
+    // Constructors.
+    //
+    CalibrationType (const algorithm_type&,
+                     const NMSmodel_type&,
+                     const calibrationSteps_type&,
+                     const trialsDirectory_type&,
+                     const trialSet_type&);
+
+    CalibrationType (::std::auto_ptr< algorithm_type >&,
+                     ::std::auto_ptr< NMSmodel_type >&,
+                     ::std::auto_ptr< calibrationSteps_type >&,
+                     const trialsDirectory_type&,
+                     const trialSet_type&);
+
+    CalibrationType (const ::xercesc::DOMElement& e,
+                     ::xml_schema::flags f = 0,
+                     ::xml_schema::container* c = 0);
+
+    CalibrationType (const CalibrationType& x,
+                     ::xml_schema::flags f = 0,
+                     ::xml_schema::container* c = 0);
+
+    virtual CalibrationType*
+    _clone (::xml_schema::flags f = 0,
+            ::xml_schema::container* c = 0) const;
+
+    virtual 
+    ~CalibrationType ();
+
+    // Implementation.
+    //
+    protected:
+    void
+    parse (::xsd::cxx::xml::dom::parser< char >&,
+           ::xml_schema::flags);
+
+    protected:
+    ::xsd::cxx::tree::one< algorithm_type > algorithm_;
+    ::xsd::cxx::tree::one< NMSmodel_type > NMSmodel_;
+    samplingFrequency_optional samplingFrequency_;
+    ::xsd::cxx::tree::one< calibrationSteps_type > calibrationSteps_;
+    ::xsd::cxx::tree::one< trialsDirectory_type > trialsDirectory_;
+    ::xsd::cxx::tree::one< trialSet_type > trialSet_;
+  };
+}
 
 #include <iosfwd>
 
@@ -1944,98 +1997,345 @@ class CalibrationType: public ::xml_schema::type
 #include <xercesc/dom/DOMDocument.hpp>
 #include <xercesc/dom/DOMErrorHandler.hpp>
 
-// Parse a URI or a local file.
-//
+namespace CalibrationXsd
+{
+  // Parse a URI or a local file.
+  //
 
-::std::auto_ptr< ::CalibrationType >
-calibration (const ::std::string& uri,
-             ::xml_schema::flags f = 0,
-             const ::xml_schema::properties& p = ::xml_schema::properties ());
+  ::std::auto_ptr< ::CalibrationXsd::CalibrationType >
+  calibration (const ::std::string& uri,
+               ::xml_schema::flags f = 0,
+               const ::xml_schema::properties& p = ::xml_schema::properties ());
 
-::std::auto_ptr< ::CalibrationType >
-calibration (const ::std::string& uri,
-             ::xml_schema::error_handler& eh,
-             ::xml_schema::flags f = 0,
-             const ::xml_schema::properties& p = ::xml_schema::properties ());
+  ::std::auto_ptr< ::CalibrationXsd::CalibrationType >
+  calibration (const ::std::string& uri,
+               ::xml_schema::error_handler& eh,
+               ::xml_schema::flags f = 0,
+               const ::xml_schema::properties& p = ::xml_schema::properties ());
 
-::std::auto_ptr< ::CalibrationType >
-calibration (const ::std::string& uri,
-             ::xercesc::DOMErrorHandler& eh,
-             ::xml_schema::flags f = 0,
-             const ::xml_schema::properties& p = ::xml_schema::properties ());
+  ::std::auto_ptr< ::CalibrationXsd::CalibrationType >
+  calibration (const ::std::string& uri,
+               ::xercesc::DOMErrorHandler& eh,
+               ::xml_schema::flags f = 0,
+               const ::xml_schema::properties& p = ::xml_schema::properties ());
 
-// Parse std::istream.
-//
+  // Parse std::istream.
+  //
 
-::std::auto_ptr< ::CalibrationType >
-calibration (::std::istream& is,
-             ::xml_schema::flags f = 0,
-             const ::xml_schema::properties& p = ::xml_schema::properties ());
+  ::std::auto_ptr< ::CalibrationXsd::CalibrationType >
+  calibration (::std::istream& is,
+               ::xml_schema::flags f = 0,
+               const ::xml_schema::properties& p = ::xml_schema::properties ());
 
-::std::auto_ptr< ::CalibrationType >
-calibration (::std::istream& is,
-             ::xml_schema::error_handler& eh,
-             ::xml_schema::flags f = 0,
-             const ::xml_schema::properties& p = ::xml_schema::properties ());
+  ::std::auto_ptr< ::CalibrationXsd::CalibrationType >
+  calibration (::std::istream& is,
+               ::xml_schema::error_handler& eh,
+               ::xml_schema::flags f = 0,
+               const ::xml_schema::properties& p = ::xml_schema::properties ());
 
-::std::auto_ptr< ::CalibrationType >
-calibration (::std::istream& is,
-             ::xercesc::DOMErrorHandler& eh,
-             ::xml_schema::flags f = 0,
-             const ::xml_schema::properties& p = ::xml_schema::properties ());
+  ::std::auto_ptr< ::CalibrationXsd::CalibrationType >
+  calibration (::std::istream& is,
+               ::xercesc::DOMErrorHandler& eh,
+               ::xml_schema::flags f = 0,
+               const ::xml_schema::properties& p = ::xml_schema::properties ());
 
-::std::auto_ptr< ::CalibrationType >
-calibration (::std::istream& is,
-             const ::std::string& id,
-             ::xml_schema::flags f = 0,
-             const ::xml_schema::properties& p = ::xml_schema::properties ());
+  ::std::auto_ptr< ::CalibrationXsd::CalibrationType >
+  calibration (::std::istream& is,
+               const ::std::string& id,
+               ::xml_schema::flags f = 0,
+               const ::xml_schema::properties& p = ::xml_schema::properties ());
 
-::std::auto_ptr< ::CalibrationType >
-calibration (::std::istream& is,
-             const ::std::string& id,
-             ::xml_schema::error_handler& eh,
-             ::xml_schema::flags f = 0,
-             const ::xml_schema::properties& p = ::xml_schema::properties ());
+  ::std::auto_ptr< ::CalibrationXsd::CalibrationType >
+  calibration (::std::istream& is,
+               const ::std::string& id,
+               ::xml_schema::error_handler& eh,
+               ::xml_schema::flags f = 0,
+               const ::xml_schema::properties& p = ::xml_schema::properties ());
 
-::std::auto_ptr< ::CalibrationType >
-calibration (::std::istream& is,
-             const ::std::string& id,
-             ::xercesc::DOMErrorHandler& eh,
-             ::xml_schema::flags f = 0,
-             const ::xml_schema::properties& p = ::xml_schema::properties ());
+  ::std::auto_ptr< ::CalibrationXsd::CalibrationType >
+  calibration (::std::istream& is,
+               const ::std::string& id,
+               ::xercesc::DOMErrorHandler& eh,
+               ::xml_schema::flags f = 0,
+               const ::xml_schema::properties& p = ::xml_schema::properties ());
 
-// Parse xercesc::InputSource.
-//
+  // Parse xercesc::InputSource.
+  //
 
-::std::auto_ptr< ::CalibrationType >
-calibration (::xercesc::InputSource& is,
-             ::xml_schema::flags f = 0,
-             const ::xml_schema::properties& p = ::xml_schema::properties ());
+  ::std::auto_ptr< ::CalibrationXsd::CalibrationType >
+  calibration (::xercesc::InputSource& is,
+               ::xml_schema::flags f = 0,
+               const ::xml_schema::properties& p = ::xml_schema::properties ());
 
-::std::auto_ptr< ::CalibrationType >
-calibration (::xercesc::InputSource& is,
-             ::xml_schema::error_handler& eh,
-             ::xml_schema::flags f = 0,
-             const ::xml_schema::properties& p = ::xml_schema::properties ());
+  ::std::auto_ptr< ::CalibrationXsd::CalibrationType >
+  calibration (::xercesc::InputSource& is,
+               ::xml_schema::error_handler& eh,
+               ::xml_schema::flags f = 0,
+               const ::xml_schema::properties& p = ::xml_schema::properties ());
 
-::std::auto_ptr< ::CalibrationType >
-calibration (::xercesc::InputSource& is,
-             ::xercesc::DOMErrorHandler& eh,
-             ::xml_schema::flags f = 0,
-             const ::xml_schema::properties& p = ::xml_schema::properties ());
+  ::std::auto_ptr< ::CalibrationXsd::CalibrationType >
+  calibration (::xercesc::InputSource& is,
+               ::xercesc::DOMErrorHandler& eh,
+               ::xml_schema::flags f = 0,
+               const ::xml_schema::properties& p = ::xml_schema::properties ());
 
-// Parse xercesc::DOMDocument.
-//
+  // Parse xercesc::DOMDocument.
+  //
 
-::std::auto_ptr< ::CalibrationType >
-calibration (const ::xercesc::DOMDocument& d,
-             ::xml_schema::flags f = 0,
-             const ::xml_schema::properties& p = ::xml_schema::properties ());
+  ::std::auto_ptr< ::CalibrationXsd::CalibrationType >
+  calibration (const ::xercesc::DOMDocument& d,
+               ::xml_schema::flags f = 0,
+               const ::xml_schema::properties& p = ::xml_schema::properties ());
 
-::std::auto_ptr< ::CalibrationType >
-calibration (::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument >& d,
-             ::xml_schema::flags f = 0,
-             const ::xml_schema::properties& p = ::xml_schema::properties ());
+  ::std::auto_ptr< ::CalibrationXsd::CalibrationType >
+  calibration (::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument >& d,
+               ::xml_schema::flags f = 0,
+               const ::xml_schema::properties& p = ::xml_schema::properties ());
+}
+
+#include <iosfwd>
+
+#include <xercesc/dom/DOMDocument.hpp>
+#include <xercesc/dom/DOMErrorHandler.hpp>
+#include <xercesc/framework/XMLFormatter.hpp>
+
+#include <xsd/cxx/xml/dom/auto-ptr.hxx>
+
+namespace CalibrationXsd
+{
+  void
+  operator<< (::xercesc::DOMElement&, const SimulatedAnnealingType&);
+
+  void
+  operator<< (::xercesc::DOMElement&, const AlgorithmType&);
+
+  void
+  operator<< (::xercesc::DOMElement&, const OpenLoopType&);
+
+  void
+  operator<< (::xercesc::DOMAttr&, const OpenLoopType&);
+
+  void
+  operator<< (::xml_schema::list_stream&,
+              const OpenLoopType&);
+
+  void
+  operator<< (::xercesc::DOMElement&, const TypeType&);
+
+  void
+  operator<< (::xercesc::DOMElement&, const TendonElementType&);
+
+  void
+  operator<< (::xercesc::DOMAttr&, const TendonElementType&);
+
+  void
+  operator<< (::xml_schema::list_stream&,
+              const TendonElementType&);
+
+  void
+  operator<< (::xercesc::DOMElement&, const TendonType&);
+
+  void
+  operator<< (::xercesc::DOMElement&, const ActivationElementType&);
+
+  void
+  operator<< (::xercesc::DOMAttr&, const ActivationElementType&);
+
+  void
+  operator<< (::xml_schema::list_stream&,
+              const ActivationElementType&);
+
+  void
+  operator<< (::xercesc::DOMElement&, const ActivationType&);
+
+  void
+  operator<< (::xercesc::DOMElement&, const NMSModelType&);
+
+  void
+  operator<< (::xercesc::DOMElement&, const TrialSetType&);
+
+  void
+  operator<< (::xercesc::DOMAttr&, const TrialSetType&);
+
+  void
+  operator<< (::xml_schema::list_stream&,
+              const TrialSetType&);
+
+  void
+  operator<< (::xercesc::DOMElement&, const ObjectiveFunctionElementType&);
+
+  void
+  operator<< (::xercesc::DOMAttr&, const ObjectiveFunctionElementType&);
+
+  void
+  operator<< (::xml_schema::list_stream&,
+              const ObjectiveFunctionElementType&);
+
+  void
+  operator<< (::xercesc::DOMElement&, const ComputationModeElementType&);
+
+  void
+  operator<< (::xercesc::DOMAttr&, const ComputationModeElementType&);
+
+  void
+  operator<< (::xml_schema::list_stream&,
+              const ComputationModeElementType&);
+
+  void
+  operator<< (::xercesc::DOMElement&, const GlobalParameterType&);
+
+  void
+  operator<< (::xercesc::DOMAttr&, const GlobalParameterType&);
+
+  void
+  operator<< (::xml_schema::list_stream&,
+              const GlobalParameterType&);
+
+  void
+  operator<< (::xercesc::DOMElement&, const SingleParameterType&);
+
+  void
+  operator<< (::xercesc::DOMAttr&, const SingleParameterType&);
+
+  void
+  operator<< (::xml_schema::list_stream&,
+              const SingleParameterType&);
+
+  void
+  operator<< (::xercesc::DOMElement&, const ObjectiveFunctionType&);
+
+  void
+  operator<< (::xercesc::DOMElement&, const DoFsType&);
+
+  void
+  operator<< (::xercesc::DOMAttr&, const DoFsType&);
+
+  void
+  operator<< (::xml_schema::list_stream&,
+              const DoFsType&);
+
+  void
+  operator<< (::xercesc::DOMElement&, const HardCodedParametersSelectionType&);
+
+  void
+  operator<< (::xercesc::DOMAttr&, const HardCodedParametersSelectionType&);
+
+  void
+  operator<< (::xml_schema::list_stream&,
+              const HardCodedParametersSelectionType&);
+
+  void
+  operator<< (::xercesc::DOMElement&, const ComputationModeType&);
+
+  void
+  operator<< (::xercesc::DOMElement&, const TwoDoublesType&);
+
+  void
+  operator<< (::xercesc::DOMAttr&, const TwoDoublesType&);
+
+  void
+  operator<< (::xml_schema::list_stream&,
+              const TwoDoublesType&);
+
+  void
+  operator<< (::xercesc::DOMElement&, const RangeType&);
+
+  void
+  operator<< (::xercesc::DOMElement&, const MuscleListType&);
+
+  void
+  operator<< (::xercesc::DOMAttr&, const MuscleListType&);
+
+  void
+  operator<< (::xml_schema::list_stream&,
+              const MuscleListType&);
+
+  void
+  operator<< (::xercesc::DOMElement&, const MuscleGroupsType&);
+
+  void
+  operator<< (::xercesc::DOMElement&, const ParameterType&);
+
+  void
+  operator<< (::xercesc::DOMElement&, const parameterSetType&);
+
+  void
+  operator<< (::xercesc::DOMElement&, const StepType&);
+
+  void
+  operator<< (::xercesc::DOMElement&, const CalibrationStepsType&);
+
+  void
+  operator<< (::xercesc::DOMElement&, const CalibrationType&);
+
+  // Serialize to std::ostream.
+  //
+
+  void
+  calibration (::std::ostream& os,
+               const ::CalibrationXsd::CalibrationType& x, 
+               const ::xml_schema::namespace_infomap& m = ::xml_schema::namespace_infomap (),
+               const ::std::string& e = "UTF-8",
+               ::xml_schema::flags f = 0);
+
+  void
+  calibration (::std::ostream& os,
+               const ::CalibrationXsd::CalibrationType& x, 
+               ::xml_schema::error_handler& eh,
+               const ::xml_schema::namespace_infomap& m = ::xml_schema::namespace_infomap (),
+               const ::std::string& e = "UTF-8",
+               ::xml_schema::flags f = 0);
+
+  void
+  calibration (::std::ostream& os,
+               const ::CalibrationXsd::CalibrationType& x, 
+               ::xercesc::DOMErrorHandler& eh,
+               const ::xml_schema::namespace_infomap& m = ::xml_schema::namespace_infomap (),
+               const ::std::string& e = "UTF-8",
+               ::xml_schema::flags f = 0);
+
+  // Serialize to xercesc::XMLFormatTarget.
+  //
+
+  void
+  calibration (::xercesc::XMLFormatTarget& ft,
+               const ::CalibrationXsd::CalibrationType& x, 
+               const ::xml_schema::namespace_infomap& m = ::xml_schema::namespace_infomap (),
+               const ::std::string& e = "UTF-8",
+               ::xml_schema::flags f = 0);
+
+  void
+  calibration (::xercesc::XMLFormatTarget& ft,
+               const ::CalibrationXsd::CalibrationType& x, 
+               ::xml_schema::error_handler& eh,
+               const ::xml_schema::namespace_infomap& m = ::xml_schema::namespace_infomap (),
+               const ::std::string& e = "UTF-8",
+               ::xml_schema::flags f = 0);
+
+  void
+  calibration (::xercesc::XMLFormatTarget& ft,
+               const ::CalibrationXsd::CalibrationType& x, 
+               ::xercesc::DOMErrorHandler& eh,
+               const ::xml_schema::namespace_infomap& m = ::xml_schema::namespace_infomap (),
+               const ::std::string& e = "UTF-8",
+               ::xml_schema::flags f = 0);
+
+  // Serialize to an existing xercesc::DOMDocument.
+  //
+
+  void
+  calibration (::xercesc::DOMDocument& d,
+               const ::CalibrationXsd::CalibrationType& x,
+               ::xml_schema::flags f = 0);
+
+  // Serialize to a new xercesc::DOMDocument.
+  //
+
+  ::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument >
+  calibration (const ::CalibrationXsd::CalibrationType& x, 
+               const ::xml_schema::namespace_infomap& m = ::xml_schema::namespace_infomap (),
+               ::xml_schema::flags f = 0);
+}
 
 #include <xsd/cxx/post.hxx>
 

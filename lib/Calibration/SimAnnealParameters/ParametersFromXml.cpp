@@ -21,7 +21,7 @@ ParametersFromXml<NMSmodelT>::ParametersFromXml(NMSmodelT& subject, std::vector<
         std::cout << "Parameter " << it->getName() << std::endl;
         ParameterDetails parameterDetails;
         ParameterID parameterId = it->getID();
-        
+
         ParameterAssignment assignment = it->getAssignment();
         if(assignment == Parameter::Grouped) {
             MuscleGroups muscleGroups;
@@ -35,7 +35,7 @@ ParametersFromXml<NMSmodelT>::ParametersFromXml(NMSmodelT& subject, std::vector<
         parameterDetails.upperLimit = it->getUpperLimit();
         parameterDetails.size = parameterDetails.muscleGroups.size();
         parameterDetails.name = it->getName();
-        
+
         std::pair<typename ParametersMap::iterator, bool> ret;
         ret = parameters_.insert(std::pair<ParameterID, ParameterDetails> (parameterId, parameterDetails));
         if (ret.second == false) 
@@ -53,13 +53,14 @@ ParametersFromXml<NMSmodelT>::ParametersFromXml(NMSmodelT& subject, std::vector<
 template<typename NMSmodelT>
 void ParametersFromXml<NMSmodelT>::getStartingVectorParameters(std::vector< double >& x) {
 
+	x.clear();
     for(typename ParametersMap::const_iterator it(parameters_.begin()); it != parameters_.end(); ++it) {
        
         std::vector<double> coefficients, groupedCoefficients;
-        getCoefficients(it->first, coefficients);
-        groupValues(it->second.muscleGroups, coefficients, groupedCoefficients);
-        x.insert(x.end(), groupedCoefficients.begin(), groupedCoefficients.end());
-    }
+		getCoefficients(it->first, coefficients);
+		groupValues(it->second.muscleGroups, coefficients, groupedCoefficients);
+		x.insert(x.end(), groupedCoefficients.begin(), groupedCoefficients.end());
+	}
 }
 
 
@@ -139,7 +140,12 @@ void ParametersFromXml<NMSmodelT>::getMuscleGroupIndex(const MuscleGroups& muscl
         for(std::list<std::string>::const_iterator mIt(gIt->begin()); mIt != gIt->end(); ++mIt) {
             std::vector<std::string>::iterator fId;
             fId = std::find(muscleNames.begin(), muscleNames.end(), *mIt);
-            muscleIndex.push_back(std::distance(muscleNames.begin(), fId));
+			if(fId != muscleNames.end())
+	            muscleIndex.push_back(std::distance(muscleNames.begin(), fId));
+			else {
+				std::cout << *mIt << " not found.\n";
+				exit(EXIT_FAILURE);
+			}
         }     
         muscleGroupsIdx.push_back(muscleIndex);
     }

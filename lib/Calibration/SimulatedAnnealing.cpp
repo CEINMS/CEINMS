@@ -22,6 +22,7 @@ using std::endl;
 using std::vector;
 #include <string>
 using std::string;
+#include <time.h>
 
 
 //#define LOG_SIMULATED_ANNEALING
@@ -32,26 +33,27 @@ SimulatedAnnealing<ParametersT, ObjectiveFunctionT, TorquesComputationT>
 ::SimulatedAnnealing(ParametersT& parametersPolicy, TorquesComputationT& torquesComputation, SimulatedAnnealingParameters simanParameters)
 :parameters_(parametersPolicy),
 objectiveFunction_(torquesComputation,  simanParameters.epsilon, simanParameters.noEpsilon) {
-     
-    noParameters_ = parameters_.getNoParameters();
-    x_.resize(noParameters_);
-    parameters_.getStartingVectorParameters(x_);
-    parameters_.getUpperLowerBounds(upperBounds_, lowerBounds_);
 
+    noParameters_ = parameters_.getNoParameters();
+	x_.resize(noParameters_);
+	parameters_.getStartingVectorParameters(x_);
+    parameters_.getUpperLowerBounds(upperBounds_, lowerBounds_);
+	
     xOpt_.resize(noParameters_);
     v_.resize(noParameters_);
     for (int i = 0; i < noParameters_; ++i)
         v_.at(i) = (upperBounds_.at(i)-lowerBounds_.at(i))/2;    
-    xp_.resize(noParameters_);
+    
+	xp_.resize(noParameters_);
     noAccepted_.resize(noParameters_);
-
+	
     nt_        = simanParameters.NT;
     ns_        = simanParameters.NS;
     rt_        = simanParameters.rt; 
     t_         = simanParameters.T;
     maxNoEval_ = simanParameters.maxNoEval;  
-    srand(1.);
-    
+    srand(time(NULL));
+   //srand(1); 
 }
 
 

@@ -24,8 +24,11 @@ using std::string;
 
 
 template <typename NMSmodelT, typename ErrorMinimizerT>
-ModelEvaluationHybrid<NMSmodelT, ErrorMinimizerT>::ModelEvaluationHybrid(NMSmodelT& subject, ErrorMinimizerT& torqueErrorMinimizer)
-:subject_(subject), torqueErrorMinimizer_(torqueErrorMinimizer)
+ModelEvaluationHybrid<NMSmodelT, ErrorMinimizerT>::ModelEvaluationHybrid(NMSmodelT& subject, 
+                                                                         ErrorMinimizerT& torqueErrorMinimizer,
+                                                                         const string& outputDir
+                                                                        )
+:subject_(subject), torqueErrorMinimizer_(torqueErrorMinimizer), outputDir_(outputDir)
 { }
 
 
@@ -96,7 +99,7 @@ void ModelEvaluationHybrid<NMSmodelT, ErrorMinimizerT>::operator()() {
 #endif
   
 #ifdef LOG_FILES
-    Logger::SimpleFileLogger<NMSmodelT> logger(subject_);
+    Logger::SimpleFileLogger<NMSmodelT> logger(subject_, outputDir_);
     logger.addLog(Logger::Activations);
     logger.addLog(Logger::FibreLengths);
     logger.addLog(Logger::FibreVelocities);
@@ -225,7 +228,7 @@ NOTE: when one a producer push an empty vector in a queue means that ther are no
     } while (runCondition);
 
 #ifdef LOG  
-  cout << "Everything went fine, check output files in ./Output\n";
+  cout << "Estimation completed. Output file printed in "+outputDir_ << endl;;
 #endif
 }
 

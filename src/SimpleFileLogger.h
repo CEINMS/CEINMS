@@ -34,7 +34,7 @@ namespace Logger {
 
         
     public:
-        SimpleFileLogger(NMSmodelT& subject);
+        SimpleFileLogger(NMSmodelT& subject, const std::string& outputDir = "./Output/");
         void addLog(LogID logID);
         void log(double time, LogID logID);
         
@@ -45,16 +45,19 @@ namespace Logger {
         
         double time_;
         std::string outputDir_;
+		std::string separator_;
         std::vector<boost::shared_ptr<std::ofstream> > outFiles_;    
         std::vector<LogID> fileTypes_;
     };
 
 
     template <typename NMSmodelT>
-    SimpleFileLogger<NMSmodelT>::SimpleFileLogger(NMSmodelT& subject)
+    SimpleFileLogger<NMSmodelT>::SimpleFileLogger(NMSmodelT& subject, const std::string& outputDir)
     :subject_(subject),
-    outputDir_("./Output/") {
-    
+    outputDir_(outputDir),
+	separator_(","){
+
+		outputDir_ += "/";
         boost::filesystem::path dir(outputDir_);
 		if(!boost::filesystem::exists(dir)) {
 			if(!boost::filesystem::create_directory(dir)) {
@@ -154,9 +157,9 @@ namespace Logger {
     template <typename NMSmodelT>
     void SimpleFileLogger<NMSmodelT>::logDataVector(const std::vector<double>& data, std::ofstream& outFile) {
         
-        outFile << time_ << " ";
+        outFile << time_ << separator_;
         for (unsigned i = 0; i < data.size()-1 ; ++i)
-            outFile << data.at(i) << " ";
+            outFile << data.at(i) << separator_;
         outFile << data.back() << std::endl; 
     }
 
@@ -164,9 +167,9 @@ namespace Logger {
     template <typename NMSmodelT>
     void SimpleFileLogger<NMSmodelT>::initFile(const std::vector<std::string>& names, std::ofstream& outFile) {
         
-        outFile << "Time ";
+        outFile << "Time"+separator_;
         for (unsigned int i = 0; i < names.size()-1 ; ++i )
-            outFile << names.at(i) << " ";
+            outFile << names.at(i) << separator_;
         outFile << names.back() << std::endl;
     }
 

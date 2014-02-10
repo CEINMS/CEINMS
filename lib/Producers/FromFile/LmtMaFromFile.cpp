@@ -20,30 +20,6 @@ LmtMaFromFile::LmtMaFromFile(const string& dataDirectory)
                    :dataDirectory_(dataDirectory)
 { }
 
-
-void LmtMaFromFile::setLmtMusclesNames(const vector<string>& lmtMusclesNames)
-{ 
-  SyncTools::Shared::musclesNamesMutex.lock();
-  if (SyncTools::Shared::musclesNames.empty())         //musclesNames is a global variable, if it isn't empty means that emg set it
-    SyncTools::Shared::musclesNames = lmtMusclesNames;
-  else
-    if (lmtMusclesNames != SyncTools::Shared::musclesNames)
-    {
-      cout << "muscles names are not the same among emg and lmt input data" << endl;
-      exit(EXIT_FAILURE);      
-    }
-  SyncTools::Shared::musclesNamesMutex.unlock();
-}
-
-void LmtMaFromFile::setMomentArmsMusclesNames(const vector< vector<string> >& musclesNamesFromMomentArmsFiles)
-{
-  SyncTools::Shared::musclesNamesOnDofMutex.lock();
-  SyncTools::Shared::musclesNamesOnDof = musclesNamesFromMomentArmsFiles;
-  SyncTools::Shared::musclesNamesOnDofMutex.unlock();
-}
-
-
-
 void LmtMaFromFile::operator()()
 {
   double myTime;  

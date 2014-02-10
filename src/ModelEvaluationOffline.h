@@ -18,7 +18,7 @@ template <typename NMSmodelT>
 class ModelEvaluationOffline : public ModelEvaluationBase {
 
 public:
-    ModelEvaluationOffline(NMSmodelT& subject);
+    ModelEvaluationOffline(NMSmodelT& subject, const std::string& outputDir = "./Output");
     ~ModelEvaluationOffline();
 
     void setSubject(NMSmodelT& subject);
@@ -28,6 +28,7 @@ private:
     void initOfflineCurve();
 
     NMSmodelT& subject_;
+    std::string outputDir_;
     std::vector< std::string > dofNames_;
     std::vector< std::string > dofNamesWithExtTorque_;
     unsigned noDof_;

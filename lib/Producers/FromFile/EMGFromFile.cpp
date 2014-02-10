@@ -4,6 +4,7 @@
 #include "EMGgeneratorFrom16To34.h"
 #include "EMGgeneratorFrom6To24.h"
 #include "EMGgeneratorFromXml.h"
+#include "FileUtils.h"
 
 #include <string>
 using std::string;
@@ -22,35 +23,24 @@ using std::endl;
 
 #define LOG
 
-EMGFromFile::EMGFromFile(const string& dataDirectory)
-                 :dataDirectory_(dataDirectory){ }
-                 
-                 
-void EMGFromFile::setEMGMusclesNames(const vector<string>& emgMusclesNames)
-{
-  SyncTools::Shared::musclesNamesMutex.lock();
-  if (SyncTools::Shared::musclesNames.empty())         //musclesNames is a global variable
-    SyncTools::Shared::musclesNames = emgMusclesNames; 
-  else
-    if (emgMusclesNames != SyncTools::Shared::musclesNames)
-    {
-      cout << "ERROR: muscles names among emg and lmt files are different" << endl;
-      exit(EXIT_FAILURE);          
-    }
-  SyncTools::Shared::musclesNamesMutex.unlock();
-}
+EMGFromFile::EMGFromFile(const string& inputDir):
+inputDir_(inputDir)
+{ }
+               
 
 void EMGFromFile::operator()()
 {
+
+	string filename(inputDir_+"/"+ FileUtils::getFile(inputDir_, "emg.txt"));
+
 #ifdef LOG
   cout << "emg produce" << endl;
 #endif
   double myTime;
-  string emgDataFilename = dataDirectory_ + "emg.txt";
 #ifdef LOG  
-  cout << "\nReading..." << emgDataFilename << endl;
+  cout << "\nReading emg file..." << filename << endl;
 #endif
-  EMGDataFromFile<EMGgeneratorFromXml> myEmgData(emgDataFilename);
+  EMGDataFromFile<EMGgeneratorFromXml> myEmgData(filename);
   vector<string> emgMusclesNames;
   myEmgData.getMusclesNames(emgMusclesNames);
   setEMGMusclesNames(emgMusclesNames);

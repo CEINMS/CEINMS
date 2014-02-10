@@ -128,6 +128,7 @@
       <xs:element name="NMSmodel" type="NMSModelType"/>
       <xs:element minOccurs="0" name="samplingFrequency" type="xs:int"/>
       <xs:element name="calibrationSteps" type="CalibrationStepsType"/>
+      <xs:element name="trialsDirectory" minOccurs="1" maxOccurs="1" type="xs:string" />
       <xs:element name="trialSet" type="TrialSetType"/>
     </xs:sequence>
   </xs:complexType>

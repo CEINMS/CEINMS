@@ -25,8 +25,8 @@ using std::string;
 
 
 template <typename NMSmodelT>
-ModelEvaluationOffline<NMSmodelT>::ModelEvaluationOffline(NMSmodelT& subject) 
-:subject_(subject)
+ModelEvaluationOffline<NMSmodelT>::ModelEvaluationOffline(NMSmodelT& subject, const std::string& outputDir) 
+:subject_(subject), outputDir_(outputDir)
 { }
 
 
@@ -150,20 +150,19 @@ void ModelEvaluationOffline<NMSmodelT>::operator()() {
 #endif
   
 #ifdef LOG_FILES
-    Logger::SimpleFileLogger<NMSmodelT> logger(subject_);
+    Logger::SimpleFileLogger<NMSmodelT> logger(subject_, outputDir_);
     logger.addLog(Logger::Activations);
     logger.addLog(Logger::FibreLengths);
     logger.addLog(Logger::FibreVelocities);
     logger.addLog(Logger::MuscleForces);
     logger.addLog(Logger::Torques);
 #endif
-
     initOfflineCurve();
-    
+
     vector<bool> stillExtTorqueDataOnDof;
     for (unsigned int i = 0; i < dofNamesWithExtTorque_.size(); ++i)
         stillExtTorqueDataOnDof.push_back(true);
-
+	
     do {  
         getLmtFromShared(lmtFromQueue);
         lmtMaTime = lmtFromQueue.back();
@@ -275,7 +274,7 @@ NOTE: when one a producer push an empty vector in a queue means that ther are no
     } while (runCondition);
 
 #ifdef LOG  
-  cout << "Everything went fine, check output files in ./Output\n";
+  cout << "Estimation completed. Output file printed in "+outputDir_ << endl;;
 #endif
 }
 

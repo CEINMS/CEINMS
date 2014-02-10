@@ -11,6 +11,7 @@
 #include "TrialData.h"
 #include "EMGDataFromFile.h"
 #include "EMGgenerator/EMGgeneratorFrom16To34.h"
+#include "EMGgenerator/EMGgeneratorFromXml.h"
 #include "DataFromFile.h"
 #include <string>
 using std::string;
@@ -60,7 +61,7 @@ void InputDataInterpreter::convert ( const string& trialID, TrialData& trial ) {
 void InputDataInterpreter::readEmgFile(TrialData& trial) {
      
     string emgDataFilename = inputDirectory_ + "/" + trial.id_ + "/emg.txt";
-    EMGDataFromFile<EMGgeneratorFrom16To34> emgDataFromFile(emgDataFilename);
+    EMGDataFromFile<EMGgeneratorFromXml> emgDataFromFile(emgDataFilename);
     trial.noMuscles_ = emgDataFromFile.getMusclesNames().size();
     trial.noEmgSteps_ = emgDataFromFile.getNoTimeSteps();
        

@@ -36,7 +36,7 @@ public:
     void getDofNames(std::vector<std::string>& dofNames) const;
     
     void pushParameter(const Parameter& parameter);
-    bool getParameterSet(ParameterSet& parameterSet) const;
+    void getParameterSet(ParameterSet& parameterSet) const;
     
     friend std::ostream& operator<< (std::ostream& output, const CalibrationStep& b);
     
@@ -58,6 +58,7 @@ public:
     CalibrationCfg::OptimizationAlgorithm getOptimizationAlgorithm() const;
     void getOptimizationAlgorithmParameters(SimulatedAnnealingParameters& parameters) const;  //overload this function when adding new opt algorithms
     bool popNextCalibrationStep(CalibrationStep& calibrationStep); 
+	void getTrialsDirectory(std::string& trialsDirectory) const;
     void getCalibrationTrials(std::list<std::string>& trials) const;
     friend std::ostream& operator<< (std::ostream& output, const CalibrationXmlReader& b);
     
@@ -66,14 +67,16 @@ private:
     void readNMSmodelCfg();
     void readOptimizationAlgorithmCfg();
     void readCalibrationStepsCfg();
-    void readStep(StepType& stepType, CalibrationStep& calibrationStep);
-    void readParameter(ParameterType& parameterType, Parameter& parameter);
-    void readCalibrationTrialList();
+    void readStep(CalibrationXsd::StepType& stepType, CalibrationStep& calibrationStep);
+    void readParameter(CalibrationXsd::ParameterType& parameterType, Parameter& parameter);
+	void readCalibrationTrialsDirectory();
+	void readCalibrationTrialList();
     unsigned runMode_;
     unsigned optimizationAlgorithm_;
+	std::string trialsDirectory_;
     std::list<CalibrationStep> calibrationSteps_;
     std::list<std::string> calibrationTrials_;
-    std::auto_ptr<CalibrationType> calibrationPointer_;    
+    std::auto_ptr<CalibrationXsd::CalibrationType> calibrationPointer_;    
     SimulatedAnnealingParameters simanParameters_;
     
 };

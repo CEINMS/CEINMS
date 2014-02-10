@@ -2,6 +2,7 @@ INCLUDE_DIRECTORIES(
   /usr/local/include/ 
   ${CMAKE_SOURCE_DIR}/lib/Producers
   ${CMAKE_SOURCE_DIR}/lib/Producers/FromFile
+  ${CMAKE_SOURCE_DIR}/lib/Producers/FromOpenSim
   ${CMAKE_SOURCE_DIR}/lib/NMSmodel
   ${CMAKE_SOURCE_DIR}/lib/NMSmodel/Tendon
   ${CMAKE_SOURCE_DIR}/lib/NMSmodel/Activation
@@ -40,15 +41,44 @@ TARGET_LINK_LIBRARIES( CEINMS
       ${XERCES_LIBRARY}  
 )
 
+#enable_language(Fortran)
+if(UNIX)
+find_package(LAPACK)
+set(lapack_unix ${LAPACK_LIBRARIES} ${BLAS_LIBRARIES})    
+endif(UNIX)
+
+ADD_EXECUTABLE( CEINMS-osim  CEINMS-osim.cpp ModelEvaluationBase.cpp ${CMAKE_SOURCE_DIR}/lib/FileIO/EMGgenerator/EMGgeneratorFromXml.cpp ProducersFromOpenSim.cpp)
+
+
+
+TARGET_LINK_LIBRARIES( CEINMS-osim
+      FileIO
+      xmlInput
+      NMSmodel
+      ProducersOSim
+      ${CMAKE_THREAD_LIBS_INIT}
+      ${Boost_LIBRARIES}
+      ${XERCES_LIBRARY}    
+)
+
+if(UNIX)
+TARGET_LINK_LIBRARIES( CEINMS-osim
+	${lapack_unix} )
+endif(UNIX)
+
 
 set(CEINMScalibrate_SOURCES
     CEINMScalibration.cpp 
     ${CMAKE_SOURCE_DIR}/lib/Calibration/InputDataInterpreter.cpp
     
 )
-    
-add_executable( CEINMScalibrate ${CEINMScalibrate_SOURCES})
 
+set(CEINMScalibrate_SOURCES
+    CEINMScalibration.cpp 
+    ${CMAKE_SOURCE_DIR}/lib/Calibration/InputDataInterpreter.cpp
+    
+)
+add_executable( CEINMScalibrate ${CEINMScalibrate_SOURCES})
 TARGET_LINK_LIBRARIES( CEINMScalibrate
       xmlInputCalibration
       NMSmodel
@@ -56,3 +86,23 @@ TARGET_LINK_LIBRARIES( CEINMScalibrate
       ${Boost_LIBRARIES}
       ${XERCES_LIBRARY}
 )
+
+set(CEINMScalibrate-osim_SOURCES
+    CEINMScalibration-osim.cpp 
+    ${CMAKE_SOURCE_DIR}/lib/Calibration/InputDataInterpreter.cpp
+    ${CMAKE_SOURCE_DIR}/lib/Calibration/InputDataInterpreterOsim.cpp )
+    
+add_executable( CEINMScalibrate-osim ${CEINMScalibrate-osim_SOURCES} )
+TARGET_LINK_LIBRARIES( CEINMScalibrate-osim
+      xmlInputCalibration
+      NMSmodel
+      FileIO
+      ${Boost_LIBRARIES}
+      ${XERCES_LIBRARY}
+      ${OPENSIM_ALL_LIBS}
+)
+
+if(UNIX)
+TARGET_LINK_LIBRARIES( CEINMScalibrate-osim
+	${lapack_unix} )
+endif(UNIX)

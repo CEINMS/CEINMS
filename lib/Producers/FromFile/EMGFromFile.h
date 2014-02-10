@@ -9,12 +9,11 @@
 class EMGFromFile:public EMGFromX
 {
   public:
-    EMGFromFile(const std::string& dataDirectory);
+    EMGFromFile(const std::string& inputDir);
     void operator()();
     virtual ~EMGFromFile();
   private:  
-    void setEMGMusclesNames(const std::vector< std::string >& emgMusclesNames);
-    std::string dataDirectory_;
+    std::string inputDir_;
 };
 
 #endif

@@ -15,6 +15,7 @@
 #include <vector>
 #include <iostream>
 #include "SimulatedAnnealingParameters.h"
+#include "calibration.hxx"
 
 // This is implementation is from the paper
 // Global Optimization of Statistical Functions with Simulated Annealing
@@ -46,7 +47,7 @@ private:
     void checkBounds(int k);
     
     // data from xml file for simulated annealing configuration
-    std::auto_ptr<SimulatedAnnealingType> annealingPointer_;
+    std::auto_ptr<CalibrationXsd::SimulatedAnnealingType> annealingPointer_;
     // input output with the subject (set/get)
     ParametersT parameters_;
     // this is implementing how we compute fp

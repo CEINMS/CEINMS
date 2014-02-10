@@ -20,6 +20,7 @@ using std::vector;
 #include <boost/thread/condition_variable.hpp>
 
 #include <cstdlib>
+#include <iostream>
 
 
 void EMGFromX::pushEmgBack(const vector<double>& newEmgToPush)
@@ -38,6 +39,24 @@ void EMGFromX::updateEmg(const vector<double>& currentEmgData, double currentTim
   pushEmgBack(emgDataToPush);
 }
 
+void EMGFromX::setEMGMusclesNames(const vector<string>& emgMusclesNames) {
+
+	SyncTools::Shared::musclesNamesMutex.lock();
+	if (SyncTools::Shared::musclesNames.empty())         //musclesNames is a global variable
+		SyncTools::Shared::musclesNames = emgMusclesNames; 
+	else
+		if (emgMusclesNames != SyncTools::Shared::musclesNames) {
+		std::cout << "lmt names - emg names\n";
+		for(unsigned i = 0; i < emgMusclesNames.size() && i < SyncTools::Shared::musclesNames.size() ; ++i) {
+			string emgName(emgMusclesNames.at(i)), lmtName(SyncTools::Shared::musclesNames.at(i)), separator("  -  ");
+			if(lmtName != emgName) separator = "  <>  ";
+			std::cout << lmtName << separator <<  emgName << std::endl;
+		}
+		std::cout << "ERROR: muscles names among emg and lmt files are different" << std::endl;
+		exit(EXIT_FAILURE);          
+    }
+	SyncTools::Shared::musclesNamesMutex.unlock();
+}
 
 EMGFromX::~EMGFromX() { }
 

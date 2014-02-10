@@ -13,8 +13,7 @@ class LmtMaFromFile:public LmtMaFromX {
     void operator()();
    
   private:
-    void setLmtMusclesNames(const std::vector< std::string >& lmtMusclesNames);
-    void setMomentArmsMusclesNames(const std::vector< std::vector < std::string > >& musclesNamesFromMomentArmsFiles);
+    
     std::string dataDirectory_;
 };
 

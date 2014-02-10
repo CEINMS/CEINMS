@@ -147,7 +147,8 @@ int main(int ac, char** av){
     list<string> calibrationTrialIDs;
     calibrationXmlReader.getCalibrationTrials(calibrationTrialIDs);
     vector<TrialData> trials;  
-    string trialsInputDirectory = "/home/co/Dropbox/Ricerca/versioning/ceinms/TestData/unix/"; //TODO get it from xml
+    string trialsInputDirectory;
+	calibrationXmlReader.getTrialsDirectory(trialsInputDirectory); //TODO get it from xml
         
     
     //3 loop the calibration steps

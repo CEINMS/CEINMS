@@ -102,6 +102,7 @@ public:
     
     // called	for control purpose
     void getMuscleNames(std::vector<std::string>& muscleNames) { muscleNames = muscleNames_; }
+	void getMuscleNamesOnDofs(std::vector<std::vector<std::string> >& muscleNamesOnDofs);
     int  getNoMuscles() const {return muscles_.size();}
     void getDoFNames(std::vector<std::string>& dofNames) { dofNames = dofNames_; }
     int  getNoDoF() {return dofs_.size();}

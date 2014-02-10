@@ -12,6 +12,7 @@
 
 #include <vector>
 #include <string>
+#include <iostream>
 
 class TrialData {
 public:
@@ -32,9 +33,21 @@ public:
   unsigned int noTorqueSteps_;
   std::vector< double > torqueTimeSteps_; // OK
   std::vector< std::vector < double > > torqueData_;
+ // friend std::ostream& operator<< (std::ostream& output, const TrialData& b);
 };
 
+/*
+std::ostream& operator<< (std::ostream& output, const TrialData& rhs) {
 
+	output << "ID " << rhs.id_ << std::endl;
+	output << "noMuscles " << rhs.noMuscles_ << std::endl;
+    output << "noEMGsteps " << rhs.noEmgSteps_ << std::endl; 
+    output << "noLmtsteps " << rhs.noLmtSteps_ << std::endl; 
+	output << "noDofs " << rhs.noDoF_ << std::endl; 
+	output << "noTorqueSteps " << rhs.noTorqueSteps_ << std::endl; 
+
+	return output;
+	}*/
 //#include "TrialData.cpp"
 
 #endif

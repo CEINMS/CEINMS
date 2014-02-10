@@ -107,7 +107,7 @@ int main(int argc, char** argv) {
     po::options_description desc("Allowed options");
     desc.add_options()
     ("help", "produce help message")
-    ("subject,s", po::value<string>(&subjectFile), "subject xml file that cointains the initial parameter values")
+    ("subject,s", po::value<string>(&subjectFile), "subject xml file")
     ("execution,x", po::value<string>(&executionFile),  "execution xml file")
     ("input-dir,i", po::value<string>(&inputDirectory), "trial directory path")
     ("emg-generator,eg", po::value<string>(&emgGeneratorFile)->default_value("cfg/xml/emgGenerator.xml"), "EMG mapping");

@@ -25,7 +25,7 @@ EMGDataFromFile<EMGgenerator>::EMGDataFromFile(const string& EMGDataFilename)
 :EMGDataFile_(EMGDataFilename.c_str()) {
  
   if (!EMGDataFile_.is_open()) {
-    cout << "ERROR: " << EMGDataFilename << " could not be open\n";
+    cout << "ERROR emg file: " << EMGDataFilename << " could not be open\n";
     exit(EXIT_FAILURE);
   }
   
@@ -59,7 +59,16 @@ EMGDataFromFile<EMGgenerator>::EMGDataFromFile(const string& EMGDataFilename)
   } 
   
   if ( !EMGgenerator_.checkFromMusclesNames(muscleNames_) ) {
+	  vector<string> musclesNamesFromGenerator;
+	  EMGgenerator_.getFromMusclesNames(musclesNamesFromGenerator);
+	  std::cout << " generator names - file names\n";
+		for(unsigned i = 0; i < musclesNamesFromGenerator.size() && i < muscleNames_.size() ; ++i) {
+			string genName(musclesNamesFromGenerator.at(i)), fileName(muscleNames_.at(i)), separator("  -  ");
+			if(genName != fileName) separator = "  <>  ";
+			std::cout << genName << separator <<  fileName << std::endl;
+		}
     cout << "THE EMG generator is not able to generate EMG for your muscles starting from muscle in the file! (muscle names are different)\n";
+
     exit(EXIT_FAILURE);
   }
   

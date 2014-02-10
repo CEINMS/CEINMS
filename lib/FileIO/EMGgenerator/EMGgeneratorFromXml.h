@@ -76,7 +76,7 @@ struct Nil : public Functor {
 class EMGgeneratorFromXml{
     
 public:
-  EMGgeneratorFromXml(const std::string& xmlFilename  = "cfg/xml/emgGenerator.xml"); 
+  EMGgeneratorFromXml(const std::string& xmlFilename  = "cfg/xml/emgGenerator/emgGenerator.xml"); 
   inline bool checkFromMusclesNames(const std::vector<std::string>& fromMusclesNames) const {
     return ( (fromMusclesNames == fromMusclesNames_) );
   }
@@ -84,6 +84,7 @@ public:
   const std::vector<std::string>&  getMusclesNames() const {return toMusclesNames_;};
   int getNoFromMuscles() const { return noFromMuscles_;}
   int getNoToMuscles() const {return noToMuscles_;}
+  void getFromMusclesNames(std::vector<std::string>& fromMusclesNames) { fromMusclesNames = fromMusclesNames_; }
 private:
     void setEmgMappingOperation(unsigned index, const std::string& operation);
     void setEmgMappingArguments(unsigned index, const std::vector<std::string>& muscleNames);

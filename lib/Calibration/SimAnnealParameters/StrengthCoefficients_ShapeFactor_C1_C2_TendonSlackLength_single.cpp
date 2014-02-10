@@ -28,7 +28,7 @@ StrengthCoefficients_ShapeFactor_C1_C2_TendonSlackLength_single<NMSmodelT>
                                                                   vector<string>& dofToCalibrate)
 :subject_(subject) {
 
-  
+  cout << "Using parameter policy: StrengthCoefficients_ShapeFactor_C1_C2_TendonSlackLength_single\n";
   subject_.getMusclesIndexFromDofs(musclesIndexToCalibrate_, dofToCalibrate);
 
 //  cout << "musclesIndexToCalibrate_\n";

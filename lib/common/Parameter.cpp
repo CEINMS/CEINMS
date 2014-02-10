@@ -75,9 +75,9 @@ std::ostream& operator<< (std::ostream& output, const Parameter& rhs) {
             break;
         case Parameter::Grouped:
             output << " ---- Grouped:\n";
-            for(typename Parameter::MuscleGroups::const_iterator mgIt = rhs.muscleGroups_.begin(); mgIt != rhs.muscleGroups_.end(); ++mgIt) {
+            for(Parameter::MuscleGroups::const_iterator mgIt = rhs.muscleGroups_.begin(); mgIt != rhs.muscleGroups_.end(); ++mgIt) {
                 output << " ----- Group: ";
-                for(typename Parameter::MuscleNames::const_iterator mIt = mgIt->begin(); mIt != mgIt->end(); ++mIt)
+                for(Parameter::MuscleNames::const_iterator mIt = mgIt->begin(); mIt != mgIt->end(); ++mIt)
                     output << *mIt << " ";
                 output << std::endl;
             }        

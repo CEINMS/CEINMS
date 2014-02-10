@@ -19,7 +19,9 @@ INCLUDE_DIRECTORIES(
   ${CMAKE_SOURCE_DIR}/lib/FileIO/EMGgenerator
   ${CMAKE_SOURCE_DIR}/lib/Producers
   ${CMAKE_SOURCE_DIR}/lib/Producers/FromFile
+  ${CMAKE_SOURCE_DIR}/lib/Producers/FromOpenSim
   ${CMAKE_SOURCE_DIR}/lib/xmlInput
+  ${CMAKE_SOURCE_DIR}/lib/common
 )
 
 ADD_LIBRARY(Producers STATIC
@@ -31,3 +33,18 @@ ADD_LIBRARY(Producers STATIC
   ${FromFile_SOURCES}
   ${FileIO_SOURCES}
 )
+
+ADD_LIBRARY(ProducersOSim STATIC
+  EMGFromX.cpp
+  ExternalTorqueFromX.cpp
+  LmtMaFromX.cpp
+  Semaphore.cpp
+  SyncTools.cpp
+  ${FromFile_SOURCES}
+  ${FileIO_SOURCES}
+  FromOpenSim/LmtMaFromOpenSim.cpp
+  FromOpenSim/ExternalTorqueFromStorage.cpp
+)
+
+target_link_libraries(ProducersOSim ${OPENSIM_ALL_LIBS})
+

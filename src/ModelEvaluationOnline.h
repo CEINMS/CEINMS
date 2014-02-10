@@ -14,18 +14,19 @@
 #include <string>
 #include "ModelEvaluationBase.h"
 
-
 template <typename NMSmodelT>
 class ModelEvaluationOnline : public ModelEvaluationBase {
 
 public:
 //    ModelEvaluationOnline();
-    ModelEvaluationOnline(NMSmodelT& subject);
+    ModelEvaluationOnline(NMSmodelT& subject, const std::string& outputDir = "./Output");
+    void setOutputDirectory(const std::string& outputDir);
 //    void setSubject(NMSmodelT& subject);
     void operator()();
     
 private:
     NMSmodelT& subject_;
+    std::string outputDir_;
  //   std::vector< std::string > musclesNames_;
  //   std::vector< std::vector < std::string > > musclesNamesOnDof_;
     std::vector< std::string > dofNames_;

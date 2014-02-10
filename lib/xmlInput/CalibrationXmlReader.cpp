@@ -7,6 +7,7 @@
 //
 
 #include "CalibrationXmlReader.h"
+#include <boost/filesystem.hpp>
 
 #include <string>
 using std::string;
@@ -14,7 +15,8 @@ using std::string;
 using std::cout;
 using std::endl;
 #include <ostream>
-
+#include "calibration.hxx"
+using namespace CalibrationXsd;
 
 CalibrationXmlReader::CalibrationXmlReader(const string& filename)
 :runMode_(0), optimizationAlgorithm_(0) {
@@ -38,6 +40,7 @@ void CalibrationXmlReader::readXml() {
     readNMSmodelCfg();
     readOptimizationAlgorithmCfg();
     readCalibrationStepsCfg();    
+	readCalibrationTrialsDirectory();
     readCalibrationTrialList();
 }
 
@@ -177,7 +180,7 @@ void CalibrationXmlReader::readParameter(ParameterType& parameterType, Parameter
         MuscleGroupsType::muscles_iterator mgIt = musclesSequence.begin();
 
         for(mgIt; mgIt != musclesSequence.end(); ++mgIt) {
-            typename Parameter::MuscleNames muscleNames;
+            Parameter::MuscleNames muscleNames;
             for(MuscleListType::iterator it = mgIt->begin(); it != mgIt->end(); ++it)
                 muscleNames.push_back(*it);
             parameter.pushMuscleGroup(muscleNames);
@@ -201,6 +204,11 @@ void CalibrationXmlReader::readParameter(ParameterType& parameterType, Parameter
     parameter.setLowerAndUpperLimits(*it, *(it+1));   
 }
 
+
+void CalibrationXmlReader::readCalibrationTrialsDirectory() {
+
+	trialsDirectory_ = calibrationPointer_->trialsDirectory();
+}
 
 void CalibrationXmlReader::readCalibrationTrialList() {
     
@@ -240,6 +248,11 @@ void CalibrationXmlReader::getOptimizationAlgorithmParameters(SimulatedAnnealing
     parameters = simanParameters_;
 }
 
+
+void CalibrationXmlReader::getTrialsDirectory(string& trialsDirectory) const {
+
+	trialsDirectory = trialsDirectory_;
+}
 
 void CalibrationXmlReader::getCalibrationTrials(std::list<string>& trials) const {
 
@@ -285,7 +298,7 @@ void CalibrationStep::getDofNames(std::vector< string >& dofNames) const {
 
 
 
-bool CalibrationStep::getParameterSet(ParameterSet& parameterSet) const {
+void CalibrationStep::getParameterSet(ParameterSet& parameterSet) const {
 
     parameterSet = parameterSet_;
 }
