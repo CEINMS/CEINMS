@@ -136,8 +136,9 @@ public:
     void getStrengthCoefficients(std::vector<double>& strengthCoefficients) const;
     void getTendonSlackLengths(std::vector<double>& tendonSlackLengths) const;
     void getMuscle(MTUtype& muscle, const std::string& muscleName);  
-    double getMusclePenalty() const;
-    double getMusclePenalty(std::vector<unsigned int>& musclesIndexList) const;
+    double getMusclesPenalty() const;
+    double getMusclesPenalty(std::vector<unsigned>& selectedMusclesIndex) const;
+    void getMusclesPenaltyVector(std::vector<double>& penalties) const;
     void getMusclesParameters(std::vector< MuscleParameters >& parameters);
     void setMuscleForces(const std::vector<double>& muscleTendonForces);
     void getMomentArmsOnDof(std::vector<double>& momentArms, unsigned whichDof) const;

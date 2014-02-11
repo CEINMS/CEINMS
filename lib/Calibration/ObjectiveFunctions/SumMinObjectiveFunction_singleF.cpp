@@ -117,6 +117,8 @@ void SumMinObjectiveFunction_singleF<TorquesComputationT>::evalFp( ) {
                 penaltyFactor += penalties_.at(t).at(r);
             }
  //           penaltyFactor = 0;
+ //           if (penaltyFactor > 0)
+ //               cout << "penalty factor: " << penaltyFactor << endl; 
             trialDifference = (trialDifference/torquesVariance_.at(t).at(dIndex)+penaltyFactor) / torques_.at(t).at(d).size();
             fp_ += trialDifference;
         }

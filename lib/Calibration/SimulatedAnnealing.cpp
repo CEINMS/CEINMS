@@ -52,8 +52,8 @@ objectiveFunction_(torquesComputation,  simanParameters.epsilon, simanParameters
     rt_        = simanParameters.rt; 
     t_         = simanParameters.T;
     maxNoEval_ = simanParameters.maxNoEval;  
-    srand(time(NULL));
-   //srand(1); 
+   // srand(time(NULL));
+   srand(1); 
 }
 
 

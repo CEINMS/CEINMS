@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<emgGenerator xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../XSD/emgGenerator.xsd">
+
+<experimental>
+	<emg id="addmag_r"/>
+	<emg id="bicfemlh_r"/>
+	<emg id="gaslat_r"/>
+	<emg id="gasmed_r"/>
+	<emg id="gmax_r"/>
+	<emg id="gmed_r"/>
+	<emg id="gra_r"/>
+	<emg id="perlong_r"/>
+	<emg id="recfem_r"/>
+	<emg id="sar_r"/>
+	<emg id="semimem_r"/>
+	<emg id="sol_r"/>
+	<emg id="tfl_r"/>
+	<emg id="tibant_r"/>
+	<emg id="vaslat_r"/>
+	<emg id="vasmed_r"/>
+</experimental>
+
+<mapping>
+	<emg id="addbrev_r"
+		 operation="assign">
+         addmag_r
+	</emg>
+	<emg id="addlong_r"
+		 operation="assign">
+         addmag_r
+	</emg>
+	<emg id="addmag1_r"
+		 operation="assign">
+         addmag_r
+	</emg>
+	<emg id="addmag2_r"
+		 operation="assign">
+         addmag_r
+	</emg>
+	<emg id="addmag3_r"
+		 operation="assign">
+         addmag_r
+	</emg>
+	<emg id="bicfemsh_r"
+		 operation="assign">
+         bicfemlh_r
+	</emg>
+	
+    <emg id="gmax1_r"
+		 operation="assign">
+         gmax_r
+	</emg>
+    <emg id="gmax2_r"
+		 operation="assign">
+         gmax_r
+	</emg>
+    <emg id="gmax3_r"
+		 operation="assign">
+         gmax_r
+	</emg>
+
+    <emg id="gmed1_r"
+		 operation="assign">
+         gmed_r
+	</emg>
+    <emg id="gmed2_r"
+		 operation="assign">
+         gmed_r
+	</emg>
+    <emg id="gmed3_r"
+		 operation="assign">
+         gmed_r
+	</emg>
+
+    <emg id="gmin1_r"
+		 operation="mean">
+         gmed_r
+         gmax_r
+	</emg>
+    <emg id="gmin2_r"
+		 operation="mean">
+         gmed_r
+         gmax_r
+	</emg>
+    <emg id="gmin3_r"
+		 operation="mean">
+         gmed_r
+         gmax_r
+	</emg>
+
+	<emg id="illiacus_r"
+		 operation="nil"/>
+
+	<emg id="perbrev_r"
+		 operation="assign">
+         perlong_r
+	</emg>
+	<emg id="perter_r"
+		 operation="assign">
+         perlong_r
+	</emg>
+
+	<emg id="psoas_r"
+		 operation="nil"/>
+
+	<emg id="semiten_r"
+		 operation="assign">
+         semimem_r
+	</emg>
+
+    <emg id="vasint_r"
+		 operation="mean">
+         vaslat_r
+         vasmed_r
+	</emg>
+
+ </mapping>
+ 
+<output>
+	addbrev_r addlong_r addmag1_r addmag2_r addmag3_r 
+    bicfemlh_r bicfemsh_r 
+    gaslat_r gasmed_r 
+    gmax1_r gmax2_r gmax3_r 
+    gmed1_r gmed2_r gmed3_r 
+    gmin1_r gmin2_r gmin3_r 
+    gra_r 
+    illiacus_r 
+    perbrev_r perlong_r perter_r
+    psoas_r recfem_r sar_r
+    semimem_r semiten_r sol_r
+    tfl_r tibant_r
+    vasint_r vaslat_r vasmed_r
+</output>
+</emgGenerator>

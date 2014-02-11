@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<calibration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="calibration.xsd">
+
+  <algorithm>
+      <simulatedAnnealing>
+      <noEpsilon>4</noEpsilon>
+      <rt>0.3</rt>
+      <T>20</T>
+      <NS>15</NS>
+      <NT>5</NT>
+      <epsilon>1.E-3</epsilon>
+      <maxNoEval>200000</maxNoEval>
+    </simulatedAnnealing>
+  </algorithm>
+
+  <NMSmodel>
+    <type>
+      <openLoop/>
+    </type>
+
+    <tendon>
+      <stiff/>
+    </tendon>
+
+    <activation>
+      <exponential/>
+    </activation>
+  </NMSmodel>
+
+    <calibrationSteps>
+        <step>
+            <dofs>R_knee_fe R_hip_fe R_hip_aa R_ankle_fe</dofs> 
+            <objectiveFunction>
+                <minimizeTorqueError/>
+            </objectiveFunction>
+            <computationMode>
+	            <fast/>
+            </computationMode> 
+            <parameterSet>
+	            <parameter>
+	                <name>c1</name>
+                    <single/>
+                    <absolute>
+                        <range>-0.95 -0.05</range>
+                    </absolute>
+	            </parameter>
+	            <parameter>
+	                <name>c2</name>
+                    <single/>
+                    <absolute>
+                        <range>-0.95 -0.05</range>
+                    </absolute>
+	            </parameter>
+	            <parameter>
+	                <name>shapeFactor</name>
+                    <single/>
+                    <absolute>
+                        <range>-2.999 -0.001</range>
+                    </absolute>
+	            </parameter>
+	            <parameter>
+	                <name>tendonSlackLength</name>
+                    <single/>
+                    <relativeToSubjectValue>
+                        <range>0.85 1.15</range>
+                    </relativeToSubjectValue>
+	            </parameter>
+                <parameter>
+                    <name>strengthCoefficient</name>
+                    <muscleGroups>
+                        <muscles>addbrev_r addlong_r addmag1_r addmag2_r addmag3_r </muscles> 
+                        <muscles>bicfemlh_r semimem_r semiten_r sar_r</muscles>               
+                        <muscles>bicfemsh_r</muscles>                                         
+                        <muscles>gaslat_r gasmed_r </muscles>                                 
+                        <muscles>gmax1_r gmax2_r gmax3_r</muscles>                            
+                        <muscles>gmed1_r gmed2_r gmed3_r gmin1_r gmin2_r gmin3_r</muscles>    
+                        <muscles>gra_r recfem_r tfl_r</muscles>                               
+                        <muscles>illiacus_r psoas_r</muscles>                                 
+                        <muscles>perbrev_r perlong_r perter_r tibant_r</muscles>              
+                        <muscles> sol_r</muscles>
+                        <muscles>vasint_r vaslat_r vasmed_r</muscles>                         
+                    </muscleGroups>
+                    <absolute>
+                        <range>0.5 2.5</range>
+                    </absolute>
+                </parameter>
+
+            </parameterSet>
+        </step> 
+    </calibrationSteps>
+
+  <trialsDirectory>/home/co/Dropbox/Ricerca/versioning/ceinms/TestData/unix_undersampled</trialsDirectory>
+  <trialSet>_CrossOvers1_</trialSet>
+
+
+</calibration>

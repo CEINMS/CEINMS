@@ -262,8 +262,8 @@ template <typename ComputationModeT, typename NMSmodelT>
 void TorquesComputation<ComputationModeT, NMSmodelT>::computeTorquesAndPenalties(std::vector< std::vector< std::vector< double > > >& torques, 
                                                   std::vector< std::vector< double > >& penalties) {
 
-    computationMode_.computeTorques(torques);
-    
+ //   computationMode_.computeTorques(torques);
+    computationMode_.computeTorquesAndPenalties(torques, penalties);
 } 
 
 

@@ -915,7 +915,7 @@ void NMSmodel<Activation, Tendon, mode>::getMomentArmsOnDof(vector<double>& mome
 
 
 template <typename Activation, typename Tendon, CurveMode::Mode mode>
-double NMSmodel<Activation, Tendon, mode>::getMusclePenalty() const {
+double NMSmodel<Activation, Tendon, mode>::getMusclesPenalty() const {
 
     double penalty = 0.;
     vectorMTUconstItr muscleIt = muscles_.begin();
@@ -926,16 +926,24 @@ double NMSmodel<Activation, Tendon, mode>::getMusclePenalty() const {
 
 
 template <typename Activation, typename Tendon, CurveMode::Mode mode>
-double NMSmodel<Activation, Tendon, mode>::getMusclePenalty(vector<unsigned>& musclesIndexList) const {
+double NMSmodel<Activation, Tendon, mode>::getMusclesPenalty(vector<unsigned>& selectedMusclesIndex) const {
 
     double penalty = 0.;
     unsigned int mILi = 0;
-    for (unsigned int i = 0; i < muscles_.size() && mILi < musclesIndexList.size(); ++i)
-        if(i == musclesIndexList.at(mILi)) {
+    for (unsigned int i = 0; i < muscles_.size() && mILi < selectedMusclesIndex.size(); ++i)
+        if(i == selectedMusclesIndex.at(mILi)) {
             penalty += muscles_.at(i).getPenalty();
             ++mILi;
         }
     return penalty;
+}
+
+template <typename Activation, typename Tendon, CurveMode::Mode mode>
+void NMSmodel<Activation, Tendon, mode>::getMusclesPenaltyVector(vector<double>& penalties) const {
+ 
+    vectorMTUconstItr muscleIt = muscles_.begin();
+    for (muscleIt = muscles_.begin(); muscleIt < muscles_.end(); ++muscleIt) 
+        penalties.push_back(muscleIt->getPenalty());    
 }
 
 

@@ -1,6 +1,17 @@
+//__________________________________________________________________________
+// Author: Claudio Pizzolato, Monica Reggiani - September 2013
+// email:  claudio.pizzolato@griffithuni.edu.au
+//
+// DO NOT REDISTRIBUTE WITHOUT PERMISSION
+//__________________________________________________________________________
+//
+
+
 #include <vector>
 using std::vector;
 #include "TrialData.h"
+#include <iostream>
+#include <stdlib.h>
 
 template<typename NMSmodelT>
 ComputationMode_Default<NMSmodelT>::ComputationMode_Default(NMSmodelT& subject):
@@ -170,6 +181,96 @@ void ComputationMode_Default<NMSmodelT>::computeTorques(vector< vector< std::vec
         }    */
     
 }
+
+
+template<typename NMSmodelT>
+void ComputationMode_Default<NMSmodelT>::computeTorquesAndPenalties(vector< vector< vector<double> > >& torques, vector< vector< double > >& penalties) {
+    
+    std::cout << "computeTorquesAndPenalties not implemented in ComputationMode_Default\nExiting.\n";
+    exit(EXIT_FAILURE);
+        getMusclesToUpdate();
+    // i is for the number of trials
+    for (unsigned int ct = 0 ; ct < trials_.size(); ++ct) {
+        
+        // initializing fiber-length curves for the trial ct
+        initFiberLengthTraceCurves(ct);
+        
+        
+        int k = 0; // k is the index for lmt and ma data
+        double lmtTime = trials_.at(ct).lmtTimeSteps_.at(k);
+        double emgTime = trials_.at(ct).emgTimeSteps_.at(0) + subject_.getGlobalEmDelay();
+
+        
+        // Let's start going through the EMG, lmt, and ma data...  
+        for (int i = 0; i < trials_.at(ct).noEmgSteps_; ++i) {
+
+            emgTime = trials_.at(ct).emgTimeSteps_.at(i);
+            subject_.setActivations(activationDataT1_.at(ct).at(i));
+            if(emgTime < lmtTime) 
+                subject_.setTime_emgs_updateActivations_pushState_selective(emgTime, trials_.at(ct).emgData_.at(i), musclesToUpdate_);
+//             subject_.setTime(emgTime);
+//             subject_.setEmgsSelective(trials_.at(ct).emgData_.at(i), musclesToUpdate_);
+//             subject_.updateActivations(musclesToUpdate_);
+//             subject_.pushState(musclesToUpdate_);
+
+
+            if ( (lmtTime <= emgTime) && (k < trials_.at(ct).noLmtSteps_)) {
+                subject_.setTime(emgTime);
+                subject_.setEmgsSelective(trials_.at(ct).emgData_.at(i), musclesToUpdate_);
+                subject_.setMuscleForces(forceDataT1_.at(ct).at(k));
+                subject_.setMuscleTendonLengthsSelective(trials_.at(ct).lmtData_.at(k), musclesToUpdate_); 
+                for (int j = 0 ; j < trials_.at(ct).noDoF_; ++j)
+                    subject_.setMomentArms(trials_.at(ct).maData_.at(j).at(k), j);
+                subject_.updateState_OFFLINE(musclesToUpdate_);
+                subject_.pushState(musclesToUpdate_);
+                vector<double> currentTorques, currentForces;
+                subject_.getTorques(currentTorques);
+                subject_.getMuscleForces(currentForces);
+            // when I'm done with the moment arm, I can ask for the new torque, and put it in the matrix
+                for (int j = 0; j < trials_.at(ct).noDoF_; ++j)
+                    torques.at(ct).at(j).at(k) = currentTorques.at(j); 
+                for (int j = 0; j < subject_.getNoMuscles(); ++j)
+                    forceDataT1_.at(ct).at(k).at(j) = currentForces.at(j);
+                
+                //calcolo delle penalty modificato per accomodare l'update di un sottoinsieme di muscoli
+                vector<double> penaltiesAtT;
+                subject_.getMusclesPenaltyVector(penaltiesAtT);
+                for (vector<unsigned>::const_iterator it(musclesToUpdate_.begin()); it < musclesToUpdate_.end(); ++it)
+                    penaltyDataT1_.at(ct).at(k).at(*it) = penaltiesAtT.at(*it);
+                penalties.at(ct).at(k) = 0;
+                for(unsigned j = 0; j < subject_.getNoMuscles(); ++j)
+                    penalties.at(ct).at(k) += penaltyDataT1_.at(ct).at(k).at(j);
+                //fine calcolo penalties
+                ++k;
+                if (k < trials_.at(ct).noLmtSteps_)
+                    lmtTime = trials_.at(ct).lmtTimeSteps_.at(k);  
+
+#ifdef DEBUG
+                cout << endl << endl << "EmgTime: " << emgTime << endl << "EMG" << endl;
+                    
+                for(unsigned int l=0; l < trials_.at(ct).emgData_.at(i).size(); ++l)
+                    cout << trials_.at(ct).emgData_.at(i).at(l) << "\t" ;
+                cout << endl << "LmtTime: " << lmtTime << endl;
+                
+                for(unsigned int l=0; l < trials_.at(ct).lmtData_.at(k).size(); ++l)
+                    cout << trials_.at(ct).lmtData_.at(k).at(l) << "\t";
+                cout << endl << "MomentArms" << endl;
+                
+                for(unsigned int l=0; l < trials_.at(ct).maData_.at(0).at(k).size(); ++l)
+                    cout << trials_.at(ct).maData_.at(0).at(k).at(l) << "\t";
+                cout << "\ncurrent torque: " << currentTorques.at(0);
+        
+                cout << endl << "----------------------------------------" << endl;
+#endif
+            }
+            vector<double> currentActivations;
+            subject_.getActivations(currentActivations);
+            for (int mi = 0; mi < subject_.getNoMuscles(); ++mi)
+                activationDataT1_.at(ct).at(i).at(mi) = currentActivations.at(mi);
+        } 
+    }
+}
+
 
 
 template<typename NMSmodelT>
