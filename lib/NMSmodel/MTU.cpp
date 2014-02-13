@@ -374,9 +374,11 @@ void MTU<Activation, Tendon, mode>::setTendonSlackLength(double tendonSlackLengt
 template<typename Activation, typename Tendon, CurveMode::Mode mode>
 double MTU<Activation, Tendon, mode>::getPenalty() const {
   
-    if (fabs(fibreLength_/optimalFibreLength_-1.0) > 0.5)
-        return 0.5;
-    return 0.;
+    double penalty(tendonDynamic_.getPenalty());
+    double const normalisedFibreRatio(fabs(fibreLength_/optimalFibreLength_-1.0));
+    if (normalisedFibreRatio > 0.5) 
+        penalty += normalisedFibreRatio*normalisedFibreRatio*100;
+    return penalty;
 }
     
 

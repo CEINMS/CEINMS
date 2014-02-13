@@ -46,6 +46,7 @@ public:
     void setMuscleTendonLength(double muscleTendonLength);
     void setActivation(double activation);
     void updateFibreLength();
+    double getPenalty() const { return .0;}
 
     double getFibreLength() { return fibreLength_;}
     void setStrengthCoefficient(double strengthCoefficient) { };

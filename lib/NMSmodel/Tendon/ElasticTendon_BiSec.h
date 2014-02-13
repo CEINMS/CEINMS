@@ -46,6 +46,7 @@ public:
     void setMuscleTendonLength(double muscleTendonLength);
     void setActivation(double activation);
     void updateFibreLength();
+    double getPenalty() const { return tendonPenalty_;}
 
     double getFibreLength() { return fibreLength_;}
     void setStrengthCoefficient(double strengthCoefficient);
@@ -77,6 +78,7 @@ private:
     double estimateFiberLengthBiSec(double tol, unsigned maxIterations);
     double computeMuscleForce(double fibreLength);
     double computeTendonForce(double fibreLength);
+    double getFibreLengthStiff() const;
     
     double optimalFibreLength_;
     double pennationAngle_;
@@ -94,6 +96,7 @@ private:
     double fibreLengthT1_;          //valore della fiberLength al passo precedente
     double muscleTendonLength_;
     double activation_;
+    double tendonPenalty_;
     
     std::string id_;
     
