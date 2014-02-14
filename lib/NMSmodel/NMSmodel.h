@@ -99,6 +99,7 @@ public:
     void setC2Coefficients(const std::vector<double>& c2Coefficients);
     void setTendonSlackLengths(const std::vector<double>& tendonSlackLengths);
     void setActivations(const std::vector<double>& activations);
+    void setOptimalFibreLengths(const std::vector<double>&  optimalFibreLengths);
     
     // called	for control purpose
     void getMuscleNames(std::vector<std::string>& muscleNames) { muscleNames = muscleNames_; }
@@ -142,6 +143,7 @@ public:
     void getMusclesParameters(std::vector< MuscleParameters >& parameters);
     void setMuscleForces(const std::vector<double>& muscleTendonForces);
     void getMomentArmsOnDof(std::vector<double>& momentArms, unsigned whichDof) const;
+    void getOptimalFibreLengths(std::vector<double>& optimalFibreLengths) const;
     
     double getGlobalEmDelay() const; //NOTE: this will be replaced by singular muscles emdelay
     

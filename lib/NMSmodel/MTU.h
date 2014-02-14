@@ -75,7 +75,8 @@ public:
     double getStrengthCoefficient() const {return strengthCoefficient_;}
     void   setTendonSlackLength(double tendonSlackLength);
     double getTendonSlackLength() const {return tendonSlackLength_;};
-    double getOptimalFiberLength() const { return optimalFibreLength_;}
+    void   setOptimalFibreLength(double optimalFibreLength);
+    double getOptimalFibreLength() const { return optimalFibreLength_;}
     double getPennationAngle() const {return pennationAngle_; }
 
     double getFiberLength() const {return fibreLength_;}

@@ -15,7 +15,7 @@
 class ElasticTendon_BiSec {
 
 public:
-    typedef Curve<CurveMode::Offline, CurveMode::Linear> CurveOffline;
+    typedef Curve<CurveMode::Offline> CurveOffline;
     ElasticTendon_BiSec();
     ElasticTendon_BiSec(std::string id);
     ElasticTendon_BiSec( double optimalFibreLength,
@@ -51,6 +51,7 @@ public:
     double getFibreLength() { return fibreLength_;}
     void setStrengthCoefficient(double strengthCoefficient);
     void setTendonSlackLength(double tendonSlackLength);
+    void setOptimalFibreLength(double optimalFibreLength) { optimalFibreLength_ = optimalFibreLength; }
     void setCurves(const CurveOffline& activeForceLengthCurve, 
                    const CurveOffline& passiveForceLengthCurve, 
                    const CurveOffline& forceVelocityCurve,

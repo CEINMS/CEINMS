@@ -372,6 +372,15 @@ void MTU<Activation, Tendon, mode>::setTendonSlackLength(double tendonSlackLengt
 
 
 template<typename Activation, typename Tendon, CurveMode::Mode mode>
+void MTU<Activation, Tendon, mode>::setOptimalFibreLength(double optimalFiberLength) {
+    
+    optimalFibreLength_ = optimalFiberLength;
+    tendonDynamic_.setOptimalFibreLength(optimalFibreLength_);
+    resetState();
+}
+
+
+template<typename Activation, typename Tendon, CurveMode::Mode mode>
 double MTU<Activation, Tendon, mode>::getPenalty() const {
   
     double penalty(tendonDynamic_.getPenalty());

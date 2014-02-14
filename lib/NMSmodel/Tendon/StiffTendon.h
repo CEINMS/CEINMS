@@ -51,6 +51,7 @@ public:
     double getFibreLength() { return fibreLength_;}
     void setStrengthCoefficient(double strengthCoefficient) { };
     void setTendonSlackLength(double tendonSlackLength) { tendonSlackLength_ = tendonSlackLength; }
+    void setOptimalFibreLength(double optimalFibreLength) { optimalFibreLength_ = optimalFibreLength; }
     void setCurves(const CurveOffline& activeForceLengthCurve, 
                    const CurveOffline& passiveForceLengthCurve, 
                    const CurveOffline& forceVelocityCurve,

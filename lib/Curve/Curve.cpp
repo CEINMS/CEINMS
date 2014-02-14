@@ -8,9 +8,11 @@
 //
 
 #include "Curve.h"
-
+#include <iostream>
 #include <vector>
 using std::vector;
+
+#include <algorithm>
 
 //const static int pointsNumber = 17;
 template <CurveMode::Mode mode,  CurveMode::Interpolation T>
@@ -231,7 +233,7 @@ template <CurveMode::Mode mode,  CurveMode::Interpolation T>
 unsigned Curve<mode, T>::getAbscissaPoint(double xValue) const{
     
   
-    const unsigned n = x_.size();
+  /*  const unsigned n = x_.size();
     unsigned k = 0; 
     if (n == 2)
         k = 0;    
@@ -250,6 +252,18 @@ unsigned Curve<mode, T>::getAbscissaPoint(double xValue) const{
                 break;
         }
     }
+    return k;*/
+  
+
+    
+    const unsigned n = x_.size();
+    unsigned k = 0; 
+    if (n == 2)
+        k = 0;    
+    else k = (std::distance(x_.begin(), std::lower_bound(x_.begin(), x_.end(), xValue)) - 1);
+
+  //  std::cout << "k, k1 "<< k << " " <<k1 << std::endl;
+    
     return k;
 }
 
@@ -282,7 +296,8 @@ double Curve<mode, T>::getValue(double xalue, unsigned abscissaPoint, Int2Type<C
 
     const unsigned k(abscissaPoint);
     double dx = xalue - x_.at(k);
-    return (y_.at(k) + dx * ( b_.at(k) + dx * ( c_.at(k) + dx * d_.at(k) ) ) );
+    double result(y_.at(k) + dx * ( b_.at(k) + dx * ( c_.at(k) + dx * d_.at(k) ) ) );
+    return result;
 }
 
 
@@ -291,19 +306,10 @@ double Curve<mode, T>::getValue(double xalue, unsigned abscissaPoint, Int2Type<C
   
     const unsigned k(abscissaPoint);
     double dx = xalue - x_.at(k);
-    return b_.at(K)*dx;
+    return b_.at(k)*dx;
     
 }
 
-
-template <CurveMode::Mode mode,  CurveMode::Interpolation T>
-double Curve<mode, T>::getValueLinInt(double xalue, unsigned abscissaPoint, Int2Type<CurveMode::Linear>) const {
-  
-    const unsigned k(abscissaPoint);
-    double dx = xalue - x_.at(k);
-    return b_.at(K)*dx;
-    
-}
 
 /*******************************************************************************/
 /* INTERPOLATE_SPLINE: given a spline function and an x-value, this routine

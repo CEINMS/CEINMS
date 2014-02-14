@@ -60,7 +60,7 @@ void XmlWriter::setParameters(NMSmodelT& subject) {
         (*i).c1(currentMuscle.getC1());
         (*i).c2(currentMuscle.getC2());
         (*i).shapeFactor(currentMuscle.getShapeFactor());
-        (*i).optimalFibreLength(currentMuscle.getOptimalFiberLength());
+        (*i).optimalFibreLength(currentMuscle.getOptimalFibreLength());
         (*i).pennationAngle(currentMuscle.getPennationAngle());
         (*i).tendonSlackLength(currentMuscle.getTendonSlackLength());
         mtuDefault.percentageChange(currentMuscle.getPercentageChange());
