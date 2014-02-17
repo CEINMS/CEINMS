@@ -224,6 +224,32 @@ int main(int argc, char** argv) {
             runThreads(consumer, emgProducer, lmtMaProducer, externalTorqueProducer);
             break;
         } 
+        
+          case NMSModelCfg::HybridExponentialActivationElasticTendonBiSecOnline: { 
+            typedef NMSmodel<ExponentialActivation, ElasticTendon_BiSec, CurveMode::Online> MyNMSmodel;
+            typedef Hybrid::ErrorMinimizerAnnealing<MyNMSmodel> MyErrorMinimizer;
+            SetupDataStructure<MyNMSmodel> setupData(subjectFile);
+            MyNMSmodel mySubject;
+            setupData.createCurves();
+            setupData.createMuscles(mySubject);
+            setupData.createDoFs(mySubject);
+            MyErrorMinimizer errorMinimizer(mySubject);
+            HybridWeightings weightings;
+            executionCfg.getHybridWeightings(weightings.alpha, weightings.beta, weightings.gamma);
+            errorMinimizer.setWeightings(weightings);
+            vector<string> toPredict, toTrack;
+            executionCfg.getMusclesToPredict(toPredict);
+            executionCfg.getMusclesToTrack(toTrack);
+            errorMinimizer.setMusclesNamesWithEmgToPredict(toPredict);
+            errorMinimizer.setMusclesNamesWithEmgToTrack(toTrack);
+            double rt, t, epsilon;
+            unsigned noEpsilon, ns, nt, maxNoEval;
+            executionCfg.getAnnealingParameters(nt, ns, rt, t, maxNoEval, epsilon, noEpsilon);
+            errorMinimizer.setAnnealingParameters(nt, ns, rt, t, maxNoEval, epsilon, noEpsilon);
+            ModelEvaluationHybrid<MyNMSmodel, MyErrorMinimizer> consumer(mySubject, errorMinimizer);
+            runThreads(consumer, emgProducer, lmtMaProducer, externalTorqueProducer);
+            break;
+        } 
 
 
         default:

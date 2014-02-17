@@ -27,7 +27,7 @@ Parameter::ID Parameter::getID() const{
     if     (boost::iequals(name_, "c1"))                  id = C1;
     else if(boost::iequals(name_, "c2"))                  id = C2;
     else if(boost::iequals(name_, "shapeFactor"))         id = ShapeFactor;
-    else if(boost::iequals(name_, "optimalFiberLength"))  id = OptimalFiberLength;
+    else if(boost::iequals(name_, "optimalFibreLength"))  id = OptimalFibreLength;
     else if(boost::iequals(name_, "pennationAngle"))      id = PennationAngle;
     else if(boost::iequals(name_, "tendonSlackLength"))   id = TendonSlackLength;
     else if(boost::iequals(name_, "maxIsometricForce"))   id = MaxIsometricForce;

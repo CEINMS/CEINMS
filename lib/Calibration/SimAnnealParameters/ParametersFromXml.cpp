@@ -186,7 +186,7 @@ void ParametersFromXml<NMSmodelT>::getCoefficients(ParameterID parameterID, std:
                 break;
             case Parameter::MaxIsometricForce:
                 break;
-            case Parameter::OptimalFiberLength:
+            case Parameter::OptimalFibreLength:
                 subject_.getOptimalFibreLengths(coefficients);
                 break;
             case Parameter::PennationAngle:
@@ -222,7 +222,7 @@ void ParametersFromXml<NMSmodelT>::setCoefficients(ParameterID parameterID, cons
                 break;
             case Parameter::MaxIsometricForce:
                 break;
-            case Parameter::OptimalFiberLength:
+            case Parameter::OptimalFibreLength:
                 subject_.setOptimalFibreLengths(coefficients);
                 break;
             case Parameter::PennationAngle:

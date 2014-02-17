@@ -153,8 +153,9 @@ void ModelEvaluationHybrid<NMSmodelT, ErrorMinimizerT>::operator()() {
             emgFromQueue.pop_back();
             if(emgFromQueue.empty())
                 runCondition = false;
-        } while(emgTime < lmtMaTime);
+        } while(emgTime < lmtMaTime && runCondition);
          
+        if(!runCondition) break;
         subject_.setTime(emgTime);
         subject_.setEmgs(emgFromQueue);      
    

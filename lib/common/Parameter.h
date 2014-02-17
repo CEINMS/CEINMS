@@ -30,7 +30,7 @@ public:
         C1,
         C2,
         ShapeFactor,
-        OptimalFiberLength,
+        OptimalFibreLength,
         PennationAngle,   
         TendonSlackLength,
         MaxIsometricForce,
