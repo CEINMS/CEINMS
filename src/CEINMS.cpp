@@ -101,6 +101,7 @@ int main(int argc, char** argv) {
     string subjectFile;
     string executionFile;
     string inputDirectory;
+    string outputDirectory;
     string emgGeneratorFile;
 
     int opt;
@@ -110,6 +111,7 @@ int main(int argc, char** argv) {
     ("subject,s", po::value<string>(&subjectFile), "subject xml file")
     ("execution,x", po::value<string>(&executionFile),  "execution xml file")
     ("input-dir,i", po::value<string>(&inputDirectory), "trial directory path")
+    ("output-dir,o", po::value<string>(&outputDirectory)->default_value("./Output"), "output directory")
     ("emg-generator,eg", po::value<string>(&emgGeneratorFile)->default_value("cfg/xml/emgGenerator.xml"), "EMG mapping");
     
     po::variables_map vm;
@@ -148,7 +150,7 @@ int main(int argc, char** argv) {
             typedef NMSmodel<ExponentialActivation, StiffTendon, CurveMode::Online> MyNMSmodel;
             MyNMSmodel mySubject;
             setupSubject(mySubject, subjectFile);
-            ModelEvaluationOnline<MyNMSmodel> consumer(mySubject);
+            ModelEvaluationOnline<MyNMSmodel> consumer(mySubject, outputDirectory);
             runThreads(consumer, emgProducer, lmtMaProducer, externalTorqueProducer);
             break;
         }
@@ -157,7 +159,7 @@ int main(int argc, char** argv) {
             typedef NMSmodel<ExponentialActivation, StiffTendon, CurveMode::Offline> MyNMSmodel;
             MyNMSmodel mySubject;
             setupSubject(mySubject, subjectFile);
-            ModelEvaluationOffline<MyNMSmodel> consumer(mySubject);
+            ModelEvaluationOffline<MyNMSmodel> consumer(mySubject, outputDirectory);
             runThreads(consumer, emgProducer, lmtMaProducer, externalTorqueProducer);
             break;
         }
@@ -184,7 +186,7 @@ int main(int argc, char** argv) {
             typedef NMSmodel<ExponentialActivation, ElasticTendon_BiSec, CurveMode::Online> MyNMSmodel;
             MyNMSmodel mySubject;
             setupSubject(mySubject, subjectFile);
-            ModelEvaluationOnline<MyNMSmodel> consumer(mySubject);
+            ModelEvaluationOnline<MyNMSmodel> consumer(mySubject, outputDirectory);
             runThreads(consumer, emgProducer, lmtMaProducer, externalTorqueProducer);
             break;
         }
@@ -193,7 +195,7 @@ int main(int argc, char** argv) {
             typedef NMSmodel<ExponentialActivation, ElasticTendon_BiSec, CurveMode::Offline> MyNMSmodel;
             MyNMSmodel mySubject;
             setupSubject(mySubject, subjectFile);
-            ModelEvaluationOffline<MyNMSmodel> consumer(mySubject);
+            ModelEvaluationOffline<MyNMSmodel> consumer(mySubject, outputDirectory);
             runThreads(consumer, emgProducer, lmtMaProducer, externalTorqueProducer);
             break;
         }
@@ -220,7 +222,7 @@ int main(int argc, char** argv) {
             unsigned noEpsilon, ns, nt, maxNoEval;
             executionCfg.getAnnealingParameters(nt, ns, rt, t, maxNoEval, epsilon, noEpsilon);
             errorMinimizer.setAnnealingParameters(nt, ns, rt, t, maxNoEval, epsilon, noEpsilon);
-            ModelEvaluationHybrid<MyNMSmodel, MyErrorMinimizer> consumer(mySubject, errorMinimizer);
+            ModelEvaluationHybrid<MyNMSmodel, MyErrorMinimizer> consumer(mySubject, errorMinimizer, outputDirectory);
             runThreads(consumer, emgProducer, lmtMaProducer, externalTorqueProducer);
             break;
         } 
@@ -246,7 +248,7 @@ int main(int argc, char** argv) {
             unsigned noEpsilon, ns, nt, maxNoEval;
             executionCfg.getAnnealingParameters(nt, ns, rt, t, maxNoEval, epsilon, noEpsilon);
             errorMinimizer.setAnnealingParameters(nt, ns, rt, t, maxNoEval, epsilon, noEpsilon);
-            ModelEvaluationHybrid<MyNMSmodel, MyErrorMinimizer> consumer(mySubject, errorMinimizer);
+            ModelEvaluationHybrid<MyNMSmodel, MyErrorMinimizer> consumer(mySubject, errorMinimizer, outputDirectory);
             runThreads(consumer, emgProducer, lmtMaProducer, externalTorqueProducer);
             break;
         } 
