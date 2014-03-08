@@ -44,7 +44,7 @@ add_subdirectory(lib/Producers)
 add_subdirectory(lib/Calibration)
 add_subdirectory(lib/common)
 add_subdirectory(src)
-add_subdirectory(sandBox)
+#add_subdirectory(sandBox)
 
 set(dir ${CMAKE_CURRENT_SOURCE_DIR}/build)
 set(EXECUTABLE_OUTPUT_PATH ${dir} CACHE PATH "Build directory" FORCE)
