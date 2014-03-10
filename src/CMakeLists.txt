@@ -59,6 +59,7 @@ TARGET_LINK_LIBRARIES( CEINMS-osim
       ${CMAKE_THREAD_LIBS_INIT}
       ${Boost_LIBRARIES}
       ${XERCES_LIBRARY}    
+      ${OPENSIM_LIBRARIES}
 )
 
 if(UNIX)
@@ -99,7 +100,7 @@ TARGET_LINK_LIBRARIES( CEINMScalibrate-osim
       FileIO
       ${Boost_LIBRARIES}
       ${XERCES_LIBRARY}
-      ${OPENSIM_ALL_LIBS}
+      ${OPENSIM_LIBRARIES}
 )
 
 if(UNIX)
