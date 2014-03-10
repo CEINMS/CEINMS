@@ -1,0 +1,9 @@
+## Authors: Monica Reggiani, Claudio Pizzolato
+add_subdirectory(common)
+add_subdirectory(xmlInput)
+add_subdirectory(FileIO)
+#add_subdirectory(FileIO/EMGgenerator)
+add_subdirectory(Producers)
+add_subdirectory(NMSmodel)
+add_subdirectory(Calibration)
+

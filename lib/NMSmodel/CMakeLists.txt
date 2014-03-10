@@ -1,28 +1,34 @@
-INCLUDE_DIRECTORIES(
-  ${CMAKE_SOURCE_DIR}/lib/xmlInput 
+## Authors: Monica Reggiani, Claudio Pizzolato
+
+include_directories(
   ${CMAKE_SOURCE_DIR}/lib/Curve
-  ${CMAKE_SOURCE_DIR}/lib/NMSmodel
-  ${CMAKE_SOURCE_DIR}/lib/NMSmodel/Tendon
-  ${CMAKE_SOURCE_DIR}/lib/NMSmodel/Activation
+  ${CMAKE_CURRENT_SOURCE_DIR}
+  ${CMAKE_CURRENT_SOURCE_DIR}/Tendon
+  ${CMAKE_CURRENT_SOURCE_DIR}/Activation
   ${CMAKE_SOURCE_DIR}/lib/OdeInt
   ${CMAKE_SOURCE_DIR}/lib/RootSolvers
+  ${xmlInput_INCLUDE_DIRS}
+  ${ceinms_common_INCLUDE_DIRS}
+  ${FileIO_INCLUDE_DIRS}
 )
 
-SET(Tendon_SOURCES
+set(Tendon_SOURCES
   Tendon/ElasticTendon.cpp
   Tendon/ElasticTendon_BiSec.cpp
   Tendon/StiffTendon.cpp
 ) 
 
 
-SET(Activation_SOURCES
+set(Activation_SOURCES
   Activation/ExponentialActivation.cpp
   Activation/PiecewiseActivation.cpp
 ) 
 
-ADD_LIBRARY(NMSmodel STATIC
+add_library(NMSmodel STATIC
   NMSmodel.cpp MuscleParameters.cpp 
   ${Tendon_SOURCES}
   ${Activation_SOURCES}
 )
+
+set(NMSmodel_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/Activation ${CMAKE_CURRENT_SOURCE_DIR}/Tendon CACHE STRING "Include directory for NMSmodel library")
 

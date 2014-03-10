@@ -1,36 +1,30 @@
-INCLUDE_DIRECTORIES(
-  /usr/local/include/ 
-  ${CMAKE_SOURCE_DIR}/lib/Producers
-  ${CMAKE_SOURCE_DIR}/lib/Producers/FromFile
-  ${CMAKE_SOURCE_DIR}/lib/Producers/FromOpenSim
-  ${CMAKE_SOURCE_DIR}/lib/NMSmodel
-  ${CMAKE_SOURCE_DIR}/lib/NMSmodel/Tendon
-  ${CMAKE_SOURCE_DIR}/lib/NMSmodel/Activation
+## Authors: Monica Reggiani, Claudio Pizzolato
+
+include_directories(
+  ${Producers_INCLUDE_DIRS}
+  ${NMSmodel_INCLUDE_DIRS}
   ${CMAKE_SOURCE_DIR}/lib/Curve
-  ${CMAKE_SOURCE_DIR}/lib/xmlInput
-  ${CMAKE_SOURCE_DIR}/lib/FileIO
-  ${CMAKE_SOURCE_DIR}/lib/FileIO/EMGgenerator
-  ${CMAKE_SOURCE_DIR}/lib/Calibration
-  ${CMAKE_SOURCE_DIR}/lib/Calibration/SimAnnealParameters
-  ${CMAKE_SOURCE_DIR}/lib/Calibration/ObjectiveFunctions
-  ${CMAKE_SOURCE_DIR}/lib/Calibration/AmoebaParameters
-  ${CMAKE_SOURCE_DIR}/lib/Calibration/TorqueComputationModes
+  ${xmlInput_INCLUDE_DIRS}
+  ${FileIO_INCLUDE_DIRS}
+  ${Calibration_INCLUDE_DIRS}
   ${CMAKE_SOURCE_DIR}/lib/Hybrid
-  ${CMAKE_SOURCE_DIR}/lib/common
+  ${ceinms_common_INCLUDE_DIRS}
 )
 
-LINK_DIRECTORIES(
-  ${CMAKE_SOURCE_DIR}/lib/xmlInput
-  ${CMAKE_SOURCE_DIR}/lib/NMSmodel
-  ${CMAKE_SOURCE_DIR}/lib/FileIO
-  ${CMAKE_SOURCE_DIR}/lib/Producers
-  ${CMAKE_SOURCE_DIR}/lib/Calibration
-  ${CMAKE_SOURCE_DIR}/lib/Hybrid
-)
+include_directories(${OPENSIM_INCLUDE_DIRS} ${SIMTK_INCLUDE_DIRS})
+
+#LINK_DIRECTORIES(
+#  ${CMAKE_SOURCE_DIR}/lib/xmlInput
+#  ${CMAKE_SOURCE_DIR}/lib/NMSmodel
+#  ${CMAKE_SOURCE_DIR}/lib/FileIO
+#  ${CMAKE_SOURCE_DIR}/lib/Producers
+#  ${CMAKE_SOURCE_DIR}/lib/Calibration
+#  ${CMAKE_SOURCE_DIR}/lib/Hybrid
+#)
 
 
 
-ADD_EXECUTABLE( CEINMS  CEINMS.cpp ModelEvaluationBase.cpp ${CMAKE_SOURCE_DIR}/lib/FileIO/EMGgenerator/EMGgeneratorFromXml.cpp)
+ADD_EXECUTABLE( CEINMS  CEINMS.cpp ModelEvaluationBase.cpp)
 TARGET_LINK_LIBRARIES( CEINMS
       FileIO
       xmlInput
@@ -42,16 +36,15 @@ TARGET_LINK_LIBRARIES( CEINMS
 )
 
 #enable_language(Fortran)
-if(UNIX)
-find_package(LAPACK)
-set(lapack_unix ${LAPACK_LIBRARIES} ${BLAS_LIBRARIES})    
-endif(UNIX)
+#if(UNIX)
+#find_package(LAPACK)
+#set(lapack_unix ${LAPACK_LIBRARIES} ${BLAS_LIBRARIES})
+#endif(UNIX)
 
-ADD_EXECUTABLE( CEINMS-osim  CEINMS-osim.cpp ModelEvaluationBase.cpp ${CMAKE_SOURCE_DIR}/lib/FileIO/EMGgenerator/EMGgeneratorFromXml.cpp ProducersFromOpenSim.cpp)
+if(OpenSim_FOUND)
+  add_executable( CEINMS-osim  CEINMS-osim.cpp ModelEvaluationBase.cpp ProducersFromOpenSim.cpp)
 
-
-
-TARGET_LINK_LIBRARIES( CEINMS-osim
+  target_link_libraries( CEINMS-osim
       FileIO
       xmlInput
       NMSmodel
@@ -60,13 +53,14 @@ TARGET_LINK_LIBRARIES( CEINMS-osim
       ${Boost_LIBRARIES}
       ${XERCES_LIBRARY}    
       ${OPENSIM_LIBRARIES}
-)
+  )
 
-if(UNIX)
-TARGET_LINK_LIBRARIES( CEINMS-osim
+  if(UNIX)
+  target_link_libraries( CEINMS-osim
 	${lapack_unix} )
-endif(UNIX)
+  endif(UNIX)
 
+endif()
 
 set(CEINMScalibrate_SOURCES
     CEINMScalibration.cpp 
@@ -80,7 +74,7 @@ set(CEINMScalibrate_SOURCES
     
 )
 add_executable( CEINMScalibrate ${CEINMScalibrate_SOURCES})
-TARGET_LINK_LIBRARIES( CEINMScalibrate
+target_link_libraries( CEINMScalibrate
       xmlInputCalibration
       NMSmodel
       FileIO
@@ -88,22 +82,24 @@ TARGET_LINK_LIBRARIES( CEINMScalibrate
       ${XERCES_LIBRARY}
 )
 
-set(CEINMScalibrate-osim_SOURCES
+if(OpenSim_FOUND)
+  set(CEINMScalibrate-osim_SOURCES
     CEINMScalibration-osim.cpp 
     ${CMAKE_SOURCE_DIR}/lib/Calibration/InputDataInterpreter.cpp
     ${CMAKE_SOURCE_DIR}/lib/Calibration/InputDataInterpreterOsim.cpp )
     
-add_executable( CEINMScalibrate-osim ${CEINMScalibrate-osim_SOURCES} )
-TARGET_LINK_LIBRARIES( CEINMScalibrate-osim
+  add_executable( CEINMScalibrate-osim ${CEINMScalibrate-osim_SOURCES} )
+  target_link_libraries( CEINMScalibrate-osim
       xmlInputCalibration
       NMSmodel
       FileIO
       ${Boost_LIBRARIES}
       ${XERCES_LIBRARY}
       ${OPENSIM_LIBRARIES}
-)
+  )
 
-if(UNIX)
-TARGET_LINK_LIBRARIES( CEINMScalibrate-osim
+  if(UNIX)
+  target_link_libraries( CEINMScalibrate-osim
 	${lapack_unix} )
-endif(UNIX)
+  endif(UNIX)
+endif()

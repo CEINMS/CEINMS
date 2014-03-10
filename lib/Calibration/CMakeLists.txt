@@ -32,16 +32,28 @@
 # )
 
 
-INCLUDE_DIRECTORIES(
-  ${CMAKE_SOURCE_DIR}/lib/xmlInput 
-  ${CMAKE_SOURCE_DIR}/lib/NMSmodel
+include_directories(
+  ${xmlInput_INCLUDE_DIRS}
+  ${NMSmodel_INCLUDE_DIRS}
   ${CMAKE_SOURCE_DIR}/lib/Curve
-  ${CMAKE_SOURCE_DIR}/lib/FileIO
-  ${CMAKE_SOURCE_DIR}/lib/Calibration
-  ${CMAKE_SOURCE_DIR}/lib/common
+  ${FileIO_INCLUDE_DIRS}
+  ${CMAKE_CURRENT_SOURCE_DIR}
+  ${ceinms_common_INCLUDE_DIRS}
 )
 
-#ADD_LIBRARY(Calibration STATIC
+if(OpenSim_FOUND)
+  include_directories(${OPENSIM_INCLUDE_DIRS} ${SIMTK_INCLUDE_DIRS})
+  set(Calibration_SOURCE InputDataInterpreter.cpp InputDataInterpreterOsim.cpp)
+else()
+  set(Calibration_SOURCE InputDataInterpreter.cpp)
+endif()
+add_library(Calibration STATIC ${Calibration_SOURCE})
+target_link_libraries(Calibration xmlInput FileIO)
+
+if(OpenSim_FOUND)
+  target_link_libraries(Calibration ${OPENSIM_LIBRARIES}) #should find out which ones are actually needed
+endif()
+
 #  SimulatedAnnealing.cpp 
  # Amoeba.cpp
  # TorquesComputation.cpp
@@ -54,4 +66,6 @@ INCLUDE_DIRECTORIES(
  # ${AmoebaObjectiveFunctions_SOURCES}
  # ${AmoebaParameters_SOURCES}
 #)
+
+set(Calibration_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/ObjectiveFunctions ${CMAKE_CURRENT_SOURCE_DIR}/SimAnnealParameters  ${CMAKE_CURRENT_SOURCE_DIR}/TorqueComputationModes CACHE STRING "Include directories for Calibration library")
 

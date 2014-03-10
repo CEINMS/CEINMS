@@ -98,7 +98,6 @@ find_library(${NameSpace}SimTKsimbody
 
 set(OPENSIM_LIBRARIES ${osimSimulation} ${osimCommon} ${osimActuators} ${osimAnalyses} ${osimTools} ${${NameSpace}SimTKcommon} ${${NameSpace}SimTKmath} ${${NameSpace}SimTKsimbody})
 
-message("opensim libs: ${OPENSIM_LIBRARIES}")
 
 #IF(WIN32)
 #	SET(PLATFORM_LIBS  pthreadVC2)
