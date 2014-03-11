@@ -10,6 +10,7 @@ include_directories(
   ${CMAKE_SOURCE_DIR}/lib/Hybrid
   ${ceinms_common_INCLUDE_DIRS}
 )
+include_directories(${Boost_INCLUDE_DIRS})
 
 include_directories(${OPENSIM_INCLUDE_DIRS} ${SIMTK_INCLUDE_DIRS})
 
@@ -32,7 +33,6 @@ TARGET_LINK_LIBRARIES( CEINMS
       Producers
       ${CMAKE_THREAD_LIBS_INIT}
       ${Boost_LIBRARIES}
-      ${XERCES_LIBRARY}  
 )
 
 #enable_language(Fortran)
@@ -41,7 +41,7 @@ TARGET_LINK_LIBRARIES( CEINMS
 #set(lapack_unix ${LAPACK_LIBRARIES} ${BLAS_LIBRARIES})
 #endif(UNIX)
 
-if(OpenSim_FOUND)
+if(OPENSIM_FOUND)
   add_executable( CEINMS-osim  CEINMS-osim.cpp ModelEvaluationBase.cpp ProducersFromOpenSim.cpp)
 
   target_link_libraries( CEINMS-osim
@@ -51,7 +51,6 @@ if(OpenSim_FOUND)
       ProducersOSim
       ${CMAKE_THREAD_LIBS_INIT}
       ${Boost_LIBRARIES}
-      ${XERCES_LIBRARY}    
       ${OPENSIM_LIBRARIES}
   )
 
@@ -63,34 +62,26 @@ if(OpenSim_FOUND)
 endif()
 
 set(CEINMScalibrate_SOURCES
-    CEINMScalibration.cpp 
-    ${CMAKE_SOURCE_DIR}/lib/Calibration/InputDataInterpreter.cpp
-    
+    CEINMScalibration.cpp
 )
 
-set(CEINMScalibrate_SOURCES
-    CEINMScalibration.cpp 
-    ${CMAKE_SOURCE_DIR}/lib/Calibration/InputDataInterpreter.cpp
-    
-)
 add_executable( CEINMScalibrate ${CEINMScalibrate_SOURCES})
 target_link_libraries( CEINMScalibrate
       xmlInputCalibration
+      Calibration
       NMSmodel
       FileIO
       ${Boost_LIBRARIES}
-      ${XERCES_LIBRARY}
 )
 
-if(OpenSim_FOUND)
+if(OPENSIM_FOUND)
   set(CEINMScalibrate-osim_SOURCES
-    CEINMScalibration-osim.cpp 
-    ${CMAKE_SOURCE_DIR}/lib/Calibration/InputDataInterpreter.cpp
-    ${CMAKE_SOURCE_DIR}/lib/Calibration/InputDataInterpreterOsim.cpp )
+    CEINMScalibration-osim.cpp  )
     
   add_executable( CEINMScalibrate-osim ${CEINMScalibrate-osim_SOURCES} )
   target_link_libraries( CEINMScalibrate-osim
       xmlInputCalibration
+      Calibration
       NMSmodel
       FileIO
       ${Boost_LIBRARIES}

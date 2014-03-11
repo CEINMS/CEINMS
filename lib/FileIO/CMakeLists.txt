@@ -6,7 +6,7 @@ set(EMGgenerator_SOURCES
   EMGgenerator/EMGgeneratorFrom6To24.cpp
   EMGgenerator/EMGgeneratorFromXml.cpp
 )
-
+include_directories(${Boost_INCLUDE_DIRS})
 include_directories(EMGgenerator
                     ${xmlInput_INCLUDE_DIRS}) #TODO check if need include ceinms_common
 

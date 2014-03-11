@@ -21,9 +21,10 @@ set(Producers_SOURCES
 
 
 include_directories(${ceinms_common_INCLUDE_DIRS} ${xmlInput_INCLUDE_DIRS} ${FileIO_INCLUDE_DIRS})
+include_directories(${Boost_INCLUDE_DIRS})
 include_directories(${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/FromFile)
 
-if(OpenSim_FOUND)
+if(OPENSIM_FOUND)
   include_directories(${OPENSIM_INCLUDE_DIRS} ${SIMTK_INCLUDE_DIRS} ${CMAKE_CURRENT_SOURCE_DIR}/FromOpenSim)
 endif()
 
@@ -34,7 +35,7 @@ add_library(Producers STATIC
 
 target_link_libraries(Producers FileIO)
 
-if(OpenSim_FOUND)
+if(OPENSIM_FOUND)
 add_library(ProducersOSim STATIC
   ${Producers_SOURCES}
   ${FromFile_SOURCES}

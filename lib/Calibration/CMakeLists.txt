@@ -41,16 +41,18 @@ include_directories(
   ${ceinms_common_INCLUDE_DIRS}
 )
 
-if(OpenSim_FOUND)
+include_directories(${Boost_INCLUDE_DIRS})
+
+if(OPENSIM_FOUND)
   include_directories(${OPENSIM_INCLUDE_DIRS} ${SIMTK_INCLUDE_DIRS})
   set(Calibration_SOURCE InputDataInterpreter.cpp InputDataInterpreterOsim.cpp)
 else()
   set(Calibration_SOURCE InputDataInterpreter.cpp)
 endif()
 add_library(Calibration STATIC ${Calibration_SOURCE})
-target_link_libraries(Calibration xmlInput FileIO)
+target_link_libraries(Calibration xmlInputCalibration FileIO)
 
-if(OpenSim_FOUND)
+if(OPENSIM_FOUND)
   target_link_libraries(Calibration ${OPENSIM_LIBRARIES}) #should find out which ones are actually needed
 endif()
 
