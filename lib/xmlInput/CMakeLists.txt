@@ -29,5 +29,5 @@ add_library(xmlInputCalibration STATIC
 
 target_link_libraries(xmlInputCalibration ceinms_common ${XERCES_LIBRARIES})
 
-set(xmlInput_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR} CACHE STRING "Include directory for xmlInput library")
+set(xmlInput_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR} ${XSD_INCLUDE_DIR} CACHE STRING "Include directory for xmlInput library")
 mark_as_advanced(xmlInput_INCLUDE_DIRS)

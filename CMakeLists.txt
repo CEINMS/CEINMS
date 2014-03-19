@@ -24,7 +24,7 @@ set(Boost_USE_STATIC_LIBS   ON)
 set(Boost_USE_MULTITHREADED ON)
 find_package(Boost COMPONENTS thread date_time program_options chrono filesystem system REQUIRED)
 
-find_package(XSD)
+find_package(XSD REQUIRED)
 
 find_package(XERCES REQUIRED)
 

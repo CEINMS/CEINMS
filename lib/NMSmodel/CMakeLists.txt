@@ -12,6 +12,8 @@ include_directories(
   ${FileIO_INCLUDE_DIRS}
 )
 
+include_directories(${Boost_INCLUDE_DIRS})
+
 set(Tendon_SOURCES
   Tendon/ElasticTendon.cpp
   Tendon/ElasticTendon_BiSec.cpp
