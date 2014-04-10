@@ -65,11 +65,11 @@ DataFromFile::DataFromFile(const string& dataFilename)
   myStream >> timeName;
     // then we have their names 
 
-
+  int noReadMuscles=0;
   do {
     myStream >> nextMuscleName;
     muscleNames_.push_back(nextMuscleName); 
-  } while (!myStream.eof());
+  } while (!myStream.eof() && ++noReadMuscles<noMuscles_);
   
 
   if (noMuscles_ != muscleNames_.size()) {
@@ -97,11 +97,12 @@ void DataFromFile::readNextData()  {
   //  cout << "\ndatafromfile check 1\n";
   myStream >>  currentDataTime_;
   //    cout << "\ndatafromfile check 1b\n";
+  int noReadMuscles=0;
   do {
     myStream >> value;
   //  cout << "datafromfile in " << dataFileName_  << ": value "<< value << endl;
     currentData_.push_back(value); 
-  } while (!myStream.eof());
+  } while (!myStream.eof() && ++noReadMuscles<noMuscles_);
   //    cout << "\ndatafromfile check 2\n";
   if(currentData_.size() != muscleNames_.size())
   {

@@ -48,8 +48,10 @@ EMGDataFromFile<EMGgenerator>::EMGDataFromFile(const string& EMGDataFilename)
   myStream >> timeName;
   // 1. first their names
   do {
+    nextMuscleName.clear();
     myStream >> nextMuscleName;
-    muscleNames_.push_back(nextMuscleName); 
+    if (nextMuscleName!="")
+        muscleNames_.push_back(nextMuscleName);
   } while (!myStream.eof());
 
   if (noMuscles_ != muscleNames_.size()) {
@@ -91,11 +93,12 @@ void EMGDataFromFile<EMGgenerator>::readNextEmgData()  {
   currentReadEMG_.clear();
   myStream >>  currentDataTime_;
  // cout << "EMGdatafromfile in emg.txt: time step "<< currentDataTime_ << endl;
+  int noReadMuscles=0;
   do {
     myStream >> value;
   //  cout << "EMGdatafromfile in emg.txt: value "<< value << endl;
-    currentReadEMG_.push_back(value); 
-  } while (!myStream.eof());
+    currentReadEMG_.push_back(value);
+  } while (!myStream.eof() && ++noReadMuscles<noMuscles_);
  // cout << "EMGDataFromFile: just read " << currentReadEMG_.size() << " values\n"; 
   EMGgenerator_.convert(currentReadEMG_, currentEMGData_);
  
