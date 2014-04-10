@@ -31,7 +31,7 @@ inputDir_(inputDir)
 void EMGFromFile::operator()()
 {
 
-	string filename(inputDir_+"/"+ FileUtils::getFile(inputDir_, "emg.txt"));
+	string filename(FileUtils::getFile(inputDir_, "emg.txt"));
 
 #ifdef LOG
   cout << "emg produce" << endl;

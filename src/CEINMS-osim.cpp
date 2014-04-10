@@ -157,12 +157,12 @@ int main(int argc, char** argv) {
     
     ExecutionXmlReader executionCfg(executionFile);          
 
-	string idStoFilename(inputDir+"/"+ FileUtils::getFile(inputDir, "id.sto"));
+	string idStoFilename(FileUtils::getFile(inputDir, "id.sto"));
 	ExternalTorqueFromStorage externalTorqueProducer(idStoFilename);
 	
 	EMGFromFile emgProducer(inputDir);
 
-	string ikMotFilename(inputDir+"/"+ FileUtils::getFile(inputDir, "ik.mot"));
+	string ikMotFilename(FileUtils::getFile(inputDir, "ik.mot"));
     
     
   NMSModelCfg::RunMode runMode = executionCfg.getRunMode();
