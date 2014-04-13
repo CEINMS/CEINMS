@@ -11,6 +11,7 @@
 #define TrialData_h
 
 #include <vector>
+#include <map>
 #include <string>
 #include <iostream>
 
@@ -21,6 +22,7 @@ public:
   std::string id_; // OK
   int noMuscles_; // OK
   int noEmgSteps_; // OK
+  std::vector< std::string > muscleNames_;
   std::vector< double > emgTimeSteps_;  // OK
   std::vector< std::vector < double > > emgData_; // OK 
   int noLmtSteps_; // OK
@@ -29,6 +31,7 @@ public:
   int noDoF_; // OK
   std::vector<std::string> dofNames_; // OK 
   // each ma has a different matrix
+  std::map<std::string, std::vector<std::string> > maMusclesNames_;
   std::vector< std::vector < std::vector < double > > > maData_; // OK 
   unsigned int noTorqueSteps_;
   std::vector< double > torqueTimeSteps_; // OK

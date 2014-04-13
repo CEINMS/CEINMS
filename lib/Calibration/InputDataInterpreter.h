@@ -19,7 +19,7 @@ class InputDataInterpreter {
   
 public:
     InputDataInterpreter();
-    InputDataInterpreter(const std::vector<std::string>& muscleNames, const std::vector<std::string>& dofNames);
+    InputDataInterpreter(const std::vector<std::string>& muscleNames, const std::vector<std::string>& dofNames); //TODO: should add the muscles for each dof's moment arms
     void convert(const std::list<std::string>& from, std::list<TrialData>& to); 
     void convert(const std::list<std::string>& from, std::vector<TrialData>& to); 
     void convert(const std::string& from, TrialData& to);
@@ -31,6 +31,7 @@ private:
     void readMuscleTendonLengthFile(TrialData& trial);
     void readMomentArmsFiles(TrialData& trial);
     void readExternalTorqueFiles(TrialData& trial);
+    bool checkOrSetMuscleNames(const std::vector <std::string>& muscleNames, std::vector<size_t>& muscleIndices); 
     bool isValid();
     std::string inputDirectory_;
     std::vector<std::string> muscleNames_;
