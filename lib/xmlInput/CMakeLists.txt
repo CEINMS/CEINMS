@@ -11,21 +11,25 @@ include_directories(${XSD_INCLUDE_DIR})
 include_directories(${Boost_INCLUDE_DIRS})
 
 #TODO: why are some files missing from these lists?
-add_library(xmlInput STATIC
-    subject.cxx
+set(xmlInput_SOURCES  subject.cxx execution.cxx emgGenerator.cxx ExecutionXmlReader.cpp)
+set(xmlInput_HEADERS  subject.hxx execution.hxx emgGenerator.hxx ExecutionXmlReader.h NMSmodelConfig.h)
+
+source_group("Headers" FILES ${xmlInput_HEADERS})
+source_group("Sources" FILES ${xmlInput_SOURCES})
+add_library(xmlInput STATIC ${xmlInput_SOURCES} ${xmlInput_HEADERS}
 #  NMSmodel.cxx
-  execution.cxx
-  emgGenerator.cxx
-  ExecutionXmlReader.cpp
 )
 
 target_link_libraries(xmlInput ${XERCES_LIBRARIES})
 
-add_library(xmlInputCalibration STATIC
-    subject.cxx
-    emgGenerator.hxx
-    calibration.cxx
-    CalibrationXmlReader.cpp)
+
+set(xmlInputCalibration_SOURCES  subject.cxx calibration.cxx emgGenerator.cxx CalibrationXmlReader.cpp)
+set(xmlInputCalibration_HEADERS  subject.hxx calibration.hxx emgGenerator.hxx CalibrationXmlReader.h CalibrationCfg.h NMSmodelConfig.h)
+
+source_group("Headers" FILES ${xmlInputCalibration_HEADERS})
+source_group("Sources" FILES ${xmlInputCalibration_SOURCES})
+
+add_library(xmlInputCalibration STATIC ${xmlInputCalibration_SOURCES} ${xmlInputCalibration_HEADERS})
 
 target_link_libraries(xmlInputCalibration ceinms_common ${XERCES_LIBRARIES})
 

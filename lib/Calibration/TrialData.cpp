@@ -14,7 +14,7 @@ using std::endl;
 using std::vector;
 #include <stdlib.h>
 #include <math.h>
-
+#include "TrialData.h"
 
 
 void TrialData::crop(const double from, const double to) {

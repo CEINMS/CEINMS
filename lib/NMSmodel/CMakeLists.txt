@@ -19,17 +19,40 @@ set(Tendon_SOURCES
   Tendon/ElasticTendon_BiSec.cpp
   Tendon/StiffTendon.cpp
 ) 
+set(Tendon_HEADERS
+  Tendon/ElasticTendon.h
+  Tendon/ElasticTendon_BiSec.h
+  Tendon/StiffTendon.h
+)
 
 
 set(Activation_SOURCES
   Activation/ExponentialActivation.cpp
   Activation/PiecewiseActivation.cpp
 ) 
+set(Activation_HEADERS
+  Activation/ExponentialActivation.h
+  Activation/PiecewiseActivation.h
+)
+
+set(NMS_SOURCES NMSmodel.cpp MuscleParameters.cpp)
+set(NMS_HEADERS NMSmodel.h MuscleParameters.h)
+
+
+source_group("NMS_headers" FILES ${NMS_HEADERS})
+source_group("NMS_sources" FILES ${NMS_SOURCES})
+source_group("Tendon_headers" FILES ${Tendon_HEADERS})
+source_group("Tendon_sources" FILES ${Tendon_SOURCES})
+source_group("Activation_headers" FILES ${Activation_HEADERS})
+source_group("Activation_sources" FILES ${Activation_SOURCES})
 
 add_library(NMSmodel STATIC
-  NMSmodel.cpp MuscleParameters.cpp 
+  ${NMS_SOURCES}
+  ${NMS_HEADERS}
   ${Tendon_SOURCES}
+  ${Tendon_HEADERS}
   ${Activation_SOURCES}
+  ${Activation_HEADERS}
 )
 
 set(NMSmodel_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/Activation ${CMAKE_CURRENT_SOURCE_DIR}/Tendon CACHE STRING "Include directory for NMSmodel library")

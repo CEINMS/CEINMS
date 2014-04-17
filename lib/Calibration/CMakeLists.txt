@@ -43,13 +43,50 @@ include_directories(
 
 include_directories(${Boost_INCLUDE_DIRS})
 
+set(Calibration_HEADERS TrialData.h
+                        TorquesComputation.h
+                        SimulatedAnnealing.h
+                        InputDataInterpreter.h
+                        ObjectiveFunctions/ObjectiveFunction.h
+                        ObjectiveFunctions/SumMinObjectiveFunction_singleF.h
+                        SimAnnealParameters/ParametersFromXml.h
+                        SimAnnealParameters/ParametersToOptimize.h
+                        SimAnnealParameters/StrengthCoefficients_ShapeFactor_C1_C2_TendonSlackLength_single.h
+                        SimAnnealParameters/StrengthCoefficients_Single_ShapeFactor_C1_C2_TendonSlackLength_use_last_Dof_only.h
+                        TorqueComputationModes/ComputationMode_Default.h
+                        TorqueComputationModes/ComputationMode_Fast.h
+                        )
+set(Calibration_SOURCES TrialData.cpp
+                        TorquesComputation.cpp
+                        SimulatedAnnealing.cpp
+                        InputDataInterpreter.cpp
+                        ObjectiveFunctions/SumMinObjectiveFunction_singleF.cpp
+                        SimAnnealParameters/ParametersFromXml.cpp
+                        SimAnnealParameters/StrengthCoefficients_ShapeFactor_C1_C2_TendonSlackLength_single.cpp
+                        SimAnnealParameters/StrengthCoefficients_Single_ShapeFactor_C1_C2_TendonSlackLength_use_last_Dof_only.cpp
+                        TorqueComputationModes/ComputationMode_Default.cpp
+                        TorqueComputationModes/ComputationMode_Fast.cpp
+                        )
+set_source_files_properties(TrialData.cpp
+                            TorquesComputation.cpp
+                            SimulatedAnnealing.cpp
+                            ObjectiveFunctions/SumMinObjectiveFunction_singleF.cpp
+                            SimAnnealParameters/ParametersFromXml.cpp
+                            SimAnnealParameters/StrengthCoefficients_ShapeFactor_C1_C2_TendonSlackLength_single.cpp
+                            SimAnnealParameters/StrengthCoefficients_Single_ShapeFactor_C1_C2_TendonSlackLength_use_last_Dof_only.cpp
+                            TorqueComputationModes/ComputationMode_Default.cpp
+                            TorqueComputationModes/ComputationMode_Fast.cpp
+                            PROPERTIES HEADER_FILE_ONLY TRUE)
 if(OPENSIM_FOUND)
   include_directories(${OPENSIM_INCLUDE_DIRS} ${SIMTK_INCLUDE_DIRS})
-  set(Calibration_SOURCE InputDataInterpreter.cpp InputDataInterpreterOsim.cpp)
-else()
-  set(Calibration_SOURCE InputDataInterpreter.cpp)
+  list(APPEND Calibration_HEADERS InputDataInterpreterOsim.h )
+  list(APPEND Calibration_SOURCES InputDataInterpreterOsim.cpp )
 endif()
-add_library(Calibration STATIC ${Calibration_SOURCE})
+
+source_group("Header Files" FILES ${Calibration_HEADERS})
+source_group("Source Files" FILES ${Calibration_SOURCES})
+
+add_library(Calibration STATIC ${Calibration_SOURCES} ${Calibration_HEADERS})
 target_link_libraries(Calibration xmlInputCalibration FileIO)
 
 if(OPENSIM_FOUND)

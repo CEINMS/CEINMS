@@ -23,9 +23,14 @@ include_directories(${OPENSIM_INCLUDE_DIRS} ${SIMTK_INCLUDE_DIRS})
 #  ${CMAKE_SOURCE_DIR}/lib/Hybrid
 #)
 
-
-
-ADD_EXECUTABLE( CEINMS  CEINMS.cpp ModelEvaluationBase.cpp)
+set(CEINMS_COMMON_SOURCES ModelEvaluationBase.cpp ModelEvaluationHybrid.cpp ModelEvaluationOnline.cpp ModelEvaluationOffline.cpp)
+set_source_files_properties(ModelEvaluationHybrid.cpp
+                            ModelEvaluationOnline.cpp
+                            ModelEvaluationOffline.cpp
+                            PROPERTIES HEADER_FILE_ONLY TRUE)
+set(CEINMS_HEADERS ModelEvaluationBase.h ModelEvaluationHybrid.h ModelEvaluationOnline.h ModelEvaluationOffline.h SimpleFileLogger.h)
+set(CEINMS_SOURCES CEINMS.cpp ${CEINMS_COMMON_SOURCES})
+ADD_EXECUTABLE( CEINMS ${CEINMS_SOURCES} ${CEINMS_HEADERS} )
 TARGET_LINK_LIBRARIES( CEINMS
       FileIO
       xmlInput
@@ -42,7 +47,9 @@ TARGET_LINK_LIBRARIES( CEINMS
 #endif(UNIX)
 
 if(OPENSIM_FOUND)
-  add_executable( CEINMS-osim  CEINMS-osim.cpp ModelEvaluationBase.cpp ProducersFromOpenSim.cpp)
+  set(CEINMS-osim_SOURCES CEINMS-osim.cpp ProducersFromOpenSim.cpp ${CEINMS_COMMON_SOURCES})
+  set(CEINMS-osim_HEADERS ProducersFromOpenSim.h ${CEINMS_HEADERS})
+  add_executable(CEINMS-osim  ${CEINMS-osim_SOURCES} ${CEINMS-osim_HEADERS})
 
   target_link_libraries( CEINMS-osim
       FileIO
@@ -61,11 +68,13 @@ if(OPENSIM_FOUND)
 
 endif()
 
-set(CEINMScalibrate_SOURCES
-    CEINMScalibration.cpp
-)
+set(CEINMScalibrate_HEADERS XmlWriter.h)
+set(CEINMScalibrate_COMMON_SOURCES XmlWriter.cpp)
+set(CEINMScalibrate_SOURCES CEINMScalibration.cpp ${CEINMScalibrate_COMMON_SOURCES})
 
-add_executable( CEINMScalibrate ${CEINMScalibrate_SOURCES})
+set_source_files_properties(XmlWriter.cpp PROPERTIES HEADER_FILE_ONLY TRUE)
+
+add_executable( CEINMScalibrate ${CEINMScalibrate_SOURCES} ${CEINMScalibrate_HEADERS})
 target_link_libraries( CEINMScalibrate
       xmlInputCalibration
       Calibration
