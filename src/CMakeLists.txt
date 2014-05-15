@@ -76,7 +76,7 @@ set_source_files_properties(XmlWriter.cpp PROPERTIES HEADER_FILE_ONLY TRUE)
 
 add_executable( CEINMScalibrate ${CEINMScalibrate_SOURCES} ${CEINMScalibrate_HEADERS})
 target_link_libraries( CEINMScalibrate
-      xmlInputCalibration
+      xmlInput
       Calibration
       NMSmodel
       FileIO
@@ -89,7 +89,7 @@ if(OPENSIM_FOUND)
     
   add_executable( CEINMScalibrate-osim ${CEINMScalibrate-osim_SOURCES} )
   target_link_libraries( CEINMScalibrate-osim
-      xmlInputCalibration
+      xmlInput
       Calibration
       NMSmodel
       FileIO

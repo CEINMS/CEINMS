@@ -87,7 +87,7 @@ source_group("Header Files" FILES ${Calibration_HEADERS})
 source_group("Source Files" FILES ${Calibration_SOURCES})
 
 add_library(Calibration STATIC ${Calibration_SOURCES} ${Calibration_HEADERS})
-target_link_libraries(Calibration xmlInputCalibration FileIO)
+target_link_libraries(Calibration xmlInput FileIO)
 
 if(OPENSIM_FOUND)
   target_link_libraries(Calibration ${OPENSIM_LIBRARIES}) #should find out which ones are actually needed
