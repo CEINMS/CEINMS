@@ -26,6 +26,7 @@ using std::endl;
 #include "EMGgenerator/EMGgeneratorFrom10To13.h"
 #include "EMGgenerator/EMGgeneratorFrom16To34.h"
 #include "EMGgenerator/EMGgeneratorFrom6To24.h"
+#include "EMGgenerator/EMGgeneratorFromXml.h"
 #include "EMGDataFromFile.h"
 #include "DataFromFile.h"
 
@@ -66,7 +67,7 @@ TorquesComputation<ComputationModeT, NMSmodelT>::TorquesComputation(NMSmodelT& s
         cout << "Reading from: " << EMGDataFilename;
 #endif
 
-        EMGDataFromFile<EMGgeneratorFrom16To34> emgDataFromFile(EMGDataFilename);
+		EMGDataFromFile<EMGgeneratorFromXml> emgDataFromFile(EMGDataFilename);
       
         if (!subject.compareMusclesNames(emgDataFromFile.getMusclesNames())) {
             cout << "Sorry! Your models have a number of muscles which is not compatible "
