@@ -22,11 +22,15 @@ using std::string;
 #include "MTU.h"
 #include "DoF.h"
 #include "Curve.h"
+#include "SubjectXmlReader.h"
 //#include "SetupDataStructure.h"
 
 template<typename NMSmodelT>
 SetupDataStructure<NMSmodelT>::SetupDataStructure(const string& configurationFile)
-:subjectPointer_(subject(configurationFile.c_str()))  {  }
+{
+    SubjectXmlReader sxr(configurationFile);
+    subjectPointer_=sxr.getSubject();
+}
 
 
 template<typename NMSmodelT>

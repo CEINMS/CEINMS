@@ -129,16 +129,7 @@ int main(int argc, char** argv) {
     EMGFromFile emgProducer(inputDirectory);
     LmtMaFromFile lmtMaProducer(inputDirectory);
     ExternalTorqueFromFile externalTorqueProducer(inputDirectory);
- 
-    
-    try {
-        std::auto_ptr<SubjectType> subjectPointer (subject (subjectFile));
-    }  
-    catch (const xml_schema::exception& e) {
-        cout << e << endl;
-        exit(EXIT_FAILURE);
-    }
-    
+
     ExecutionXmlReader executionCfg(executionFile);             
     
    NMSModelCfg::RunMode runMode = executionCfg.getRunMode();
