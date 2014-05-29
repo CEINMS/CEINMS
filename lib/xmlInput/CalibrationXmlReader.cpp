@@ -16,13 +16,15 @@ using std::cout;
 using std::endl;
 #include <ostream>
 #include "calibration.hxx"
+#include "calibration-schema.hxx"
+#include "validation.h"
 using namespace CalibrationXsd;
 
 CalibrationXmlReader::CalibrationXmlReader(const string& filename)
 :runMode_(0), optimizationAlgorithm_(0) {
 
     try {
-        std::auto_ptr<CalibrationType> calibrationPointer(calibration(filename));
+        std::auto_ptr<CalibrationType> calibrationPointer(parseAndValidate<CalibrationType>(filename, calibration_schema, sizeof(calibration_schema)));
         calibrationPointer_ = calibrationPointer;
     }  
     catch (const xml_schema::exception& e) {

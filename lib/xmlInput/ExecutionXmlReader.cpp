@@ -13,13 +13,15 @@ using std::string;
 #include <iostream>
 using std::cout;
 using std::endl;
+#include "execution-schema.hxx"
+#include "validation.h"
 
 ExecutionXmlReader::ExecutionXmlReader(const string& filename)
 :runMode_(0) {
 
 	try {
-        std::auto_ptr<ExecutionType> executionPointer(execution(filename));
-		executionPointer_ = executionPointer;
+        std::auto_ptr<ExecutionType> executionPointer(parseAndValidate<ExecutionType>(filename, execution_schema, sizeof(execution_schema)));
+        executionPointer_ = executionPointer;
     }  
     catch (const xml_schema::exception& e) {
         cout << e << endl;
