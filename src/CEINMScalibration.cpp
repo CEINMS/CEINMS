@@ -132,13 +132,13 @@ int main(int ac, char** av){
     }
 
     
-    try {
-        std::auto_ptr<SubjectType> subjectPointer (subject (uncalibratedSubjectXmlFile));
-    }  
-    catch (const xml_schema::exception& e) {
-        cout << e << endl;
-        exit(EXIT_FAILURE);
-    }
+//     try {
+//         std::auto_ptr<SubjectType> subjectPointer (subject (uncalibratedSubjectXmlFile));
+//     }
+//     catch (const xml_schema::exception& e) {
+//         cout << e << endl;
+//         exit(EXIT_FAILURE);
+//     }
     
     //1 read calibration xml
     CalibrationXmlReader calibrationXmlReader(calibrationXmlFile);

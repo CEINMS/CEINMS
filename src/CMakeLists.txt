@@ -12,8 +12,6 @@ include_directories(
 )
 include_directories(${Boost_INCLUDE_DIRS})
 
-include_directories(${OPENSIM_INCLUDE_DIRS} ${SIMTK_INCLUDE_DIRS})
-
 #LINK_DIRECTORIES(
 #  ${CMAKE_SOURCE_DIR}/lib/xmlInput
 #  ${CMAKE_SOURCE_DIR}/lib/NMSmodel
@@ -47,6 +45,7 @@ TARGET_LINK_LIBRARIES( CEINMS
 #endif(UNIX)
 
 if(OPENSIM_FOUND)
+  include_directories(${OPENSIM_INCLUDE_DIRS} ${SIMTK_INCLUDE_DIRS})
   set(CEINMS-osim_SOURCES CEINMS-osim.cpp ProducersFromOpenSim.cpp ${CEINMS_COMMON_SOURCES})
   set(CEINMS-osim_HEADERS ProducersFromOpenSim.h ${CEINMS_HEADERS})
   add_executable(CEINMS-osim  ${CEINMS-osim_SOURCES} ${CEINMS-osim_HEADERS})
@@ -76,7 +75,7 @@ set_source_files_properties(XmlWriter.cpp PROPERTIES HEADER_FILE_ONLY TRUE)
 
 add_executable( CEINMScalibrate ${CEINMScalibrate_SOURCES} ${CEINMScalibrate_HEADERS})
 target_link_libraries( CEINMScalibrate
-      xmlInputCalibration
+      xmlInput
       Calibration
       NMSmodel
       FileIO
@@ -89,7 +88,7 @@ if(OPENSIM_FOUND)
     
   add_executable( CEINMScalibrate-osim ${CEINMScalibrate-osim_SOURCES} )
   target_link_libraries( CEINMScalibrate-osim
-      xmlInputCalibration
+      xmlInput
       Calibration
       NMSmodel
       FileIO

@@ -16,8 +16,12 @@ using std::string;
 
 //TODO: it should re-parse all the info from the subject, instead of re-writing the oldXml
 XmlWriter::XmlWriter(const string& startXmlFile)
-:outFilename_("calibratedSubject.xml"), subjectPointer_(subject(startXmlFile.c_str())), startXmlFile_(startXmlFile)
-{ }
+:outFilename_("calibratedSubject.xml"), startXmlFile_(startXmlFile)
+{
+    SubjectXmlReader sxr(startXmlFile);
+    subjectPointer_=sxr.getSubject();
+
+}
 
 
 void XmlWriter::setOutputFilename(const string& outFilename) {
