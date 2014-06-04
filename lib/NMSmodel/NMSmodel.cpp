@@ -685,14 +685,19 @@ void NMSmodel<Activation, Tendon, mode>::getMusclesIndexFromDofs(vector<unsigned
         }
     }
     std::sort(musclesList.begin(), musclesList.end()); //sort all muscles names in the vector
-    std::unique(musclesList.begin(), musclesList.end()); //removes duplicated muscles
-    
-    unsigned mlI = 0;
-    for(unsigned i = 0; i < muscles_.size() && mlI < musclesList.size(); ++i) {
-        if( muscles_.at(i).compareMusclesId(musclesList.at(mlI)) ) {
-            musclesIndexList.push_back(i);
-            ++mlI;
-        } 
+    std::vector<std::string>::iterator last=std::unique(musclesList.begin(), musclesList.end()); //removes duplicated muscles
+
+    for(unsigned i = 0; i < muscles_.size(); ++i) {
+        bool muscFound=false;
+        std::vector<std::string>::iterator musclesOfInterest(musclesList.begin());
+        while(musclesOfInterest!=last && !muscFound)
+        {
+            if( muscles_.at(i).compareMusclesId(*musclesOfInterest) ) {
+                musclesIndexList.push_back(i);
+                muscFound=true;
+            }
+            musclesOfInterest++;
+        }
     }
 }
 
