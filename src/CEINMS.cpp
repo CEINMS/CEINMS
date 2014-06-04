@@ -11,8 +11,8 @@
 #include "LmtMaFromFile.h"
 #include "ExternalTorqueFromFile.h"
 #include "ModelEvaluationOnline.h"
-#include "ModelEvaluationOffline.h"
-#include "ModelEvaluationHybrid.h"
+//#include "ModelEvaluationOffline.h"
+//#include "ModelEvaluationHybrid.h"
 #include "SetupDataStructure.h"
 #include "Activation/ExponentialActivation.h"
 #include "Tendon/StiffTendon.h"
@@ -25,7 +25,6 @@
 
 #include <ctime>
 
-#include <boost/thread.hpp>
 #include <string>
 using std::string;
 #include <iostream>
@@ -40,10 +39,10 @@ namespace po = boost::program_options;
 template<typename T1, typename T2, typename T3, typename T4>
 void runThreads(T1& t1, T2& t2, T3& t3, T4& t4) {
  
-    boost::thread thread1(t1);
-    boost::thread thread2(t2);  
-    boost::thread thread3(t3);  
-    boost::thread thread4(t4);
+    std::thread thread1(t1);
+    std::thread thread2(t2);  
+    std::thread thread3(t3);  
+    std::thread thread4(t4);
     thread1.join();
     thread2.join();
     thread3.join();
@@ -122,13 +121,7 @@ int main(int argc, char** argv) {
         cout << desc << "\n";
         return 1;
     }
-    // check command line arguments... 
-  
-
-
-    EMGFromFile emgProducer(inputDirectory);
-    LmtMaFromFile lmtMaProducer(inputDirectory);
-    ExternalTorqueFromFile externalTorqueProducer(inputDirectory);
+ 
 
     ExecutionXmlReader executionCfg(executionFile);             
     
@@ -138,22 +131,37 @@ int main(int argc, char** argv) {
     switch(runMode) {
                
         case NMSModelCfg::OpenLoopExponentialActivationStiffTendonOnline: {
-            typedef NMSmodel<ExponentialActivation, StiffTendon, CurveMode::Online> MyNMSmodel;
-            MyNMSmodel mySubject;
-            setupSubject(mySubject, subjectFile);
-            ModelEvaluationOnline<MyNMSmodel> consumer(mySubject, outputDirectory);
-            runThreads(consumer, emgProducer, lmtMaProducer, externalTorqueProducer);
-            break;
+          // 1. define the model
+          typedef NMSmodel<ExponentialActivation, StiffTendon, CurveMode::Online> MyNMSmodel;
+          MyNMSmodel mySubject;
+          setupSubject(mySubject, subjectFile);
+          
+          // 2. define the thread connecting with the input sources
+          LmtMaFromFile lmtMaProducer(mySubject, inputDirectory);
+          ExternalTorqueFromFile externalTorqueProducer(mySubject, inputDirectory);
+          EMGFromFile emgProducer(mySubject, inputDirectory);
+
+          // 3. start the model
+          ModelEvaluationOnline<MyNMSmodel> simulator(mySubject, outputDirectory);
+          runThreads(simulator, emgProducer, lmtMaProducer, externalTorqueProducer);
+          break;
         }
        
-        case NMSModelCfg::OpenLoopExponentialActivationStiffTendonOffline: {
-            typedef NMSmodel<ExponentialActivation, StiffTendon, CurveMode::Offline> MyNMSmodel;
-            MyNMSmodel mySubject;
-            setupSubject(mySubject, subjectFile);
-            ModelEvaluationOffline<MyNMSmodel> consumer(mySubject, outputDirectory);
-            runThreads(consumer, emgProducer, lmtMaProducer, externalTorqueProducer);
-            break;
-        }
+//         case NMSModelCfg::OpenLoopExponentialActivationStiffTendonOffline: {
+//           // 1. define the model 
+//           typedef NMSmodel<ExponentialActivation, StiffTendon, CurveMode::Offline> MyNMSmodel;
+//           MyNMSmodel mySubject;
+//           setupSubject(mySubject, subjectFile);
+//           
+//           // 2. define the producer. They have a reference to the subject and can ask information about it
+//           LmtMaFromFile lmtMaProducer(mySubject, inputDirectory);
+//           ExternalTorqueFromFile externalTorqueProducer(mySubject, inputDirectory);
+//           EMGFromFile emgProducer(mySubject, inputDirectory);
+//           
+//           ModelEvaluationOffline<MyNMSmodel> consumer(mySubject, outputDirectory);
+//           runThreads(consumer, emgProducer, lmtMaProducer, externalTorqueProducer);
+//           break;
+//         }
         /*
         case NMSModelCfg::OpenLoopExponentialActivationElasticTendonOnline: {
             typedef NMSmodel<ExponentialActivation, ElasticTendon<CurveMode::Online>, CurveMode::Online> MyNMSmodel;
@@ -173,76 +181,76 @@ int main(int argc, char** argv) {
             break;
         }
         */
-        case NMSModelCfg::OpenLoopExponentialActivationElasticTendonBiSecOnline: {
-            typedef NMSmodel<ExponentialActivation, ElasticTendon_BiSec, CurveMode::Online> MyNMSmodel;
-            MyNMSmodel mySubject;
-            setupSubject(mySubject, subjectFile);
-            ModelEvaluationOnline<MyNMSmodel> consumer(mySubject, outputDirectory);
-            runThreads(consumer, emgProducer, lmtMaProducer, externalTorqueProducer);
-            break;
-        }
-        
-        case NMSModelCfg::OpenLoopExponentialActivationElasticTendonBiSecOffline: {
-            typedef NMSmodel<ExponentialActivation, ElasticTendon_BiSec, CurveMode::Offline> MyNMSmodel;
-            MyNMSmodel mySubject;
-            setupSubject(mySubject, subjectFile);
-            ModelEvaluationOffline<MyNMSmodel> consumer(mySubject, outputDirectory);
-            runThreads(consumer, emgProducer, lmtMaProducer, externalTorqueProducer);
-            break;
-        }
-        
-        
-        case NMSModelCfg::HybridExponentialActivationStiffTendonOnline: { 
-            typedef NMSmodel<ExponentialActivation, StiffTendon, CurveMode::Online> MyNMSmodel;
-            typedef Hybrid::ErrorMinimizerAnnealing<MyNMSmodel> MyErrorMinimizer;
-            SetupDataStructure<MyNMSmodel> setupData(subjectFile);
-            MyNMSmodel mySubject;
-            setupData.createCurves();
-            setupData.createMuscles(mySubject);
-            setupData.createDoFs(mySubject);
-            MyErrorMinimizer errorMinimizer(mySubject);
-            HybridWeightings weightings;
-            executionCfg.getHybridWeightings(weightings.alpha, weightings.beta, weightings.gamma);
-            errorMinimizer.setWeightings(weightings);
-            vector<string> toPredict, toTrack;
-            executionCfg.getMusclesToPredict(toPredict);
-            executionCfg.getMusclesToTrack(toTrack);
-            errorMinimizer.setMusclesNamesWithEmgToPredict(toPredict);
-            errorMinimizer.setMusclesNamesWithEmgToTrack(toTrack);
-            double rt, t, epsilon;
-            unsigned noEpsilon, ns, nt, maxNoEval;
-            executionCfg.getAnnealingParameters(nt, ns, rt, t, maxNoEval, epsilon, noEpsilon);
-            errorMinimizer.setAnnealingParameters(nt, ns, rt, t, maxNoEval, epsilon, noEpsilon);
-            ModelEvaluationHybrid<MyNMSmodel, MyErrorMinimizer> consumer(mySubject, errorMinimizer, outputDirectory);
-            runThreads(consumer, emgProducer, lmtMaProducer, externalTorqueProducer);
-            break;
-        } 
-        
-          case NMSModelCfg::HybridExponentialActivationElasticTendonBiSecOnline: { 
-            typedef NMSmodel<ExponentialActivation, ElasticTendon_BiSec, CurveMode::Online> MyNMSmodel;
-            typedef Hybrid::ErrorMinimizerAnnealing<MyNMSmodel> MyErrorMinimizer;
-            SetupDataStructure<MyNMSmodel> setupData(subjectFile);
-            MyNMSmodel mySubject;
-            setupData.createCurves();
-            setupData.createMuscles(mySubject);
-            setupData.createDoFs(mySubject);
-            MyErrorMinimizer errorMinimizer(mySubject);
-            HybridWeightings weightings;
-            executionCfg.getHybridWeightings(weightings.alpha, weightings.beta, weightings.gamma);
-            errorMinimizer.setWeightings(weightings);
-            vector<string> toPredict, toTrack;
-            executionCfg.getMusclesToPredict(toPredict);
-            executionCfg.getMusclesToTrack(toTrack);
-            errorMinimizer.setMusclesNamesWithEmgToPredict(toPredict);
-            errorMinimizer.setMusclesNamesWithEmgToTrack(toTrack);
-            double rt, t, epsilon;
-            unsigned noEpsilon, ns, nt, maxNoEval;
-            executionCfg.getAnnealingParameters(nt, ns, rt, t, maxNoEval, epsilon, noEpsilon);
-            errorMinimizer.setAnnealingParameters(nt, ns, rt, t, maxNoEval, epsilon, noEpsilon);
-            ModelEvaluationHybrid<MyNMSmodel, MyErrorMinimizer> consumer(mySubject, errorMinimizer, outputDirectory);
-            runThreads(consumer, emgProducer, lmtMaProducer, externalTorqueProducer);
-            break;
-        } 
+//         case NMSModelCfg::OpenLoopExponentialActivationElasticTendonBiSecOnline: {
+//             typedef NMSmodel<ExponentialActivation, ElasticTendon_BiSec, CurveMode::Online> MyNMSmodel;
+//             MyNMSmodel mySubject;
+//             setupSubject(mySubject, subjectFile);
+//             ModelEvaluationOnline<MyNMSmodel> consumer(mySubject, outputDirectory);
+//             runThreads(consumer, emgProducer, lmtMaProducer, externalTorqueProducer);
+//             break;
+//         }
+//         
+//         case NMSModelCfg::OpenLoopExponentialActivationElasticTendonBiSecOffline: {
+//             typedef NMSmodel<ExponentialActivation, ElasticTendon_BiSec, CurveMode::Offline> MyNMSmodel;
+//             MyNMSmodel mySubject;
+//             setupSubject(mySubject, subjectFile);
+//             ModelEvaluationOffline<MyNMSmodel> consumer(mySubject, outputDirectory);
+//             runThreads(consumer, emgProducer, lmtMaProducer, externalTorqueProducer);
+//             break;
+//         }
+//         
+//         
+//         case NMSModelCfg::HybridExponentialActivationStiffTendonOnline: { 
+//             typedef NMSmodel<ExponentialActivation, StiffTendon, CurveMode::Online> MyNMSmodel;
+//             typedef Hybrid::ErrorMinimizerAnnealing<MyNMSmodel> MyErrorMinimizer;
+//             SetupDataStructure<MyNMSmodel> setupData(subjectFile);
+//             MyNMSmodel mySubject;
+//             setupData.createCurves();
+//             setupData.createMuscles(mySubject);
+//             setupData.createDoFs(mySubject);
+//             MyErrorMinimizer errorMinimizer(mySubject);
+//             HybridWeightings weightings;
+//             executionCfg.getHybridWeightings(weightings.alpha, weightings.beta, weightings.gamma);
+//             errorMinimizer.setWeightings(weightings);
+//             vector<string> toPredict, toTrack;
+//             executionCfg.getMusclesToPredict(toPredict);
+//             executionCfg.getMusclesToTrack(toTrack);
+//             errorMinimizer.setMusclesNamesWithEmgToPredict(toPredict);
+//             errorMinimizer.setMusclesNamesWithEmgToTrack(toTrack);
+//             double rt, t, epsilon;
+//             unsigned noEpsilon, ns, nt, maxNoEval;
+//             executionCfg.getAnnealingParameters(nt, ns, rt, t, maxNoEval, epsilon, noEpsilon);
+//             errorMinimizer.setAnnealingParameters(nt, ns, rt, t, maxNoEval, epsilon, noEpsilon);
+//             ModelEvaluationHybrid<MyNMSmodel, MyErrorMinimizer> consumer(mySubject, errorMinimizer, outputDirectory);
+//             runThreads(consumer, emgProducer, lmtMaProducer, externalTorqueProducer);
+//             break;
+//         } 
+//         
+//           case NMSModelCfg::HybridExponentialActivationElasticTendonBiSecOnline: { 
+//             typedef NMSmodel<ExponentialActivation, ElasticTendon_BiSec, CurveMode::Online> MyNMSmodel;
+//             typedef Hybrid::ErrorMinimizerAnnealing<MyNMSmodel> MyErrorMinimizer;
+//             SetupDataStructure<MyNMSmodel> setupData(subjectFile);
+//             MyNMSmodel mySubject;
+//             setupData.createCurves();
+//             setupData.createMuscles(mySubject);
+//             setupData.createDoFs(mySubject);
+//             MyErrorMinimizer errorMinimizer(mySubject);
+//             HybridWeightings weightings;
+//             executionCfg.getHybridWeightings(weightings.alpha, weightings.beta, weightings.gamma);
+//             errorMinimizer.setWeightings(weightings);
+//             vector<string> toPredict, toTrack;
+//             executionCfg.getMusclesToPredict(toPredict);
+//             executionCfg.getMusclesToTrack(toTrack);
+//             errorMinimizer.setMusclesNamesWithEmgToPredict(toPredict);
+//             errorMinimizer.setMusclesNamesWithEmgToTrack(toTrack);
+//             double rt, t, epsilon;
+//             unsigned noEpsilon, ns, nt, maxNoEval;
+//             executionCfg.getAnnealingParameters(nt, ns, rt, t, maxNoEval, epsilon, noEpsilon);
+//             errorMinimizer.setAnnealingParameters(nt, ns, rt, t, maxNoEval, epsilon, noEpsilon);
+//             ModelEvaluationHybrid<MyNMSmodel, MyErrorMinimizer> consumer(mySubject, errorMinimizer, outputDirectory);
+//             runThreads(consumer, emgProducer, lmtMaProducer, externalTorqueProducer);
+//             break;
+//         } 
 
 
         default:

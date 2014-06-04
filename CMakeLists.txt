@@ -16,6 +16,10 @@ if(UNIX AND NOT CMAKE_BUILD_TYPE)
 #	set(CMAKE_SHARED_LINKER_FLAGS "-O3")
 endif()
 
+if(UNIX)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread -std=c++11 -Wno-deprecated-declarations ")
+endif(UNIX)
+
 set(CMAKE_VERBOSE_MAKEFILE OFF)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_SOURCE_DIR})

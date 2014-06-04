@@ -50,54 +50,58 @@ void DataSynchronizer::getEmgs(std::vector<double>& emgs) {
     
 
     void DataSynchronizer::popEmgFront(std::vector<double>& emgFromQueue) {   
-        
-        Shared::queueEmgSemFull.wait(); //waits if there is no item in queueEmg
-        Shared::queueEmgMutex.lock();   
-
-        emgFromQueue = Shared::queueEmg.front(); 
-        Shared::queueEmg.pop_front(); 
-        
-        Shared::queueEmgMutex.unlock();
-        Shared::queueEmgSemEmpty.notify();  //notify that an item has been removed from queueEmg
-                                    
+//         Shared::queueEmgSemFull.wait(); //waits if there is no item in queueEmg
+//         Shared::queueEmgMutex.lock();   
+// 
+//         emgFromQueue = Shared::queueEmg.front(); 
+//         Shared::queueEmg.pop_front(); 
+//         
+//         Shared::queueEmgMutex.unlock();
+//         Shared::queueEmgSemEmpty.notify();  //notify that an item has been removed from queueEmg
+      emgFromQueue = Shared::queueEmg.pop();
     }
 
     void DataSynchronizer::popLmtFront(std::vector<double>& lmtFromQueue) { 
 
-        Shared::queueLmtSemFull.wait();
-        Shared::queueLmtMutex.lock(); 
- 
-        lmtFromQueue = Shared::queueLmt.front(); 
-        Shared::queueLmt.pop_front();  
-  
-        Shared::queueLmtMutex.unlock();
-        Shared::queueLmtSemEmpty.notify();
+//         Shared::queueLmtSemFull.wait();
+//         Shared::queueLmtMutex.lock(); 
+//  
+//         lmtFromQueue = Shared::queueLmt.front(); 
+//         Shared::queueLmt.pop_front();  
+//   
+//         Shared::queueLmtMutex.unlock();
+//         Shared::queueLmtSemEmpty.notify();
+           lmtFromQueue = Shared::queueLmt.pop();
  
     }
 
     void DataSynchronizer::popMomentArmsFront(std::vector<double>& momentArmsFromQueue, unsigned int whichDof) { 
   
-        Shared::queueMomentArmsSemFull.wait();
-        Shared::queueMomentArmsMutex.lock();   
-
-        momentArmsFromQueue = Shared::queueMomentArms.at(whichDof).front(); 
-        Shared::queueMomentArms.at(whichDof).pop_front();  
-
-        Shared::queueMomentArmsMutex.unlock();
-        Shared::queueMomentArmsSemEmpty.notify();
+//         Shared::queueMomentArmsSemFull.wait();
+//         Shared::queueMomentArmsMutex.lock();   
+// 
+//         momentArmsFromQueue = Shared::queueMomentArms.at(whichDof).front(); 
+//         Shared::queueMomentArms.at(whichDof).pop_front();  
+// 
+//         Shared::queueMomentArmsMutex.unlock();
+//         Shared::queueMomentArmsSemEmpty.notify();
+	
+	Shared::queueMomentArms.at(whichDof).pop(); 
     }
     
   
     void DataSynchronizer::popExternalTorqueFront(vector<double>& externalTorqueFromQueue, unsigned int whichDof) {   
     
-        Shared::queueExternalTorqueSemFull.wait(); //waits if there is no item in queue
-        Shared::queueExternalTorqueMutex.lock();   
-
-        externalTorqueFromQueue = (Shared::queueExternalTorque.at(whichDof)).front(); 
-        Shared::queueExternalTorque.at(whichDof).pop_front(); 
-  
-        Shared::queueExternalTorqueMutex.unlock();
-        Shared::queueExternalTorqueSemEmpty.notify();  //notify that an item has been removed from queue
+//         Shared::queueExternalTorqueSemFull.wait(); //waits if there is no item in queue
+//         Shared::queueExternalTorqueMutex.lock();   
+// 
+//         externalTorqueFromQueue = (Shared::queueExternalTorque.at(whichDof)).front(); 
+//         Shared::queueExternalTorque.at(whichDof).pop_front(); 
+//   
+//         Shared::queueExternalTorqueMutex.unlock();
+//         Shared::queueExternalTorqueSemEmpty.notify();  //notify that an item has been removed from queue
+	
+	Shared::queueExternalTorque.at(whichDof).pop(); 
     }
 };
 

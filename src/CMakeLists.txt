@@ -2,8 +2,10 @@
 
 include_directories(
   ${Producers_INCLUDE_DIRS}
+  ${InputConnectors_INCLUDE_DIRS}
   ${NMSmodel_INCLUDE_DIRS}
   ${CMAKE_SOURCE_DIR}/lib/Curve
+  ${CMAKE_SOURCE_DIR}/lib/Concurrency
   ${xmlInput_INCLUDE_DIRS}
   ${FileIO_INCLUDE_DIRS}
   ${Calibration_INCLUDE_DIRS}
@@ -33,7 +35,7 @@ TARGET_LINK_LIBRARIES( CEINMS
       FileIO
       xmlInput
       NMSmodel
-      Producers
+      InputConnectors
       ${CMAKE_THREAD_LIBS_INIT}
       ${Boost_LIBRARIES}
 )

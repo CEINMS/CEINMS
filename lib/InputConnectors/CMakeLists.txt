@@ -20,23 +20,21 @@ set(FromOpenSim_HEADERS
   FromOpenSim/ExternalTorqueFromStorage.h
 )
 
-set(Producers_SOURCES
+set(InputConnectors_SOURCES
   EMGFromX.cpp
   ExternalTorqueFromX.cpp
   LmtMaFromX.cpp
-  Semaphore.cpp
-  SyncTools.cpp
+  InputQueues.cpp
 )
-set(Producers_HEADERS
+set(InputConnectors_HEADERS
   EMGFromX.h
   ExternalTorqueFromX.h
   LmtMaFromX.h
-  Semaphore.h
-  SyncTools.h
+  InputQueues.h
 )
 
-source_group("Headers" FILES ${Producers_HEADERS} ${FromFile_HEADERS} )
-source_group("Sources" FILES ${Producers_SOURCES} ${FromFile_SOURCES} )
+source_group("Headers" FILES ${InputConnectors_HEADERS} ${FromFile_HEADERS} )
+source_group("Sources" FILES ${InputConnectors_SOURCES} ${FromFile_SOURCES} )
 
 include_directories(${ceinms_common_INCLUDE_DIRS} ${xmlInput_INCLUDE_DIRS} ${FileIO_INCLUDE_DIRS})
 include_directories(${Boost_INCLUDE_DIRS})
@@ -48,30 +46,29 @@ if(OPENSIM_FOUND)
   source_group("Sources" FILES  ${FromOpenSim_SOURCES})
 endif()
 
-add_library(Producers STATIC
-  ${Producers_SOURCES}
+add_library(InputConnectors STATIC
+  ${InputConnectors_SOURCES}
   ${FromFile_SOURCES}
-  ${Producers_HEADERS}
+  ${InputConnectors_HEADERS}
   ${FromFile_HEADERS}
   ${CMAKE_SOURCE_DIR}/lib/Concurrency/Latch.cpp
 )
 
-target_link_libraries(Producers FileIO)
+target_link_libraries(InputConnectors FileIO)
 
 if(OPENSIM_FOUND)
-    add_library(ProducersOSim STATIC
-      ${Producers_SOURCES}
+    add_library(InputConnectorsOSim STATIC
+      ${InputConnectors_SOURCES}
       ${FromFile_SOURCES}
       ${FromOpenSim_SOURCES}
-      ${Producers_HEADERS}
+      ${InputConnectors_HEADERS}
       ${FromFile_HEADERS}
       ${FromOpenSim_HEADERS}
     )
 
-    target_link_libraries(ProducersOSim FileIO ${OPENSIM_LIBRARIES})
+    target_link_libraries(InputConnectorsOSim FileIO ${OPENSIM_LIBRARIES})
 
-    set(Producers_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/FromFile ${CMAKE_CURRENT_SOURCE_DIR}/FromOpenSim CACHE STRING "Include directories for Producers library" FORCE)
+    set(InputConnectors_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/FromFile ${CMAKE_CURRENT_SOURCE_DIR}/FromOpenSim CACHE STRING "Include directories for InputConnectors library" FORCE)
 else()
-  set(Producers_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/FromFile  CACHE STRING "Include directories for Producers library" FORCE)
+  set(InputConnectors_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/FromFile  CACHE STRING "Include directories for InputConnectors library" FORCE)
 endif()
-

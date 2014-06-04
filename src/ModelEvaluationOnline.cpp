@@ -7,7 +7,7 @@
 //
 
 
-#include "SyncTools.h"
+#include "InputQueues.h"
 #include "SimpleFileLogger.h"
 
 #include <iostream>
@@ -17,6 +17,8 @@ using std::endl;
 using std::vector;
 #include <string>
 using std::string;
+
+#include "ModelEvaluationOnline.h"
 
 #define LOG_FILES
 #define LOG
@@ -40,27 +42,17 @@ void ModelEvaluationOnline<NMSmodelT>::operator()() {
     vector<double> externalTorqueTime;
     bool runCondition = true;
     
-    //read dofs names from XML file and set dofNames global variable
     subject_.getDoFNames(dofNames_);
-    setDofNamesToShared(dofNames_);  //set dof names on global variable, needed to lmtMaFromFile class
     noDof_ = dofNames_.size();
     momentArmsFromQueue.resize(noDof_);
     
-    // all initialization stuff MUST be placed before this line
-    // be sure to call getMusclesNames() just after readyToStart.wait() if you want to
-    SyncTools::Shared::readyToStart.wait(); //barrier
+    CEINMS::InputConnectors::readyInputQueues.wait(); //barrier
 
-    vector<string> muscleNamesFromShared;
-    getMusclesNamesFromShared(muscleNamesFromShared);
-    vector< vector<string> > muscleNamesOnDofFromShared;
-    getMusclesNamesOnDofsFromShared(muscleNamesOnDofFromShared);
- 
-//CHECK MUSCLES NAMES between XML model and input files 
-
-    getDofNamesAssociatedToExternalTorque(dofNamesWithExtTorque_);
-    externalTorqueTime.resize(dofNamesWithExtTorque_.size());
-    externalTorqueFromQueue.resize(dofNamesWithExtTorque_.size());
-
+    if ( CEINMS::InputConnectors::queueExternalTorque.size() != 0) {
+      dofNamesWithExtTorque_ = dofNames_; 
+      externalTorqueTime.resize(dofNamesWithExtTorque_.size());
+      externalTorqueFromQueue.resize(dofNamesWithExtTorque_.size());
+    }
 #ifdef LOG
     cout << "Deegres of Freedom with an external torque data:\n";
     for(unsigned int i = 0; i < dofNamesWithExtTorque_.size(); ++i)
@@ -69,24 +61,8 @@ void ModelEvaluationOnline<NMSmodelT>::operator()() {
         cout << "no external torque data found!\n";
 #endif
 
-  //external torques provided as input may refer to a subset of dof, 
-  //ie. we may have less external torques then the number of dofs 
-  //private class variable dofNamesWithExtTorque_ stores the dof names list with external torque data
-  
-    if(!subject_.compareMusclesNames(muscleNamesFromShared)) {
-        cout << "ERROR: muscles names from emg or lmt files don't match with XML model ones\n";
-        exit(EXIT_FAILURE);
-    }
- //   
-    for(unsigned int i = 0; i < noDof_; ++i) {
-        if(!subject_.compareMusclesNamesOnDoF(muscleNamesOnDofFromShared.at(i), i)) {
-        cout << "ERROR: muscles names from " << dofNames_.at(i) << "Ma.txt file don't match with XML model ones\n";
-        exit(EXIT_FAILURE);
-        }      
-    }
-
-//END CHECK MUSCLES
-    double globalEmDelay = subject_.getGlobalEmDelay(); 
+    
+  double globalEmDelay = subject_.getGlobalEmDelay(); 
    
 
 #ifdef LOG
@@ -107,11 +83,11 @@ void ModelEvaluationOnline<NMSmodelT>::operator()() {
         stillExtTorqueDataOnDof.push_back(true);
 
     do {  
-        getLmtFromShared(lmtFromQueue);
+        getLmtFromInputQueue(lmtFromQueue);
         lmtMaTime = lmtFromQueue.back();
         lmtFromQueue.pop_back();         //removes time value from the end of vector
         for(unsigned int i = 0; i < noDof_; ++i) {
-            getMomentArmsFromShared((momentArmsFromQueue.at(i)), i);    
+            getMomentArmsFromInputQueue((momentArmsFromQueue.at(i)), i);    
             momentArmsFromQueue.at(i).pop_back();  //removes time value from the end of vector
         }
         for(unsigned int i = 0; i < dofNamesWithExtTorque_.size(); ++i) {  
@@ -120,7 +96,7 @@ void ModelEvaluationOnline<NMSmodelT>::operator()() {
 //è allo stesso modo possibile avere un numero di dati differente a seconda del dof considerato
 //stillExtTorqueDataOnDof è un vettore che tiene conto di questo, in modo da evitare problemi di lunghezza sui vettori
                 if(stillExtTorqueDataOnDof.at(i)) {   
-                    getExternalTorqueFromShared(externalTorqueFromQueue.at(i), i);
+                    getExternalTorqueFromInputQueue(externalTorqueFromQueue.at(i), i);
                     externalTorqueTime.at(i) = externalTorqueFromQueue.at(i).back();
                     externalTorqueFromQueue.at(i).pop_back();
                     if(externalTorqueFromQueue.at(i).empty())
@@ -142,7 +118,7 @@ void ModelEvaluationOnline<NMSmodelT>::operator()() {
 //tale variabile può essere utilizzata come controllo, poiché la torque esterna è misurata solo su alcuni dof.
 
         do {
-            getEmgFromShared(emgFromQueue);
+            getEmgFromInputQueue(emgFromQueue);
             emgTime = emgFromQueue.back() + globalEmDelay;
             emgFromQueue.pop_back();
             if(!emgFromQueue.empty()) {
@@ -213,7 +189,7 @@ void ModelEvaluationOnline<NMSmodelT>::operator()() {
    OR when an empty vector is acqured from one of the queues the thread stop consuming 
 NOTE: when one a producer push an empty vector in a queue means that ther are no more data to be produced, it's like an end frame. 
 */
-        runCondition = (emgTime < SyncTools::Shared::globalTimeLimit) && (lmtMaTime < SyncTools::Shared::globalTimeLimit) && runCondition;
+        runCondition = (emgTime <  CEINMS::InputConnectors::globalTimeLimit) && (lmtMaTime <  CEINMS::InputConnectors::globalTimeLimit) && runCondition;
     } while (runCondition);
 
 #ifdef LOG  

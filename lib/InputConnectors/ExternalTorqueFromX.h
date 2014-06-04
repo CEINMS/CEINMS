@@ -16,14 +16,21 @@
 
 class ExternalTorqueFromX
 {
-  public:
-    virtual ~ExternalTorqueFromX();
-    virtual void operator()() {};
-    void pushExternalTorqueBack(const std::vector<double>& newExternalTorqueToPush, unsigned int whichDof);
-    void updateExternalTorque(const std::vector<double>& currentExternalTorqueData, double currentTime, unsigned int whichDof); 
-    void getDofNames(std::vector< std::string >& dofNamesFromModel);
-    void setExternalTorqueDofNames(std::vector<std::string> dofNamesWithExternalTorqueFromInput);
-   
+public:
+  template <typename NMSModelT>
+  ExternalTorqueFromX(const NMSModelT& subject);
+  virtual ~ExternalTorqueFromX();
+  virtual void operator()() {};
+  void updateExternalTorque(const std::vector<double>& currentExternalTorqueData, double currentTime, unsigned int whichDof); 
+protected:
+  std::vector< std::string > dofNames_;
 };
+
+
+template <typename NMSModelT>
+ExternalTorqueFromX::ExternalTorqueFromX(const NMSModelT& subject)
+{
+  subject.getDoFNames(dofNames_);  
+}
 
 #endif

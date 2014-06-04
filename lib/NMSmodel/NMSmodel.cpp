@@ -640,7 +640,7 @@ void NMSmodel<Activation, Tendon, mode>::getMusclesIndexOnDof(vector<unsigned>& 
 
 
 template <typename Activation, typename Tendon, CurveMode::Mode mode>
-void NMSmodel<Activation, Tendon, mode>::getMuscleNamesOnDofs(vector<vector<string> >& muscleNamesOnDofs) {
+void NMSmodel<Activation, Tendon, mode>::getMuscleNamesOnDofs(vector<vector<string> >& muscleNamesOnDofs) const {
 
 	muscleNamesOnDofs.clear();
 	for(vectorDoFconstItr it(dofs_.begin()); it != dofs_.end(); ++it) {

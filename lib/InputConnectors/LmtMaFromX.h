@@ -14,19 +14,30 @@
 #include <vector>
 #include <string>
 
+
 class LmtMaFromX
 {
-  public:
+  public:    
+    template <typename NMSModelT>
+    LmtMaFromX(const NMSModelT& subject);
     virtual ~LmtMaFromX();
     virtual void operator()() {};
-    void pushLmtBack(const std::vector<double>& newLmtToPush);
-    void pushMomentArmsBack(const std::vector<double>& newMomentArmsToPush, unsigned int whichDof);
     void updateLmt(const std::vector<double>& currentLmtData, double currentTime);
     void updateMomentArms(const std::vector<double>& currentMomentArmsData, double currentTime, unsigned int whichDof); 
-    void getDofNames(std::vector< std::string >& dofNamesFromModel);
-	void setNoDof(unsigned nDof);
-	void setLmtMusclesNames(const std::vector< std::string >& lmtMusclesNames);
-    void setMomentArmsMusclesNames(const std::vector< std::vector < std::string > >& musclesNamesFromMomentArmsFiles);
+    
+  protected:
+    std::vector< std::string > musclesNames_;
+    std::vector< std::string > dofNames_;
+    std::vector< std::vector< std::string > > muscleNamesOnDofs_;
 };
+
+
+template <typename NMSModelT>
+LmtMaFromX::LmtMaFromX(const NMSModelT& subject)
+{ 
+  subject.getMuscleNames(musclesNames_); 
+  subject.getDoFNames(dofNames_);
+  subject.getMuscleNamesOnDofs(muscleNamesOnDofs_);
+}
 
 #endif

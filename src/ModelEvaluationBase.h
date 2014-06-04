@@ -17,17 +17,14 @@
 class ModelEvaluationBase {
     
 public:  
-    virtual ~ModelEvaluationBase();
-    virtual void operator()() = 0;
+  ModelEvaluationBase(); 
+  virtual ~ModelEvaluationBase();
+  virtual void operator()() = 0;
     
-    void getEmgFromShared(std::vector<double>& emgFromQueue);
-    void getLmtFromShared(std::vector<double>& lmtFromQueue);
-    void getMomentArmsFromShared(std::vector<double>& momentArmsFromQueue, unsigned int whichDof);
-    void getExternalTorqueFromShared(std::vector<double>& externalTorqueFromQueue, unsigned int whichDof);    
-    void getMusclesNamesFromShared(std::vector<std::string>& muscleNames);
-    void getMusclesNamesOnDofsFromShared(std::vector< std::vector<std::string> >& muscleNamesOnDofs);
-    void setDofNamesToShared(const std::vector<std::string>& dofNames);
-    void getDofNamesAssociatedToExternalTorque(std::vector<std::string>& dofNames);
+  void getEmgFromInputQueue(std::vector<double>& emgFromQueue);
+  void getLmtFromInputQueue(std::vector<double>& lmtFromQueue);
+  void getMomentArmsFromInputQueue(std::vector<double>& momentArmsFromQueue, unsigned int whichDof);
+  void getExternalTorqueFromInputQueue(std::vector<double>& externalTorqueFromQueue, unsigned int whichDof); 
 };
 
 #endif
