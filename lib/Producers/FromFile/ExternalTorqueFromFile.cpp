@@ -1,5 +1,6 @@
 #include "ExternalTorqueFromFile.h"
 #include "DataFromFile.h"
+#include "DataFromStorageFile.h"
 #include "SyncTools.h"
 
 
@@ -45,17 +46,17 @@ void ExternalTorqueFromFile::operator()()
   int noDofWithExtTorque = 0;
 
 //TORQUE INIT
-  vector<DataFromFile*> myExternalTorqueData;
+  vector<DataFromStorageFile*> myExternalTorqueData;
   for (vector<string>::iterator dofIt = dofNamesFromModel.begin(); dofIt < dofNamesFromModel.end(); ++dofIt) 
   { 
-    if(externalTorqueFileExist(dataDirectory_ + *dofIt + "Torque.txt"))
+    if(externalTorqueFileExist(dataDirectory_ + *dofIt + "Torque.sto"))
     {
       externalTorqueDofNames.push_back(*dofIt);
-      *dofIt = dataDirectory_ + *dofIt + "Torque.txt";
+      *dofIt = dataDirectory_ + *dofIt + "Torque.sto";
 #ifdef LOG  
       cout << "\nReading..." << *dofIt << endl;
 #endif
-      DataFromFile* newDoFDataFromFilePointer = new DataFromFile(*dofIt);
+      DataFromStorageFile* newDoFDataFromFilePointer = new DataFromStorageFile(*dofIt);
       myExternalTorqueData.push_back(newDoFDataFromFilePointer);  
       ++noDofWithExtTorque;    
     }  

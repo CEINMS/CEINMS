@@ -1,5 +1,6 @@
 #include "LmtMaFromFile.h"
 #include "DataFromFile.h"
+#include "DataFromStorageFile.h"
 #include "SyncTools.h"
 
 
@@ -35,11 +36,11 @@ void LmtMaFromFile::operator()()
 
 //LMT INIT
 //open lmt file and read muscles names
-  string lmtDataFilename = dataDirectory_ + "lmt.txt";  
+  string lmtDataFilename = dataDirectory_ + "lmt.sto";
 #ifdef LOG  
   cout << "\nReading..." << lmtDataFilename << endl;
 #endif
-  DataFromFile myLmtData(lmtDataFilename);
+  DataFromStorageFile myLmtData(lmtDataFilename);
   vector<string> lmtMusclesNames;
   lmtMusclesNames = myLmtData.getMusclesNames();
 //set lmt muscles name read from file to global variable
@@ -51,14 +52,14 @@ void LmtMaFromFile::operator()()
 
 //MOMENT ARMS INIT
 //open moment arms files and read muscles names
-  vector<DataFromFile*> myMomentArmsData;
+  vector<DataFromStorageFile*> myMomentArmsData;
   for (vector<string>::iterator dofIt = dofNamesFromModel.begin(); dofIt < dofNamesFromModel.end(); ++dofIt) 
   {
-    *dofIt = dataDirectory_ + *dofIt + "Ma.txt";
+    *dofIt = dataDirectory_ + *dofIt + "Ma.sto";
 #ifdef LOG  
     cout << "\nReading..." << *dofIt << endl;
 #endif
-    DataFromFile* newDoFDataFromFilePointer = new DataFromFile(*dofIt);
+    DataFromStorageFile* newDoFDataFromFilePointer = new DataFromStorageFile(*dofIt);
     myMomentArmsData.push_back(newDoFDataFromFilePointer);  
   }  
   vector< vector <string> > musclesNamesFromMomentArmsFiles;
