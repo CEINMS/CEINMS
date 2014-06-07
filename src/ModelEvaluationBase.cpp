@@ -19,9 +19,8 @@ ModelEvaluationBase::ModelEvaluationBase() {
   CEINMS::InputConnectors::queueLmt.subscribe();
   CEINMS::InputConnectors::queueEmg.subscribe();
   for (auto& it : CEINMS::InputConnectors::queueMomentArms)
-    it.subscribe(); 
-  for (auto& it : CEINMS::InputConnectors::queueExternalTorque)
-    it.subscribe(); 
+    (*it).subscribe(); 
+  CEINMS::InputConnectors::queueExternalTorques.subscribe(); 
 }
 
 void ModelEvaluationBase::getEmgFromInputQueue(vector<double>& emgs) {
@@ -34,12 +33,12 @@ void ModelEvaluationBase::getLmtFromInputQueue(vector<double>& lmts) {
 
 
 void ModelEvaluationBase::getMomentArmsFromInputQueue(vector<double>& momentArms, unsigned int whichDof) {
-  momentArms =  CEINMS::InputConnectors::queueMomentArms.at(whichDof).pop();
+  momentArms =  (*CEINMS::InputConnectors::queueMomentArms.at(whichDof)).pop();
 }
 
 
-void ModelEvaluationBase::getExternalTorqueFromInputQueue(vector<double>& externalTorque, unsigned int whichDof) {
-  externalTorque =  CEINMS::InputConnectors::queueExternalTorque.at(whichDof).pop(); 
+void ModelEvaluationBase::getExternalTorquesFromInputQueue(vector<double>& externalTorques) {
+  externalTorques =  CEINMS::InputConnectors::queueExternalTorques.pop(); 
 }
 
 ModelEvaluationBase::~ModelEvaluationBase() { }

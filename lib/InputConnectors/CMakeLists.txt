@@ -1,34 +1,36 @@
 ## Authors: Monica Reggiani, Claudio Pizzolato
 
-set(FromFile_SOURCES
+set(FromStorageFile_SOURCES
   FromFile/EMGFromFile.cpp
-  FromFile/ExternalTorqueFromFile.cpp
-  FromFile/LmtMaFromFile.cpp
+  FromFile/ExternalTorquesFromStorageFile.cpp
+  FromFile/LmtMaFromStorageFile.cpp
+  FromFile/Utilities.cpp
 )
-set(FromFile_HEADERS
+set(FromStorageFile_HEADERS
   FromFile/EMGFromFile.h
-  FromFile/ExternalTorqueFromFile.h
-  FromFile/LmtMaFromFile.h
+  FromFile/ExternalTorquesFromStorageFile.h
+  FromFile/LmtMaFromStorageFile.h
+  FromFile/Utilities.h
 )
 
 set(FromOpenSim_SOURCES
   FromOpenSim/LmtMaFromOpenSim.cpp
-  FromOpenSim/ExternalTorqueFromStorage.cpp
+  FromOpenSim/ExternalTorquesFromStorageFile.cpp
 )
 set(FromOpenSim_HEADERS
   FromOpenSim/LmtMaFromOpenSim.h
-  FromOpenSim/ExternalTorqueFromStorage.h
+  FromOpenSim/ExternalTorquesFromStorageFile.h
 )
 
 set(InputConnectors_SOURCES
   EMGFromX.cpp
-  ExternalTorqueFromX.cpp
+  ExternalTorquesFromX.cpp
   LmtMaFromX.cpp
   InputQueues.cpp
 )
 set(InputConnectors_HEADERS
   EMGFromX.h
-  ExternalTorqueFromX.h
+  ExternalTorquesFromX.h
   LmtMaFromX.h
   InputQueues.h
 )
@@ -48,9 +50,9 @@ endif()
 
 add_library(InputConnectors STATIC
   ${InputConnectors_SOURCES}
-  ${FromFile_SOURCES}
+  ${FromStorageFile_SOURCES}
   ${InputConnectors_HEADERS}
-  ${FromFile_HEADERS}
+  ${FromStorageFile_HEADERS}
   ${CMAKE_SOURCE_DIR}/lib/Concurrency/Latch.cpp
 )
 
@@ -59,10 +61,10 @@ target_link_libraries(InputConnectors FileIO)
 if(OPENSIM_FOUND)
     add_library(InputConnectorsOSim STATIC
       ${InputConnectors_SOURCES}
-      ${FromFile_SOURCES}
+      ${FromStorageFile_SOURCES}
       ${FromOpenSim_SOURCES}
       ${InputConnectors_HEADERS}
-      ${FromFile_HEADERS}
+      ${FromStorageFile_HEADERS}
       ${FromOpenSim_HEADERS}
     )
 

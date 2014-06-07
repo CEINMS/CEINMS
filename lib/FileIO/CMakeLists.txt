@@ -6,15 +6,17 @@ set(EMGgenerator_SOURCES
   EMGgenerator/EMGgeneratorFrom6To24.cpp
   EMGgenerator/EMGgeneratorFromXml.cpp
   DataFromFile.cpp
+  DataFromStorageFile.cpp
   EMGDataFromFile.cpp
 )
 
-set(EMGgenerator_HEADERS
+set(EMGgenerator_HEADERS 
   EMGgenerator/EMGgeneratorFrom10To13.h
   EMGgenerator/EMGgeneratorFrom16To34.h
   EMGgenerator/EMGgeneratorFrom6To24.h
   EMGgenerator/EMGgeneratorFromXml.h
   DataFromFile.h
+  DataFromStorageFile.h
   EMGDataFromFile.h
   policyTemplates.h
 )

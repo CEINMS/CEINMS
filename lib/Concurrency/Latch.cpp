@@ -15,9 +15,24 @@
 
   
 namespace CEINMS{ namespace Concurrency{
+
+Latch::Latch() 
+:count_(0)
+{ }
+  
 Latch::Latch(int count)
 :count_(count) 
 { }
+
+void Latch::setCount(int count)
+{
+  if (count_ != 0) {
+    std::cout << "You are not allowed to reset a Latch\n";
+    exit(EXIT_FAILURE);
+  }
+  else
+    count_ = count;
+}
 
 void Latch::wait() {
     std::unique_lock<std::mutex> mlock(mutex_);
@@ -32,5 +47,6 @@ void Latch::wait() {
     }
     mlock.unlock();
 }
+
 
 }; };

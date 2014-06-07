@@ -18,13 +18,14 @@ namespace CEINMS {
     //:TODO: I have no idea about this globalTimeLimit.... WHY... AND WHY SO HIDDEN.. come on
     float globalTimeLimit = 100.;
     
-    const unsigned int numberOfThreads = 4; // 4 se c'è il produttore della torque esterna, 3 altrimenti
     Concurrency::Queue< std::vector<double> > queueEmg; 
     Concurrency::Queue< std::vector<double> > queueLmt;
-    std::vector< Concurrency::Queue< std::vector<double> > > queueMomentArms; 
-    std::vector< Concurrency::Queue< std::vector<double> > > queueExternalTorque;
+    std::vector< Concurrency::Queue< std::vector<double> >* > queueMomentArms; 
+    Concurrency::Queue< std::vector<double> > queueExternalTorques;
+    bool externalTorquesAvailable = false; 
     
-    CEINMS::Concurrency::Latch readyInputQueues(numberOfThreads); 
-    
+    Concurrency::Latch inputQueuesAreReady;
+    Concurrency::Latch doneWithSubscription; 
+  
     };
 };

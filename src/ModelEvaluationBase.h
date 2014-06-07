@@ -24,7 +24,7 @@ public:
   void getEmgFromInputQueue(std::vector<double>& emgFromQueue);
   void getLmtFromInputQueue(std::vector<double>& lmtFromQueue);
   void getMomentArmsFromInputQueue(std::vector<double>& momentArmsFromQueue, unsigned int whichDof);
-  void getExternalTorqueFromInputQueue(std::vector<double>& externalTorqueFromQueue, unsigned int whichDof); 
+  void getExternalTorquesFromInputQueue(std::vector<double>& externalTorquesFromQueue); 
 };
 
 #endif

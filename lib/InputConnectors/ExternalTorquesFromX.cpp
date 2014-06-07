@@ -8,7 +8,7 @@
 //
 
 
-#include "ExternalTorqueFromX.h"
+#include "ExternalTorquesFromX.h"
 #include "InputQueues.h"
 
 #include <iostream>
@@ -21,16 +21,16 @@ using std::vector;
 #include <cstdlib>
 
 
-void ExternalTorqueFromX::updateExternalTorque(const vector<double>& currentExternalTorqueData, double currentTime, unsigned int whichDof)
+void ExternalTorquesFromX::updateExternalTorques(const vector<double>& currentExternalTorquesData, double currentTime)
 {
-  vector<double> ExternalTorqueDataToPush = currentExternalTorqueData;
-  ExternalTorqueDataToPush.push_back(currentTime);
-  CEINMS::InputConnectors::queueExternalTorque.at(whichDof).push(ExternalTorqueDataToPush);
+  vector<double> ExternalTorquesDataToPush = currentExternalTorquesData;
+  ExternalTorquesDataToPush.push_back(currentTime); 
+  CEINMS::InputConnectors::queueExternalTorques.push(ExternalTorquesDataToPush);
 }
 
 
 
-ExternalTorqueFromX::~ExternalTorqueFromX() { }
+ExternalTorquesFromX::~ExternalTorquesFromX() { }
 
 
 

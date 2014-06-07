@@ -13,7 +13,7 @@
 
 #include <vector>
 #include <string>
-
+#include "InputQueues.h"
 
 class LmtMaFromX
 {
@@ -38,6 +38,14 @@ LmtMaFromX::LmtMaFromX(const NMSModelT& subject)
   subject.getMuscleNames(musclesNames_); 
   subject.getDoFNames(dofNames_);
   subject.getMuscleNamesOnDofs(muscleNamesOnDofs_);
+  /*
+  std::cout << "SIZE:" << CEINMS::InputConnectors::queueMomentArms.size() << std::endl; 
+  CEINMS::InputConnectors::queueMomentArms.resize(3);
+  */
+//   for (int i= 0; i < dofNames_.size(); ++i) {
+//     CEINMS::Concurrency::Queue< std::vector<double> > newQueue;
+//     CEINMS::InputConnectors::queueMomentArms.push_back(newQueue); 
+//   }
 }
 
 #endif

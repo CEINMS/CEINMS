@@ -21,7 +21,7 @@ void EMGFromFile::operator()()
   string filename(FileUtils::getFile(inputDir_, "emg.txt"));
     
 #ifdef LOG  
-  cout << "\nReading emg file..." << filename << endl;
+  cout << "\nEMG: Reading emg file..." << filename << endl;
 #endif
   
   EMGDataFromFile<EMGgeneratorFromXml> myEmgData(filename);
@@ -32,7 +32,8 @@ void EMGFromFile::operator()()
     exit(EXIT_FAILURE);  
   }
   
-  CEINMS::InputConnectors::readyInputQueues.wait(); 
+  CEINMS::InputConnectors::inputQueuesAreReady.wait(); 
+  CEINMS::InputConnectors::doneWithSubscription.wait();
   
   while (myEmgData.areStillData())
   { 
@@ -45,7 +46,7 @@ void EMGFromFile::operator()()
   // SyncTools::Shared::emgProducingDone.notify();
   
 #ifdef LOG  
-  cout << "\nEMG DONE\n";
+  cout << "\nEMG: EMG DONE\n";
 #endif
  
 }

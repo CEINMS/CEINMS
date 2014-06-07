@@ -9,7 +9,7 @@
 
 #include "EMGFromFile.h"
 #include "LmtMaFromFile.h"
-#include "ExternalTorqueFromFile.h"
+#include "ExternalTorquesFromStorageFile.h"
 #include "ModelEvaluationOnline.h"
 //#include "ModelEvaluationOffline.h"
 //#include "ModelEvaluationHybrid.h"

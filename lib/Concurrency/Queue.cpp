@@ -30,6 +30,7 @@ namespace CEINMS{ namespace Concurrency{
     }
     
     mlock.unlock();
+    
     return val;
     
   }

@@ -1,5 +1,5 @@
 //__________________________________________________________________________
-// Author(s): Claudio Pizzolato, Monica Reggiani - October 2013
+// Author(s): Claudio Pizzolato, Monica Reggiani - June 2014
 // email:  claudio.pizzolato@griffithuni.edu.au
 //         monica.reggiani@gmail.com
 //
@@ -8,27 +8,27 @@
 //
 
 
-#ifndef ExternalTorqueFromX_h
-#define ExternalTorqueFromX_h
+#ifndef ExternalTorquesFromX_h
+#define ExternalTorquesFromX_h
 
 #include <vector>
 #include <string>
 
-class ExternalTorqueFromX
+class ExternalTorquesFromX
 {
 public:
   template <typename NMSModelT>
-  ExternalTorqueFromX(const NMSModelT& subject);
-  virtual ~ExternalTorqueFromX();
+  ExternalTorquesFromX(const NMSModelT& subject);
+  virtual ~ExternalTorquesFromX();
   virtual void operator()() {};
-  void updateExternalTorque(const std::vector<double>& currentExternalTorqueData, double currentTime, unsigned int whichDof); 
+  void updateExternalTorques(const std::vector<double>& currentExternalTorquesData, double currentTime); 
 protected:
   std::vector< std::string > dofNames_;
 };
 
 
 template <typename NMSModelT>
-ExternalTorqueFromX::ExternalTorqueFromX(const NMSModelT& subject)
+ExternalTorquesFromX::ExternalTorquesFromX(const NMSModelT& subject)
 {
   subject.getDoFNames(dofNames_);  
 }

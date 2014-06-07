@@ -17,9 +17,13 @@
 namespace CEINMS{ namespace Concurrency{
 class Latch {
 public:
+  Latch();
   Latch(int count);
 
+  void setCount(int count);
+  
   void wait();
+  
 
   Latch(const Latch&) = delete;
   Latch& operator=(const Latch&) = delete; 

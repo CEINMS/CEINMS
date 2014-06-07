@@ -31,7 +31,7 @@ void LmtMaFromX::updateMomentArms(const vector<double>& currentMomentArmsData, d
 {
   vector<double> momentArmsDataToPush = currentMomentArmsData;
   momentArmsDataToPush.push_back(currentTime); 
-  CEINMS::InputConnectors::queueMomentArms.at(whichDof).push(momentArmsDataToPush);
+  (*CEINMS::InputConnectors::queueMomentArms.at(whichDof)).push(momentArmsDataToPush);
 }
 
 LmtMaFromX::~LmtMaFromX() { }

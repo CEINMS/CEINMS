@@ -40,6 +40,16 @@ TARGET_LINK_LIBRARIES( CEINMS
       ${Boost_LIBRARIES}
 )
 
+ADD_EXECUTABLE( TestInputConnectors TestInputConnectors.cpp  ${CEINMS_COMMON_SOURCES} ${CEINMS_HEADERS}  )
+TARGET_LINK_LIBRARIES( TestInputConnectors
+      FileIO
+      xmlInput
+      NMSmodel
+      InputConnectors
+      ${CMAKE_THREAD_LIBS_INIT}
+      ${Boost_LIBRARIES}
+)
+
 #enable_language(Fortran)
 #if(UNIX)
 #find_package(LAPACK)
@@ -83,6 +93,8 @@ target_link_libraries( CEINMScalibrate
       FileIO
       ${Boost_LIBRARIES}
 )
+
+
 
 if(OPENSIM_FOUND)
   set(CEINMScalibrate-osim_SOURCES

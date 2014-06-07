@@ -27,8 +27,6 @@ public:
 private:
     NMSmodelT& subject_;
     std::string outputDir_;
- //   std::vector< std::string > musclesNames_;
- //   std::vector< std::vector < std::string > > musclesNamesOnDof_;
     std::vector< std::string > dofNames_;
     std::vector< std::string > dofNamesWithExtTorque_;
     unsigned noDof_;

@@ -33,34 +33,18 @@ ModelEvaluationOnline<NMSmodelT>::ModelEvaluationOnline(NMSmodelT& subject, cons
 
 template <typename NMSmodelT>
 void ModelEvaluationOnline<NMSmodelT>::operator()() {
- 
-    vector<double> emgFromQueue;
-    vector<double> lmtFromQueue;
-    vector< vector<double> > momentArmsFromQueue;
-    vector< vector<double> > externalTorqueFromQueue;  
-    double emgTime, lmtMaTime;
-    vector<double> externalTorqueTime;
-    bool runCondition = true;
+  vector<double> emgFromQueue;
+  vector<double> lmtFromQueue;
+  vector<double> externalTorquesFromQueue;  
+  vector< vector<double> > momentArmsFromQueue;
+  double emgTime, lmtMaTime, externalTorqueTime;
+  bool runCondition = true;
     
-    subject_.getDoFNames(dofNames_);
-    noDof_ = dofNames_.size();
-    momentArmsFromQueue.resize(noDof_);
+  subject_.getDoFNames(dofNames_);
+  noDof_ = dofNames_.size();
+  momentArmsFromQueue.resize(noDof_);
     
-    CEINMS::InputConnectors::readyInputQueues.wait(); //barrier
-
-    if ( CEINMS::InputConnectors::queueExternalTorque.size() != 0) {
-      dofNamesWithExtTorque_ = dofNames_; 
-      externalTorqueTime.resize(dofNamesWithExtTorque_.size());
-      externalTorqueFromQueue.resize(dofNamesWithExtTorque_.size());
-    }
-#ifdef LOG
-    cout << "Deegres of Freedom with an external torque data:\n";
-    for(unsigned int i = 0; i < dofNamesWithExtTorque_.size(); ++i)
-        cout << dofNamesWithExtTorque_.at(i) << endl;
-    if (dofNamesWithExtTorque_.size() == 0)
-        cout << "no external torque data found!\n";
-#endif
-
+  CEINMS::InputConnectors::readyInputQueues.wait(); 
     
   double globalEmDelay = subject_.getGlobalEmDelay(); 
    
@@ -86,6 +70,12 @@ void ModelEvaluationOnline<NMSmodelT>::operator()() {
         getLmtFromInputQueue(lmtFromQueue);
         lmtMaTime = lmtFromQueue.back();
         lmtFromQueue.pop_back();         //removes time value from the end of vector
+#ifdef LOG
+        cout << lmtMaTime << endl; 
+        for (auto& it: lmtFromQueue)
+           cout << it << " ";
+        cout << endl;
+#endif
         for(unsigned int i = 0; i < noDof_; ++i) {
             getMomentArmsFromInputQueue((momentArmsFromQueue.at(i)), i);    
             momentArmsFromQueue.at(i).pop_back();  //removes time value from the end of vector
@@ -96,8 +86,8 @@ void ModelEvaluationOnline<NMSmodelT>::operator()() {
 //è allo stesso modo possibile avere un numero di dati differente a seconda del dof considerato
 //stillExtTorqueDataOnDof è un vettore che tiene conto di questo, in modo da evitare problemi di lunghezza sui vettori
                 if(stillExtTorqueDataOnDof.at(i)) {   
-                    getExternalTorqueFromInputQueue(externalTorqueFromQueue.at(i), i);
-                    externalTorqueTime.at(i) = externalTorqueFromQueue.at(i).back();
+                    getExternalTorquesFromInputQueue(externalTorquesFromQueue);
+                    externalTorqueTime.at(i) = externalTorquesFromQueue.at(i).back();
                     externalTorqueFromQueue.at(i).pop_back();
                     if(externalTorqueFromQueue.at(i).empty())
                         stillExtTorqueDataOnDof.at(i) = false;

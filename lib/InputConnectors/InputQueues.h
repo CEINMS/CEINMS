@@ -24,10 +24,12 @@ namespace CEINMS {
     
     extern Concurrency::Queue< std::vector<double> > queueEmg; 
     extern Concurrency::Queue< std::vector<double> > queueLmt; 
-    extern std::vector< Concurrency::Queue< std::vector<double> > > queueMomentArms; 
-    extern std::vector< Concurrency::Queue< std::vector<double> > > queueExternalTorque;
+    extern std::vector< Concurrency::Queue< std::vector<double> >* > queueMomentArms; 
+    extern bool externalTorquesAvailable; 
+    extern Concurrency::Queue< std::vector<double> >  queueExternalTorques;
  
-    extern Concurrency::Latch readyInputQueues; 
+    extern Concurrency::Latch inputQueuesAreReady;
+    extern Concurrency::Latch doneWithSubscription; 
     };
 };
 

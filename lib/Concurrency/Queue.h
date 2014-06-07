@@ -21,7 +21,7 @@ class Queue {
   public:
     
     Queue() = default;
-    Queue(const Queue&); //:TODO: = delete;   
+    Queue(const Queue&)= delete;   
     Queue& operator=(const Queue&) = delete; 
     
     void subscribe(); 
