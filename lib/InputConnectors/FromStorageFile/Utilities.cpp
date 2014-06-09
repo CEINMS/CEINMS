@@ -36,11 +36,11 @@ string findFile(const string& pattern, const string& directoryPath) {
   filenames.erase(pos, std::end(filenames));
 
   if (filenames.size() == 0) {
-    cout << "Could not find the *_MuscleAnalysis_Length.sto file in" << directoryPath << endl; 
+    cout << "Could not find the * "<< pattern << " file in" << directoryPath << endl;
     exit(EXIT_FAILURE);
   }
   if (filenames.size() > 1) {
-    cout << "Too many *_MuscleAnalysis_Length.sto file in" << directoryPath << endl; 
+    cout << "Too many *" <<pattern << " files in" << directoryPath << endl;
     exit(EXIT_FAILURE);
   }
     
