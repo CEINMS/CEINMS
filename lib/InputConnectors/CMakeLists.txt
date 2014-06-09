@@ -15,11 +15,11 @@ set(FromStorageFile_HEADERS
 
 set(FromOpenSim_SOURCES
   FromOpenSim/LmtMaFromOpenSim.cpp
-  FromOpenSim/ExternalTorquesFromStorageFile.cpp
+  FromOpenSim/ExternalTorqueFromStorage.cpp
 )
 set(FromOpenSim_HEADERS
   FromOpenSim/LmtMaFromOpenSim.h
-  FromOpenSim/ExternalTorquesFromStorageFile.h
+  FromOpenSim/ExternalTorqueFromStorage.h
 )
 
 set(InputConnectors_SOURCES
