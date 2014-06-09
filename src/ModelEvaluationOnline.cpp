@@ -58,7 +58,7 @@ void ModelEvaluationOnline<NMSmodelT>::operator()() {
     logger.addLog(Logger::MuscleForces);
     logger.addLog(Logger::Torques);
 #endif
-
+  double externalTorqueTime = std::numeric_limits<double>::lowest();
   bool runCondition = true; 
   do {  // while(runCondition)
      
@@ -87,13 +87,13 @@ void ModelEvaluationOnline<NMSmodelT>::operator()() {
     
     // 3. read external Torque 
     vector<double> externalTorquesFromQueue;  
-    double externalTorqueTime;
+
     if (CEINMS::InputConnectors::externalTorquesAvailable) {
-      do {
+        while ((externalTorqueTime < lmtMaTime) /*&& (!(externalTorquesFromQueue.empty()))*/) {
         getExternalTorquesFromInputQueue(externalTorquesFromQueue);
         externalTorqueTime = externalTorquesFromQueue.back();
         externalTorquesFromQueue.pop_back();
-      } while ((externalTorqueTime < lmtMaTime) && (!(externalTorquesFromQueue.empty())));
+      }
     }
 
 //:TODO: nota da aggiornare....
