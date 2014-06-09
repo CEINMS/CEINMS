@@ -112,7 +112,7 @@ int main(int argc, char** argv) {
     ("execution,x", po::value<string>(&executionFile),  "execution xml file")
     ("input-dir,i", po::value<string>(&inputDirectory), "trial directory path")
     ("output-dir,o", po::value<string>(&outputDirectory)->default_value("./Output"), "output directory")
-    ("emg-generator,eg", po::value<string>(&emgGeneratorFile)->default_value("cfg/xml/emgGenerator.xml"), "EMG mapping");
+    ("emg-generator,g", po::value<string>(&emgGeneratorFile)->default_value("cfg/xml/emgGenerator.xml"), "EMG mapping");
     
     po::variables_map vm;
     po::store(po::parse_command_line(argc, argv, desc), vm);
