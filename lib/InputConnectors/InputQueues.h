@@ -25,6 +25,7 @@ namespace CEINMS {
     extern Concurrency::Queue< std::vector<double> > queueEmg; 
     extern Concurrency::Queue< std::vector<double> > queueLmt; 
     extern std::vector< Concurrency::Queue< std::vector<double> >* > queueMomentArms; 
+    
     extern bool externalTorquesAvailable; 
     extern Concurrency::Queue< std::vector<double> >  queueExternalTorques;
  

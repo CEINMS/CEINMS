@@ -18,7 +18,7 @@ template <typename NMSmodelT>
 class ModelEvaluationOnline : public ModelEvaluationBase {
 
 public:
-//    ModelEvaluationOnline();
+    ModelEvaluationOnline() = delete;
     ModelEvaluationOnline(NMSmodelT& subject, const std::string& outputDir = "./Output");
     void setOutputDirectory(const std::string& outputDir);
 //    void setSubject(NMSmodelT& subject);
@@ -30,6 +30,7 @@ private:
     std::vector< std::string > dofNames_;
     std::vector< std::string > dofNamesWithExtTorque_;
     unsigned noDof_;
+    double globalEmDelay_;
 };
 
 #include "ModelEvaluationOnline.cpp"
