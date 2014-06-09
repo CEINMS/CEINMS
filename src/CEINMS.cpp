@@ -8,7 +8,7 @@
 
 
 #include "EMGFromFile.h"
-#include "LmtMaFromFile.h"
+#include "LmtMaFromStorageFile.h"
 #include "ExternalTorquesFromStorageFile.h"
 #include "ModelEvaluationOnline.h"
 //#include "ModelEvaluationOffline.h"
@@ -125,7 +125,7 @@ int main(int argc, char** argv) {
 
     ExecutionXmlReader executionCfg(executionFile);             
     
-   NMSModelCfg::RunMode runMode = executionCfg.getRunMode();
+    NMSModelCfg::RunMode runMode = executionCfg.getRunMode();
    
 //    NMSModelCfg::RunMode runMode = NMSModelCfg::HybridPiecewiseActivationElasticTendonOnline;
     switch(runMode) {
@@ -137,14 +137,59 @@ int main(int argc, char** argv) {
           setupSubject(mySubject, subjectFile);
           
           // 2. define the thread connecting with the input sources
-          LmtMaFromFile lmtMaProducer(mySubject, inputDirectory);
-          ExternalTorqueFromFile externalTorqueProducer(mySubject, inputDirectory);
           EMGFromFile emgProducer(mySubject, inputDirectory);
-
+          LmtMaFromStorageFile lmtMaProducer(mySubject, inputDirectory);
+          ExternalTorqueFromStorageFile externalTorqueProducer(mySubject, inputDirectory);
+          
+          CEINMS::InputConnectors::inputQueuesAreReady.setCount(4); 
+          CEINMS::InputConnectors::doneWithSubscription.setCount(5);
+          
           // 3. start the model
           ModelEvaluationOnline<MyNMSmodel> simulator(mySubject, outputDirectory);
           runThreads(simulator, emgProducer, lmtMaProducer, externalTorqueProducer);
           break;
+          
+ /*         
+    
+    vector<string> muscleNames; 
+    mySubject.getMuscleNames(muscleNames);
+    vector<string> dofNames;
+    mySubject.getDoFNames(dofNames);
+   
+    
+    std::thread emgProdThread(emgProducer); 
+    std::thread externalTorquesProdThread(externalTorquesProducer);
+    std::thread lmtMaProdThread(lmtMaProducer);
+    CEINMS::InputConnectors::inputQueuesAreReady.wait();
+    
+    
+     std::thread emgConsThread(consumeAndStore, ref(CEINMS::InputConnectors::queueEmg), outputDirectory + "/emg.csv", ref(muscleNames)); 
+     std::thread externalTorquesConThread(consumeAndStore, ref(CEINMS::InputConnectors::queueExternalTorques), outputDirectory + "/externalTorques.csv",ref(dofNames));
+     std::thread lmtConsThread(consumeAndStore, ref(CEINMS::InputConnectors::queueLmt),outputDirectory + "/lmt.csv", ref(muscleNames));
+    
+    
+    std::vector<std::thread> maConsThreads(dofNames.size());
+    vector< vector <string> > muscleNamesOnDofs; 
+    mySubject.getMuscleNamesOnDofs(muscleNamesOnDofs);
+    for (int currentDof= 0; currentDof < dofNames.size(); ++currentDof) 
+    { 
+      maConsThreads.at(currentDof) = std::thread(consumeAndStore, ref(*(CEINMS::InputConnectors::queueMomentArms.at(currentDof))), outputDirectory + "/ma_" + dofNames.at(currentDof) + ".csv", ref(muscleNamesOnDofs.at(currentDof)));
+    } 
+    
+    emgProdThread.join();
+    externalTorquesProdThread.join();
+    lmtMaProdThread.join();
+    
+    emgConsThread.join();
+    externalTorquesConThread.join();
+    lmtConsThread.join();
+    for (int i = 0; i < dofNames.size(); ++i) {
+      maConsThreads.at(i).join(); 
+    }*/
+          
+         
+
+      
         }
        
 //         case NMSModelCfg::OpenLoopExponentialActivationStiffTendonOffline: {

@@ -24,7 +24,10 @@ using std::vector;
 
 ExternalTorqueFromStorage::ExternalTorqueFromStorage(const string& filename)
                    :filename_(filename)
-{ }
+{ 
+  
+  
+}
 
 bool ExternalTorqueFromStorage::externalTorqueFileExist(const string& fileName)
 {

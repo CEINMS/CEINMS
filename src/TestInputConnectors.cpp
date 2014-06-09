@@ -23,6 +23,8 @@
 #include "Curve.h"
 #include "ExecutionXmlReader.h"
 
+#include "FileUtils.h"
+
 #include <iomanip>
 
 #include <ctime>
@@ -79,9 +81,20 @@ void consumeAndStore(CEINMS::Concurrency::Queue< std::vector<double> >& queue, c
 }
 
 
-
-
-
+void setLmtMaFilenames(const string& inputDirectory, const vector< string > dofNames, string& lmtDataFilename, vector< string >& maDataFilenames)
+{
+  std::string pattern{"_MuscleAnalysis_Length.sto"};
+  std::string directory{inputDirectory + "/MuscleAnalysis/"};
+  lmtDataFilename = directory + findFile(pattern, directory);
+  
+  int currentDof = 0; 
+  for (auto& it: dofNames)
+  {
+    std::string pattern = "_MomentArm_" + it + ".sto";
+    std::string maDataFilename = directory + findFile(pattern, directory);
+    maDataFilenames.push_back(maDataFilename); 
+  }
+}
 
 int main(int argc, char** argv) {
  
@@ -115,42 +128,50 @@ int main(int argc, char** argv) {
     typedef NMSmodel<ExponentialActivation, StiffTendon, CurveMode::Online> MyNMSmodel;
     MyNMSmodel mySubject;
     setupSubject(mySubject, subjectFile);
-           
-    EMGFromFile emgProducer(mySubject, inputDirectory);
-    LmtMaFromStorageFile lmtMaProducer(mySubject, inputDirectory);
-    ExternalTorquesFromStorageFile externalTorquesProducer(mySubject, inputDirectory);   
     
     vector<string> muscleNames; 
     mySubject.getMuscleNames(muscleNames);
     vector<string> dofNames;
     mySubject.getDoFNames(dofNames);
-    CEINMS::InputConnectors::inputQueuesAreReady.setCount(4); 
+    
+    
+    string emgFilename(FileUtils::getFile(inputDirectory, "emg.txt"));
+    EMGFromFile emgProducer(mySubject, emgFilename);
+    
+    
+    string externalTorqueFilename(inputDirectory + "inverse_dynamics.sto");
+    ExternalTorquesFromStorageFile externalTorquesProducer(mySubject, externalTorqueFilename);  
+    
+    string lmtFilename;
+    vector< string > maFilename;
+    setLmtMaFilenames(inputDirectory, dofNames, lmtFilename, maFilename);
+    LmtMaFromStorageFile lmtMaProducer(mySubject, lmtFilename, maFilename); 
+    
     CEINMS::InputConnectors::doneWithSubscription.setCount(6+dofNames.size());
     
-    std::thread emgProdThread(emgProducer); 
-    std::thread externalTorquesProdThread(externalTorquesProducer);
-    std::thread lmtMaProdThread(lmtMaProducer);
-    CEINMS::InputConnectors::inputQueuesAreReady.wait();
+    std::thread emgProdThread(std::ref(emgProducer)); 
+    std::thread externalTorquesProdThread(std::ref(externalTorquesProducer));
+    std::thread lmtMaProdThread(std::ref(lmtMaProducer));
     
     
-     std::thread emgConsThread(consumeAndStore, ref(CEINMS::InputConnectors::queueEmg), outputDirectory + "/emg.csv", ref(muscleNames)); 
-     std::thread externalTorquesConThread(consumeAndStore, ref(CEINMS::InputConnectors::queueExternalTorques), outputDirectory + "/externalTorques.csv",ref(dofNames));
-     std::thread lmtConsThread(consumeAndStore, ref(CEINMS::InputConnectors::queueLmt),outputDirectory + "/lmt.csv", ref(muscleNames));
+    std::thread emgConsThread(std::ref(consumeAndStore), std::ref(CEINMS::InputConnectors::queueEmg), outputDirectory + "/emg.csv", std::ref(muscleNames)); 
+    std::thread externalTorquesConThread(std::ref(consumeAndStore), std::ref(CEINMS::InputConnectors::queueExternalTorques), outputDirectory + "/externalTorques.csv",std::ref(dofNames));
+    std::thread lmtConsThread(std::ref(consumeAndStore), std::ref(CEINMS::InputConnectors::queueLmt),outputDirectory + "/lmt.csv", std::ref(muscleNames));
     
     
-    std::vector<std::thread> maConsThreads(dofNames.size());
-    vector< vector <string> > muscleNamesOnDofs; 
-    mySubject.getMuscleNamesOnDofs(muscleNamesOnDofs);
-    for (int currentDof= 0; currentDof < dofNames.size(); ++currentDof) 
-    { 
-      maConsThreads.at(currentDof) = std::thread(consumeAndStore, ref(*(CEINMS::InputConnectors::queueMomentArms.at(currentDof))), outputDirectory + "/ma_" + dofNames.at(currentDof) + ".csv", ref(muscleNamesOnDofs.at(currentDof)));
-    } 
+   std::vector<std::thread> maConsThreads(dofNames.size());
+   vector< vector <string> > muscleNamesOnDofs; 
+   mySubject.getMuscleNamesOnDofs(muscleNamesOnDofs);
+   for (int currentDof= 0; currentDof < dofNames.size(); ++currentDof) 
+   { 
+     maConsThreads.at(currentDof) = std::thread(std::ref(consumeAndStore), std::ref(*(CEINMS::InputConnectors::queueMomentArms.at(currentDof))), outputDirectory + "/ma_" + dofNames.at(currentDof) + ".csv", std::ref(muscleNamesOnDofs.at(currentDof)));
+   } 
     
     emgProdThread.join();
-    externalTorquesProdThread.join();
-    lmtMaProdThread.join();
+     lmtMaProdThread.join();
+     externalTorquesProdThread.join();
     
-      emgConsThread.join();
+    emgConsThread.join();
     externalTorquesConThread.join();
     lmtConsThread.join();
     for (int i = 0; i < dofNames.size(); ++i) {

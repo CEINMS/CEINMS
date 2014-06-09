@@ -1,16 +1,16 @@
 ## Authors: Monica Reggiani, Claudio Pizzolato
 
 set(FromStorageFile_SOURCES
-  FromFile/EMGFromFile.cpp
-  FromFile/ExternalTorquesFromStorageFile.cpp
-  FromFile/LmtMaFromStorageFile.cpp
-  FromFile/Utilities.cpp
+  FromStorageFile/EMGFromFile.cpp
+  FromStorageFile/ExternalTorquesFromStorageFile.cpp
+  FromStorageFile/LmtMaFromStorageFile.cpp
+  FromStorageFile/Utilities.cpp
 )
 set(FromStorageFile_HEADERS
-  FromFile/EMGFromFile.h
-  FromFile/ExternalTorquesFromStorageFile.h
-  FromFile/LmtMaFromStorageFile.h
-  FromFile/Utilities.h
+  FromStorageFile/EMGFromFile.h
+  FromStorageFile/ExternalTorquesFromStorageFile.h
+  FromStorageFile/LmtMaFromStorageFile.h
+  FromStorageFile/Utilities.h
 )
 
 set(FromOpenSim_SOURCES
@@ -35,12 +35,12 @@ set(InputConnectors_HEADERS
   InputQueues.h
 )
 
-source_group("Headers" FILES ${InputConnectors_HEADERS} ${FromFile_HEADERS} )
-source_group("Sources" FILES ${InputConnectors_SOURCES} ${FromFile_SOURCES} )
+source_group("Headers" FILES ${InputConnectors_HEADERS} ${FromStorageFile_HEADERS} )
+source_group("Sources" FILES ${InputConnectors_SOURCES} ${FromStorageFile_SOURCES} )
 
 include_directories(${ceinms_common_INCLUDE_DIRS} ${xmlInput_INCLUDE_DIRS} ${FileIO_INCLUDE_DIRS})
 include_directories(${Boost_INCLUDE_DIRS})
-include_directories(${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/FromFile ${CMAKE_SOURCE_DIR}/lib/Concurrency)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/FromStorageFile ${CMAKE_SOURCE_DIR}/lib/Concurrency)
 
 if(OPENSIM_FOUND)
   include_directories(${OPENSIM_INCLUDE_DIRS} ${SIMTK_INCLUDE_DIRS} ${CMAKE_CURRENT_SOURCE_DIR}/FromOpenSim)
@@ -70,7 +70,7 @@ if(OPENSIM_FOUND)
 
     target_link_libraries(InputConnectorsOSim FileIO ${OPENSIM_LIBRARIES})
 
-    set(InputConnectors_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/FromFile ${CMAKE_CURRENT_SOURCE_DIR}/FromOpenSim CACHE STRING "Include directories for InputConnectors library" FORCE)
+    set(InputConnectors_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/FromStorageFile ${CMAKE_CURRENT_SOURCE_DIR}/FromOpenSim CACHE STRING "Include directories for InputConnectors library" FORCE)
 else()
-  set(InputConnectors_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/FromFile  CACHE STRING "Include directories for InputConnectors library" FORCE)
+  set(InputConnectors_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/FromStorageFile  CACHE STRING "Include directories for InputConnectors library" FORCE)
 endif()
