@@ -32,7 +32,7 @@ DataFromStorageFile::DataFromStorageFile(const string& dataFilename)
   
   string line;
   getline(dataFile_, line, '\n');
-  while (line!="endheader" && !(dataFile_).eof())
+  while (line!="endheader" && line!= "endheader\r" && !dataFile_.eof())
   {
       if( size_t foundInfo=line.find("nRows=")!=string::npos)
       {

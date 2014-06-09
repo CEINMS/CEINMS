@@ -43,6 +43,4 @@ private:
   std::vector<double> currentData_;
 };
 
-
-
 #endif

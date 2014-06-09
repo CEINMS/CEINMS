@@ -9,6 +9,7 @@
 
 #include "InputQueues.h"
 #include "SimpleFileLogger.h"
+#include "StorageLogger.h"
 
 #include <iostream>
 using std::cout;
@@ -49,12 +50,13 @@ void ModelEvaluationOnline<NMSmodelT>::operator()() {
 #endif
   
 #ifdef LOG_FILES
-  Logger::SimpleFileLogger<NMSmodelT> logger(subject_, outputDir_);
-  logger.addLog(Logger::Activations);
-  logger.addLog(Logger::FibreLengths);
-  logger.addLog(Logger::FibreVelocities);
-  logger.addLog(Logger::MuscleForces);
-  logger.addLog(Logger::Torques);
+    Logger::StorageLogger<NMSmodelT> logger(subject_, outputDir_);
+    //Logger::SimpleFileLogger<NMSmodelT> logger(subject_, outputDir_);
+    logger.addLog(Logger::Activations);
+    logger.addLog(Logger::FibreLengths);
+    logger.addLog(Logger::FibreVelocities);
+    logger.addLog(Logger::MuscleForces);
+    logger.addLog(Logger::Torques);
 #endif
 
   bool runCondition = true; 

@@ -13,6 +13,7 @@
 #include "EMGgenerator/EMGgeneratorFrom16To34.h"
 #include "EMGgenerator/EMGgeneratorFromXml.h"
 #include "DataFromFile.h"
+#include "DataFromStorageFile.h"
 #include <string>
 using std::string;
 #include <vector>
@@ -117,11 +118,11 @@ void InputDataInterpreter::readEmgFile(TrialData& trial) {
 
 void InputDataInterpreter::readMuscleTendonLengthFile(TrialData& trial) {
 
-    string lmtDataFilename = inputDirectory_ + "/" + trial.id_ + "/lmt.txt";
-    DataFromFile lmtDataFromFile(lmtDataFilename);
+    string lmtDataFilename = inputDirectory_ + "/" + trial.id_ + "/lmt.sto";
+    DataFromStorageFile lmtDataFromFile(lmtDataFilename);
     trial.noLmtSteps_ =  lmtDataFromFile.getNoTimeSteps();
     vector<size_t> muscleIndices;
-    if (!checkOrSetMuscleNames(lmtDataFromFile.getMusclesNames(), muscleIndices))
+    if (!checkOrSetMuscleNames(lmtDataFromFile.getColumnNames(), muscleIndices))
     {
         std::cout << "Error while reading " << lmtDataFilename << ": muscle names not consistent with subject.xml" <<std::endl;
         exit(EXIT_FAILURE);
@@ -150,9 +151,23 @@ void InputDataInterpreter::readMomentArmsFiles(TrialData& trial) {
     trial.maData_.resize(dofNames_.size());
    
     for (int k = 0; k < trial.noDoF_; ++k ) {
-        string maDataFilename = inputDirectory_ + "/" + trial.id_ + "/" + dofNames_.at(k) + "Ma.txt";
-        DataFromFile maDataFromFile(maDataFilename);
-        trial.maMusclesNames_[dofNames_.at(k)] =  maDataFromFile.getMusclesNames(); //TODO should check against some input list, if only it was provided....
+        string maDataFilename = inputDirectory_ + "/" + trial.id_ + "/" + dofNames_.at(k) + "Ma.sto";
+        DataFromStorageFile maDataFromFile(maDataFilename);
+        vector <string> muscleNames= maDataFromFile.getColumnNames();
+        trial.maMusclesNames_[dofNames_.at(k)] = muscleNames; //TODO should check against some input list, if only it was provided....
+
+        std::vector<int> dofIndices(maDataFromFile.getColumnNames().size(), -1);
+        for (vector<string>::iterator muscIt=muscleNames.begin(); muscIt!=muscleNames.end(); ++ muscIt)
+        {
+
+            vector<string>::const_iterator foundMusc=std::find(muscleNames_.begin(), muscleNames_.end(), *muscIt);
+            if (foundMusc==muscleNames_.end())
+            {
+                std::cout << "ERROR while checking muscles available in "<< maDataFilename<<std::endl;
+                exit(EXIT_FAILURE);
+            }
+        }
+
         for (int j = 0; j < trial.noLmtSteps_; ++j) {
             maDataFromFile.readNextData();
             vector<double> nextMaData(maDataFromFile.getCurrentData());
@@ -166,19 +181,36 @@ void InputDataInterpreter::readExternalTorqueFiles (TrialData& trial) {
 
     trial.noDoF_ = dofNames_.size();
     trial.torqueData_.resize(dofNames_.size());
+    string torqueDataFilename = inputDirectory_ + "/" + trial.id_ + "/" + "Torque.sto";
+    DataFromStorageFile torqueDataFromFile(torqueDataFilename);
+    vector<string> torqueDofNames=torqueDataFromFile.getColumnNames();
 
-    for (int k = 0; k < trial.noDoF_; ++k ) {
-        string torqueDataFilename = inputDirectory_ + "/" + trial.id_ + "/" + dofNames_.at(k) + "Torque.txt";
-        DataFromFile torqueDataFromFile(torqueDataFilename);
+    std::vector<int> dofIndices(torqueDofNames.size(), -1);
+    for (vector<string>::iterator dofIt=dofNames_.begin(); dofIt!=dofNames_.end(); ++ dofIt)
+    {
+        vector<string>::const_iterator foundDof=std::find(torqueDofNames.begin(), torqueDofNames.end(), *dofIt + "_moment");
+        if (foundDof!=torqueDofNames.end())
+                dofIndices[foundDof-torqueDofNames.begin()]=dofIt-dofNames_.begin();
+            else
+            {
+                std::cout << "ERROR while checking DOFs available in torque data file"<<std::endl;
+                exit(EXIT_FAILURE);
+            }
+    }
+
         trial.noTorqueSteps_ =  torqueDataFromFile.getNoTimeSteps();
+
         for (int j = 0; j < trial.noTorqueSteps_; ++j) {
             torqueDataFromFile.readNextData();
             double torqueDataTime(torqueDataFromFile.getCurrentTime());
             vector<double> nextTorqueData(torqueDataFromFile.getCurrentData());
             trial.torqueTimeSteps_.push_back(torqueDataTime);
-            trial.torqueData_.at(k).push_back(nextTorqueData.front());
+            for(size_t k=0; k<nextTorqueData.size(); ++k)
+            {
+                if (dofIndices.at(k) !=-1)
+                    trial.torqueData_.at(dofIndices.at(k)).push_back(nextTorqueData.at(k));
+            }
         }     
-    }   
 }
        
 
