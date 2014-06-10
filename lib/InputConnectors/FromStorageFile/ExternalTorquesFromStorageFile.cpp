@@ -44,7 +44,7 @@ void ExternalTorquesFromStorageFile::operator()()
     }
     
     vector<double> endOfTorques;
-    updateExternalTorques(endOfTorques, 0); 
+    updateExternalTorques(endOfTorques, std::numeric_limits<double>::infinity()); 
     
     } 
     else {
