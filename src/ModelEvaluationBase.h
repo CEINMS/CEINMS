@@ -14,6 +14,8 @@
 #include <vector>
 #include <string>
 
+#include "InputQueues.h"
+
 class ModelEvaluationBase {
     
 public:  
@@ -21,10 +23,10 @@ public:
   virtual ~ModelEvaluationBase();
   virtual void operator()() = 0;
     
-  void getEmgFromInputQueue(std::vector<double>& emgFromQueue);
-  void getLmtFromInputQueue(std::vector<double>& lmtFromQueue);
-  void getMomentArmsFromInputQueue(std::vector<double>& momentArmsFromQueue, unsigned int whichDof);
-  void getExternalTorquesFromInputQueue(std::vector<double>& externalTorquesFromQueue); 
+  void getEmgFromInputQueue(CEINMS::InputConnectors::FrameType& emgFromQueue);
+  void getLmtFromInputQueue(CEINMS::InputConnectors::FrameType& lmtFromQueue);
+  void getMomentArmsFromInputQueue(CEINMS::InputConnectors::FrameType& momentArmsFromQueue, unsigned int whichDof);
+  void getExternalTorquesFromInputQueue(CEINMS::InputConnectors::FrameType& externalTorquesFromQueue); 
 };
 
 #endif

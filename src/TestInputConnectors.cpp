@@ -55,7 +55,7 @@ void setupSubject(T& mySubject, string configurationFile) {
         
 
 
-void consumeAndStore(CEINMS::Concurrency::Queue< std::vector<double> >& queue, const string& outputFileName, const vector<string>& header) {
+void consumeAndStore(CEINMS::Concurrency::Queue< CEINMS::InputConnectors::FrameType >& queue, const string& outputFileName, const vector<string>& header) {
   
   queue.subscribe(); 
   CEINMS::InputConnectors::doneWithSubscription.wait();
@@ -73,9 +73,10 @@ void consumeAndStore(CEINMS::Concurrency::Queue< std::vector<double> >& queue, c
   outputFile << "Time" << ",\n";
   
   for(;;) {
-     vector<double> item = queue.pop(); 
-     for (auto it : item)
+     CEINMS::InputConnectors::FrameType item = queue.pop();
+     for (auto it : item.data)
        outputFile << std::setprecision(8)  << it << ","; 
+     outputFile << item.time <<","; 
      outputFile << endl; 
   }
 }

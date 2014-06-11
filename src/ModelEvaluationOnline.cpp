@@ -1,5 +1,5 @@
 //__________________________________________________________________________
-// Author(s): Claudio Pizzolato, Monica Reggiani - September 2013
+// Author(s): Claudio Pizzolato, Monica Reggiani - June 2014
 // email:  claudio.pizzolato@griffithuni.edu.au
 //
 // DO NOT REDISTRIBUTE WITHOUT PERMISSION
@@ -63,36 +63,33 @@ void ModelEvaluationOnline<NMSmodelT>::operator()() {
   do {  // while(runCondition)
      
     // 1. read lmt Data
-    vector<double> lmtFromQueue;
+    CEINMS::InputConnectors::FrameType lmtFrameFromQueue;
     double lmtMaTime;
      
-    getLmtFromInputQueue(lmtFromQueue);
-    lmtMaTime = lmtFromQueue.back();
-    lmtFromQueue.pop_back();   //removes time value from the end of vector
+    getLmtFromInputQueue(lmtFrameFromQueue);
+    lmtMaTime = lmtFrameFromQueue.time;
 #ifdef LOG
     cout << lmtMaTime << endl; 
-    for (auto& it: lmtFromQueue)
+    for (auto& it: lmtFrameFromQueue.data)
       cout << it << " ";
     cout << endl;
 #endif
    
   
     // 2. read moment arms data
-    vector< vector<double> > momentArmsFromQueue;
-    momentArmsFromQueue.resize(noDof_);
+    vector< CEINMS::InputConnectors::FrameType > momentArmsFrameFromQueue;
+    momentArmsFrameFromQueue.resize(noDof_);
     for(unsigned int i = 0; i < noDof_; ++i) {
-      getMomentArmsFromInputQueue((momentArmsFromQueue.at(i)), i);    
-      momentArmsFromQueue.at(i).pop_back();  //removes time value from the end of vector
+      getMomentArmsFromInputQueue((momentArmsFrameFromQueue.at(i)), i); 
     }
     
     // 3. read external Torque 
-    vector<double> externalTorquesFromQueue;  
+    CEINMS::InputConnectors::FrameType externalTorquesFrameFromQueue;  
 
     if (CEINMS::InputConnectors::externalTorquesAvailable) {
         while ((externalTorqueTime < lmtMaTime) /*&& (!(externalTorquesFromQueue.empty()))*/) {
-        getExternalTorquesFromInputQueue(externalTorquesFromQueue);
-        externalTorqueTime = externalTorquesFromQueue.back();
-        externalTorquesFromQueue.pop_back();
+        getExternalTorquesFromInputQueue(externalTorquesFrameFromQueue);
+        externalTorqueTime = externalTorquesFrameFromQueue.time;
       }
     }
 
@@ -107,16 +104,15 @@ void ModelEvaluationOnline<NMSmodelT>::operator()() {
 //nella variabile privata dofNamesWithExtTorque_ sono contenuti i nomi dei gradi di libertà ai quali è associata una torque esterna
 //tale variabile può essere utilizzata come controllo, poiché la torque esterna è misurata solo su alcuni dof.
 
-    vector<double> emgFromQueue;
+    CEINMS::InputConnectors::FrameType emgFrameFromQueue;
     double emgTime;
     do {
-      getEmgFromInputQueue(emgFromQueue);
-      emgTime = emgFromQueue.back() + globalEmDelay_;
-      emgFromQueue.pop_back();
-      if(!emgFromQueue.empty()) {
+      getEmgFromInputQueue(emgFrameFromQueue);
+      emgTime = emgFrameFromQueue.time + globalEmDelay_;
+      if(!emgFrameFromQueue.data.empty()) {
         //ROBA CHE DEVE FARE EMG
         subject_.setTime(emgTime);
-        subject_.setEmgs(emgFromQueue);
+        subject_.setEmgs(emgFrameFromQueue.data);
         if (emgTime < lmtMaTime) {
           subject_.updateActivations();
           subject_.pushState();
@@ -129,10 +125,10 @@ void ModelEvaluationOnline<NMSmodelT>::operator()() {
     } while(emgTime < lmtMaTime && runCondition);
    
  //ROBA VARIA lmt ma
-    if (!lmtFromQueue.empty() && !momentArmsFromQueue.empty() && runCondition) {
-      subject_.setMuscleTendonLengths(lmtFromQueue);
+    if (!lmtFrameFromQueue.data.empty() && !momentArmsFrameFromQueue.empty() && runCondition) {
+      subject_.setMuscleTendonLengths(lmtFrameFromQueue.data);
       for (unsigned int i = 0; i < noDof_; ++i)     
-        subject_.setMomentArms(momentArmsFromQueue.at(i), i); 
+        subject_.setMomentArms(momentArmsFrameFromQueue.at(i).data, i); 
       subject_.updateState();
       subject_.pushState();
     
@@ -148,20 +144,20 @@ void ModelEvaluationOnline<NMSmodelT>::operator()() {
       
 #ifdef LOG
       cout << endl << endl << "Time: " << emgTime << endl << "EMG" << endl;
-      for (auto& it:emgFromQueue)
+      for (auto& it:emgFrameFromQueue.data)
         cout << it << "\t";
        
       cout << endl << "Lmt" << endl;
-      for (auto& it:lmtFromQueue)
+      for (auto& it:lmtFrameFromQueue.data)
         cout << it << "\t"; 
 
       for (unsigned int j = 0; j < dofNames_.size(); ++j) {
         cout << endl << "MomentArms on: " << dofNames_.at(j) << endl;
-        for (auto& it: momentArmsFromQueue.at(j))
+        for (auto& it: momentArmsFrameFromQueue.at(j).data)
           cout << it << "\t"; 
       }
       
-      for (auto& it:externalTorquesFromQueue)
+      for (auto& it:externalTorquesFrameFromQueue.data)
         cout << it << " "; 
        
       vector<double> cTorques;

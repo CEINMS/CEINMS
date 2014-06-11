@@ -13,23 +13,27 @@
 
 #include "Queue.h"
 #include "Latch.h"
+#include "QueueData.h"
 
 #include <list>
 #include <vector>
  
+ 
+
 namespace CEINMS {
   namespace InputConnectors { 
-    
+     
+    typedef QueueData< std::vector< double > > FrameType; 
+
     extern float globalTimeLimit;
     
-    extern Concurrency::Queue< std::vector<double> > queueEmg; 
-    extern Concurrency::Queue< std::vector<double> > queueLmt; 
-    extern std::vector< Concurrency::Queue< std::vector<double> >* > queueMomentArms; 
+    extern Concurrency::Queue< FrameType > queueEmg; 
+    extern Concurrency::Queue< FrameType > queueLmt; 
+    extern std::vector< Concurrency::Queue< FrameType >* > queueMomentArms; 
     
     extern bool externalTorquesAvailable; 
-    extern Concurrency::Queue< std::vector<double> >  queueExternalTorques;
+    extern Concurrency::Queue< FrameType >  queueExternalTorques;
  
-    extern Concurrency::Latch inputQueuesAreReady;
     extern Concurrency::Latch doneWithSubscription; 
     };
 };

@@ -18,14 +18,17 @@ namespace CEINMS {
     //:TODO: I have no idea about this globalTimeLimit.... WHY... AND WHY SO HIDDEN.. come on
     float globalTimeLimit = 100.;
     
-    Concurrency::Queue< std::vector<double> > queueEmg; 
-    Concurrency::Queue< std::vector<double> > queueLmt;
-    std::vector< Concurrency::Queue< std::vector<double> >* > queueMomentArms; 
-    Concurrency::Queue< std::vector<double> > queueExternalTorques;
-    bool externalTorquesAvailable = false; 
+    Concurrency::Queue< FrameType > queueEmg; 
+    Concurrency::Queue< FrameType > queueLmt; 
+    std::vector< Concurrency::Queue< FrameType >* > queueMomentArms; 
     
-    Concurrency::Latch inputQueuesAreReady;
+    bool externalTorquesAvailable = false; 
+    Concurrency::Queue< FrameType >  queueExternalTorques;
+ 
     Concurrency::Latch doneWithSubscription; 
   
+    
+    
+    
     };
 };

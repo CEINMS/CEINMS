@@ -22,15 +22,17 @@ using std::vector;
 
 void LmtMaFromX::updateLmt(const vector<double>& currentLmtData, double currentTime)
 {
-  vector<double> lmtDataToPush = currentLmtData;
-  lmtDataToPush.push_back(currentTime); 
+  QueueData< vector<double> > lmtDataToPush;
+  lmtDataToPush.data = currentLmtData; 
+  lmtDataToPush.time = currentTime; 
   CEINMS::InputConnectors::queueLmt.push(lmtDataToPush);
 }
 
 void LmtMaFromX::updateMomentArms(const vector<double>& currentMomentArmsData, double currentTime, unsigned int whichDof)
 {
-  vector<double> momentArmsDataToPush = currentMomentArmsData;
-  momentArmsDataToPush.push_back(currentTime); 
+  QueueData< vector<double> > momentArmsDataToPush; 
+  momentArmsDataToPush.data = currentMomentArmsData; 
+  momentArmsDataToPush.time = currentTime; 
   (*CEINMS::InputConnectors::queueMomentArms.at(whichDof)).push(momentArmsDataToPush);
 }
 

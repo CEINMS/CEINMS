@@ -23,9 +23,10 @@ using std::vector;
 
 void ExternalTorquesFromX::updateExternalTorques(const vector<double>& currentExternalTorquesData, double currentTime)
 {
-  vector<double> ExternalTorquesDataToPush = currentExternalTorquesData;
-  ExternalTorquesDataToPush.push_back(currentTime); 
-  CEINMS::InputConnectors::queueExternalTorques.push(ExternalTorquesDataToPush);
+  QueueData< vector<double> > externalTorquesDataToPush;
+  externalTorquesDataToPush.data = currentExternalTorquesData;
+  externalTorquesDataToPush.time = currentTime; 
+  CEINMS::InputConnectors::queueExternalTorques.push(externalTorquesDataToPush);
 }
 
 

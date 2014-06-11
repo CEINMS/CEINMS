@@ -14,14 +14,15 @@
 using std::string;
 #include <vector>
 using std::vector;
-
+#include "QueueData.h"
 #include <cstdlib>
 
 
 void EMGFromX::updateEmg(const vector<double>& currentEmgData, double currentTime)
 {
-  vector<double> emgDataToPush = currentEmgData;
-  emgDataToPush.push_back(currentTime); 
+  QueueData< vector<double> > emgDataToPush; 
+  emgDataToPush.data = currentEmgData;
+  emgDataToPush.time = currentTime; 
   CEINMS::InputConnectors::queueEmg.push(emgDataToPush);
 }
 
