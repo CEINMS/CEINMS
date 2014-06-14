@@ -3,6 +3,7 @@
 include_directories(
   ${Producers_INCLUDE_DIRS}
   ${InputConnectors_INCLUDE_DIRS}
+  ${OutputConnectors_INCLUDE_DIRS}
   ${NMSmodel_INCLUDE_DIRS}
   ${CMAKE_SOURCE_DIR}/lib/Curve
   ${CMAKE_SOURCE_DIR}/lib/Concurrency
@@ -23,7 +24,7 @@ include_directories(${Boost_INCLUDE_DIRS})
 #  ${CMAKE_SOURCE_DIR}/lib/Hybrid
 #)
 
-set(CEINMS_COMMON_SOURCES ModelEvaluationBase.cpp ModelEvaluationHybrid.cpp ModelEvaluationOnline.cpp ModelEvaluationOffline.cpp)
+set(CEINMS_COMMON_SOURCES  ModelEvaluationHybrid.cpp ModelEvaluationOnline.cpp ModelEvaluationOffline.cpp)
 set_source_files_properties(ModelEvaluationHybrid.cpp
                             ModelEvaluationOnline.cpp
                             ModelEvaluationOffline.cpp
@@ -36,6 +37,7 @@ TARGET_LINK_LIBRARIES( CEINMS
       xmlInput
       NMSmodel
       InputConnectors
+      OutputConnectors
       ${CMAKE_THREAD_LIBS_INIT}
       ${Boost_LIBRARIES}
 )

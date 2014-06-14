@@ -14,12 +14,12 @@
 #include <string>
 #include "ModelEvaluationBase.h"
 
-template <typename NMSmodelT>
-class ModelEvaluationOnline : public ModelEvaluationBase {
+template <typename NMSmodelT, typename Logger>
+class ModelEvaluationOnline : public ModelEvaluationBase<Logger> {
 
 public:
     ModelEvaluationOnline() = delete;
-    ModelEvaluationOnline(NMSmodelT& subject, const std::string& outputDir = "./Output");
+    ModelEvaluationOnline(NMSmodelT& subject, const std::vector< std::string >& valuesToLog); // const std::string& outputDir = "./Output");
     void setOutputDirectory(const std::string& outputDir);
 //    void setSubject(NMSmodelT& subject);
     void operator()();

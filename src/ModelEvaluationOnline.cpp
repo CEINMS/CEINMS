@@ -21,21 +21,23 @@ using std::vector;
 using std::string;
 
 #include "ModelEvaluationOnline.h"
+#include "ModelEvaluationBase.h"
 #include "InputQueues.h"
+#include "OutputQueues.h"
 #define LOG_FILES
 #define LOG
 
-template <typename NMSmodelT>
-ModelEvaluationOnline<NMSmodelT>::ModelEvaluationOnline(NMSmodelT& subject, const std::string& outputDir )
-:subject_(subject), outputDir_(outputDir)
+template <typename NMSmodelT, typename Logger>
+ModelEvaluationOnline<NMSmodelT, Logger>::ModelEvaluationOnline(NMSmodelT& subject, const vector<string>& valuesToLog) //const std::string& outputDir )
+:ModelEvaluationBase<Logger>::ModelEvaluationBase(valuesToLog), subject_(subject)
 {
   subject_.getDoFNames(dofNames_);
   noDof_ = dofNames_.size(); 
   globalEmDelay_ = subject.getGlobalEmDelay(); 
 }
 
-template <typename NMSmodelT>
-void ModelEvaluationOnline<NMSmodelT>::operator()() {
+template <typename NMSmodelT, typename Logger>
+void ModelEvaluationOnline<NMSmodelT, Logger>::operator()() {
 
   CEINMS::InputConnectors::queueLmt.subscribe();
   CEINMS::InputConnectors::queueEmg.subscribe();
@@ -49,15 +51,6 @@ void ModelEvaluationOnline<NMSmodelT>::operator()() {
   cout << "starting consume" << endl;
 #endif
   
-#ifdef LOG_FILES
-    Logger::StorageLogger<NMSmodelT> logger(subject_, outputDir_);
-    //Logger::SimpleFileLogger<NMSmodelT> logger(subject_, outputDir_);
-    logger.addLog(Logger::Activations);
-    logger.addLog(Logger::FibreLengths);
-    logger.addLog(Logger::FibreVelocities);
-    logger.addLog(Logger::MuscleForces);
-    logger.addLog(Logger::Torques);
-#endif
   double externalTorqueTime = std::numeric_limits<double>::lowest();
   bool runCondition = true; 
   do {  // while(runCondition)
@@ -66,7 +59,7 @@ void ModelEvaluationOnline<NMSmodelT>::operator()() {
     CEINMS::InputConnectors::FrameType lmtFrameFromQueue;
     double lmtMaTime;
      
-    getLmtFromInputQueue(lmtFrameFromQueue);
+    ModelEvaluationBase<Logger>::getLmtFromInputQueue(lmtFrameFromQueue);
     lmtMaTime = lmtFrameFromQueue.time;
 #ifdef LOG
     cout << lmtMaTime << endl; 
@@ -80,7 +73,7 @@ void ModelEvaluationOnline<NMSmodelT>::operator()() {
     vector< CEINMS::InputConnectors::FrameType > momentArmsFrameFromQueue;
     momentArmsFrameFromQueue.resize(noDof_);
     for(unsigned int i = 0; i < noDof_; ++i) {
-      getMomentArmsFromInputQueue((momentArmsFrameFromQueue.at(i)), i); 
+      ModelEvaluationBase<Logger>::getMomentArmsFromInputQueue((momentArmsFrameFromQueue.at(i)), i); 
     }
     
     // 3. read external Torque 
@@ -88,7 +81,7 @@ void ModelEvaluationOnline<NMSmodelT>::operator()() {
 
     if (CEINMS::InputConnectors::externalTorquesAvailable) {
         while ((externalTorqueTime < lmtMaTime) /*&& (!(externalTorquesFromQueue.empty()))*/) {
-        getExternalTorquesFromInputQueue(externalTorquesFrameFromQueue);
+        ModelEvaluationBase<Logger>::getExternalTorquesFromInputQueue(externalTorquesFrameFromQueue);
         externalTorqueTime = externalTorquesFrameFromQueue.time;
       }
     }
@@ -107,7 +100,7 @@ void ModelEvaluationOnline<NMSmodelT>::operator()() {
     CEINMS::InputConnectors::FrameType emgFrameFromQueue;
     double emgTime;
     do {
-      getEmgFromInputQueue(emgFrameFromQueue);
+      ModelEvaluationBase<Logger>::getEmgFromInputQueue(emgFrameFromQueue);
       emgTime = emgFrameFromQueue.time + globalEmDelay_;
       if(!emgFrameFromQueue.data.empty()) {
         //ROBA CHE DEVE FARE EMG
@@ -118,7 +111,9 @@ void ModelEvaluationOnline<NMSmodelT>::operator()() {
           subject_.pushState();
         
 #ifdef LOG_FILES  
-          logger.log(emgTime, Logger::Activations);
+          vector<double> data;
+          subject_.getActivations(data); 
+          ModelEvaluationBase<Logger>::logger.log(emgTime, data, "Activations");
 #endif  
         }
       } else runCondition = false;
@@ -131,16 +126,22 @@ void ModelEvaluationOnline<NMSmodelT>::operator()() {
         subject_.setMomentArms(momentArmsFrameFromQueue.at(i).data, i); 
       subject_.updateState();
       subject_.pushState();
-    
-
 
 #ifdef LOG_FILES
-      logger.log(emgTime, Logger::Activations);
-      logger.log(emgTime, Logger::FibreLengths);
-      logger.log(emgTime, Logger::FibreVelocities);
-      logger.log(emgTime, Logger::MuscleForces);
-      logger.log(emgTime, Logger::Torques);
+      //:TODO: Improve as now you are defining two times what you want to log 
+      vector<double> data;
+      subject_.getActivations(data); 
+      ModelEvaluationBase<Logger>::logger.log(emgTime, data, "Activations");
+      subject_.getFiberLengths(data);
+      ModelEvaluationBase<Logger>::logger.log(emgTime, data, "FiberLenghts");
+      subject_.getFiberVelocities(data); 
+      ModelEvaluationBase<Logger>::logger.log(emgTime, data, "FiberVelocities");
+      subject_.getMuscleForces(data); 
+      ModelEvaluationBase<Logger>::logger.log(emgTime, data, "MuscleForces");
+      subject_.getTorques(data);
+      ModelEvaluationBase<Logger>::logger.log(emgTime, data, "Torques");
 #endif
+      
       
 #ifdef LOG
       cout << endl << endl << "Time: " << emgTime << endl << "EMG" << endl;
@@ -177,9 +178,25 @@ void ModelEvaluationOnline<NMSmodelT>::operator()() {
     runCondition = (emgTime <  CEINMS::InputConnectors::globalTimeLimit) && (lmtMaTime <  CEINMS::InputConnectors::globalTimeLimit) && runCondition;
   } while (runCondition);
 
-#ifdef LOG  
-   cout << "Estimation completed. Output file printed in "+outputDir_ << endl;;
+  
+  
+#ifdef LOG_FILES
+      //:TODO: improve this... This is the end... so I'm just writing on the queue a time equal to 0
+      vector<double> endData;
+      double endTime =  std::numeric_limits<double>::infinity();
+      ModelEvaluationBase<Logger>::logger.log(endTime, endData, "Activations");
+      ModelEvaluationBase<Logger>::logger.log(endTime, endData, "FiberLenghts");
+      ModelEvaluationBase<Logger>::logger.log(endTime, endData, "FiberVelocities");
+      ModelEvaluationBase<Logger>::logger.log(endTime, endData, "MuscleForces");
+      ModelEvaluationBase<Logger>::logger.log(endTime, endData, "Torques");
 #endif
+      
+      CEINMS::OutputConnectors::doneWithExecution.wait();
+#ifdef LOG  
+   cout << "Estimation completed. " << endl;
+#endif
+  
+   
 }
 
 

@@ -26,6 +26,9 @@
 
 #include "InputQueues.h"
 
+#include "LoggerOnQueues.h"
+#include "ToStorageFile/DataToStorageFiles.h"
+
 //#include "ModelEvaluationOffline.h"
 //#include "ModelEvaluationHybrid.h"
 
@@ -194,18 +197,25 @@ int main(int argc, char** argv) {
           string externalTorqueFilename(inputDirectory + "inverse_dynamics.sto"); 
           ExternalTorquesFromStorageFile externalTorquesProducer(mySubject, externalTorqueFilename); 
    
+              
+          // 2b. define the thread consuming the output sources
+          vector<string> valuesToWrite = {"Activations", "FiberLenghts", "FiberVelocities", "MuscleForces", "Torques"};
+          DataToStorageFiles dataToStorageFiles(mySubject, valuesToWrite, outputDirectory) ;  
           
           // 3. define the model simulator
-          ModelEvaluationOnline<MyNMSmodel> simulator(mySubject, outputDirectory);
+          vector<string> valuesToLog = {"Activations", "FiberLenghts", "FiberVelocities", "MuscleForces", "Torques"};
+          ModelEvaluationOnline<MyNMSmodel, LoggerOnQueues> simulator(mySubject, valuesToLog);
      
           
-          CEINMS::InputConnectors::doneWithSubscription.setCount(4);
+          CEINMS::InputConnectors::doneWithSubscription.setCount(5);
+          CEINMS::OutputConnectors::doneWithExecution.setCount(2);
           
           // 4. start the threads
           std::thread emgProdThread(std::ref(emgProducer)); 
           std::thread externalTorquesProdThread(std::ref(externalTorquesProducer));
           std::thread lmtMaProdThread(std::ref(lmtMaProducer));
           std::thread simulatorThread(std::ref(simulator));    
+          std::thread dataToStorageThread(std::ref(dataToStorageFiles)); 
           
 //           vector < string > muscleNames; 
 //           mySubject.getMuscleNames(muscleNames);
@@ -216,6 +226,7 @@ int main(int argc, char** argv) {
           lmtMaProdThread.join();
           externalTorquesProdThread.join();
           simulatorThread.join();
+          dataToStorageThread.join();
 
           break;
         }
