@@ -27,7 +27,7 @@
 #include "InputQueues.h"
 
 #include "LoggerOnQueues.h"
-#include "ToStorageFile/DataToStorageFiles.h"
+#include "QueuesToStorageFiles.h"
 
 //#include "ModelEvaluationOffline.h"
 //#include "ModelEvaluationHybrid.h"
@@ -200,7 +200,7 @@ int main(int argc, char** argv) {
               
           // 2b. define the thread consuming the output sources
           vector<string> valuesToWrite = {"Activations", "FiberLenghts", "FiberVelocities", "MuscleForces", "Torques"};
-          DataToStorageFiles dataToStorageFiles(mySubject, valuesToWrite, outputDirectory) ;  
+          QueuesToStorageFiles queuesToStorageFiles(mySubject, valuesToWrite, outputDirectory) ;  
           
           // 3. define the model simulator
           vector<string> valuesToLog = {"Activations", "FiberLenghts", "FiberVelocities", "MuscleForces", "Torques"};
@@ -215,7 +215,7 @@ int main(int argc, char** argv) {
           std::thread externalTorquesProdThread(std::ref(externalTorquesProducer));
           std::thread lmtMaProdThread(std::ref(lmtMaProducer));
           std::thread simulatorThread(std::ref(simulator));    
-          std::thread dataToStorageThread(std::ref(dataToStorageFiles)); 
+          std::thread queuesToStorageFilesThread(std::ref(queuesToStorageFiles)); 
           
 //           vector < string > muscleNames; 
 //           mySubject.getMuscleNames(muscleNames);
@@ -226,7 +226,7 @@ int main(int argc, char** argv) {
           lmtMaProdThread.join();
           externalTorquesProdThread.join();
           simulatorThread.join();
-          dataToStorageThread.join();
+          queuesToStorageFilesThread.join();
 
           break;
         }

@@ -20,8 +20,12 @@
  
 namespace CEINMS {
   namespace OutputConnectors { 
-     
-    typedef QueueData< std::vector< double > > FrameType; 
+    
+    typedef std::vector< double > DataType; 
+    typedef QueueData< DataType > FrameType; 
+    
+    const double TimePlaceholderForEndOfData = std::numeric_limits<double>::infinity();
+    
     extern std::map< std::string, Concurrency::Queue< FrameType >* > logQueues; 
  
     extern Concurrency::Latch doneWithExecution; 

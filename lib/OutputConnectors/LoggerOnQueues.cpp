@@ -13,24 +13,31 @@
 #include <string>
 #include <iostream>
 
-LoggerOnQueues::LoggerOnQueues(const std::vector< std::string >& valuesToLog) {
+LoggerOnQueues::LoggerOnQueues(const std::vector< std::string >& valuesToLog) 
+{
+  
     for (auto& it: valuesToLog) 
         CEINMS::OutputConnectors::logQueues.insert(std::make_pair(it, new CEINMS::Concurrency::Queue< CEINMS::OutputConnectors::FrameType>) ); 
+
+  
 }
 
-void LoggerOnQueues::log(double time, const std::vector< double >& dataToLog, const std::string& queueID)
+void LoggerOnQueues::log(double time, const CEINMS::OutputConnectors::DataType& dataToLog, const std::string& valueToLog)
 {
-    QueueData< std::vector<double> > dataToPush;
+  
+    CEINMS::OutputConnectors::FrameType dataToPush;
     dataToPush.data = dataToLog; 
     dataToPush.time = time; 
-    auto currentQueue = CEINMS::OutputConnectors::logQueues.find(queueID);
+    
+    auto currentQueue = CEINMS::OutputConnectors::logQueues.find(valueToLog);
+
     if (currentQueue == CEINMS::OutputConnectors::logQueues.end()) {
-        std::cout << queueID << " queue was not found\n";
+        std::cout << "queue for " << valueToLog << " was not found\n";
         exit(EXIT_FAILURE);
     }
-    else {
-        currentQueue->second->push(dataToPush);
-        std::cout << "Pushing data in: " << queueID << std::endl;    
-    }
+    else 
+        currentQueue->second->push(dataToPush);   
+
+  
 }
 
