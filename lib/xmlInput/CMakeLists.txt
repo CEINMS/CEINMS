@@ -73,3 +73,10 @@ target_link_libraries(xmlInput ceinms_common ${XERCES_LIBRARIES})
 
 set(xmlInput_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR} ${XSD_INCLUDE_DIR} CACHE STRING "Include directory for xmlInput library")
 mark_as_advanced(xmlInput_INCLUDE_DIRS)
+
+install(FILES ${xmlInput_HEADERS} ${xmlInput_GENERATED_HEADERS} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}) #should add namespace
+install(TARGETS xmlInput
+        EXPORT CEINMSTargets
+        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})

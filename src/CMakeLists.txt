@@ -42,7 +42,7 @@ TARGET_LINK_LIBRARIES( CEINMS
       ${Boost_LIBRARIES}
 )
 
-ADD_EXECUTABLE( TestInputConnectors TestInputConnectors.cpp  ${CEINMS_COMMON_SOURCES} ${CEINMS_HEADERS}  )
+ADD_EXECUTABLE( TestInputConnectors EXCLUDE_FROM_ALL TestInputConnectors.cpp  ${CEINMS_COMMON_SOURCES} ${CEINMS_HEADERS}  )
 TARGET_LINK_LIBRARIES( TestInputConnectors
       FileIO
       xmlInput
@@ -117,4 +117,13 @@ if(OPENSIM_FOUND)
   target_link_libraries( CEINMScalibrate-osim
 	${lapack_unix} )
   endif(UNIX)
+endif()
+
+
+install(TARGETS CEINMS CEINMScalibrate
+        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+
+if(OPENSIM_FOUND)
+    install(TARGETS CEINMS-osim CEINMScalibrate-osim
+            RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
 endif()

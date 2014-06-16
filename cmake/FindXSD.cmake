@@ -3,26 +3,26 @@
 # path will be in XSD_EXECUTABLE. Look in the usual locations, as well as in
 # the 'bin' directory in the path given in the XSD_ROOT environment variable.
 
-FIND_PROGRAM( XSD_EXECUTABLE 
-			  NAMES
-				xsd
-				xsdcxx
-		   	  HINTS ${RWSL_DEPS}/xsd/bin $ENV{XSD_ROOT}/bin
-			  PATHS /usr/local/xsd-3.2.0-i686-macosx/bin
-			  		/usr/local/xsd-3.2.0-x86_64-linux-gnu/bin
-			  		/usr/local/bin
-					/opt/xsd-3.2.0-i686-macosx/bin
-			  		/opt/xsd-3.2.0-x86_64-linux-gnu/bin
-			  		/usr/bin
-					"C:/Program Files (x86)/CodeSynthesis XSD 3.3/include"
-					ENV PATH )
+FIND_PROGRAM( XSD_EXECUTABLE
+              NAMES
+                xsd
+                xsdcxx
+              HINTS ${RWSL_DEPS}/xsd/bin $ENV{XSD_ROOT}/bin
+              PATHS /usr/local/xsd-3.2.0-i686-macosx/bin
+                    /usr/local/xsd-3.2.0-x86_64-linux-gnu/bin
+                    /usr/local/bin
+                    /opt/xsd-3.2.0-i686-macosx/bin
+                    /opt/xsd-3.2.0-x86_64-linux-gnu/bin
+                    /usr/bin
+                    "C:/Program Files (x86)/CodeSynthesis XSD 3.3/include"
+                    ENV PATH )
 
 IF( XSD_EXECUTABLE )
 
-  # 
+  #
   # Obtain the include directory that one can use with INCLUDE_DIRECTORIES() to
   # access the xsd include files.
-  
+
   GET_FILENAME_COMPONENT( XSD_BIN_DIR "${XSD_EXECUTABLE}" PATH )
   GET_FILENAME_COMPONENT( XSD_ROOT_DIR "${XSD_BIN_DIR}" PATH )
   SET( XSD_INCLUDE_DIR "${XSD_ROOT_DIR}/include" )
@@ -43,7 +43,7 @@ ENDIF( XSD_FOUND )
 
 MARK_AS_ADVANCED( XSD_INCLUDE_DIR XSD_EXECUTABLE )
 
-# 
+#
 # Macro that attempts to generate C++ files from an XML schema. The NAME
 # argument is the name of the CMake variable to use to store paths to the
 # derived C++ source file. The FILE argument is the path of the schema file to
@@ -62,7 +62,7 @@ MACRO( XSD_SCHEMA NAME FILE )
   
   SET( xs_SRC "${FILE}" )
 
-  # 
+  #
   # XSD will generate two or three C++ files (*.cxx,*.hxx,*.ixx). Get the
   # destination file path sans any extension and then build paths to the
   # generated files.
@@ -83,14 +83,14 @@ MACRO( XSD_SCHEMA NAME FILE )
   # the XSD cxx-tree command.
   
   ADD_CUSTOM_COMMAND( OUTPUT "${xs_CXX}" "${xs_HXX}" "${xs_IXX}"
-  					  COMMAND ${XSD_EXECUTABLE}
-					  ARGS "cxx-tree" ${ARGN} ${xs_SRC}
-					  DEPENDS ${xs_SRC} )
+                      COMMAND ${XSD_EXECUTABLE}
+                      ARGS "cxx-tree" ${ARGN} ${xs_SRC}
+                      DEPENDS ${xs_SRC} )
 
   #
   # Don't fail if a generated file does not exist.
   
   SET_SOURCE_FILES_PROPERTIES( "${xs_CXX}" "${xs_HXX}" "${xs_IXX}"
-  							   PROPERTIES GENERATED TRUE )
+                                PROPERTIES GENERATED TRUE )
 
 ENDMACRO( XSD_SCHEMA )

@@ -8,8 +8,8 @@
 #  XERCES_LIBRARY, where to find the XERCES library.
 
 FIND_PATH(XERCES_INCLUDE_DIR /xercesc/util/XercesVersion.hpp
-	"${XERCES_DIR}\\include"
-	"C:/Program\ Files\ (x86)/CodeSynthesis\ XSD\ 3.3/include"
+    "${XERCES_DIR}\\include"
+    "C:/Program\ Files\ (x86)/CodeSynthesis\ XSD\ 3.3/include"
  )
  
 MESSAGE(STATUS "XERCES Include Dir ${XERCES_INCLUDE_DIR}")
@@ -19,64 +19,64 @@ if(CMAKE_SIZEOF_VOID_P EQUAL 8) #64bit compilation
   NAMES
       xerces-c
       xerces-c_2
-	  xerces-c_3
-	  xerces-c_3_1
-	  xerces-c_3_1_vc100
+      xerces-c_3
+      xerces-c_3_1
+      xerces-c_3_1_vc100
   PATHS 
     "${XERCES_DIR}\\lib"
     /usr/local/lib
     /usr/lib
     /usr/lib/x86_64-linux-gnu/
-	"C:/Program\ Files\ (x86)/CodeSynthesis\ XSD\ 3.3/bin64"
-	"C:/Program\ Files\ (x86)/CodeSynthesis\ XSD\ 3.3/lib64/vc-10.0"
+    "C:/Program\ Files\ (x86)/CodeSynthesis\ XSD\ 3.3/bin64"
+    "C:/Program\ Files\ (x86)/CodeSynthesis\ XSD\ 3.3/lib64/vc-10.0"
   )
 
   FIND_LIBRARY(XERCES_LIBRARY_DEBUG
   NAMES
       xerces-cD
       xerces-c_2D
-	  xerces-c_3D
-	  xerces-c_3_1D
-	  xerces-c_3_1_vc100D
+      xerces-c_3D
+      xerces-c_3_1D
+      xerces-c_3_1_vc100D
   PATHS
     "${XERCES_DIR}\\lib"
     /usr/local/lib
     /usr/lib
     /usr/lib/x86_64-linux-gnu/
-	"C:/Program\ Files\ (x86)/CodeSynthesis\ XSD\ 3.3/bin64"
-	"C:/Program\ Files\ (x86)/CodeSynthesis\ XSD\ 3.3/lib64/vc-10.0"
+    "C:/Program\ Files\ (x86)/CodeSynthesis\ XSD\ 3.3/bin64"
+    "C:/Program\ Files\ (x86)/CodeSynthesis\ XSD\ 3.3/lib64/vc-10.0"
   )
 else()
     FIND_LIBRARY(XERCES_LIBRARY
   NAMES
       xerces-c
       xerces-c_2
-	  xerces-c_3
-	  xerces-c_3_1
-	  xerces-c_3_1_vc100
+      xerces-c_3
+      xerces-c_3_1
+      xerces-c_3_1_vc100
   PATHS
     "${XERCES_DIR}\\lib"
     /usr/local/lib
     /usr/lib
     /usr/lib/x86_64-linux-gnu/
-	"C:/Program\ Files\ (x86)/CodeSynthesis\ XSD\ 3.3/bin"
-	"C:/Program\ Files\ (x86)/CodeSynthesis\ XSD\ 3.3/lib/vc-10.0"
+    "C:/Program\ Files\ (x86)/CodeSynthesis\ XSD\ 3.3/bin"
+    "C:/Program\ Files\ (x86)/CodeSynthesis\ XSD\ 3.3/lib/vc-10.0"
   )
 
   FIND_LIBRARY(XERCES_LIBRARY_DEBUG
   NAMES
       xerces-cD
       xerces-c_2D
-	  xerces-c_3D
-	  xerces-c_3_1D
-	  xerces-c_3_1_vc100D
+      xerces-c_3D
+      xerces-c_3_1D
+      xerces-c_3_1_vc100D
   PATHS
     "${XERCES_DIR}\\lib"
     /usr/local/lib
     /usr/lib
     /usr/lib/x86_64-linux-gnu/
-	"C:/Program\ Files\ (x86)/CodeSynthesis\ XSD\ 3.3/bin"
-	"C:/Program\ Files\ (x86)/CodeSynthesis\ XSD\ 3.3/lib/vc-10.0"
+    "C:/Program\ Files\ (x86)/CodeSynthesis\ XSD\ 3.3/bin"
+    "C:/Program\ Files\ (x86)/CodeSynthesis\ XSD\ 3.3/lib/vc-10.0"
   )
 endif()
 

@@ -8,11 +8,11 @@
 
 
 set(OPENSIM_POSSIBLE_DIRECTORIES 
-	~/Programs/opensim
-	$ENV{OPENSIM_HOME}
-	"C:/OpenSim\ 3.0/"
-	"C:/OpenSim3.1/"
-	)
+    ~/Programs/opensim
+    $ENV{OPENSIM_HOME}
+    "C:/OpenSim\ 3.0/"
+    "C:/OpenSim3.1/"
+    )
 
 find_path(OPENSIM_INCLUDE_DIRS OpenSim/OpenSim.h
           PATHS ${OPENSIM_POSSIBLE_DIRECTORIES}
@@ -23,21 +23,21 @@ find_path(SIMTK_INCLUDE_DIRS Simbody.h
           PATHS ${OPENSIM_POSSIBLE_DIRECTORIES}
           PATH_SUFFIXES sdk/include/SimTK/include sdk/include/SimTK/simbody)
 MESSAGE( STATUS "SimTK Include path: ${SIMTK_INCLUDE_DIRS}")
-		  
+
 #find_path(OPENSIM_LIBS_DIR
-#		  NAMES
-#			  osimCommon.lib
-#			  osimCommon.so
-#			  libosimCommon.so
+#         NAMES
+#             osimCommon.lib
+#             osimCommon.so
+#             libosimCommon.so
 #          PATHS ${OPENSIM_POSSIBLE_DIRECTORIES}
 #          PATH_SUFFIXES sdk/lib lib)
 #MESSAGE( STATUS "OpenSim Lib path: ${OPENSIM_LIBS_DIR}")
-		  
+
 #why?
 find_path(OPENSIM_DLL_DIR 
-		  NAMES
-			  osimCommon.dll
-#			  id
+        NAMES
+            osimCommon.dll
+#           id
           PATHS ${OPENSIM_POSSIBLE_DIRECTORIES}
           PATH_SUFFIXES bin)
 MESSAGE( STATUS "OpenSim dll path: ${OPENSIM_DLL_DIR}")	  

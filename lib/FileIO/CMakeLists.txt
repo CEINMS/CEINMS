@@ -31,4 +31,11 @@ add_library(FileIO STATIC ${EMGgenerator_SOURCES} ${EMGgenerator_HEADERS})
 target_link_libraries(FileIO xmlInput)
 
 set(FileIO_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/EMGgenerator CACHE STRING "Include directories for FileIO library")
+mark_as_advanced(FileIO_INCLUDE_DIRS)
 
+install(FILES ${EMGgenerator_HEADERS} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}) #should add namespace
+install(TARGETS FileIO
+        EXPORT CEINMSTargets
+        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})

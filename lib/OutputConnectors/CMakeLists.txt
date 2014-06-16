@@ -23,7 +23,7 @@ set(QueuesToStorageFiles_HEADERS
 
 include_directories(${ceinms_common_INCLUDE_DIRS}  )
 include_directories(${Boost_INCLUDE_DIRS})
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}  ${CMAKE_SOURCE_DIR}/lib/Concurrency ${CMAKE_SOURCE_DIR}/lib/InputConnectors)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}  ${CMAKE_SOURCE_DIR}/lib/Concurrency ${InputConnectors_INCLUDE_DIRS})
 
 add_library(OutputConnectors STATIC
   ${OutputConnectors_SOURCES}
@@ -33,3 +33,11 @@ add_library(OutputConnectors STATIC
 )
 
 set(OutputConnectors_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/QueuesToStorageFiles CACHE STRING "Include directories for InputConnectors library" FORCE)
+mark_as_advanced(OutputConnectors_INCLUDE_DIRS)
+
+install(FILES ${OutputConnectors_HEADERS} ${QueuesToStorageFiles_HEADERS} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}) #should add namespace
+install(TARGETS OutputConnectors
+        EXPORT CEINMSTargets
+        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})

@@ -1,6 +1,6 @@
 # Authors: Monica Reggiani, Claudio Pizzolato
 
-cmake_minimum_required (VERSION 2.8.5)
+cmake_minimum_required (VERSION 2.8.8) # CMakePackageConfigHelpers.cmake is missing in previous versions
 project(CEINMS)
 
 # Include GNUInstallDirs to get canonical paths
@@ -22,7 +22,7 @@ endif(UNIX)
 
 set(CMAKE_VERBOSE_MAKEFILE OFF)
 
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_SOURCE_DIR})
+set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
 
 set(Boost_USE_STATIC_LIBS   ON)
 set(Boost_USE_MULTITHREADED ON)
@@ -33,15 +33,31 @@ find_package(XSD REQUIRED)
 find_package(XERCES REQUIRED)
 
 find_package(OpenSim)
-#link_directories(${OPENSIM_LIBRARY_DIRS})
-#find_package(Eigen3 REQUIRED)
-#include_directories(${EIGEN3_INCLUDE_DIR})
+
+# Choose common build locations for executables and libraries
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 
 add_subdirectory(lib)
 add_subdirectory(src)
-#add_subdirectory(sandBox)
 
-set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR}/bin CACHE PATH "Build directory" FORCE)
-set(LIBRARY_OUTPUT_PATH ${CMAKE_BINARY_DIR}/lib CACHE PATH "Build directory" FORCE)
+set(ConfigPackageLocation ${CMAKE_INSTALL_LIBDIR}/CEINMS)
+install(EXPORT CEINMSTargets
+        FILE CEINMSTargets.cmake
+        NAMESPACE CEINMS::
+        DESTINATION ${ConfigPackageLocation})
 
+include(CMakePackageConfigHelpers)
+configure_package_config_file(cmake/CEINMSConfig.cmake.in
+                              ${CMAKE_CURRENT_BINARY_DIR}/CEINMSConfig.cmake
+                              INSTALL_DESTINATION ${ConfigPackageLocation}
+                              PATH_VARS CMAKE_INSTALL_INCLUDEDIR)
 
+write_basic_package_version_file(${CMAKE_CURRENT_BINARY_DIR}/CEINMSConfigVersion.cmake
+                                    VERSION 0.2.1
+                                    COMPATIBILITY ExactVersion )
+
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/CEINMSConfig.cmake
+              ${CMAKE_CURRENT_BINARY_DIR}/CEINMSConfigVersion.cmake
+              DESTINATION ${ConfigPackageLocation})
