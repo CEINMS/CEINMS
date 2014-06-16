@@ -17,7 +17,8 @@
 
 #include <map>
 #include <string>
- 
+#include <vector>
+
 namespace CEINMS {
   namespace OutputConnectors { 
     
