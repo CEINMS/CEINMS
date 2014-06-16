@@ -7,26 +7,27 @@
 //__________________________________________________________________________
 //
 
-
-#include "SyncTools.h"
-#include <boost/thread/mutex.hpp>
-#include <boost/thread/barrier.hpp>
-#include <boost/thread/condition_variable.hpp>
-#include "Semaphore.h"
+#include "EMGFromX.h"
+#include "InputQueues.h"
 
 #include <string>
 using std::string;
-#include <list>
-using std::list;
 #include <vector>
 using std::vector;
+#include "QueueData.h"
+#include <cstdlib>
 
 
-namespace SyncTools {
-    namespace Shared {
-    float globalTimeLimit = 100.;
-  //  Semaphore lmtProducingDone(0);
-  //  Semaphore emgProducingDone(0);
+void EMGFromX::updateEmg(const vector<double>& currentEmgData, double currentTime)
+{
+  QueueData< vector<double> > emgDataToPush; 
+  emgDataToPush.data = currentEmgData;
+  emgDataToPush.time = currentTime; 
+  CEINMS::InputConnectors::queueEmg.push(emgDataToPush);
+}
 
-    };
-};
+
+EMGFromX::~EMGFromX() { }
+
+
+

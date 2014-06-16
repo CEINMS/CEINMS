@@ -10,11 +10,15 @@ if(WIN32)
     set(CMAKE_CXX_FLAGS "/EHsc")# -std=c++11 -fpermissive")
 endif()
 if(UNIX AND NOT CMAKE_BUILD_TYPE)
-    set(CMAKE_BUILD_TYPE Release CACHE STRING "Choose the type of build, options are: None Debug Release RelWithDebInfo MinSizeRel." FORCE)
+    set(CMAKE_BUILD_TYPE Debug CACHE STRING "Choose the type of build, options are: None Debug Release RelWithDebInfo MinSizeRel." FORCE)
 #	set(CMAKE_CXX_FLAGS "-O3")
 #	set(CMAKE_EXE_LINKER_FLAGS "-O3")
 #	set(CMAKE_SHARED_LINKER_FLAGS "-O3")
 endif()
+
+if(UNIX)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread -std=c++11 -Wno-deprecated-declarations ")
+endif(UNIX)
 
 set(CMAKE_VERBOSE_MAKEFILE OFF)
 

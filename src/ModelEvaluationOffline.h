@@ -25,7 +25,7 @@ public:
     void operator()();
     
 private:
-    void initOfflineCurve();
+  //  void initOfflineCurve();
 
     NMSmodelT& subject_;
     std::string outputDir_;

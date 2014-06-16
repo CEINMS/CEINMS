@@ -40,7 +40,7 @@ source_group("Sources" FILES ${Producers_SOURCES} ${FromFile_SOURCES} )
 
 include_directories(${ceinms_common_INCLUDE_DIRS} ${xmlInput_INCLUDE_DIRS} ${FileIO_INCLUDE_DIRS})
 include_directories(${Boost_INCLUDE_DIRS})
-include_directories(${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/FromFile)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/FromFile ${CMAKE_SOURCE_DIR}/lib/Concurrency)
 
 if(OPENSIM_FOUND)
   include_directories(${OPENSIM_INCLUDE_DIRS} ${SIMTK_INCLUDE_DIRS} ${CMAKE_CURRENT_SOURCE_DIR}/FromOpenSim)
@@ -53,6 +53,7 @@ add_library(Producers STATIC
   ${FromFile_SOURCES}
   ${Producers_HEADERS}
   ${FromFile_HEADERS}
+  ${CMAKE_SOURCE_DIR}/lib/Concurrency/Latch.cpp
 )
 
 target_link_libraries(Producers FileIO)

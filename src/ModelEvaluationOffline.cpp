@@ -7,7 +7,7 @@
 //
 
 
-//#include "ModelEvaluationOffline.h"
+#include "ModelEvaluationOffline.h"
 #include "SyncTools.h"
 #include "SimpleFileLogger.h"
 
@@ -29,7 +29,7 @@ ModelEvaluationOffline<NMSmodelT>::ModelEvaluationOffline(NMSmodelT& subject, co
 :subject_(subject), outputDir_(outputDir)
 { }
 
-
+/*
 template <typename NMSmodelT>
 void ModelEvaluationOffline<NMSmodelT>::initOfflineCurve() {
 
@@ -74,12 +74,11 @@ void ModelEvaluationOffline<NMSmodelT>::initOfflineCurve() {
         subject_.pushState();
     }
     subject_.updateFibreLengthTraces();
-}
+}*/
 
 
 template <typename NMSmodelT>
 void ModelEvaluationOffline<NMSmodelT>::setSubject(NMSmodelT& subject) {
-    
     subject_ = subject;
 }
 
@@ -98,7 +97,6 @@ void ModelEvaluationOffline<NMSmodelT>::operator()() {
     
     //read dofs names from XML file and set dofNames global variable
     subject_.getDoFNames(dofNames_);
-    setDofNamesToShared(dofNames_);  //set dof names on global variable, needed to lmtMaFromFile class
     noDof_ = dofNames_.size();
     momentArmsFromQueue.resize(noDof_);
     
@@ -106,10 +104,9 @@ void ModelEvaluationOffline<NMSmodelT>::operator()() {
     // be sure to call getMusclesNames() just after readyToStart.wait() if you want to
     SyncTools::Shared::readyToStart.wait(); //barrier
 
-    vector<string> muscleNamesFromShared;
-    getMusclesNamesFromShared(muscleNamesFromShared);
-    vector< vector<string> > muscleNamesOnDofFromShared;
-    getMusclesNamesOnDofsFromShared(muscleNamesOnDofFromShared);
+    vector< string > muscleNames = subject_.getMusclesNames(); 
+    vector< vector<string> > muscleNamesOnDof;
+    subject_.getMuscleNamesOnDofs(muscleNamesOnDofs);
  
 //CHECK MUSCLES NAMES between XML model and input files 
 
@@ -129,13 +126,13 @@ void ModelEvaluationOffline<NMSmodelT>::operator()() {
   //ie. we may have less external torques then the number of dofs 
   //private class variable dofNamesWithExtTorque_ stores the dof names list with external torque data
   
-    if(!subject_.compareMusclesNames(muscleNamesFromShared)) {
+    if(!subject_.compareMusclesNames(muscleNames)) {
         cout << "ERROR: muscles names from emg or lmt files don't match with XML model ones\n";
         exit(EXIT_FAILURE);
     }
     
     for(unsigned int i = 0; i < noDof_; ++i) {
-        if(!subject_.compareMusclesNamesOnDoF(muscleNamesOnDofFromShared.at(i), i)) {
+        if(!subject_.compareMusclesNamesOnDoF(muscleNamesOnDof.at(i), i)) {
         cout << "ERROR: muscles names from " << dofNames_.at(i) << "Ma.txt file don't match with XML model ones\n";
         exit(EXIT_FAILURE);
         }      

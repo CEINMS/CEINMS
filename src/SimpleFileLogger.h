@@ -17,16 +17,9 @@
 #include <boost/make_shared.hpp>
 #include <boost/filesystem.hpp>
 #include <stdlib.h>
+#include "Logger.h"
 
 namespace Logger {
-    enum LogID{Activations, 
-                FibreLengths, 
-                FibreVelocities,
-                MuscleForces,
-                Torques,
-                Emgs,
-                AdjustedEmgs};
-
 
     template <typename NMSmodelT>
     class SimpleFileLogger {
