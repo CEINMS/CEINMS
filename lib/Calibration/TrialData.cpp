@@ -1,3 +1,12 @@
+//__________________________________________________________________________
+// Author(s): Claudio Pizzolato, Monica Reggiani - September 2013
+// email:  claudio.pizzolato@griffithuni.edu.au
+//         monica.reggiani@gmail.com
+//
+// DO NOT REDISTRIBUTE WITHOUT PERMISSION
+//__________________________________________________________________________
+//
+
 #include <iostream>
 using std::cout;
 using std::endl;
@@ -5,7 +14,7 @@ using std::endl;
 using std::vector;
 #include <stdlib.h>
 #include <math.h>
-
+#include "TrialData.h"
 
 
 void TrialData::crop(const double from, const double to) {

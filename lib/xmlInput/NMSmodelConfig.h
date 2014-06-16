@@ -1,3 +1,12 @@
+//__________________________________________________________________________
+// Author(s): Claudio Pizzolato - October 2013
+// email:  claudio.pizzolato@griffithuni.edu.au
+//
+// DO NOT REDISTRIBUTE WITHOUT PERMISSION
+//__________________________________________________________________________
+//
+
+
 #ifndef NMSModelCfg_h
 #define NMSModelCfg_h
 

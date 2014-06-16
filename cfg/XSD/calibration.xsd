@@ -51,6 +51,9 @@
     <xs:list itemType="xs:string"/>
   </xs:simpleType>
   <xs:complexType name="ObjectiveFunctionElementType"/>
+  <xs:complexType name="ComputationModeElementType"/>
+  <xs:complexType name="GlobalParameterType"/>
+  <xs:complexType name="SingleParameterType"/>
   <xs:complexType name="ObjectiveFunctionType">
     <xs:choice>
       <xs:element name="minimizeTorqueError" type="ObjectiveFunctionElementType"/>
@@ -60,7 +63,12 @@
     <xs:list itemType="xs:string"/>
   </xs:simpleType>
   <xs:complexType name="HardCodedParametersSelectionType"/>
-  
+  <xs:complexType name="ComputationModeType">
+      <xs:choice>
+          <xs:element name="default" type="ComputationModeElementType"/>
+          <xs:element name="fast"    type="ComputationModeElementType"/>
+      </xs:choice>
+  </xs:complexType>
   <xs:simpleType name="TwoDoublesType">
     <xs:list itemType="xs:double"/>
   </xs:simpleType>
@@ -82,7 +90,11 @@
   <xs:complexType name="ParameterType">
     <xs:sequence>
       <xs:element name="name" type="xs:string"/>
-      <xs:element name="muscleGroups" minOccurs="0" type="MuscleGroupsType"/>
+      <xs:choice>
+        <xs:element name="muscleGroups" type="MuscleGroupsType"/>
+        <xs:element name="global" type="GlobalParameterType"/>
+        <xs:element name="single" type="SingleParameterType"/>
+      </xs:choice>
       <xs:choice>
         <xs:element name="absolute" type="RangeType"/>
         <xs:element name="relativeToSubjectValue" type="RangeType"/>
@@ -98,6 +110,7 @@
     <xs:sequence>
       <xs:element name="dofs" type="DoFsType"/>
       <xs:element name="objectiveFunction" type="ObjectiveFunctionType"/>
+      <xs:element name="computationMode" type="ComputationModeType"/>
       <xs:choice>
         <xs:element name="strengthCoefficients_ShapeFactor_C1_C2_TendonSLackLength_single" type="HardCodedParametersSelectionType"/>
         <xs:element name="parameterSet" type="parameterSetType"/>
@@ -115,6 +128,7 @@
       <xs:element name="NMSmodel" type="NMSModelType"/>
       <xs:element minOccurs="0" name="samplingFrequency" type="xs:int"/>
       <xs:element name="calibrationSteps" type="CalibrationStepsType"/>
+      <xs:element name="trialsDirectory" minOccurs="1" maxOccurs="1" type="xs:string" />
       <xs:element name="trialSet" type="TrialSetType"/>
     </xs:sequence>
   </xs:complexType>

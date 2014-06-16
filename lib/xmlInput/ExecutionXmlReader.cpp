@@ -1,17 +1,26 @@
+//__________________________________________________________________________
+// Author(s): Claudio Pizzolato - October 2013
+// email:  claudio.pizzolato@griffithuni.edu.au
+//
+// DO NOT REDISTRIBUTE WITHOUT PERMISSION
+//__________________________________________________________________________
+//
+
+
 #include "ExecutionXmlReader.h"
-
-
 #include <string>
 using std::string;
 #include <iostream>
 using std::cout;
 using std::endl;
+#include "execution-schema.hxx"
+#include "validation.h"
 
 ExecutionXmlReader::ExecutionXmlReader(const string& filename)
 :runMode_(0) {
-    
-    try {
-        std::auto_ptr<ExecutionType> executionPointer(execution(filename));
+
+	try {
+        std::auto_ptr<ExecutionType> executionPointer(parseAndValidate<ExecutionType>(filename, execution_schema, sizeof(execution_schema)));
         executionPointer_ = executionPointer;
     }  
     catch (const xml_schema::exception& e) {
@@ -22,7 +31,7 @@ ExecutionXmlReader::ExecutionXmlReader(const string& filename)
 }
 
 void ExecutionXmlReader::readXml() {
-
+	
      try {
         ExecutionType::NMSmodel_type& myModel(executionPointer_->NMSmodel());
         ExecutionType::NMSmodel_type::activation_type& myActivation(myModel.activation());
@@ -163,10 +172,29 @@ void ExecutionXmlReader::getHybridWeightings(double& alpha, double& beta, double
 
     HybridType::gamma_type& myGamma(myType.hybrid()->gamma());
     gamma = myGamma;
-    
-    
 }
 
+
+void ExecutionXmlReader::getAnnealingParameters(unsigned& nt, unsigned& ns, double& rt, double& t, unsigned& maxNoEval, double& epsilon, unsigned& noEpsilon) const {
+	    
+	ExecutionType::NMSmodel_type& myModel(executionPointer_->NMSmodel());
+    ExecutionType::NMSmodel_type::type_type& myType(myModel.type());
+    ExecutionType::NMSmodel_type::type_type::hybrid_optional& myHybOpt(myType.hybrid());
+    if(!myHybOpt.present()) {
+        cout << "Cannot get Simulated Annealing parameters, hybrid option not selected\n";
+        exit(EXIT_FAILURE);
+    }
+
+	ExecutionType::NMSmodel_type::type_type::hybrid_type::algorithm_type& myAlgorithmType(myType.hybrid()->algorithm());
+	ExecutionType::NMSmodel_type::type_type::hybrid_type::algorithm_type::simulatedAnnealing_type& mySimanType(myAlgorithmType.simulatedAnnealing());
+	nt = mySimanType.NT();
+	ns = mySimanType.NS();
+	rt = mySimanType.rt();
+	t  = mySimanType.T();
+	maxNoEval = mySimanType.maxNoEval();
+	epsilon = mySimanType.epsilon();
+	noEpsilon = mySimanType.noEpsilon();
+}
 
 
 NMSModelCfg::RunMode ExecutionXmlReader::getRunMode() const {

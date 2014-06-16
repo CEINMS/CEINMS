@@ -1,3 +1,12 @@
+//__________________________________________________________________________
+// Author(s): Claudio Pizzolato, Monica Reggiani - September 2013
+// email:  claudio.pizzolato@griffithuni.edu.au
+//
+// DO NOT REDISTRIBUTE WITHOUT PERMISSION
+//__________________________________________________________________________
+//
+
+
 #include "SyncTools.h"
 #include "SimpleFileLogger.h"
 
@@ -13,8 +22,8 @@ using std::string;
 #define LOG
 
 template <typename NMSmodelT>
-ModelEvaluationOnline<NMSmodelT>::ModelEvaluationOnline(NMSmodelT& subject)
-:subject_(subject)
+ModelEvaluationOnline<NMSmodelT>::ModelEvaluationOnline(NMSmodelT& subject, const std::string& outputDir )
+:subject_(subject), outputDir_(outputDir)
 {}
 
 
@@ -68,7 +77,7 @@ void ModelEvaluationOnline<NMSmodelT>::operator()() {
         cout << "ERROR: muscles names from emg or lmt files don't match with XML model ones\n";
         exit(EXIT_FAILURE);
     }
-    
+ //   
     for(unsigned int i = 0; i < noDof_; ++i) {
         if(!subject_.compareMusclesNamesOnDoF(muscleNamesOnDofFromShared.at(i), i)) {
         cout << "ERROR: muscles names from " << dofNames_.at(i) << "Ma.txt file don't match with XML model ones\n";
@@ -77,13 +86,15 @@ void ModelEvaluationOnline<NMSmodelT>::operator()() {
     }
 
 //END CHECK MUSCLES
+    double globalEmDelay = subject_.getGlobalEmDelay(); 
+   
 
 #ifdef LOG
   cout << "starting consume" << endl;
 #endif
   
 #ifdef LOG_FILES
-    Logger::SimpleFileLogger<NMSmodelT> logger(subject_);
+    Logger::SimpleFileLogger<NMSmodelT> logger(subject_, outputDir_);
     logger.addLog(Logger::Activations);
     logger.addLog(Logger::FibreLengths);
     logger.addLog(Logger::FibreVelocities);
@@ -132,7 +143,7 @@ void ModelEvaluationOnline<NMSmodelT>::operator()() {
 
         do {
             getEmgFromShared(emgFromQueue);
-            emgTime = emgFromQueue.back();
+            emgTime = emgFromQueue.back() + globalEmDelay;
             emgFromQueue.pop_back();
             if(!emgFromQueue.empty()) {
                 //ROBA CHE DEVE FARE EMG
@@ -206,7 +217,7 @@ NOTE: when one a producer push an empty vector in a queue means that ther are no
     } while (runCondition);
 
 #ifdef LOG  
-  cout << "Everything went fine, check output files in ./Output\n";
+   cout << "Estimation completed. Output file printed in "+outputDir_ << endl;;
 #endif
 }
 

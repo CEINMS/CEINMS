@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<emgGenerator xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../XSD/emgGenerator.xsd">
+
+<experimental>
+	<emg id="addbrev_r"/>																																	
+	<emg id="addlong_r"/>
+	<emg id="addmag1_r"/>
+	<emg id="addmag2_r"/>
+	<emg id="addmag3_r"/>
+	<emg id="bicfemlh_r"/>
+	<emg id="bicfemsh_r"/>
+	<emg id="gaslat_r"/>
+	<emg id="gasmed_r"/>
+	<emg id="gmax1_r"/>
+	<emg id="gmax2_r"/>
+	<emg id="gmax3_r"/>
+	<emg id="gmed1_r"/>
+	<emg id="gmed2_r"/>
+	<emg id="gmed3_r"/>
+	<emg id="gmin1_r"/>
+	<emg id="gmin2_r"/>
+	<emg id="gmin3_r"/>
+	<emg id="gra_r"/>
+	<emg id="illiacus_r"/>
+	<emg id="perbrev_r"/>
+	<emg id="perlong_r"/>
+	<emg id="perter_r"/>
+	<emg id="psoas_r"/>
+	<emg id="recfem_r"/>
+	<emg id="sar_r"/>
+	<emg id="semimem_r"/>
+	<emg id="semiten_r"/>
+	<emg id="sol_r"/>
+	<emg id="tfl_r"/>
+	<emg id="tibant_r"/>
+	<emg id="vasint_r"/>
+	<emg id="vaslat_r"/>
+	<emg id="vasmed_r"/>
+</experimental>
+
+<mapping>
+	<emg id="add_brev_r"
+		 operation="assign">
+         addbrev_r
+	</emg>
+	<emg id="add_long_r"
+		 operation="assign">
+         addlong_r
+	</emg>
+	<emg id="add_mag1_r"
+		 operation="assign">
+         addmag1_r
+	</emg>
+	<emg id="add_mag2_r"
+		 operation="assign">
+         addmag2_r
+	</emg>
+	<emg id="add_mag3_r"
+		 operation="assign">
+         addmag3_r
+	</emg>
+	<emg id="bifemsh_r"
+		 operation="assign">
+         bicfemsh_r
+	</emg>
+	<emg id="bifemlh_r"
+		 operation="assign">
+         bicfemlh_r
+	</emg>
+    <emg id="glut_max1_r"
+		 operation="assign">
+         gmax1_r
+	</emg>
+    <emg id="glut_max2_r"
+		 operation="assign">
+         gmax2_r
+	</emg>
+    <emg id="glut_max3_r"
+		 operation="assign">
+         gmax3_r
+	</emg>
+
+    <emg id="glut_med1_r"
+		 operation="assign">
+         gmed1_r
+	</emg>
+    <emg id="glut_med2_r"
+		 operation="assign">
+         gmed2_r
+	</emg>
+    <emg id="glut_med3_r"
+		 operation="assign">
+         gmed2_r
+	</emg>
+    <emg id="glut_min1_r"
+		 operation="assign">
+		 gmin1_r
+	</emg>
+    <emg id="glut_min2_r"
+		 operation="assign">
+		 gmin2_r
+	</emg>
+    <emg id="glut_min3_r"
+		 operation="assign">
+		 gmin1_r
+	</emg>
+	<emg id="grac_r"
+		 operation="assign">
+		 gra_r
+	</emg>
+	<emg id="iliacus_r"
+		 operation="assign">
+		 illiacus_r
+	</emg>		 
+	<emg id="med_gas_r"
+		 operation="assign">
+		 gasmed_r
+	</emg>	
+	<emg id="lat_gas_r"
+		 operation="assign">
+		 gaslat_r
+	</emg>
+	<emg id="per_brev_r"
+		 operation="assign">
+         perbrev_r
+	</emg>
+	<emg id="per_long_r"
+		 operation="assign">
+         perlong_r
+	</emg>
+	<emg id="per_tert_r"
+		 operation="assign">
+         perter_r
+	</emg>
+	<emg id="psoas_r"
+		 operation="assign">
+		 psoas_r
+    </emg>
+	<emg id="rect_fem_r"
+		 operation="assign">
+         recfem_r
+	</emg>
+	<emg id="sar_r"
+		 operation="assign">
+         sar_r
+	</emg>
+	<emg id="semimem_r"
+		 operation="assign">
+         semimem_r
+	</emg>
+
+	<emg id="soleus_r"
+		 operation="assign">
+         sol_r
+	</emg>
+	<emg id="tfl_r"
+		 operation="assign">
+         tfl_r
+	</emg>
+	<emg id="tib_ant_r"
+		 operation="assign">
+         tibant_r
+	</emg>
+   
+	<emg id="vas_int_r"
+		 operation="assign">
+		 vasint_r
+	</emg>
+	<emg id="vas_lat_r"
+		 operation="assign">
+         vaslat_r
+	</emg>
+	<emg id="vas_med_r"
+		 operation="assign">
+         vasmed_r
+	</emg>	
+
+</mapping>
+
+<output>
+	add_brev_r add_long_r add_mag1_r add_mag2_r add_mag3_r 
+    bifemlh_r bifemsh_r 
+    glut_max1_r glut_max2_r glut_max3_r 
+    glut_med1_r glut_med2_r glut_med3_r 
+    glut_min1_r glut_min2_r glut_min3_r 
+    grac_r 
+    iliacus_r 
+	lat_gas_r med_gas_r 
+    per_brev_r per_long_r per_tert_r
+    psoas_r rect_fem_r sar_r
+    semimem_r semiten_r soleus_r
+    tfl_r tib_ant_r
+    vas_int_r vas_lat_r vas_med_r
+</output>
+</emgGenerator>

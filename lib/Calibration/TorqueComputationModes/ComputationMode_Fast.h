@@ -1,3 +1,12 @@
+//__________________________________________________________________________
+// Author: Claudio Pizzolato, Monica Reggiani - September 2013
+// email:  claudio.pizzolato@griffithuni.edu.au
+//
+// DO NOT REDISTRIBUTE WITHOUT PERMISSION
+//__________________________________________________________________________
+//
+
+
 #ifndef ComputationMode_Fast_h
 #define ComputationMode_Fast_h
 
@@ -19,7 +28,7 @@ public:
     void setTrials(const std::vector<TrialData>& trials);
     ComputationMode_Fast& operator=(const ComputationMode_Fast& orig);
     void computeTorques(std::vector< std::vector< std::vector<double> > >& torques);
-    void computePenalties(std::vector< std::vector< double > >& penalties);
+    void computeTorquesAndPenalties(std::vector< std::vector< std::vector<double> > >& torques, std::vector< std::vector< double > >& penalties);
 private:
     void getMusclesToUpdate();
     void initFiberLengthTraceCurves(unsigned trialIndex);
@@ -27,6 +36,7 @@ private:
     std::vector< TrialData > trials_;
     std::vector<MuscleParameters> parametersT1_;
     std::vector< std::vector < std::vector<double> > > forceDataT1_; //1st trial, 2nd row, 3rd muscle
+    std::vector< std::vector < std::vector<double> > > penaltyDataT1_; //1st trial, 2nd row, 3rd muscle
     std::vector< std::vector < std::vector<double> > > normFiberVelDataT1_; //1st trial, 2nd row, 3rd muscle
     std::vector<unsigned> musclesToUpdate_;
     

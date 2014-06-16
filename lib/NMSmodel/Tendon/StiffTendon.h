@@ -1,3 +1,13 @@
+//__________________________________________________________________________
+// Author(s): Claudio Pizzolato, Monica Reggiani, Massimo Sartori - October 2013
+// email:  claudio.pizzolato@griffithuni.edu.au
+//         monica.reggiani@gmail.com
+//         massimo.sartori@gmail.com
+//
+// DO NOT REDISTRIBUTE WITHOUT PERMISSION
+//__________________________________________________________________________
+//
+
 #ifndef StiffTendon_h
 #define StiffTendon_h
 #include "Curve.h"
@@ -19,8 +29,8 @@ public:
                    double strengthCoefficient,
                    const CurveOffline& activeForceLengthCurve,
                    const CurveOffline& passiveForceLengthCurve, 
-                   const CurveOffline& forceVelocityCurve
-                 );
+                   const CurveOffline& forceVelocityCurve,
+                   const CurveOffline& tendonForceStrainCurve);
     virtual ~StiffTendon();
 
     
@@ -36,13 +46,16 @@ public:
     void setMuscleTendonLength(double muscleTendonLength);
     void setActivation(double activation);
     void updateFibreLength();
+    double getPenalty() const { return .0;}
 
     double getFibreLength() { return fibreLength_;}
     void setStrengthCoefficient(double strengthCoefficient) { };
     void setTendonSlackLength(double tendonSlackLength) { tendonSlackLength_ = tendonSlackLength; }
+    void setOptimalFibreLength(double optimalFibreLength) { optimalFibreLength_ = optimalFibreLength; }
     void setCurves(const CurveOffline& activeForceLengthCurve, 
                    const CurveOffline& passiveForceLengthCurve, 
-                   const CurveOffline& forceVelocityCurve) { };
+                   const CurveOffline& forceVelocityCurve,
+                   const CurveOffline& tendonForceStrainCurve) { };
                    
     void pushState() {};
     void resetState();

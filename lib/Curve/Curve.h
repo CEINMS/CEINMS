@@ -1,11 +1,11 @@
-// This is part of
-// NeuroMuscoloSkeletal Model Software (NMS)
-// Copyright (C) 2010 David Lloyd Massimo Sartori Monica Reggiani
+//__________________________________________________________________________
+// Author(s): Claudio Pizzolato, Monica Reggiani - September 2013
+// email:  claudio.pizzolato@griffithuni.edu.au
+//         monica.reggiani@gmail.com
 //
-// ?? Licenza ??
+// DO NOT REDISTRIBUTE WITHOUT PERMISSION
+//__________________________________________________________________________
 //
-// The authors may be contacted via:
-// email: massimo.sartori@gmail.com monica.reggiani@gmail.com
 
 #ifndef Curve_h
 #define Curve_h
@@ -15,6 +15,16 @@
 
 namespace CurveMode {
     enum Mode{Online, Offline};
+    enum Interpolation{Cubic, Linear};
+
+    
+};
+
+
+template <int v>
+struct Int2Type {
+
+    enum { value = v };
 };
 
 
@@ -32,15 +42,15 @@ struct Select<CurveMode::Online, T, U> {
 }; 
 
 
-template <CurveMode::Mode mode>
+template <CurveMode::Mode mode,  CurveMode::Interpolation T>
 class Curve;
 
 
-template <CurveMode::Mode mode>
-std::ostream& operator<< (std::ostream& output, const Curve<mode>& c);
+template <CurveMode::Mode mode,  CurveMode::Interpolation T>
+std::ostream& operator<< (std::ostream& output, const Curve<mode, T>& c);
 
 
-template <CurveMode::Mode mode>
+template <CurveMode::Mode mode, CurveMode::Interpolation T = CurveMode::Cubic>
 class Curve {
 
 public:
@@ -64,9 +74,14 @@ public:
     double getFirstDerivative(double xValue) const;
     double getSecondDerivative(double xValue) const;
     friend std::ostream& operator<< <>(std::ostream& output, const Curve& c);
-    unsigned getSize();
+    bool empty() {return b_.empty();}
 private:
-    void computeCoefficients();
+    void computeCoefficients(Int2Type<CurveMode::Cubic>);
+    void computeCoefficients(Int2Type<CurveMode::Linear>);
+
+    double getValue(double xValue, unsigned abscissaPoint, Int2Type<CurveMode::Cubic>) const;
+    double getValue(double xValue, unsigned abscissaPoint, Int2Type<CurveMode::Linear>) const;
+    unsigned getAbscissaPoint(double xValue) const;
 
     typedef typename Select<mode, std::vector<double>, CircularVector<double> >::Result VectorType;  
     VectorType x_;

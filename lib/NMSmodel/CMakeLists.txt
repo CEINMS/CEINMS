@@ -1,27 +1,59 @@
-INCLUDE_DIRECTORIES(
-  ${CMAKE_SOURCE_DIR}/lib/xmlInput 
+## Authors: Monica Reggiani, Claudio Pizzolato
+
+include_directories(
   ${CMAKE_SOURCE_DIR}/lib/Curve
-  ${CMAKE_SOURCE_DIR}/lib/NMSmodel
-  ${CMAKE_SOURCE_DIR}/lib/NMSmodel/Tendon
-  ${CMAKE_SOURCE_DIR}/lib/NMSmodel/Activation
+  ${CMAKE_CURRENT_SOURCE_DIR}
+  ${CMAKE_CURRENT_SOURCE_DIR}/Tendon
+  ${CMAKE_CURRENT_SOURCE_DIR}/Activation
   ${CMAKE_SOURCE_DIR}/lib/OdeInt
+  ${CMAKE_SOURCE_DIR}/lib/RootSolvers
+  ${xmlInput_INCLUDE_DIRS}
+  ${ceinms_common_INCLUDE_DIRS}
+  ${FileIO_INCLUDE_DIRS}
 )
 
-SET(Tendon_SOURCES
+include_directories(${Boost_INCLUDE_DIRS})
+
+set(Tendon_SOURCES
   Tendon/ElasticTendon.cpp
   Tendon/ElasticTendon_BiSec.cpp
   Tendon/StiffTendon.cpp
 ) 
+set(Tendon_HEADERS
+  Tendon/ElasticTendon.h
+  Tendon/ElasticTendon_BiSec.h
+  Tendon/StiffTendon.h
+)
 
 
-SET(Activation_SOURCES
+set(Activation_SOURCES
   Activation/ExponentialActivation.cpp
   Activation/PiecewiseActivation.cpp
 ) 
-
-ADD_LIBRARY(NMSmodel STATIC
-  NMSmodel.cpp MuscleParameters.cpp 
-  ${Tendon_SOURCES}
-  ${Activation_SOURCES}
+set(Activation_HEADERS
+  Activation/ExponentialActivation.h
+  Activation/PiecewiseActivation.h
 )
+
+set(NMS_SOURCES NMSmodel.cpp MuscleParameters.cpp)
+set(NMS_HEADERS NMSmodel.h MuscleParameters.h)
+
+
+source_group("NMS_headers" FILES ${NMS_HEADERS})
+source_group("NMS_sources" FILES ${NMS_SOURCES})
+source_group("Tendon_headers" FILES ${Tendon_HEADERS})
+source_group("Tendon_sources" FILES ${Tendon_SOURCES})
+source_group("Activation_headers" FILES ${Activation_HEADERS})
+source_group("Activation_sources" FILES ${Activation_SOURCES})
+
+add_library(NMSmodel STATIC
+  ${NMS_SOURCES}
+  ${NMS_HEADERS}
+  ${Tendon_SOURCES}
+  ${Tendon_HEADERS}
+  ${Activation_SOURCES}
+  ${Activation_HEADERS}
+)
+
+set(NMSmodel_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/Activation ${CMAKE_CURRENT_SOURCE_DIR}/Tendon CACHE STRING "Include directory for NMSmodel library")
 

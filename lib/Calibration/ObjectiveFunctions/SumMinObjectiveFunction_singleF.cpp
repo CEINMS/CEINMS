@@ -1,11 +1,12 @@
-// This is part of
-// NeuroMuscoloSkeletal Model Software (NMS)
-// Copyright (C) 2010 David Lloyd Massimo Sartori Monica Reggiani
+//__________________________________________________________________________
+// Author(s): Claudio Pizzolato, Monica Reggiani - September 2013
+// email:  claudio.pizzolato@griffithuni.edu.au
+//         monica.reggiani@gmail.com
 //
-// ?? Licenza ??
+// DO NOT REDISTRIBUTE WITHOUT PERMISSION
+//__________________________________________________________________________
 //
-// The authors may be contacted via:
-// email: massimo.sartori@gmail.com monica.reggiani@gmail.com
+
 
 #include <math.h>
 #include <float.h>
@@ -116,6 +117,8 @@ void SumMinObjectiveFunction_singleF<TorquesComputationT>::evalFp( ) {
                 penaltyFactor += penalties_.at(t).at(r);
             }
  //           penaltyFactor = 0;
+ //           if (penaltyFactor > 0)
+ //               cout << "penalty factor: " << penaltyFactor << endl; 
             trialDifference = (trialDifference/torquesVariance_.at(t).at(dIndex)+penaltyFactor) / torques_.at(t).at(d).size();
             fp_ += trialDifference;
         }

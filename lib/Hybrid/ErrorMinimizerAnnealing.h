@@ -16,6 +16,7 @@ namespace Hybrid {
         void setAllExternalTorques(std::vector<double> externalTorques, const std::vector< std::string >& dofs);
         void setTime(double time) {currentTime_ = time;}
         void setWeightings(HybridWeightings weightings) {weightings_ = weightings;}
+		void setAnnealingParameters(unsigned nt, unsigned ns, double rt, double t, unsigned maxNoEval, double epsilon, unsigned noEpsilon);
         void minimize();
     private:
         HybridWeightings weightings_;
@@ -27,8 +28,15 @@ namespace Hybrid {
         std::vector<std::string> musclesNamesWithEmgToPredict_;
         std::vector<double> lastActivations_;
         double currentTime_;
+		unsigned            nt_;
+		unsigned            ns_;
+		double              rt_;
+		double              t_;
+		unsigned            maxNoEval_;  
+		double				epsilon_;
+		unsigned			noEpsilon_;
     };
-}
+};
 
 #include "ErrorMinimizerAnnealing.cpp"
 

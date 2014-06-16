@@ -1,3 +1,12 @@
+//__________________________________________________________________________
+// Author(s): Claudio Pizzolato - October 2013
+// email:  claudio.pizzolato@griffithuni.edu.au
+//
+// DO NOT REDISTRIBUTE WITHOUT PERMISSION
+//__________________________________________________________________________
+//
+
+
 #ifndef NMSmodelPolicyTemplates_h
 #define NMSmodelPolicyTemplates_h
 
@@ -25,25 +34,25 @@ template class NMSmodel<PiecewiseActivation, StiffTendon, CurveMode::Online>;
 template
 std::ostream& operator<< (std::ostream& output, const NMSmodel<PiecewiseActivation, StiffTendon, CurveMode::Online>& b);
 
-/*
 
-template class NMSmodel<ExponentialActivation, ElasticTendon<CurveMode::Offline>, CurveMode::Offline>;
-template
-std::ostream& operator<< (std::ostream& output, const NMSmodel<ExponentialActivation, ElasticTendon<CurveMode::Offline>, CurveMode::Offline>& b);
 
-template class NMSmodel<ExponentialActivation, ElasticTendon<CurveMode::Online>, CurveMode::Online>;
-template
-std::ostream& operator<< (std::ostream& output, const NMSmodel<ExponentialActivation, ElasticTendon<CurveMode::Offline>, CurveMode::Online>& b);
+// template class NMSmodel<ExponentialActivation, ElasticTendon<CurveMode::Offline>, CurveMode::Offline>;
+// template
+// std::ostream& operator<< (std::ostream& output, const NMSmodel<ExponentialActivation, ElasticTendon<CurveMode::Offline>, CurveMode::Offline>& b);
+// 
+// template class NMSmodel<ExponentialActivation, ElasticTendon<CurveMode::Online>, CurveMode::Online>;
+// template
+// std::ostream& operator<< (std::ostream& output, const NMSmodel<ExponentialActivation, ElasticTendon<CurveMode::Offline>, CurveMode::Online>& b);
+// 
+// template class NMSmodel<PiecewiseActivation, ElasticTendon<CurveMode::Offline>, CurveMode::Offline>;
+// template
+// std::ostream& operator<< (std::ostream& output, const NMSmodel<PiecewiseActivation, ElasticTendon<CurveMode::Offline>, CurveMode::Offline>& b);
+// 
+// template class NMSmodel<PiecewiseActivation, ElasticTendon<CurveMode::Offline>, CurveMode::Online>;
+// template
+// std::ostream& operator<< (std::ostream& output, const NMSmodel<PiecewiseActivation, ElasticTendon<CurveMode::Offline>, CurveMode::Online>& b);
+// 
 
-template class NMSmodel<PiecewiseActivation, ElasticTendon<CurveMode::Offline>, CurveMode::Offline>;
-template
-std::ostream& operator<< (std::ostream& output, const NMSmodel<PiecewiseActivation, ElasticTendon<CurveMode::Offline>, CurveMode::Offline>& b);
-
-template class NMSmodel<PiecewiseActivation, ElasticTendon<CurveMode::Offline>, CurveMode::Online>;
-template
-std::ostream& operator<< (std::ostream& output, const NMSmodel<PiecewiseActivation, ElasticTendon<CurveMode::Offline>, CurveMode::Online>& b);
-
-*/
 
 
 template class NMSmodel<ExponentialActivation, ElasticTendon_BiSec, CurveMode::Offline>;

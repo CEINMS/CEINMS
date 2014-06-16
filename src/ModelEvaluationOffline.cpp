@@ -1,3 +1,12 @@
+//__________________________________________________________________________
+// Author(s): Claudio Pizzolato, Monica Reggiani - September 2013
+// email:  claudio.pizzolato@griffithuni.edu.au
+//
+// DO NOT REDISTRIBUTE WITHOUT PERMISSION
+//__________________________________________________________________________
+//
+
+
 //#include "ModelEvaluationOffline.h"
 #include "SyncTools.h"
 #include "SimpleFileLogger.h"
@@ -16,8 +25,8 @@ using std::string;
 
 
 template <typename NMSmodelT>
-ModelEvaluationOffline<NMSmodelT>::ModelEvaluationOffline(NMSmodelT& subject) 
-:subject_(subject)
+ModelEvaluationOffline<NMSmodelT>::ModelEvaluationOffline(NMSmodelT& subject, const std::string& outputDir) 
+:subject_(subject), outputDir_(outputDir)
 { }
 
 
@@ -44,12 +53,13 @@ void ModelEvaluationOffline<NMSmodelT>::initOfflineCurve() {
 
     SyncTools::Shared::queueEmgMutex.unlock();
     
+    double globalEmDelay = subject_.getGlobalEmDelay(); 
     unsigned lmtCt = 0;
     double lmtTime = (allLmt.at(0)).back();
     double emgTime; 
     
     for(int emgCt = 0; emgCt < allEmg.size() - 1; ++emgCt) {
-        emgTime = (allEmg.at(emgCt)).back();
+        emgTime = (allEmg.at(emgCt)).back() + globalEmDelay;
         allEmg.at(emgCt).pop_back();
         subject_.setTime(emgTime);
         subject_.setEmgs(allEmg.at(emgCt));
@@ -133,25 +143,26 @@ void ModelEvaluationOffline<NMSmodelT>::operator()() {
 
 //END CHECK MUSCLES
 
+    double globalEmDelay = subject_.getGlobalEmDelay(); 
+
 #ifdef LOG
   cout << "starting consume" << endl;
 #endif
   
 #ifdef LOG_FILES
-    Logger::SimpleFileLogger<NMSmodelT> logger(subject_);
+    Logger::SimpleFileLogger<NMSmodelT> logger(subject_, outputDir_);
     logger.addLog(Logger::Activations);
     logger.addLog(Logger::FibreLengths);
     logger.addLog(Logger::FibreVelocities);
     logger.addLog(Logger::MuscleForces);
     logger.addLog(Logger::Torques);
 #endif
-
     initOfflineCurve();
-    
+
     vector<bool> stillExtTorqueDataOnDof;
     for (unsigned int i = 0; i < dofNamesWithExtTorque_.size(); ++i)
         stillExtTorqueDataOnDof.push_back(true);
-
+	
     do {  
         getLmtFromShared(lmtFromQueue);
         lmtMaTime = lmtFromQueue.back();
@@ -189,7 +200,7 @@ void ModelEvaluationOffline<NMSmodelT>::operator()() {
 
         do {
             getEmgFromShared(emgFromQueue);
-            emgTime = emgFromQueue.back();
+            emgTime = emgFromQueue.back() + globalEmDelay;
             emgFromQueue.pop_back();
             if(!emgFromQueue.empty()) {
                 //ROBA CHE DEVE FARE EMG
@@ -263,7 +274,7 @@ NOTE: when one a producer push an empty vector in a queue means that ther are no
     } while (runCondition);
 
 #ifdef LOG  
-  cout << "Everything went fine, check output files in ./Output\n";
+  cout << "Estimation completed. Output file printed in "+outputDir_ << endl;;
 #endif
 }
 

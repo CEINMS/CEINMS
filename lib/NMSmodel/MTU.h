@@ -60,9 +60,11 @@ public:
     double getEmg() const { return activationDynamic_.getEmg(); }
     double getPastEmg() const { return activationDynamic_.getPastEmg(); }
     double getNeuralActivation() const { return activationDynamic_.getNeuralActivation(); }
-    void   setCurves(const CurveOffline& activeForceLengthCurve, const CurveOffline& passiveForceLengthCurve, const CurveOffline& forceVelocityCurve);
+    void   setCurves(const CurveOffline& activeForceLengthCurve, const CurveOffline& passiveForceLengthCurve, const CurveOffline& forceVelocityCurve, const CurveOffline& tendonForceLengthCurve);
     void   setActivation(double activation); //recompute all the data that depend on activation
     double getActivation() const {return activation_;}
+    void   setEmDelay(double emDelay) { emDelay_ = emDelay;}
+    double getEmDelay() const { return emDelay_;}
     void   setShapeFactor(double shapeFactor);
     double getShapeFactor() const {return shapeFactor_;}
     void   setC1(double c1);
@@ -73,7 +75,8 @@ public:
     double getStrengthCoefficient() const {return strengthCoefficient_;}
     void   setTendonSlackLength(double tendonSlackLength);
     double getTendonSlackLength() const {return tendonSlackLength_;};
-    double getOptimalFiberLength() const { return optimalFibreLength_;}
+    void   setOptimalFibreLength(double optimalFibreLength);
+    double getOptimalFibreLength() const { return optimalFibreLength_;}
     double getPennationAngle() const {return pennationAngle_; }
 
     double getFiberLength() const {return fibreLength_;}
@@ -103,6 +106,7 @@ private:
     void resetState();
     
     std::string id_;
+    double emDelay_;
     
     // MUSCLE ACTIVATION: parameters and utility methods 
     Activation activationDynamic_;
@@ -133,7 +137,8 @@ private:
     CurveOffline  forceVelocityCurve_;
     CurveOffline  activeForceLengthCurve_;
     CurveOffline  passiveForceLengthCurve_;
-
+    CurveOffline  tendonForceStrainCurve_;
+    
     double timeScale_;
     double time_;
 };

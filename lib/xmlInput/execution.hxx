@@ -31,8 +31,8 @@
 // in the accompanying FLOSSE file.
 //
 
-#ifndef EXECUTION_HXX
-#define EXECUTION_HXX
+#ifndef CXX______CFG_XSD_EXECUTION_HXX
+#define CXX______CFG_XSD_EXECUTION_HXX
 
 // Begin prologue.
 //
@@ -78,6 +78,21 @@
 #include <xsd/cxx/tree/parsing/float.hxx>
 #include <xsd/cxx/tree/parsing/double.hxx>
 #include <xsd/cxx/tree/parsing/decimal.hxx>
+
+#include <xsd/cxx/xml/dom/serialization-header.hxx>
+#include <xsd/cxx/tree/serialization.hxx>
+#include <xsd/cxx/tree/serialization/byte.hxx>
+#include <xsd/cxx/tree/serialization/unsigned-byte.hxx>
+#include <xsd/cxx/tree/serialization/short.hxx>
+#include <xsd/cxx/tree/serialization/unsigned-short.hxx>
+#include <xsd/cxx/tree/serialization/int.hxx>
+#include <xsd/cxx/tree/serialization/unsigned-int.hxx>
+#include <xsd/cxx/tree/serialization/long.hxx>
+#include <xsd/cxx/tree/serialization/unsigned-long.hxx>
+#include <xsd/cxx/tree/serialization/boolean.hxx>
+#include <xsd/cxx/tree/serialization/float.hxx>
+#include <xsd/cxx/tree/serialization/double.hxx>
+#include <xsd/cxx/tree/serialization/decimal.hxx>
 
 namespace xml_schema
 {
@@ -174,6 +189,16 @@ namespace xml_schema
   typedef ::xsd::cxx::tree::entity< char, ncname > entity;
   typedef ::xsd::cxx::tree::entities< char, simple_type, entity > entities;
 
+  // Namespace information and list stream. Used in
+  // serialization functions.
+  //
+  typedef ::xsd::cxx::xml::dom::namespace_info< char > namespace_info;
+  typedef ::xsd::cxx::xml::dom::namespace_infomap< char > namespace_infomap;
+  typedef ::xsd::cxx::tree::list_stream< char > list_stream;
+  typedef ::xsd::cxx::tree::as_double< double_ > as_double;
+  typedef ::xsd::cxx::tree::as_decimal< decimal > as_decimal;
+  typedef ::xsd::cxx::tree::facet facet;
+
   // Flags and properties.
   //
   typedef ::xsd::cxx::tree::flags flags;
@@ -197,6 +222,7 @@ namespace xml_schema
   typedef ::xsd::cxx::tree::unexpected_enumerator< char > unexpected_enumerator;
   typedef ::xsd::cxx::tree::expected_text_content< char > expected_text_content;
   typedef ::xsd::cxx::tree::no_prefix_mapping< char > no_prefix_mapping;
+  typedef ::xsd::cxx::tree::serialization< char > serialization;
 
   // Error handler callback interface.
   //
@@ -1350,16 +1376,20 @@ class ExecutionType: public ::xml_schema::type
   // elaboratedDoFs
   // 
   typedef ::ElaboratedDoFsType elaboratedDoFs_type;
+  typedef ::xsd::cxx::tree::optional< elaboratedDoFs_type > elaboratedDoFs_optional;
   typedef ::xsd::cxx::tree::traits< elaboratedDoFs_type, char > elaboratedDoFs_traits;
 
-  const elaboratedDoFs_type&
+  const elaboratedDoFs_optional&
   elaboratedDoFs () const;
 
-  elaboratedDoFs_type&
+  elaboratedDoFs_optional&
   elaboratedDoFs ();
 
   void
   elaboratedDoFs (const elaboratedDoFs_type& x);
+
+  void
+  elaboratedDoFs (const elaboratedDoFs_optional& x);
 
   void
   elaboratedDoFs (::std::auto_ptr< elaboratedDoFs_type > p);
@@ -1367,29 +1397,29 @@ class ExecutionType: public ::xml_schema::type
   // logging
   // 
   typedef ::LoggingType logging_type;
+  typedef ::xsd::cxx::tree::optional< logging_type > logging_optional;
   typedef ::xsd::cxx::tree::traits< logging_type, char > logging_traits;
 
-  const logging_type&
+  const logging_optional&
   logging () const;
 
-  logging_type&
+  logging_optional&
   logging ();
 
   void
   logging (const logging_type& x);
 
   void
+  logging (const logging_optional& x);
+
+  void
   logging (::std::auto_ptr< logging_type > p);
 
   // Constructors.
   //
-  ExecutionType (const NMSmodel_type&,
-                 const elaboratedDoFs_type&,
-                 const logging_type&);
+  ExecutionType (const NMSmodel_type&);
 
-  ExecutionType (::std::auto_ptr< NMSmodel_type >&,
-                 const elaboratedDoFs_type&,
-                 ::std::auto_ptr< logging_type >&);
+  ExecutionType (::std::auto_ptr< NMSmodel_type >&);
 
   ExecutionType (const ::xercesc::DOMElement& e,
                  ::xml_schema::flags f = 0,
@@ -1418,8 +1448,8 @@ class ExecutionType: public ::xml_schema::type
   online_optional online_;
   offline_optional offline_;
   samplingFrequency_optional samplingFrequency_;
-  ::xsd::cxx::tree::one< elaboratedDoFs_type > elaboratedDoFs_;
-  ::xsd::cxx::tree::one< logging_type > logging_;
+  elaboratedDoFs_optional elaboratedDoFs_;
+  logging_optional logging_;
 };
 
 #include <iosfwd>
@@ -1521,6 +1551,179 @@ execution (::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument >& d,
            ::xml_schema::flags f = 0,
            const ::xml_schema::properties& p = ::xml_schema::properties ());
 
+#include <iosfwd>
+
+#include <xercesc/dom/DOMDocument.hpp>
+#include <xercesc/dom/DOMErrorHandler.hpp>
+#include <xercesc/framework/XMLFormatter.hpp>
+
+#include <xsd/cxx/xml/dom/auto-ptr.hxx>
+
+void
+operator<< (::xercesc::DOMElement&, const TendonElementType&);
+
+void
+operator<< (::xercesc::DOMAttr&, const TendonElementType&);
+
+void
+operator<< (::xml_schema::list_stream&,
+            const TendonElementType&);
+
+void
+operator<< (::xercesc::DOMElement&, const TendonType&);
+
+void
+operator<< (::xercesc::DOMElement&, const ActivationElementType&);
+
+void
+operator<< (::xercesc::DOMAttr&, const ActivationElementType&);
+
+void
+operator<< (::xml_schema::list_stream&,
+            const ActivationElementType&);
+
+void
+operator<< (::xercesc::DOMElement&, const ActivationType&);
+
+void
+operator<< (::xercesc::DOMElement&, const SimulatedAnnealingType&);
+
+void
+operator<< (::xercesc::DOMElement&, const HybridAlgorithmType&);
+
+void
+operator<< (::xercesc::DOMElement&, const OpenLoopType&);
+
+void
+operator<< (::xercesc::DOMAttr&, const OpenLoopType&);
+
+void
+operator<< (::xml_schema::list_stream&,
+            const OpenLoopType&);
+
+void
+operator<< (::xercesc::DOMElement&, const MuscleListType&);
+
+void
+operator<< (::xercesc::DOMAttr&, const MuscleListType&);
+
+void
+operator<< (::xml_schema::list_stream&,
+            const MuscleListType&);
+
+void
+operator<< (::xercesc::DOMElement&, const HybridType&);
+
+void
+operator<< (::xercesc::DOMElement&, const TypeType&);
+
+void
+operator<< (::xercesc::DOMElement&, const NMSModelType&);
+
+void
+operator<< (::xercesc::DOMElement&, const ElaboratedDoFsType&);
+
+void
+operator<< (::xercesc::DOMAttr&, const ElaboratedDoFsType&);
+
+void
+operator<< (::xml_schema::list_stream&,
+            const ElaboratedDoFsType&);
+
+void
+operator<< (::xercesc::DOMElement&, const ExecutionElementType&);
+
+void
+operator<< (::xercesc::DOMAttr&, const ExecutionElementType&);
+
+void
+operator<< (::xml_schema::list_stream&,
+            const ExecutionElementType&);
+
+void
+operator<< (::xercesc::DOMElement&, const FileType&);
+
+void
+operator<< (::xercesc::DOMAttr&, const FileType&);
+
+void
+operator<< (::xml_schema::list_stream&,
+            const FileType&);
+
+void
+operator<< (::xercesc::DOMElement&, const LoggingType&);
+
+void
+operator<< (::xercesc::DOMElement&, const ExecutionType&);
+
+// Serialize to std::ostream.
+//
+
+void
+execution (::std::ostream& os,
+           const ::ExecutionType& x, 
+           const ::xml_schema::namespace_infomap& m = ::xml_schema::namespace_infomap (),
+           const ::std::string& e = "UTF-8",
+           ::xml_schema::flags f = 0);
+
+void
+execution (::std::ostream& os,
+           const ::ExecutionType& x, 
+           ::xml_schema::error_handler& eh,
+           const ::xml_schema::namespace_infomap& m = ::xml_schema::namespace_infomap (),
+           const ::std::string& e = "UTF-8",
+           ::xml_schema::flags f = 0);
+
+void
+execution (::std::ostream& os,
+           const ::ExecutionType& x, 
+           ::xercesc::DOMErrorHandler& eh,
+           const ::xml_schema::namespace_infomap& m = ::xml_schema::namespace_infomap (),
+           const ::std::string& e = "UTF-8",
+           ::xml_schema::flags f = 0);
+
+// Serialize to xercesc::XMLFormatTarget.
+//
+
+void
+execution (::xercesc::XMLFormatTarget& ft,
+           const ::ExecutionType& x, 
+           const ::xml_schema::namespace_infomap& m = ::xml_schema::namespace_infomap (),
+           const ::std::string& e = "UTF-8",
+           ::xml_schema::flags f = 0);
+
+void
+execution (::xercesc::XMLFormatTarget& ft,
+           const ::ExecutionType& x, 
+           ::xml_schema::error_handler& eh,
+           const ::xml_schema::namespace_infomap& m = ::xml_schema::namespace_infomap (),
+           const ::std::string& e = "UTF-8",
+           ::xml_schema::flags f = 0);
+
+void
+execution (::xercesc::XMLFormatTarget& ft,
+           const ::ExecutionType& x, 
+           ::xercesc::DOMErrorHandler& eh,
+           const ::xml_schema::namespace_infomap& m = ::xml_schema::namespace_infomap (),
+           const ::std::string& e = "UTF-8",
+           ::xml_schema::flags f = 0);
+
+// Serialize to an existing xercesc::DOMDocument.
+//
+
+void
+execution (::xercesc::DOMDocument& d,
+           const ::ExecutionType& x,
+           ::xml_schema::flags f = 0);
+
+// Serialize to a new xercesc::DOMDocument.
+//
+
+::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument >
+execution (const ::ExecutionType& x, 
+           const ::xml_schema::namespace_infomap& m = ::xml_schema::namespace_infomap (),
+           ::xml_schema::flags f = 0);
+
 #include <xsd/cxx/post.hxx>
 
 // Begin epilogue.
@@ -1528,4 +1731,4 @@ execution (::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument >& d,
 //
 // End epilogue.
 
-#endif // EXECUTION_HXX
+#endif // CXX______CFG_XSD_EXECUTION_HXX

@@ -121,6 +121,7 @@ public:
    *
    */
   int getNoToMuscles() const {return noToMuscles_;}
+  void getFromMusclesNames(std::vector<std::string>& fromMusclesNames) { fromMusclesNames = fromMusclesNames_; }
 private:
   static const unsigned int noFromMuscles_ = 6;
   static const unsigned int noToMuscles_ = 24;

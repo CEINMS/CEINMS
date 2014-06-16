@@ -1,11 +1,11 @@
-// This is part of
-// NeuroMuscoloSkeletal Model Software (NMS)
-// Copyright (C) 2010 David Lloyd Massimo Sartori Monica Reggiani
+//__________________________________________________________________________
+// Author(s): Claudio Pizzolato, Monica Reggiani - October 2013
+// email:  claudio.pizzolato@griffithuni.edu.au
+//         monica.reggiani@gmail.com
 //
-// ?? Licenza ??
+// DO NOT REDISTRIBUTE WITHOUT PERMISSION
+//__________________________________________________________________________
 //
-// The authors may be contacted via:
-// email: massimo.sartori@gmail.com monica.reggiani@gmail.com
 
 #include <vector>
 using std::vector;
@@ -25,7 +25,7 @@ EMGDataFromFile<EMGgenerator>::EMGDataFromFile(const string& EMGDataFilename)
 :EMGDataFile_(EMGDataFilename.c_str()) {
  
   if (!EMGDataFile_.is_open()) {
-    cout << "ERROR: " << EMGDataFilename << " could not be open\n";
+    cout << "ERROR emg file: " << EMGDataFilename << " could not be open\n";
     exit(EXIT_FAILURE);
   }
   
@@ -48,8 +48,10 @@ EMGDataFromFile<EMGgenerator>::EMGDataFromFile(const string& EMGDataFilename)
   myStream >> timeName;
   // 1. first their names
   do {
+    nextMuscleName.clear();
     myStream >> nextMuscleName;
-    muscleNames_.push_back(nextMuscleName); 
+    if (nextMuscleName!="")
+        muscleNames_.push_back(nextMuscleName);
   } while (!myStream.eof());
 
   if (noMuscles_ != muscleNames_.size()) {
@@ -59,7 +61,16 @@ EMGDataFromFile<EMGgenerator>::EMGDataFromFile(const string& EMGDataFilename)
   } 
   
   if ( !EMGgenerator_.checkFromMusclesNames(muscleNames_) ) {
+	  vector<string> musclesNamesFromGenerator;
+	  EMGgenerator_.getFromMusclesNames(musclesNamesFromGenerator);
+	  std::cout << " generator names - file names\n";
+		for(unsigned i = 0; i < musclesNamesFromGenerator.size() && i < muscleNames_.size() ; ++i) {
+			string genName(musclesNamesFromGenerator.at(i)), fileName(muscleNames_.at(i)), separator("  -  ");
+			if(genName != fileName) separator = "  <>  ";
+			std::cout << genName << separator <<  fileName << std::endl;
+		}
     cout << "THE EMG generator is not able to generate EMG for your muscles starting from muscle in the file! (muscle names are different)\n";
+
     exit(EXIT_FAILURE);
   }
   
@@ -82,11 +93,12 @@ void EMGDataFromFile<EMGgenerator>::readNextEmgData()  {
   currentReadEMG_.clear();
   myStream >>  currentDataTime_;
  // cout << "EMGdatafromfile in emg.txt: time step "<< currentDataTime_ << endl;
+  int noReadMuscles=0;
   do {
     myStream >> value;
   //  cout << "EMGdatafromfile in emg.txt: value "<< value << endl;
-    currentReadEMG_.push_back(value); 
-  } while (!myStream.eof());
+    currentReadEMG_.push_back(value);
+  } while (!myStream.eof() && ++noReadMuscles<noMuscles_);
  // cout << "EMGDataFromFile: just read " << currentReadEMG_.size() << " values\n"; 
   EMGgenerator_.convert(currentReadEMG_, currentEMGData_);
  

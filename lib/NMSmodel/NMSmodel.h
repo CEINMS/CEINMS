@@ -90,6 +90,7 @@ public:
     void setStrengthCoefficientsBasedOnGroups(
                 const std::vector<double>& values, 
                 const std::vector< std::vector< int > >& muscleGroups);
+    void setStrengthCoefficients(const std::vector<double>& strengthCoefficients);
     void setShapeFactor(double shapeFactor);
     void setShapeFactors(const std::vector<double>& shapeFactors);
     void setC1(double C1);
@@ -98,9 +99,11 @@ public:
     void setC2Coefficients(const std::vector<double>& c2Coefficients);
     void setTendonSlackLengths(const std::vector<double>& tendonSlackLengths);
     void setActivations(const std::vector<double>& activations);
+    void setOptimalFibreLengths(const std::vector<double>&  optimalFibreLengths);
     
     // called	for control purpose
     void getMuscleNames(std::vector<std::string>& muscleNames) { muscleNames = muscleNames_; }
+	void getMuscleNamesOnDofs(std::vector<std::vector<std::string> >& muscleNamesOnDofs);
     int  getNoMuscles() const {return muscles_.size();}
     void getDoFNames(std::vector<std::string>& dofNames) { dofNames = dofNames_; }
     int  getNoDoF() {return dofs_.size();}
@@ -131,13 +134,18 @@ public:
     void getC1Coefficients(std::vector<double>& c1Coefficients) const;
     double getC2() const { return muscles_.at(0).getC2();}
     void getC2Coefficients(std::vector<double>& c2Coefficients) const;  
+    void getStrengthCoefficients(std::vector<double>& strengthCoefficients) const;
     void getTendonSlackLengths(std::vector<double>& tendonSlackLengths) const;
     void getMuscle(MTUtype& muscle, const std::string& muscleName);  
-    double getMusclePenalty() const;
-    double getMusclePenalty(std::vector<unsigned int>& musclesIndexList) const;
+    double getMusclesPenalty() const;
+    double getMusclesPenalty(std::vector<unsigned>& selectedMusclesIndex) const;
+    void getMusclesPenaltyVector(std::vector<double>& penalties) const;
     void getMusclesParameters(std::vector< MuscleParameters >& parameters);
     void setMuscleForces(const std::vector<double>& muscleTendonForces);
     void getMomentArmsOnDof(std::vector<double>& momentArms, unsigned whichDof) const;
+    void getOptimalFibreLengths(std::vector<double>& optimalFibreLengths) const;
+    
+    double getGlobalEmDelay() const; //NOTE: this will be replaced by singular muscles emdelay
     
     friend class SetupDataStructure<NMSmodel<Activation, Tendon, mode> >;
     friend std::ostream& operator<< <> (std::ostream& output, const NMSmodel& b);

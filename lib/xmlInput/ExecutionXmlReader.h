@@ -1,3 +1,12 @@
+//__________________________________________________________________________
+// Author(s): Claudio Pizzolato - October 2013
+// email:  claudio.pizzolato@griffithuni.edu.au
+//
+// DO NOT REDISTRIBUTE WITHOUT PERMISSION
+//__________________________________________________________________________
+//
+
+
 #ifndef ExecutionXmlReader_h
 #define ExecutionXmlReader_h
 
@@ -15,6 +24,7 @@ public:
     void getMusclesToPredict(std::vector<std::string>& musclesToPredict);
     void getMusclesToTrack(std::vector<std::string>& musclesToTrack);
     void getHybridWeightings(double& alpha, double& beta, double& gamma);
+	void getAnnealingParameters(unsigned& nt, unsigned& ns, double& rt, double& t, unsigned& maxNoEval, double& epsilon, unsigned& noEpsilon) const;
     
 private:
     void readXml();

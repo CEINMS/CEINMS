@@ -1,3 +1,13 @@
+//__________________________________________________________________________
+// Author(s): Claudio Pizzolato, Monica Reggiani - October 2013
+// email:  claudio.pizzolato@griffithuni.edu.au
+//         monica.reggiani@gmail.com
+//
+// DO NOT REDISTRIBUTE WITHOUT PERMISSION
+//__________________________________________________________________________
+//
+
+
 #include "LmtMaFromX.h"
 #include "DataFromFile.h"
 #include "SyncTools.h"
@@ -51,12 +61,45 @@ void LmtMaFromX::getDofNames(vector<string>& dofNamesFromModel)
   dofNamesFromModel = SyncTools::Shared::dofNames; //gets dof names from XML model, passed from global variable dofNames  
   SyncTools::Shared::dofNamesSem.notify();
 
-//TODO: forse non è il posto migliore per fare quello che c'è sotto..mmmm
-  SyncTools::Shared::queueMomentArmsMutex.lock();
-  SyncTools::Shared::queueMomentArms.resize(dofNamesFromModel.size());  
-  SyncTools::Shared::queueMomentArmsMutex.unlock();
+  setNoDof(dofNamesFromModel.size());
 }
-  
+
+
+void LmtMaFromX::setNoDof(unsigned nDof) {
+
+     SyncTools::Shared::queueMomentArmsMutex.lock();
+     SyncTools::Shared::queueMomentArms.resize(nDof);  
+     SyncTools::Shared::queueMomentArmsMutex.unlock();
+
+}
+
+
+void LmtMaFromX::setLmtMusclesNames(const vector<string>& lmtMusclesNames) {
+
+	SyncTools::Shared::musclesNamesMutex.lock();
+	if (SyncTools::Shared::musclesNames.empty())         //musclesNames is a global variable, if it isn't empty means that emg set it
+		SyncTools::Shared::musclesNames = lmtMusclesNames;
+	else if (lmtMusclesNames != SyncTools::Shared::musclesNames) {
+		cout << "muscles names are not the same among emg and lmt input data" << endl;
+		cout << "lmt names - emg names\n";
+		for(unsigned i = 0; i < lmtMusclesNames.size() && i < SyncTools::Shared::musclesNames.size() ; ++i) {
+			string lmtName(lmtMusclesNames.at(i)), emgName(SyncTools::Shared::musclesNames.at(i)), separator("  -  ");
+			if(lmtName != emgName) separator = "  <>  ";
+			cout << lmtName << separator <<  emgName << endl;
+		}
+		exit(EXIT_FAILURE);      
+    }
+	SyncTools::Shared::musclesNamesMutex.unlock();
+}
+
+void LmtMaFromX::setMomentArmsMusclesNames(const vector< vector<string> >& musclesNamesFromMomentArmsFiles) {
+
+	SyncTools::Shared::musclesNamesOnDofMutex.lock();
+	SyncTools::Shared::musclesNamesOnDof = musclesNamesFromMomentArmsFiles;
+	SyncTools::Shared::musclesNamesOnDofMutex.unlock();
+}
+
+
 LmtMaFromX::~LmtMaFromX() { }
 
 

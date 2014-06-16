@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:annotation>
+    <xs:documentation xml:lang="en"/>
+  </xs:annotation>
+  <xs:complexType name="MTUType">
+    <xs:sequence>
+      <xs:element name="name" type="xs:string"/>
+      <xs:element minOccurs="0" name="emDelay" type="xs:double"/>
+      <xs:element name="c1" type="xs:double"/>
+      <xs:element name="c2" type="xs:double"/>
+      <xs:element name="shapeFactor" type="xs:double"/>
+      <xs:element name="optimalFibreLength" type="xs:double"/>
+      <xs:element name="pennationAngle" type="xs:double"/>
+      <xs:element name="tendonSlackLength" type="xs:double"/>
+      <xs:element name="maxIsometricForce" type="xs:double"/>
+      <xs:element name="strengthCoefficient" type="xs:double"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="MTUSetType">
+    <xs:sequence>
+      <xs:element maxOccurs="unbounded" minOccurs="1" name="mtu" type="MTUType"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:simpleType name="MTUNameSetType">
+    <xs:list itemType="xs:string"/>
+  </xs:simpleType>
+  <xs:complexType name="DoFType">
+    <xs:sequence>
+      <xs:element name="name" type="xs:string"/>
+      <xs:element name="mtuNameSet" type="MTUNameSetType"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:simpleType name="CalibrationSequenceType">
+    <xs:list itemType="xs:string"/>
+  </xs:simpleType>
+  <xs:complexType name="CalibratedType">
+    <xs:sequence>
+      <xs:element name="startSubjectFile" type="xs:string"/>
+      <xs:element name="calibrationSequence" type="CalibrationSequenceType"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="UncalibratedType">
+    <xs:sequence>
+      <xs:element name="subjectID" type="xs:string"/>
+      <xs:element name="additionalInfo" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="CalibrationInfoType">
+    <xs:choice>
+      <xs:element name="uncalibrated" type="UncalibratedType"/>
+      <xs:element name="calibrated" type="CalibratedType"/>
+    </xs:choice>
+  </xs:complexType>
+  <xs:complexType name="DoFSetType">
+    <xs:sequence>
+      <xs:element maxOccurs="unbounded" minOccurs="1" name="dof" type="DoFType"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:simpleType name="PointsSequenceType">
+    <xs:list itemType="xs:double"/>
+  </xs:simpleType>
+  <xs:complexType name="CurveType">
+    <xs:sequence>
+      <xs:element name="name" type="xs:string"/>
+      <xs:element name="xPoints" type="PointsSequenceType"/>
+      <xs:element name="yPoints" type="PointsSequenceType"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="MTUDefaultType">
+    <xs:sequence>
+      <xs:element name="emDelay" type="xs:double"/>
+      <xs:element name="percentageChange" type="xs:double"/>
+      <xs:element name="damping" type="xs:double"/>
+      <xs:element maxOccurs="4" minOccurs="0" name="curve" type="CurveType"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="SubjectType">
+    <xs:sequence>
+      <xs:element name="mtuDefault" type="MTUDefaultType"/>
+      <xs:element name="mtuSet" type="MTUSetType"/>
+      <xs:element name="dofSet" type="DoFSetType"/>
+      <xs:element name="calibrationInfo" type="CalibrationInfoType"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="subject" type="SubjectType"/>
+</xs:schema>

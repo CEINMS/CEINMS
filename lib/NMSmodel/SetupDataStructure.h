@@ -1,18 +1,18 @@
-// This is part of
-// NeuroMuscoloSkeletal Model Software (NMS)
-// Copyright (C) 2010 David Lloyd Massimo Sartori Monica Reggiani
+//__________________________________________________________________________
+// Author(s): Claudio Pizzolato, Monica Reggiani - October 2013
+// email:  claudio.pizzolato@griffithuni.edu.au
+//         monica.reggiani@gmail.com
 //
-// ?? Licenza ??
+// DO NOT REDISTRIBUTE WITHOUT PERMISSION
+//__________________________________________________________________________
 //
-// The authors may be contacted via:
-// email: massimo.sartori@gmail.com monica.reggiani@gmail.com
 
 
 #ifndef SetupDataStructure_
 #define SetupDataStructure_
 
 #include <string>
-#include "NMSmodel.hxx"
+#include "subject.hxx"
 #include "Curve.h"
 
 template<typename NMSmodelT>
@@ -27,13 +27,13 @@ public:
     void  createMuscles(NMSmodelT& mySubject);
     void  createDoFs(NMSmodelT& mySubject);
     void  writeXMLCalibratedFile(NMSmodelT& mySubject, const std::string& XMLfilename);
-
 private:
     // Create the body structure from the Input
-    std::auto_ptr<NMSmodelType> subjectPointer;
+    std::auto_ptr<SubjectType> subjectPointer_;
     CurveOffline forceVelocityCurve_;
     CurveOffline activeForceLengthCurve_;
     CurveOffline passiveForceLengthCurve_;
+    CurveOffline tendonForceStrain_;
 };
 
 #include "SetupDataStructure.cpp"

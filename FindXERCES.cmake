@@ -14,8 +14,9 @@ FIND_PATH(XERCES_INCLUDE_DIR /xercesc/util/XercesVersion.hpp
  
 MESSAGE(STATUS "XERCES Include Dir ${XERCES_INCLUDE_DIR}")
  
-FIND_LIBRARY(XERCES_LIBRARY
-  NAMES  
+if(CMAKE_SIZEOF_VOID_P EQUAL 8) #64bit compilation
+    FIND_LIBRARY(XERCES_LIBRARY
+  NAMES
       xerces-c
       xerces-c_2
 	  xerces-c_3
@@ -24,16 +25,68 @@ FIND_LIBRARY(XERCES_LIBRARY
   PATHS 
     "${XERCES_DIR}\\lib"
     /usr/local/lib
-    /usr/lib 
-    /usr/lib/x86_64-linux-gnu/ 
+    /usr/lib
+    /usr/lib/x86_64-linux-gnu/
+	"C:/Program\ Files\ (x86)/CodeSynthesis\ XSD\ 3.3/bin64"
+	"C:/Program\ Files\ (x86)/CodeSynthesis\ XSD\ 3.3/lib64/vc-10.0"
+  )
+
+  FIND_LIBRARY(XERCES_LIBRARY_DEBUG
+  NAMES
+      xerces-cD
+      xerces-c_2D
+	  xerces-c_3D
+	  xerces-c_3_1D
+	  xerces-c_3_1_vc100D
+  PATHS
+    "${XERCES_DIR}\\lib"
+    /usr/local/lib
+    /usr/lib
+    /usr/lib/x86_64-linux-gnu/
+	"C:/Program\ Files\ (x86)/CodeSynthesis\ XSD\ 3.3/bin64"
+	"C:/Program\ Files\ (x86)/CodeSynthesis\ XSD\ 3.3/lib64/vc-10.0"
+  )
+else()
+    FIND_LIBRARY(XERCES_LIBRARY
+  NAMES
+      xerces-c
+      xerces-c_2
+	  xerces-c_3
+	  xerces-c_3_1
+	  xerces-c_3_1_vc100
+  PATHS
+    "${XERCES_DIR}\\lib"
+    /usr/local/lib
+    /usr/lib
+    /usr/lib/x86_64-linux-gnu/
 	"C:/Program\ Files\ (x86)/CodeSynthesis\ XSD\ 3.3/bin"
 	"C:/Program\ Files\ (x86)/CodeSynthesis\ XSD\ 3.3/lib/vc-10.0"
   )
+
+  FIND_LIBRARY(XERCES_LIBRARY_DEBUG
+  NAMES
+      xerces-cD
+      xerces-c_2D
+	  xerces-c_3D
+	  xerces-c_3_1D
+	  xerces-c_3_1_vc100D
+  PATHS
+    "${XERCES_DIR}\\lib"
+    /usr/local/lib
+    /usr/lib
+    /usr/lib/x86_64-linux-gnu/
+	"C:/Program\ Files\ (x86)/CodeSynthesis\ XSD\ 3.3/bin"
+	"C:/Program\ Files\ (x86)/CodeSynthesis\ XSD\ 3.3/lib/vc-10.0"
+  )
+endif()
 
   MESSAGE(STATUS "XERCES Lib Dir ${XERCES_LIBRARY}")
   
 IF (XERCES_LIBRARY AND XERCES_INCLUDE_DIR)
     SET(XERCES_LIBRARIES ${XERCES_LIBRARY})
+    if(XERCES_LIBRARY_DEBUG)
+      set(XERCES_LIBRARIES optimized ${XERCES_LIBRARY} debug ${XERCES_LIBRARY_DEBUG})
+    endif()
     SET(XERCES_FOUND "YES")
 ELSE (XERCES_LIBRARY AND XERCES_INCLUDE_DIR)
   SET(XERCES_FOUND "NO")
@@ -54,5 +107,6 @@ GET_FILENAME_COMPONENT (NATIVE_XERCES_LIB_PATH ${XERCES_LIBRARY} PATH)
 
 MARK_AS_ADVANCED(
   XERCES_LIBRARY
+  XERCES_LIBRARY_DEBUG
   XERCES_INCLUDE_DIR
   )

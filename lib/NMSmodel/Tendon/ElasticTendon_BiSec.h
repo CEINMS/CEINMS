@@ -1,3 +1,11 @@
+//__________________________________________________________________________
+// Author(s): Claudio Pizzolato - October 2013
+// email:  claudio.pizzolato@griffithuni.edu.au
+//
+// DO NOT REDISTRIBUTE WITHOUT PERMISSION
+//__________________________________________________________________________
+//
+
 #ifndef ElasticTendon_BiSec_h
 #define ElasticTendon_BiSec_h
 #include <string>
@@ -19,9 +27,10 @@ public:
                    double strengthCoefficient,
                    const CurveOffline& activeForceLengthCurve,
                    const CurveOffline& passiveForceLengthCurve, 
-                   const CurveOffline& forceVelocityCurve
-                 );
+                   const CurveOffline& forceVelocityCurve,
+                   const CurveOffline& tendonForceStrainCurve);
     virtual ~ElasticTendon_BiSec() {}
+    double operator()(double fl);
     ElasticTendon_BiSec(const ElasticTendon_BiSec& orig);
     ElasticTendon_BiSec& operator=(const ElasticTendon_BiSec& orig);
     
@@ -37,13 +46,16 @@ public:
     void setMuscleTendonLength(double muscleTendonLength);
     void setActivation(double activation);
     void updateFibreLength();
+    double getPenalty() const { return tendonPenalty_;}
 
     double getFibreLength() { return fibreLength_;}
     void setStrengthCoefficient(double strengthCoefficient);
     void setTendonSlackLength(double tendonSlackLength);
+    void setOptimalFibreLength(double optimalFibreLength) { optimalFibreLength_ = optimalFibreLength; }
     void setCurves(const CurveOffline& activeForceLengthCurve, 
                    const CurveOffline& passiveForceLengthCurve, 
-                   const CurveOffline& forceVelocityCurve);
+                   const CurveOffline& forceVelocityCurve,
+                   const CurveOffline& tendonForceStrainCurve);
                    
     void pushState();
     void resetState();
@@ -63,10 +75,11 @@ public:
     void resetState();
     */
 private:
-    double estimateFiberLengthBiSec(double tol, unsigned maxIterations);
     double evaluateForceError(double fibreLength);
+    double estimateFiberLengthBiSec(double tol, unsigned maxIterations);
     double computeMuscleForce(double fibreLength);
     double computeTendonForce(double fibreLength);
+    double getFibreLengthStiff() const;
     
     double optimalFibreLength_;
     double pennationAngle_;
@@ -84,6 +97,7 @@ private:
     double fibreLengthT1_;          //valore della fiberLength al passo precedente
     double muscleTendonLength_;
     double activation_;
+    double tendonPenalty_;
     
     std::string id_;
     

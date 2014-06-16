@@ -68,6 +68,18 @@ SimulatedAnnealingBase<NMSmodelT,Parameters, ObjectiveFunction, StaticComputatio
 }
 
 
+template<typename NMSmodelT, typename Parameters, typename ObjectiveFunction, typename StaticComputationT>
+void SimulatedAnnealingBase<NMSmodelT, Parameters, ObjectiveFunction, StaticComputationT>::setAnnealingParameters(unsigned nt, unsigned ns, double rt, double t, unsigned maxNoEval, double epsilon, unsigned noEpsilon) {
+
+	nt_ = nt;
+    ns_ = ns;
+    rt_ = rt;
+    t_  = t;
+    maxNoEval_ = maxNoEval;
+	objectiveFunction_.setEpsilon(epsilon);
+	objectiveFunction_.setNoEpsilon(noEpsilon);
+}
+
 
 template<typename NMSmodelT, typename Parameters, typename ObjectiveFunction, typename StaticComputationT>
 void SimulatedAnnealingBase<NMSmodelT, Parameters, ObjectiveFunction, StaticComputationT>::checkBounds(int k) {

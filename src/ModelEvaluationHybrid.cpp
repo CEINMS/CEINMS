@@ -1,3 +1,12 @@
+//__________________________________________________________________________
+// Author(s): Claudio Pizzolato, Monica Reggiani - September 2013
+// email:  claudio.pizzolato@griffithuni.edu.au
+//
+// DO NOT REDISTRIBUTE WITHOUT PERMISSION
+//__________________________________________________________________________
+//
+
+
 #include "SyncTools.h"
 #include "SimpleFileLogger.h"
 
@@ -15,8 +24,11 @@ using std::string;
 
 
 template <typename NMSmodelT, typename ErrorMinimizerT>
-ModelEvaluationHybrid<NMSmodelT, ErrorMinimizerT>::ModelEvaluationHybrid(NMSmodelT& subject, ErrorMinimizerT& torqueErrorMinimizer)
-:subject_(subject), torqueErrorMinimizer_(torqueErrorMinimizer)
+ModelEvaluationHybrid<NMSmodelT, ErrorMinimizerT>::ModelEvaluationHybrid(NMSmodelT& subject, 
+                                                                         ErrorMinimizerT& torqueErrorMinimizer,
+                                                                         const string& outputDir
+                                                                        )
+:subject_(subject), torqueErrorMinimizer_(torqueErrorMinimizer), outputDir_(outputDir)
 { }
 
 
@@ -80,12 +92,14 @@ void ModelEvaluationHybrid<NMSmodelT, ErrorMinimizerT>::operator()() {
 
 //END CHECK MUSCLES
 
+    double globalEmDelay = subject_.getGlobalEmDelay(); 
+
 #ifdef LOG
   cout << "starting consume" << endl;
 #endif
   
 #ifdef LOG_FILES
-    Logger::SimpleFileLogger<NMSmodelT> logger(subject_);
+    Logger::SimpleFileLogger<NMSmodelT> logger(subject_, outputDir_);
     logger.addLog(Logger::Activations);
     logger.addLog(Logger::FibreLengths);
     logger.addLog(Logger::FibreVelocities);
@@ -135,12 +149,13 @@ void ModelEvaluationHybrid<NMSmodelT, ErrorMinimizerT>::operator()() {
 
         do {
             getEmgFromShared(emgFromQueue);
-            emgTime = emgFromQueue.back();
+            emgTime = emgFromQueue.back() + globalEmDelay;
             emgFromQueue.pop_back();
             if(emgFromQueue.empty())
                 runCondition = false;
-        } while(emgTime < lmtMaTime);
+        } while(emgTime < lmtMaTime && runCondition);
          
+        if(!runCondition) break;
         subject_.setTime(emgTime);
         subject_.setEmgs(emgFromQueue);      
    
@@ -214,7 +229,7 @@ NOTE: when one a producer push an empty vector in a queue means that ther are no
     } while (runCondition);
 
 #ifdef LOG  
-  cout << "Everything went fine, check output files in ./Output\n";
+  cout << "Estimation completed. Output file printed in "+outputDir_ << endl;;
 #endif
 }
 

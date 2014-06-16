@@ -1,3 +1,12 @@
+//__________________________________________________________________________
+// Author(s): Claudio Pizzolato, Monica Reggiani - September 2013
+// email:  claudio.pizzolato@griffithuni.edu.au
+//
+// DO NOT REDISTRIBUTE WITHOUT PERMISSION
+//__________________________________________________________________________
+//
+
+
 #include "EMGFromFile.h"
 #include "LmtMaFromFile.h"
 #include "ExternalTorqueFromFile.h"
@@ -23,7 +32,10 @@ using std::string;
 using std::cout;
 #include <vector>
 using std::vector;
+#include <stdlib.h>
 
+#include <boost/program_options.hpp>
+namespace po = boost::program_options;
 
 template<typename T1, typename T2, typename T3, typename T4>
 void runThreads(T1& t1, T2& t2, T3& t3, T4& t4) {
@@ -68,15 +80,15 @@ void printHeader() {
     
 void printAuthors() {
     
-    time_t now = time(0);
-    tm *gmtm = gmtime(&now);
+    time_t now = std::time(0);
+    tm *gmtm = std::gmtime(&now);
     cout << "Copyright (C) " << gmtm->tm_year+1900 << endl;
-    cout << "David LLoyd, Monica Reggiani, Massimo Sartori, Claudio Pizzolato\n\n";
+    cout << "Claudio Pizzolato, Monica Reggiani, David Lloyd, Massimo Sartori\n\n";
+    
+    cout << "Software developers: Claudio Pizzolato, Monica Reggiani\n";
 }
     
- 
- 
- 
+
 int main(int argc, char** argv) {
  
     printHeader();
@@ -86,29 +98,39 @@ int main(int argc, char** argv) {
   cout << "Check configuration data...\n";
 #endif
   
+    string subjectFile;
+    string executionFile;
+    string inputDirectory;
+    string outputDirectory;
+    string emgGeneratorFile;
+
+    int opt;
+    po::options_description desc("Allowed options");
+    desc.add_options()
+    ("help", "produce help message")
+    ("subject,s", po::value<string>(&subjectFile), "subject xml file")
+    ("execution,x", po::value<string>(&executionFile),  "execution xml file")
+    ("input-dir,i", po::value<string>(&inputDirectory), "trial directory path")
+    ("output-dir,o", po::value<string>(&outputDirectory)->default_value("./Output"), "output directory")
+    ("emg-generator,g", po::value<string>(&emgGeneratorFile)->default_value("cfg/xml/emgGenerator.xml"), "EMG mapping");
+    
+    po::variables_map vm;
+    po::store(po::parse_command_line(argc, argv, desc), vm);
+    po::notify(vm);    
+
+    if (vm.count("help") || argc < 7) {
+        cout << desc << "\n";
+        return 1;
+    }
     // check command line arguments... 
-  if ( argc != 4 ) {
-    cout << "Usage: CEINMS configurationFile DirFiles\n";
-    cout << "Ex: CEINMS subject.xml execution.xml inputDirectory/ \n";
-    exit(EXIT_FAILURE);
-  }
   
 
 
-    EMGFromFile emgProducer(argv[3]);
-    LmtMaFromFile lmtMaProducer(argv[3]);
-    ExternalTorqueFromFile externalTorqueProducer(argv[3]);
- 
-    string configurationFile(argv[1]);
-    try {
-        std::auto_ptr<NMSmodelType> subjectPointer (subject (configurationFile));
-    }  
-    catch (const xml_schema::exception& e) {
-        cout << e << endl;
-        exit(EXIT_FAILURE);
-    }
-    
-    ExecutionXmlReader executionCfg(argv[2]);             
+    EMGFromFile emgProducer(inputDirectory);
+    LmtMaFromFile lmtMaProducer(inputDirectory);
+    ExternalTorqueFromFile externalTorqueProducer(inputDirectory);
+
+    ExecutionXmlReader executionCfg(executionFile);             
     
    NMSModelCfg::RunMode runMode = executionCfg.getRunMode();
    
@@ -118,8 +140,8 @@ int main(int argc, char** argv) {
         case NMSModelCfg::OpenLoopExponentialActivationStiffTendonOnline: {
             typedef NMSmodel<ExponentialActivation, StiffTendon, CurveMode::Online> MyNMSmodel;
             MyNMSmodel mySubject;
-            setupSubject(mySubject, configurationFile);
-            ModelEvaluationOnline<MyNMSmodel> consumer(mySubject);
+            setupSubject(mySubject, subjectFile);
+            ModelEvaluationOnline<MyNMSmodel> consumer(mySubject, outputDirectory);
             runThreads(consumer, emgProducer, lmtMaProducer, externalTorqueProducer);
             break;
         }
@@ -127,8 +149,8 @@ int main(int argc, char** argv) {
         case NMSModelCfg::OpenLoopExponentialActivationStiffTendonOffline: {
             typedef NMSmodel<ExponentialActivation, StiffTendon, CurveMode::Offline> MyNMSmodel;
             MyNMSmodel mySubject;
-            setupSubject(mySubject, configurationFile);
-            ModelEvaluationOffline<MyNMSmodel> consumer(mySubject);
+            setupSubject(mySubject, subjectFile);
+            ModelEvaluationOffline<MyNMSmodel> consumer(mySubject, outputDirectory);
             runThreads(consumer, emgProducer, lmtMaProducer, externalTorqueProducer);
             break;
         }
@@ -136,7 +158,7 @@ int main(int argc, char** argv) {
         case NMSModelCfg::OpenLoopExponentialActivationElasticTendonOnline: {
             typedef NMSmodel<ExponentialActivation, ElasticTendon<CurveMode::Online>, CurveMode::Online> MyNMSmodel;
             MyNMSmodel mySubject;
-            setupSubject(mySubject, configurationFile);
+            setupSubject(mySubject, subjectFile);
             ModelEvaluationOnline<MyNMSmodel> consumer(mySubject);
             runThreads(consumer, emgProducer, lmtMaProducer, externalTorqueProducer);
             break;
@@ -145,7 +167,7 @@ int main(int argc, char** argv) {
         case NMSModelCfg::OpenLoopExponentialActivationElasticTendonOffline: {
             typedef NMSmodel<ExponentialActivation, ElasticTendon<CurveMode::Offline>, CurveMode::Offline> MyNMSmodel;
             MyNMSmodel mySubject;
-            setupSubject(mySubject, configurationFile);
+            setupSubject(mySubject, subjectFile);
             ModelEvaluationOffline<MyNMSmodel> consumer(mySubject);
             runThreads(consumer, emgProducer, lmtMaProducer, externalTorqueProducer);
             break;
@@ -154,8 +176,8 @@ int main(int argc, char** argv) {
         case NMSModelCfg::OpenLoopExponentialActivationElasticTendonBiSecOnline: {
             typedef NMSmodel<ExponentialActivation, ElasticTendon_BiSec, CurveMode::Online> MyNMSmodel;
             MyNMSmodel mySubject;
-            setupSubject(mySubject, configurationFile);
-            ModelEvaluationOnline<MyNMSmodel> consumer(mySubject);
+            setupSubject(mySubject, subjectFile);
+            ModelEvaluationOnline<MyNMSmodel> consumer(mySubject, outputDirectory);
             runThreads(consumer, emgProducer, lmtMaProducer, externalTorqueProducer);
             break;
         }
@@ -163,8 +185,8 @@ int main(int argc, char** argv) {
         case NMSModelCfg::OpenLoopExponentialActivationElasticTendonBiSecOffline: {
             typedef NMSmodel<ExponentialActivation, ElasticTendon_BiSec, CurveMode::Offline> MyNMSmodel;
             MyNMSmodel mySubject;
-            setupSubject(mySubject, configurationFile);
-            ModelEvaluationOffline<MyNMSmodel> consumer(mySubject);
+            setupSubject(mySubject, subjectFile);
+            ModelEvaluationOffline<MyNMSmodel> consumer(mySubject, outputDirectory);
             runThreads(consumer, emgProducer, lmtMaProducer, externalTorqueProducer);
             break;
         }
@@ -173,7 +195,7 @@ int main(int argc, char** argv) {
         case NMSModelCfg::HybridExponentialActivationStiffTendonOnline: { 
             typedef NMSmodel<ExponentialActivation, StiffTendon, CurveMode::Online> MyNMSmodel;
             typedef Hybrid::ErrorMinimizerAnnealing<MyNMSmodel> MyErrorMinimizer;
-            SetupDataStructure<MyNMSmodel> setupData(configurationFile);
+            SetupDataStructure<MyNMSmodel> setupData(subjectFile);
             MyNMSmodel mySubject;
             setupData.createCurves();
             setupData.createMuscles(mySubject);
@@ -187,10 +209,42 @@ int main(int argc, char** argv) {
             executionCfg.getMusclesToTrack(toTrack);
             errorMinimizer.setMusclesNamesWithEmgToPredict(toPredict);
             errorMinimizer.setMusclesNamesWithEmgToTrack(toTrack);
-            ModelEvaluationHybrid<MyNMSmodel, MyErrorMinimizer> consumer(mySubject, errorMinimizer);
+            double rt, t, epsilon;
+            unsigned noEpsilon, ns, nt, maxNoEval;
+            executionCfg.getAnnealingParameters(nt, ns, rt, t, maxNoEval, epsilon, noEpsilon);
+            errorMinimizer.setAnnealingParameters(nt, ns, rt, t, maxNoEval, epsilon, noEpsilon);
+            ModelEvaluationHybrid<MyNMSmodel, MyErrorMinimizer> consumer(mySubject, errorMinimizer, outputDirectory);
             runThreads(consumer, emgProducer, lmtMaProducer, externalTorqueProducer);
             break;
         } 
+        
+          case NMSModelCfg::HybridExponentialActivationElasticTendonBiSecOnline: { 
+            typedef NMSmodel<ExponentialActivation, ElasticTendon_BiSec, CurveMode::Online> MyNMSmodel;
+            typedef Hybrid::ErrorMinimizerAnnealing<MyNMSmodel> MyErrorMinimizer;
+            SetupDataStructure<MyNMSmodel> setupData(subjectFile);
+            MyNMSmodel mySubject;
+            setupData.createCurves();
+            setupData.createMuscles(mySubject);
+            setupData.createDoFs(mySubject);
+            MyErrorMinimizer errorMinimizer(mySubject);
+            HybridWeightings weightings;
+            executionCfg.getHybridWeightings(weightings.alpha, weightings.beta, weightings.gamma);
+            errorMinimizer.setWeightings(weightings);
+            vector<string> toPredict, toTrack;
+            executionCfg.getMusclesToPredict(toPredict);
+            executionCfg.getMusclesToTrack(toTrack);
+            errorMinimizer.setMusclesNamesWithEmgToPredict(toPredict);
+            errorMinimizer.setMusclesNamesWithEmgToTrack(toTrack);
+            double rt, t, epsilon;
+            unsigned noEpsilon, ns, nt, maxNoEval;
+            executionCfg.getAnnealingParameters(nt, ns, rt, t, maxNoEval, epsilon, noEpsilon);
+            errorMinimizer.setAnnealingParameters(nt, ns, rt, t, maxNoEval, epsilon, noEpsilon);
+            ModelEvaluationHybrid<MyNMSmodel, MyErrorMinimizer> consumer(mySubject, errorMinimizer, outputDirectory);
+            runThreads(consumer, emgProducer, lmtMaProducer, externalTorqueProducer);
+            break;
+        } 
+
+
         default:
             std::cout << "Implementation not available yet. Verify you XML configuration file\n";
             break;

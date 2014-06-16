@@ -899,16 +899,16 @@ samplingFrequency (const samplingFrequency_optional& x)
   this->samplingFrequency_ = x;
 }
 
-const ExecutionType::elaboratedDoFs_type& ExecutionType::
+const ExecutionType::elaboratedDoFs_optional& ExecutionType::
 elaboratedDoFs () const
 {
-  return this->elaboratedDoFs_.get ();
+  return this->elaboratedDoFs_;
 }
 
-ExecutionType::elaboratedDoFs_type& ExecutionType::
+ExecutionType::elaboratedDoFs_optional& ExecutionType::
 elaboratedDoFs ()
 {
-  return this->elaboratedDoFs_.get ();
+  return this->elaboratedDoFs_;
 }
 
 void ExecutionType::
@@ -918,27 +918,39 @@ elaboratedDoFs (const elaboratedDoFs_type& x)
 }
 
 void ExecutionType::
+elaboratedDoFs (const elaboratedDoFs_optional& x)
+{
+  this->elaboratedDoFs_ = x;
+}
+
+void ExecutionType::
 elaboratedDoFs (::std::auto_ptr< elaboratedDoFs_type > x)
 {
   this->elaboratedDoFs_.set (x);
 }
 
-const ExecutionType::logging_type& ExecutionType::
+const ExecutionType::logging_optional& ExecutionType::
 logging () const
 {
-  return this->logging_.get ();
+  return this->logging_;
 }
 
-ExecutionType::logging_type& ExecutionType::
+ExecutionType::logging_optional& ExecutionType::
 logging ()
 {
-  return this->logging_.get ();
+  return this->logging_;
 }
 
 void ExecutionType::
 logging (const logging_type& x)
 {
   this->logging_.set (x);
+}
+
+void ExecutionType::
+logging (const logging_optional& x)
+{
+  this->logging_ = x;
 }
 
 void ExecutionType::
@@ -2354,30 +2366,26 @@ LoggingType::
 //
 
 ExecutionType::
-ExecutionType (const NMSmodel_type& NMSmodel,
-               const elaboratedDoFs_type& elaboratedDoFs,
-               const logging_type& logging)
+ExecutionType (const NMSmodel_type& NMSmodel)
 : ::xml_schema::type (),
   NMSmodel_ (NMSmodel, ::xml_schema::flags (), this),
   online_ (::xml_schema::flags (), this),
   offline_ (::xml_schema::flags (), this),
   samplingFrequency_ (::xml_schema::flags (), this),
-  elaboratedDoFs_ (elaboratedDoFs, ::xml_schema::flags (), this),
-  logging_ (logging, ::xml_schema::flags (), this)
+  elaboratedDoFs_ (::xml_schema::flags (), this),
+  logging_ (::xml_schema::flags (), this)
 {
 }
 
 ExecutionType::
-ExecutionType (::std::auto_ptr< NMSmodel_type >& NMSmodel,
-               const elaboratedDoFs_type& elaboratedDoFs,
-               ::std::auto_ptr< logging_type >& logging)
+ExecutionType (::std::auto_ptr< NMSmodel_type >& NMSmodel)
 : ::xml_schema::type (),
   NMSmodel_ (NMSmodel, ::xml_schema::flags (), this),
   online_ (::xml_schema::flags (), this),
   offline_ (::xml_schema::flags (), this),
   samplingFrequency_ (::xml_schema::flags (), this),
-  elaboratedDoFs_ (elaboratedDoFs, ::xml_schema::flags (), this),
-  logging_ (logging, ::xml_schema::flags (), this)
+  elaboratedDoFs_ (::xml_schema::flags (), this),
+  logging_ (::xml_schema::flags (), this)
 {
 }
 
@@ -2484,7 +2492,7 @@ parse (::xsd::cxx::xml::dom::parser< char >& p,
       ::std::auto_ptr< elaboratedDoFs_type > r (
         elaboratedDoFs_traits::create (i, f, this));
 
-      if (!elaboratedDoFs_.present ())
+      if (!this->elaboratedDoFs_)
       {
         this->elaboratedDoFs_.set (r);
         continue;
@@ -2498,7 +2506,7 @@ parse (::xsd::cxx::xml::dom::parser< char >& p,
       ::std::auto_ptr< logging_type > r (
         logging_traits::create (i, f, this));
 
-      if (!logging_.present ())
+      if (!this->logging_)
       {
         this->logging_.set (r);
         continue;
@@ -2512,20 +2520,6 @@ parse (::xsd::cxx::xml::dom::parser< char >& p,
   {
     throw ::xsd::cxx::tree::expected_element< char > (
       "NMSmodel",
-      "");
-  }
-
-  if (!elaboratedDoFs_.present ())
-  {
-    throw ::xsd::cxx::tree::expected_element< char > (
-      "elaboratedDoFs",
-      "");
-  }
-
-  if (!logging_.present ())
-  {
-    throw ::xsd::cxx::tree::expected_element< char > (
-      "logging",
       "");
   }
 }
@@ -2824,6 +2818,713 @@ execution (::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument >& d,
     n.namespace_ (),
     "execution",
     "");
+}
+
+#include <ostream>
+#include <xsd/cxx/tree/error-handler.hxx>
+#include <xsd/cxx/xml/dom/serialization-source.hxx>
+
+void
+operator<< (::xercesc::DOMElement& e, const TendonElementType& i)
+{
+  e << static_cast< const ::xml_schema::type& > (i);
+}
+
+void
+operator<< (::xercesc::DOMAttr&, const TendonElementType&)
+{
+}
+
+void
+operator<< (::xml_schema::list_stream&,
+            const TendonElementType&)
+{
+}
+
+void
+operator<< (::xercesc::DOMElement& e, const TendonType& i)
+{
+  e << static_cast< const ::xml_schema::type& > (i);
+
+  // stiff
+  //
+  if (i.stiff ())
+  {
+    ::xercesc::DOMElement& s (
+      ::xsd::cxx::xml::dom::create_element (
+        "stiff",
+        e));
+
+    s << *i.stiff ();
+  }
+
+  // elastic
+  //
+  if (i.elastic ())
+  {
+    ::xercesc::DOMElement& s (
+      ::xsd::cxx::xml::dom::create_element (
+        "elastic",
+        e));
+
+    s << *i.elastic ();
+  }
+
+  // elasticBiSec
+  //
+  if (i.elasticBiSec ())
+  {
+    ::xercesc::DOMElement& s (
+      ::xsd::cxx::xml::dom::create_element (
+        "elasticBiSec",
+        e));
+
+    s << *i.elasticBiSec ();
+  }
+}
+
+void
+operator<< (::xercesc::DOMElement& e, const ActivationElementType& i)
+{
+  e << static_cast< const ::xml_schema::type& > (i);
+}
+
+void
+operator<< (::xercesc::DOMAttr&, const ActivationElementType&)
+{
+}
+
+void
+operator<< (::xml_schema::list_stream&,
+            const ActivationElementType&)
+{
+}
+
+void
+operator<< (::xercesc::DOMElement& e, const ActivationType& i)
+{
+  e << static_cast< const ::xml_schema::type& > (i);
+
+  // exponential
+  //
+  if (i.exponential ())
+  {
+    ::xercesc::DOMElement& s (
+      ::xsd::cxx::xml::dom::create_element (
+        "exponential",
+        e));
+
+    s << *i.exponential ();
+  }
+
+  // piecewise
+  //
+  if (i.piecewise ())
+  {
+    ::xercesc::DOMElement& s (
+      ::xsd::cxx::xml::dom::create_element (
+        "piecewise",
+        e));
+
+    s << *i.piecewise ();
+  }
+}
+
+void
+operator<< (::xercesc::DOMElement& e, const SimulatedAnnealingType& i)
+{
+  e << static_cast< const ::xml_schema::type& > (i);
+
+  // noEpsilon
+  //
+  {
+    ::xercesc::DOMElement& s (
+      ::xsd::cxx::xml::dom::create_element (
+        "noEpsilon",
+        e));
+
+    s << i.noEpsilon ();
+  }
+
+  // rt
+  //
+  {
+    ::xercesc::DOMElement& s (
+      ::xsd::cxx::xml::dom::create_element (
+        "rt",
+        e));
+
+    s << ::xml_schema::as_double(i.rt ());
+  }
+
+  // T
+  //
+  {
+    ::xercesc::DOMElement& s (
+      ::xsd::cxx::xml::dom::create_element (
+        "T",
+        e));
+
+    s << ::xml_schema::as_double(i.T ());
+  }
+
+  // NS
+  //
+  {
+    ::xercesc::DOMElement& s (
+      ::xsd::cxx::xml::dom::create_element (
+        "NS",
+        e));
+
+    s << i.NS ();
+  }
+
+  // NT
+  //
+  {
+    ::xercesc::DOMElement& s (
+      ::xsd::cxx::xml::dom::create_element (
+        "NT",
+        e));
+
+    s << i.NT ();
+  }
+
+  // epsilon
+  //
+  {
+    ::xercesc::DOMElement& s (
+      ::xsd::cxx::xml::dom::create_element (
+        "epsilon",
+        e));
+
+    s << ::xml_schema::as_double(i.epsilon ());
+  }
+
+  // maxNoEval
+  //
+  {
+    ::xercesc::DOMElement& s (
+      ::xsd::cxx::xml::dom::create_element (
+        "maxNoEval",
+        e));
+
+    s << i.maxNoEval ();
+  }
+}
+
+void
+operator<< (::xercesc::DOMElement& e, const HybridAlgorithmType& i)
+{
+  e << static_cast< const ::xml_schema::type& > (i);
+
+  // simulatedAnnealing
+  //
+  {
+    ::xercesc::DOMElement& s (
+      ::xsd::cxx::xml::dom::create_element (
+        "simulatedAnnealing",
+        e));
+
+    s << i.simulatedAnnealing ();
+  }
+}
+
+void
+operator<< (::xercesc::DOMElement& e, const OpenLoopType& i)
+{
+  e << static_cast< const ::xml_schema::type& > (i);
+}
+
+void
+operator<< (::xercesc::DOMAttr&, const OpenLoopType&)
+{
+}
+
+void
+operator<< (::xml_schema::list_stream&,
+            const OpenLoopType&)
+{
+}
+
+void
+operator<< (::xercesc::DOMElement& e, const MuscleListType& i)
+{
+  e << static_cast< const ::xsd::cxx::tree::list< ::xml_schema::string, char >& > (i);
+}
+
+void
+operator<< (::xercesc::DOMAttr& a, const MuscleListType& i)
+{
+  a << static_cast< const ::xsd::cxx::tree::list< ::xml_schema::string, char >& > (i);
+}
+
+void
+operator<< (::xml_schema::list_stream& l,
+            const MuscleListType& i)
+{
+  l << static_cast< const ::xsd::cxx::tree::list< ::xml_schema::string, char >& > (i);
+}
+
+void
+operator<< (::xercesc::DOMElement& e, const HybridType& i)
+{
+  e << static_cast< const ::xml_schema::type& > (i);
+
+  // alpha
+  //
+  {
+    ::xercesc::DOMElement& s (
+      ::xsd::cxx::xml::dom::create_element (
+        "alpha",
+        e));
+
+    s << ::xml_schema::as_double(i.alpha ());
+  }
+
+  // beta
+  //
+  {
+    ::xercesc::DOMElement& s (
+      ::xsd::cxx::xml::dom::create_element (
+        "beta",
+        e));
+
+    s << ::xml_schema::as_double(i.beta ());
+  }
+
+  // gamma
+  //
+  {
+    ::xercesc::DOMElement& s (
+      ::xsd::cxx::xml::dom::create_element (
+        "gamma",
+        e));
+
+    s << ::xml_schema::as_double(i.gamma ());
+  }
+
+  // trackedMuscles
+  //
+  {
+    ::xercesc::DOMElement& s (
+      ::xsd::cxx::xml::dom::create_element (
+        "trackedMuscles",
+        e));
+
+    s << i.trackedMuscles ();
+  }
+
+  // predictedMuscles
+  //
+  {
+    ::xercesc::DOMElement& s (
+      ::xsd::cxx::xml::dom::create_element (
+        "predictedMuscles",
+        e));
+
+    s << i.predictedMuscles ();
+  }
+
+  // algorithm
+  //
+  {
+    ::xercesc::DOMElement& s (
+      ::xsd::cxx::xml::dom::create_element (
+        "algorithm",
+        e));
+
+    s << i.algorithm ();
+  }
+}
+
+void
+operator<< (::xercesc::DOMElement& e, const TypeType& i)
+{
+  e << static_cast< const ::xml_schema::type& > (i);
+
+  // openLoop
+  //
+  if (i.openLoop ())
+  {
+    ::xercesc::DOMElement& s (
+      ::xsd::cxx::xml::dom::create_element (
+        "openLoop",
+        e));
+
+    s << *i.openLoop ();
+  }
+
+  // hybrid
+  //
+  if (i.hybrid ())
+  {
+    ::xercesc::DOMElement& s (
+      ::xsd::cxx::xml::dom::create_element (
+        "hybrid",
+        e));
+
+    s << *i.hybrid ();
+  }
+}
+
+void
+operator<< (::xercesc::DOMElement& e, const NMSModelType& i)
+{
+  e << static_cast< const ::xml_schema::type& > (i);
+
+  // type
+  //
+  {
+    ::xercesc::DOMElement& s (
+      ::xsd::cxx::xml::dom::create_element (
+        "type",
+        e));
+
+    s << i.type ();
+  }
+
+  // tendon
+  //
+  {
+    ::xercesc::DOMElement& s (
+      ::xsd::cxx::xml::dom::create_element (
+        "tendon",
+        e));
+
+    s << i.tendon ();
+  }
+
+  // activation
+  //
+  {
+    ::xercesc::DOMElement& s (
+      ::xsd::cxx::xml::dom::create_element (
+        "activation",
+        e));
+
+    s << i.activation ();
+  }
+}
+
+void
+operator<< (::xercesc::DOMElement& e, const ElaboratedDoFsType& i)
+{
+  e << static_cast< const ::xsd::cxx::tree::list< ::xml_schema::string, char >& > (i);
+}
+
+void
+operator<< (::xercesc::DOMAttr& a, const ElaboratedDoFsType& i)
+{
+  a << static_cast< const ::xsd::cxx::tree::list< ::xml_schema::string, char >& > (i);
+}
+
+void
+operator<< (::xml_schema::list_stream& l,
+            const ElaboratedDoFsType& i)
+{
+  l << static_cast< const ::xsd::cxx::tree::list< ::xml_schema::string, char >& > (i);
+}
+
+void
+operator<< (::xercesc::DOMElement& e, const ExecutionElementType& i)
+{
+  e << static_cast< const ::xml_schema::type& > (i);
+}
+
+void
+operator<< (::xercesc::DOMAttr&, const ExecutionElementType&)
+{
+}
+
+void
+operator<< (::xml_schema::list_stream&,
+            const ExecutionElementType&)
+{
+}
+
+void
+operator<< (::xercesc::DOMElement& e, const FileType& i)
+{
+  e << static_cast< const ::xml_schema::type& > (i);
+}
+
+void
+operator<< (::xercesc::DOMAttr&, const FileType&)
+{
+}
+
+void
+operator<< (::xml_schema::list_stream&,
+            const FileType&)
+{
+}
+
+void
+operator<< (::xercesc::DOMElement& e, const LoggingType& i)
+{
+  e << static_cast< const ::xml_schema::type& > (i);
+
+  // txt
+  //
+  if (i.txt ())
+  {
+    ::xercesc::DOMElement& s (
+      ::xsd::cxx::xml::dom::create_element (
+        "txt",
+        e));
+
+    s << *i.txt ();
+  }
+
+  // csv
+  //
+  if (i.csv ())
+  {
+    ::xercesc::DOMElement& s (
+      ::xsd::cxx::xml::dom::create_element (
+        "csv",
+        e));
+
+    s << *i.csv ();
+  }
+
+  // mot
+  //
+  if (i.mot ())
+  {
+    ::xercesc::DOMElement& s (
+      ::xsd::cxx::xml::dom::create_element (
+        "mot",
+        e));
+
+    s << *i.mot ();
+  }
+}
+
+void
+operator<< (::xercesc::DOMElement& e, const ExecutionType& i)
+{
+  e << static_cast< const ::xml_schema::type& > (i);
+
+  // NMSmodel
+  //
+  {
+    ::xercesc::DOMElement& s (
+      ::xsd::cxx::xml::dom::create_element (
+        "NMSmodel",
+        e));
+
+    s << i.NMSmodel ();
+  }
+
+  // online
+  //
+  if (i.online ())
+  {
+    ::xercesc::DOMElement& s (
+      ::xsd::cxx::xml::dom::create_element (
+        "online",
+        e));
+
+    s << *i.online ();
+  }
+
+  // offline
+  //
+  if (i.offline ())
+  {
+    ::xercesc::DOMElement& s (
+      ::xsd::cxx::xml::dom::create_element (
+        "offline",
+        e));
+
+    s << *i.offline ();
+  }
+
+  // samplingFrequency
+  //
+  if (i.samplingFrequency ())
+  {
+    ::xercesc::DOMElement& s (
+      ::xsd::cxx::xml::dom::create_element (
+        "samplingFrequency",
+        e));
+
+    s << *i.samplingFrequency ();
+  }
+
+  // elaboratedDoFs
+  //
+  if (i.elaboratedDoFs ())
+  {
+    ::xercesc::DOMElement& s (
+      ::xsd::cxx::xml::dom::create_element (
+        "elaboratedDoFs",
+        e));
+
+    s << *i.elaboratedDoFs ();
+  }
+
+  // logging
+  //
+  if (i.logging ())
+  {
+    ::xercesc::DOMElement& s (
+      ::xsd::cxx::xml::dom::create_element (
+        "logging",
+        e));
+
+    s << *i.logging ();
+  }
+}
+
+void
+execution (::std::ostream& o,
+           const ::ExecutionType& s,
+           const ::xml_schema::namespace_infomap& m,
+           const ::std::string& e,
+           ::xml_schema::flags f)
+{
+  ::xsd::cxx::xml::auto_initializer i (
+    (f & ::xml_schema::flags::dont_initialize) == 0);
+
+  ::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument > d (
+    ::execution (s, m, f));
+
+  ::xsd::cxx::tree::error_handler< char > h;
+
+  ::xsd::cxx::xml::dom::ostream_format_target t (o);
+  if (!::xsd::cxx::xml::dom::serialize (t, *d, e, h, f))
+  {
+    h.throw_if_failed< ::xsd::cxx::tree::serialization< char > > ();
+  }
+}
+
+void
+execution (::std::ostream& o,
+           const ::ExecutionType& s,
+           ::xml_schema::error_handler& h,
+           const ::xml_schema::namespace_infomap& m,
+           const ::std::string& e,
+           ::xml_schema::flags f)
+{
+  ::xsd::cxx::xml::auto_initializer i (
+    (f & ::xml_schema::flags::dont_initialize) == 0);
+
+  ::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument > d (
+    ::execution (s, m, f));
+  ::xsd::cxx::xml::dom::ostream_format_target t (o);
+  if (!::xsd::cxx::xml::dom::serialize (t, *d, e, h, f))
+  {
+    throw ::xsd::cxx::tree::serialization< char > ();
+  }
+}
+
+void
+execution (::std::ostream& o,
+           const ::ExecutionType& s,
+           ::xercesc::DOMErrorHandler& h,
+           const ::xml_schema::namespace_infomap& m,
+           const ::std::string& e,
+           ::xml_schema::flags f)
+{
+  ::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument > d (
+    ::execution (s, m, f));
+  ::xsd::cxx::xml::dom::ostream_format_target t (o);
+  if (!::xsd::cxx::xml::dom::serialize (t, *d, e, h, f))
+  {
+    throw ::xsd::cxx::tree::serialization< char > ();
+  }
+}
+
+void
+execution (::xercesc::XMLFormatTarget& t,
+           const ::ExecutionType& s,
+           const ::xml_schema::namespace_infomap& m,
+           const ::std::string& e,
+           ::xml_schema::flags f)
+{
+  ::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument > d (
+    ::execution (s, m, f));
+
+  ::xsd::cxx::tree::error_handler< char > h;
+
+  if (!::xsd::cxx::xml::dom::serialize (t, *d, e, h, f))
+  {
+    h.throw_if_failed< ::xsd::cxx::tree::serialization< char > > ();
+  }
+}
+
+void
+execution (::xercesc::XMLFormatTarget& t,
+           const ::ExecutionType& s,
+           ::xml_schema::error_handler& h,
+           const ::xml_schema::namespace_infomap& m,
+           const ::std::string& e,
+           ::xml_schema::flags f)
+{
+  ::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument > d (
+    ::execution (s, m, f));
+  if (!::xsd::cxx::xml::dom::serialize (t, *d, e, h, f))
+  {
+    throw ::xsd::cxx::tree::serialization< char > ();
+  }
+}
+
+void
+execution (::xercesc::XMLFormatTarget& t,
+           const ::ExecutionType& s,
+           ::xercesc::DOMErrorHandler& h,
+           const ::xml_schema::namespace_infomap& m,
+           const ::std::string& e,
+           ::xml_schema::flags f)
+{
+  ::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument > d (
+    ::execution (s, m, f));
+  if (!::xsd::cxx::xml::dom::serialize (t, *d, e, h, f))
+  {
+    throw ::xsd::cxx::tree::serialization< char > ();
+  }
+}
+
+void
+execution (::xercesc::DOMDocument& d,
+           const ::ExecutionType& s,
+           ::xml_schema::flags)
+{
+  ::xercesc::DOMElement& e (*d.getDocumentElement ());
+  const ::xsd::cxx::xml::qualified_name< char > n (
+    ::xsd::cxx::xml::dom::name< char > (e));
+
+  if (n.name () == "execution" &&
+      n.namespace_ () == "")
+  {
+    e << s;
+  }
+  else
+  {
+    throw ::xsd::cxx::tree::unexpected_element < char > (
+      n.name (),
+      n.namespace_ (),
+      "execution",
+      "");
+  }
+}
+
+::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument >
+execution (const ::ExecutionType& s,
+           const ::xml_schema::namespace_infomap& m,
+           ::xml_schema::flags f)
+{
+  ::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument > d (
+    ::xsd::cxx::xml::dom::serialize< char > (
+      "execution",
+      "",
+      m, f));
+
+  ::execution (*d, s, f);
+  return d;
 }
 
 #include <xsd/cxx/post.hxx>
