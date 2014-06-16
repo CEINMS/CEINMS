@@ -47,11 +47,10 @@ void QueuesToStorageFiles::operator()() {
        
     
        CEINMS::OutputConnectors::FrameType currentFrame;
-       std::vector< CEINMS::OutputConnectors::DataType > dataToWrite;
-       
+       std::vector< CEINMS::OutputConnectors::FrameType > dataToWrite;
        currentFrame = currentQueue->second->pop(); 
        while (currentFrame.time != CEINMS::OutputConnectors::TimePlaceholderForEndOfData) {
-         dataToWrite.push_back(currentFrame.data);
+         dataToWrite.push_back(currentFrame);
          currentFrame = currentQueue->second->pop();
        }
 
@@ -60,7 +59,8 @@ void QueuesToStorageFiles::operator()() {
        auto q = outFiles_.find(currentValue);
        auto outFile = (q->second);
        for(auto& dataIt: dataToWrite) {
-           for(auto& sampleIt:dataIt)
+           *outFile << dataIt.time << separator_;
+           for(auto& sampleIt:dataIt.data)
              *outFile << sampleIt << separator_; 
            *outFile << std::endl;     
        }     
@@ -73,7 +73,7 @@ void QueuesToStorageFiles::operator()() {
 }
 
  
-void QueuesToStorageFiles::initFile(const std::string& valueName, const std::vector< CEINMS::OutputConnectors::DataType >& dataToWrite ) 
+void QueuesToStorageFiles::initFile(const std::string& valueName, const std::vector< CEINMS::OutputConnectors::FrameType >& dataToWrite ) 
 {
 
     auto q = outFiles_.find(valueName);
@@ -84,7 +84,7 @@ void QueuesToStorageFiles::initFile(const std::string& valueName, const std::vec
     
     auto outFile = (q->second);
     *outFile << "CEINMS output" << std::endl;
-    *outFile << "datacolumns " << dataToWrite.back().size() <<std::endl;
+    *outFile << "datacolumns " << dataToWrite.back().data.size() + 1 <<std::endl;
     *outFile << "datarows " << dataToWrite.size() <<std::endl;
     *outFile << "endheader" << std::endl;
 

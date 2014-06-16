@@ -28,7 +28,7 @@ public:
     void operator()();
 
 private:
-    void initFile(const std::string& valueName, const std::vector< std::vector< double > >& dataToWrite );
+    void initFile(const std::string& valueName, const std::vector< CEINMS::OutputConnectors::FrameType >& dataToWrite );
     void addLog(std::string valueName);
     
     std::string outputDir_;
