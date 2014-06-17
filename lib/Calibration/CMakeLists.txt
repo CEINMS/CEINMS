@@ -54,6 +54,7 @@ endif()
 
 # Save path to include directory for "internal" usage
 set(Calibration_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/ObjectiveFunctions ${CMAKE_CURRENT_SOURCE_DIR}/SimAnnealParameters  ${CMAKE_CURRENT_SOURCE_DIR}/TorqueComputationModes CACHE STRING "Include directories for Calibration library")
+mark_as_advanced(Calibration_INCLUDE_DIRS)
 
 #Install
 install(FILES ${Calibration_HEADERS} ${Calibration_TEMPLATE_IMPLEMENTATION} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}) #should add namespace

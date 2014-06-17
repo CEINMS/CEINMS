@@ -89,6 +89,7 @@ if(OPENSIM_FOUND)
 else()
     set(InputConnectors_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/FromStorageFile  CACHE STRING "Include directories for InputConnectors library" FORCE)
 endif()
+mark_as_advanced(InputConnectors_INCLUDE_DIRS)
 
 # Install
 install(FILES ${FromStorageFile_HEADERS} ${InputConnectors_HEADERS} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}) #should add namespace
