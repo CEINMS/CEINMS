@@ -11,8 +11,10 @@ FIND_PATH(XERCES_INCLUDE_DIR /xercesc/util/XercesVersion.hpp
     "${XERCES_DIR}\\include"
     "C:/Program\ Files\ (x86)/CodeSynthesis\ XSD\ 3.3/include"
  )
- 
-MESSAGE(STATUS "XERCES Include Dir ${XERCES_INCLUDE_DIR}")
+
+if (NOT XERCES_FIND_QUIETLY)
+    MESSAGE(STATUS "XERCES Include Dir ${XERCES_INCLUDE_DIR}")
+endif()
  
 if(CMAKE_SIZEOF_VOID_P EQUAL 8) #64bit compilation
     FIND_LIBRARY(XERCES_LIBRARY
@@ -80,8 +82,10 @@ else()
   )
 endif()
 
+if (NOT XERCES_FIND_QUIETLY)
   MESSAGE(STATUS "XERCES Lib Dir ${XERCES_LIBRARY}")
-  
+endif()
+
 IF (XERCES_LIBRARY AND XERCES_INCLUDE_DIR)
     SET(XERCES_LIBRARIES ${XERCES_LIBRARY})
     if(XERCES_LIBRARY_DEBUG)
