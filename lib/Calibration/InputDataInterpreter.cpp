@@ -19,7 +19,7 @@ using std::string;
 #include <vector>
 using std::vector;
 #include <list>
-#include <boost/concept_check.hpp>
+//#include <boost/concept_check.hpp>
 using std::list;
 
 InputDataInterpreter::InputDataInterpreter() //should be disabled??

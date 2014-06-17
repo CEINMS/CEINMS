@@ -1,5 +1,6 @@
-## Authors: Monica Reggiani, Claudio Pizzolato
+## Authors: Monica Reggiani, Claudio Pizzolato, Elena Ceseracciu
 
+# List source files
 set(EMGgenerator_SOURCES
   EMGgenerator/EMGgeneratorFrom10To13.cpp
   EMGgenerator/EMGgeneratorFrom16To34.cpp
@@ -20,19 +21,20 @@ set(EMGgenerator_HEADERS
   EMGDataFromFile.h
   policyTemplates.h
 )
-include_directories(${Boost_INCLUDE_DIRS})
-include_directories(EMGgenerator
-                    ${xmlInput_INCLUDE_DIRS}) #TODO check if need include ceinms_common
 
 source_group("Headers" FILES ${EMGgenerator_HEADERS})
 source_group("Sources" FILES ${EMGgenerator_SOURCES})
+
+# Define target
 add_library(FileIO STATIC ${EMGgenerator_SOURCES} ${EMGgenerator_HEADERS})
-
 target_link_libraries(FileIO xmlInput)
+target_include_directories(FileIO PRIVATE EMGgenerator ${xmlInput_INCLUDE_DIRS} PUBLIC ${Boost_INCLUDE_DIRS})
 
-set(FileIO_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/EMGgenerator CACHE STRING "Include directories for FileIO library")
+# Save path to include directory for "internal" usage
+set(FileIO_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/EMGgenerator ${xmlInput_INCLUDE_DIRS} CACHE STRING "Include directories for FileIO library")
 mark_as_advanced(FileIO_INCLUDE_DIRS)
 
+# Install
 install(FILES ${EMGgenerator_HEADERS} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}) #should add namespace
 install(TARGETS FileIO
         EXPORT CEINMSTargets

@@ -5,13 +5,9 @@
 #include_directories(${XSD_INCLUDE_DIR})
 #xsd_schema(subject.xml)
 
-include_directories(${ceinms_common_INCLUDE_DIRS})
-include_directories(${XERCES_INCLUDE_DIR})
-include_directories(${XSD_INCLUDE_DIR})
-include_directories(${Boost_INCLUDE_DIRS})
-
 add_executable(xsdbin xsdbin.cxx)
 target_link_libraries(xsdbin ${XERCES_LIBRARIES})
+target_include_directories(xsdbin PRIVATE ${XERCES_INCLUDE_DIR})
 
 macro (schema_to_bin xsdfile)
 
@@ -52,24 +48,30 @@ set(xmlInput_HEADERS    subject.hxx
                         calibration.hxx
                         CalibrationXmlReader.h
                         CalibrationCfg.h
-                        SubjectXmlReader.h
-                        grammar-input-stream.hxx
-                        validation.h)
+                        SubjectXmlReader.h)
+
+set(xmlInput_IMPL_HEADERS   impl/grammar-input-stream.hxx
+                            impl/validation.h)
 
 set(xmlInput_GENERATED_HEADERS  ${CMAKE_CURRENT_BINARY_DIR}/execution-schema.hxx
                                 ${CMAKE_CURRENT_BINARY_DIR}/calibration-schema.hxx
                                 ${CMAKE_CURRENT_BINARY_DIR}/subject-schema.hxx)
 
 source_group("Headers" FILES ${xmlInput_HEADERS})
+source_group("Private headers" FILES ${xmlInput_IMPL_HEADERS})
 source_group("Generated headers" FILES ${xmlInput_GENERATED_HEADERS})
 source_group("Sources" FILES ${xmlInput_SOURCES})
 source_group("Generated sources" FILES ${xmlInput_GENERATED_SOURCES})
+
+
 add_library(xmlInput STATIC ${xmlInput_SOURCES}
                             ${xmlInput_HEADERS}
+                            ${xmlInput_IMPL_HEADERS}
                             ${xmlInput_GENERATED_HEADERS}
                             ${xmlInput_GENERATED_SOURCES})
 
 target_link_libraries(xmlInput ceinms_common ${XERCES_LIBRARIES})
+target_include_directories(xmlInput PRIVATE ${ceinms_common_INCLUDE_DIRS} ${XERCES_INCLUDE_DIR} impl PUBLIC ${XSD_INCLUDE_DIR})
 
 set(xmlInput_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR} ${XSD_INCLUDE_DIR} CACHE STRING "Include directory for xmlInput library")
 mark_as_advanced(xmlInput_INCLUDE_DIRS)
@@ -79,4 +81,6 @@ install(TARGETS xmlInput
         EXPORT CEINMSTargets
         RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
         LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
+        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        # INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR} # only available from CMake 2.8.12
+        )

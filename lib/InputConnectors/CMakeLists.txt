@@ -1,5 +1,6 @@
-## Authors: Monica Reggiani, Claudio Pizzolato
+## Authors: Monica Reggiani, Claudio Pizzolato, Elena Ceseracciu
 
+# List source files
 set(FromStorageFile_SOURCES
   FromStorageFile/EMGFromFile.cpp
   FromStorageFile/ExternalTorquesFromStorageFile.cpp
@@ -37,26 +38,27 @@ set(InputConnectors_HEADERS
 
 source_group("Headers" FILES ${InputConnectors_HEADERS} ${FromStorageFile_HEADERS} )
 source_group("Sources" FILES ${InputConnectors_SOURCES} ${FromStorageFile_SOURCES} )
-
-include_directories(${ceinms_common_INCLUDE_DIRS} ${xmlInput_INCLUDE_DIRS} ${FileIO_INCLUDE_DIRS})
-include_directories(${Boost_INCLUDE_DIRS})
-include_directories(${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/FromStorageFile ${CMAKE_SOURCE_DIR}/lib/Concurrency)
-
 if(OPENSIM_FOUND)
-  include_directories(${OPENSIM_INCLUDE_DIRS} ${SIMTK_INCLUDE_DIRS} ${CMAKE_CURRENT_SOURCE_DIR}/FromOpenSim)
   source_group("Headers" FILES  ${FromOpenSim_HEADERS})
   source_group("Sources" FILES  ${FromOpenSim_SOURCES})
 endif()
 
+# Define targets
 add_library(InputConnectors STATIC
   ${InputConnectors_SOURCES}
   ${FromStorageFile_SOURCES}
   ${InputConnectors_HEADERS}
   ${FromStorageFile_HEADERS}
-  ${CMAKE_SOURCE_DIR}/lib/Concurrency/Latch.cpp
 )
+target_link_libraries(InputConnectors FileIO Concurrency ${Boost_FILESYSTEM_LIBRARY})
+target_include_directories(InputConnectors
+                                PRIVATE     FromStorageFile
+                                            ${CMAKE_CURRENT_SOURCE_DIR}
+                                            ${ceinms_common_INCLUDE_DIRS}
+                                            ${FileIO_INCLUDE_DIRS}
+                                            ${Concurrency_INCLUDE_DIRS}
+                                            ${Boost_INCLUDE_DIRS})
 
-target_link_libraries(InputConnectors FileIO)
 
 if(OPENSIM_FOUND)
     add_library(InputConnectorsOSim STATIC
@@ -68,13 +70,27 @@ if(OPENSIM_FOUND)
       ${FromOpenSim_HEADERS}
     )
 
-    target_link_libraries(InputConnectorsOSim FileIO ${OPENSIM_LIBRARIES})
-
-    set(InputConnectors_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/FromStorageFile ${CMAKE_CURRENT_SOURCE_DIR}/FromOpenSim CACHE STRING "Include directories for InputConnectors library" FORCE)
-else()
-  set(InputConnectors_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/FromStorageFile  CACHE STRING "Include directories for InputConnectors library" FORCE)
+    target_link_libraries(InputConnectorsOSim FileIO Concurrency ${Boost_FILESYSTEM_LIBRARY} ${OPENSIM_LIBRARIES})
+    target_include_directories(InputConnectors
+                                PRIVATE     FromStorageFile
+                                            FromOpenSim
+                                            ${CMAKE_CURRENT_SOURCE_DIR}
+                                            ${ceinms_common_INCLUDE_DIRS}
+                                            ${FileIO_INCLUDE_DIRS}
+                                            ${Concurrency_INCLUDE_DIRS}
+                                            ${Boost_INCLUDE_DIRS}
+                                            FromOpenSim
+                                PUBLIC      ${OPENSIM_INCLUDE_DIRS} ${SIMTK_INCLUDE_DIRS})
 endif()
 
+# Save path to include directory for "internal" usage
+if(OPENSIM_FOUND)
+    set(InputConnectors_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}/FromStorageFile" "${CMAKE_CURRENT_SOURCE_DIR}/FromOpenSim" CACHE STRING "Include directories for InputConnectors library" FORCE)
+else()
+    set(InputConnectors_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/FromStorageFile  CACHE STRING "Include directories for InputConnectors library" FORCE)
+endif()
+
+# Install
 install(FILES ${FromStorageFile_HEADERS} ${InputConnectors_HEADERS} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}) #should add namespace
 install(TARGETS InputConnectors
         EXPORT CEINMSTargets

@@ -1,12 +1,12 @@
 ## Authors: Monica Reggiani, Claudio Pizzolato
 
 include_directories(
-  ${Producers_INCLUDE_DIRS}
+  #${Producers_INCLUDE_DIRS}
   ${InputConnectors_INCLUDE_DIRS}
   ${OutputConnectors_INCLUDE_DIRS}
   ${NMSmodel_INCLUDE_DIRS}
-  ${CMAKE_SOURCE_DIR}/lib/Curve
-  ${CMAKE_SOURCE_DIR}/lib/Concurrency
+  ${Curve_INCLUDE_DIRS}
+  ${Concurrency_INCLUDE_DIRS}
   ${xmlInput_INCLUDE_DIRS}
   ${FileIO_INCLUDE_DIRS}
   ${Calibration_INCLUDE_DIRS}
@@ -29,7 +29,7 @@ set_source_files_properties(ModelEvaluationHybrid.cpp
                             ModelEvaluationOnline.cpp
                             ModelEvaluationOffline.cpp
                             PROPERTIES HEADER_FILE_ONLY TRUE)
-set(CEINMS_HEADERS ModelEvaluationBase.h ModelEvaluationHybrid.h ModelEvaluationOnline.h ModelEvaluationOffline.h SimpleFileLogger.h)
+set(CEINMS_HEADERS ModelEvaluationBase.h ModelEvaluationHybrid.h ModelEvaluationOnline.h ModelEvaluationOffline.h Logger.h SimpleFileLogger.h StorageLogger.h)
 set(CEINMS_SOURCES CEINMS.cpp ${CEINMS_COMMON_SOURCES})
 ADD_EXECUTABLE( CEINMS ${CEINMS_SOURCES} ${CEINMS_HEADERS} )
 TARGET_LINK_LIBRARIES( CEINMS
@@ -38,8 +38,9 @@ TARGET_LINK_LIBRARIES( CEINMS
       NMSmodel
       InputConnectors
       OutputConnectors
-      ${CMAKE_THREAD_LIBS_INIT}
-      ${Boost_LIBRARIES}
+      #${CMAKE_THREAD_LIBS_INIT}
+      ${Boost_PROGRAM_OPTIONS_LIBRARY}
+      ${Boost_FILESYSTEM_LIBRARY}
 )
 
 ADD_EXECUTABLE( TestInputConnectors EXCLUDE_FROM_ALL TestInputConnectors.cpp  ${CEINMS_COMMON_SOURCES} ${CEINMS_HEADERS}  )
@@ -48,8 +49,9 @@ TARGET_LINK_LIBRARIES( TestInputConnectors
       xmlInput
       NMSmodel
       InputConnectors
-      ${CMAKE_THREAD_LIBS_INIT}
-      ${Boost_LIBRARIES}
+      #${CMAKE_THREAD_LIBS_INIT}
+      ${Boost_PROGRAM_OPTIONS_LIBRARY}
+      ${Boost_FILESYSTEM_LIBRARY}
 )
 
 #enable_language(Fortran)
@@ -68,9 +70,10 @@ if(OPENSIM_FOUND)
       FileIO
       xmlInput
       NMSmodel
-      ProducersOSim
-      ${CMAKE_THREAD_LIBS_INIT}
-      ${Boost_LIBRARIES}
+      #ProducersOSim
+      #${CMAKE_THREAD_LIBS_INIT}
+      ${Boost_PROGRAM_OPTIONS_LIBRARY}
+      ${Boost_FILESYSTEM_LIBRARY}
       ${OPENSIM_LIBRARIES}
   )
 
@@ -93,7 +96,7 @@ target_link_libraries( CEINMScalibrate
       Calibration
       NMSmodel
       FileIO
-      ${Boost_LIBRARIES}
+      ${Boost_PROGRAM_OPTIONS_LIBRARY}
 )
 
 
@@ -108,7 +111,7 @@ if(OPENSIM_FOUND)
       Calibration
       NMSmodel
       FileIO
-      ${Boost_LIBRARIES}
+      ${Boost_PROGRAM_OPTIONS_LIBRARY}
       ${XERCES_LIBRARY}
       ${OPENSIM_LIBRARIES}
   )

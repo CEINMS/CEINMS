@@ -1,17 +1,8 @@
 # Authors: Elena Ceseracciu, Monica Reggiani, Claudio Pizzolato
 
 project(Calibration)
-include_directories(
-  ${xmlInput_INCLUDE_DIRS}
-  ${NMSmodel_INCLUDE_DIRS}
-  ${CMAKE_SOURCE_DIR}/lib/Curve
-  ${FileIO_INCLUDE_DIRS}
-  ${CMAKE_CURRENT_SOURCE_DIR}
-  ${ceinms_common_INCLUDE_DIRS}
-)
 
-include_directories(${Boost_INCLUDE_DIRS})
-
+# List source files
 set(Calibration_HEADERS TrialData.h
                         TorquesComputation.h
                         SimulatedAnnealing.h
@@ -41,7 +32,6 @@ set(Calibration_TEMPLATE_IMPLEMENTATION
 set_source_files_properties( ${Calibration_TEMPLATE_IMPLEMENTATION} PROPERTIES HEADER_FILE_ONLY TRUE)
 
 if(OPENSIM_FOUND)
-  include_directories(${OPENSIM_INCLUDE_DIRS} ${SIMTK_INCLUDE_DIRS})
   list(APPEND Calibration_HEADERS InputDataInterpreterOsim.h )
   list(APPEND Calibration_SOURCES InputDataInterpreterOsim.cpp )
 endif()
@@ -51,13 +41,21 @@ source_group("Source Files" FILES ${Calibration_SOURCES} ${Calibration_TEMPLATE_
 
 add_library(Calibration STATIC ${Calibration_SOURCES} ${Calibration_HEADERS} ${Calibration_TEMPLATE_IMPLEMENTATION})
 target_link_libraries(Calibration xmlInput FileIO)
+target_include_directories( Calibration
+                            PRIVATE ${NMSmodel_INCLUDE_DIRS}
+                                    ${Curve_INCLUDE_DIRS}
+                                    ${FileIO_INCLUDE_DIRS}
+                                    ${ceinms_common_INCLUDE_DIRS})
 
 if(OPENSIM_FOUND)
-  target_link_libraries(Calibration ${OPENSIM_LIBRARIES}) #should find out which ones are actually needed
+  target_include_directories(Calibration PUBLIC ${OPENSIM_INCLUDE_DIRS} ${SIMTK_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS})
+  target_link_libraries(Calibration ${OPENSIM_LIBRARIES} ${Boost_FILESYSTEM_LIBRARY}) #should find out which ones are actually needed
 endif()
 
+# Save path to include directory for "internal" usage
 set(Calibration_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/ObjectiveFunctions ${CMAKE_CURRENT_SOURCE_DIR}/SimAnnealParameters  ${CMAKE_CURRENT_SOURCE_DIR}/TorqueComputationModes CACHE STRING "Include directories for Calibration library")
 
+#Install
 install(FILES ${Calibration_HEADERS} ${Calibration_TEMPLATE_IMPLEMENTATION} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}) #should add namespace
 install(TARGETS Calibration
         EXPORT CEINMSTargets

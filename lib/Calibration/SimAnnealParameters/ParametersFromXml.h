@@ -17,7 +17,7 @@
 #include <vector>
 #include <string>
 #include <map>
-#include <boost/concept_check.hpp>
+//#include <boost/concept_check.hpp>
 
 template <typename NMSmodelT>
 class ParametersFromXml : public ParametersToOptimize  {

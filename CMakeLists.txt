@@ -1,6 +1,6 @@
 # Authors: Monica Reggiani, Claudio Pizzolato
 
-cmake_minimum_required (VERSION 2.8.8) # CMakePackageConfigHelpers.cmake is missing in previous versions
+cmake_minimum_required (VERSION 2.8.11) # "target_include_directories" command  and VS12 generator are missing in previous versions
 project(CEINMS)
 
 # Include GNUInstallDirs to get canonical paths
@@ -26,7 +26,7 @@ set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
 
 set(Boost_USE_STATIC_LIBS   ON)
 set(Boost_USE_MULTITHREADED ON)
-find_package(Boost REQUIRED COMPONENTS thread date_time program_options chrono filesystem system )
+find_package(Boost REQUIRED COMPONENTS program_options filesystem system)
 
 find_package(XSD REQUIRED)
 
@@ -39,9 +39,14 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 
+if(MSVC)
+    set(CMAKE_DEBUG_POSTFIX "d")
+endif(MSVC)
+
 add_subdirectory(lib)
 add_subdirectory(src)
 
+# Create CEINMSConfig.cmake etc.
 set(ConfigPackageLocation ${CMAKE_INSTALL_LIBDIR}/CEINMS)
 install(EXPORT CEINMSTargets
         FILE CEINMSTargets.cmake

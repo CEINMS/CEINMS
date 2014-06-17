@@ -12,7 +12,7 @@
 #define SetupDataStructure_
 
 #include <string>
-#include "subject.hxx"
+#include "subject.hxx" // TODO: we should find a way to only include this from xmlInput
 #include "Curve.h"
 
 template<typename NMSmodelT>

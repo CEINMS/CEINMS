@@ -7,7 +7,6 @@
 //
 
 #include "CalibrationXmlReader.h"
-#include <boost/filesystem.hpp>
 
 #include <string>
 using std::string;
