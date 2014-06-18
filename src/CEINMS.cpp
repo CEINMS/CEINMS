@@ -184,7 +184,7 @@ int main(int argc, char** argv) {
           // 2. define the thread connecting with the input sources
           
           string emgFilename(FileUtils::getFile(inputDirectory, "emg.txt"));
-          EMGFromFile emgProducer(mySubject, emgFilename);
+          EMGFromFile emgProducer(mySubject, emgFilename, emgGeneratorFile);
           
           vector< string > dofNames; 
           mySubject.getDoFNames(dofNames);

@@ -19,7 +19,7 @@ template <typename EMGgenerator>
 class EMGDataFromFile {
 public:
   EMGDataFromFile() { std::cout << "You should not be there\n"; }
-  EMGDataFromFile(const std::string& inputFile);
+  EMGDataFromFile(const std::string& inputFile, const std::string& emgGeneratorFile);
   const std::vector<std::string>& getMusclesNames() const { return EMGgenerator_.getMusclesNames(); }
   void getMusclesNames( std::vector< std::string >& muscleNames ) const {muscleNames = EMGgenerator_.getMusclesNames(); }
   void readNextEmgData();

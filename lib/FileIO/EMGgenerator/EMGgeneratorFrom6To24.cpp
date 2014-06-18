@@ -18,7 +18,7 @@ using std::vector;
 #include "EMGgeneratorFrom6To24.h"
 
 
-EMGgeneratorFrom6To24::EMGgeneratorFrom6To24(){  
+EMGgeneratorFrom6To24::EMGgeneratorFrom6To24(const std::string dummy){
   fromMusclesNames_.clear();
   
   fromMusclesNames_.push_back("bicfemlh_r"); // 0

@@ -21,8 +21,8 @@ using std::stringstream;
 #include "EMGDataFromFile.h"
 
 template <typename EMGgenerator>
-EMGDataFromFile<EMGgenerator>::EMGDataFromFile(const string& EMGDataFilename)
-:EMGDataFile_(EMGDataFilename.c_str()) {
+EMGDataFromFile<EMGgenerator>::EMGDataFromFile(const string& EMGDataFilename, const std::string& emgGeneratorFile)
+:EMGDataFile_(EMGDataFilename.c_str()), EMGgenerator_(emgGeneratorFile) {
  
   if (!EMGDataFile_.is_open()) {
     cout << "ERROR emg file: " << EMGDataFilename << " could not be open\n";

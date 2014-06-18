@@ -17,7 +17,7 @@ using std::vector;
 
 #include "EMGgeneratorFrom10To13.h"
 
-EMGgeneratorFrom10To13::EMGgeneratorFrom10To13(){
+EMGgeneratorFrom10To13::EMGgeneratorFrom10To13(const std::string dummy){
 
   fromMusclesNames_.clear();
   fromMusclesNames_.push_back("semimem_r");

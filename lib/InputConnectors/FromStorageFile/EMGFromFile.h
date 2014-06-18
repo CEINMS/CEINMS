@@ -17,7 +17,7 @@ class EMGFromFile:public EMGFromX
 {
   public:
     template <typename NMSModelT>
-    EMGFromFile(const NMSModelT& subject, const std::string& inputDir);
+    EMGFromFile(const NMSModelT& subject, const std::string& emgFilename, const std::string& emgGeneratorFilename);
     void operator()();
     virtual ~EMGFromFile();
   private:  
@@ -27,8 +27,8 @@ class EMGFromFile:public EMGFromX
 
 
 template <typename NMSModelT>
-EMGFromFile::EMGFromFile(const NMSModelT& subject, const std::string& emgFilename)
-:EMGFromX(subject), emgData_(emgFilename) 
+EMGFromFile::EMGFromFile(const NMSModelT& subject, const std::string& emgFilename, const std::string& emgGeneratorFilename)
+:EMGFromX(subject), emgData_(emgFilename, emgGeneratorFilename)
 { 
    
 #ifdef LOG  

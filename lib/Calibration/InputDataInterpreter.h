@@ -26,6 +26,7 @@ public:
     void setInputDirectory(const std::string& inputDirectory);
     void setMuscleNames(const std::vector<std::string> muscleNames);
     void setDofNames(const std::vector<std::string> dofNames);
+    void setEmgGeneratorXmlFilename(const std::string& filename){emgGeneratorXmlFilename_=filename;};
 private:
     void readEmgFile(TrialData& trial);
     void readMuscleTendonLengthFile(TrialData& trial);
@@ -34,6 +35,7 @@ private:
     bool checkOrSetMuscleNames(const std::vector <std::string>& muscleNames, std::vector<size_t>& muscleIndices); 
     bool isValid();
     std::string inputDirectory_;
+    std::string emgGeneratorXmlFilename_;
     std::vector<std::string> muscleNames_;
     std::vector<std::string> dofNames_;
     

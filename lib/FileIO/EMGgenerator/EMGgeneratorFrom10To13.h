@@ -56,7 +56,7 @@ public:
    * Constructor. 
    * Setup names for the 10 input muscles and 13 NMS model muscles
    */
-  EMGgeneratorFrom10To13(); 
+  EMGgeneratorFrom10To13(const std::string dummy="");
   
   /**
    * Check that the sequence of muscles in fromMusclesNames matches

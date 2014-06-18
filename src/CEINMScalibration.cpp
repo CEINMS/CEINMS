@@ -111,6 +111,7 @@ int main(int ac, char** av){
     string calibrationXmlFile;
     string uncalibratedSubjectXmlFile;
     string newCalibratedSubjectXmlFile;
+    string emgGeneratorFile;
     printHeader();
     printAuthors();
 
@@ -120,8 +121,9 @@ int main(int ac, char** av){
     ("help", "produce help message")
     ("calibration,c", po::value<string>(&calibrationXmlFile),  "calibration xml file")
     ("subject,s", po::value<string>(&uncalibratedSubjectXmlFile), "subject xml file that cointains the initial parameter values")
-    ("output,o", po::value<string>(&newCalibratedSubjectXmlFile)->default_value("calibratedSubject.xml"), "name of the calibrated subject file");
-    
+    ("output,o", po::value<string>(&newCalibratedSubjectXmlFile)->default_value("calibratedSubject.xml"), "name of the calibrated subject file")
+    ("emg-generator,g", po::value<string>(&emgGeneratorFile)->default_value("cfg/xml/emgGenerator.xml"), "EMG mapping");
+
     po::variables_map vm;
     po::store(po::parse_command_line(ac, av, desc), vm);
     po::notify(vm);    
@@ -166,6 +168,7 @@ int main(int ac, char** av){
             mySubject.getDoFNames(dofNames);
             InputDataInterpreter inputData(muscleNames, dofNames);
             inputData.setInputDirectory(trialsInputDirectory);
+            inputData.setEmgGeneratorXmlFilename(emgGeneratorFile);
             inputData.convert(calibrationTrialIDs, trials);
             CalibrationStep currentCalibrationStep;
             while(calibrationXmlReader.popNextCalibrationStep(currentCalibrationStep)) {
