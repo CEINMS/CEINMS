@@ -9,6 +9,8 @@
 #ifndef ArrayConverter_h
 #define ArrayConverter_h
 
+#include <vector>
+
 class ArrayConverter{
 public:
     template<typename T>
@@ -21,7 +23,7 @@ public:
     }
     template<typename T>
     static void fromStdVector(OpenSim::Array<T>& dstArray, const std::vector<T>& srcVector) {
-        for(typename vector<T>::const_iterator it(srcVector.begin()); it != srcVector.end(); ++it)
+        for(typename std::vector<T>::const_iterator it(srcVector.begin()); it != srcVector.end(); ++it)
             dstArray.append(*it);
     }
 

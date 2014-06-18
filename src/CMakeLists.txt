@@ -64,7 +64,8 @@ if(OPENSIM_FOUND)
   include_directories(${OPENSIM_INCLUDE_DIRS} ${SIMTK_INCLUDE_DIRS})
   set(CEINMS-osim_SOURCES CEINMS-osim.cpp ProducersFromOpenSim.cpp ${CEINMS_COMMON_SOURCES})
   set(CEINMS-osim_HEADERS ProducersFromOpenSim.h ${CEINMS_HEADERS})
-  add_executable(CEINMS-osim  ${CEINMS-osim_SOURCES} ${CEINMS-osim_HEADERS})
+  #temp: excluded from all, so that "all" compiles
+  add_executable(CEINMS-osim EXCLUDE_FROM_ALL ${CEINMS-osim_SOURCES} ${CEINMS-osim_HEADERS})
 
   target_link_libraries( CEINMS-osim
       FileIO
@@ -105,7 +106,7 @@ if(OPENSIM_FOUND)
   set(CEINMScalibrate-osim_SOURCES
     CEINMScalibration-osim.cpp  )
     
-  add_executable( CEINMScalibrate-osim ${CEINMScalibrate-osim_SOURCES} )
+  add_executable( CEINMScalibrate-osim EXCLUDE_FROM_ALL ${CEINMScalibrate-osim_SOURCES} )
   target_link_libraries( CEINMScalibrate-osim
       xmlInput
       Calibration
@@ -126,7 +127,7 @@ endif()
 install(TARGETS CEINMS CEINMScalibrate
         RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
 
-if(OPENSIM_FOUND)
-    install(TARGETS CEINMS-osim CEINMScalibrate-osim
-            RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
-endif()
+#if(OPENSIM_FOUND)
+#    install(TARGETS CEINMS-osim CEINMScalibrate-osim
+#            RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+#endif()

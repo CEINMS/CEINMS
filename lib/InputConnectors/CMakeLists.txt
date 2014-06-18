@@ -16,11 +16,11 @@ set(FromStorageFile_HEADERS
 
 set(FromOpenSim_SOURCES
   FromOpenSim/LmtMaFromOpenSim.cpp
-  FromOpenSim/ExternalTorqueFromStorage.cpp
+  FromOpenSim/ExternalTorquesFromStorage.cpp
 )
 set(FromOpenSim_HEADERS
   FromOpenSim/LmtMaFromOpenSim.h
-  FromOpenSim/ExternalTorqueFromStorage.h
+  FromOpenSim/ExternalTorquesFromStorage.h
 )
 
 set(InputConnectors_SOURCES
@@ -71,7 +71,7 @@ if(OPENSIM_FOUND)
     )
 
     target_link_libraries(InputConnectorsOSim FileIO Concurrency ${Boost_FILESYSTEM_LIBRARY} ${OPENSIM_LIBRARIES})
-    target_include_directories(InputConnectors
+    target_include_directories(InputConnectorsOSim
                                 PRIVATE     FromStorageFile
                                             FromOpenSim
                                             ${CMAKE_CURRENT_SOURCE_DIR}
