@@ -194,7 +194,7 @@ int main(int argc, char** argv) {
           LmtMaFromStorageFile lmtMaProducer(mySubject, lmtFilename, maFilename); 
           
           
-          string externalTorqueFilename(inputDirectory + "inverse_dynamics.sto"); 
+          string externalTorqueFilename(FileUtils::getFile(inputDirectory, "inverse_dynamics.sto"));
           ExternalTorquesFromStorageFile externalTorquesProducer(mySubject, externalTorqueFilename); 
    
               
