@@ -9,6 +9,7 @@
 
 #include "EMGgeneratorFromXml.h"
 #include "emgGenerator.hxx"
+#include "EmgGeneratorXmlReader.h"
 #include <vector>
 using std::vector;
 #include <string>
@@ -25,7 +26,9 @@ using std::find;
 EMGgeneratorFromXml::EMGgeneratorFromXml(const std::string& xmlFilename) {
     
     try {
-    std::auto_ptr<emgGenerator> generatorPtr(emgGenerator_(xmlFilename.c_str()));
+
+    EmgGeneratorXmlReader sxr(xmlFilename);
+    std::auto_ptr<emgGenerator> generatorPtr=sxr.getEmgGenerator();
     
     emgGenerator::experimental_type& experimentalEmgs(generatorPtr->experimental());
     EmgListType::emg_sequence& experimentalEmgList(experimentalEmgs.emg());
