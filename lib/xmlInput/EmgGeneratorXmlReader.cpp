@@ -1,5 +1,5 @@
 //__________________________________________________________________________
-// Author(s): Elena Ceseracciu - May 2014
+// Author(s): Elena Ceseracciu - June 2014
 // email:  elena.ceseracciu@gmail.com
 //
 // DO NOT REDISTRIBUTE WITHOUT PERMISSION
@@ -13,24 +13,22 @@ using std::string;
 using std::cout;
 using std::endl;
 
-#include "SubjectXmlReader.h"
+#include "EmgGeneratorXmlReader.h"
 #include "validation.h"
-#include "subject-schema.hxx"
+#include "emgGenerator-schema.hxx"
 
-SubjectXmlReader::SubjectXmlReader(const std::string& filename)
+EmgGeneratorXmlReader::EmgGeneratorXmlReader(const string& filename)
 {
-
     try {
-    subjectPointer_= parseAndValidate<SubjectType>(filename, subject_schema, sizeof(subject_schema));
+    emgGenPointer_= parseAndValidate<emgGenerator>(filename, emgGenerator_schema, sizeof(emgGenerator_schema));
     }
     catch (const xml_schema::exception& e) {
         cout << e << endl;
         exit(EXIT_FAILURE);
     }
-
 }
 
-std::auto_ptr<SubjectType> SubjectXmlReader::getSubject()
+std::auto_ptr< emgGenerator > EmgGeneratorXmlReader::getEmgGenerator()
 {
-    return subjectPointer_;
+    return emgGenPointer_;
 }

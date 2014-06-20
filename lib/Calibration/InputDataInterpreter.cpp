@@ -89,7 +89,7 @@ void InputDataInterpreter::convert ( const string& trialID, TrialData& trial ) {
 void InputDataInterpreter::readEmgFile(TrialData& trial) {
      
     string emgDataFilename = inputDirectory_ + "/" + trial.id_ + "/emg.txt";
-    EMGDataFromFile<EMGgeneratorFromXml> emgDataFromFile(emgDataFilename);
+    EMGDataFromFile<EMGgeneratorFromXml> emgDataFromFile(emgDataFilename, emgGeneratorXmlFilename_);
     vector<size_t> muscleIndices;
     if (!checkOrSetMuscleNames(emgDataFromFile.getMusclesNames(), muscleIndices))
     {

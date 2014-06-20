@@ -91,7 +91,7 @@ void InputDataInterpreterOsim::readEmgFile(TrialData& trial) {
      
     string emgDataFilename(getFile(inputDirectory_+"/"+trial.id_, "emg.txt" ));
     emgDataFilename = inputDirectory_+"/"+trial.id_+"/"+emgDataFilename;
-    EMGDataFromFile<EMGgeneratorFromXml> emgDataFromFile(emgDataFilename);
+    EMGDataFromFile<EMGgeneratorFromXml> emgDataFromFile(emgDataFilename, emgGeneratorXmlFilename_);
     trial.noMuscles_ = emgDataFromFile.getMusclesNames().size();
     trial.noEmgSteps_ = emgDataFromFile.getNoTimeSteps();
        

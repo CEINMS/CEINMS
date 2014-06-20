@@ -29,6 +29,7 @@ public:
     void setMuscleNames(const std::vector<std::string>& muscleNames);
     void setDofNames(const std::vector<std::string>& dofNames);
     void setMuscleNamesOnDofs(const std::vector< std::vector<std::string> >& muscleNamesOnDofs);
+    void setEmgGeneratorXmlFilename(const std::string& filename){emgGeneratorXmlFilename_=filename;};
 
 private:
     void setLmt(const OpenSim::Storage& from, TrialData& to);
@@ -48,6 +49,7 @@ private:
     std::vector<std::string> muscleNames_;
     std::vector<std::string> dofNames_;
     std::vector< std::vector<std::string> > muscleNamesOnDofs_;
+    std::string emgGeneratorXmlFilename_;
     
 };
 

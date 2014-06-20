@@ -24,6 +24,7 @@ endmacro()
 schema_to_bin(${CMAKE_SOURCE_DIR}/cfg/XSD/execution.xsd)
 schema_to_bin(${CMAKE_SOURCE_DIR}/cfg/XSD/calibration.xsd)
 schema_to_bin(${CMAKE_SOURCE_DIR}/cfg/XSD/subject.xsd)
+schema_to_bin(${CMAKE_SOURCE_DIR}/cfg/XSD/emgGenerator.xsd)
 
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
@@ -34,11 +35,13 @@ set(xmlInput_SOURCES    subject.cxx
                         calibration.cxx
                         CalibrationXmlReader.cpp
                         SubjectXmlReader.cpp
-                        grammar-input-stream.cxx)
+                        grammar-input-stream.cxx
+                        EmgGeneratorXmlReader.cpp)
 
 set(xmlInput_GENERATED_SOURCES  ${CMAKE_CURRENT_BINARY_DIR}/execution-schema.cxx
                                 ${CMAKE_CURRENT_BINARY_DIR}/calibration-schema.cxx
-                                ${CMAKE_CURRENT_BINARY_DIR}/subject-schema.cxx)
+                                ${CMAKE_CURRENT_BINARY_DIR}/subject-schema.cxx
+                                ${CMAKE_CURRENT_BINARY_DIR}/emgGenerator-schema.cxx)
 
 set(xmlInput_HEADERS    subject.hxx
                         execution.hxx
@@ -48,14 +51,16 @@ set(xmlInput_HEADERS    subject.hxx
                         calibration.hxx
                         CalibrationXmlReader.h
                         CalibrationCfg.h
-                        SubjectXmlReader.h)
+                        SubjectXmlReader.h
+                        EmgGeneratorXmlReader.h)
 
 set(xmlInput_IMPL_HEADERS   impl/grammar-input-stream.hxx
                             impl/validation.h)
 
 set(xmlInput_GENERATED_HEADERS  ${CMAKE_CURRENT_BINARY_DIR}/execution-schema.hxx
                                 ${CMAKE_CURRENT_BINARY_DIR}/calibration-schema.hxx
-                                ${CMAKE_CURRENT_BINARY_DIR}/subject-schema.hxx)
+                                ${CMAKE_CURRENT_BINARY_DIR}/subject-schema.hxx
+                                ${CMAKE_CURRENT_BINARY_DIR}/emgGenerator-schema.hxx)
 
 source_group("Headers" FILES ${xmlInput_HEADERS})
 source_group("Private headers" FILES ${xmlInput_IMPL_HEADERS})

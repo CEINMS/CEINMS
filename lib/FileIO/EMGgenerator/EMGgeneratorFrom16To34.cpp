@@ -18,7 +18,7 @@ using std::vector;
 #include "EMGgeneratorFrom16To34.h"
 
 
-EMGgeneratorFrom16To34::EMGgeneratorFrom16To34(){  
+EMGgeneratorFrom16To34::EMGgeneratorFrom16To34(const std::string dummy){
   fromMusclesNames_.clear();
   
   fromMusclesNames_.push_back("addmag_r"); // 0															
