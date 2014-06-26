@@ -50,9 +50,9 @@ void LmtMaFromStorageFile::operator()()
   }
     
   vector<double> endOfData;
-  updateLmt(endOfData, 0);
+  updateLmt(endOfData, std::numeric_limits<double>::infinity());
   for (unsigned int i = 0; i < dofNames_.size(); ++i)
-    updateMomentArms(endOfData, 0, i); 
+      updateMomentArms(endOfData, std::numeric_limits<double>::infinity(), i);
 
   //SyncTools::Shared::lmtProducingDone.notify(); //used for validate curve only
  
