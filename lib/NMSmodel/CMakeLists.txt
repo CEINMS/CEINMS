@@ -54,7 +54,7 @@ target_include_directories(NMSmodel PRIVATE ${Curve_INCLUDE_DIRS}
                                             ${FileIO_INCLUDE_DIRS}
 #                                    PUBLIC  ${Boost_INCLUDE_DIRS}
                                     )
-
+target_link_libraries(NMSmodel xmlInput)
 # Save path to include directory for "internal" usage
 set(NMSmodel_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}/Activation" "${CMAKE_CURRENT_SOURCE_DIR}/Tendon" CACHE STRING "Include directory for NMSmodel library")
 mark_as_advanced(NMSmodel_INCLUDE_DIRS)
