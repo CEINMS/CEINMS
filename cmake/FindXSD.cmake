@@ -14,7 +14,7 @@ FIND_PROGRAM( XSD_EXECUTABLE
                     /opt/xsd-3.2.0-i686-macosx/bin
                     /opt/xsd-3.2.0-x86_64-linux-gnu/bin
                     /usr/bin
-                    "C:/Program Files (x86)/CodeSynthesis XSD 3.3/include"
+                    "C:/Program Files (x86)/CodeSynthesis XSD 3.3/bin"
                     ENV PATH )
 
 IF( XSD_EXECUTABLE )
@@ -22,12 +22,16 @@ IF( XSD_EXECUTABLE )
   #
   # Obtain the include directory that one can use with INCLUDE_DIRECTORIES() to
   # access the xsd include files.
-
   GET_FILENAME_COMPONENT( XSD_BIN_DIR "${XSD_EXECUTABLE}" PATH )
   GET_FILENAME_COMPONENT( XSD_ROOT_DIR "${XSD_BIN_DIR}" PATH )
-  SET( XSD_INCLUDE_DIR "${XSD_ROOT_DIR}/include" )
+  set(XSD_INCLUDE_POSSIBLE_DIRS "${XSD_ROOT_DIR}/include")
+
 ENDIF( XSD_EXECUTABLE )
 
+find_path(XSD_INCLUDE_DIR xsd/cxx/config.hxx
+                          HINTS ${XSD_INCLUDE_POSSIBLE_DIRS}
+                          PATHS "C:/Program Files (x86)/CodeSynthesis XSD 3.3/include"
+                          )
 #
 # General CMake package configuration.
 
