@@ -7,6 +7,7 @@
 //
 
 #include "CalibrationXmlReader.h"
+#include "InputDataXmlReader.h"
 #include "subject.hxx"
 #include "NMSmodel.h"
 #include "InputDataInterpreter.h"
@@ -47,6 +48,7 @@ using std::endl;
 
 #include <list>
 using std::list;
+#include <map>
 
 #include <stdlib.h>
 
@@ -119,24 +121,39 @@ void setLmtMaFilenames(const string& directory, const vector< string > dofNames,
     }
 }
 
+void sortMaFilenames(const std::map<string, string>& maMap, const vector< string > dofNames, vector< string >& maDataFilenames)
+{
+    int currentDof = 0;
+    for (auto& it : dofNames)
+    {
+        try
+        {
+            maDataFilenames.push_back(maMap.at(it));
+        }
+        catch (std::out_of_range)
+        {
+            std::cerr << "Could not find moment arm file for " << it << " degree of freedom" << std::endl;
+            exit(EXIT_FAILURE);
+        }
+    }
+}
 
 template<typename NMSmodel>
-TrialData readTrialDirectory(std::string inputDirectory, NMSmodel& mySubject, std::string trialId, std::string emgGeneratorFile)
+TrialData readTrialData(std::string inputDataFilename, NMSmodel& mySubject, std::string trialId, std::string emgGeneratorFile)
 {
-    // 2. define the thread connecting with the input sources
+    InputDataXmlReader dataLocations(inputDataFilename);
 
-    string emgFilename(FileUtils::getFile(inputDirectory, "emg.txt"));
+    string emgFilename(dataLocations.getEmgFile());
     EMGFromFile emgProducer(mySubject, emgFilename, emgGeneratorFile);
 
     vector< string > dofNames;
     mySubject.getDoFNames(dofNames);
-    string lmtFilename;
     vector< string > maFilename;
-    setLmtMaFilenames(inputDirectory, dofNames, lmtFilename, maFilename);
-    LmtMaFromStorageFile lmtMaProducer(mySubject, lmtFilename, maFilename);
+    sortMaFilenames(dataLocations.getMaFiles(), dofNames, maFilename);
+    LmtMaFromStorageFile lmtMaProducer(mySubject, dataLocations.getLmtFile(), maFilename);
 
 
-    string externalTorqueFilename(FileUtils::getFile(inputDirectory, "inverse_dynamics.sto"));
+    string externalTorqueFilename(dataLocations.getExternalTorqueFile());
     ExternalTorquesFromStorageFile externalTorquesProducer(mySubject, externalTorqueFilename);
 
     QueuesToTrialData queuesToTrialData(mySubject, trialId);
@@ -208,9 +225,6 @@ int main(int ac, char** av){
     list<string> calibrationTrialIDs;
     calibrationXmlReader.getCalibrationTrials(calibrationTrialIDs);
     vector<TrialData> trials;  
-    string trialsInputDirectory;
-	calibrationXmlReader.getTrialsDirectory(trialsInputDirectory); //TODO get it from xml
-        
     
     //3 loop the calibration steps
     NMSModelCfg::RunMode runMode = calibrationXmlReader.getNMSmodelRunMode();
@@ -224,7 +238,7 @@ int main(int ac, char** av){
             setupSubject(mySubject, uncalibratedSubjectXmlFile);
             for (list<string>::iterator trialIt = calibrationTrialIDs.begin(); trialIt != calibrationTrialIDs.end(); ++trialIt)
             {
-                trials.push_back(readTrialDirectory(trialsInputDirectory + "/" +  *trialIt , mySubject, *trialIt, emgGeneratorFile));
+                trials.push_back(readTrialData(*trialIt , mySubject, *trialIt, emgGeneratorFile));
             }
             //vector<string> muscleNames, dofNames;
             //mySubject.getMuscleNames(muscleNames);
@@ -324,7 +338,7 @@ int main(int ac, char** av){
             setupSubject(mySubject, uncalibratedSubjectXmlFile);
             for (list<string>::iterator trialIt = calibrationTrialIDs.begin(); trialIt != calibrationTrialIDs.end(); ++trialIt)
             {
-                trials.push_back(readTrialDirectory(trialsInputDirectory + "/" + *trialIt, mySubject, *trialIt, emgGeneratorFile));
+                trials.push_back(readTrialData(*trialIt, mySubject, *trialIt, emgGeneratorFile));
             }
             //vector<string> muscleNames, dofNames;
             //mySubject.getMuscleNames(muscleNames);
@@ -425,7 +439,7 @@ int main(int ac, char** av){
             setupSubject(mySubject, uncalibratedSubjectXmlFile);
             for (list<string>::iterator trialIt = calibrationTrialIDs.begin(); trialIt != calibrationTrialIDs.end(); ++trialIt)
             {
-                trials.push_back(readTrialDirectory(trialsInputDirectory + "/" + *trialIt, mySubject, *trialIt, emgGeneratorFile));
+                trials.push_back(readTrialData(*trialIt, mySubject, *trialIt, emgGeneratorFile));
             }
             //vector<string> muscleNames, dofNames;
             //mySubject.getMuscleNames(muscleNames);
