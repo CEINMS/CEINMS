@@ -12,6 +12,8 @@ using std::cout;
 using std::endl;
 #include <vector>
 using std::vector;
+#include <map>
+using std::map;
 #include "NMSmodel.h"
 #include <string>
 using std::string;
@@ -648,6 +650,17 @@ void NMSmodel<Activation, Tendon, mode>::getMuscleNamesOnDofs(vector<vector<stri
 		it->getMusclesNamesOnDof(muscleNamesOnDof);
 		muscleNamesOnDofs.push_back(muscleNamesOnDof);
 	}
+}
+
+template <typename Activation, typename Tendon, CurveMode::Mode mode>
+void NMSmodel<Activation, Tendon, mode>::getMuscleNamesOnDofs(map <string, vector<string> >& muscleNamesOnDofs) const {
+
+    muscleNamesOnDofs.clear();
+    for (vectorDoFconstItr it(dofs_.begin()); it != dofs_.end(); ++it) {
+        vector<string> muscleNamesOnDof;
+        it->getMusclesNamesOnDof(muscleNamesOnDof);
+        muscleNamesOnDofs[it->getName()] =muscleNamesOnDof;
+    }
 }
 
 template <typename Activation, typename Tendon, CurveMode::Mode mode>

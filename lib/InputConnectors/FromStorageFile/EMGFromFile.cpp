@@ -24,7 +24,7 @@ void EMGFromFile::operator()()
   } 
   
   vector<double> endOfEmg;
-  updateEmg(endOfEmg, 0); 
+  updateEmg(endOfEmg, std::numeric_limits<double>::infinity());
   
   // SyncTools::Shared::emgProducingDone.notify();
   

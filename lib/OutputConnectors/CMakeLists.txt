@@ -4,10 +4,12 @@
 set(OutputConnectors_SOURCES
     OutputQueues.cpp
     LoggerOnQueues.cpp
+    QueuesToTrialData.cpp
 )
 set(OutputConnectors_HEADERS 
     OutputQueues.h
     LoggerOnQueues.h
+    QueuesToTrialData.h
 )
 
 set(QueuesToStorageFiles_SOURCES
@@ -31,6 +33,7 @@ target_include_directories(OutputConnectors
                                         ${ceinms_common_INCLUDE_DIRS}
                                         ${InputConnectors_INCLUDE_DIRS}
                                         ${Concurrency_INCLUDE_DIRS}
+                                        ${Calibration_INCLUDE_DIRS}
                                 PUBLIC ${Boost_INCLUDE_DIRS})
 
 # Save path to include directory for "internal" usage
