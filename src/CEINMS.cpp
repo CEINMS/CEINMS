@@ -17,6 +17,7 @@
 #include "HybridWeightings.h"
 #include "Curve.h"
 #include "ExecutionXmlReader.h"
+#include "InputDataXmlReader.h"
 #include "FileUtils.h"
 
 #include "EMGFromFile.h"
@@ -43,6 +44,8 @@ using std::cout;
 using std::endl;
 #include <vector>
 using std::vector;
+#include <map>
+using std::map;
 #include <stdlib.h>
 
 #include <boost/program_options.hpp>
@@ -104,6 +107,24 @@ void setLmtMaFilenames(const string& inputDirectory, const vector< string > dofN
 }
 
 
+void sortMaFilenames(const map<string, string>& maMap, const vector< string > dofNames, vector< string >& maDataFilenames)
+{
+    int currentDof = 0;
+    for (auto& it : dofNames)
+    {
+        try
+        {
+            maDataFilenames.push_back(maMap.at(it));
+        }
+        catch (std::out_of_range)
+        {
+            std::cerr << "Could not find moment arm file for " << it << " degree of freedom" << std::endl;
+            exit(EXIT_FAILURE);
+        }
+    }
+}
+
+
 
 void consumeAndStore(CEINMS::Concurrency::Queue< std::vector<double> >& queue, const string& outputFileName, const vector<string>& header) {
   
@@ -141,7 +162,7 @@ int main(int argc, char** argv) {
   
     string subjectFile;
     string executionFile;
-    string inputDirectory;
+    string inputData;
     string outputDirectory;
     string emgGeneratorFile;
 
@@ -151,7 +172,7 @@ int main(int argc, char** argv) {
     ("help", "produce help message")
     ("subject,s", po::value<string>(&subjectFile), "subject xml file")
     ("execution,x", po::value<string>(&executionFile),  "execution xml file")
-    ("input-dir,i", po::value<string>(&inputDirectory), "trial directory path")
+    ("input-dir,i", po::value<string>(&inputData), "input data description file")
     ("output-dir,o", po::value<string>(&outputDirectory)->default_value("./Output"), "output directory")
     ("emg-generator,g", po::value<string>(&emgGeneratorFile)->default_value("cfg/xml/emgGenerator.xml"), "EMG mapping");
     
@@ -166,7 +187,8 @@ int main(int argc, char** argv) {
  
 
     ExecutionXmlReader executionCfg(executionFile);             
-    
+    InputDataXmlReader dataLocations(inputData);
+
     NMSModelCfg::RunMode runMode = executionCfg.getRunMode();
    
 //    NMSModelCfg::RunMode runMode = NMSModelCfg::HybridPiecewiseActivationElasticTendonOnline;
@@ -183,18 +205,17 @@ int main(int argc, char** argv) {
           
           // 2. define the thread connecting with the input sources
           
-          string emgFilename(FileUtils::getFile(inputDirectory, "emg.txt"));
+          string emgFilename(dataLocations.getEmgFile());
           EMGFromFile emgProducer(mySubject, emgFilename, emgGeneratorFile);
           
           vector< string > dofNames; 
           mySubject.getDoFNames(dofNames);
-          string lmtFilename;
           vector< string > maFilename;
-          setLmtMaFilenames(inputDirectory, dofNames, lmtFilename, maFilename);
-          LmtMaFromStorageFile lmtMaProducer(mySubject, lmtFilename, maFilename); 
+          sortMaFilenames(dataLocations.getMaFiles(), dofNames, maFilename);
+          LmtMaFromStorageFile lmtMaProducer(mySubject, dataLocations.getLmtFile(), maFilename);
           
           
-          string externalTorqueFilename(FileUtils::getFile(inputDirectory, "inverse_dynamics.sto"));
+          string externalTorqueFilename(dataLocations.getExternalTorqueFile());
           ExternalTorquesFromStorageFile externalTorquesProducer(mySubject, externalTorqueFilename); 
    
               

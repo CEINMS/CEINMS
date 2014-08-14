@@ -28,6 +28,7 @@ schema_to_bin(${CMAKE_SOURCE_DIR}/cfg/XSD/execution.xsd)
 schema_to_bin(${CMAKE_SOURCE_DIR}/cfg/XSD/calibration.xsd)
 schema_to_bin(${CMAKE_SOURCE_DIR}/cfg/XSD/subject.xsd)
 schema_to_bin(${CMAKE_SOURCE_DIR}/cfg/XSD/emgGenerator.xsd)
+schema_to_bin(${CMAKE_SOURCE_DIR}/cfg/XSD/inputData.xsd)
 
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
@@ -36,24 +37,28 @@ xsd_schema(subject_GENERATED_FILES ${CMAKE_SOURCE_DIR}/cfg/XSD/subject.xsd --gen
 xsd_schema(emgGenerator_GENERATED_FILES ${CMAKE_SOURCE_DIR}/cfg/XSD/emgGenerator.xsd --generate-serialization)
 xsd_schema(calibration_GENERATED_FILES ${CMAKE_SOURCE_DIR}/cfg/XSD/calibration.xsd --generate-serialization --namespace-map =CalibrationXsd)
 xsd_schema(execution_GENERATED_FILES ${CMAKE_SOURCE_DIR}/cfg/XSD/execution.xsd --generate-serialization)
+xsd_schema(inputData_GENERATED_FILES ${CMAKE_SOURCE_DIR}/cfg/XSD/inputData.xsd --generate-serialization)
 
 set(xmlInput_SOURCES    ExecutionXmlReader.cpp
                         CalibrationXmlReader.cpp
                         SubjectXmlReader.cpp
                         grammar-input-stream.cxx
-                        EmgGeneratorXmlReader.cpp)
+                        EmgGeneratorXmlReader.cpp
+                        InputDataXmlReader.cpp)
 
 set(xmlInput_GENERATED_SOURCES  ${CMAKE_CURRENT_BINARY_DIR}/execution-schema.cxx
                                 ${CMAKE_CURRENT_BINARY_DIR}/calibration-schema.cxx
                                 ${CMAKE_CURRENT_BINARY_DIR}/subject-schema.cxx
-                                ${CMAKE_CURRENT_BINARY_DIR}/emgGenerator-schema.cxx)
+                                ${CMAKE_CURRENT_BINARY_DIR}/emgGenerator-schema.cxx
+                                ${CMAKE_CURRENT_BINARY_DIR}/inputData-schema.cxx)
 
 set(xmlInput_HEADERS    ExecutionXmlReader.h
                         NMSmodelConfig.h
                         CalibrationXmlReader.h
                         CalibrationCfg.h
                         SubjectXmlReader.h
-                        EmgGeneratorXmlReader.h)
+                        EmgGeneratorXmlReader.h
+                        InputDataXmlReader.h)
 
 set(xmlInput_IMPL_HEADERS   impl/grammar-input-stream.hxx
                             impl/validation.h)
@@ -61,7 +66,8 @@ set(xmlInput_IMPL_HEADERS   impl/grammar-input-stream.hxx
 set(xmlInput_GENERATED_HEADERS  ${CMAKE_CURRENT_BINARY_DIR}/execution-schema.hxx
                                 ${CMAKE_CURRENT_BINARY_DIR}/calibration-schema.hxx
                                 ${CMAKE_CURRENT_BINARY_DIR}/subject-schema.hxx
-                                ${CMAKE_CURRENT_BINARY_DIR}/emgGenerator-schema.hxx)
+                                ${CMAKE_CURRENT_BINARY_DIR}/emgGenerator-schema.hxx
+                                ${CMAKE_CURRENT_BINARY_DIR}/inputData-schema.hxx)
 
 source_group("Headers" FILES ${xmlInput_HEADERS})
 source_group("Private headers" FILES ${xmlInput_IMPL_HEADERS})
@@ -80,6 +86,7 @@ add_library(xmlInput STATIC ${xmlInput_SOURCES}
                             ${emgGenerator_GENERATED_FILES}
                             ${calibration_GENERATED_FILES}
                             ${execution_GENERATED_FILES}
+                            ${inputData_GENERATED_FILES}
                             )
 
 target_link_libraries(xmlInput ceinms_common ${XERCES_LIBRARIES})
