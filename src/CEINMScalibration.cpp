@@ -31,6 +31,12 @@
 #include "SimulatedAnnealing.h"
 
 #include "XmlWriter.h"
+#include "FileUtils.h"
+
+#include "EMGFromFile.h"
+#include "LmtMaFromStorageFile.h"
+#include "ExternalTorquesFromStorageFile.h"
+#include "QueuesToTrialData.h"
 
 #include <string>
 using std::string;
@@ -99,6 +105,59 @@ void printAuthors() {
     cout << "Software developers: Claudio Pizzolato, Monica Reggiani\n";
 }
 
+void setLmtMaFilenames(const string& directory, const vector< string > dofNames, string& lmtDataFilename, vector< string >& maDataFilenames)
+{
+    std::string pattern{ "_Length.sto" };
+    lmtDataFilename = directory + "/" + findFile(pattern, directory);
+
+    int currentDof = 0;
+    for (auto& it : dofNames)
+    {
+        std::string pattern = "_MomentArm_" + it + ".sto";
+        std::string maDataFilename = directory + "/" + findFile(pattern, directory);
+        maDataFilenames.push_back(maDataFilename);
+    }
+}
+
+
+template<typename NMSmodel>
+TrialData readTrialDirectory(std::string inputDirectory, NMSmodel& mySubject, std::string trialId, std::string emgGeneratorFile)
+{
+    // 2. define the thread connecting with the input sources
+
+    string emgFilename(FileUtils::getFile(inputDirectory, "emg.txt"));
+    EMGFromFile emgProducer(mySubject, emgFilename, emgGeneratorFile);
+
+    vector< string > dofNames;
+    mySubject.getDoFNames(dofNames);
+    string lmtFilename;
+    vector< string > maFilename;
+    setLmtMaFilenames(inputDirectory, dofNames, lmtFilename, maFilename);
+    LmtMaFromStorageFile lmtMaProducer(mySubject, lmtFilename, maFilename);
+
+
+    string externalTorqueFilename(FileUtils::getFile(inputDirectory, "inverse_dynamics.sto"));
+    ExternalTorquesFromStorageFile externalTorquesProducer(mySubject, externalTorqueFilename);
+
+    QueuesToTrialData queuesToTrialData(mySubject, trialId);
+
+    CEINMS::InputConnectors::doneWithSubscription.setCount(4);
+    CEINMS::OutputConnectors::doneWithExecution.setCount(1);
+
+    // 4. start the threads
+    std::thread emgProdThread(std::ref(emgProducer));
+    std::thread externalTorquesProdThread(std::ref(externalTorquesProducer));
+    std::thread lmtMaProdThread(std::ref(lmtMaProducer));
+    std::thread queuesToTrialDataThread(std::ref(queuesToTrialData));
+
+    emgProdThread.join();
+    lmtMaProdThread.join();
+    externalTorquesProdThread.join();
+    queuesToTrialDataThread.join();
+
+    return queuesToTrialData.getTrialData();
+};
+
 
 int main(int ac, char** av){
     
@@ -163,13 +222,18 @@ int main(int ac, char** av){
             typedef NMSmodel<ExponentialActivation, StiffTendon, CurveMode::Offline> MyNMSmodel;
             MyNMSmodel mySubject;
             setupSubject(mySubject, uncalibratedSubjectXmlFile);
-            vector<string> muscleNames, dofNames;
-            mySubject.getMuscleNames(muscleNames);
-            mySubject.getDoFNames(dofNames);
-            InputDataInterpreter inputData(muscleNames, dofNames);
-            inputData.setInputDirectory(trialsInputDirectory);
-            inputData.setEmgGeneratorXmlFilename(emgGeneratorFile);
-            inputData.convert(calibrationTrialIDs, trials);
+            for (list<string>::iterator trialIt = calibrationTrialIDs.begin(); trialIt != calibrationTrialIDs.end(); ++trialIt)
+            {
+                trials.push_back(readTrialDirectory(trialsInputDirectory + "/" +  *trialIt , mySubject, *trialIt, emgGeneratorFile));
+            }
+            //vector<string> muscleNames, dofNames;
+            //mySubject.getMuscleNames(muscleNames);
+            //mySubject.getDoFNames(dofNames);
+
+            //InputDataInterpreter inputData(muscleNames, dofNames);
+            //inputData.setInputDirectory(trialsInputDirectory);
+            //inputData.setEmgGeneratorXmlFilename(emgGeneratorFile);
+            //inputData.convert(calibrationTrialIDs, trials);
             CalibrationStep currentCalibrationStep;
             while(calibrationXmlReader.popNextCalibrationStep(currentCalibrationStep)) {
                 std::cout << "CalibrationStepCfg " << currentCalibrationStep.getStepCfg() << std::endl;
@@ -258,12 +322,16 @@ int main(int ac, char** av){
             typedef NMSmodel<PiecewiseActivation, StiffTendon, CurveMode::Offline> MyNMSmodel;
             MyNMSmodel mySubject;
             setupSubject(mySubject, uncalibratedSubjectXmlFile);
-            vector<string> muscleNames, dofNames;
-            mySubject.getMuscleNames(muscleNames);
-            mySubject.getDoFNames(dofNames);
-            InputDataInterpreter inputData(muscleNames, dofNames);
-            inputData.setInputDirectory(trialsInputDirectory);
-            inputData.convert(calibrationTrialIDs, trials);
+            for (list<string>::iterator trialIt = calibrationTrialIDs.begin(); trialIt != calibrationTrialIDs.end(); ++trialIt)
+            {
+                trials.push_back(readTrialDirectory(trialsInputDirectory + "/" + *trialIt, mySubject, *trialIt, emgGeneratorFile));
+            }
+            //vector<string> muscleNames, dofNames;
+            //mySubject.getMuscleNames(muscleNames);
+            //mySubject.getDoFNames(dofNames);
+            //InputDataInterpreter inputData(muscleNames, dofNames);
+            //inputData.setInputDirectory(trialsInputDirectory);
+            //inputData.convert(calibrationTrialIDs, trials);
             CalibrationStep currentCalibrationStep;
             while(calibrationXmlReader.popNextCalibrationStep(currentCalibrationStep)) {
                 std::cout << "CalibrationStepCfg " << currentCalibrationStep.getStepCfg() << std::endl;
@@ -355,12 +423,16 @@ int main(int ac, char** av){
             typedef NMSmodel<ExponentialActivation, ElasticTendon_BiSec, CurveMode::Offline> MyNMSmodel;
             MyNMSmodel mySubject;
             setupSubject(mySubject, uncalibratedSubjectXmlFile);
-            vector<string> muscleNames, dofNames;
-            mySubject.getMuscleNames(muscleNames);
-            mySubject.getDoFNames(dofNames);
-            InputDataInterpreter inputData(muscleNames, dofNames);
-            inputData.setInputDirectory(trialsInputDirectory);
-            inputData.convert(calibrationTrialIDs, trials);
+            for (list<string>::iterator trialIt = calibrationTrialIDs.begin(); trialIt != calibrationTrialIDs.end(); ++trialIt)
+            {
+                trials.push_back(readTrialDirectory(trialsInputDirectory + "/" + *trialIt, mySubject, *trialIt, emgGeneratorFile));
+            }
+            //vector<string> muscleNames, dofNames;
+            //mySubject.getMuscleNames(muscleNames);
+            //mySubject.getDoFNames(dofNames);
+            //InputDataInterpreter inputData(muscleNames, dofNames);
+            //inputData.setInputDirectory(trialsInputDirectory);
+            //inputData.convert(calibrationTrialIDs, trials);
             CalibrationStep currentCalibrationStep;
             while(calibrationXmlReader.popNextCalibrationStep(currentCalibrationStep)) {
                 std::cout << "CalibrationStepCfg " << currentCalibrationStep.getStepCfg() << std::endl;
@@ -452,12 +524,12 @@ int main(int ac, char** av){
             typedef NMSmodel<PiecewiseActivation, ElasticTendon_BiSec, CurveMode::Offline> MyNMSmodel;
             MyNMSmodel mySubject;
             setupSubject(mySubject, uncalibratedSubjectXmlFile);
-            vector<string> muscleNames, dofNames;
-            mySubject.getMuscleNames(muscleNames);
-            mySubject.getDoFNames(dofNames);
-            InputDataInterpreter inputData(muscleNames, dofNames);
-            inputData.setInputDirectory(trialsInputDirectory);
-            inputData.convert(calibrationTrialIDs, trials);
+            //vector<string> muscleNames, dofNames;
+            //mySubject.getMuscleNames(muscleNames);
+            //mySubject.getDoFNames(dofNames);
+            //InputDataInterpreter inputData(muscleNames, dofNames);
+            //inputData.setInputDirectory(trialsInputDirectory);
+            //inputData.convert(calibrationTrialIDs, trials);
             CalibrationStep currentCalibrationStep;
             while(calibrationXmlReader.popNextCalibrationStep(currentCalibrationStep)) {
                 std::cout << "CalibrationStepCfg " << currentCalibrationStep.getStepCfg() << std::endl;

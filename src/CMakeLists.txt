@@ -97,6 +97,8 @@ target_link_libraries( CEINMScalibrate
       Calibration
       NMSmodel
       FileIO
+      InputConnectors
+      OutputConnectors
       ${Boost_PROGRAM_OPTIONS_LIBRARY}
 )
 

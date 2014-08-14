@@ -45,6 +45,12 @@ LmtMaFromStorageFile::LmtMaFromStorageFile(const NMSModelT& subject, const std::
    }
   
   // 3. setup the queue for Moment Arms
+  if (!CEINMS::InputConnectors::queueMomentArms.empty())
+  {
+      for (auto it : CEINMS::InputConnectors::queueMomentArms)
+          delete it;
+  }
+  CEINMS::InputConnectors::queueMomentArms.clear();
   for (int i=0; i < dofNames_.size(); ++i) 
     CEINMS::InputConnectors::queueMomentArms.push_back(new CEINMS::Concurrency::Queue< CEINMS::InputConnectors::FrameType >); 
     

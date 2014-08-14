@@ -12,6 +12,7 @@
 #define NMSmodel_h
 
 #include <vector>
+#include <map>
 #include <string>
 #include <iostream>
 #include <stdlib.h>
@@ -104,6 +105,7 @@ public:
     // called	for control purpose
     void getMuscleNames(std::vector<std::string>& muscleNames) const { muscleNames = muscleNames_; }
     void getMuscleNamesOnDofs (std::vector<std::vector<std::string> >& muscleNamesOnDofs) const;
+    void getMuscleNamesOnDofs(std::map< std::string, std::vector<std::string> >& muscleNamesOnDofs) const;
     int  getNoMuscles() const {return muscles_.size();}
     void getDoFNames(std::vector<std::string>& dofNames) const { dofNames = dofNames_; }
     int  getNoDoF() const {return dofs_.size();}
