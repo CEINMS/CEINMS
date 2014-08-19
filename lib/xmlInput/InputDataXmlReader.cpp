@@ -18,6 +18,19 @@ using std::endl;
 #include "inputData-schema.hxx"
 #include "validation.h"
 
+inline bool isAbsolute(const char *path) {
+    if (path[0] == '/' || path[0] == '\\') {
+        return true;
+    }
+    std::string str(path);
+    if (str.length()>1) {
+        if (str[1] == ':') {
+            return true;
+        }
+    }
+    return false;
+};
+
 InputDataXmlReader::InputDataXmlReader(const string& filename)
 {
 
@@ -58,8 +71,11 @@ void InputDataXmlReader::readXml() {
 
 std::string InputDataXmlReader::getLmtFile()
 {
-    //TODO: check that the provided location is not absolute
-    return filepath_ + *(inputDataPointer_->muscleTendonLengthFile().begin());
+    std::string fileName(*(inputDataPointer_->muscleTendonLengthFile().begin()));
+     if (isAbsolute(fileName.c_str()))
+            return fileName;
+        else
+            return filepath_ + fileName;
 }
 
 std::map<std::string, std::string> InputDataXmlReader::getMaFiles()
@@ -67,7 +83,11 @@ std::map<std::string, std::string> InputDataXmlReader::getMaFiles()
     map<string, string> result;
     for (auto it : inputDataPointer_->momentArmsFiles().begin()->momentArmsFile())
     {
-        std::string pathToMaFile= filepath_+ it; //TODO: check that the provided location is not absolute
+        std::string pathToMaFile;
+        if (isAbsolute(it.c_str()))
+            pathToMaFile = it;
+        else
+            pathToMaFile = filepath_ + it;
         result.insert(std::pair<string, string>(it.dofName(), pathToMaFile));
     }
     // return filepath_ + *(inputDataPointer_->momentArmsDirectory().begin());
@@ -76,13 +96,19 @@ std::map<std::string, std::string> InputDataXmlReader::getMaFiles()
 
 std::string InputDataXmlReader::getEmgFile()
 {
-    //TODO: check that the provided location is not absolute
-    return filepath_ + *(inputDataPointer_->emgFile().begin());
+    std::string fileName(*(inputDataPointer_->emgFile().begin()));
+    if (isAbsolute(fileName.c_str()))
+        return fileName;
+    else
+        return filepath_ + fileName;
 }
 
 std::string InputDataXmlReader::getExternalTorqueFile()
 {
-    //TODO: check that the provided location is not absolute
-    return filepath_ + *(inputDataPointer_->externalTorquesFile().begin());
+    std::string fileName(*(inputDataPointer_->externalTorquesFile().begin()));
+    if (isAbsolute(fileName.c_str()))
+        return fileName;
+    else
+        return filepath_ + fileName;
 }
 
