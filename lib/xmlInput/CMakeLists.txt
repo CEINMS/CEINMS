@@ -90,9 +90,9 @@ add_library(xmlInput STATIC ${xmlInput_SOURCES}
                             )
 
 target_link_libraries(xmlInput ceinms_common ${XERCES_LIBRARIES})
-target_include_directories(xmlInput PRIVATE ${ceinms_common_INCLUDE_DIRS} ${XERCES_INCLUDE_DIR} impl PUBLIC ${XSD_INCLUDE_DIR})
+target_include_directories(xmlInput PRIVATE ${ceinms_common_INCLUDE_DIRS} impl PUBLIC ${XSD_INCLUDE_DIR} ${XERCES_INCLUDE_DIR})
 
-set(xmlInput_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR} ${XSD_INCLUDE_DIR} CACHE INTERNAL "Include directory for xmlInput library")
+set(xmlInput_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR} ${XSD_INCLUDE_DIR} ${XERCES_INCLUDE_DIR} CACHE INTERNAL "Include directory for xmlInput library")
 mark_as_advanced(xmlInput_INCLUDE_DIRS)
 
 install(FILES ${xmlInput_HEADERS} ${xmlInput_GENERATED_HEADERS} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}) #should add namespace
