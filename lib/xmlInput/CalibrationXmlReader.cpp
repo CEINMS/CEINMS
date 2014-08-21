@@ -30,7 +30,16 @@ CalibrationXmlReader::CalibrationXmlReader(const string& filename)
         cout << e << endl;
         exit(EXIT_FAILURE);
     }
-    std::cout << "Xml reader constructor\n";
+
+    // save the location of input filename
+    string::size_type dirSep = filename.rfind('/'); // Unix/Mac dir separator
+
+    if (dirSep == string::npos)
+        dirSep = filename.rfind('\\'); // DOS dir separator
+
+    if (dirSep != string::npos) // if '_fileName' contains path information...
+        filepath_ = filename.substr(0, dirSep + 1); // include trailing slashes
+
     readXml();
 }
 
@@ -41,7 +50,6 @@ void CalibrationXmlReader::readXml() {
     readNMSmodelCfg();
     readOptimizationAlgorithmCfg();
     readCalibrationStepsCfg();    
-	readCalibrationTrialsDirectory();
     readCalibrationTrialList();
 }
 
@@ -206,17 +214,12 @@ void CalibrationXmlReader::readParameter(ParameterType& parameterType, Parameter
 }
 
 
-void CalibrationXmlReader::readCalibrationTrialsDirectory() {
-
-	trialsDirectory_ = calibrationPointer_->trialsDirectory();
-}
-
 void CalibrationXmlReader::readCalibrationTrialList() {
     
     CalibrationType::trialSet_type& myTrialSet(calibrationPointer_->trialSet());
     TrialSetType::iterator it = myTrialSet.begin();
     for(it; it != myTrialSet.end(); ++it)
-        calibrationTrials_.push_back(*it);
+        calibrationTrials_.push_back(filepath_ + *it); //TODO: check that the provided location is not absolute
 }
 
 
@@ -250,10 +253,6 @@ void CalibrationXmlReader::getOptimizationAlgorithmParameters(SimulatedAnnealing
 }
 
 
-void CalibrationXmlReader::getTrialsDirectory(string& trialsDirectory) const {
-
-	trialsDirectory = trialsDirectory_;
-}
 
 void CalibrationXmlReader::getCalibrationTrials(std::list<string>& trials) const {
 

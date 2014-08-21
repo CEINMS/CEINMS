@@ -58,7 +58,6 @@ public:
     CalibrationCfg::OptimizationAlgorithm getOptimizationAlgorithm() const;
     void getOptimizationAlgorithmParameters(SimulatedAnnealingParameters& parameters) const;  //overload this function when adding new opt algorithms
     bool popNextCalibrationStep(CalibrationStep& calibrationStep); 
-	void getTrialsDirectory(std::string& trialsDirectory) const;
     void getCalibrationTrials(std::list<std::string>& trials) const;
     friend std::ostream& operator<< (std::ostream& output, const CalibrationXmlReader& b);
     
@@ -69,7 +68,6 @@ private:
     void readCalibrationStepsCfg();
     void readStep(CalibrationXsd::StepType& stepType, CalibrationStep& calibrationStep);
     void readParameter(CalibrationXsd::ParameterType& parameterType, Parameter& parameter);
-	void readCalibrationTrialsDirectory();
 	void readCalibrationTrialList();
     unsigned runMode_;
     unsigned optimizationAlgorithm_;
@@ -78,6 +76,7 @@ private:
     std::list<std::string> calibrationTrials_;
     std::auto_ptr<CalibrationXsd::CalibrationType> calibrationPointer_;    
     SimulatedAnnealingParameters simanParameters_;
+    std::string filepath_;
     
 };
 
