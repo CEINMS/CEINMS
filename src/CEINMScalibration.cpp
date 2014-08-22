@@ -54,9 +54,7 @@ using std::list;
 
 #include <ctime>
 
-#include <boost/program_options.hpp>
-namespace po = boost::program_options;
-
+#include <CeinmsCalibrationSetupXmlReader.h>
 
 
 template <typename T>
@@ -105,6 +103,18 @@ void printAuthors() {
     cout << "Claudio Pizzolato, Monica Reggiani, Massimo Sartori, David Lloyd\n\n";
     
     cout << "Software developers: Claudio Pizzolato, Monica Reggiani\n";
+}
+
+void PrintUsage()
+{
+    string progName = "CEINMScalibrate";
+    cout << "\n\n" << progName << ":\n";// << GetVersionAndDate() << "\n\n";
+    cout << "Option            Argument          Action / Notes\n";
+    cout << "------            --------          --------------\n";
+    cout << "-Help, -H                           Print the command-line options for " << progName << ".\n";
+    cout << "-PrintSetup, -PS                    Generates a template Setup file\n";
+    cout << "-Setup, -S        SetupFileName     Specify an xml setup file.\n";
+
 }
 
 void setLmtMaFilenames(const string& directory, const vector< string > dofNames, string& lmtDataFilename, vector< string >& maDataFilenames)
@@ -176,48 +186,66 @@ TrialData readTrialData(std::string inputDataFilename, NMSmodel& mySubject, std:
 };
 
 
-int main(int ac, char** av){
+
+
+int main(int argc, char** argv){
     
     
     
-//    string calibrationXmlFile("calibration.xml");
-//    string uncalibratedSubjectXmlFile("uncalibratedSubject.xml");
-//    string newCalibratedSubjectXmlFile("calibratedSubject.xml");
-
-    string calibrationXmlFile;
-    string uncalibratedSubjectXmlFile;
-    string newCalibratedSubjectXmlFile;
-    string emgGeneratorFile;
-    printHeader();
-    printAuthors();
-
-    int opt;
-    po::options_description desc("Allowed options");
-    desc.add_options()
-    ("help", "produce help message")
-    ("calibration,c", po::value<string>(&calibrationXmlFile),  "calibration xml file")
-    ("subject,s", po::value<string>(&uncalibratedSubjectXmlFile), "subject xml file that cointains the initial parameter values")
-    ("output,o", po::value<string>(&newCalibratedSubjectXmlFile)->default_value("calibratedSubject.xml"), "name of the calibrated subject file")
-    ("emg-generator,g", po::value<string>(&emgGeneratorFile)->default_value("cfg/xml/emgGenerator.xml"), "EMG mapping");
-
-    po::variables_map vm;
-    po::store(po::parse_command_line(ac, av, desc), vm);
-    po::notify(vm);    
-
-    if (vm.count("help") || ac < 5) {
-        cout << desc << "\n";
-        return 1;
+    string option = "";
+    string setupFileName;
+    if (argc < 2) {
+        PrintUsage();
+        return 0;
     }
+    else{
+        int i;
+        for (i = 1; i <= (argc - 1); i++) {
+            option = argv[i];
 
-    
-//     try {
-//         std::auto_ptr<SubjectType> subjectPointer (subject (uncalibratedSubjectXmlFile));
-//     }
-//     catch (const xml_schema::exception& e) {
-//         cout << e << endl;
-//         exit(EXIT_FAILURE);
-//     }
-    
+            // PRINT THE USAGE OPTIONS
+            if ((option == "-help") || (option == "-h") || (option == "-Help") || (option == "-H") ||
+                (option == "-usage") || (option == "-u") || (option == "-Usage") || (option == "-U")) {
+                PrintUsage();
+                return 0;
+            }
+            else if ((option == "-S") || (option == "-Setup")) {
+                if (argv[i + 1] == 0){
+                    cout << "No setup file specified!" << endl;
+                    PrintUsage();
+                    return -1;
+                }
+                setupFileName = argv[i + 1];
+                break;
+
+                // Print a default setup file
+            }
+            else if ((option == "-PrintSetup") || (option == "-PS")) {
+                if (CeinmsCalibrationSetupXmlReader::writeTemplateCeinmsCalibrationSetupFile("defaultCeinmsCalibrationSetupFile.xml"))
+                {
+                    std::cout << "Wrote template setup file to defaultCeinmsCalibrationSetupFile.xml" << std::endl;
+                    return 0;
+                }
+                else
+                {
+                    std::cout << "An error occurred while writing template setup file to defaultCeinmsSetupFIle.xml" << std::endl;
+                    return -1;
+                }
+            }
+            else {
+                cout << "Unrecognized option " << option << " on command line... Ignored" << endl;
+                PrintUsage();
+                return -1;
+            }
+        }
+    }
+    CeinmsCalibrationSetupXmlReader ceinmsSetup(setupFileName);
+
+    string uncalibratedSubjectXmlFile = ceinmsSetup.getSubjectFile();
+    string calibrationXmlFile = ceinmsSetup.getCalibrationFile();
+    string newCalibratedSubjectXmlFile = ceinmsSetup.getOutputSubjectFile();
+    string emgGeneratorFile = ceinmsSetup.getEmgGeneratorFile();
+
     //1 read calibration xml
     CalibrationXmlReader calibrationXmlReader(calibrationXmlFile);
     

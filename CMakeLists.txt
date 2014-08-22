@@ -26,7 +26,7 @@ set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
 
 set(Boost_USE_STATIC_LIBS   ON)
 set(Boost_USE_MULTITHREADED ON)
-find_package(Boost REQUIRED COMPONENTS program_options filesystem system)
+find_package(Boost REQUIRED COMPONENTS filesystem system)
 
 find_package(XSD REQUIRED)
 

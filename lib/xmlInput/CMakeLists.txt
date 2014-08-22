@@ -29,6 +29,8 @@ schema_to_bin(${CMAKE_SOURCE_DIR}/cfg/XSD/calibration.xsd)
 schema_to_bin(${CMAKE_SOURCE_DIR}/cfg/XSD/subject.xsd)
 schema_to_bin(${CMAKE_SOURCE_DIR}/cfg/XSD/emgGenerator.xsd)
 schema_to_bin(${CMAKE_SOURCE_DIR}/cfg/XSD/inputData.xsd)
+schema_to_bin(${CMAKE_SOURCE_DIR}/cfg/XSD/ceinmsSetup.xsd)
+schema_to_bin(${CMAKE_SOURCE_DIR}/cfg/XSD/ceinmsCalibrationSetup.xsd)
 
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
@@ -38,19 +40,26 @@ xsd_schema(emgGenerator_GENERATED_FILES ${CMAKE_SOURCE_DIR}/cfg/XSD/emgGenerator
 xsd_schema(calibration_GENERATED_FILES ${CMAKE_SOURCE_DIR}/cfg/XSD/calibration.xsd --generate-serialization --namespace-map =CalibrationXsd)
 xsd_schema(execution_GENERATED_FILES ${CMAKE_SOURCE_DIR}/cfg/XSD/execution.xsd --generate-serialization)
 xsd_schema(inputData_GENERATED_FILES ${CMAKE_SOURCE_DIR}/cfg/XSD/inputData.xsd --generate-serialization)
+xsd_schema(ceinmsSetup_GENERATED_FILES ${CMAKE_SOURCE_DIR}/cfg/XSD/ceinmsSetup.xsd --generate-serialization)
+xsd_schema(ceinmsCalibrationSetup_GENERATED_FILES ${CMAKE_SOURCE_DIR}/cfg/XSD/ceinmsCalibrationSetup.xsd --generate-serialization)
 
 set(xmlInput_SOURCES    ExecutionXmlReader.cpp
                         CalibrationXmlReader.cpp
                         SubjectXmlReader.cpp
                         grammar-input-stream.cxx
                         EmgGeneratorXmlReader.cpp
-                        InputDataXmlReader.cpp)
+                        InputDataXmlReader.cpp
+                        CeinmsSetupXmlReader.cpp
+                        CeinmsCalibrationSetupXmlReader.cpp
+                        )
 
 set(xmlInput_GENERATED_SOURCES  ${CMAKE_CURRENT_BINARY_DIR}/execution-schema.cxx
                                 ${CMAKE_CURRENT_BINARY_DIR}/calibration-schema.cxx
                                 ${CMAKE_CURRENT_BINARY_DIR}/subject-schema.cxx
                                 ${CMAKE_CURRENT_BINARY_DIR}/emgGenerator-schema.cxx
-                                ${CMAKE_CURRENT_BINARY_DIR}/inputData-schema.cxx)
+                                ${CMAKE_CURRENT_BINARY_DIR}/inputData-schema.cxx
+                                ${CMAKE_CURRENT_BINARY_DIR}/ceinmsSetup-schema.cxx
+                                ${CMAKE_CURRENT_BINARY_DIR}/ceinmsCalibrationSetup-schema.cxx)
 
 set(xmlInput_HEADERS    ExecutionXmlReader.h
                         NMSmodelConfig.h
@@ -58,7 +67,10 @@ set(xmlInput_HEADERS    ExecutionXmlReader.h
                         CalibrationCfg.h
                         SubjectXmlReader.h
                         EmgGeneratorXmlReader.h
-                        InputDataXmlReader.h)
+                        InputDataXmlReader.h
+                        CeinmsSetupXmlReader.h
+                        CeinmsCalibrationSetupXmlReader.h
+                        )
 
 set(xmlInput_IMPL_HEADERS   impl/grammar-input-stream.hxx
                             impl/validation.h)
@@ -67,7 +79,9 @@ set(xmlInput_GENERATED_HEADERS  ${CMAKE_CURRENT_BINARY_DIR}/execution-schema.hxx
                                 ${CMAKE_CURRENT_BINARY_DIR}/calibration-schema.hxx
                                 ${CMAKE_CURRENT_BINARY_DIR}/subject-schema.hxx
                                 ${CMAKE_CURRENT_BINARY_DIR}/emgGenerator-schema.hxx
-                                ${CMAKE_CURRENT_BINARY_DIR}/inputData-schema.hxx)
+                                ${CMAKE_CURRENT_BINARY_DIR}/inputData-schema.hxx
+                                ${CMAKE_CURRENT_BINARY_DIR}/ceinmsSetup-schema.hxx
+                                ${CMAKE_CURRENT_BINARY_DIR}/ceinmsCalibrationSetup-schema.hxx)
 
 source_group("Headers" FILES ${xmlInput_HEADERS})
 source_group("Private headers" FILES ${xmlInput_IMPL_HEADERS})
@@ -87,6 +101,8 @@ add_library(xmlInput STATIC ${xmlInput_SOURCES}
                             ${calibration_GENERATED_FILES}
                             ${execution_GENERATED_FILES}
                             ${inputData_GENERATED_FILES}
+                            ${ceinmsSetup_GENERATED_FILES}
+                            ${ceinmsCalibrationSetup_GENERATED_FILES}
                             )
 
 target_link_libraries(xmlInput ceinms_common ${XERCES_LIBRARIES})

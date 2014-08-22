@@ -48,8 +48,7 @@ using std::vector;
 using std::map;
 #include <stdlib.h>
 
-#include <boost/program_options.hpp>
-namespace po = boost::program_options;
+#include <CeinmsSetupXmlReader.h>
 
 
 template <typename T>
@@ -89,8 +88,19 @@ void printAuthors() {
     
     cout << "Software developers: Claudio Pizzolato, Monica Reggiani\n";
 }
-    
-    
+
+void PrintUsage()
+{
+    string progName= "CEINMS";
+    cout << "\n\n" << progName << ":\n";// << GetVersionAndDate() << "\n\n";
+    cout << "Option            Argument          Action / Notes\n";
+    cout << "------            --------          --------------\n";
+    cout << "-Help, -H                           Print the command-line options for " << progName << ".\n";
+    cout << "-PrintSetup, -PS                    Generates a template Setup file\n";
+    cout << "-Setup, -S        SetupFileName     Specify an xml setup file.\n";
+
+}
+
 void setLmtMaFilenames(const string& inputDirectory, const vector< string > dofNames, string& lmtDataFilename, vector< string >& maDataFilenames)
 {
   std::string pattern{"_MuscleAnalysis_Length.sto"};
@@ -159,32 +169,62 @@ int main(int argc, char** argv) {
 #ifdef LOG  
   cout << "Check configuration data...\n";
 #endif
-  
-    string subjectFile;
-    string executionFile;
-    string inputData;
-    string outputDirectory;
-    string emgGeneratorFile;
 
-    int opt;
-    po::options_description desc("Allowed options");
-    desc.add_options()
-    ("help", "produce help message")
-    ("subject,s", po::value<string>(&subjectFile), "subject xml file")
-    ("execution,x", po::value<string>(&executionFile),  "execution xml file")
-    ("input-dir,i", po::value<string>(&inputData), "input data description file")
-    ("output-dir,o", po::value<string>(&outputDirectory)->default_value("./Output"), "output directory")
-    ("emg-generator,g", po::value<string>(&emgGeneratorFile)->default_value("cfg/xml/emgGenerator.xml"), "EMG mapping");
-    
-    po::variables_map vm;
-    po::store(po::parse_command_line(argc, argv, desc), vm);
-    po::notify(vm);    
-
-    if (vm.count("help") || argc < 7) {
-        cout << desc << "\n";
-        return 1;
+    string option="";
+    string setupFileName;
+    if (argc < 2) {
+        PrintUsage();
+        return 0;
     }
- 
+    else{
+        int i;
+        for (i = 1; i <= (argc - 1); i++) {
+            option = argv[i];
+
+            // PRINT THE USAGE OPTIONS
+            if ((option == "-help") || (option == "-h") || (option == "-Help") || (option == "-H") ||
+                (option == "-usage") || (option == "-u") || (option == "-Usage") || (option == "-U")) {
+                PrintUsage();
+                return 0;
+            }
+            else if ((option == "-S") || (option == "-Setup")) {
+                if (argv[i + 1] == 0){
+                    cout << "No setup file specified!" << endl;
+                    PrintUsage();
+                    return -1;
+                }
+                setupFileName = argv[i + 1];
+                break;
+
+                // Print a default setup file
+            }
+            else if ((option == "-PrintSetup") || (option == "-PS")) {
+                if (CeinmsSetupXmlReader::writeTemplateCeinmsSetupFile("defaultCeinmsSetupFile.xml"))
+                {
+                    std::cout << "Wrote template setup file to defaultCeinmsSetupFile.xml" << std::endl;
+                    return 0;
+                }
+                else
+                {
+                    std::cout << "An error occurred while writing template setup file to defaultCeinmsSetupFIle.xml" << std::endl;
+                    return -1;
+                }
+            }
+            else {
+                cout << "Unrecognized option " << option << " on command line... Ignored" << endl;
+                PrintUsage();
+                return -1;
+            }
+        }
+    }
+    CeinmsSetupXmlReader ceinmsSetup(setupFileName);
+
+    string subjectFile = ceinmsSetup.getSubjectFile();
+    string executionFile = ceinmsSetup.getExecutionFile();
+    string inputData = ceinmsSetup.getInputDataFile();
+    string outputDirectory = ceinmsSetup.getOutputDirectory();
+    string emgGeneratorFile = ceinmsSetup.getEmgGeneratorFile();
+
 
     ExecutionXmlReader executionCfg(executionFile);             
     InputDataXmlReader dataLocations(inputData);
