@@ -10,28 +10,34 @@
 #define ModelEvaluationOffline_h
 
 #include <vector>
+#include <list>
 #include <string>
 #include "ModelEvaluationBase.h"
 
 
-template <typename NMSmodelT>
-class ModelEvaluationOffline : public ModelEvaluationBase {
+template <typename NMSmodelT, typename Logger>
+class ModelEvaluationOffline : public ModelEvaluationBase<Logger> {
 
 public:
-    ModelEvaluationOffline(NMSmodelT& subject, const std::string& outputDir = "./Output");
+    ModelEvaluationOffline() = delete;
+    ModelEvaluationOffline(NMSmodelT& subject, const std::vector< std::string >& valuesToLog);
     ~ModelEvaluationOffline();
 
-    void setSubject(NMSmodelT& subject);
+    void setOutputDirectory(const std::string& outputDir);
     void operator()();
     
 private:
-  //  void initOfflineCurve();
-
+    void readDataFromQueues();
+    void initOfflineCurve();
     NMSmodelT& subject_;
     std::string outputDir_;
     std::vector< std::string > dofNames_;
     std::vector< std::string > dofNamesWithExtTorque_;
+
+    std::list< CEINMS::InputConnectors::FrameType > lmtDataFromQueue_, emgDataFromQueue_, externalTorquesDataFromQueue_;
+    std::list< std::vector < CEINMS::InputConnectors::FrameType > > maDataFromQueue_;
     unsigned noDof_;
+    double globalEmDelay_;
 };
 
 #include "ModelEvaluationOffline.cpp"

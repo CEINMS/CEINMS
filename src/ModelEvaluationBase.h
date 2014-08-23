@@ -30,7 +30,12 @@ protected:
   void getLmtFromInputQueue(CEINMS::InputConnectors::FrameType& lmtFromQueue);
   void getMomentArmsFromInputQueue(CEINMS::InputConnectors::FrameType& momentArmsFromQueue, unsigned int whichDof);
   void getExternalTorquesFromInputQueue(CEINMS::InputConnectors::FrameType& externalTorquesFromQueue); 
-  
+
+  CEINMS::InputConnectors::FrameType getEmgFromInputQueue();
+  CEINMS::InputConnectors::FrameType getLmtFromInputQueue();
+  CEINMS::InputConnectors::FrameType getMomentArmsFromInputQueue(unsigned int whichDof);
+  CEINMS::InputConnectors::FrameType getExternalTorquesFromInputQueue();
+
   Logger logger; 
 };
 

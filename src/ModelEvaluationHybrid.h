@@ -1,5 +1,5 @@
 //__________________________________________________________________________
-// Author(s): Claudio Pizzolato, Monica Reggiani - September 2013
+// Author(s): Claudio Pizzolato, Monica Reggiani - August 2014
 // email:  claudio.pizzolato@griffithuni.edu.au
 //
 // DO NOT REDISTRIBUTE WITHOUT PERMISSION
@@ -14,11 +14,12 @@
 #include <string>
 #include "ModelEvaluationBase.h"
 
-template <typename NMSmodelT, typename ErrorMinimizerT>
-class ModelEvaluationHybrid : public ModelEvaluationBase {
+template <typename NMSmodelT, typename ErrorMinimizerT, typename Logger>
+class ModelEvaluationHybrid : public ModelEvaluationBase<Logger> {
 
 public:
-    ModelEvaluationHybrid(NMSmodelT& subject, ErrorMinimizerT& torqueErrorMinimizer, const std::string& outputDir = "./Output");
+    ModelEvaluationHybrid(NMSmodelT& subject, ErrorMinimizerT& torqueErrorMinimizer, const vector<string>& valuesToLog);
+    void setOutputDirectory(const std::string& outputDir);
     void operator()();
     
 private:
@@ -28,6 +29,8 @@ private:
     std::vector< std::string > dofNames_;
     std::vector< std::string > dofNamesWithExtTorque_;
     unsigned noDof_;
+    double globalEmDelay_;
+
 };
 
 #include "ModelEvaluationHybrid.cpp"
