@@ -540,31 +540,68 @@ int main(int argc, char** argv) {
              break;
          } 
          
-//           case NMSModelCfg::HybridExponentialActivationElasticTendonBiSecOnline: { 
-//             typedef NMSmodel<ExponentialActivation, ElasticTendon_BiSec, CurveMode::Online> MyNMSmodel;
-//             typedef Hybrid::ErrorMinimizerAnnealing<MyNMSmodel> MyErrorMinimizer;
-//             SetupDataStructure<MyNMSmodel> setupData(subjectFile);
-//             MyNMSmodel mySubject;
-//             setupData.createCurves();
-//             setupData.createMuscles(mySubject);
-//             setupData.createDoFs(mySubject);
-//             MyErrorMinimizer errorMinimizer(mySubject);
-//             HybridWeightings weightings;
-//             executionCfg.getHybridWeightings(weightings.alpha, weightings.beta, weightings.gamma);
-//             errorMinimizer.setWeightings(weightings);
-//             vector<string> toPredict, toTrack;
-//             executionCfg.getMusclesToPredict(toPredict);
-//             executionCfg.getMusclesToTrack(toTrack);
-//             errorMinimizer.setMusclesNamesWithEmgToPredict(toPredict);
-//             errorMinimizer.setMusclesNamesWithEmgToTrack(toTrack);
-//             double rt, t, epsilon;
-//             unsigned noEpsilon, ns, nt, maxNoEval;
-//             executionCfg.getAnnealingParameters(nt, ns, rt, t, maxNoEval, epsilon, noEpsilon);
-//             errorMinimizer.setAnnealingParameters(nt, ns, rt, t, maxNoEval, epsilon, noEpsilon);
-//             ModelEvaluationHybrid<MyNMSmodel, MyErrorMinimizer> consumer(mySubject, errorMinimizer, outputDirectory);
-//             runThreads(consumer, emgProducer, lmtMaProducer, externalTorqueProducer);
-//             break;
-//         } 
+           case NMSModelCfg::HybridExponentialActivationElasticTendonBiSecOnline: { 
+               // 1. define the model
+               typedef NMSmodel<ExponentialActivation, ElasticTendon_BiSec, CurveMode::Online> MyNMSmodel;
+               MyNMSmodel mySubject;
+               setupSubject(mySubject, subjectFile);
+
+               // 2. define the thread connecting with the input sources          
+               string emgFilename(dataLocations.getEmgFile());
+               EMGFromFile emgProducer(mySubject, emgFilename, emgGeneratorFile);
+
+               vector< string > dofNames;
+               mySubject.getDoFNames(dofNames);
+               vector< string > maFilename;
+               sortMaFilenames(dataLocations.getMaFiles(), dofNames, maFilename);
+               LmtMaFromStorageFile lmtMaProducer(mySubject, dataLocations.getLmtFile(), maFilename);
+
+               string externalTorqueFilename(dataLocations.getExternalTorqueFile());
+               ExternalTorquesFromStorageFile externalTorquesProducer(mySubject, externalTorqueFilename);
+
+               // 2b. define the thread consuming the output sources
+               vector<string> valuesToWrite = { "Activations", "FiberLenghts", "FiberVelocities", "MuscleForces", "Torques", "AdjustedEmgs" };
+               QueuesToStorageFiles queuesToStorageFiles(mySubject, valuesToWrite, outputDirectory);
+
+               // 3. define the model simulator
+               vector<string> valuesToLog = { "Activations", "FiberLenghts", "FiberVelocities", "MuscleForces", "Torques", "AdjustedEmgs" };
+
+               CEINMS::InputConnectors::doneWithSubscription.setCount(5);
+               CEINMS::OutputConnectors::doneWithExecution.setCount(2);
+
+               // 4. define the optimiser
+               typedef Hybrid::ErrorMinimizerAnnealing<MyNMSmodel> MyErrorMinimizer;
+               MyErrorMinimizer errorMinimizer(mySubject);
+               HybridWeightings weightings;
+               executionCfg.getHybridWeightings(weightings.alpha, weightings.beta, weightings.gamma);
+               errorMinimizer.setWeightings(weightings);
+               vector<string> toPredict, toTrack;
+               executionCfg.getMusclesToPredict(toPredict);
+               executionCfg.getMusclesToTrack(toTrack);
+               errorMinimizer.setMusclesNamesWithEmgToPredict(toPredict);
+               errorMinimizer.setMusclesNamesWithEmgToTrack(toTrack);
+               double rt, t, epsilon;
+               unsigned noEpsilon, ns, nt, maxNoEval;
+               executionCfg.getAnnealingParameters(nt, ns, rt, t, maxNoEval, epsilon, noEpsilon);
+               errorMinimizer.setAnnealingParameters(nt, ns, rt, t, maxNoEval, epsilon, noEpsilon);
+
+               ModelEvaluationHybrid<MyNMSmodel, MyErrorMinimizer, LoggerOnQueues> simulator(mySubject, errorMinimizer, valuesToLog);
+
+
+               // 5. start the threads
+               std::thread emgProdThread(std::ref(emgProducer));
+               std::thread externalTorquesProdThread(std::ref(externalTorquesProducer));
+               std::thread lmtMaProdThread(std::ref(lmtMaProducer));
+               std::thread simulatorThread(std::ref(simulator));
+               std::thread queuesToStorageFilesThread(std::ref(queuesToStorageFiles));
+
+               emgProdThread.join();
+               lmtMaProdThread.join();
+               externalTorquesProdThread.join();
+               simulatorThread.join();
+               queuesToStorageFilesThread.join();
+               break;
+         } 
 
 
         default:
