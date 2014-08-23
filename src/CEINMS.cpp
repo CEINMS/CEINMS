@@ -86,7 +86,7 @@ void printAuthors() {
     cout << "Copyright (C) " << gmtm->tm_year+1900 << endl;
     cout << "Claudio Pizzolato, Monica Reggiani, David Lloyd, Massimo Sartori\n\n";
     
-    cout << "Software developers: Claudio Pizzolato, Monica Reggiani\n";
+    cout << "Software developers: Claudio Pizzolato, Elena Ceseracciu, Monica Reggiani\n";
 }
 
 void PrintUsage()
@@ -206,7 +206,7 @@ int main(int argc, char** argv) {
                 }
                 else
                 {
-                    std::cout << "An error occurred while writing template setup file to defaultCeinmsSetupFIle.xml" << std::endl;
+                    std::cout << "An error occurred while writing template setup file to defaultCeinmsSetupFile.xml" << std::endl;
                     return -1;
                 }
             }

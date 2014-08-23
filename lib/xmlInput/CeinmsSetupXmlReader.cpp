@@ -124,7 +124,7 @@ bool CeinmsSetupXmlReader::writeTemplateCeinmsSetupFile(const string& templateFi
         return false;
     CeinmsType templateCeinmsSetup;
     templateCeinmsSetup.subjectFile().push_back("subject.xml");
-    templateCeinmsSetup.inputDataFile().push_back("./InputData/");
+    templateCeinmsSetup.inputDataFile().push_back("inputData.xml");
     templateCeinmsSetup.executionFile().push_back("execution.xml");
     templateCeinmsSetup.emgGeneratorFile().push_back("emgGenerator.xml");
     templateCeinmsSetup.outputDirectory().push_back("./Output");
