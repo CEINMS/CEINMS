@@ -1,7 +1,7 @@
 #include <vector>
 using std::vector;
 #include "TrialData.h"
-
+#define DEBUG
 
 template<typename NMSmodelT>
 ComputationMode_Fast<NMSmodelT>::ComputationMode_Fast(NMSmodelT& subject):
@@ -49,7 +49,7 @@ void ComputationMode_Fast<NMSmodelT>::getMusclesToUpdate() {
     musclesToUpdate_.clear();
     subject_.getMusclesParameters(currentParameters);
     for(unsigned int i = 0; i < currentParameters.size(); ++i)
-  //      if(!(currentParameters.at(i) == parametersT1_.at(i)))
+        if(!(currentParameters.at(i) == parametersT1_.at(i)))
             musclesToUpdate_.push_back(i);
     parametersT1_ = currentParameters;
 }
