@@ -14,10 +14,11 @@ using std::map;
 using std::cout;
 using std::endl;
 #include <fstream>
-#include "ceinmsSetup-schema.hxx"
-#include "validation.h"
 
 #include "CeinmsSetupXmlReader.h"
+#include "validation.h"
+
+#include "ceinmsSetup-schema.hxx"
 
 inline bool isAbsolute(const char *path) {
     if (path[0] == '/' || path[0] == '\\') {
