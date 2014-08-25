@@ -28,9 +28,9 @@ bool ExternalTorquesFromStorageFile::externalTorquesFileExist(const string& file
 void ExternalTorquesFromStorageFile::operator()()
 {
 
-  CEINMS::InputConnectors::doneWithSubscription.wait();
+   inputConnectors_.doneWithSubscription.wait();
     
-  if (CEINMS::InputConnectors::externalTorquesAvailable) 
+  if (inputConnectors_.externalTorquesAvailable)
   {
     while (externalTorquesDataFromFile_.areStillData())
     {

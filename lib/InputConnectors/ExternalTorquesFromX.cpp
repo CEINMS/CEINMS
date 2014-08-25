@@ -26,7 +26,7 @@ void ExternalTorquesFromX::updateExternalTorques(const vector<double>& currentEx
   QueueData< vector<double> > externalTorquesDataToPush;
   externalTorquesDataToPush.data = currentExternalTorquesData;
   externalTorquesDataToPush.time = currentTime; 
-  CEINMS::InputConnectors::queueExternalTorques.push(externalTorquesDataToPush);
+  inputConnectors_.queueExternalTorques.push(externalTorquesDataToPush);
 }
 
 

@@ -12,29 +12,30 @@ class ExternalTorquesFromStorageFile:public ExternalTorquesFromX
 {
 public:
   template <typename NMSModelT>
-  ExternalTorquesFromStorageFile(const NMSModelT& subject, const std::string& dataDirectory);
+  ExternalTorquesFromStorageFile(CEINMS::InputConnectors& inputConnectors, const NMSModelT& subject, const std::string& dataDirectory);
   void operator()();
 
 private:
   bool externalTorquesFileExist(const std::string& fileName);
   std::string dataDirectory_;
   std::vector<std::size_t> dofPosInStorage_;
-  DataFromStorageFile externalTorquesDataFromFile_; 
+  DataFromStorageFile externalTorquesDataFromFile_;
+  CEINMS::InputConnectors& inputConnectors_;
 };
 
 
 template <typename NMSModelT>
-ExternalTorquesFromStorageFile::ExternalTorquesFromStorageFile(const NMSModelT& subject, const std::string& externalTorqueFilename)
-:ExternalTorquesFromX(subject), externalTorquesDataFromFile_(externalTorqueFilename)
+ExternalTorquesFromStorageFile::ExternalTorquesFromStorageFile(CEINMS::InputConnectors& inputConnectors, const NMSModelT& subject, const std::string& externalTorqueFilename)
+:ExternalTorquesFromX(inputConnectors, subject), externalTorquesDataFromFile_(externalTorqueFilename), inputConnectors_(inputConnectors)
 {  
   
 #ifdef LOG
   std::cout << "\nExtTorque: starting externalTorqueProduce, reading from external torque data file" << std::endl;
 #endif
   
-  CEINMS::InputConnectors::externalTorquesAvailable = externalTorquesFileExist(externalTorqueFilename);
+  inputConnectors_.externalTorquesAvailable = externalTorquesFileExist(externalTorqueFilename);
  
-  if (CEINMS::InputConnectors::externalTorquesAvailable)  {   
+  if (inputConnectors_.externalTorquesAvailable)  {
 #ifdef LOG  
     std::cout << "\n ExtTorque: external Torques available " << std::endl;
 #endif
