@@ -10,6 +10,7 @@
 FIND_PATH(XERCES_INCLUDE_DIR /xercesc/util/XercesVersion.hpp
     "${XERCES_DIR}\\include"
     "C:/Program\ Files\ (x86)/CodeSynthesis\ XSD\ 3.3/include"
+    $ENV{XERCES_ROOT}/include
  )
 
 if (NOT XERCES_FIND_QUIETLY)
@@ -26,6 +27,7 @@ if(CMAKE_SIZEOF_VOID_P EQUAL 8) #64bit compilation
       xerces-c_3_1_vc100
   PATHS 
     "${XERCES_DIR}\\lib"
+   $ENV{XERCES_ROOT}/lib
     /usr/local/lib
     /usr/lib
     /usr/lib/x86_64-linux-gnu/

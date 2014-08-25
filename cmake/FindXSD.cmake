@@ -15,7 +15,8 @@ FIND_PROGRAM( XSD_EXECUTABLE
                     /opt/xsd-3.2.0-x86_64-linux-gnu/bin
                     /usr/bin
                     "C:/Program Files (x86)/CodeSynthesis XSD 3.3/bin"
-                    ENV PATH )
+$ENV{XSD_ROOT}/bin                    
+ENV PATH )
 
 IF( XSD_EXECUTABLE )
 
@@ -31,7 +32,8 @@ ENDIF( XSD_EXECUTABLE )
 find_path(XSD_INCLUDE_DIR xsd/cxx/config.hxx
                           HINTS ${XSD_INCLUDE_POSSIBLE_DIRS}
                           PATHS "C:/Program Files (x86)/CodeSynthesis XSD 3.3/include"
-                          )
+				 $ENV{XSD_ROOT}/libxsd
+                         )
 #
 # General CMake package configuration.
 
