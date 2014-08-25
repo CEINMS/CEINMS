@@ -45,7 +45,7 @@ endif(MSVC)
 
 add_subdirectory(lib)
 add_subdirectory(src)
-
+add_subdirectory(docs)
 # Create CEINMSConfig.cmake etc.
 set(ConfigPackageLocation ${CMAKE_INSTALL_LIBDIR}/CEINMS)
 install(EXPORT CEINMSTargets
