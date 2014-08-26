@@ -25,7 +25,7 @@ void LmtMaFromX::updateLmt(const vector<double>& currentLmtData, double currentT
   QueueData< vector<double> > lmtDataToPush;
   lmtDataToPush.data = currentLmtData; 
   lmtDataToPush.time = currentTime; 
-  CEINMS::InputConnectors::queueLmt.push(lmtDataToPush);
+  inputConnectors_.queueLmt.push(lmtDataToPush);
 }
 
 void LmtMaFromX::updateMomentArms(const vector<double>& currentMomentArmsData, double currentTime, unsigned int whichDof)
@@ -33,7 +33,7 @@ void LmtMaFromX::updateMomentArms(const vector<double>& currentMomentArmsData, d
   QueueData< vector<double> > momentArmsDataToPush; 
   momentArmsDataToPush.data = currentMomentArmsData; 
   momentArmsDataToPush.time = currentTime; 
-  (*CEINMS::InputConnectors::queueMomentArms.at(whichDof)).push(momentArmsDataToPush);
+  (*inputConnectors_.queueMomentArms.at(whichDof)).push(momentArmsDataToPush);
 }
 
 LmtMaFromX::~LmtMaFromX() { }

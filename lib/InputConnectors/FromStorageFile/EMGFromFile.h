@@ -17,18 +17,19 @@ class EMGFromFile:public EMGFromX
 {
   public:
     template <typename NMSModelT>
-    EMGFromFile(const NMSModelT& subject, const std::string& emgFilename, const std::string& emgGeneratorFilename);
+    EMGFromFile(CEINMS::InputConnectors& inputConnectors, const NMSModelT& subject, const std::string& emgFilename, const std::string& emgGeneratorFilename);
     void operator()();
     virtual ~EMGFromFile();
   private:  
     std::string inputDir_;
     EMGDataFromFile<EMGgeneratorFromXml> emgData_;
+    CEINMS::InputConnectors& inputConnectors_;
 };
 
 
 template <typename NMSModelT>
-EMGFromFile::EMGFromFile(const NMSModelT& subject, const std::string& emgFilename, const std::string& emgGeneratorFilename)
-:EMGFromX(subject), emgData_(emgFilename, emgGeneratorFilename)
+EMGFromFile::EMGFromFile(CEINMS::InputConnectors& inputConnectors, const NMSModelT& subject, const std::string& emgFilename, const std::string& emgGeneratorFilename)
+:EMGFromX(inputConnectors, subject), emgData_(emgFilename, emgGeneratorFilename), inputConnectors_(inputConnectors)
 { 
    
 #ifdef LOG  

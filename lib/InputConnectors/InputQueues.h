@@ -21,20 +21,23 @@
  
 
 namespace CEINMS {
-  namespace InputConnectors { 
-     
-    typedef QueueData< std::vector< double > > FrameType; 
+  class InputConnectors {
+  public:
+      InputConnectors(){};
+    ~InputConnectors();
+    InputConnectors(const InputConnectors& inputConn) = delete;
+    typedef QueueData< std::vector< double > > FrameType;
 
-    extern float globalTimeLimit;
+    float globalTimeLimit;
+
+    Concurrency::Queue< FrameType > queueEmg;
+    Concurrency::Queue< FrameType > queueLmt;
+    std::vector< Concurrency::Queue< FrameType >* > queueMomentArms;
     
-    extern Concurrency::Queue< FrameType > queueEmg; 
-    extern Concurrency::Queue< FrameType > queueLmt; 
-    extern std::vector< Concurrency::Queue< FrameType >* > queueMomentArms; 
-    
-    extern bool externalTorquesAvailable; 
-    extern Concurrency::Queue< FrameType >  queueExternalTorques;
+    bool externalTorquesAvailable;
+    Concurrency::Queue< FrameType >  queueExternalTorques;
  
-    extern Concurrency::Latch doneWithSubscription; 
+    Concurrency::Latch doneWithSubscription;
     };
 };
 

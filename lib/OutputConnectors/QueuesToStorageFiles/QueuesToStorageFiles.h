@@ -15,15 +15,16 @@
 #include <fstream>
 #include <boost/filesystem.hpp>
 #include "OutputQueues.h"
+#include "InputQueues.h"
 
 class QueuesToStorageFiles {
 public:
     QueuesToStorageFiles() = delete;
-    QueuesToStorageFiles(const QueuesToStorageFiles&)= delete;   
+    QueuesToStorageFiles(const QueuesToStorageFiles&) = delete;
     QueuesToStorageFiles& operator=(const QueuesToStorageFiles&) = delete; 
     
     template <typename NMSmodelT>
-    QueuesToStorageFiles(const NMSmodelT& subject, const std::vector< std::string >& valuesToWrite, const std::string& outputDir ="./Output/");
+    QueuesToStorageFiles(CEINMS::InputConnectors& inputConnectors, const NMSmodelT& subject, const std::vector< std::string >& valuesToWrite, const std::string& outputDir = "./Output/");
     ~QueuesToStorageFiles() = default;
     void operator()();
 
@@ -37,12 +38,13 @@ private:
     std::vector<std::string> valuesToWrite_;
     std::vector<std::string> torqueNames_; 
     std::vector<std::string> muscleNames_; 
+    CEINMS::InputConnectors& inputConnectors_;
 };
 
 
 template <typename NMSmodelT>
-QueuesToStorageFiles::QueuesToStorageFiles(const NMSmodelT& subject, const std::vector< std::string >& valuesToWrite, const std::string& outputDir)
-:outputDir_(outputDir), separator_("\t"), valuesToWrite_(valuesToWrite){
+QueuesToStorageFiles::QueuesToStorageFiles(CEINMS::InputConnectors& inputConnectors, const NMSmodelT& subject, const std::vector< std::string >& valuesToWrite, const std::string& outputDir)
+:outputDir_(outputDir), separator_("\t"), valuesToWrite_(valuesToWrite), inputConnectors_(inputConnectors){
     outputDir_ += "/";
     boost::filesystem::path dir(outputDir_);
     if(!boost::filesystem::exists(dir)) {

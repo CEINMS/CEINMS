@@ -15,7 +15,7 @@ using std::endl;
 
 void EMGFromFile::operator()()
 {
-  CEINMS::InputConnectors::doneWithSubscription.wait();
+  inputConnectors_.doneWithSubscription.wait();
   
   while (emgData_.areStillData())
   { 

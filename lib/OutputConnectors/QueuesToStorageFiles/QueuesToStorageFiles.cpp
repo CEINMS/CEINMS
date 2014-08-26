@@ -31,7 +31,7 @@ void QueuesToStorageFiles::operator()() {
         }
     }
     
-    CEINMS::InputConnectors::doneWithSubscription.wait();
+    inputConnectors_.doneWithSubscription.wait();
     
     CEINMS::OutputConnectors::doneWithExecution.wait();
     
