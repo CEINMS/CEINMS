@@ -9,7 +9,7 @@
 
 
 #include "LmtMaFromX.h"
-#include "InputQueues.h"
+#include "InputConnectors.h"
 
 using std::cout;
 using std::endl;

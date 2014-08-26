@@ -9,7 +9,7 @@
 
 #include "EMGDataFromFile.h"
 #include "EMGgeneratorFromXml.h"
-#include "InputQueues.h"
+#include "InputConnectors.h"
 
 #define LOG
 
@@ -23,13 +23,12 @@ class EMGFromFile:public EMGFromX
   private:  
     std::string inputDir_;
     EMGDataFromFile<EMGgeneratorFromXml> emgData_;
-    CEINMS::InputConnectors& inputConnectors_;
 };
 
 
 template <typename NMSModelT>
 EMGFromFile::EMGFromFile(CEINMS::InputConnectors& inputConnectors, const NMSModelT& subject, const std::string& emgFilename, const std::string& emgGeneratorFilename)
-:EMGFromX(inputConnectors, subject), emgData_(emgFilename, emgGeneratorFilename), inputConnectors_(inputConnectors)
+:EMGFromX(inputConnectors, subject), emgData_(emgFilename, emgGeneratorFilename)
 { 
    
 #ifdef LOG  

@@ -10,7 +10,7 @@
 
 
 #include "QueuesToTrialData.h"
-#include "InputQueues.h"
+#include "InputConnectors.h"
 
 
 void QueuesToTrialData::operator()() {

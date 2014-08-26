@@ -19,12 +19,11 @@ class LmtMaFromStorageFile:public LmtMaFromX {
     std::vector< std::vector<size_t> > musclePositionsInMaStorages_;
     DataFromStorageFile lmtData_; 
     std::vector< DataFromStorageFile* > maDataStorageFiles_;
-    CEINMS::InputConnectors& inputConnectors_;
 };
 
 template <typename NMSModelT>
 LmtMaFromStorageFile::LmtMaFromStorageFile(CEINMS::InputConnectors& inputConnectors, const NMSModelT& subject, const std::string& lmtDataFilename, const std::vector< std::string>& maDataFileName)
-:LmtMaFromX(inputConnectors, subject), lmtData_(lmtDataFilename), inputConnectors_(inputConnectors)
+:LmtMaFromX(inputConnectors, subject), lmtData_(lmtDataFilename)
 {  // 1. Open the input files
    for (std::string it: maDataFileName)
    {

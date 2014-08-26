@@ -13,7 +13,7 @@
 
 #include <vector>
 #include <string>
-#include <InputQueues.h>
+#include "InputConnectors.h"
 
 class ExternalTorquesFromX
 {

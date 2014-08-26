@@ -1,5 +1,5 @@
 #include "QueuesToStorageFiles.h"
-#include "InputQueues.h"
+#include "InputConnectors.h"
 
 void QueuesToStorageFiles::addLog(std::string valueName)
 {

@@ -8,8 +8,8 @@
 //
 
 
-#ifndef InputQueues_h
-#define InputQueues_h
+#ifndef InputConnectors_h
+#define InputConnectors_h
 
 #include "Queue.h"
 #include "Latch.h"

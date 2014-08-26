@@ -15,7 +15,7 @@
 #include <fstream>
 #include <boost/filesystem.hpp>
 #include "OutputQueues.h"
-#include "InputQueues.h"
+#include "InputConnectors.h"
 
 class QueuesToStorageFiles {
 public:

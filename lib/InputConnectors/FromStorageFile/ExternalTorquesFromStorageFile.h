@@ -2,7 +2,7 @@
 #define ExternalTorquesFromFile_h
 
 #include "ExternalTorquesFromX.h"
-#include "InputQueues.h"
+#include "InputConnectors.h"
 #include "Utilities.h"
 #include "DataFromStorageFile.h"
 
@@ -20,13 +20,12 @@ private:
   std::string dataDirectory_;
   std::vector<std::size_t> dofPosInStorage_;
   DataFromStorageFile externalTorquesDataFromFile_;
-  CEINMS::InputConnectors& inputConnectors_;
 };
 
 
 template <typename NMSModelT>
 ExternalTorquesFromStorageFile::ExternalTorquesFromStorageFile(CEINMS::InputConnectors& inputConnectors, const NMSModelT& subject, const std::string& externalTorqueFilename)
-:ExternalTorquesFromX(inputConnectors, subject), externalTorquesDataFromFile_(externalTorqueFilename), inputConnectors_(inputConnectors)
+:ExternalTorquesFromX(inputConnectors, subject), externalTorquesDataFromFile_(externalTorqueFilename)
 {  
   
 #ifdef LOG

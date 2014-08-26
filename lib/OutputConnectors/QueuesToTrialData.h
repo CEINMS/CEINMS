@@ -16,7 +16,7 @@
 #include <fstream>
 #include <boost/filesystem.hpp>
 #include "OutputQueues.h"
-#include "InputQueues.h"
+#include "InputConnectors.h"
 #include "TrialData.h"
 
 class QueuesToTrialData {

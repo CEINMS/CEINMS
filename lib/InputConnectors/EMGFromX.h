@@ -12,7 +12,7 @@
 
 #include <string>
 #include <vector>
-#include "InputQueues.h"
+#include "InputConnectors.h"
 class EMGFromX 
 {
 public:

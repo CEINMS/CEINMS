@@ -9,7 +9,7 @@
 
 
 #include "ExternalTorquesFromX.h"
-#include "InputQueues.h"
+#include "InputConnectors.h"
 
 #include <iostream>
 using std::cout;

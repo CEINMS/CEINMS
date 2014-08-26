@@ -8,7 +8,7 @@
 //
 
 #include "EMGFromX.h"
-#include "InputQueues.h"
+#include "InputConnectors.h"
 
 #include <string>
 using std::string;
