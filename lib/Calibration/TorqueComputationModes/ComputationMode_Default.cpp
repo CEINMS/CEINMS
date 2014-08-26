@@ -77,21 +77,30 @@ void ComputationMode_Default<NMSmodelT>::initFiberLengthTraceCurves(unsigned tri
     unsigned k = 0; // k is the index for lmt and ma data
     double lmtTime = trials_.at(ct).lmtTimeSteps_.at(k);
     double emgTime = trials_.at(ct).emgTimeSteps_.at(0);
+    bool firstLmtArrived(false);
 
     subject_.resetFibreLengthTraces(musclesToUpdate_);
     
     for (unsigned i = 0; i < trials_.at(ct).noEmgSteps_; ++i) {
     
         emgTime = trials_.at(ct).emgTimeSteps_.at(i);
+        if (!firstLmtArrived && emgTime < lmtTime) {
+            subject_.setTime(emgTime);
+            subject_.setActivations(activationDataT1_.at(ct).at(i));
+            subject_.setEmgsSelective(trials_.at(ct).emgData_.at(i), musclesToUpdate_);
+            subject_.updateActivations(musclesToUpdate_);
+        }
 
-        if (NumCompare::lessEqual(lmtTime, emgTime) && (k < trials_.at(ct).noLmtSteps_)) {
+        if (NumCompare::lessEqual(lmtTime, emgTime) && (k < trials_.at(ct).noLmtSteps_) && (k < trials_.at(ct).maData_.front().size())) {
 
+            firstLmtArrived = true;           
             // set emg to model, set activations of the muscles not updated
             subject_.setTime(emgTime);
             subject_.setEmgsSelective(trials_.at(ct).emgData_.at(i), musclesToUpdate_);
             subject_.setActivations(activationDataT1_.at(ct).at(i));
             subject_.updateActivations(musclesToUpdate_);
-            
+
+
             // set lmt 
             subject_.setMuscleTendonLengthsSelective(trials_.at(ct).lmtData_.at(k), musclesToUpdate_);
             subject_.updateFibreLengths_OFFLINEPREP(musclesToUpdate_);
@@ -131,7 +140,7 @@ void ComputationMode_Default<NMSmodelT>::computeTorques(vector< vector< std::vec
             emgTime = trials_.at(ct).emgTimeSteps_.at(i);
 //            if(emgTime < lmtTime) 
 //                subject_.setTime_emgs_updateActivations_pushState_selective(emgTime, trials_.at(ct).emgData_.at(i), musclesToUpdate_);
-            if ((lmtTime <= emgTime) && (k < trials_.at(ct).noLmtSteps_) && (k < trials_.at(ct).maData_.front().size())) {
+            if (NumCompare::lessEqual(lmtTime, emgTime) && (k < trials_.at(ct).noLmtSteps_) && (k < trials_.at(ct).maData_.front().size())) {
                 subject_.setMuscleForces(forceDataT1_.at(ct).at(k));
                 subject_.setTime(emgTime);
                 subject_.setEmgsSelective(trials_.at(ct).emgData_.at(i), musclesToUpdate_);
@@ -205,16 +214,22 @@ void ComputationMode_Default<NMSmodelT>::computeTorquesAndPenalties(vector< vect
         int k = 0; // k is the index for lmt and ma data
         double lmtTime = trials_.at(ct).lmtTimeSteps_.at(k);
         double emgTime = trials_.at(ct).emgTimeSteps_.at(0) + subject_.getGlobalEmDelay();
-
+        bool firstLmtArrived(false);
 
         // Let's start going through the EMG, lmt, and ma data...  
         for (int i = 0; i < trials_.at(ct).noEmgSteps_; ++i) {
 
             emgTime = trials_.at(ct).emgTimeSteps_.at(i);
-            //            if(emgTime < lmtTime) 
-            //                subject_.setTime_emgs_updateActivations_pushState_selective(emgTime, trials_.at(ct).emgData_.at(i), musclesToUpdate_);
-            if ((lmtTime <= emgTime) && (k < trials_.at(ct).noLmtSteps_) && (k < trials_.at(ct).maData_.front().size())) {
+            if (!firstLmtArrived && emgTime < lmtTime) {
+                subject_.setActivations(activationDataT1_.at(ct).at(i));
+                subject_.setEmgsSelective(trials_.at(ct).emgData_.at(i), musclesToUpdate_);
+                subject_.updateActivations(musclesToUpdate_);
+            }
 
+//            if(emgTime < lmtTime) 
+//                subject_.setTime_emgs_updateActivations_pushState_selective(emgTime, trials_.at(ct).emgData_.at(i), musclesToUpdate_);
+            if (NumCompare::lessEqual(lmtTime, emgTime) && (k < trials_.at(ct).noLmtSteps_) && (k < trials_.at(ct).maData_.front().size())) {
+                firstLmtArrived = true;
                 subject_.setMuscleForces(forceDataT1_.at(ct).at(k));
                 subject_.setTime(emgTime);
                 subject_.setEmgsSelective(trials_.at(ct).emgData_.at(i), musclesToUpdate_);                
@@ -248,10 +263,6 @@ void ComputationMode_Default<NMSmodelT>::computeTorquesAndPenalties(vector< vect
                 if (k < trials_.at(ct).noLmtSteps_)
                     lmtTime = trials_.at(ct).lmtTimeSteps_.at(k);  
 
-                vector<double> currentActivations;
-                subject_.getActivations(currentActivations);
-                for (int mi = 0; mi < subject_.getNoMuscles(); ++mi)
-                    activationDataT1_.at(ct).at(i).at(mi) = currentActivations.at(mi);
 
 #ifdef DEBUG
                 cout << endl << endl << "EmgTime: " << emgTime << endl << "EMG" << endl;
@@ -271,6 +282,11 @@ void ComputationMode_Default<NMSmodelT>::computeTorquesAndPenalties(vector< vect
                 cout << endl << "----------------------------------------" << endl;
 #endif
             }
+            vector<double> currentActivations;
+            subject_.getActivations(currentActivations);
+            for (int mi = 0; mi < subject_.getNoMuscles(); ++mi)
+                activationDataT1_.at(ct).at(i).at(mi) = currentActivations.at(mi);
+
 
         } 
     }
