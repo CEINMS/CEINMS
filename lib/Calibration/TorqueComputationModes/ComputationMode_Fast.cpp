@@ -144,7 +144,7 @@ void ComputationMode_Fast<NMSmodelT>::computeTorquesAndPenalties(vector< vector<
     getMusclesToUpdate();
     // i is for the number of trials
     for (unsigned int ct = 0 ; ct < trials_.size(); ++ct) {
-        std::cout << "Trial " << ct + 1 << "/" << trials_.size() << std::endl;
+     //   std::cout << "Trial " << ct + 1 << "/" << trials_.size() << std::endl;
         initFiberLengthTraceCurves(ct);
         unsigned k = 0; // k is the index for lmt and ma data
         double lmtTime = trials_.at(ct).lmtTimeSteps_.at(k);

@@ -12,6 +12,7 @@ using std::vector;
 #include "TrialData.h"
 #include <iostream>
 #include <stdlib.h>
+#include "NumCompare.h"
 
 template<typename NMSmodelT>
 ComputationMode_Default<NMSmodelT>::ComputationMode_Default(NMSmodelT& subject):
@@ -37,6 +38,13 @@ void ComputationMode_Default<NMSmodelT>::setTrials( const vector<TrialData>& tri
             forceDataT1_.at(i).at(j).resize(nMuscles);
     }
     
+    penaltyDataT1_.resize(trials_.size());
+    for (unsigned int i = 0; i < trials_.size(); ++i) {
+        penaltyDataT1_.at(i).resize(trials_.at(i).noLmtSteps_);
+        for (unsigned int j = 0; j < trials_.at(i).noLmtSteps_; ++j)
+            penaltyDataT1_.at(i).at(j).resize(nMuscles);
+    }
+
     // resizing emgDataT1_
     // forceDataT1_ forces at previous calibration step
     activationDataT1_.resize(trials_.size());
@@ -74,19 +82,26 @@ void ComputationMode_Default<NMSmodelT>::initFiberLengthTraceCurves(unsigned tri
     
     for (unsigned i = 0; i < trials_.at(ct).noEmgSteps_; ++i) {
     
-        // set emg to model and save the activations
-        subject_.setActivations(activationDataT1_.at(ct).at(i));
         emgTime = trials_.at(ct).emgTimeSteps_.at(i);
-        subject_.setTime_emgs_updateActivations_pushState_selective(emgTime, trials_.at(ct).emgData_.at(i), musclesToUpdate_);
-        vector<double> currentActivations;
-        subject_.getActivations(currentActivations);
-        for (int mi = 0; mi < subject_.getNoMuscles(); ++mi)
-            activationDataT1_.at(ct).at(i).at(mi) = currentActivations.at(mi);
-        
-        // set lmt 
-        if ( (lmtTime <= emgTime) && (k < trials_.at(ct).noLmtSteps_)) {
+
+        if (NumCompare::lessEqual(lmtTime, emgTime) && (k < trials_.at(ct).noLmtSteps_)) {
+
+            // set emg to model, set activations of the muscles not updated
+            subject_.setTime(emgTime);
+            subject_.setEmgsSelective(trials_.at(ct).emgData_.at(i), musclesToUpdate_);
+            subject_.setActivations(activationDataT1_.at(ct).at(i));
+            subject_.updateActivations(musclesToUpdate_);
+            
+            // set lmt 
             subject_.setMuscleTendonLengthsSelective(trials_.at(ct).lmtData_.at(k), musclesToUpdate_);
             subject_.updateFibreLengths_OFFLINEPREP(musclesToUpdate_);
+
+            //save activations for the next iteration
+            vector<double> currentActivations;
+            subject_.getActivations(currentActivations);
+            for (int mi = 0; mi < subject_.getNoMuscles(); ++mi)
+                activationDataT1_.at(ct).at(i).at(mi) = currentActivations.at(mi);
+
             ++k;
             if (k < trials_.at(ct).noLmtSteps_)
                 lmtTime = trials_.at(ct).lmtTimeSteps_.at(k);  
@@ -106,46 +121,43 @@ void ComputationMode_Default<NMSmodelT>::computeTorques(vector< vector< std::vec
         // initializing fiber-length curves for the trial ct
         initFiberLengthTraceCurves(ct);
         
-        
         int k = 0; // k is the index for lmt and ma data
         double lmtTime = trials_.at(ct).lmtTimeSteps_.at(k);
         double emgTime = trials_.at(ct).emgTimeSteps_.at(0) + subject_.getGlobalEmDelay();
 
-        
         // Let's start going through the EMG, lmt, and ma data...  
         for (int i = 0; i < trials_.at(ct).noEmgSteps_; ++i) {
 
             emgTime = trials_.at(ct).emgTimeSteps_.at(i);
-            subject_.setActivations(activationDataT1_.at(ct).at(i));
-            if(emgTime < lmtTime) 
-                subject_.setTime_emgs_updateActivations_pushState_selective(emgTime, trials_.at(ct).emgData_.at(i), musclesToUpdate_);
-//             subject_.setTime(emgTime);
-//             subject_.setEmgsSelective(trials_.at(ct).emgData_.at(i), musclesToUpdate_);
-//             subject_.updateActivations(musclesToUpdate_);
-//             subject_.pushState(musclesToUpdate_);
-
-
-            if ( (lmtTime <= emgTime) && (k < trials_.at(ct).noLmtSteps_)) {
+//            if(emgTime < lmtTime) 
+//                subject_.setTime_emgs_updateActivations_pushState_selective(emgTime, trials_.at(ct).emgData_.at(i), musclesToUpdate_);
+            if ((lmtTime <= emgTime) && (k < trials_.at(ct).noLmtSteps_) && (k < trials_.at(ct).maData_.front().size())) {
+                subject_.setMuscleForces(forceDataT1_.at(ct).at(k));
                 subject_.setTime(emgTime);
                 subject_.setEmgsSelective(trials_.at(ct).emgData_.at(i), musclesToUpdate_);
-                subject_.setMuscleForces(forceDataT1_.at(ct).at(k));
-                subject_.setMuscleTendonLengthsSelective(trials_.at(ct).lmtData_.at(k), musclesToUpdate_); 
-                for (int j = 0 ; j < trials_.at(ct).noDoF_; ++j)
+                subject_.setMuscleTendonLengths(trials_.at(ct).lmtData_.at(k));
+                for (int j = 0; j < trials_.at(ct).noDoF_; ++j) {
                     subject_.setMomentArms(trials_.at(ct).maData_.at(j).at(k), j);
+                }
                 subject_.updateState_OFFLINE(musclesToUpdate_);
                 subject_.pushState(musclesToUpdate_);
                 vector<double> currentTorques, currentForces;
                 subject_.getTorques(currentTorques);
                 subject_.getMuscleForces(currentForces);
-            // when I'm done with the moment arm, I can ask for the new torque, and put it in the matrix
-            for (int j = 0; j < trials_.at(ct).noDoF_; ++j)
-                torques.at(ct).at(j).at(k) = currentTorques.at(j); 
-            for (int j = 0; j < subject_.getNoMuscles(); ++j)
-                forceDataT1_.at(ct).at(k).at(j) = currentForces.at(j);
+                // when I'm done with the moment arm, I can ask for the new torque, and put it in the matrix
+                for (int j = 0; j < trials_.at(ct).noDoF_; ++j)
+                    torques.at(ct).at(j).at(k) = currentTorques.at(j); 
+                for (int j = 0; j < subject_.getNoMuscles(); ++j)
+                    forceDataT1_.at(ct).at(k).at(j) = currentForces.at(j);
             
-            ++k;
-            if (k < trials_.at(ct).noLmtSteps_)
-                lmtTime = trials_.at(ct).lmtTimeSteps_.at(k);  
+                ++k;
+                if (k < trials_.at(ct).noLmtSteps_)
+                    lmtTime = trials_.at(ct).lmtTimeSteps_.at(k);  
+
+                vector<double> currentActivations;
+                subject_.getActivations(currentActivations);
+                for (int mi = 0; mi < subject_.getNoMuscles(); ++mi)
+                    activationDataT1_.at(ct).at(i).at(mi) = currentActivations.at(mi);
 
 #ifdef DEBUG
         cout << endl << endl << "EmgTime: " << emgTime << endl << "EMG" << endl;
@@ -165,10 +177,6 @@ void ComputationMode_Default<NMSmodelT>::computeTorques(vector< vector< std::vec
         cout << endl << "----------------------------------------" << endl;
 #endif
             }
-            vector<double> currentActivations;
-            subject_.getActivations(currentActivations);
-            for (int mi = 0; mi < subject_.getNoMuscles(); ++mi)
-                activationDataT1_.at(ct).at(i).at(mi) = currentActivations.at(mi);
         } 
     }
     /*
@@ -186,64 +194,64 @@ void ComputationMode_Default<NMSmodelT>::computeTorques(vector< vector< std::vec
 template<typename NMSmodelT>
 void ComputationMode_Default<NMSmodelT>::computeTorquesAndPenalties(vector< vector< vector<double> > >& torques, vector< vector< double > >& penalties) {
     
-    std::cout << "computeTorquesAndPenalties not implemented in ComputationMode_Default\nExiting.\n";
-    exit(EXIT_FAILURE);
-        getMusclesToUpdate();
+
+    getMusclesToUpdate();
     // i is for the number of trials
-    for (unsigned int ct = 0 ; ct < trials_.size(); ++ct) {
-        
-        // initializing fiber-length curves for the trial ct
+    for (unsigned int ct = 0; ct < trials_.size(); ++ct) {
+         // initializing fiber-length curves for the trial ct
         initFiberLengthTraceCurves(ct);
-        
-        
+
+
         int k = 0; // k is the index for lmt and ma data
         double lmtTime = trials_.at(ct).lmtTimeSteps_.at(k);
         double emgTime = trials_.at(ct).emgTimeSteps_.at(0) + subject_.getGlobalEmDelay();
 
-        
+
         // Let's start going through the EMG, lmt, and ma data...  
         for (int i = 0; i < trials_.at(ct).noEmgSteps_; ++i) {
 
             emgTime = trials_.at(ct).emgTimeSteps_.at(i);
-            subject_.setActivations(activationDataT1_.at(ct).at(i));
-            if(emgTime < lmtTime) 
-                subject_.setTime_emgs_updateActivations_pushState_selective(emgTime, trials_.at(ct).emgData_.at(i), musclesToUpdate_);
-//             subject_.setTime(emgTime);
-//             subject_.setEmgsSelective(trials_.at(ct).emgData_.at(i), musclesToUpdate_);
-//             subject_.updateActivations(musclesToUpdate_);
-//             subject_.pushState(musclesToUpdate_);
+            //            if(emgTime < lmtTime) 
+            //                subject_.setTime_emgs_updateActivations_pushState_selective(emgTime, trials_.at(ct).emgData_.at(i), musclesToUpdate_);
+            if ((lmtTime <= emgTime) && (k < trials_.at(ct).noLmtSteps_) && (k < trials_.at(ct).maData_.front().size())) {
 
-
-            if ( (lmtTime <= emgTime) && (k < trials_.at(ct).noLmtSteps_)) {
-                subject_.setTime(emgTime);
-                subject_.setEmgsSelective(trials_.at(ct).emgData_.at(i), musclesToUpdate_);
                 subject_.setMuscleForces(forceDataT1_.at(ct).at(k));
-                subject_.setMuscleTendonLengthsSelective(trials_.at(ct).lmtData_.at(k), musclesToUpdate_); 
-                for (int j = 0 ; j < trials_.at(ct).noDoF_; ++j)
+                subject_.setTime(emgTime);
+                subject_.setEmgsSelective(trials_.at(ct).emgData_.at(i), musclesToUpdate_);                
+                subject_.setMuscleTendonLengths(trials_.at(ct).lmtData_.at(k));
+                for (int j = 0; j < trials_.at(ct).noDoF_; ++j) {
                     subject_.setMomentArms(trials_.at(ct).maData_.at(j).at(k), j);
+                }
                 subject_.updateState_OFFLINE(musclesToUpdate_);
                 subject_.pushState(musclesToUpdate_);
                 vector<double> currentTorques, currentForces;
                 subject_.getTorques(currentTorques);
                 subject_.getMuscleForces(currentForces);
-            // when I'm done with the moment arm, I can ask for the new torque, and put it in the matrix
+                // when I'm done with the moment arm, I can ask for the new torque, and put it in the matrix
                 for (int j = 0; j < trials_.at(ct).noDoF_; ++j)
-                    torques.at(ct).at(j).at(k) = currentTorques.at(j); 
+                    torques.at(ct).at(j).at(k) = currentTorques.at(j);
                 for (int j = 0; j < subject_.getNoMuscles(); ++j)
                     forceDataT1_.at(ct).at(k).at(j) = currentForces.at(j);
-                
                 //calcolo delle penalty modificato per accomodare l'update di un sottoinsieme di muscoli
                 vector<double> penaltiesAtT;
                 subject_.getMusclesPenaltyVector(penaltiesAtT);
-                for (vector<unsigned>::const_iterator it(musclesToUpdate_.begin()); it < musclesToUpdate_.end(); ++it)
+   
+                for (vector<unsigned>::const_iterator it(musclesToUpdate_.begin()); it < musclesToUpdate_.end(); ++it) {
                     penaltyDataT1_.at(ct).at(k).at(*it) = penaltiesAtT.at(*it);
+                }
+   
                 penalties.at(ct).at(k) = 0;
-                for(unsigned j = 0; j < subject_.getNoMuscles(); ++j)
+                for (unsigned j = 0; j < subject_.getNoMuscles(); ++j)
                     penalties.at(ct).at(k) += penaltyDataT1_.at(ct).at(k).at(j);
                 //fine calcolo penalties
                 ++k;
                 if (k < trials_.at(ct).noLmtSteps_)
                     lmtTime = trials_.at(ct).lmtTimeSteps_.at(k);  
+
+                vector<double> currentActivations;
+                subject_.getActivations(currentActivations);
+                for (int mi = 0; mi < subject_.getNoMuscles(); ++mi)
+                    activationDataT1_.at(ct).at(i).at(mi) = currentActivations.at(mi);
 
 #ifdef DEBUG
                 cout << endl << endl << "EmgTime: " << emgTime << endl << "EMG" << endl;
@@ -263,10 +271,7 @@ void ComputationMode_Default<NMSmodelT>::computeTorquesAndPenalties(vector< vect
                 cout << endl << "----------------------------------------" << endl;
 #endif
             }
-            vector<double> currentActivations;
-            subject_.getActivations(currentActivations);
-            for (int mi = 0; mi < subject_.getNoMuscles(); ++mi)
-                activationDataT1_.at(ct).at(i).at(mi) = currentActivations.at(mi);
+
         } 
     }
 }
