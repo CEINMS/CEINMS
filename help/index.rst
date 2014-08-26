@@ -17,10 +17,13 @@ CEINMS is a toolbox for EMG-driven simulation of musculoskeletal models.
 The theory behind CEINMS
 ========================
 
+
 Reference Manuals
 #################
 
-Detailed documentation is organized in the following documents:
+.. only:: html
+
+    Detailed documentation is organized in the following documents:
 
 .. toctree::
    :maxdepth: 1
