@@ -122,7 +122,7 @@ void ComputationMode_Default<NMSmodelT>::initFiberLengthTraceCurves(unsigned tri
 
 template<typename NMSmodelT>
 void ComputationMode_Default<NMSmodelT>::computeTorques(vector< vector< std::vector<double> > >& torques) {
-
+    /*
        getMusclesToUpdate();
     // i is for the number of trials
     for (unsigned int ct = 0 ; ct < trials_.size(); ++ct) {
@@ -188,15 +188,15 @@ void ComputationMode_Default<NMSmodelT>::computeTorques(vector< vector< std::vec
             }
         } 
     }
-    /*
-            for(unsigned ct = 0; ct < forceDataT1_.size(); ++ct)
-        for(unsigned j = 0; j < forceDataT1_.at(ct).size(); ++j) {
-            for(unsigned k = 0; k < forceDataT1_.at(ct).at(j).size(); ++k)
-                std::cout << forceDataT1_.at(ct).at(j).at(k) << std::endl;
-            std::cout << std::endl;
-            
-        }    */
-    
+//  
+//            for(unsigned ct = 0; ct < forceDataT1_.size(); ++ct)
+//        for(unsigned j = 0; j < forceDataT1_.at(ct).size(); ++j) {
+//            for(unsigned k = 0; k < forceDataT1_.at(ct).at(j).size(); ++k)
+//                std::cout << forceDataT1_.at(ct).at(j).at(k) << std::endl;
+//            std::cout << std::endl;
+//            
+//        }    
+    */
 }
 
 

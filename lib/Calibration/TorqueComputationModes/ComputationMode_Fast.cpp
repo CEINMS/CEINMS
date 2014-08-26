@@ -6,7 +6,12 @@ using std::vector;
 
 template<typename NMSmodelT>
 ComputationMode_Fast<NMSmodelT>::ComputationMode_Fast(NMSmodelT& subject):
-subject_(subject) { }
+subject_(subject) {
+
+    //with the automatic undersampling of emgs, time difference is negligibile compared to the default version - CP, Aug 2014
+    std::cout << "CalibrationMode Fast is disabled" << std::endl;
+    exit(EXIT_FAILURE);
+}
 
 
 template<typename NMSmodelT>
