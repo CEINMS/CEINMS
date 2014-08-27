@@ -17,7 +17,7 @@ set(Hybrid_Parameters_TEMPLATE_IMPLEMENTATIONS ceinms/Parameters/RecursiveEMGs.c
 set(Hybrid_StaticComp_TEMPLATE_IMPLEMENTATIONS ceinms/StaticComputationMode/Default.cpp)
 set(Hybrid_ObjFunc_TEMPLATE_IMPLEMENTATIONS    ceinms/ObjectiveFunction/MinTorqueTrackEMGs.cpp)
 # Install
-install(FILES ${Hybrid_HEADERS} ${Hybrid_TEMPLATE_IMPLEMENTATIONS} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/ceinms)
-install(FILES ${Hybrid_Parameters_HEADERS} ${Hybrid_Parameters_TEMPLATE_IMPLEMENTATIONS} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/ceinms/Parameters)
-install(FILES ${Hybrid_StaticComp_HEADERS} ${Hybrid_StaticComp_TEMPLATE_IMPLEMENTATIONS} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/ceinms/StaticComp)
-install(FILES ${Hybrid_ObjFunc_HEADERS} ${Hybrid_ObjFunc_TEMPLATE_IMPLEMENTATIONS} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/ceinms/ObjFunc)
+install(FILES ${Hybrid_HEADERS} ${Hybrid_TEMPLATE_IMPLEMENTATIONS} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/ceinms COMPONENT Development)
+install(FILES ${Hybrid_Parameters_HEADERS} ${Hybrid_Parameters_TEMPLATE_IMPLEMENTATIONS} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/ceinms/Parameters COMPONENT Development)
+install(FILES ${Hybrid_StaticComp_HEADERS} ${Hybrid_StaticComp_TEMPLATE_IMPLEMENTATIONS} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/ceinms/StaticComp COMPONENT Development)
+install(FILES ${Hybrid_ObjFunc_HEADERS} ${Hybrid_ObjFunc_TEMPLATE_IMPLEMENTATIONS} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/ceinms/ObjFunc COMPONENT Development)

@@ -41,9 +41,9 @@ set(OptimizationSystems_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}"
         CACHE INTERNAL "Include directories for OptimizationSystems library")
 
 #Install
-#install(FILES ${OptimizationSystems_HEADERS} ${OptimizationSystems_TEMPLATE_IMPLEMENTATION} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}) #should add namespace
-#install(TARGETS OptimizationSystems
-#        EXPORT CEINMSTargets
-#        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-#        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-#        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
+install(FILES ${OptimizationSystems_HEADERS} ${OptimizationSystems_TEMPLATE_IMPLEMENTATION} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/ceinms COMPONENT Development)
+install(TARGETS OptimizationSystems
+        EXPORT CEINMSTargets
+        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT Applications
+        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT Development
+        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT Development)

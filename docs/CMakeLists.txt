@@ -20,8 +20,8 @@ if(BUILD_SPHINX_MANUAL_HTML OR BUILD_SPHINX_MANUAL_LATEX)
 
     set(conf_docs "${CMAKE_SOURCE_DIR}/help")
     set(conf_path "${CMAKE_CURRENT_SOURCE_DIR}")
-    set(conf_version "0.1.1")
-    set(conf_release "0.1.1")
+    set(conf_version "${CEINMS_MAJOR_VERSION}.${CEINMS_MINOR_VERSION}.${CEINMS_PATCH_VERSION}")
+    set(conf_release "${CEINMS_MAJOR_VERSION}.${CEINMS_MINOR_VERSION}.${CEINMS_PATCH_VERSION}")
 
     option(SPHINX_NUMFIG_NUMBER_FIGURES "Number figures (suggested: ON for better HTML output, OFF for LaTex" ON)
     if(SPHINX_NUMFIG_NUMBER_FIGURES)
