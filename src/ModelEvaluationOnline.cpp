@@ -7,7 +7,7 @@
 //
 
 
-#include "InputQueues.h"
+
 #include "SimpleFileLogger.h"
 #include "StorageLogger.h"
 
@@ -22,14 +22,14 @@ using std::string;
 
 #include "ModelEvaluationOnline.h"
 #include "ModelEvaluationBase.h"
-#include "InputQueues.h"
+#include "InputConnectors.h"
 #include "OutputQueues.h"
 #define LOG_FILES
 #define LOG
 
 template <typename NMSmodelT, typename Logger>
-ModelEvaluationOnline<NMSmodelT, Logger>::ModelEvaluationOnline(NMSmodelT& subject, const vector<string>& valuesToLog) //const std::string& outputDir )
-:ModelEvaluationBase<Logger>::ModelEvaluationBase(valuesToLog), subject_(subject)
+ModelEvaluationOnline<NMSmodelT, Logger>::ModelEvaluationOnline(CEINMS::InputConnectors& inputConnectors, NMSmodelT& subject, const vector<string>& valuesToLog) //const std::string& outputDir )
+:ModelEvaluationBase<Logger>::ModelEvaluationBase(inputConnectors, valuesToLog), subject_(subject)
 {
   subject_.getDoFNames(dofNames_);
   noDof_ = dofNames_.size(); 
@@ -39,13 +39,7 @@ ModelEvaluationOnline<NMSmodelT, Logger>::ModelEvaluationOnline(NMSmodelT& subje
 template <typename NMSmodelT, typename Logger>
 void ModelEvaluationOnline<NMSmodelT, Logger>::operator()() {
 
-  CEINMS::InputConnectors::queueLmt.subscribe();
-  CEINMS::InputConnectors::queueEmg.subscribe();
-  for (auto& it : CEINMS::InputConnectors::queueMomentArms)
-    (*it).subscribe(); 
-  CEINMS::InputConnectors::queueExternalTorques.subscribe();
-  
-  CEINMS::InputConnectors::doneWithSubscription.wait();
+    ModelEvaluationBase<Logger>::subscribeToInputConnectors();
   
 #ifdef LOG
   cout << "starting consume" << endl;
@@ -79,7 +73,7 @@ void ModelEvaluationOnline<NMSmodelT, Logger>::operator()() {
     // 3. read external Torque 
     CEINMS::InputConnectors::FrameType externalTorquesFrameFromQueue;  
 
-    if (CEINMS::InputConnectors::externalTorquesAvailable) {
+    if (ModelEvaluationBase<Logger>::externalTorquesAvailable()) {
         while ((externalTorqueTime < lmtMaTime) /*&& (!(externalTorquesFromQueue.empty()))*/) {
         ModelEvaluationBase<Logger>::getExternalTorquesFromInputQueue(externalTorquesFrameFromQueue);
         externalTorqueTime = externalTorquesFrameFromQueue.time;
@@ -174,8 +168,8 @@ void ModelEvaluationOnline<NMSmodelT, Logger>::operator()() {
 //    when time value from input data is greater then globalTimeLimit (which value is set in ExternalVariables.cpp)
 //   OR when an empty vector is acqured from one of the queues the thread stop consuming 
 // NOTE: when one a producer push an empty vector in a queue means that ther are no more data to be produced, it's like an end frame. 
-
-    runCondition = (emgTime <  CEINMS::InputConnectors::globalTimeLimit) && (lmtMaTime <  CEINMS::InputConnectors::globalTimeLimit) && runCondition;
+    float globalTimeLimit = ModelEvaluationBase<Logger>::getGlobalTimeLimit();
+    runCondition = (emgTime <  globalTimeLimit) && (lmtMaTime <  globalTimeLimit) && runCondition;
   } while (runCondition);
 
   

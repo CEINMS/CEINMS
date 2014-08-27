@@ -7,7 +7,7 @@
 //__________________________________________________________________________
 //
 
-#include "InputQueues.h"
+#include "InputConnectors.h"
 
 #include <vector>
 using std::vector;
@@ -16,56 +16,79 @@ using std::string;
 
 
 template <typename Logger>
-ModelEvaluationBase<Logger>::ModelEvaluationBase(const vector<string>& valuesToLog) 
-:logger(valuesToLog)
+ModelEvaluationBase<Logger>::ModelEvaluationBase(CEINMS::InputConnectors& inputConnectors, const vector<string>& valuesToLog)
+    :inputConnectors_(inputConnectors), logger(valuesToLog)
 { }
 
 
 template <typename Logger>
+void ModelEvaluationBase<Logger>::subscribeToInputConnectors() {
+
+    inputConnectors_.queueLmt.subscribe();
+    inputConnectors_.queueEmg.subscribe();
+    for (auto& it : inputConnectors_.queueMomentArms)
+        (*it).subscribe();
+    inputConnectors_.queueExternalTorques.subscribe();
+
+    inputConnectors_.doneWithSubscription.wait();
+}
+
+
+template <typename Logger>
+bool ModelEvaluationBase<Logger>::externalTorquesAvailable() const {
+    return inputConnectors_.externalTorquesAvailable;
+}
+
+template <typename Logger>
+float ModelEvaluationBase<Logger>::getGlobalTimeLimit() const {
+    return inputConnectors_.globalTimeLimit;
+}
+
+template <typename Logger>
 void ModelEvaluationBase<Logger>::getEmgFromInputQueue(CEINMS::InputConnectors::FrameType& emgs) {
-    emgs = CEINMS::InputConnectors::queueEmg.pop(); 
+    emgs = inputConnectors_.queueEmg.pop();
 }
 
 
 template <typename Logger>
 void ModelEvaluationBase<Logger>::getLmtFromInputQueue(CEINMS::InputConnectors::FrameType& lmts) {
-    lmts =  CEINMS::InputConnectors::queueLmt.pop();
+    lmts = inputConnectors_.queueLmt.pop();
 }
 
 
 template <typename Logger>
 void ModelEvaluationBase<Logger>::getMomentArmsFromInputQueue(CEINMS::InputConnectors::FrameType& momentArms, unsigned int whichDof) {
-    momentArms =  (*CEINMS::InputConnectors::queueMomentArms.at(whichDof)).pop();
+    momentArms = (*inputConnectors_.queueMomentArms.at(whichDof)).pop();
 }
 
 
 template <typename Logger>
 void ModelEvaluationBase<Logger>::getExternalTorquesFromInputQueue(CEINMS::InputConnectors::FrameType& externalTorques) {
-    externalTorques =  CEINMS::InputConnectors::queueExternalTorques.pop(); 
+    externalTorques = inputConnectors_.queueExternalTorques.pop();
 }
 
 
 template <typename Logger>
 CEINMS::InputConnectors::FrameType ModelEvaluationBase<Logger>::getEmgFromInputQueue() {
-    return CEINMS::InputConnectors::queueEmg.pop();
+    return inputConnectors_.queueEmg.pop();
 }
 
 
 template <typename Logger>
 CEINMS::InputConnectors::FrameType ModelEvaluationBase<Logger>::getLmtFromInputQueue() {
-    return CEINMS::InputConnectors::queueLmt.pop();
+    return inputConnectors_.queueLmt.pop();
 }
 
 
 template <typename Logger>
 CEINMS::InputConnectors::FrameType ModelEvaluationBase<Logger>::getMomentArmsFromInputQueue(unsigned int whichDof) {
-    return (*CEINMS::InputConnectors::queueMomentArms.at(whichDof)).pop();
+    return (*inputConnectors_.queueMomentArms.at(whichDof)).pop();
 }
 
 
 template <typename Logger>
 CEINMS::InputConnectors::FrameType ModelEvaluationBase<Logger>::getExternalTorquesFromInputQueue(){
-    return CEINMS::InputConnectors::queueExternalTorques.pop();
+    return inputConnectors_.queueExternalTorques.pop();
 }
 
 

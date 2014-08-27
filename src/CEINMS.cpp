@@ -25,7 +25,7 @@
 #include "ExternalTorquesFromStorageFile.h"
 #include "ModelEvaluationOnline.h" 
 
-#include "InputQueues.h"
+#include "InputConnectors.h"
 
 #include "LoggerOnQueues.h"
 #include "QueuesToStorageFiles.h"
@@ -50,6 +50,8 @@ using std::map;
 
 #include <CeinmsSetupXmlReader.h>
 
+
+CEINMS::InputConnectors inputConnectors;
 
 template <typename T>
 void setupSubject(T& mySubject, string configurationFile) {
@@ -84,7 +86,7 @@ void printAuthors() {
     time_t now = std::time(0);
     tm *gmtm = std::gmtime(&now);
     cout << "Copyright (C) " << gmtm->tm_year+1900 << endl;
-    cout << "Claudio Pizzolato, Monica Reggiani, David Lloyd, Massimo Sartori\n\n";
+    cout << "Claudio Pizzolato, Monica Reggiani, David Lloyd\n\n";
     
     cout << "Software developers: Claudio Pizzolato, Elena Ceseracciu, Monica Reggiani\n";
 }
@@ -139,7 +141,7 @@ void sortMaFilenames(const map<string, string>& maMap, const vector< string > do
 void consumeAndStore(CEINMS::Concurrency::Queue< std::vector<double> >& queue, const string& outputFileName, const vector<string>& header) {
   
   queue.subscribe(); 
-  CEINMS::InputConnectors::doneWithSubscription.wait();
+  inputConnectors.doneWithSubscription.wait();
   
   std::ofstream outputFile (outputFileName);
   if (!outputFile.is_open())
@@ -243,26 +245,26 @@ int main(int argc, char** argv) {
           
             // 2. define the thread connecting with the input sources          
             string emgFilename(dataLocations.getEmgFile());
-            EMGFromFile emgProducer(mySubject, emgFilename, emgGeneratorFile);
+            EMGFromFile emgProducer(inputConnectors, mySubject, emgFilename, emgGeneratorFile);
           
             vector< string > dofNames; 
             mySubject.getDoFNames(dofNames);
             vector< string > maFilename;
             sortMaFilenames(dataLocations.getMaFiles(), dofNames, maFilename);
-            LmtMaFromStorageFile lmtMaProducer(mySubject, dataLocations.getLmtFile(), maFilename);
+            LmtMaFromStorageFile lmtMaProducer(inputConnectors, mySubject, dataLocations.getLmtFile(), maFilename);
                    
             string externalTorqueFilename(dataLocations.getExternalTorqueFile());
-            ExternalTorquesFromStorageFile externalTorquesProducer(mySubject, externalTorqueFilename); 
+            ExternalTorquesFromStorageFile externalTorquesProducer(inputConnectors, mySubject, externalTorqueFilename);
                
             // 2b. define the thread consuming the output sources
             vector<string> valuesToWrite = {"Activations", "FiberLenghts", "FiberVelocities", "MuscleForces", "Torques"};
-            QueuesToStorageFiles queuesToStorageFiles(mySubject, valuesToWrite, outputDirectory) ;  
+            QueuesToStorageFiles queuesToStorageFiles(inputConnectors, mySubject, valuesToWrite, outputDirectory);
           
             // 3. define the model simulator
             vector<string> valuesToLog = {"Activations", "FiberLenghts", "FiberVelocities", "MuscleForces", "Torques"};
-            ModelEvaluationOnline<MyNMSmodel, LoggerOnQueues> simulator(mySubject, valuesToLog);
+            ModelEvaluationOnline<MyNMSmodel, LoggerOnQueues> simulator(inputConnectors, mySubject, valuesToLog);
      
-            CEINMS::InputConnectors::doneWithSubscription.setCount(5);
+            inputConnectors.doneWithSubscription.setCount(5);
             CEINMS::OutputConnectors::doneWithExecution.setCount(2);
           
             // 4. start the threads
@@ -290,26 +292,26 @@ int main(int argc, char** argv) {
 
             // 2. define the thread connecting with the input sources          
             string emgFilename(dataLocations.getEmgFile());
-            EMGFromFile emgProducer(mySubject, emgFilename, emgGeneratorFile);
+            EMGFromFile emgProducer(inputConnectors, mySubject, emgFilename, emgGeneratorFile);
 
             vector< string > dofNames;
             mySubject.getDoFNames(dofNames);
             vector< string > maFilename;
             sortMaFilenames(dataLocations.getMaFiles(), dofNames, maFilename);
-            LmtMaFromStorageFile lmtMaProducer(mySubject, dataLocations.getLmtFile(), maFilename);
+            LmtMaFromStorageFile lmtMaProducer(inputConnectors, mySubject, dataLocations.getLmtFile(), maFilename);
 
             string externalTorqueFilename(dataLocations.getExternalTorqueFile());
-            ExternalTorquesFromStorageFile externalTorquesProducer(mySubject, externalTorqueFilename);
+            ExternalTorquesFromStorageFile externalTorquesProducer(inputConnectors, mySubject, externalTorqueFilename);
 
             // 2b. define the thread consuming the output sources
             vector<string> valuesToWrite = { "Activations", "FiberLenghts", "FiberVelocities", "MuscleForces", "Torques" };
-            QueuesToStorageFiles queuesToStorageFiles(mySubject, valuesToWrite, outputDirectory);
+            QueuesToStorageFiles queuesToStorageFiles(inputConnectors, mySubject, valuesToWrite, outputDirectory);
 
             // 3. define the model simulator
             vector<string> valuesToLog = { "Activations", "FiberLenghts", "FiberVelocities", "MuscleForces", "Torques" };
-            ModelEvaluationOffline<MyNMSmodel, LoggerOnQueues> simulator(mySubject, valuesToLog);
+            ModelEvaluationOffline<MyNMSmodel, LoggerOnQueues> simulator(inputConnectors, mySubject, valuesToLog);
 
-            CEINMS::InputConnectors::doneWithSubscription.setCount(5);
+            inputConnectors.doneWithSubscription.setCount(5);
             CEINMS::OutputConnectors::doneWithExecution.setCount(2);
 
             // 4. start the threads
@@ -430,26 +432,26 @@ int main(int argc, char** argv) {
 
              // 2. define the thread connecting with the input sources          
              string emgFilename(dataLocations.getEmgFile());
-             EMGFromFile emgProducer(mySubject, emgFilename, emgGeneratorFile);
+             EMGFromFile emgProducer(inputConnectors, mySubject, emgFilename, emgGeneratorFile);
 
              vector< string > dofNames;
              mySubject.getDoFNames(dofNames);
              vector< string > maFilename;
              sortMaFilenames(dataLocations.getMaFiles(), dofNames, maFilename);
-             LmtMaFromStorageFile lmtMaProducer(mySubject, dataLocations.getLmtFile(), maFilename);
+             LmtMaFromStorageFile lmtMaProducer(inputConnectors, mySubject, dataLocations.getLmtFile(), maFilename);
 
              string externalTorqueFilename(dataLocations.getExternalTorqueFile());
-             ExternalTorquesFromStorageFile externalTorquesProducer(mySubject, externalTorqueFilename);
+             ExternalTorquesFromStorageFile externalTorquesProducer(inputConnectors, mySubject, externalTorqueFilename);
 
              // 2b. define the thread consuming the output sources
              vector<string> valuesToWrite = { "Activations", "FiberLenghts", "FiberVelocities", "MuscleForces", "Torques" };
-             QueuesToStorageFiles queuesToStorageFiles(mySubject, valuesToWrite, outputDirectory);
+             QueuesToStorageFiles queuesToStorageFiles(inputConnectors, mySubject, valuesToWrite, outputDirectory);
 
              // 3. define the model simulator
              vector<string> valuesToLog = { "Activations", "FiberLenghts", "FiberVelocities", "MuscleForces", "Torques" };
-             ModelEvaluationOnline<MyNMSmodel, LoggerOnQueues> simulator(mySubject, valuesToLog);
+             ModelEvaluationOnline<MyNMSmodel, LoggerOnQueues> simulator(inputConnectors, mySubject, valuesToLog);
 
-             CEINMS::InputConnectors::doneWithSubscription.setCount(5);
+             inputConnectors.doneWithSubscription.setCount(5);
              CEINMS::OutputConnectors::doneWithExecution.setCount(2);
 
              // 4. start the threads
@@ -476,26 +478,26 @@ int main(int argc, char** argv) {
 
              // 2. define the thread connecting with the input sources          
              string emgFilename(dataLocations.getEmgFile());
-             EMGFromFile emgProducer(mySubject, emgFilename, emgGeneratorFile);
+             EMGFromFile emgProducer(inputConnectors, mySubject, emgFilename, emgGeneratorFile);
 
              vector< string > dofNames;
              mySubject.getDoFNames(dofNames);
              vector< string > maFilename;
              sortMaFilenames(dataLocations.getMaFiles(), dofNames, maFilename);
-             LmtMaFromStorageFile lmtMaProducer(mySubject, dataLocations.getLmtFile(), maFilename);
+             LmtMaFromStorageFile lmtMaProducer(inputConnectors, mySubject, dataLocations.getLmtFile(), maFilename);
 
              string externalTorqueFilename(dataLocations.getExternalTorqueFile());
-             ExternalTorquesFromStorageFile externalTorquesProducer(mySubject, externalTorqueFilename);
+             ExternalTorquesFromStorageFile externalTorquesProducer(inputConnectors, mySubject, externalTorqueFilename);
 
              // 2b. define the thread consuming the output sources
              vector<string> valuesToWrite = { "Activations", "FiberLenghts", "FiberVelocities", "MuscleForces", "Torques" };
-             QueuesToStorageFiles queuesToStorageFiles(mySubject, valuesToWrite, outputDirectory);
+             QueuesToStorageFiles queuesToStorageFiles(inputConnectors, mySubject, valuesToWrite, outputDirectory);
 
              // 3. define the model simulator
              vector<string> valuesToLog = { "Activations", "FiberLenghts", "FiberVelocities", "MuscleForces", "Torques" };
-             ModelEvaluationOffline<MyNMSmodel, LoggerOnQueues> simulator(mySubject, valuesToLog);
+             ModelEvaluationOffline<MyNMSmodel, LoggerOnQueues> simulator(inputConnectors, mySubject, valuesToLog);
 
-             CEINMS::InputConnectors::doneWithSubscription.setCount(5);
+             inputConnectors.doneWithSubscription.setCount(5);
              CEINMS::OutputConnectors::doneWithExecution.setCount(2);
 
              // 4. start the threads
@@ -525,25 +527,25 @@ int main(int argc, char** argv) {
 
              // 2. define the thread connecting with the input sources          
              string emgFilename(dataLocations.getEmgFile());
-             EMGFromFile emgProducer(mySubject, emgFilename, emgGeneratorFile);
+             EMGFromFile emgProducer(inputConnectors, mySubject, emgFilename, emgGeneratorFile);
 
              vector< string > dofNames;
              mySubject.getDoFNames(dofNames);
              vector< string > maFilename;
              sortMaFilenames(dataLocations.getMaFiles(), dofNames, maFilename);
-             LmtMaFromStorageFile lmtMaProducer(mySubject, dataLocations.getLmtFile(), maFilename);
+             LmtMaFromStorageFile lmtMaProducer(inputConnectors, mySubject, dataLocations.getLmtFile(), maFilename);
 
              string externalTorqueFilename(dataLocations.getExternalTorqueFile());
-             ExternalTorquesFromStorageFile externalTorquesProducer(mySubject, externalTorqueFilename);
+             ExternalTorquesFromStorageFile externalTorquesProducer(inputConnectors, mySubject, externalTorqueFilename);
 
              // 2b. define the thread consuming the output sources
              vector<string> valuesToWrite = { "Activations", "FiberLenghts", "FiberVelocities", "MuscleForces", "Torques", "AdjustedEmgs" };
-             QueuesToStorageFiles queuesToStorageFiles(mySubject, valuesToWrite, outputDirectory);
+             QueuesToStorageFiles queuesToStorageFiles(inputConnectors, mySubject, valuesToWrite, outputDirectory);
 
              // 3. define the model simulator
              vector<string> valuesToLog = { "Activations", "FiberLenghts", "FiberVelocities", "MuscleForces", "Torques", "AdjustedEmgs" };
             
-             CEINMS::InputConnectors::doneWithSubscription.setCount(5);
+             inputConnectors.doneWithSubscription.setCount(5);
              CEINMS::OutputConnectors::doneWithExecution.setCount(2);
 
              // 4. define the optimiser
@@ -562,7 +564,7 @@ int main(int argc, char** argv) {
              executionCfg.getAnnealingParameters(nt, ns, rt, t, maxNoEval, epsilon, noEpsilon);
              errorMinimizer.setAnnealingParameters(nt, ns, rt, t, maxNoEval, epsilon, noEpsilon);
              
-             ModelEvaluationHybrid<MyNMSmodel, MyErrorMinimizer, LoggerOnQueues> simulator(mySubject, errorMinimizer, valuesToLog);
+             ModelEvaluationHybrid<MyNMSmodel, MyErrorMinimizer, LoggerOnQueues> simulator(inputConnectors, mySubject, errorMinimizer, valuesToLog);
              
              
              // 5. start the threads
@@ -588,25 +590,25 @@ int main(int argc, char** argv) {
 
                // 2. define the thread connecting with the input sources          
                string emgFilename(dataLocations.getEmgFile());
-               EMGFromFile emgProducer(mySubject, emgFilename, emgGeneratorFile);
+               EMGFromFile emgProducer(inputConnectors, mySubject, emgFilename, emgGeneratorFile);
 
                vector< string > dofNames;
                mySubject.getDoFNames(dofNames);
                vector< string > maFilename;
                sortMaFilenames(dataLocations.getMaFiles(), dofNames, maFilename);
-               LmtMaFromStorageFile lmtMaProducer(mySubject, dataLocations.getLmtFile(), maFilename);
+               LmtMaFromStorageFile lmtMaProducer(inputConnectors, mySubject, dataLocations.getLmtFile(), maFilename);
 
                string externalTorqueFilename(dataLocations.getExternalTorqueFile());
-               ExternalTorquesFromStorageFile externalTorquesProducer(mySubject, externalTorqueFilename);
+               ExternalTorquesFromStorageFile externalTorquesProducer(inputConnectors, mySubject, externalTorqueFilename);
 
                // 2b. define the thread consuming the output sources
                vector<string> valuesToWrite = { "Activations", "FiberLenghts", "FiberVelocities", "MuscleForces", "Torques", "AdjustedEmgs" };
-               QueuesToStorageFiles queuesToStorageFiles(mySubject, valuesToWrite, outputDirectory);
+               QueuesToStorageFiles queuesToStorageFiles(inputConnectors, mySubject, valuesToWrite, outputDirectory);
 
                // 3. define the model simulator
                vector<string> valuesToLog = { "Activations", "FiberLenghts", "FiberVelocities", "MuscleForces", "Torques", "AdjustedEmgs" };
 
-               CEINMS::InputConnectors::doneWithSubscription.setCount(5);
+               inputConnectors.doneWithSubscription.setCount(5);
                CEINMS::OutputConnectors::doneWithExecution.setCount(2);
 
                // 4. define the optimiser
@@ -625,7 +627,7 @@ int main(int argc, char** argv) {
                executionCfg.getAnnealingParameters(nt, ns, rt, t, maxNoEval, epsilon, noEpsilon);
                errorMinimizer.setAnnealingParameters(nt, ns, rt, t, maxNoEval, epsilon, noEpsilon);
 
-               ModelEvaluationHybrid<MyNMSmodel, MyErrorMinimizer, LoggerOnQueues> simulator(mySubject, errorMinimizer, valuesToLog);
+               ModelEvaluationHybrid<MyNMSmodel, MyErrorMinimizer, LoggerOnQueues> simulator(inputConnectors, mySubject, errorMinimizer, valuesToLog);
 
 
                // 5. start the threads

@@ -24,11 +24,12 @@ using std::string;
 
 
 template <typename NMSmodelT, typename ErrorMinimizerT, typename Logger>
-ModelEvaluationHybrid<NMSmodelT, ErrorMinimizerT, Logger>::ModelEvaluationHybrid(NMSmodelT& subject, 
-                                                                         ErrorMinimizerT& torqueErrorMinimizer,
-                                                                         const vector<string>& valuesToLog
-                                                                        )
-    :ModelEvaluationBase<Logger>::ModelEvaluationBase(valuesToLog), 
+ModelEvaluationHybrid<NMSmodelT, ErrorMinimizerT, Logger>::ModelEvaluationHybrid(CEINMS::InputConnectors& inputConnectors,
+                                                                                 NMSmodelT& subject,
+                                                                                 ErrorMinimizerT& torqueErrorMinimizer,
+                                                                                 const vector<string>& valuesToLog
+                                                                                )
+    :ModelEvaluationBase<Logger>::ModelEvaluationBase(inputConnectors, valuesToLog), 
     subject_(subject),
     torqueErrorMinimizer_(torqueErrorMinimizer) { 
 
@@ -41,13 +42,7 @@ ModelEvaluationHybrid<NMSmodelT, ErrorMinimizerT, Logger>::ModelEvaluationHybrid
 template <typename NMSmodelT, typename ErrorMinimizerT, typename Logger>
 void ModelEvaluationHybrid<NMSmodelT, ErrorMinimizerT, Logger>::operator()() {
 
-    CEINMS::InputConnectors::queueLmt.subscribe();
-    CEINMS::InputConnectors::queueEmg.subscribe();
-    for (auto& it : CEINMS::InputConnectors::queueMomentArms)
-        (*it).subscribe();
-    CEINMS::InputConnectors::queueExternalTorques.subscribe();
-
-    CEINMS::InputConnectors::doneWithSubscription.wait();
+    ModelEvaluationBase<Logger>::subscribeToInputConnectors();
 
 #ifdef LOG
     cout << "starting consume" << endl;
@@ -81,7 +76,7 @@ void ModelEvaluationHybrid<NMSmodelT, ErrorMinimizerT, Logger>::operator()() {
         // 3. read external Torque 
         CEINMS::InputConnectors::FrameType externalTorquesFrameFromQueue;
 
-        if (CEINMS::InputConnectors::externalTorquesAvailable) {
+        if (ModelEvaluationBase<Logger>::externalTorquesAvailable()) {
             while ((externalTorqueTime < lmtMaTime) /*&& (!(externalTorquesFromQueue.empty()))*/) {
                 ModelEvaluationBase<Logger>::getExternalTorquesFromInputQueue(externalTorquesFrameFromQueue);
                 externalTorqueTime = externalTorquesFrameFromQueue.time;
@@ -177,8 +172,9 @@ void ModelEvaluationHybrid<NMSmodelT, ErrorMinimizerT, Logger>::operator()() {
         else runCondition = false;
 
  
-        runCondition = (emgTime <  CEINMS::InputConnectors::globalTimeLimit) && (lmtMaTime <  CEINMS::InputConnectors::globalTimeLimit) && runCondition;
-    } while (runCondition);
+        float globalTimeLimit = ModelEvaluationBase<Logger>::getGlobalTimeLimit();
+        runCondition = (emgTime <  globalTimeLimit) && (lmtMaTime <  globalTimeLimit) && runCondition;
+  } while (runCondition);
 
 
 

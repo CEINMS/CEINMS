@@ -20,15 +20,15 @@ using std::string;
 
 #include "ModelEvaluationOffline.h"
 #include "ModelEvaluationBase.h"
-#include "InputQueues.h"
+#include "InputConnectors.h"
 #include "OutputQueues.h"
 #define LOG_FILES
 #define LOG
 
 
 template <typename NMSmodelT, typename Logger>
-ModelEvaluationOffline<NMSmodelT, Logger>::ModelEvaluationOffline(NMSmodelT& subject, const vector<string>& valuesToLog)
-    :ModelEvaluationBase<Logger>::ModelEvaluationBase(valuesToLog), subject_(subject)
+ModelEvaluationOffline<NMSmodelT, Logger>::ModelEvaluationOffline(CEINMS::InputConnectors& inputConnectors, NMSmodelT& subject, const vector<string>& valuesToLog)
+    :ModelEvaluationBase<Logger>::ModelEvaluationBase(inputConnectors, valuesToLog), subject_(subject)
 {
     subject_.getDoFNames(dofNames_);
     noDof_ = dofNames_.size();
@@ -58,7 +58,7 @@ void ModelEvaluationOffline<NMSmodelT, Logger>::readDataFromQueues() {
     } while (runCondition);
 
 
-    runCondition = CEINMS::InputConnectors::externalTorquesAvailable;
+    runCondition = ModelEvaluationBase<Logger>::externalTorquesAvailable();
     //read external torques
     do{
         auto frame(ModelEvaluationBase<Logger>::getExternalTorquesFromInputQueue());
@@ -107,13 +107,7 @@ void ModelEvaluationOffline<NMSmodelT, Logger>::initOfflineCurve() {
 template <typename NMSmodelT, typename Logger>
 void ModelEvaluationOffline<NMSmodelT, Logger>::operator()() {
  
-    CEINMS::InputConnectors::queueLmt.subscribe();
-    CEINMS::InputConnectors::queueEmg.subscribe();
-    for (auto& it : CEINMS::InputConnectors::queueMomentArms)
-        (*it).subscribe();
-    CEINMS::InputConnectors::queueExternalTorques.subscribe();
-
-    CEINMS::InputConnectors::doneWithSubscription.wait();
+    ModelEvaluationBase<Logger>::subscribeToInputConnectors();
 
 #ifdef LOG
     cout << "starting consume" << endl;
