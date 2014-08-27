@@ -9,6 +9,7 @@
 
 #include "SimpleFileLogger.h"
 #include "StorageLogger.h"
+#include "TimeCompare.h"
 
 #include <iostream>
 using std::cout;
@@ -93,7 +94,7 @@ void ModelEvaluationOffline<NMSmodelT, Logger>::initOfflineCurve() {
         subject_.setTime(emgTime);
         subject_.setEmgs(emgIt.data);
         subject_.updateActivations();
-        if (lmtIt->time <= emgTime && lmtIt != lmtDataFromQueue_.end()) {
+        if (TimeCompare::lessEqual(lmtIt->time, emgTime) && lmtIt != lmtDataFromQueue_.end()) {
             subject_.setMuscleTendonLengths(lmtIt->data);
             subject_.updateFibreLengths_OFFLINEPREP();
             ++lmtIt;
@@ -140,7 +141,7 @@ void ModelEvaluationOffline<NMSmodelT, Logger>::operator()() {
             //ROBA CHE DEVE FARE EMG
             subject_.setTime(emgTime);
             subject_.setEmgs(emgFrameFromQueue.data);
-            if (emgTime < lmtMaTime) {
+            if (TimeCompare::less(emgTime, lmtMaTime)) {
                 subject_.updateActivations();
                 subject_.pushState();
 #ifdef LOG_FILES  
@@ -150,7 +151,7 @@ void ModelEvaluationOffline<NMSmodelT, Logger>::operator()() {
 #endif    
             }  
             runCondition = (runCondition && !emgDataFromQueue_.empty());
-        } while (emgTime < lmtMaTime && runCondition);
+        } while (TimeCompare::less(emgTime, lmtMaTime) && runCondition);
 
 
         // 2. read moment arms data
@@ -165,7 +166,7 @@ void ModelEvaluationOffline<NMSmodelT, Logger>::operator()() {
 
         // 3. read external Torque 
         CEINMS::InputConnectors::FrameType externalTorquesFrameFromQueue;
-        while (externalTorqueTime < lmtMaTime && !externalTorquesDataFromQueue_.empty()) {
+        while (TimeCompare::less(externalTorqueTime, lmtMaTime) && !externalTorquesDataFromQueue_.empty()) {
             externalTorquesFrameFromQueue = externalTorquesDataFromQueue_.front();
             externalTorquesDataFromQueue_.pop_front();
             externalTorqueTime = externalTorquesFrameFromQueue.time;

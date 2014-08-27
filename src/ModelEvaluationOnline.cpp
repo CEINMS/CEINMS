@@ -20,6 +20,7 @@ using std::vector;
 #include <boost/concept_check.hpp>
 using std::string;
 
+#include "TimeCompare.h"
 #include "ModelEvaluationOnline.h"
 #include "ModelEvaluationBase.h"
 #include "InputConnectors.h"
@@ -100,7 +101,7 @@ void ModelEvaluationOnline<NMSmodelT, Logger>::operator()() {
         //ROBA CHE DEVE FARE EMG
         subject_.setTime(emgTime);
         subject_.setEmgs(emgFrameFromQueue.data);
-        if (emgTime < lmtMaTime) {
+        if (TimeCompare::less(emgTime, lmtMaTime)) {
           subject_.updateActivations();
           subject_.pushState();
         
@@ -111,7 +112,7 @@ void ModelEvaluationOnline<NMSmodelT, Logger>::operator()() {
 #endif  
         }
       } else runCondition = false;
-    } while(emgTime < lmtMaTime && runCondition);
+    } while(TimeCompare::less(emgTime, lmtMaTime) && runCondition);
    
  //ROBA VARIA lmt ma
     if (!lmtFrameFromQueue.data.empty() && !momentArmsFrameFromQueue.empty() && runCondition) {

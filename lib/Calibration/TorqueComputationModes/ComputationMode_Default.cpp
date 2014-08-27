@@ -12,7 +12,7 @@ using std::vector;
 #include "TrialData.h"
 #include <iostream>
 #include <stdlib.h>
-#include "NumCompare.h"
+#include "TimeCompare.h"
 
 template<typename NMSmodelT>
 ComputationMode_Default<NMSmodelT>::ComputationMode_Default(NMSmodelT& subject):
@@ -91,7 +91,7 @@ void ComputationMode_Default<NMSmodelT>::initFiberLengthTraceCurves(unsigned tri
             subject_.updateActivations(musclesToUpdate_);
         }
 
-        if (NumCompare::lessEqual(lmtTime, emgTime) && (k < trials_.at(ct).noLmtSteps_) && (k < trials_.at(ct).maData_.front().size())) {
+        if (TimeCompare::lessEqual(lmtTime, emgTime) && (k < trials_.at(ct).noLmtSteps_) && (k < trials_.at(ct).maData_.front().size())) {
 
             firstLmtArrived = true;           
             // set emg to model, set activations of the muscles not updated
@@ -228,7 +228,7 @@ void ComputationMode_Default<NMSmodelT>::computeTorquesAndPenalties(vector< vect
 
 //            if(emgTime < lmtTime) 
 //                subject_.setTime_emgs_updateActivations_pushState_selective(emgTime, trials_.at(ct).emgData_.at(i), musclesToUpdate_);
-            if (NumCompare::lessEqual(lmtTime, emgTime) && (k < trials_.at(ct).noLmtSteps_) && (k < trials_.at(ct).maData_.front().size())) {
+            if (TimeCompare::lessEqual(lmtTime, emgTime) && (k < trials_.at(ct).noLmtSteps_) && (k < trials_.at(ct).maData_.front().size())) {
                 firstLmtArrived = true;
                 subject_.setMuscleForces(forceDataT1_.at(ct).at(k));
                 subject_.setTime(emgTime);

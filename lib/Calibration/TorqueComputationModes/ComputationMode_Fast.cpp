@@ -1,7 +1,7 @@
 #include <vector>
 using std::vector;
 #include "TrialData.h"
-#include "NumCompare.h"
+#include "TimeCompare.h"
 //#define DEBUG
 
 template<typename NMSmodelT>
@@ -160,7 +160,7 @@ void ComputationMode_Fast<NMSmodelT>::computeTorquesAndPenalties(vector< vector<
 //            if(emgTime < lmtTime) 
 //                subject_.setTime_emgs_updateActivations_pushState_selective(emgTime, trials_.at(ct).emgData_.at(i), musclesToUpdate_);
 
-            if (NumCompare::lessEqual(lmtTime, emgTime) && (k < trials_.at(ct).noLmtSteps_) && (k < trials_.at(ct).maData_.front().size())) {
+            if (TimeCompare::lessEqual(lmtTime, emgTime) && (k < trials_.at(ct).noLmtSteps_) && (k < trials_.at(ct).maData_.front().size())) {
                 subject_.setMuscleForces(forceDataT1_.at(ct).at(k));
                 subject_.setTime(emgTime);
                 subject_.setEmgsSelective(trials_.at(ct).emgData_.at(i), musclesToUpdate_);

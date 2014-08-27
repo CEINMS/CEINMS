@@ -9,7 +9,7 @@
 
 #include "SimpleFileLogger.h"
 #include "StorageLogger.h"
-
+#include "TimeCompare.h"
 #include <iostream>
 using std::cout;
 using std::endl;
@@ -104,7 +104,7 @@ void ModelEvaluationHybrid<NMSmodelT, ErrorMinimizerT, Logger>::operator()() {
                 }
             }
             else runCondition = false;
-        } while (emgTime < lmtMaTime && runCondition);
+        } while (TimeCompare::less(emgTime, lmtMaTime) && runCondition);
 
         //ROBA VARIA lmt ma
         if (!lmtFrameFromQueue.data.empty() && !momentArmsFrameFromQueue.empty() && runCondition) {
@@ -173,7 +173,7 @@ void ModelEvaluationHybrid<NMSmodelT, ErrorMinimizerT, Logger>::operator()() {
 
  
         float globalTimeLimit = ModelEvaluationBase<Logger>::getGlobalTimeLimit();
-        runCondition = (emgTime <  globalTimeLimit) && (lmtMaTime <  globalTimeLimit) && runCondition;
+        runCondition = TimeCompare::less(emgTime, globalTimeLimit) && TimeCompare::less(lmtMaTime, globalTimeLimit) && runCondition;
   } while (runCondition);
 
 

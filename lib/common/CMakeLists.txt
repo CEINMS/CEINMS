@@ -5,7 +5,8 @@ set(Common_HEADERS  ArrayConverter.h
                     FileUtils.h
                     Parameter.h
                     SimulatedAnnealingParameters.h
-                    QueueData.h)
+                    QueueData.h
+					TimeCompare.h)
 
 set(Common_SOURCES  Parameter.cpp
                     FileUtils.cpp)
