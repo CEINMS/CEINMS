@@ -42,136 +42,112 @@ void ModelEvaluationOnline<NMSmodelT, Logger>::operator()() {
 
     ModelEvaluationBase<Logger>::subscribeToInputConnectors();
   
-#ifdef LOG
-  cout << "starting consume" << endl;
-#endif
+    #ifdef LOG
+    cout << "starting consume" << endl;
+    #endif
   
-  double externalTorqueTime = std::numeric_limits<double>::lowest();
-  bool runCondition = true; 
-  do {  // while(runCondition)
+    double externalTorqueTime = std::numeric_limits<double>::lowest();
+    double emgTime = std::numeric_limits<double>::lowest();
+    bool runCondition = true; 
+    bool firstLmtArrived(false);
+    do {  // while(runCondition)
      
-    // 1. read lmt Data
-    CEINMS::InputConnectors::FrameType lmtFrameFromQueue;
-    double lmtMaTime;
-     
-    ModelEvaluationBase<Logger>::getLmtFromInputQueue(lmtFrameFromQueue);
-    lmtMaTime = lmtFrameFromQueue.time;
-#ifdef LOG
-    cout << lmtMaTime << endl; 
-    for (auto& it: lmtFrameFromQueue.data)
-      cout << it << " ";
-    cout << endl;
-#endif
-   
+        // 1. read lmt Data
+        CEINMS::InputConnectors::FrameType lmtFrameFromQueue;
+        ModelEvaluationBase<Logger>::getLmtFromInputQueue(lmtFrameFromQueue);
+        double lmtMaTime = lmtFrameFromQueue.time;
+
+        // update runCondition
+        runCondition = runCondition && !lmtFrameFromQueue.data.empty();
+
+        // 2. read moment arms data
+        vector< CEINMS::InputConnectors::FrameType > momentArmsFrameFromQueue;
+        momentArmsFrameFromQueue.resize(noDof_);
+        for(unsigned int i = 0; i < noDof_; ++i) {
+          ModelEvaluationBase<Logger>::getMomentArmsFromInputQueue((momentArmsFrameFromQueue.at(i)), i);
+          runCondition = runCondition && !momentArmsFrameFromQueue.at(i).data.empty();
+        }
+
+        // 3. read external Torque 
+        CEINMS::InputConnectors::FrameType externalTorquesFrameFromQueue;  
+        if (ModelEvaluationBase<Logger>::externalTorquesAvailable()) {
+            while (TimeCompare::less(externalTorqueTime, lmtMaTime)) {
+                ModelEvaluationBase<Logger>::getExternalTorquesFromInputQueue(externalTorquesFrameFromQueue);
+                externalTorqueTime = externalTorquesFrameFromQueue.time;
+            }
+        }
+
+        // 4. read emgs
+        CEINMS::InputConnectors::FrameType emgFrameFromQueue;    
+        while (TimeCompare::less(emgTime, lmtMaTime) && runCondition) {
+            ModelEvaluationBase<Logger>::getEmgFromInputQueue(emgFrameFromQueue);
+            emgTime = emgFrameFromQueue.time + globalEmDelay_;
+            runCondition = runCondition && !emgFrameFromQueue.data.empty();
+            if (!TimeCompare::less(emgTime, lmtMaTime)) firstLmtArrived = true;
+            if (!firstLmtArrived && runCondition) {
+                subject_.setTime(emgTime);
+                subject_.setEmgs(emgFrameFromQueue.data);
+                subject_.updateActivations();
+                subject_.pushState();
+            }
+        }
   
-    // 2. read moment arms data
-    vector< CEINMS::InputConnectors::FrameType > momentArmsFrameFromQueue;
-    momentArmsFrameFromQueue.resize(noDof_);
-    for(unsigned int i = 0; i < noDof_; ++i) {
-      ModelEvaluationBase<Logger>::getMomentArmsFromInputQueue((momentArmsFrameFromQueue.at(i)), i); 
-    }
-    
-    // 3. read external Torque 
-    CEINMS::InputConnectors::FrameType externalTorquesFrameFromQueue;  
-
-    if (ModelEvaluationBase<Logger>::externalTorquesAvailable()) {
-        while ((externalTorqueTime < lmtMaTime) /*&& (!(externalTorquesFromQueue.empty()))*/) {
-        ModelEvaluationBase<Logger>::getExternalTorquesFromInputQueue(externalTorquesFrameFromQueue);
-        externalTorqueTime = externalTorquesFrameFromQueue.time;
-      }
-    }
-
-//:TODO: nota da aggiornare....
-//dopo il for la variabile externalTorqueFromQueue conterrà i valori delle torque esterne sincronizzati con i tempi
-//forniti dal produttore di lmt e ma. Si ricorda che per questioni di ortogonalità la variabile externalTorqueFromQueue
-//è un vettore di vettori di double. tuttavia, poiché è presente un unico valore di torque esterna per un dato istante di tempo
-//è possibile estrarre i dati e porli in un semplice vettore di double.
-//externalTorqueTime contiene i valori temporali di ogni torque esterna. la forma è generalizzata poiché si ipotizza una diversa frequenza
-//di campionamento per ogni torque esterna.
-//nel caso attuale externalTorqueTime contine lo stesso valore temporale per ogni torque esterna.
-//nella variabile privata dofNamesWithExtTorque_ sono contenuti i nomi dei gradi di libertà ai quali è associata una torque esterna
-//tale variabile può essere utilizzata come controllo, poiché la torque esterna è misurata solo su alcuni dof.
-
-    CEINMS::InputConnectors::FrameType emgFrameFromQueue;
-    double emgTime;
-    do {
-      ModelEvaluationBase<Logger>::getEmgFromInputQueue(emgFrameFromQueue);
-      emgTime = emgFrameFromQueue.time + globalEmDelay_;
-      if(!emgFrameFromQueue.data.empty()) {
-        //ROBA CHE DEVE FARE EMG
-        subject_.setTime(emgTime);
-        subject_.setEmgs(emgFrameFromQueue.data);
-        if (TimeCompare::less(emgTime, lmtMaTime)) {
-          subject_.updateActivations();
-          subject_.pushState();
-        
-#ifdef LOG_FILES  
+        //5. lmt, ma, emg, extTorques have been read correctly and I can push to the model
+        if (runCondition) {
+            subject_.setTime(emgTime);
+            subject_.setEmgs(emgFrameFromQueue.data);
+            subject_.setMuscleTendonLengths(lmtFrameFromQueue.data);
+            for (unsigned int i = 0; i < noDof_; ++i)     
+                subject_.setMomentArms(momentArmsFrameFromQueue.at(i).data, i); 
+            subject_.updateState();
+            subject_.pushState();
+    #ifdef LOG_FILES
+          //:TODO: Improve as now you are defining two times what you want to log 
           vector<double> data;
           subject_.getActivations(data); 
           ModelEvaluationBase<Logger>::logger.log(emgTime, data, "Activations");
-#endif  
-        }
-      } else runCondition = false;
-    } while(TimeCompare::less(emgTime, lmtMaTime) && runCondition);
-   
- //ROBA VARIA lmt ma
-    if (!lmtFrameFromQueue.data.empty() && !momentArmsFrameFromQueue.empty() && runCondition) {
-      subject_.setMuscleTendonLengths(lmtFrameFromQueue.data);
-      for (unsigned int i = 0; i < noDof_; ++i)     
-        subject_.setMomentArms(momentArmsFrameFromQueue.at(i).data, i); 
-      subject_.updateState();
-      subject_.pushState();
-
-#ifdef LOG_FILES
-      //:TODO: Improve as now you are defining two times what you want to log 
-      vector<double> data;
-      subject_.getActivations(data); 
-      ModelEvaluationBase<Logger>::logger.log(emgTime, data, "Activations");
-      subject_.getFiberLengths(data);
-      ModelEvaluationBase<Logger>::logger.log(emgTime, data, "FiberLenghts");
-      subject_.getFiberVelocities(data); 
-      ModelEvaluationBase<Logger>::logger.log(emgTime, data, "FiberVelocities");
-      subject_.getMuscleForces(data); 
-      ModelEvaluationBase<Logger>::logger.log(emgTime, data, "MuscleForces");
-      subject_.getTorques(data);
-      ModelEvaluationBase<Logger>::logger.log(emgTime, data, "Torques");
-#endif
+          subject_.getFiberLengths(data);
+          ModelEvaluationBase<Logger>::logger.log(emgTime, data, "FiberLenghts");
+          subject_.getFiberVelocities(data); 
+          ModelEvaluationBase<Logger>::logger.log(emgTime, data, "FiberVelocities");
+          subject_.getMuscleForces(data); 
+          ModelEvaluationBase<Logger>::logger.log(emgTime, data, "MuscleForces");
+          subject_.getTorques(data);
+          ModelEvaluationBase<Logger>::logger.log(emgTime, data, "Torques");
+    #endif
       
-      
-#ifdef LOG
-      cout << endl << endl << "Time: " << emgTime << endl << "EMG" << endl;
-      for (auto& it:emgFrameFromQueue.data)
-        cout << it << "\t";
+    #ifdef LOG
+          cout << endl << endl << "EmgTime: " << emgTime << endl << "EMG" << endl;
+          for (auto& it:emgFrameFromQueue.data)
+            cout << it << "\t";
        
-      cout << endl << "Lmt" << endl;
-      for (auto& it:lmtFrameFromQueue.data)
-        cout << it << "\t"; 
+          cout << endl << "LmtTime: " << lmtMaTime << endl << "Lmt" << endl;
+          for (auto& it:lmtFrameFromQueue.data)
+            cout << it << "\t"; 
 
-      for (unsigned int j = 0; j < dofNames_.size(); ++j) {
-        cout << endl << "MomentArms on: " << dofNames_.at(j) << endl;
-        for (auto& it: momentArmsFrameFromQueue.at(j).data)
-          cout << it << "\t"; 
-      }
+          for (unsigned int j = 0; j < dofNames_.size(); ++j) {
+            cout << endl << "MomentArms on: " << dofNames_.at(j) << endl;
+            for (auto& it: momentArmsFrameFromQueue.at(j).data)
+              cout << it << "\t"; 
+          }
       
-      for (auto& it:externalTorquesFrameFromQueue.data)
-        cout << it << " "; 
+          for (auto& it:externalTorquesFrameFromQueue.data)
+            cout << it << " "; 
        
-      vector<double> cTorques;
-      subject_.getTorques(cTorques);
-      for(unsigned int i = 0; i < cTorques.size(); ++i) {
-        cout << "\nCurrent Torque on " << dofNames_.at(i) << " ";
-        cout << cTorques.at(i); 
-      }   
-      cout << endl << "----------------------------------------" << endl;
-#endif
-    } else runCondition = false;
+          vector<double> cTorques;
+          subject_.getTorques(cTorques);
+          for(unsigned int i = 0; i < cTorques.size(); ++i) {
+            cout << "\nCurrent Torque on " << dofNames_.at(i) << " ";
+            cout << cTorques.at(i); 
+          }   
+          cout << endl << "----------------------------------------" << endl;
+    #endif
+        } 
 
-//    when time value from input data is greater then globalTimeLimit (which value is set in ExternalVariables.cpp)
-//   OR when an empty vector is acqured from one of the queues the thread stop consuming 
-// NOTE: when one a producer push an empty vector in a queue means that ther are no more data to be produced, it's like an end frame. 
-    float globalTimeLimit = ModelEvaluationBase<Logger>::getGlobalTimeLimit();
-    runCondition = (emgTime <  globalTimeLimit) && (lmtMaTime <  globalTimeLimit) && runCondition;
-  } while (runCondition);
+   //   float globalTimeLimit = ModelEvaluationBase<Logger>::getGlobalTimeLimit();
+    //   runCondition = TimeCompare::less(emgTime,  globalTimeLimit) && TimeCompare::less(lmtMaTime, globalTimeLimit) && runCondition;
+     
+ } while (runCondition);
 
   
   
