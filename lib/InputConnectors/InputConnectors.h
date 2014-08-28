@@ -18,7 +18,6 @@
 #include <list>
 #include <vector>
  
- 
 
 namespace CEINMS {
 class InputConnectors {
