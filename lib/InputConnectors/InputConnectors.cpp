@@ -14,6 +14,11 @@
 
 
 namespace CEINMS {
+
+    InputConnectors::InputConnectors():
+        globalTimeLimit(std::numeric_limits<double>::infinity()), externalTorquesAvailable(false) { }
+
+
     InputConnectors::~InputConnectors()
     {
         if (!queueMomentArms.empty())
