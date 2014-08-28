@@ -13,4 +13,5 @@ Preparing your experimental data
     - perform id with opensim
     - perform muscle analysis with opensim
     - prepare inputData.xml
+
 **Don't forget to sanity-check your results!**

@@ -1,7 +1,36 @@
 CEINMS configuration files
 ##########################
 
-CEINMS is entirely configured through a set of XML files. XSD schemas for these files are provided together with the software.
+CEINMS is entirely configured through XML files. Each file type is described by an `XML schema (XSD) <http://www.w3schools.com/schema/>`_. This allows to check the *formal* correctness of an XML file without even launching CEINMS, using any XML-validating software (for example, `XML Copy Editor <http://xml-copy-editor.sourceforge.net/>`_). XSD files are provided together with the software.
+
+Configuration files are presented in the following sections. An example of each file is provided and explained, and the corresponding grammar scheme is reported.
+Files are divided into three categories:
+
+**execution** to define how to perform the simulation (see :doc:`/manual/ceinms-ceinms`)
+
+.. toctree::
+   :maxdepth: 2
+
+   CEINMS main setup </manual/xsd/ceinmsSetup.xsd>
+   Execution parameters</manual/xsd/execution.xsd>
+
+**calibration** to define how to perform the model calibration (see :doc:`/manual/ceinms-ceinmscalibrate`)
+
+.. toctree::
+   :maxdepth: 2
+
+   CEINMScalibrate main setup </manual/xsd/ceinmsCalibrationSetup.xsd>
+   Calibration parameters</manual/xsd/calibration.xsd>
+
+**common data** to describe the data that is required by the former categories, i.e., the model under investigation and how to find the input (experimental) data
+
+.. toctree::
+   :maxdepth: 2
+
+   Subject description </manual/xsd/subject.xsd>
+   Trial (input data) description </manual/xsd/inputData.xsd>
+   EMG experimental-to-model mappings </manual/xsd/emgGenerator.xsd>
+
 A list of the XML files is given below. XML file *names* are given as examples, but they are not fixed, as they are configurable themselves; what matters is that their *content* matches the corresponding XSD grammar.
 
 The main files that govern the configuration of the CEINMS executables are:
@@ -32,7 +61,7 @@ and for CEINMS
     In the following, an example of each configuration file is provided and explained, and the corresponding grammar scheme is reported.
 
 .. toctree::
-   :maxdepth: 1
+   :maxdepth: 2
 
    CEINMS setup XSD </manual/xsd/ceinmsSetup.xsd>
    CEINMScalibrate setup XSD </manual/xsd/ceinmsCalibrationSetup.xsd>

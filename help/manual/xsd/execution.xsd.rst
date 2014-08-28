@@ -1,5 +1,5 @@
-Trial (input) data configuration file
-#####################################
+Execution configuration file
+##############################
 
 .. only:: html or latex
 
@@ -16,6 +16,6 @@ XML example
 
 XSD grammar
 ------------------------
-.. literalinclude:: ../../../cfg/XSD/inputData.xsd
+.. literalinclude:: ../../../cfg/XSD/execution.xsd
    :language: xml
    :encoding: latin-1

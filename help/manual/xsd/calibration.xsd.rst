@@ -1,5 +1,5 @@
-Trial (input) data configuration file
-#####################################
+Calibration configuration file
+##############################
 
 .. only:: html or latex
 
@@ -16,6 +16,7 @@ XML example
 
 XSD grammar
 ------------------------
-.. literalinclude:: ../../../cfg/XSD/inputData.xsd
+
+.. literalinclude:: ../../../cfg/XSD/calibration.xsd
    :language: xml
    :encoding: latin-1
