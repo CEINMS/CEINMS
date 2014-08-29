@@ -54,36 +54,6 @@ TARGET_LINK_LIBRARIES( TestInputConnectors
       ${Boost_FILESYSTEM_LIBRARY}
 )
 
-#enable_language(Fortran)
-#if(UNIX)
-#find_package(LAPACK)
-#set(lapack_unix ${LAPACK_LIBRARIES} ${BLAS_LIBRARIES})
-#endif(UNIX)
-
-if(OPENSIM_FOUND)
-  include_directories(${OPENSIM_INCLUDE_DIRS} ${SIMTK_INCLUDE_DIRS})
-  set(CEINMS-osim_SOURCES CEINMS-osim.cpp ProducersFromOpenSim.cpp ${CEINMS_COMMON_SOURCES})
-  set(CEINMS-osim_HEADERS ProducersFromOpenSim.h ${CEINMS_HEADERS})
-  #temp: excluded from all, so that "all" compiles
-  add_executable(CEINMS-osim EXCLUDE_FROM_ALL ${CEINMS-osim_SOURCES} ${CEINMS-osim_HEADERS})
-
-  target_link_libraries( CEINMS-osim
-      FileIO
-      xmlInput
-      NMSmodel
-      #ProducersOSim
-      #${CMAKE_THREAD_LIBS_INIT}
-      ${Boost_PROGRAM_OPTIONS_LIBRARY}
-      ${Boost_FILESYSTEM_LIBRARY}
-      ${OPENSIM_LIBRARIES}
-  )
-
-  if(UNIX)
-  target_link_libraries( CEINMS-osim
-	${lapack_unix} )
-  endif(UNIX)
-
-endif()
 
 set(CEINMScalibrate_HEADERS XmlWriter.h)
 set(CEINMScalibrate_COMMON_SOURCES XmlWriter.cpp)
@@ -103,33 +73,6 @@ target_link_libraries( CEINMScalibrate
 )
 
 
-
-if(OPENSIM_FOUND)
-  set(CEINMScalibrate-osim_SOURCES
-    CEINMScalibration-osim.cpp  )
-    
-  add_executable( CEINMScalibrate-osim EXCLUDE_FROM_ALL ${CEINMScalibrate-osim_SOURCES} )
-  target_link_libraries( CEINMScalibrate-osim
-      xmlInput
-      Calibration
-      NMSmodel
-      FileIO
-      ${Boost_PROGRAM_OPTIONS_LIBRARY}
-      ${XERCES_LIBRARY}
-      ${OPENSIM_LIBRARIES}
-  )
-
-  if(UNIX)
-  target_link_libraries( CEINMScalibrate-osim
-	${lapack_unix} )
-  endif(UNIX)
-endif()
-
-
 install(TARGETS CEINMS CEINMScalibrate
         RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
 
-#if(OPENSIM_FOUND)
-#    install(TARGETS CEINMS-osim CEINMScalibrate-osim
-#            RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
-#endif()

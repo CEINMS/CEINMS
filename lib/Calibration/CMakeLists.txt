@@ -31,11 +31,6 @@ set(Calibration_TEMPLATE_IMPLEMENTATION
 
 set_source_files_properties( ${Calibration_TEMPLATE_IMPLEMENTATION} PROPERTIES HEADER_FILE_ONLY TRUE)
 
-if(OPENSIM_FOUND)
-  list(APPEND Calibration_HEADERS InputDataInterpreterOsim.h )
-  list(APPEND Calibration_SOURCES InputDataInterpreterOsim.cpp )
-endif()
-
 source_group("Header Files" FILES ${Calibration_HEADERS})
 source_group("Source Files" FILES ${Calibration_SOURCES} ${Calibration_TEMPLATE_IMPLEMENTATION})
 
@@ -46,11 +41,6 @@ target_include_directories( Calibration
                                     ${Curve_INCLUDE_DIRS}
                                     ${FileIO_INCLUDE_DIRS}
                                     ${ceinms_common_INCLUDE_DIRS})
-
-if(OPENSIM_FOUND)
-  target_include_directories(Calibration PUBLIC ${OPENSIM_INCLUDE_DIRS} ${SIMTK_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS})
-  target_link_libraries(Calibration ${OPENSIM_LIBRARIES} ${Boost_FILESYSTEM_LIBRARY}) #should find out which ones are actually needed
-endif()
 
 # Save path to include directory for "internal" usage
 set(Calibration_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/ObjectiveFunctions ${CMAKE_CURRENT_SOURCE_DIR}/SimAnnealParameters  ${CMAKE_CURRENT_SOURCE_DIR}/TorqueComputationModes CACHE STRING "Include directories for Calibration library")
