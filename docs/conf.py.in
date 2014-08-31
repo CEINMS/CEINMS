@@ -34,11 +34,21 @@ exclude_patterns = []
 
 todo_include_todos = True
 
+# to read bibtex: http://sphinxcontrib-bibtex.readthedocs.org/
+# to enumerate figures: http://sourceforge.net/projects/numfig/
+
 extensions = ['sphinx.ext.intersphinx',
               'sphinx.ext.extlinks',
               'sphinx.ext.todo',
-              'sphinx.ext.mathjax']
+              'sphinx.ext.mathjax',
+              'sphinxcontrib.bibtex',
+              'sphinx.ext.ifconfig',
+              'sphinx.ext.numfig']
 templates_path = ['@conf_path@/templates']
+
+# numfig:
+# numfig_number_figures = True
+# numfig_figure_caption_prefix = "Figure"
 
 # ceinms_manuals = sorted(glob.glob(r'@conf_docs@/manual/*.rst'))
 # ceinms_manual_description = re.compile('^\.\. cmake-manual-description:(.*)$')
