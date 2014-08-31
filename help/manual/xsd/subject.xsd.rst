@@ -1,7 +1,7 @@
 Subject description file
 ###############################
 
-.. only:: html or latex
+.. only:: html
 
    .. contents::
 

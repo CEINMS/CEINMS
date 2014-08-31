@@ -1,7 +1,7 @@
 CEINMScalibrate configuration file
 ##################################
 
-.. only:: html or latex
+.. only:: html
 
    .. contents::
 

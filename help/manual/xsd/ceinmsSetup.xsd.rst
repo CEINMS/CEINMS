@@ -1,7 +1,7 @@
 CEINMS main setup
 #################
 
-.. only:: html or latex
+.. only:: html
 
    .. contents::
 

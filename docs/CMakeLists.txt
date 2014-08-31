@@ -45,12 +45,6 @@ if(BUILD_SPHINX_MANUAL_HTML OR BUILD_SPHINX_MANUAL_LATEX)
     endif()
 
     set(rst_sources ${conf_docs}/index.rst
-                    ${conf_docs}/manual/ceinms-ceinmscalibrate.rst
-                    ${conf_docs}/manual/ceinms-ceinms.rst
-                    ${conf_docs}/manual/ceinms-data.rst
-                    ${conf_docs}/manual/ceinms-faq.rst
-                    ${conf_docs}/manual/ceinms-installing.rst
-                    ${conf_docs}/manual/ceinms-setups.rst
                     ${conf_docs}/manual/xsd/ceinmsCalibrationSetup.xsd.rst
                     ${conf_docs}/manual/xsd/ceinmsSetup.xsd.rst
                     ${conf_docs}/manual/xsd/inputData.xsd.rst
