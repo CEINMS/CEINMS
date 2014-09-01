@@ -1,3 +1,5 @@
+.. _introActivationDynamics:
+
 Activation dynamics
 ===================
 
@@ -5,15 +7,15 @@ Muscle excitations are extracted from raw EMG signals using a standard filtering
 Neural activation is derived from muscle excitation by modelling the muscle’s twitch response in the activation dynamic model, which has been shown to improve muscle force predictions :cite:`buchanan2004neuromusculoskeletal,lloyd2003emg,lloyd2008neuromusculoskeletal`. This is represented by a critically damped linear second-order differential system46, expressed in a discrete form by using backward differences :cite:`buchanan2004neuromusculoskeletal,lloyd2003emg,lloyd2008neuromusculoskeletal`.
 
 .. math::
-
    u_j(t) = \alpha e_j(t-d) - \beta_1 u_j(t-1) -\beta_2 u_j(t-2)
 
 
-where is the :math:`j`-th muscle excitation at time :math:`t`, the neural activation, the muscle gain coefficient, :math:`\beta_1` and :math:`\beta_2` the recursive coefficients, and :math:`d` the electromechanical delay. A stable solution for this is obtained including the following constrains :cite:`buchanan2004neuromusculoskeletal,lloyd2003emg`
+where :math:`e_j` is the :math:`j`-th muscle excitation at time :math:`t`, :math:`u_j` is the neural activation, :math:`\alpha` is the muscle gain coefficient, :math:`\beta_1` and :math:`\beta_2` are the recursive coefficients, and :math:`d` is the electromechanical delay. A stable solution for this is obtained including the following constrains :cite:`buchanan2004neuromusculoskeletal,lloyd2003emg`
 
 .. math::
 
    \beta_1 = C_1 + C_2
+
    \beta_2 = C_1 \cdot C_2
 
 where:
@@ -47,6 +49,7 @@ The second model was introduced and described by
 .. math::
 
    a_j(t) = \alpha_j^{act} ln(\beta_j^{act}u_j(t)+1), 0 \leq u_j(t)	\le u_0
+
    a_j(t) = m_j u_j(t) + c_j, u_0 \leq u_j(t) \leq 1
 
 For each muscle :math:`j`, the parameters :math:`\alpha_j^{act}`,  :math:`\beta_j^{act}`, :math:`m_j`, :math:`c_j` depend only from the shape factor , constrained in the interval :math:`(0, 0.12]`.

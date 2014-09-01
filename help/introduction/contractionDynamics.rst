@@ -1,3 +1,5 @@
+.. _introContractionDynamics:
+
 Contraction dynamics
 ====================
 
@@ -8,13 +10,23 @@ Musculotendon kinematics and muscle activation (:num:`Fig. #calibration`) are us
   F^{mt} = F^t = F^{max}[f_a(\widetilde{l}_m) f_v(\widetilde{v}_m) a + f_p(\widetilde{l}_m) + d_m  \widetilde{v}_m]	 \cos \varphi
 
 
-where :math:`F^t` is the tendon force, :math:`a` is the muscle activation, :math:`d_m` is the muscle damping element, and :math:`\varphi`  is the pennation angle of the fibres, which is function of the instantaneous fibre length (:math:l_m)
+where :math:`F^t` is the tendon force, :math:`a` is the muscle activation, :math:`d_m` is the muscle damping element, and :math:`\varphi`  is the pennation angle of the fibres, which is function of the instantaneous fibre length (:math:`l_m`)
 
 .. math::
 
    \varphi = \sin^{-1}(\frac{L_m^0 \sin \varphi_0}{l_m})
 
-where :math:`\varphi_0` is the pennation angle of the fibres at their optimal length. The tendon element influences the estimation of the fibre length, i.e.
+where :math:`\varphi_0` is the pennation angle of the fibres at their optimal length.
+The optimal fibre length has been shown to increase as activation decreases :cite:`huijing1995important`, according to:
+
+.. math::
+
+   L_m^0(t) = L_m^0(\gamma(1-a(t))+1)
+
+where :math:`\gamma` is the percentage change in optimal fibre length.
+
+
+The tendon element influences the estimation of the fibre length, i.e.
 
 .. math::
 

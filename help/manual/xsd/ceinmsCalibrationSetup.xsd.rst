@@ -1,3 +1,5 @@
+.. _ceinmscalibrateConfigurationFile:
+
 CEINMScalibrate configuration file
 ##################################
 
