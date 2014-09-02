@@ -107,15 +107,17 @@ XML example
 A calibration configuration file consists of a root element named ``calibration`` that contains the following elements:
 
 - ``algorithm``: a description of the optimization algorithm to use (see `algorithm`_)
-- ``NMSmodel``: a collection of options for the simulation of the model TODO: what??
+- ``NMSmodel``: a collection of options for the simulation of the model TODO: what?? (see `NMSmodel`_)
 - (optionally) ``samplingFrequency`` TODO check what for
 - ``calibrationSteps``: a list of ``step`` elements (at least one) that describe an optimization procedure (see `step`_)
 - ``trialSet``: a list of XML files, each describing a trial to be used for calibration (see :ref:`inputDataDescFile`)
 
+.. _optimizationalgorithm:
+
 algorithm
 =========
 
-This is the optimization algorithm that is used to minimize the objective function associated to each calibration `step`_(``objectiveFunction`` element). At the moment, only the *simulated annealing* algorithm is available.
+This is the optimization algorithm that is used to minimize the objective function associated to each calibration `step`_ (``objectiveFunction`` element). At the moment, only the *simulated annealing* algorithm is available.
 
 
 .. todo:: decide where to describe the simulated annealing and the meaning of its parameters
