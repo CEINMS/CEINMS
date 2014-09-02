@@ -19,9 +19,9 @@
     <xs:complexType name="InputDataType">
         <xs:sequence>
             <xs:choice maxOccurs="unbounded">
-                <xs:element maxOccurs="1" name="muscleTendonLengthFile" type="xs:string"/>
-                <xs:element maxOccurs="1" name="momentArmsFiles" type="momentArmsListType"/>
-                <xs:element maxOccurs="1" name="emgFile" type="xs:string"/>
+                <xs:element minOccurs="1" maxOccurs="1" name="muscleTendonLengthFile" type="xs:string"/>
+                <xs:element minOccurs="1" maxOccurs="1" name="momentArmsFiles" type="momentArmsListType"/>
+                <xs:element minOccurs="1" maxOccurs="1" name="emgFile" type="xs:string"/>
                 <xs:element maxOccurs="1" name="externalTorquesFile" type="xs:string"/>
             </xs:choice>
         </xs:sequence>

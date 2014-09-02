@@ -1,0 +1,112 @@
+#=============================================================================
+# CMake - Cross Platform Makefile Generator
+# Copyright 2000-2013 Kitware, Inc., Insight Software Consortium
+#
+# Distributed under the OSI-approved BSD License (the "License");
+# see accompanying file Copyright.txt for details.
+#
+# This software is distributed WITHOUT ANY WARRANTY; without even the
+# implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+# See the License for more information.
+#=============================================================================
+import sys
+import os
+import re
+import glob
+
+sys.path.insert(0, r'@conf_path@')
+
+source_suffix = '.rst'
+master_doc = 'index'
+
+project = 'CEINMS User Guide'
+copyright = '@conf_copyright@'
+version = '@conf_version@' # feature version
+release = '@conf_release@' # full version string
+
+primary_domain = 'cmake'
+
+intersphinx_mapping = {}
+extlinks = {'cmake-issue': ('http://www.cmake.org/Bug/view.php?id=%s', 'CMake issue #'),
+            'cmake-commit': ('http://cmake.org/gitweb?p=cmake.git;a=commitdiff;h=%s', '')}
+
+exclude_patterns = []
+
+todo_include_todos = True
+
+# to read bibtex: http://sphinxcontrib-bibtex.readthedocs.org/
+# to enumerate figures: http://sourceforge.net/projects/numfig/
+
+extensions = ['sphinx.ext.intersphinx',
+              'sphinx.ext.extlinks',
+              'sphinx.ext.todo',
+              'sphinx.ext.mathjax',
+              'sphinxcontrib.bibtex',
+              'sphinx.ext.ifconfig',
+              'sphinx.ext.numfig']
+templates_path = ['@conf_path@/templates']
+
+# numfig:
+# numfig_number_figures = True
+# numfig_figure_caption_prefix = "Figure"
+
+# ceinms_manuals = sorted(glob.glob(r'@conf_docs@/manual/*.rst'))
+# ceinms_manual_description = re.compile('^\.\. cmake-manual-description:(.*)$')
+# man_pages = []
+# for fpath in ceinms_manuals:
+    # try:
+        # name, sec, rst = os.path.basename(fpath).split('.')
+        # desc = None
+        # f = open(fpath, 'r')
+        # for l in f:
+            # m = ceinms_manual_description.match(l)
+            # if m:
+                # desc = m.group(1).strip()
+                # break
+        # f.close()
+        # if desc:
+            # man_pages.append(('manual/%s.%s' % (name, sec),
+                              # name, desc, [], int(sec)))
+        # else:
+            # sys.stderr.write("ERROR: No cmake-manual-description in '%s'\n" % fpath)
+    # except Exception as e:
+        # sys.stderr.write("ERROR: %s\n" % str(e))
+# man_show_urls = False
+
+html_show_sourcelink = True
+html_static_path = ['@conf_path@/static']
+html_style = 'ceinms.css'
+html_theme = 'default'
+html_theme_options = {
+    "externalrefs": "true",
+    "relbarbgcolor": "#b30",
+    "sidebarwidth": "300"
+}
+
+html_title = 'CEINMS %s Documentation' % release
+html_short_title = '%s Documentation' % release
+html_favicon = '@conf_path@/static/ceinms-favicon.ico'
+
+# -- Options for LaTeX output ---------------------------------------------
+latex_elements = {}
+
+# Grouping the document tree into LaTeX files. List of tuples
+# (source start file, target name, title,
+#  author, documentclass [howto, manual, or own class]).
+latex_documents = [
+  ('index', 'CEINMSUserGuide.tex', u'CEINMS User Guide Documentation',
+   u'Elena Ceseracciu', 'manual'),
+]
+
+
+
+rst_epilog = """
+.. _`Universita' degli Studi di Padova`: http://www.unipd.it
+.. _`Dipartimento di Tecnica e Gestione dei Sistemi Industriali`: http://www.gest.unipd.it
+.. _`Rehabilitation Engineering Group`: http://reg.gest.unipd.it
+.. _`Centre For Musculoskeletal Research`: http://www.griffith.edu.au/health/musculoskeletal-research
+.. _`Griffith University`: http://www.griffith.edu.au/
+"""
+latex_show_pagerefs = 'true'
+latex_show_urls = 'footnote'
+latex_use_parts = 'true'
