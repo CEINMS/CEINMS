@@ -280,59 +280,6 @@ int main(int argc, char** argv){
             while(calibrationXmlReader.popNextCalibrationStep(currentCalibrationStep)) {
                 std::cout << "CalibrationStepCfg " << currentCalibrationStep.getStepCfg() << std::endl;
                 switch(currentCalibrationStep.getStepCfg()) {
-                    case CalibrationCfg::MinimizeTorqueErrorStrengthCoefficients_ShapeFactor_C1_C2_TendonSlackLength_singleFast: {
-                        typedef TorquesComputation<ComputationMode_Fast<MyNMSmodel>, MyNMSmodel> MyComputationMode;
-                        typedef StrengthCoefficients_ShapeFactor_C1_C2_TendonSlackLength_single<MyNMSmodel> MyParameters;
-                        typedef SumMinObjectiveFunction_singleF<MyComputationMode> MyObjFunction;            
-                        typedef SimulatedAnnealing<MyParameters, MyObjFunction, MyComputationMode> MyOptimizator;
-                        
-                        vector<string> dofsToCalibrate;
-                        currentCalibrationStep.getDofNames(dofsToCalibrate);
-                        MyComputationMode torqueComputation(mySubject, trials, dofsToCalibrate);
-                        SimulatedAnnealingParameters simanParameters;
-                        calibrationXmlReader.getOptimizationAlgorithmParameters(simanParameters);
-                        MyParameters parameterPolicy(mySubject, dofsToCalibrate);
-                        MyOptimizator optimizator(parameterPolicy, torqueComputation, simanParameters);
-                        optimizator.optimize();
-                    }
-                    break;
-                    
-                    case CalibrationCfg::MinimizeTorqueErrorStrengthCoefficients_ShapeFactor_C1_C2_TendonSlackLength_singleDefault: {
-                        typedef TorquesComputation<ComputationMode_Default<MyNMSmodel>, MyNMSmodel> MyComputationMode;
-                        typedef StrengthCoefficients_ShapeFactor_C1_C2_TendonSlackLength_single<MyNMSmodel> MyParameters;
-                        typedef SumMinObjectiveFunction_singleF<MyComputationMode> MyObjFunction;            
-                        typedef SimulatedAnnealing<MyParameters, MyObjFunction, MyComputationMode> MyOptimizator;
-                        
-                        vector<string> dofsToCalibrate;
-                        currentCalibrationStep.getDofNames(dofsToCalibrate);
-                        MyComputationMode torqueComputation(mySubject, trials, dofsToCalibrate);
-                        SimulatedAnnealingParameters simanParameters;
-                        calibrationXmlReader.getOptimizationAlgorithmParameters(simanParameters);
-                        MyParameters parameterPolicy(mySubject, dofsToCalibrate);
-                        MyOptimizator optimizator(parameterPolicy, torqueComputation, simanParameters);
-                        optimizator.optimize();
-                    }
-                    break;
-
-                    case CalibrationCfg::MinimizeTorqueErrorParameterSetFast: {
-                        typedef TorquesComputation<ComputationMode_Fast<MyNMSmodel>, MyNMSmodel> MyComputationMode;
-                        typedef ParametersFromXml<MyNMSmodel> MyParameters;
-                        typedef SumMinObjectiveFunction_singleF<MyComputationMode> MyObjFunction;            
-                        typedef SimulatedAnnealing<MyParameters, MyObjFunction, MyComputationMode> MyOptimizator;
-                        
-                        vector<string> dofsToCalibrate;
-                        currentCalibrationStep.getDofNames(dofsToCalibrate);
-                        MyComputationMode torqueComputation(mySubject, trials, dofsToCalibrate);
-                        SimulatedAnnealingParameters simanParameters;
-                        calibrationXmlReader.getOptimizationAlgorithmParameters(simanParameters);
-                        ParameterSet parameterSet;
-                        currentCalibrationStep.getParameterSet(parameterSet);
-                        MyParameters parameterPolicy(mySubject, dofsToCalibrate, parameterSet);
-                        MyOptimizator optimizator(parameterPolicy, torqueComputation, simanParameters);
-                        optimizator.optimize();
-                    }
-                    break;
-                    
                     case CalibrationCfg::MinimizeTorqueErrorParameterSetDefault: {
                         typedef TorquesComputation<ComputationMode_Default<MyNMSmodel>, MyNMSmodel> MyComputationMode;
                         typedef ParametersFromXml<MyNMSmodel> MyParameters;
@@ -378,59 +325,6 @@ int main(int argc, char** argv){
             while(calibrationXmlReader.popNextCalibrationStep(currentCalibrationStep)) {
                 std::cout << "CalibrationStepCfg " << currentCalibrationStep.getStepCfg() << std::endl;
                 switch(currentCalibrationStep.getStepCfg()) {
-                    case CalibrationCfg::MinimizeTorqueErrorStrengthCoefficients_ShapeFactor_C1_C2_TendonSlackLength_singleFast: {
-                        typedef TorquesComputation<ComputationMode_Fast<MyNMSmodel>, MyNMSmodel> MyComputationMode;
-                        typedef StrengthCoefficients_ShapeFactor_C1_C2_TendonSlackLength_single<MyNMSmodel> MyParameters;
-                        typedef SumMinObjectiveFunction_singleF<MyComputationMode> MyObjFunction;            
-                        typedef SimulatedAnnealing<MyParameters, MyObjFunction, MyComputationMode> MyOptimizator;
-                        
-                        vector<string> dofsToCalibrate;
-                        currentCalibrationStep.getDofNames(dofsToCalibrate);
-                        MyComputationMode torqueComputation(mySubject, trials, dofsToCalibrate);
-                        SimulatedAnnealingParameters simanParameters;
-                        calibrationXmlReader.getOptimizationAlgorithmParameters(simanParameters);
-                        MyParameters parameterPolicy(mySubject, dofsToCalibrate);
-                        MyOptimizator optimizator(parameterPolicy, torqueComputation, simanParameters);
-                        optimizator.optimize();
-                    }
-                    break;
-                    
-                    case CalibrationCfg::MinimizeTorqueErrorStrengthCoefficients_ShapeFactor_C1_C2_TendonSlackLength_singleDefault: {
-                        typedef TorquesComputation<ComputationMode_Default<MyNMSmodel>, MyNMSmodel> MyComputationMode;
-                        typedef StrengthCoefficients_ShapeFactor_C1_C2_TendonSlackLength_single<MyNMSmodel> MyParameters;
-                        typedef SumMinObjectiveFunction_singleF<MyComputationMode> MyObjFunction;            
-                        typedef SimulatedAnnealing<MyParameters, MyObjFunction, MyComputationMode> MyOptimizator;
-                        
-                        vector<string> dofsToCalibrate;
-                        currentCalibrationStep.getDofNames(dofsToCalibrate);
-                        MyComputationMode torqueComputation(mySubject, trials, dofsToCalibrate);
-                        SimulatedAnnealingParameters simanParameters;
-                        calibrationXmlReader.getOptimizationAlgorithmParameters(simanParameters);
-                        MyParameters parameterPolicy(mySubject, dofsToCalibrate);
-                        MyOptimizator optimizator(parameterPolicy, torqueComputation, simanParameters);
-                        optimizator.optimize();
-                    }
-                    break;
-
-                    case CalibrationCfg::MinimizeTorqueErrorParameterSetFast: {
-                        typedef TorquesComputation<ComputationMode_Fast<MyNMSmodel>, MyNMSmodel> MyComputationMode;
-                        typedef ParametersFromXml<MyNMSmodel> MyParameters;
-                        typedef SumMinObjectiveFunction_singleF<MyComputationMode> MyObjFunction;            
-                        typedef SimulatedAnnealing<MyParameters, MyObjFunction, MyComputationMode> MyOptimizator;
-                        
-                        vector<string> dofsToCalibrate;
-                        currentCalibrationStep.getDofNames(dofsToCalibrate);
-                        MyComputationMode torqueComputation(mySubject, trials, dofsToCalibrate);
-                        SimulatedAnnealingParameters simanParameters;
-                        calibrationXmlReader.getOptimizationAlgorithmParameters(simanParameters);
-                        ParameterSet parameterSet;
-                        currentCalibrationStep.getParameterSet(parameterSet);
-                        MyParameters parameterPolicy(mySubject, dofsToCalibrate, parameterSet);
-                        MyOptimizator optimizator(parameterPolicy, torqueComputation, simanParameters);
-                        optimizator.optimize();
-                    }
-                    break;
-                    
                     case CalibrationCfg::MinimizeTorqueErrorParameterSetDefault: {
                         typedef TorquesComputation<ComputationMode_Default<MyNMSmodel>, MyNMSmodel> MyComputationMode;
                         typedef ParametersFromXml<MyNMSmodel> MyParameters;
@@ -479,59 +373,6 @@ int main(int argc, char** argv){
             while(calibrationXmlReader.popNextCalibrationStep(currentCalibrationStep)) {
                 std::cout << "CalibrationStepCfg " << currentCalibrationStep.getStepCfg() << std::endl;
                 switch(currentCalibrationStep.getStepCfg()) {
-                    case CalibrationCfg::MinimizeTorqueErrorStrengthCoefficients_ShapeFactor_C1_C2_TendonSlackLength_singleFast: {
-                        typedef TorquesComputation<ComputationMode_Fast<MyNMSmodel>, MyNMSmodel> MyComputationMode;
-                        typedef StrengthCoefficients_ShapeFactor_C1_C2_TendonSlackLength_single<MyNMSmodel> MyParameters;
-                        typedef SumMinObjectiveFunction_singleF<MyComputationMode> MyObjFunction;            
-                        typedef SimulatedAnnealing<MyParameters, MyObjFunction, MyComputationMode> MyOptimizator;
-                        
-                        vector<string> dofsToCalibrate;
-                        currentCalibrationStep.getDofNames(dofsToCalibrate);
-                        MyComputationMode torqueComputation(mySubject, trials, dofsToCalibrate);
-                        SimulatedAnnealingParameters simanParameters;
-                        calibrationXmlReader.getOptimizationAlgorithmParameters(simanParameters);
-                        MyParameters parameterPolicy(mySubject, dofsToCalibrate);
-                        MyOptimizator optimizator(parameterPolicy, torqueComputation, simanParameters);
-                        optimizator.optimize();
-                    }
-                    break;
-                    
-                    case CalibrationCfg::MinimizeTorqueErrorStrengthCoefficients_ShapeFactor_C1_C2_TendonSlackLength_singleDefault: {
-                        typedef TorquesComputation<ComputationMode_Default<MyNMSmodel>, MyNMSmodel> MyComputationMode;
-                        typedef StrengthCoefficients_ShapeFactor_C1_C2_TendonSlackLength_single<MyNMSmodel> MyParameters;
-                        typedef SumMinObjectiveFunction_singleF<MyComputationMode> MyObjFunction;            
-                        typedef SimulatedAnnealing<MyParameters, MyObjFunction, MyComputationMode> MyOptimizator;
-                        
-                        vector<string> dofsToCalibrate;
-                        currentCalibrationStep.getDofNames(dofsToCalibrate);
-                        MyComputationMode torqueComputation(mySubject, trials, dofsToCalibrate);
-                        SimulatedAnnealingParameters simanParameters;
-                        calibrationXmlReader.getOptimizationAlgorithmParameters(simanParameters);
-                        MyParameters parameterPolicy(mySubject, dofsToCalibrate);
-                        MyOptimizator optimizator(parameterPolicy, torqueComputation, simanParameters);
-                        optimizator.optimize();
-                    }
-                    break;
-
-                    case CalibrationCfg::MinimizeTorqueErrorParameterSetFast: {
-                        typedef TorquesComputation<ComputationMode_Fast<MyNMSmodel>, MyNMSmodel> MyComputationMode;
-                        typedef ParametersFromXml<MyNMSmodel> MyParameters;
-                        typedef SumMinObjectiveFunction_singleF<MyComputationMode> MyObjFunction;            
-                        typedef SimulatedAnnealing<MyParameters, MyObjFunction, MyComputationMode> MyOptimizator;
-                        
-                        vector<string> dofsToCalibrate;
-                        currentCalibrationStep.getDofNames(dofsToCalibrate);
-                        MyComputationMode torqueComputation(mySubject, trials, dofsToCalibrate);
-                        SimulatedAnnealingParameters simanParameters;
-                        calibrationXmlReader.getOptimizationAlgorithmParameters(simanParameters);
-                        ParameterSet parameterSet;
-                        currentCalibrationStep.getParameterSet(parameterSet);
-                        MyParameters parameterPolicy(mySubject, dofsToCalibrate, parameterSet);
-                        MyOptimizator optimizator(parameterPolicy, torqueComputation, simanParameters);
-                        optimizator.optimize();
-                    }
-                    break;
-                    
                     case CalibrationCfg::MinimizeTorqueErrorParameterSetDefault: {
                         typedef TorquesComputation<ComputationMode_Default<MyNMSmodel>, MyNMSmodel> MyComputationMode;
                         typedef ParametersFromXml<MyNMSmodel> MyParameters;
@@ -576,59 +417,6 @@ int main(int argc, char** argv){
             while(calibrationXmlReader.popNextCalibrationStep(currentCalibrationStep)) {
                 std::cout << "CalibrationStepCfg " << currentCalibrationStep.getStepCfg() << std::endl;
                 switch(currentCalibrationStep.getStepCfg()) {
-                    case CalibrationCfg::MinimizeTorqueErrorStrengthCoefficients_ShapeFactor_C1_C2_TendonSlackLength_singleFast: {
-                        typedef TorquesComputation<ComputationMode_Fast<MyNMSmodel>, MyNMSmodel> MyComputationMode;
-                        typedef StrengthCoefficients_ShapeFactor_C1_C2_TendonSlackLength_single<MyNMSmodel> MyParameters;
-                        typedef SumMinObjectiveFunction_singleF<MyComputationMode> MyObjFunction;            
-                        typedef SimulatedAnnealing<MyParameters, MyObjFunction, MyComputationMode> MyOptimizator;
-                        
-                        vector<string> dofsToCalibrate;
-                        currentCalibrationStep.getDofNames(dofsToCalibrate);
-                        MyComputationMode torqueComputation(mySubject, trials, dofsToCalibrate);
-                        SimulatedAnnealingParameters simanParameters;
-                        calibrationXmlReader.getOptimizationAlgorithmParameters(simanParameters);
-                        MyParameters parameterPolicy(mySubject, dofsToCalibrate);
-                        MyOptimizator optimizator(parameterPolicy, torqueComputation, simanParameters);
-                        optimizator.optimize();
-                    }
-                    break;
-                    
-                    case CalibrationCfg::MinimizeTorqueErrorStrengthCoefficients_ShapeFactor_C1_C2_TendonSlackLength_singleDefault: {
-                        typedef TorquesComputation<ComputationMode_Default<MyNMSmodel>, MyNMSmodel> MyComputationMode;
-                        typedef StrengthCoefficients_ShapeFactor_C1_C2_TendonSlackLength_single<MyNMSmodel> MyParameters;
-                        typedef SumMinObjectiveFunction_singleF<MyComputationMode> MyObjFunction;            
-                        typedef SimulatedAnnealing<MyParameters, MyObjFunction, MyComputationMode> MyOptimizator;
-                        
-                        vector<string> dofsToCalibrate;
-                        currentCalibrationStep.getDofNames(dofsToCalibrate);
-                        MyComputationMode torqueComputation(mySubject, trials, dofsToCalibrate);
-                        SimulatedAnnealingParameters simanParameters;
-                        calibrationXmlReader.getOptimizationAlgorithmParameters(simanParameters);
-                        MyParameters parameterPolicy(mySubject, dofsToCalibrate);
-                        MyOptimizator optimizator(parameterPolicy, torqueComputation, simanParameters);
-                        optimizator.optimize();
-                    }
-                    break;
-
-                    case CalibrationCfg::MinimizeTorqueErrorParameterSetFast: {
-                        typedef TorquesComputation<ComputationMode_Fast<MyNMSmodel>, MyNMSmodel> MyComputationMode;
-                        typedef ParametersFromXml<MyNMSmodel> MyParameters;
-                        typedef SumMinObjectiveFunction_singleF<MyComputationMode> MyObjFunction;            
-                        typedef SimulatedAnnealing<MyParameters, MyObjFunction, MyComputationMode> MyOptimizator;
-                        
-                        vector<string> dofsToCalibrate;
-                        currentCalibrationStep.getDofNames(dofsToCalibrate);
-                        MyComputationMode torqueComputation(mySubject, trials, dofsToCalibrate);
-                        SimulatedAnnealingParameters simanParameters;
-                        calibrationXmlReader.getOptimizationAlgorithmParameters(simanParameters);
-                        ParameterSet parameterSet;
-                        currentCalibrationStep.getParameterSet(parameterSet);
-                        MyParameters parameterPolicy(mySubject, dofsToCalibrate, parameterSet);
-                        MyOptimizator optimizator(parameterPolicy, torqueComputation, simanParameters);
-                        optimizator.optimize();
-                    }
-                    break;
-                    
                     case CalibrationCfg::MinimizeTorqueErrorParameterSetDefault: {
                         typedef TorquesComputation<ComputationMode_Default<MyNMSmodel>, MyNMSmodel> MyComputationMode;
                         typedef ParametersFromXml<MyNMSmodel> MyParameters;

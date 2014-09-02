@@ -144,32 +144,13 @@ void CalibrationXmlReader::readStep(StepType& step, CalibrationStep& calibration
     ObjectiveFunctionElementType& myObjFuncMinTorqueError(myObjFuc.minimizeTorqueError());
   //  if (myObjFuncMinTorqueError.present())
     calibrationStep.setObjectiveFunction(CalibrationCfg::MinimizeTorqueError);
-    
-    //add computation torque mode
-    ComputationModeType& myCompMode(step.computationMode());
-    StepType::computationMode_type::default_optional& myCompModeDefaultOpt(myCompMode.default_());
-    if(myCompModeDefaultOpt.present())
-        calibrationStep.setComputationMode(CalibrationCfg::Default);
-    else
-        calibrationStep.setComputationMode(CalibrationCfg::Fast);
-
-    StepType::strengthCoefficients_ShapeFactor_C1_C2_TendonSLackLength_single_optional& myHardCodedParamPolicyOpt(step.strengthCoefficients_ShapeFactor_C1_C2_TendonSLackLength_single());
-    StepType::parameterSet_optional& myParamSetOpt(step.parameterSet());
-    
-    if(myHardCodedParamPolicyOpt.present())
-        calibrationStep.setParametersPolicy(CalibrationCfg::StrengthCoefficients_ShapeFactor_C1_C2_TendonSlackLength_single);
-    else if(myParamSetOpt.present()) {       
-        calibrationStep.setParametersPolicy(CalibrationCfg::ParameterSet);
-        
-        StepType::parameterSet_type::parameter_sequence& parameterSequence(step.parameterSet()->parameter());
-        StepType::parameterSet_type::parameter_iterator parIt = parameterSequence.begin();
-        for(parIt; parIt != parameterSequence.end(); ++parIt) {
-            Parameter parameter;
-            readParameter(*parIt, parameter);
-            calibrationStep.pushParameter(parameter);
-        }        
+    StepType::parameterSet_type::parameter_sequence& parameterSequence = step.parameterSet().parameter();
+    StepType::parameterSet_type::parameter_iterator parIt = parameterSequence.begin();
+    for(parIt; parIt != parameterSequence.end(); ++parIt) {
+        Parameter parameter;
+        readParameter(*parIt, parameter);
+        calibrationStep.pushParameter(parameter);
     }
-        
 }
 
 
@@ -267,21 +248,9 @@ void CalibrationStep::setObjectiveFunction(unsigned int objectiveFunction) {
 }
 
 
-void CalibrationStep::setParametersPolicy(unsigned int parametersPolicy) {
-    
-    parametersPolicy_ = parametersPolicy;
-}
-
-
-void CalibrationStep::setComputationMode(unsigned int computationMode) {
-    
-    computationMode_ = computationMode;
-}
-
-
 CalibrationCfg::Step CalibrationStep::getStepCfg() const {
 
-    return static_cast<CalibrationCfg::Step>(objectiveFunction_+parametersPolicy_+computationMode_);
+    return static_cast<CalibrationCfg::Step>(objectiveFunction_);
 }
 
 
@@ -364,33 +333,6 @@ std::ostream& operator<< (std::ostream& output, const CalibrationStep& rhs) {
             break;
     }
 
-    output << " --- Computation Mode: ";
-    switch(rhs.computationMode_) {
-        case (CalibrationCfg::Default):
-            output << "Default\n";
-            break;
-        case (CalibrationCfg::Fast):
-            output << "Fast\n";
-            break;
-        default:
-            output << "Not Found\n";
-            break;
-    }
-
-    output << " --- Parameters Policy: ";
-    switch(rhs.parametersPolicy_) {
-        case (CalibrationCfg::StrengthCoefficients_ShapeFactor_C1_C2_TendonSlackLength_single):
-            output << "Hardcoded policy\n";
-            break;
-        case (CalibrationCfg::ParameterSet):
-            output << "ParameterSet\n";
-            for(ParameterSet::const_iterator it = rhs.parameterSet_.begin(); it != rhs.parameterSet_.end(); ++it)
-                output << *it;
-            break;
-        default:
-            output << "Not Found\n";
-            break;
-    }    
     return output;
 }
 

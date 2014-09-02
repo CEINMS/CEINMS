@@ -51,7 +51,6 @@
     <xs:list itemType="xs:string"/>
   </xs:simpleType>
   <xs:complexType name="ObjectiveFunctionElementType"/>
-  <xs:complexType name="ComputationModeElementType"/>
   <xs:complexType name="GlobalParameterType"/>
   <xs:complexType name="SingleParameterType"/>
   <xs:complexType name="ObjectiveFunctionType">
@@ -62,13 +61,6 @@
   <xs:simpleType name="DoFsType">
     <xs:list itemType="xs:string"/>
   </xs:simpleType>
-  <xs:complexType name="HardCodedParametersSelectionType"/>
-  <xs:complexType name="ComputationModeType">
-      <xs:choice>
-          <xs:element name="default" type="ComputationModeElementType"/>
-          <xs:element name="fast"    type="ComputationModeElementType"/>
-      </xs:choice>
-  </xs:complexType>
   <xs:simpleType name="TwoDoublesType">
     <xs:list itemType="xs:double"/>
   </xs:simpleType>
@@ -110,11 +102,7 @@
     <xs:sequence>
       <xs:element name="dofs" type="DoFsType"/>
       <xs:element name="objectiveFunction" type="ObjectiveFunctionType"/>
-      <xs:element name="computationMode" type="ComputationModeType"/>
-      <xs:choice>
-        <xs:element name="strengthCoefficients_ShapeFactor_C1_C2_TendonSLackLength_single" type="HardCodedParametersSelectionType"/>
-        <xs:element name="parameterSet" type="parameterSetType"/>
-      </xs:choice>
+      <xs:element name="parameterSet" type="parameterSetType"/>
     </xs:sequence>
   </xs:complexType>
   <xs:complexType name="CalibrationStepsType">

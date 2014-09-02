@@ -28,7 +28,6 @@ class CalibrationStep {
 public:
     void setObjectiveFunction(unsigned objectiveFunction);    
     void setParametersPolicy(unsigned parametersPolicy);    
-    void setComputationMode(unsigned computationMode);    
     CalibrationCfg::Step getStepCfg() const;
     
     void pushDofName(std::string& dofName);
@@ -42,8 +41,6 @@ public:
     
 private:
     unsigned objectiveFunction_;
-    unsigned parametersPolicy_;
-    unsigned computationMode_;
     std::list<std::string> dofNames_;
     ParameterSet parameterSet_;
 };
