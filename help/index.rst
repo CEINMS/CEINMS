@@ -13,11 +13,8 @@ Introduction
 ############
 
 .. toctree::
-   :maxdepth: 1
+   /introduction/CEINMS
 
-      CEINMS Overview </introduction/overview>
-      Neuromusculoskeletal models </introduction/models>
-      Bibliography </introduction/bibliography>
 
 #################
 Reference Manuals
@@ -71,4 +68,3 @@ CEINMS is being developed by the `Rehabilitation Engineering Group`_, `Dipartime
 
  * :ref:`search`
 .. * :ref:`genindex`
-
