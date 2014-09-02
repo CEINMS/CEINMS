@@ -7,11 +7,12 @@
 # also defined, but not for general use are
 #  XERCES_LIBRARY, where to find the XERCES library.
 
-FIND_PATH(XERCES_INCLUDE_DIR /xercesc/util/XercesVersion.hpp
-    "${XERCES_DIR}\\include"
-    "C:/Program\ Files\ (x86)/CodeSynthesis\ XSD\ 3.3/include"
-    $ENV{XERCES_ROOT}/include
- )
+find_path(XERCES_INCLUDE_DIR /xercesc/util/XercesVersion.hpp
+            PATHS   "${XERCES_DIR}"
+                    "C:/Program Files (x86)/CodeSynthesis XSD 3.3"
+                    "C:/Program Files (x86)/CodeSynthesis XSD 4.0"
+                    $ENV{XERCES_ROOT}
+            PATH_SUFFIXES include)
 
 if (NOT XERCES_FIND_QUIETLY)
     MESSAGE(STATUS "XERCES Include Dir ${XERCES_INCLUDE_DIR}")
@@ -25,6 +26,7 @@ if(CMAKE_SIZEOF_VOID_P EQUAL 8) #64bit compilation
       xerces-c_3
       xerces-c_3_1
       xerces-c_3_1_vc100
+
   PATHS 
     "${XERCES_DIR}\\lib"
    $ENV{XERCES_ROOT}/lib
