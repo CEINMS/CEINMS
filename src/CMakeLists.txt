@@ -43,18 +43,6 @@ TARGET_LINK_LIBRARIES( CEINMS
       ${Boost_FILESYSTEM_LIBRARY}
 )
 
-ADD_EXECUTABLE( TestInputConnectors EXCLUDE_FROM_ALL TestInputConnectors.cpp  ${CEINMS_COMMON_SOURCES} ${CEINMS_HEADERS}  )
-TARGET_LINK_LIBRARIES( TestInputConnectors
-      FileIO
-      xmlInput
-      NMSmodel
-      InputConnectors
-      #${CMAKE_THREAD_LIBS_INIT}
-      ${Boost_PROGRAM_OPTIONS_LIBRARY}
-      ${Boost_FILESYSTEM_LIBRARY}
-)
-
-
 set(CEINMScalibrate_HEADERS XmlWriter.h)
 set(CEINMScalibrate_COMMON_SOURCES XmlWriter.cpp)
 set(CEINMScalibrate_SOURCES CEINMScalibration.cpp ${CEINMScalibrate_COMMON_SOURCES})
