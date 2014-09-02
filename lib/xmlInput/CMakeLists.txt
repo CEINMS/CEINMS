@@ -35,13 +35,13 @@ schema_to_bin(${CMAKE_SOURCE_DIR}/cfg/XSD/ceinmsCalibrationSetup.xsd)
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
 # Generate c++ code for xsd schema files
-xsd_schema(subject_GENERATED_FILES ${CMAKE_SOURCE_DIR}/cfg/XSD/subject.xsd --generate-serialization)
-xsd_schema(emgGenerator_GENERATED_FILES ${CMAKE_SOURCE_DIR}/cfg/XSD/emgGenerator.xsd --generate-serialization)
-xsd_schema(calibration_GENERATED_FILES ${CMAKE_SOURCE_DIR}/cfg/XSD/calibration.xsd --generate-serialization --namespace-map =CalibrationXsd)
-xsd_schema(execution_GENERATED_FILES ${CMAKE_SOURCE_DIR}/cfg/XSD/execution.xsd --generate-serialization)
-xsd_schema(inputData_GENERATED_FILES ${CMAKE_SOURCE_DIR}/cfg/XSD/inputData.xsd --generate-serialization)
-xsd_schema(ceinmsSetup_GENERATED_FILES ${CMAKE_SOURCE_DIR}/cfg/XSD/ceinmsSetup.xsd --generate-serialization)
-xsd_schema(ceinmsCalibrationSetup_GENERATED_FILES ${CMAKE_SOURCE_DIR}/cfg/XSD/ceinmsCalibrationSetup.xsd --generate-serialization)
+xsd_schema(subject_GENERATED ${CMAKE_SOURCE_DIR}/cfg/XSD/subject.xsd --generate-serialization)
+xsd_schema(emgGenerator_GENERATED ${CMAKE_SOURCE_DIR}/cfg/XSD/emgGenerator.xsd --generate-serialization)
+xsd_schema(calibration_GENERATED ${CMAKE_SOURCE_DIR}/cfg/XSD/calibration.xsd --generate-serialization --namespace-map =CalibrationXsd)
+xsd_schema(execution_GENERATED ${CMAKE_SOURCE_DIR}/cfg/XSD/execution.xsd --generate-serialization)
+xsd_schema(inputData_GENERATED ${CMAKE_SOURCE_DIR}/cfg/XSD/inputData.xsd --generate-serialization)
+xsd_schema(ceinmsSetup_GENERATED ${CMAKE_SOURCE_DIR}/cfg/XSD/ceinmsSetup.xsd --generate-serialization)
+xsd_schema(ceinmsCalibrationSetup_GENERATED ${CMAKE_SOURCE_DIR}/cfg/XSD/ceinmsCalibrationSetup.xsd --generate-serialization)
 
 set(xmlInput_SOURCES    ExecutionXmlReader.cpp
                         CalibrationXmlReader.cpp
@@ -53,7 +53,7 @@ set(xmlInput_SOURCES    ExecutionXmlReader.cpp
                         CeinmsCalibrationSetupXmlReader.cpp
                         )
 
-set(xmlInput_GENERATED_SOURCES  ${CMAKE_CURRENT_BINARY_DIR}/execution-schema.cxx
+set(schemas_GENERATED_SOURCES  ${CMAKE_CURRENT_BINARY_DIR}/execution-schema.cxx
                                 ${CMAKE_CURRENT_BINARY_DIR}/calibration-schema.cxx
                                 ${CMAKE_CURRENT_BINARY_DIR}/subject-schema.cxx
                                 ${CMAKE_CURRENT_BINARY_DIR}/emgGenerator-schema.cxx
@@ -75,7 +75,7 @@ set(xmlInput_HEADERS    ExecutionXmlReader.h
 set(xmlInput_IMPL_HEADERS   impl/grammar-input-stream.hxx
                             impl/validation.h)
 
-set(xmlInput_GENERATED_HEADERS  ${CMAKE_CURRENT_BINARY_DIR}/execution-schema.hxx
+set(schemas_GENERATED_HEADERS  ${CMAKE_CURRENT_BINARY_DIR}/execution-schema.hxx
                                 ${CMAKE_CURRENT_BINARY_DIR}/calibration-schema.hxx
                                 ${CMAKE_CURRENT_BINARY_DIR}/subject-schema.hxx
                                 ${CMAKE_CURRENT_BINARY_DIR}/emgGenerator-schema.hxx
@@ -85,24 +85,45 @@ set(xmlInput_GENERATED_HEADERS  ${CMAKE_CURRENT_BINARY_DIR}/execution-schema.hxx
 
 source_group("Headers" FILES ${xmlInput_HEADERS})
 source_group("Private headers" FILES ${xmlInput_IMPL_HEADERS})
-source_group("Generated headers" FILES ${xmlInput_GENERATED_HEADERS})
+source_group("Generated headers" FILES  ${schemas_GENERATED_HEADERS}
+                                        ${subject_GENERATED_HEADERS}
+                                        ${emgGenerator_GENERATED_HEADERS}
+                                        ${calibration_GENERATED_HEADERS}
+                                        ${execution_GENERATED_HEADERS}
+                                        ${inputData_GENERATED_HEADERS}
+                                        ${ceinmsSetup_GENERATED_HEADERS}
+                                        ${ceinmsCalibrationSetup_GENERATED_HEADERS})
 source_group("Sources" FILES ${xmlInput_SOURCES})
-source_group("Generated sources" FILES ${xmlInput_GENERATED_SOURCES})
-#TODO: how do I add the outputs of xsd_schema ?
+source_group("Generated sources" FILES  ${schemas_GENERATED_SOURCES}
+                                        ${subject_GENERATED_SOURCES}
+                                        ${emgGenerator_GENERATED_SOURCES}
+                                        ${calibration_GENERATED_SOURCES}
+                                        ${execution_GENERATED_SOURCES}
+                                        ${inputData_GENERATED_SOURCES}
+                                        ${ceinmsSetup_GENERATED_SOURCES}
+                                        ${ceinmsCalibrationSetup_GENERATED_SOURCES})
+
 
 
 add_library(xmlInput STATIC ${xmlInput_SOURCES}
                             ${xmlInput_HEADERS}
                             ${xmlInput_IMPL_HEADERS}
-                            ${xmlInput_GENERATED_HEADERS}
-                            ${xmlInput_GENERATED_SOURCES}
-                            ${subject_GENERATED_FILES}
-                            ${emgGenerator_GENERATED_FILES}
-                            ${calibration_GENERATED_FILES}
-                            ${execution_GENERATED_FILES}
-                            ${inputData_GENERATED_FILES}
-                            ${ceinmsSetup_GENERATED_FILES}
-                            ${ceinmsCalibrationSetup_GENERATED_FILES}
+                            ${schemas_GENERATED_HEADERS}
+                            ${schemas_GENERATED_SOURCES}
+                            ${subject_GENERATED_HEADERS}
+                            ${emgGenerator_GENERATED_HEADERS}
+                            ${calibration_GENERATED_HEADERS}
+                            ${execution_GENERATED_HEADERS}
+                            ${inputData_GENERATED_HEADERS}
+                            ${ceinmsSetup_GENERATED_HEADERS}
+                            ${ceinmsCalibrationSetup_GENERATED_HEADERS}
+                            ${subject_GENERATED_SOURCES}
+                            ${emgGenerator_GENERATED_SOURCES}
+                            ${calibration_GENERATED_SOURCES}
+                            ${execution_GENERATED_SOURCES}
+                            ${inputData_GENERATED_SOURCES}
+                            ${ceinmsSetup_GENERATED_SOURCES}
+                            ${ceinmsCalibrationSetup_GENERATED_SOURCES}
                             )
 
 target_link_libraries(xmlInput ceinms_common ${XERCES_LIBRARIES})
