@@ -1,3 +1,5 @@
+.. _subjectDescFile:
+
 Subject description file
 ###############################
 
@@ -78,10 +80,6 @@ XML example
             </dof>
             <dof>
                 <name>ankle_angle_r</name>
-                <mtuNameSet>lat_gas_r med_gas_r per_brev_r per_long_r per_tert_r soleus_r tib_ant_r</mtuNameSet>
-            </dof>
-            <dof>
-                <name>subtalar_angle_r</name>
                 <mtuNameSet>lat_gas_r med_gas_r per_brev_r per_long_r per_tert_r soleus_r tib_ant_r</mtuNameSet>
             </dof>
         </dofSet>

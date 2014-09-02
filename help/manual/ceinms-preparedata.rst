@@ -1,3 +1,5 @@
+.. _prepareExperimentalData:
+
 Preparing your experimental data
 ################################
 
