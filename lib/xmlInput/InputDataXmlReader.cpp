@@ -61,7 +61,8 @@ void InputDataXmlReader::readXml() {
         std::string& myLmtFile(*(inputDataPointer_->muscleTendonLengthFile().begin()));
         std::string& myEmgFile(*(inputDataPointer_->emgFile().begin()));
        //TODO std::string& myMomentArmDir(*(inputDataPointer_->momentArmsFDirectory().begin()));
-        std::string& myExtTorqueFile(*(inputDataPointer_->externalTorquesFile().begin()));
+        if (inputDataPointer_->externalTorquesFile().size() >0 )
+            std::string& myExtTorqueFile(*(inputDataPointer_->externalTorquesFile().begin()));
     }
     catch (const xml_schema::exception& e) {
         cout << e << endl;
@@ -105,6 +106,8 @@ std::string InputDataXmlReader::getEmgFile()
 
 std::string InputDataXmlReader::getExternalTorqueFile()
 {
+    if (inputDataPointer_->externalTorquesFile().size() < 1)
+        return "";
     std::string fileName(*(inputDataPointer_->externalTorquesFile().begin()));
     if (isAbsolute(fileName.c_str()))
         return fileName;
