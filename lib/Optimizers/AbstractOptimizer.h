@@ -9,7 +9,7 @@ namespace CEINMS {
         public:
             virtual ~AbstractOptimizer() {};
             virtual bool optimize() = 0;
-            virtual std::vector<double> getOptimizedParameters() = 0;
+            virtual std::vector<double> getOptimizedParameters() const  = 0;
 
         };
     }

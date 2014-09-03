@@ -8,17 +8,21 @@
 namespace CEINMS {
     namespace Optimizers {
 
-        template<typename ObjectiveFunction>
-        class SimulatedAnnealing : AbstractOptimizer  {
+        template<typename OptimizerSystem>
+        class SimulatedAnnealing : public AbstractOptimizer  {
         public:
-            SimulatedAnnealing(ObjectiveFunction& objectiveFunction, SimulatedAnnealingParameters simulatedAnnealingParameters);
-            ~SimulatedAnnealing();
+            SimulatedAnnealing(OptimizerSystem& optimizerSystem, SimulatedAnnealingParameters simulatedAnnealingParameters);
+            ~SimulatedAnnealing() {};
             bool optimize();
-            std::vector<double> getOptimizedParameters();
+            std::vector<double> getOptimizedParameters() const { return xOpt_; }
 
         private:
             void checkBounds(int k);
-            ObjectiveFunctionT objectiveFunction_;
+            double computeMetropolisCriteria(double t) const;
+            bool doTerminate();
+            void updateFandFlatest();
+
+            OptimizerSystem& optimizerSystem_;
 
             std::vector<double> x_;
             std::vector<double> upperBounds_;
@@ -26,18 +30,22 @@ namespace CEINMS {
             std::vector<double> xOpt_;
             std::vector<double> xp_;
             std::vector<double> v_;
+            std::vector<double> fLatest_;
             std::vector<int>    noAccepted_;
             int                 noParameters_;
-
+            double              f_, fp_, fOpt_;
             //annealing parameters    
-            double              nt_;
-            double              ns_;
-            double              rt_;
-            double              t_;
-            int                 maxNoEval_;
+            unsigned                nt_;
+            unsigned                ns_;
+            double                  rt_;
+            double                  t_;
+            unsigned                maxNoEval_;
+            double                  epsilon_;
+            unsigned                nEpsilon_;
         };
+
+
     }
 }
-
-
+#include "SimulatedAnnealing.cpp"
 #endif
