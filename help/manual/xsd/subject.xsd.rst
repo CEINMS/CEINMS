@@ -126,6 +126,8 @@ Each muscle tendon unit is further described by the following, muscle-specific p
 .. todo:: write something here
 
 
+.. _subjectDof:
+
 dof
 ===
 

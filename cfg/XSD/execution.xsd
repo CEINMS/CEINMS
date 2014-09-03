@@ -80,9 +80,7 @@
         <xs:element name="online" type="ExecutionElementType"/>
         <xs:element name="offline" type="ExecutionElementType"/>
       </xs:choice>
-      <xs:element minOccurs="0" name="samplingFrequency" type="xs:int"/>
       <xs:element minOccurs="0" name="elaboratedDoFs" type="ElaboratedDoFsType"/>
-      <xs:element minOccurs="0" name="logging" type="LoggingType"/>
     </xs:sequence>
   </xs:complexType>
   <xs:element name="execution" type="ExecutionType"/>

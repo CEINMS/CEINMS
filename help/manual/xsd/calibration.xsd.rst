@@ -107,8 +107,7 @@ XML example
 A calibration configuration file consists of a root element named ``calibration`` that contains the following elements:
 
 - ``algorithm``: a description of the optimization algorithm to use (see `algorithm`_)
-- ``NMSmodel``: a collection of options for the simulation of the model TODO: what?? (see `NMSmodel`_)
-- (optionally) ``samplingFrequency`` TODO check what for
+- ``NMSmodel``: a collection of options for the simulation of the model (see the corresponding section :ref:`executionNMSmodel` in the execution description file)
 - ``calibrationSteps``: a list of ``step`` elements (at least one) that describe an optimization procedure (see `step`_)
 - ``trialSet``: a list of XML files, each describing a trial to be used for calibration (see :ref:`inputDataDescFile`)
 
@@ -123,21 +122,6 @@ This is the optimization algorithm that is used to minimize the objective functi
 .. todo:: decide where to describe the simulated annealing and the meaning of its parameters
 
 
-NMSmodel
-========
-
-.. todo:: add general explanation (similar to execution?)
-
-
-- ``type``: for calibration, it can only contain an ``openLoop`` element
-- ``tendon``: the behaviour of the tendon: it can be
-    - ``stiff``  rigid tendon
-    - ``elastic`` elastic tendon
-    - ``elasticBiSec`` TODO ??
-- ``activation``: the formula to use to model the excitation-to-activation non-linear relation
-    - ``exponential``
-    - ``piecewise`` TODO add references to :ref:`introActivationDynamics`
-
 
 step
 ====
@@ -150,17 +134,18 @@ It contains the following elements:
 - ``parameterSet``: a list of ``parameter`` elements, each describing how to calibrate one type of muscle parameter (see `parameter`_
 
 
-.. todo:: check if we still need the HardCodedParametersSelectionType
-
 parameter
 =========
 
 - ``name``: parameter identifier
 - a specifier for which muscles "share" the same parameter value (this varies the number of parameters to calibrate):
+
     - ``global``: single value for all muscles, or
     - ``single``: different value for each muscle, or
     - ``muscleGroups``: a list of ``muscles`` elements, each containing a list of muscles that share the same value for the parameter
+
 - a specifier for the calibration range. All elements of this type contain a ``range`` element, that consists of two numbers, representing respectively the minimum and maximum value of the range. The actual extremes depend on the type of specifier:
+
     - ``absolute``: the values in ``range`` are the absolute minimum and maximum values that are allowed for the parameter
     - ``relativeToSubjectValue``: the values in ``range`` represent the multiplying factor by which to multiply the initial value for this parameter (in the input subject description XML, see :ref:`subjectDescFile`) to obtain the actual minimum and maximum values.
 

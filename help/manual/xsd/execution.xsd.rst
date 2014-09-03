@@ -52,42 +52,37 @@ XML example
 
       <online/>
 
-      <samplingFrequency>
-      200
-      </samplingFrequency>
-
       <elaboratedDoFs>
       </elaboratedDoFs>
-
-      <logging>
-         <txt/>
-      </logging>
-
 
     </execution>
 
 An execution configuration file consists of a root element named ``execution`` that contains the following elements:
 
-- ``NMSmodel``  a collection of options for the simulation of the model TODO: what?? (see `NMSmodel`_)
+- ``NMSmodel``: the specification of muscular model to simulate (see `NMSmodel`_)
 -  an ``online`` or ``offline`` empty element, depending on: TODO: what?
-- ``samplingFrequency`` TODO: what? NYI?
-- ``elaboratedDoFs`` TODO: what? NYI?
-- ``logging`` TODO: what? NYI?
+- (optional) ``elaboratedDoFs`` to select the degrees of freedom (see :ref:`subjectDof` ) to elaborate
+
+    .. note:: this feature is not implemented yet.
+
+.. _executionNMSmodel:
 
 NMSmodel
 ========
 
-.. todo:: add general explanation (link here from calibration?)
+This is the specification of the type of muscular model to use among the ones described in :ref:`introNMSmodels` and the desired operation mode:
 
+- ``type``: the operation mode might contain an ``openLoop`` empty element, or an ``hybrid`` element  TODO: check if they match what we wrote in the introduction
+- ``tendon``: the behaviour of the tendon: it can be (see :ref:`introTendonModels` )
 
-- ``type``: TODO what is it exactly? might contain an ``openLoop`` empty element, or an ``hybrid`` element
-- ``tendon``: the behaviour of the tendon: it can be
-    - ``stiff``  rigid tendon
-    - ``elastic`` elastic tendon
-    - ``elasticBiSec`` TODO ??
-- ``activation``: the formula to use to model the excitation-to-activation non-linear relation
+    - ``stiff`` (ST) rigid tendon
+    - ``elastic`` (IET) integration elastic tendon TODO: check if this is correct
+    - ``elasticBiSec`` (EET) equilibrium elastic tendon
+
+- ``activation``: the formula to use to model the excitation-to-activation non-linear relation (see :ref:`introNeuralToMuscle` )
+
     - ``exponential``
-    - ``piecewise`` TODO add references to :ref:`introActivationDynamics`
+    - ``piecewise``
 
 hybrid
 ======
@@ -96,7 +91,7 @@ hybrid
 
 The hybrid execution modality configuration is provided here:
 
-- ``alpha`` weight for
+- ``alpha`` weight for TODO revise everything
 - ``beta`` weight for
 - ``gamma`` weight for
 - ``trackedMuscles`` list of muscles for which an EMG reference signal to "track" is provided

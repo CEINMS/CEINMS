@@ -1,22 +1,22 @@
-CEINNMS
+CEINMS
 =======
 
 Overview
 --------
 
 CEINMS is the result of an interdisciplinary collaboration among the biomechanics and the computer science worlds.
-Inspired by early EMG-driven methods :cite:`hansen2006anatomy` used in the biomechanical community, Lloyd and colleagues developed algorithms and software to calibrate EMG-driven, or now called EMG-informed, neuromusculoskeletal models to an individual :cite:`buchanan2004neuromusculoskeletal,gerus2013subject,lloyd2003emg,lloyd1996model,lloyd2001strategies,lloyd2008neuromusculoskeletal,sartori2013hybrid,sartori2012emg,winby2013correlation,winby2009muscle`
+Inspired by early electromyography-driven (EMG-driven) methods :cite:`hansen2006anatomy` used in the biomechanical community, Lloyd and colleagues developed algorithms and software to calibrate EMG-driven, or now called EMG-informed, neuromusculoskeletal models to match each individual's characteristics :cite:`buchanan2004neuromusculoskeletal,gerus2013subject,lloyd2003emg,lloyd1996model,lloyd2001strategies,lloyd2008neuromusculoskeletal,sartori2013hybrid,sartori2012emg,winby2013correlation,winby2009muscle`
 
-Fundamental to these calibrated methods was ability to validate the outputs to other data not used for calibration. All these algorithms and software were collected and integrated together to create CEINMS.
+Fundamental to these calibrated methods was the ability to validate the outputs against other data not used for calibration. All these algorithms and software were collected and integrated together to create CEINMS.
 
-CEINMS was designed and written to be flexible and generic software, that is, given the appropriate anatomical and physiological data, it can operate with any number of musculotendon units and any number of DOF. Moreover, the modular design allows the independent selection of different operation modes:
+CEINMS was designed and written to be flexible and generic software, that is, given the appropriate anatomical and physiological data, it can operate with any number of musculotendon units (MTU) and any number of degree of freedoms (DOF). Moreover, the modular design allows the independent selection of different operation modes:
 
 #. *Full-predictive open-loop mode.* The experimentally recorded EMG signals and 3D joint angles are used as input to a neuromusculoskeletal model to directly drive the computations of the musculotendon forces :cite:`gerus2013subject,lloyd2003emg,lloyd1996model,lloyd2001strategies,lloyd2008neuromusculoskeletal,sartori2012emg,winby2013correlation,winby2009muscle` (:num:`Fig. #figoverview`).
-#. *Hybrid mode.* The excitation patterns muscles (e.g. deep muscles) from which it is not practical to routinely collect EMG signals, are constructed using optimization algorithms. Then, the constructed excitations, experimental EMGs, and 3D joint angles are used as input for the neuromusculoskeletal model :cite:`sartori2013hybrid`.
-#. *EMG-assisted mode.* This mode is a more generalizable form of the Hybrid mode. It uses optimization to adjust both the excitations determined from experimentally recorded EMG signals and determine the excitations of muscles without experimental EMG. Then the muscle excitations, coupled with 3D joint angles, are used as input to the neuromusculoskeletal model.
+#. *Hybrid mode.* The excitation patterns of muscles from which it is not practical or possible to routinely collect EMG signals (e.g. deep muscles) are constructed using optimization algorithms. Then, the constructed excitations, experimental EMGs, and 3D joint angles are used as input for the neuromusculoskeletal model :cite:`sartori2013hybrid`.
+#. *EMG-assisted mode.* This mode is a more generalizable form of the Hybrid mode. It uses optimization to adjust both the excitations determined from experimentally recorded EMG signals and to determine the excitations of muscles without experimental EMG. Then the muscle excitations, coupled with 3D joint angles, are used as input to the neuromusculoskeletal model.
 #. *Full optimization-driven closed-loop mode.* In this mode, without the aid of experimental EMG data, an optimization algorithm is used to construct all the muscle excitations to drive the neuromusculoskeletal model :cite:`erdemir2007model,tsirakos1997inverse`. Importantly, the different operation modes can be executed on the same neuromusculoskeletal model, allowing a consistent comparison among the different neural solutions. Fundamental to the current EMG-informed methods and the above modes of operation, CEINMS can be calibrated to the individual subject (:num:`Fig. #calibration`) :cite:`lloyd2003emg`. This is a selected operation procedure in CEINMS, so it can run un-calibrated or calibrated state.
 
-The aim of calibration is to determine the values for a set of parameters for each musculotendon unit. The first parameter set defines the musculotendon unit's activation dynamics (:num:`Fig. #calibration` and :num:`Fig. #processingflow`), which characterise the transformation of muscle excitation to muscle activation. The second parameter set define the musculotendon contraction dynamics (:num:`Fig. #calibration` and :num:`Fig. #processingflow`), which transforms the muscle activation and musculotendon kinematics to force :cite:`buchanan2004neuromusculoskeletal,gerus2013subject,lloyd2003emg,lloyd1996model,lloyd2001strategies,lloyd2008neuromusculoskeletal,sartori2013hybrid,sartori2012emg,winby2013correlation`. These parameters may change non-linearly across individuals, so simulated annealing :cite:`goffe1994global` is employed to alter the values of these various parameters to enable close tracking of the experimental joint moments and/or excitations derived from EMG signal, which are estimated from data collected during the execution of different motor tasks :cite:`buchanan2004neuromusculoskeletal,gerus2013subject,lloyd2003emg,lloyd1996model,lloyd2001strategies,lloyd2008neuromusculoskeletal,sartori2013hybrid,sartori2012emg,winby2013correlation,winby2009muscle`. Various calibration control functions (e.g. minimize maximum activation, minimize maximum joint contact forces etc.) can also be implemented to direct the final set of model parameters :cite:`gerus2013subject,sartori2013hybrid`. Finally, during calibration, the parameters are also constrained to vary within predefined boundaries to ensure muscles operate in their physiological range.
+The aim of calibration is to determine the values for a set of parameters for each musculotendon unit. The first parameter set defines the musculotendon unit's activation dynamics (:num:`Fig. #calibration` and :num:`Fig. #processingflow`), which characterise the transformation of muscle excitation to muscle activation. The second parameter set define the musculotendon contraction dynamics (:num:`Fig. #calibration` and :num:`Fig. #processingflow`), which transform the muscle activation and musculotendon kinematics into force :cite:`buchanan2004neuromusculoskeletal,gerus2013subject,lloyd2003emg,lloyd1996model,lloyd2001strategies,lloyd2008neuromusculoskeletal,sartori2013hybrid,sartori2012emg,winby2013correlation`. These parameters may change non-linearly across individuals, therefore an optimization algorithm, such as *simulated annealing* :cite:`goffe1994global` is employed to alter the values of the parameters to enable close tracking of the experimental joint moments and/or excitations derived from EMG signals, acquired during the execution of different motor tasks :cite:`buchanan2004neuromusculoskeletal,gerus2013subject,lloyd2003emg,lloyd1996model,lloyd2001strategies,lloyd2008neuromusculoskeletal,sartori2013hybrid,sartori2012emg,winby2013correlation,winby2009muscle`. Various calibration control functions (e.g. minimize maximum activation, minimize maximum joint contact forces etc.) can also be implemented to direct the final set of model parameters :cite:`gerus2013subject,sartori2013hybrid`. Finally, during calibration, the parameters are also constrained to vary within predefined boundaries to ensure that the muscles operate in their physiological range.
 
 The result of the calibration is a subject-specific neuromusculoskeletal (NMS) model, which reflects the musculotendon physiology, activation and contraction dynamics for an individual. Finally, CEINMS can be validated with a novel set of input data, which has not been used for the calibration process, and run with any of the four execution modes.
 
@@ -52,6 +52,7 @@ The result of the calibration is a subject-specific neuromusculoskeletal (NMS) m
 
    General data processing flow showing activation dynamics and contraction dynamics.
 
+.. _introNMSmodels:
 
 Neuromusculoskeletal models used in CEINMS
 ------------------------------------------
@@ -89,6 +90,11 @@ and
 .. math::
 
    \alpha - \beta_1 - \beta_2 = 1
+
+.. _introNeuralToMuscle:
+
+Neural activation to muscle activation
+**************************************
 
 The relation between neural activation and the muscle activation is non-linear, and CEINMS has two different solutions :cite:`buchanan2004neuromusculoskeletal,lloyd2003emg,manal2003one`. The first was introduced by :cite:`lloyd2003emg`,
 
@@ -138,6 +144,11 @@ The tendon element influences the estimation of the fibre length, i.e.
 
    Active and passive force length curves. Values are normalised by :math:`F^{max}` and :math:`L_m^0` with :math:`1.0` being :math:`100\%` activation. Optimal muscle fibre length was scaled with activation by a relationship experimentally determined in :cite:`huijing1995important` (b) Normalised force-velocity relationship. Note the parallel damping element added to prevent singularities in the inverted force-velocity relationship :cite:`schutte1993using` when activation or isometric force equals :math:`0.0`. (c) Exponential tendon force-strain relationship
 
+.. _introTendonModels:
+
+Tendon models
+*************
+
 CEINMS includes three different tendon models to estimate MTU forces. In the first, the equations for the musculotendon force dynamics are solved by numerically integrating a set of ordinary differential equations. This *integration elastic tendon (IET)* model calculates the muscle fibre length by forward integration of the muscle fibre velocity. The starting value of fibre velocity :math:`v^m` is first estimated through an optimization routine, which distribute the total MTU velocity between fibres and tendon. :math:`v^m` is then integrated using a Runge-Kutta-Fehlberg algorithm to calculate first :math:`l_m` and :math:`l_t` then from equation :eq:`neuralactivation`. The strain of the tendon is then calculated as
 
 .. math:: \epsilon = \frac{l_t-l_{ts}}{l_t}
@@ -170,8 +181,8 @@ Although a complete comparison of the all proposed implementations of the elasti
 
 .. only:: html
 
-   Bibliography
-   ============
+Bibliography
+============
 
 .. bibliography:: literature.bib
    :all:
