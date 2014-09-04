@@ -78,6 +78,11 @@ void ModelEvaluationHybrid<NMSmodelT, ErrorMinimizerT, Logger>::operator()() {
                 externalTorqueTime = externalTorquesFrameFromQueue.time;
             }
         }
+        else
+        {
+            std::cout << "External torque data is needed in Hybrid Mode but it is not available!" << std::endl;
+            break;
+        }
 
         // 4. read emgs
         CEINMS::InputConnectors::FrameType emgFrameFromQueue;

@@ -75,7 +75,11 @@ void QueuesToStorageFiles::operator()() {
  
 void QueuesToStorageFiles::initFile(const std::string& valueName, const std::vector< CEINMS::OutputConnectors::FrameType >& dataToWrite ) 
 {
-
+    if (dataToWrite.size() < 1)
+    {
+        std::cout << "No " << valueName << "data to write!" << std::endl;
+        return;
+    }
     auto q = outFiles_.find(valueName);
     if (q == outFiles_.end() ) {
         std::cout << valueName << " file was not found\n";
