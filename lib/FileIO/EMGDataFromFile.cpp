@@ -28,31 +28,43 @@ EMGDataFromFile<EMGgenerator>::EMGDataFromFile(const string& EMGDataFilename, co
     cout << "ERROR emg file: " << EMGDataFilename << " could not be open\n";
     exit(EXIT_FAILURE);
   }
-  
-  // reading number of columns/rows
-  string trash;
-  EMGDataFile_ >> trash; 
-  int noColumns;
-  EMGDataFile_ >> noColumns;
-  noMuscles_ = noColumns-1;
-  EMGDataFile_ >> trash;
-  EMGDataFile_ >> noTimeSteps_;
 
-  // reading muscles
   string line;
-  getline(EMGDataFile_, line, '\n'); getline(EMGDataFile_, line, '\n');  
+  getline(EMGDataFile_, line, '\n');
+  while (line!="endheader" && line!= "endheader\r" && !EMGDataFile_.eof())
+  {
+      if( size_t foundInfo=line.find("nRows=")!=string::npos)
+      {
+          noTimeSteps_=atoi(line.substr(6).c_str());
+      }
+      if( size_t foundInfo=line.find("datarows ")!=string::npos)
+      {
+          noTimeSteps_=atoi(line.substr(9).c_str());
+      }
+      if( size_t foundInfo=line.find("nColumns=")!=string::npos)
+      {
+          noMuscles_=atoi(line.substr(9).c_str())-1; //nColumns includes the "time" column
+      }
+      if( size_t foundInfo=line.find("datacolumns ")!=string::npos)
+      {
+          noMuscles_=atoi(line.substr(12).c_str())-1; //nColumns includes the "time" column
+      }
+      getline((EMGDataFile_), line, '\n');
+  }
+  // reading muscles
+  getline((EMGDataFile_), line, '\n');  
   stringstream myStream(line);
-  string nextMuscleName;
-  // --- Read Interpolation Data
+  string nextColumnName;
+    // the first is the "Time"
   string timeName;
   myStream >> timeName;
-  // 1. first their names
+    // then we have their names
+  int noReadColumns = 0;
   do {
-    nextMuscleName.clear();
-    myStream >> nextMuscleName;
-    if (nextMuscleName!="")
-        muscleNames_.push_back(nextMuscleName);
-  } while (!myStream.eof());
+      myStream >> nextColumnName;
+      muscleNames_.push_back(nextColumnName);
+  } while (!myStream.eof() && ++noReadColumns < noMuscles_);
+
 
   if (noMuscles_ != muscleNames_.size()) {
     cout << "Something is wrong. " << noMuscles_ << " muscles should be in the file "
