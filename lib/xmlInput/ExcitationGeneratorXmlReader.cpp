@@ -13,14 +13,14 @@ using std::string;
 using std::cout;
 using std::endl;
 
-#include "EmgGeneratorXmlReader.h"
+#include "ExcitationGeneratorXmlReader.h"
 #include "validation.h"
-#include "emgGenerator-schema.hxx"
+#include "excitationGenerator-schema.hxx"
 
-EmgGeneratorXmlReader::EmgGeneratorXmlReader(const string& filename)
+ExcitationGeneratorXmlReader::ExcitationGeneratorXmlReader(const string& filename)
 {
     try {
-    emgGenPointer_= parseAndValidate<emgGenerator>(filename, emgGenerator_schema, sizeof(emgGenerator_schema));
+    excitationGenPointer_= parseAndValidate<excitationGenerator>(filename, excitationGenerator_schema, sizeof(excitationGenerator_schema));
     }
     catch (const xml_schema::exception& e) {
         cout << e << endl;
@@ -28,7 +28,7 @@ EmgGeneratorXmlReader::EmgGeneratorXmlReader(const string& filename)
     }
 }
 
-std::auto_ptr< emgGenerator > EmgGeneratorXmlReader::getEmgGenerator()
+std::auto_ptr< excitationGenerator > ExcitationGeneratorXmlReader::getExcitationGenerator()
 {
-    return emgGenPointer_;
+    return excitationGenPointer_;
 }

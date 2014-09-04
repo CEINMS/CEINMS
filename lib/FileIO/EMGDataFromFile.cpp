@@ -60,9 +60,9 @@ EMGDataFromFile<EMGgenerator>::EMGDataFromFile(const string& EMGDataFilename, co
     exit(EXIT_FAILURE);
   } 
   
-  if ( !EMGgenerator_.checkFromMusclesNames(muscleNames_) ) {
+  if ( !EMGgenerator_.checkInputSignalsNames(muscleNames_) ) {
 	  vector<string> musclesNamesFromGenerator;
-	  EMGgenerator_.getFromMusclesNames(musclesNamesFromGenerator);
+	  EMGgenerator_.getInputSignalsNames(musclesNamesFromGenerator);
 	  std::cout << " generator names - file names\n";
 		for(unsigned i = 0; i < musclesNamesFromGenerator.size() && i < muscleNames_.size() ; ++i) {
 			string genName(musclesNamesFromGenerator.at(i)), fileName(muscleNames_.at(i)), separator("  -  ");
@@ -75,8 +75,8 @@ EMGDataFromFile<EMGgenerator>::EMGDataFromFile(const string& EMGDataFilename, co
   }
   
 //TODO fix resize
-  currentReadEMG_.resize(EMGgenerator_.getNoFromMuscles());
-  currentEMGData_.resize(EMGgenerator_.getNoToMuscles());
+  currentReadEMG_.resize(EMGgenerator_.getNoInputSignals());
+  currentEMGData_.resize(EMGgenerator_.getNoExcitations());
   currentDataTime_ = 0.;
   currentTimeStep_ = 0;
 }

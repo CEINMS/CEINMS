@@ -10,7 +10,6 @@
 #include "InputDataXmlReader.h"
 #include "subject.hxx"
 #include "NMSmodel.h"
-#include "InputDataInterpreter.h"
 #include "SetupDataStructure.h"
 //Activation Policies
 #include "Activation/ExponentialActivation.h"

@@ -8,5 +8,5 @@ Files belonging to this category serve to describe the data that is required by 
 
    xsd/subject.xsd
    xsd/inputData.xsd
-   xsd/emgGenerator.xsd
+   xsd/excitationGenerator.xsd
 

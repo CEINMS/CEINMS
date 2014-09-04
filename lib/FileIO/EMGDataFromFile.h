@@ -20,8 +20,8 @@ class EMGDataFromFile {
 public:
   EMGDataFromFile() { std::cout << "You should not be there\n"; }
   EMGDataFromFile(const std::string& inputFile, const std::string& emgGeneratorFile);
-  const std::vector<std::string>& getMusclesNames() const { return EMGgenerator_.getMusclesNames(); }
-  void getMusclesNames( std::vector< std::string >& muscleNames ) const {muscleNames = EMGgenerator_.getMusclesNames(); }
+  const std::vector<std::string>& getMusclesNames() const { return EMGgenerator_.getExcitationsNames(); }
+  void getMusclesNames( std::vector< std::string >& muscleNames ) const {muscleNames = EMGgenerator_.getExcitationsNames(); }
   void readNextEmgData();
   inline double getCurrentTime() const {return currentDataTime_;}
   bool areStillData() const { return currentTimeStep_ < noTimeSteps_; } 

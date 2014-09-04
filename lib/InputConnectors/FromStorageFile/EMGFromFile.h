@@ -8,7 +8,7 @@
 #include "EMGFromX.h"
 
 #include "EMGDataFromFile.h"
-#include "EMGgeneratorFromXml.h"
+#include "ExcitationGeneratorFromXml.h"
 #include "InputQueues.h"
 
 #define LOG
@@ -22,7 +22,7 @@ class EMGFromFile:public EMGFromX
     virtual ~EMGFromFile();
   private:  
     std::string inputDir_;
-    EMGDataFromFile<EMGgeneratorFromXml> emgData_;
+    EMGDataFromFile<ExcitationGeneratorFromXml> emgData_;
 };
 
 

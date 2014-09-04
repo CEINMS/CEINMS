@@ -6,7 +6,6 @@ project(Calibration)
 set(Calibration_HEADERS TrialData.h
                         TorquesComputation.h
                         SimulatedAnnealing.h
-                        InputDataInterpreter.h
                         ObjectiveFunctions/ObjectiveFunction.h
                         ObjectiveFunctions/SumMinObjectiveFunction_singleF.h
                         SimAnnealParameters/ParametersFromXml.h
@@ -16,7 +15,7 @@ set(Calibration_HEADERS TrialData.h
                         TorqueComputationModes/ComputationMode_Default.h
                         TorqueComputationModes/ComputationMode_Fast.h
                         )
-set(Calibration_SOURCES InputDataInterpreter.cpp)
+set(Calibration_SOURCES )
 
 set(Calibration_TEMPLATE_IMPLEMENTATION
                             TrialData.cpp

@@ -1,3 +1,0 @@
-INCLUDE_DIRECTORIES(
-  ${CMAKE_SOURCE_DIR}/lib/xmlInput
-)

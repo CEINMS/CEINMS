@@ -27,7 +27,7 @@ endmacro()
 schema_to_bin(${CMAKE_SOURCE_DIR}/cfg/XSD/execution.xsd)
 schema_to_bin(${CMAKE_SOURCE_DIR}/cfg/XSD/calibration.xsd)
 schema_to_bin(${CMAKE_SOURCE_DIR}/cfg/XSD/subject.xsd)
-schema_to_bin(${CMAKE_SOURCE_DIR}/cfg/XSD/emgGenerator.xsd)
+schema_to_bin(${CMAKE_SOURCE_DIR}/cfg/XSD/excitationGenerator.xsd)
 schema_to_bin(${CMAKE_SOURCE_DIR}/cfg/XSD/inputData.xsd)
 schema_to_bin(${CMAKE_SOURCE_DIR}/cfg/XSD/ceinmsSetup.xsd)
 schema_to_bin(${CMAKE_SOURCE_DIR}/cfg/XSD/ceinmsCalibrationSetup.xsd)
@@ -36,7 +36,7 @@ include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
 # Generate c++ code for xsd schema files
 xsd_schema(subject_GENERATED ${CMAKE_SOURCE_DIR}/cfg/XSD/subject.xsd --generate-serialization)
-xsd_schema(emgGenerator_GENERATED ${CMAKE_SOURCE_DIR}/cfg/XSD/emgGenerator.xsd --generate-serialization)
+xsd_schema(excitationGenerator_GENERATED ${CMAKE_SOURCE_DIR}/cfg/XSD/excitationGenerator.xsd --generate-serialization)
 xsd_schema(calibration_GENERATED ${CMAKE_SOURCE_DIR}/cfg/XSD/calibration.xsd --generate-serialization --namespace-map =CalibrationXsd)
 xsd_schema(execution_GENERATED ${CMAKE_SOURCE_DIR}/cfg/XSD/execution.xsd --generate-serialization)
 xsd_schema(inputData_GENERATED ${CMAKE_SOURCE_DIR}/cfg/XSD/inputData.xsd --generate-serialization)
@@ -47,7 +47,7 @@ set(xmlInput_SOURCES    ExecutionXmlReader.cpp
                         CalibrationXmlReader.cpp
                         SubjectXmlReader.cpp
                         grammar-input-stream.cxx
-                        EmgGeneratorXmlReader.cpp
+                        ExcitationGeneratorXmlReader.cpp
                         InputDataXmlReader.cpp
                         CeinmsSetupXmlReader.cpp
                         CeinmsCalibrationSetupXmlReader.cpp
@@ -56,7 +56,7 @@ set(xmlInput_SOURCES    ExecutionXmlReader.cpp
 set(schemas_GENERATED_SOURCES  ${CMAKE_CURRENT_BINARY_DIR}/execution-schema.cxx
                                 ${CMAKE_CURRENT_BINARY_DIR}/calibration-schema.cxx
                                 ${CMAKE_CURRENT_BINARY_DIR}/subject-schema.cxx
-                                ${CMAKE_CURRENT_BINARY_DIR}/emgGenerator-schema.cxx
+                                ${CMAKE_CURRENT_BINARY_DIR}/excitationGenerator-schema.cxx
                                 ${CMAKE_CURRENT_BINARY_DIR}/inputData-schema.cxx
                                 ${CMAKE_CURRENT_BINARY_DIR}/ceinmsSetup-schema.cxx
                                 ${CMAKE_CURRENT_BINARY_DIR}/ceinmsCalibrationSetup-schema.cxx)
@@ -66,7 +66,7 @@ set(xmlInput_HEADERS    ExecutionXmlReader.h
                         CalibrationXmlReader.h
                         CalibrationCfg.h
                         SubjectXmlReader.h
-                        EmgGeneratorXmlReader.h
+                        ExcitationGeneratorXmlReader.h
                         InputDataXmlReader.h
                         CeinmsSetupXmlReader.h
                         CeinmsCalibrationSetupXmlReader.h
@@ -78,7 +78,7 @@ set(xmlInput_IMPL_HEADERS   impl/grammar-input-stream.hxx
 set(schemas_GENERATED_HEADERS  ${CMAKE_CURRENT_BINARY_DIR}/execution-schema.hxx
                                 ${CMAKE_CURRENT_BINARY_DIR}/calibration-schema.hxx
                                 ${CMAKE_CURRENT_BINARY_DIR}/subject-schema.hxx
-                                ${CMAKE_CURRENT_BINARY_DIR}/emgGenerator-schema.hxx
+                                ${CMAKE_CURRENT_BINARY_DIR}/excitationGenerator-schema.hxx
                                 ${CMAKE_CURRENT_BINARY_DIR}/inputData-schema.hxx
                                 ${CMAKE_CURRENT_BINARY_DIR}/ceinmsSetup-schema.hxx
                                 ${CMAKE_CURRENT_BINARY_DIR}/ceinmsCalibrationSetup-schema.hxx)
@@ -87,7 +87,7 @@ source_group("Headers" FILES ${xmlInput_HEADERS})
 source_group("Private headers" FILES ${xmlInput_IMPL_HEADERS})
 source_group("Generated headers" FILES  ${schemas_GENERATED_HEADERS}
                                         ${subject_GENERATED_HEADERS}
-                                        ${emgGenerator_GENERATED_HEADERS}
+                                        ${excitationGenerator_GENERATED_HEADERS}
                                         ${calibration_GENERATED_HEADERS}
                                         ${execution_GENERATED_HEADERS}
                                         ${inputData_GENERATED_HEADERS}
@@ -96,7 +96,7 @@ source_group("Generated headers" FILES  ${schemas_GENERATED_HEADERS}
 source_group("Sources" FILES ${xmlInput_SOURCES})
 source_group("Generated sources" FILES  ${schemas_GENERATED_SOURCES}
                                         ${subject_GENERATED_SOURCES}
-                                        ${emgGenerator_GENERATED_SOURCES}
+                                        ${excitationGenerator_GENERATED_SOURCES}
                                         ${calibration_GENERATED_SOURCES}
                                         ${execution_GENERATED_SOURCES}
                                         ${inputData_GENERATED_SOURCES}
@@ -111,14 +111,14 @@ add_library(xmlInput STATIC ${xmlInput_SOURCES}
                             ${schemas_GENERATED_HEADERS}
                             ${schemas_GENERATED_SOURCES}
                             ${subject_GENERATED_HEADERS}
-                            ${emgGenerator_GENERATED_HEADERS}
+                            ${excitationGenerator_GENERATED_HEADERS}
                             ${calibration_GENERATED_HEADERS}
                             ${execution_GENERATED_HEADERS}
                             ${inputData_GENERATED_HEADERS}
                             ${ceinmsSetup_GENERATED_HEADERS}
                             ${ceinmsCalibrationSetup_GENERATED_HEADERS}
                             ${subject_GENERATED_SOURCES}
-                            ${emgGenerator_GENERATED_SOURCES}
+                            ${excitationGenerator_GENERATED_SOURCES}
                             ${calibration_GENERATED_SOURCES}
                             ${execution_GENERATED_SOURCES}
                             ${inputData_GENERATED_SOURCES}
