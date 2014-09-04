@@ -280,7 +280,7 @@ int main(int argc, char** argv){
                 std::cout << "CalibrationStepCfg " << currentCalibrationStep.getStepCfg() << std::endl;
                 switch(currentCalibrationStep.getStepCfg()) {
                     case CalibrationCfg::MinimizeTorqueErrorParameterSetDefault: {
-                        typedef TorquesComputation<ComputationMode_Default<MyNMSmodel>, MyNMSmodel> MyComputationMode;
+                        typedef TorquesComputation<ComputationMode_Fast<MyNMSmodel>, MyNMSmodel> MyComputationMode; //TODO:: switch back to default after computeTorquesAndPenalties in ComputationMode_Default is fixed
                         typedef ParametersFromXml<MyNMSmodel> MyParameters;
                         typedef SumMinObjectiveFunction_singleF<MyComputationMode> MyObjFunction;            
                         typedef SimulatedAnnealing<MyParameters, MyObjFunction, MyComputationMode> MyOptimizator;
@@ -325,7 +325,7 @@ int main(int argc, char** argv){
                 std::cout << "CalibrationStepCfg " << currentCalibrationStep.getStepCfg() << std::endl;
                 switch(currentCalibrationStep.getStepCfg()) {
                     case CalibrationCfg::MinimizeTorqueErrorParameterSetDefault: {
-                        typedef TorquesComputation<ComputationMode_Default<MyNMSmodel>, MyNMSmodel> MyComputationMode;
+                        typedef TorquesComputation<ComputationMode_Fast<MyNMSmodel>, MyNMSmodel> MyComputationMode; //TODO:: switch back to default after computeTorquesAndPenalties in ComputationMode_Default is fixed
                         typedef ParametersFromXml<MyNMSmodel> MyParameters;
                         typedef SumMinObjectiveFunction_singleF<MyComputationMode> MyObjFunction;            
                         typedef SimulatedAnnealing<MyParameters, MyObjFunction, MyComputationMode> MyOptimizator;
@@ -373,7 +373,7 @@ int main(int argc, char** argv){
                 std::cout << "CalibrationStepCfg " << currentCalibrationStep.getStepCfg() << std::endl;
                 switch(currentCalibrationStep.getStepCfg()) {
                     case CalibrationCfg::MinimizeTorqueErrorParameterSetDefault: {
-                        typedef TorquesComputation<ComputationMode_Default<MyNMSmodel>, MyNMSmodel> MyComputationMode;
+                        typedef TorquesComputation<ComputationMode_Fast<MyNMSmodel>, MyNMSmodel> MyComputationMode; //TODO:: switch back to default after computeTorquesAndPenalties in ComputationMode_Default is fixed
                         typedef ParametersFromXml<MyNMSmodel> MyParameters;
                         typedef SumMinObjectiveFunction_singleF<MyComputationMode> MyObjFunction;            
                         typedef SimulatedAnnealing<MyParameters, MyObjFunction, MyComputationMode> MyOptimizator;
@@ -417,7 +417,7 @@ int main(int argc, char** argv){
                 std::cout << "CalibrationStepCfg " << currentCalibrationStep.getStepCfg() << std::endl;
                 switch(currentCalibrationStep.getStepCfg()) {
                     case CalibrationCfg::MinimizeTorqueErrorParameterSetDefault: {
-                        typedef TorquesComputation<ComputationMode_Default<MyNMSmodel>, MyNMSmodel> MyComputationMode;
+                        typedef TorquesComputation<ComputationMode_Fast<MyNMSmodel>, MyNMSmodel> MyComputationMode; //TODO:: switch back to default after computeTorquesAndPenalties in ComputationMode_Default is fixed
                         typedef ParametersFromXml<MyNMSmodel> MyParameters;
                         typedef SumMinObjectiveFunction_singleF<MyComputationMode> MyObjFunction;            
                         typedef SimulatedAnnealing<MyParameters, MyObjFunction, MyComputationMode> MyOptimizator;
