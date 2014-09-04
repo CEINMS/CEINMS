@@ -74,8 +74,8 @@ void CalibrationXmlReader::readNMSmodelCfg() {
     
         CalibrationType::NMSmodel_type::tendon_type& myTendon(myModel.tendon());
         CalibrationType::NMSmodel_type::tendon_type::stiff_optional& myStiffOpt(myTendon.stiff());
-        CalibrationType::NMSmodel_type::tendon_type::elastic_optional& myElsaticOpt(myTendon.elastic());
-        CalibrationType::NMSmodel_type::tendon_type::elasticBiSec_optional& myElsaticBiSecOpt(myTendon.elasticBiSec());
+        CalibrationType::NMSmodel_type::tendon_type::integrationElastic_optional& myElsaticOpt(myTendon.integrationElastic());
+        CalibrationType::NMSmodel_type::tendon_type::equilibriumElastic_optional& myElsaticBiSecOpt(myTendon.equilibriumElastic());
     
         if(myStiffOpt.present())
             runMode_ += NMSModelCfg::StiffTendon;

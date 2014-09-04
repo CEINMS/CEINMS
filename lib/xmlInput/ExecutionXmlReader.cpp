@@ -49,8 +49,8 @@ void ExecutionXmlReader::readXml() {
         
         ExecutionType::NMSmodel_type::tendon_type& myTendon(myModel.tendon());
         ExecutionType::NMSmodel_type::tendon_type::stiff_optional& myStiffOpt(myTendon.stiff());
-        ExecutionType::NMSmodel_type::tendon_type::elastic_optional& myElsaticOpt(myTendon.elastic());
-        ExecutionType::NMSmodel_type::tendon_type::elasticBiSec_optional& myElsaticBiSecOpt(myTendon.elasticBiSec());
+        ExecutionType::NMSmodel_type::tendon_type::integrationElastic_optional& myElsaticOpt(myTendon.integrationElastic());
+        ExecutionType::NMSmodel_type::tendon_type::equilibriumElastic_optional& myElsaticBiSecOpt(myTendon.equilibriumElastic());
         
         if(myStiffOpt.present())
             runMode_ += NMSModelCfg::StiffTendon;

@@ -76,8 +76,8 @@ This is the specification of the type of muscular model to use among the ones de
 - ``tendon``: the behaviour of the tendon: it can be (see :ref:`introTendonModels` )
 
     - ``stiff`` (ST) rigid tendon
-    - ``elastic`` (IET) integration elastic tendon TODO: check if this is correct
-    - ``elasticBiSec`` (EET) equilibrium elastic tendon
+    - ``integrationElastic`` (IET) integration elastic tendon
+    - ``equilibriumElastic`` (EET) equilibrium elastic tendon
 
 - ``activation``: the formula to use to model the excitation-to-activation non-linear relation (see :ref:`introNeuralToMuscle` )
 

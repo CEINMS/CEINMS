@@ -9,8 +9,8 @@
   <xs:complexType name="TendonType">
     <xs:choice>
       <xs:element name="stiff" type="TendonElementType"/>
-      <xs:element name="elastic" type="TendonElementType"/>
-      <xs:element name="elasticBiSec" type="TendonElementType"/>
+      <xs:element name="integrationElastic" type="TendonElementType"/>
+      <xs:element name="equilibriumElastic" type="TendonElementType"/>
     </xs:choice>
   </xs:complexType>
   <xs:complexType name="ActivationElementType"/>
