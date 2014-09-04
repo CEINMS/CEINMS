@@ -22,7 +22,7 @@ public:
     std::string getSubjectFile();
     std::string getInputDataFile();
     std::string getExecutionFile();
-    std::string getEmgGeneratorFile();
+    std::string getExcitationGeneratorFile();
     std::string getOutputDirectory();
     static bool writeTemplateCeinmsSetupFile(const std::string& templateFile);
 

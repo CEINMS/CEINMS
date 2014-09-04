@@ -61,7 +61,7 @@ void CeinmsCalibrationSetupXmlReader::readXml() {
     try {
         std::string& mySubjectFile(*(ceinmsCalibrationSetupPointer_->subjectFile().begin()));
         std::string& myCalibrationExecutionFile(*(ceinmsCalibrationSetupPointer_->calibrationFile().begin()));
-        std::string& myEmgGeneratorFile(*(ceinmsCalibrationSetupPointer_->emgGeneratorFile().begin()));
+        std::string& myEmgGeneratorFile(*(ceinmsCalibrationSetupPointer_->excitationGeneratorFile().begin()));
         std::string& myOutputSubjectFile(*(ceinmsCalibrationSetupPointer_->outputSubjectFile().begin()));
 
     }
@@ -89,9 +89,9 @@ std::string CeinmsCalibrationSetupXmlReader::getCalibrationFile()
         return filepath_ + fileName;
 }
 
-std::string CeinmsCalibrationSetupXmlReader::getEmgGeneratorFile()
+std::string CeinmsCalibrationSetupXmlReader::getExcitationGeneratorFile()
 {
-    std::string fileName(*(ceinmsCalibrationSetupPointer_->emgGeneratorFile().begin()));
+    std::string fileName(*(ceinmsCalibrationSetupPointer_->excitationGeneratorFile().begin()));
     if (isAbsolute(fileName.c_str()))
         return fileName;
     else
@@ -115,7 +115,7 @@ bool CeinmsCalibrationSetupXmlReader::writeTemplateCeinmsCalibrationSetupFile(co
     CeinmsCalibrationType templateCeinmsSetup;
     templateCeinmsSetup.subjectFile().push_back("subjectUncalibrated.xml");
     templateCeinmsSetup.calibrationFile().push_back("calibration.xml");
-    templateCeinmsSetup.emgGeneratorFile().push_back("emgGenerator.xml");
+    templateCeinmsSetup.excitationGeneratorFile().push_back("excitationGenerator.xml");
     templateCeinmsSetup.outputSubjectFile().push_back("subjectCalibrated.xml");
     ceinmsCalibration(templateFileStream, templateCeinmsSetup);
     templateFileStream.close();

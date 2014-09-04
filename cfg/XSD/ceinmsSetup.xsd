@@ -11,7 +11,7 @@
         <xs:element maxOccurs="1" name="subjectFile" type="xs:string"/>
         <xs:element maxOccurs="1" name="inputDataFile" type="xs:string"/>
         <xs:element maxOccurs="1" name="executionFile" type="xs:string"/>
-        <xs:element maxOccurs="1" name="emgGeneratorFile" type="xs:string"/>
+        <xs:element maxOccurs="1" name="excitationGeneratorFile" type="xs:string"/>
         <xs:element maxOccurs="1" name="outputDirectory" type="xs:string"/>
       </xs:choice>
     </xs:sequence>

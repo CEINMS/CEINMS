@@ -243,7 +243,7 @@ int main(int argc, char** argv){
     string uncalibratedSubjectXmlFile = ceinmsSetup.getSubjectFile();
     string calibrationXmlFile = ceinmsSetup.getCalibrationFile();
     string newCalibratedSubjectXmlFile = ceinmsSetup.getOutputSubjectFile();
-    string emgGeneratorFile = ceinmsSetup.getEmgGeneratorFile();
+    string emgGeneratorFile = ceinmsSetup.getExcitationGeneratorFile();
 
     //1 read calibration xml
     CalibrationXmlReader calibrationXmlReader(calibrationXmlFile);

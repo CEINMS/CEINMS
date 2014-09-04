@@ -9,7 +9,7 @@
     <xs:sequence>
       <xs:choice maxOccurs="unbounded">
         <xs:element maxOccurs="1" name="subjectFile" type="xs:string"/>
-        <xs:element maxOccurs="1" name="emgGeneratorFile" type="xs:string"/>
+        <xs:element maxOccurs="1" name="excitationGeneratorFile" type="xs:string"/>
         <xs:element maxOccurs="1" name="calibrationFile" type="xs:string"/>
         <xs:element maxOccurs="1" name="outputSubjectFile" type="xs:string"/>
       </xs:choice>

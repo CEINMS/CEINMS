@@ -223,7 +223,7 @@ int main(int argc, char** argv) {
     string executionFile = ceinmsSetup.getExecutionFile();
     string inputData = ceinmsSetup.getInputDataFile();
     string outputDirectory = ceinmsSetup.getOutputDirectory();
-    string emgGeneratorFile = ceinmsSetup.getEmgGeneratorFile();
+    string emgGeneratorFile = ceinmsSetup.getExcitationGeneratorFile();
 
 
     ExecutionXmlReader executionCfg(executionFile);             

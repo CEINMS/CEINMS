@@ -21,7 +21,7 @@ public:
     CeinmsCalibrationSetupXmlReader(const std::string& filename);
     std::string getSubjectFile();
     std::string getCalibrationFile();
-    std::string getEmgGeneratorFile();
+    std::string getExcitationGeneratorFile();
     std::string getOutputSubjectFile();
     static bool writeTemplateCeinmsCalibrationSetupFile(const std::string& templateFile);
 

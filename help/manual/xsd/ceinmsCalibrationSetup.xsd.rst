@@ -17,7 +17,7 @@ XML example
     <?xml version="1.0" encoding="UTF-8" standalone="no"?>
     <ceinmsCalibration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="ceinmsCalibrationSetup.xsd">
       <subjectFile>subject.xml</subjectFile>
-      <emgGeneratorFile>emgGenerator/emgGenerator-16To34.xml</emgGeneratorFile>
+      <excitationGeneratorFile>excitationGenerator-16To34.xml</excitationGeneratorFile>
       <calibrationFile>Calibration/calibrationTest.xml</calibrationFile>
       <outputSubjectFile>subjectCalibrated.xml</outputSubjectFile>
     </ceinmsCalibration>
@@ -25,7 +25,7 @@ XML example
 A CEINMScalibrate setup file consists of a root element named ``ceinmsCalibration`` that contains the following elements:
 
 - ``subjectFile`` the location of the :doc:`subject description file </manual/xsd/subject.xsd>`
-- ``emgGeneratorFile`` the location of the :doc:`EMG mapping description file </manual/xsd/emgGenerator.xsd>`
+- ``excitationGeneratorFile`` the location of the :doc:`/manual/xsd/excitationGenerator.xsd`
 - ``calibrationFile`` the location of the :doc:`calibration parameters file </manual/xsd/calibration.xsd>` (including which trials to calibrate on)
 - ``outputSubjectFile`` the name of the output (calibrated) subject file.
 

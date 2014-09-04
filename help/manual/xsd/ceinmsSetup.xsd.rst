@@ -20,7 +20,7 @@ CEINMS setup XML example
       <subjectFile>subjectCalibrated.xml</subjectFile>
       <inputDataFile>../TestData/walking1/walking1.xml</inputDataFile>
       <executionFile>Execution/executionTest.xml</executionFile>
-      <emgGeneratorFile>emgGenerator/emgGenerator-16To34.xml</emgGeneratorFile>
+      <excitationGeneratorFile>excitationGenerator-16To34.xml</excitationGeneratorFile>
       <outputDirectory>../../OutputData/walking1/</outputDirectory>
     </ceinms>
 
@@ -29,7 +29,7 @@ A CEINMS setup file consists of a root element named ``ceinms`` that contains th
 - ``subjectFile`` the location of the :doc:`subject description file </manual/xsd/subject.xsd>`
 - ``inputDataFile`` the location of the :doc:`trial (input) data description file </manual/xsd/inputData.xsd>`
 - ``executionFile`` the location of the :doc:`execution parameters file </manual/xsd/execution.xsd>`
-- ``emgGeneratorFile`` the location of the :doc:`EMG mapping description file </manual/xsd/emgGenerator.xsd>`
+- ``excitationGeneratorFile`` the location of the :doc:`/manual/xsd/excitationGenerator.xsd`
 - ``outputDirectory`` the folder where output results are saved
 
 

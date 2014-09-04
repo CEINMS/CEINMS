@@ -63,7 +63,7 @@ void CeinmsSetupXmlReader::readXml() {
         std::string& mySubjectFile(*(ceinmsSetupPointer_->subjectFile().begin()));
         std::string& myInputDataFile(*(ceinmsSetupPointer_->inputDataFile().begin()));
         std::string& myExecutionFile(*(ceinmsSetupPointer_->executionFile().begin()));
-        std::string& myEmgGeneratorFile(*(ceinmsSetupPointer_->emgGeneratorFile().begin()));
+        std::string& myEmgGeneratorFile(*(ceinmsSetupPointer_->excitationGeneratorFile().begin()));
         std::string& myOutputDirectory(*(ceinmsSetupPointer_->outputDirectory().begin()));
 
     }
@@ -100,9 +100,9 @@ std::string CeinmsSetupXmlReader::getExecutionFile()
         return filepath_ + fileName;
 }
 
-std::string CeinmsSetupXmlReader::getEmgGeneratorFile()
+std::string CeinmsSetupXmlReader::getExcitationGeneratorFile()
 {
-    std::string fileName(*(ceinmsSetupPointer_->emgGeneratorFile().begin()));
+    std::string fileName(*(ceinmsSetupPointer_->excitationGeneratorFile().begin()));
     if (isAbsolute(fileName.c_str()))
         return fileName;
     else
@@ -127,7 +127,7 @@ bool CeinmsSetupXmlReader::writeTemplateCeinmsSetupFile(const string& templateFi
     templateCeinmsSetup.subjectFile().push_back("subject.xml");
     templateCeinmsSetup.inputDataFile().push_back("inputData.xml");
     templateCeinmsSetup.executionFile().push_back("execution.xml");
-    templateCeinmsSetup.emgGeneratorFile().push_back("emgGenerator.xml");
+    templateCeinmsSetup.excitationGeneratorFile().push_back("excitationGenerator.xml");
     templateCeinmsSetup.outputDirectory().push_back("./Output");
     ceinms (templateFileStream, templateCeinmsSetup);
     templateFileStream.close();
