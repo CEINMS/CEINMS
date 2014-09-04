@@ -242,7 +242,7 @@ int main(int argc, char** argv) {
             setupSubject(mySubject, subjectFile);
           
             // 2. define the thread connecting with the input sources          
-            string emgFilename(dataLocations.getEmgFile());
+            string emgFilename(dataLocations.getExcitationsFile());
             EMGFromFile emgProducer(mySubject, emgFilename, emgGeneratorFile);
           
             vector< string > dofNames; 
@@ -289,7 +289,7 @@ int main(int argc, char** argv) {
             setupSubject(mySubject, subjectFile);
 
             // 2. define the thread connecting with the input sources          
-            string emgFilename(dataLocations.getEmgFile());
+            string emgFilename(dataLocations.getExcitationsFile());
             EMGFromFile emgProducer(mySubject, emgFilename, emgGeneratorFile);
 
             vector< string > dofNames;
@@ -429,7 +429,7 @@ int main(int argc, char** argv) {
              setupSubject(mySubject, subjectFile);
 
              // 2. define the thread connecting with the input sources          
-             string emgFilename(dataLocations.getEmgFile());
+             string emgFilename(dataLocations.getExcitationsFile());
              EMGFromFile emgProducer(mySubject, emgFilename, emgGeneratorFile);
 
              vector< string > dofNames;
@@ -475,7 +475,7 @@ int main(int argc, char** argv) {
              setupSubject(mySubject, subjectFile);
 
              // 2. define the thread connecting with the input sources          
-             string emgFilename(dataLocations.getEmgFile());
+             string emgFilename(dataLocations.getExcitationsFile());
              EMGFromFile emgProducer(mySubject, emgFilename, emgGeneratorFile);
 
              vector< string > dofNames;
@@ -524,7 +524,7 @@ int main(int argc, char** argv) {
              setupSubject(mySubject, subjectFile);
 
              // 2. define the thread connecting with the input sources          
-             string emgFilename(dataLocations.getEmgFile());
+             string emgFilename(dataLocations.getExcitationsFile());
              EMGFromFile emgProducer(mySubject, emgFilename, emgGeneratorFile);
 
              vector< string > dofNames;
@@ -587,7 +587,7 @@ int main(int argc, char** argv) {
                setupSubject(mySubject, subjectFile);
 
                // 2. define the thread connecting with the input sources          
-               string emgFilename(dataLocations.getEmgFile());
+               string emgFilename(dataLocations.getExcitationsFile());
                EMGFromFile emgProducer(mySubject, emgFilename, emgGeneratorFile);
 
                vector< string > dofNames;

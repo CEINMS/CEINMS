@@ -152,7 +152,7 @@ TrialData readTrialData(std::string inputDataFilename, NMSmodel& mySubject, std:
 {
     InputDataXmlReader dataLocations(inputDataFilename);
 
-    string emgFilename(dataLocations.getEmgFile());
+    string emgFilename(dataLocations.getExcitationsFile());
     EMGFromFile emgProducer(mySubject, emgFilename, emgGeneratorFile);
 
     vector< string > dofNames;

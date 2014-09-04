@@ -21,7 +21,7 @@ public:
     InputDataXmlReader(const std::string& filename);
     std::string getLmtFile();
     std::map<std::string, std::string> getMaFiles();
-    std::string getEmgFile();
+    std::string getExcitationsFile();
     std::string getExternalTorqueFile();
 
 private:
