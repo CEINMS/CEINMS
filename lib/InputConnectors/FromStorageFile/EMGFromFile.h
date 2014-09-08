@@ -39,6 +39,13 @@ EMGFromFile::EMGFromFile(const NMSModelT& subject, const std::string& emgFilenam
   emgData_.getMusclesNames(emgMusclesNames);
   if (!(musclesNames_==emgMusclesNames)) {
     std::cout << "\n\n ERROR: Muscle names from emg file and subject differ!\n";
+    std::cout << "Subject muscles: ";
+    for (auto it : musclesNames_)
+        std::cout << it << "\t";
+    std::cout << "\nEMG muscles: ";
+    for (auto it : emgMusclesNames)
+        std::cout << it << "\t";
+    std::cout << std::endl;
     exit(EXIT_FAILURE);  
   }
  
