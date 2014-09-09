@@ -470,7 +470,7 @@ int main(int argc, char** argv) {
          
          case NMSModelCfg::OpenLoopExponentialActivationElasticTendonBiSecOffline: {
              // 1. define the model
-             typedef NMSmodel<ExponentialActivation, StiffTendon, CurveMode::Offline> MyNMSmodel;
+			 typedef NMSmodel<ExponentialActivation, ElasticTendon_BiSec, CurveMode::Offline> MyNMSmodel;
              MyNMSmodel mySubject;
              setupSubject(mySubject, subjectFile);
 
