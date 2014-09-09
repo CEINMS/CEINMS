@@ -20,7 +20,7 @@ class ModelEvaluationOffline : public ModelEvaluationBase<Logger> {
 
 public:
     ModelEvaluationOffline() = delete;
-    ModelEvaluationOffline(NMSmodelT& subject, const std::vector< std::string >& valuesToLog);
+    ModelEvaluationOffline(CEINMS::InputConnectors& inputConnectors, NMSmodelT& subject, const std::vector< std::string >& valuesToLog);
     ~ModelEvaluationOffline();
 
     void setOutputDirectory(const std::string& outputDir);

@@ -10,18 +10,18 @@
 
 
 #include "QueuesToTrialData.h"
-#include "InputQueues.h"
+#include "InputConnectors.h"
 
 
 void QueuesToTrialData::operator()() {
 
-    CEINMS::InputConnectors::queueLmt.subscribe();
-    CEINMS::InputConnectors::queueEmg.subscribe();
-    for (auto& it : CEINMS::InputConnectors::queueMomentArms)
+    inputConnectors_.queueLmt.subscribe();
+    inputConnectors_.queueEmg.subscribe();
+    for (auto& it : inputConnectors_.queueMomentArms)
         (*it).subscribe();
-    CEINMS::InputConnectors::queueExternalTorques.subscribe();
+    inputConnectors_.queueExternalTorques.subscribe();
 
-    CEINMS::InputConnectors::doneWithSubscription.wait();
+    inputConnectors_.doneWithSubscription.wait();
 
     CEINMS::OutputConnectors::doneWithExecution.wait();
 
@@ -34,15 +34,15 @@ void QueuesToTrialData::operator()() {
         // 1. read lmt Data
         if (lmtRunning)
         {
-            CEINMS::InputConnectors::FrameType lmtFrameFromQueue = CEINMS::InputConnectors::queueLmt.pop();
+            CEINMS::InputConnectors::FrameType lmtFrameFromQueue = inputConnectors_.queueLmt.pop();
             if (lmtFrameFromQueue.time < std::numeric_limits<double>::infinity())
             {
                 data_.lmtTimeSteps_.push_back(lmtFrameFromQueue.time);
                 data_.lmtData_.push_back(lmtFrameFromQueue.data);
                 data_.noLmtSteps_++;
                 // 2. read moment arms data
-                for (unsigned int i = 0; i < CEINMS::InputConnectors::queueMomentArms.size(); ++i) {
-                    CEINMS::InputConnectors::FrameType momentArmsFrameFromQueue = (*CEINMS::InputConnectors::queueMomentArms.at(i)).pop();
+                for (unsigned int i = 0; i < inputConnectors_.queueMomentArms.size(); ++i) {
+                    CEINMS::InputConnectors::FrameType momentArmsFrameFromQueue = (*inputConnectors_.queueMomentArms.at(i)).pop();
                     data_.maData_.at(i).push_back(momentArmsFrameFromQueue.data);
                 }
             }
@@ -53,7 +53,7 @@ void QueuesToTrialData::operator()() {
         // 3. read external Torque
         if (torqueRunning)
         {
-            CEINMS::InputConnectors::FrameType externalTorquesFrameFromQueue = CEINMS::InputConnectors::queueExternalTorques.pop();
+            CEINMS::InputConnectors::FrameType externalTorquesFrameFromQueue = inputConnectors_.queueExternalTorques.pop();
             if (externalTorquesFrameFromQueue.time < std::numeric_limits<double>::infinity())
             {
                 data_.torqueTimeSteps_.push_back(externalTorquesFrameFromQueue.time);
@@ -68,7 +68,7 @@ void QueuesToTrialData::operator()() {
         if (emgRunning)
         {
 
-            CEINMS::InputConnectors::FrameType emgFrameFromQueue = CEINMS::InputConnectors::queueEmg.pop();
+            CEINMS::InputConnectors::FrameType emgFrameFromQueue = inputConnectors_.queueEmg.pop();
             if (emgFrameFromQueue.time < std::numeric_limits<double>::infinity())
             {
                 data_.emgTimeSteps_.push_back(emgFrameFromQueue.time);

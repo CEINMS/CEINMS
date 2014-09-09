@@ -14,14 +14,14 @@
 #include <vector>
 #include <string>
 
-#include "InputQueues.h"
+#include "InputConnectors.h"
 
 template <typename Logger>
 class ModelEvaluationBase {
     
 public:  
   ModelEvaluationBase() = delete; 
-  ModelEvaluationBase(const std::vector<std::string>& valuesToLog); 
+  ModelEvaluationBase(CEINMS::InputConnectors& inputConnectors, const std::vector<std::string>& valuesToLog);
   virtual ~ModelEvaluationBase();
   virtual void operator()() = 0;
 
@@ -36,7 +36,14 @@ protected:
   CEINMS::InputConnectors::FrameType getMomentArmsFromInputQueue(unsigned int whichDof);
   CEINMS::InputConnectors::FrameType getExternalTorquesFromInputQueue();
 
+  void subscribeToInputConnectors();
+  bool externalTorquesAvailable() const;
+  float getGlobalTimeLimit() const;
+
   Logger logger; 
+
+private:
+    CEINMS::InputConnectors& inputConnectors_;
 };
 
 #include "ModelEvaluationBase.cpp"

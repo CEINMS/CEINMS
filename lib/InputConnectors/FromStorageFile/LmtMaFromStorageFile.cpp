@@ -1,7 +1,7 @@
 #include "LmtMaFromStorageFile.h"
 
 #include "DataFromStorageFile.h"
-#include "InputQueues.h"
+#include "InputConnectors.h"
 
 #include <iostream>
 using std::cout;
@@ -20,7 +20,7 @@ using std::vector;
 void LmtMaFromStorageFile::operator()()
 {
   // 1. wait - if required - for the required subscriptions to happen
-  CEINMS::InputConnectors::doneWithSubscription.wait();  
+  inputConnectors_.doneWithSubscription.wait();
   
   double time;  
   while (lmtData_.areStillData())

@@ -13,13 +13,13 @@
 
 #include <vector>
 #include <string>
-#include "InputQueues.h"
+#include "InputConnectors.h"
 
 class LmtMaFromX
 {
   public:    
     template <typename NMSModelT>
-    LmtMaFromX(const NMSModelT& subject);
+    LmtMaFromX(CEINMS::InputConnectors& inputConnectors, const NMSModelT& subject);
     virtual ~LmtMaFromX();
     virtual void operator()() {};
     void updateLmt(const std::vector<double>& currentLmtData, double currentTime);
@@ -29,11 +29,12 @@ class LmtMaFromX
     std::vector< std::string > musclesNames_;
     std::vector< std::string > dofNames_;
     std::vector< std::vector< std::string > > muscleNamesOnDofs_;
+    CEINMS::InputConnectors& inputConnectors_;
 };
 
 
 template <typename NMSModelT>
-LmtMaFromX::LmtMaFromX(const NMSModelT& subject)
+LmtMaFromX::LmtMaFromX(CEINMS::InputConnectors& inputConnectors, const NMSModelT& subject) : inputConnectors_(inputConnectors)
 { 
   subject.getMuscleNames(musclesNames_); 
   subject.getDoFNames(dofNames_);

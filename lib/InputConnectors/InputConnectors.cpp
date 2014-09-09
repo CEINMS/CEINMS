@@ -8,27 +8,27 @@
 //
 
 
-#include "InputQueues.h"
+#include "InputConnectors.h"
 
 #include <vector>
 
 
 namespace CEINMS {
-  namespace InputConnectors {
+
+    InputConnectors::InputConnectors():
+        globalTimeLimit(std::numeric_limits<double>::infinity()), externalTorquesAvailable(false) { }
+
+
+    InputConnectors::~InputConnectors()
+    {
+        if (!queueMomentArms.empty())
+        {
+            for (auto it : queueMomentArms)
+                delete it;
+        }
+    }
+
     //:TODO: I have no idea about this globalTimeLimit.... WHY... AND WHY SO HIDDEN.. come on
-    float globalTimeLimit = 100.;
-    
-    Concurrency::Queue< FrameType > queueEmg; 
-    Concurrency::Queue< FrameType > queueLmt; 
-    std::vector< Concurrency::Queue< FrameType >* > queueMomentArms; 
-    
-    bool externalTorquesAvailable = false; 
-    Concurrency::Queue< FrameType >  queueExternalTorques;
- 
-    Concurrency::Latch doneWithSubscription; 
-  
-    
-    
-    
-    };
+//    float globalTimeLimit = 100.;
+
 };

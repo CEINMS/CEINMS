@@ -1,7 +1,7 @@
 #include "ExternalTorquesFromStorageFile.h"
 #include "ExternalTorquesFromX.h"
 #include "DataFromStorageFile.h"
-#include "InputQueues.h"
+#include "InputConnectors.h"
 
 
 #include <iostream>
@@ -12,7 +12,6 @@ using std::string;
 #include <vector>
 using std::vector;
 #include <cstdlib>
-#include "InputQueues.h"
 #include "Utilities.h"
 
 #define LOG
@@ -28,9 +27,9 @@ bool ExternalTorquesFromStorageFile::externalTorquesFileExist(const string& file
 void ExternalTorquesFromStorageFile::operator()()
 {
 
-  CEINMS::InputConnectors::doneWithSubscription.wait();
+   inputConnectors_.doneWithSubscription.wait();
     
-  if (CEINMS::InputConnectors::externalTorquesAvailable) 
+  if (inputConnectors_.externalTorquesAvailable)
   {
     while (externalTorquesDataFromFile_.areStillData())
     {

@@ -1,5 +1,5 @@
 #include "QueuesToStorageFiles.h"
-#include "InputQueues.h"
+#include "InputConnectors.h"
 
 void QueuesToStorageFiles::addLog(std::string valueName)
 {
@@ -31,7 +31,7 @@ void QueuesToStorageFiles::operator()() {
         }
     }
     
-    CEINMS::InputConnectors::doneWithSubscription.wait();
+    inputConnectors_.doneWithSubscription.wait();
     
     CEINMS::OutputConnectors::doneWithExecution.wait();
     

@@ -8,7 +8,7 @@
 //
 
 #include "EMGFromX.h"
-#include "InputQueues.h"
+#include "InputConnectors.h"
 
 #include <string>
 using std::string;
@@ -23,7 +23,7 @@ void EMGFromX::updateEmg(const vector<double>& currentEmgData, double currentTim
   QueueData< vector<double> > emgDataToPush; 
   emgDataToPush.data = currentEmgData;
   emgDataToPush.time = currentTime; 
-  CEINMS::InputConnectors::queueEmg.push(emgDataToPush);
+  inputConnectors_.queueEmg.push(emgDataToPush);
 }
 
 

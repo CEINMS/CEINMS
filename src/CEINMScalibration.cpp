@@ -151,23 +151,25 @@ template<typename NMSmodel>
 TrialData readTrialData(std::string inputDataFilename, NMSmodel& mySubject, std::string trialId, std::string emgGeneratorFile)
 {
     InputDataXmlReader dataLocations(inputDataFilename);
+    CEINMS::InputConnectors* inputConnectors= new CEINMS::InputConnectors();
 
     string emgFilename(dataLocations.getExcitationsFile());
-    EMGFromFile emgProducer(mySubject, emgFilename, emgGeneratorFile);
+    EMGFromFile emgProducer(*inputConnectors, mySubject, emgFilename, emgGeneratorFile);
 
     vector< string > dofNames;
     mySubject.getDoFNames(dofNames);
     vector< string > maFilename;
     sortMaFilenames(dataLocations.getMaFiles(), dofNames, maFilename);
-    LmtMaFromStorageFile lmtMaProducer(mySubject, dataLocations.getLmtFile(), maFilename);
+    LmtMaFromStorageFile lmtMaProducer(*inputConnectors, mySubject, dataLocations.getLmtFile(), maFilename);
 
 
     string externalTorqueFilename(dataLocations.getExternalTorqueFile());
-    ExternalTorquesFromStorageFile externalTorquesProducer(mySubject, externalTorqueFilename);
+    ExternalTorquesFromStorageFile externalTorquesProducer(*inputConnectors, mySubject, externalTorqueFilename);
 
-    QueuesToTrialData queuesToTrialData(mySubject, trialId);
+    QueuesToTrialData queuesToTrialData(*inputConnectors, mySubject, trialId);
 
-    CEINMS::InputConnectors::doneWithSubscription.setCount(4);
+
+    inputConnectors->doneWithSubscription.setCount(4);
     CEINMS::OutputConnectors::doneWithExecution.setCount(1);
 
     // 4. start the threads
@@ -180,7 +182,7 @@ TrialData readTrialData(std::string inputDataFilename, NMSmodel& mySubject, std:
     lmtMaProdThread.join();
     externalTorquesProdThread.join();
     queuesToTrialDataThread.join();
-
+    delete inputConnectors;
     return queuesToTrialData.getTrialData();
 };
 

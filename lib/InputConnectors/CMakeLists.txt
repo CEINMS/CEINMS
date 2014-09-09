@@ -18,13 +18,13 @@ set(InputConnectors_SOURCES
   EMGFromX.cpp
   ExternalTorquesFromX.cpp
   LmtMaFromX.cpp
-  InputQueues.cpp
+  InputConnectors.cpp
 )
 set(InputConnectors_HEADERS
   EMGFromX.h
   ExternalTorquesFromX.h
   LmtMaFromX.h
-  InputQueues.h
+  InputConnectors.h
 )
 
 source_group("Headers" FILES ${InputConnectors_HEADERS} ${FromStorageFile_HEADERS} )

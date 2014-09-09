@@ -10,7 +10,7 @@
 class LmtMaFromStorageFile:public LmtMaFromX {
   public:
     template <typename NMSModelT>
-    LmtMaFromStorageFile(const NMSModelT& subject, const std::string& lmtDataFilename, const std::vector< std::string>& maDataFileName);
+    LmtMaFromStorageFile(CEINMS::InputConnectors& inputConnectors, const NMSModelT& subject, const std::string& lmtDataFilename, const std::vector< std::string>& maDataFileName);
     void operator()();
    
   private:    
@@ -22,8 +22,8 @@ class LmtMaFromStorageFile:public LmtMaFromX {
 };
 
 template <typename NMSModelT>
-LmtMaFromStorageFile::LmtMaFromStorageFile(const NMSModelT& subject, const std::string& lmtDataFilename, const std::vector< std::string>& maDataFileName)
-:LmtMaFromX(subject), lmtData_(lmtDataFilename)
+LmtMaFromStorageFile::LmtMaFromStorageFile(CEINMS::InputConnectors& inputConnectors, const NMSModelT& subject, const std::string& lmtDataFilename, const std::vector< std::string>& maDataFileName)
+:LmtMaFromX(inputConnectors, subject), lmtData_(lmtDataFilename)
 {  // 1. Open the input files
    for (std::string it: maDataFileName)
    {
@@ -44,15 +44,9 @@ LmtMaFromStorageFile::LmtMaFromStorageFile(const NMSModelT& subject, const std::
      currentDof++;
    }
   
-  // 3. setup the queue for Moment Arms
-  if (!CEINMS::InputConnectors::queueMomentArms.empty())
-  {
-      for (auto it : CEINMS::InputConnectors::queueMomentArms)
-          delete it;
-  }
-  CEINMS::InputConnectors::queueMomentArms.clear();
+  inputConnectors_.queueMomentArms.clear();
   for (int i=0; i < dofNames_.size(); ++i) 
-    CEINMS::InputConnectors::queueMomentArms.push_back(new CEINMS::Concurrency::Queue< CEINMS::InputConnectors::FrameType >); 
+    inputConnectors_.queueMomentArms.push_back(new CEINMS::Concurrency::Queue< CEINMS::InputConnectors::FrameType >);
     
 }
 
