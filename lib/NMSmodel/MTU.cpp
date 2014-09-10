@@ -307,11 +307,13 @@ void MTU<Activation, Tendon, mode>::updateMtuStiffness() {
 		(dfa*fv*activation_ + dfp)*
 		cos(radians(pennationAngleAtT));
     
+    mtuStiffness_ = (muscleStiffness_ * tendonStiffness_) / (muscleStiffness_ + tendonStiffness_);
+    /*
 	cout << "Muscle stiffness: " << muscleStiffness_ << endl;
     cout << "Tendon stiffness: " << tendonStiffness_ << endl;
-    cout << "---" << endl;
-    
-	mtuStiffness_ = (muscleStiffness_ * tendonStiffness_) / (muscleStiffness_ + tendonStiffness_);
+    cout << "MTU    stiffness: " << mtuStiffness_ << endl;
+    cout << " - - - " << endl;
+    */
 }
 
 

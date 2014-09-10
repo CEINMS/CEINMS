@@ -24,7 +24,7 @@ using std::string;
 #include "InputConnectors.h"
 #include "OutputQueues.h"
 #define LOG_FILES
-#define LOG
+//#define LOG_ON_SCREEN
 
 
 template <typename NMSmodelT, typename Logger>
@@ -182,7 +182,7 @@ void ModelEvaluationOfflineStiffness<NMSmodelT, Logger>::operator()() {
         ModelEvaluationBase<Logger>::logger.log(emgTime, data, "DofsStiffness");
 #endif
 
-#ifdef LOG
+#ifdef LOG_ON_SCREEN
         cout << endl << endl << "EmgTime: " << emgTime << endl << "EMG" << endl;
         for (auto& it : emgFrameFromQueue.data)
             cout << it << "\t";
@@ -227,7 +227,7 @@ void ModelEvaluationOfflineStiffness<NMSmodelT, Logger>::operator()() {
 #endif
 
     CEINMS::OutputConnectors::doneWithExecution.wait();
-#ifdef LOG  
+#ifdef LOG_ON_SCREEN  
     cout << "Estimation completed. " << endl;
 #endif
 

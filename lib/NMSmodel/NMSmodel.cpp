@@ -201,7 +201,7 @@ void NMSmodel<Activation, Tendon, mode>::updateState() {
     updateActivations();
     updateFibreLengthsAndVelocities();
     updateMuscleForces();
-	updateMtuStiffness();
+	updateMtusStiffness();
     updateTorques();
 	updateDofsStiffness();
 }
@@ -213,7 +213,7 @@ void NMSmodel<Activation, Tendon, mode>::updateState(const vector<unsigned>& sel
     updateActivations(selectedmusclesIndex);
     updateFibreLengthsAndVelocities(selectedmusclesIndex);
     updateMuscleForces(selectedmusclesIndex);
-	updateMtuStiffness(selectedmusclesIndex);
+	updateMtusStiffness(selectedmusclesIndex);
     updateTorques();
 	updateDofsStiffness();   
 }
@@ -225,7 +225,7 @@ void NMSmodel<Activation, Tendon, mode>::updateState_OFFLINE() {
     updateActivations();
     updateFibreLengthsAndVelocities_OFFLINE();
     updateMuscleForces();
-	updateMtuStiffness();
+	updateMtusStiffness();
     updateTorques();
 	updateDofsStiffness();
 }
@@ -237,7 +237,7 @@ void NMSmodel<Activation, Tendon, mode>::updateState_OFFLINE(const vector<unsign
     updateActivations(selectedmusclesIndex);
     updateFibreLengthsAndVelocities_OFFLINE(selectedmusclesIndex);
     updateMuscleForces(selectedmusclesIndex);
-	updateMtuStiffness(selectedmusclesIndex);
+	updateMtusStiffness(selectedmusclesIndex);
     updateTorques();
 	updateDofsStiffness();  
 }
@@ -249,7 +249,7 @@ void NMSmodel<Activation, Tendon, mode>::updateState_HYBRID() {
     updateActivations();
     updateFibreLengthsAndVelocities_OFFLINE();
     updateMuscleForces();
-	updateMtuStiffness();
+	updateMtusStiffness();
     updateTorques();
 	updateDofsStiffness();
 }
@@ -261,7 +261,7 @@ void NMSmodel<Activation, Tendon, mode>::updateState_HYBRID(const vector<unsigne
     updateActivations(selectedmusclesIndex);
     updateFibreLengthsAndVelocities_HYBRID(selectedmusclesIndex);
     updateMuscleForces(selectedmusclesIndex);
-	updateMtuStiffness(selectedmusclesIndex);
+	updateMtusStiffness(selectedmusclesIndex);
     updateTorques();  
 	updateDofsStiffness();
 }
@@ -381,7 +381,7 @@ void NMSmodel<Activation, Tendon, mode>::updateMuscleForces() {
 }
 
 template <typename Activation, typename Tendon, CurveMode::Mode mode>
-void NMSmodel<Activation, Tendon, mode>::updateMtuStiffness() {
+void NMSmodel<Activation, Tendon, mode>::updateMtusStiffness() {
 
 	vectorMTUitr muscleIt = muscles_.begin();
 	for (muscleIt; muscleIt != muscles_.end(); ++muscleIt)
@@ -401,7 +401,7 @@ void NMSmodel<Activation, Tendon, mode>::updateMuscleForces(const vector<unsigne
 }
 
 template <typename Activation, typename Tendon, CurveMode::Mode mode>
-void NMSmodel<Activation, Tendon, mode>::updateMtuStiffness(const vector<unsigned>& selectedMusclesIndex) {
+void NMSmodel<Activation, Tendon, mode>::updateMtusStiffness(const vector<unsigned>& selectedMusclesIndex) {
 
 	vectorMTUitr muscleIt;
 	vector<unsigned>::const_iterator it = selectedMusclesIndex.begin();

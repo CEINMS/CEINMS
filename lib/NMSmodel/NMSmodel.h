@@ -74,9 +74,9 @@ public:
     void updateFibreLengths_OFFLINEPREP();
     void updateFibreLengths_OFFLINEPREP(const std::vector<unsigned>& selectedMusclesIndex);
     void updateMuscleForces();
-	void updateMtuStiffness();
+	void updateMtusStiffness();
     void updateMuscleForces(const std::vector<unsigned>& selectedMusclesIndex);
-    void updateMtuStiffness(const std::vector<unsigned>& selectedMusclesIndex);
+    void updateMtusStiffness(const std::vector<unsigned>& selectedMusclesIndex);
 	void updateTorques();
 	void updateDofsStiffness();
     void pushState();

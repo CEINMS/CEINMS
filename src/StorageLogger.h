@@ -84,8 +84,8 @@ namespace Logger {
             case Torques:
                 filename = "Torques.sto";
                 break;
-			case dofsStiffness:
-				filename = "dofsStiffness.sto";
+			case DofsStiffness:
+				filename = "DofsStiffness.sto";
 				break;	
             case Emgs:
                 filename = "Emgs.sto";
@@ -132,7 +132,7 @@ namespace Logger {
             case Torques:
                 subject_.getTorques(data);
                 break;
-			case dofsStiffness:
+			case DofsStiffness:
 				subject_.getDofsStiffness(data);
 				break;	
             case Emgs:
@@ -166,7 +166,7 @@ namespace Logger {
         outFile << "endheader" << std::endl;
 
         std::vector<std::string> names;
-        if( (fileTypes_.at(index) == Torques) || (fileTypes_.at(index) == dofsStiffness) )
+        if( (fileTypes_.at(index) == Torques) || (fileTypes_.at(index) == DofsStiffness) )
             subject_.getDoFNames(names);
         else
             subject_.getMuscleNames(names);

@@ -90,7 +90,7 @@ void QueuesToStorageFiles::initFile(const std::string& valueName, const std::vec
 
     
     *outFile << "time" + separator_; 
-    if (valueName == "Torques")
+    if (valueName == "Torques" || valueName == "DofsStiffness")
         for(auto& it: torqueNames_)
             *outFile << it << separator_;
     else 

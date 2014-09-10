@@ -17,7 +17,7 @@ namespace Logger {
                 MuscleForces,
                 MtusStiffness,
                 Torques,
-				dofsStiffness,
+				DofsStiffness,
                 Emgs,
                 AdjustedEmgs};
 }

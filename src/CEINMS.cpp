@@ -539,11 +539,11 @@ int main(int argc, char** argv) {
              ExternalTorquesFromStorageFile externalTorquesProducer(inputConnectors, mySubject, externalTorqueFilename);
 
              // 2b. define the thread consuming the output sources
-             vector<string> valuesToWrite = { "Activations", "FiberLenghts", "FiberVelocities", "MuscleForces", "MtusStiffness", "Torques", "dofsStiffness" };
+             vector<string> valuesToWrite = { "Activations", "FiberLenghts", "FiberVelocities", "MuscleForces", "Torques", "MtusStiffness", "DofsStiffness" };
              QueuesToStorageFiles queuesToStorageFiles(inputConnectors, mySubject, valuesToWrite, outputDirectory);
 
              // 3. define the model simulator
-             vector<string> valuesToLog = { "Activations", "FiberLenghts", "FiberVelocities", "MuscleForces", "MtusStiffness", "Torques", "dofsStiffness" };
+             vector<string> valuesToLog = { "Activations", "FiberLenghts", "FiberVelocities", "MuscleForces", "Torques", "MtusStiffness", "DofsStiffness" };
              ModelEvaluationOfflineStiffness<MyNMSmodel, LoggerOnQueues> simulator(inputConnectors, mySubject, valuesToLog);
 
              inputConnectors.doneWithSubscription.setCount(5);
