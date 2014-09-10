@@ -201,7 +201,9 @@ void NMSmodel<Activation, Tendon, mode>::updateState() {
     updateActivations();
     updateFibreLengthsAndVelocities();
     updateMuscleForces();
+	updateMtuStiffness();
     updateTorques();
+	updateDofsStiffness();
 }
 
 
@@ -211,7 +213,9 @@ void NMSmodel<Activation, Tendon, mode>::updateState(const vector<unsigned>& sel
     updateActivations(selectedmusclesIndex);
     updateFibreLengthsAndVelocities(selectedmusclesIndex);
     updateMuscleForces(selectedmusclesIndex);
-    updateTorques();   
+	updateMtuStiffness(selectedmusclesIndex);
+    updateTorques();
+	updateDofsStiffness();   
 }
 
 
@@ -221,7 +225,9 @@ void NMSmodel<Activation, Tendon, mode>::updateState_OFFLINE() {
     updateActivations();
     updateFibreLengthsAndVelocities_OFFLINE();
     updateMuscleForces();
+	updateMtuStiffness();
     updateTorques();
+	updateDofsStiffness();
 }
 
 
@@ -231,7 +237,9 @@ void NMSmodel<Activation, Tendon, mode>::updateState_OFFLINE(const vector<unsign
     updateActivations(selectedmusclesIndex);
     updateFibreLengthsAndVelocities_OFFLINE(selectedmusclesIndex);
     updateMuscleForces(selectedmusclesIndex);
-    updateTorques();  
+	updateMtuStiffness(selectedmusclesIndex);
+    updateTorques();
+	updateDofsStiffness();  
 }
 
 
@@ -241,7 +249,9 @@ void NMSmodel<Activation, Tendon, mode>::updateState_HYBRID() {
     updateActivations();
     updateFibreLengthsAndVelocities_OFFLINE();
     updateMuscleForces();
+	updateMtuStiffness();
     updateTorques();
+	updateDofsStiffness();
 }
 
 
@@ -251,7 +261,9 @@ void NMSmodel<Activation, Tendon, mode>::updateState_HYBRID(const vector<unsigne
     updateActivations(selectedmusclesIndex);
     updateFibreLengthsAndVelocities_HYBRID(selectedmusclesIndex);
     updateMuscleForces(selectedmusclesIndex);
+	updateMtuStiffness(selectedmusclesIndex);
     updateTorques();  
+	updateDofsStiffness();
 }
 
 
@@ -368,6 +380,14 @@ void NMSmodel<Activation, Tendon, mode>::updateMuscleForces() {
         muscleIt->updateMuscleForce();  
 }
 
+template <typename Activation, typename Tendon, CurveMode::Mode mode>
+void NMSmodel<Activation, Tendon, mode>::updateMtuStiffness() {
+
+	vectorMTUitr muscleIt = muscles_.begin();
+	for (muscleIt; muscleIt != muscles_.end(); ++muscleIt)
+		muscleIt->updateMtuStiffness();
+}
+
 
 template <typename Activation, typename Tendon, CurveMode::Mode mode>
 void NMSmodel<Activation, Tendon, mode>::updateMuscleForces(const vector<unsigned>& selectedMusclesIndex) {
@@ -380,6 +400,17 @@ void NMSmodel<Activation, Tendon, mode>::updateMuscleForces(const vector<unsigne
     }
 }
 
+template <typename Activation, typename Tendon, CurveMode::Mode mode>
+void NMSmodel<Activation, Tendon, mode>::updateMtuStiffness(const vector<unsigned>& selectedMusclesIndex) {
+
+	vectorMTUitr muscleIt;
+	vector<unsigned>::const_iterator it = selectedMusclesIndex.begin();
+	for (it; it != selectedMusclesIndex.end(); ++it) {
+		muscleIt = muscles_.begin() + *it;
+		muscleIt->updateMtuStiffness();
+	}
+}
+
 
 template <typename Activation, typename Tendon, CurveMode::Mode mode>
 void NMSmodel<Activation, Tendon, mode>::updateTorques() {
@@ -389,6 +420,13 @@ void NMSmodel<Activation, Tendon, mode>::updateTorques() {
         dofIt->updateTorque();  
 }
 
+template <typename Activation, typename Tendon, CurveMode::Mode mode>
+void NMSmodel<Activation, Tendon, mode>::updateDofsStiffness() {
+
+	vectorDoFitr dofIt = dofs_.begin();
+	for (dofIt; dofIt != dofs_.end(); ++dofIt)
+		dofIt->updateDofStiffness();
+}
 
 template <typename Activation, typename Tendon, CurveMode::Mode mode>
 void NMSmodel<Activation, Tendon, mode>::pushState() {
@@ -549,6 +587,16 @@ void NMSmodel<Activation, Tendon, mode>::getMuscleForces(vector<double>& muscleF
         muscleForces.push_back(muscleIt->getMuscleForce());
 }
 
+template <typename Activation, typename Tendon, CurveMode::Mode mode>
+void NMSmodel<Activation, Tendon, mode>::getMtusStiffness(vector<double>& mtusStiffness) const {
+
+    mtusStiffness.clear();
+    mtusStiffness.reserve(muscles_.size());
+    vectorMTUconstItr muscleIt = muscles_.begin();
+    for (muscleIt = muscles_.begin(); muscleIt != muscles_.end(); ++muscleIt)
+        mtusStiffness.push_back(muscleIt->getMtuStiffness());
+}
+
 
 template <typename Activation, typename Tendon, CurveMode::Mode mode>
 void NMSmodel<Activation, Tendon, mode>::getTorques(vector<double>& torques) const {
@@ -558,6 +606,16 @@ void NMSmodel<Activation, Tendon, mode>::getTorques(vector<double>& torques) con
     vectorDoFconstItr dofIt = dofs_.begin();
     for (dofIt = dofs_.begin(); dofIt < dofs_.end(); ++dofIt) 
         torques.push_back(dofIt->getTorque());
+}
+
+template <typename Activation, typename Tendon, CurveMode::Mode mode>
+void NMSmodel<Activation, Tendon, mode>::getDofsStiffness(vector<double>& dofsStiffness) const {
+
+	dofsStiffness.clear();
+	dofsStiffness.reserve(dofs_.size());
+	vectorDoFconstItr dofIt = dofs_.begin();
+	for (dofIt = dofs_.begin(); dofIt < dofs_.end(); ++dofIt)
+		dofsStiffness.push_back(dofIt->getDofStiffness());
 }
 
 

@@ -15,16 +15,16 @@ using std::endl;
 
 template<typename Activation, typename Tendon, CurveMode::Mode mode>
 DoF<Activation, Tendon, mode>::DoF()
-:id_(""), muscles_(0), momentArms_(0), torque_(0) {  }
+    :id_(""), muscles_(0), momentArms_(0), torque_(0), dofStiffness_(0) { }
 
 template<typename Activation, typename Tendon, CurveMode::Mode mode>
 DoF<Activation, Tendon, mode>::DoF(const string& id)
-:id_(id), muscles_(0), momentArms_(0), torque_(0) {  }
+    : id_(id), muscles_(0), momentArms_(0), torque_(0), dofStiffness_(0) {  }
 
 template<typename Activation, typename Tendon, CurveMode::Mode mode>
 DoF<Activation, Tendon, mode>::DoF(const DoF& orig)
 :id_(orig.id_), muscles_(orig.muscles_), 
- momentArms_(orig.momentArms_), torque_(orig.torque_) {  }
+momentArms_(orig.momentArms_), torque_(orig.torque_), dofStiffness_(orig.dofStiffness_) {  }
 
 
 template<typename Activation, typename Tendon, CurveMode::Mode mode>
@@ -96,6 +96,18 @@ void DoF<Activation, Tendon, mode>::updateTorque() {
     }
 }
 
+template<typename Activation, typename Tendon, CurveMode::Mode mode>
+void DoF<Activation, Tendon, mode>::updateDofStiffness() {
+
+    dofStiffness_ = 0;
+	vector<double>::const_iterator currentMomentArm;
+	currentMomentArm = momentArms_.begin();
+	for (unsigned int i = 0; i < muscles_.size(); ++i) {
+		// Approximation: d(momentArm) negligible
+		dofStiffness_ += muscles_.at(i)->getMtuStiffness() * pow((*currentMomentArm),2);
+		currentMomentArm++;
+	}
+}
 
 template<typename Activation, typename Tendon, CurveMode::Mode mode>
 bool DoF<Activation, Tendon, mode>::compareMusclesNames (const vector<string>& muscleNames) const  {

@@ -52,6 +52,7 @@ public:
     void   updateFibreLengthAndVelocity_HYBRID();
     void   updateFibreLength_OFFLINEPREP();
     void   updateMuscleForce();
+	void   updateMtuStiffness();
     void   pushState();
     
     
@@ -83,6 +84,7 @@ public:
     double getFiberVelocity() const {return fibreVelocity_; }
     double getNormFiberVelocity() const {return normFibreVelocity_; } 
     double getMuscleForce() const {return muscleForce_;}
+	double getMtuStiffness() const { return mtuStiffness_; }
     double getPercentageChange() const { return percentageChange_;}
     double getDamping() const {return damping_;}
     double getMaxIsometricForce() const { return maxIsometricForce_;}
@@ -90,6 +92,7 @@ public:
 
   
     void   setMuscleForce(double muscleForce) {muscleForce_ = muscleForce;}
+    void   setMtuStiffness(double mtuStiffness) { mtuStiffness_ = mtuStiffness; }   
     void   updateFibreLengthTrace();
     void   resetFibreLengthTrace();
     double getPenalty() const;
@@ -123,8 +126,10 @@ private:
     double fibreVelocity_;       /**< \f$v^m\f$ */
     double normFibreVelocity_; 
     double fibreLength_;         /**< \f$l^m\f$ */    
+	double muscleTendonLength_;
     CurveT  fibreLengthTrace_;
     double muscleForce_;    /**< \f$F^{mt}\f$ */
+	double mtuStiffness_;
     
     // parameters
     double optimalFibreLength_;  /**< \f$l_0^m\f$ */

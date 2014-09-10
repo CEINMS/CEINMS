@@ -21,7 +21,7 @@ template<typename Activation, typename Tendon, CurveMode::Mode mode>
 MTU<Activation, Tendon, mode>::MTU() 
 :id_(""), emDelay_(.0), c1_(0.), c2_(0.), shapeFactor_(0.), activation_(0.), 
 optimalFibreLength_(0.), pennationAngle_(0.), tendonSlackLength_(0.), 
-percentageChange_(0.), fibreLength_(0.), 
+percentageChange_(0.), fibreLength_(0.), muscleTendonLength_(0.),
 fibreVelocity_(0.), damping_(0.), maxIsometricForce_(0.), time_(.0), timeScale_(0.),
 strengthCoefficient_(0.), muscleForce_(0.)  { }
 
@@ -30,7 +30,7 @@ template<typename Activation, typename Tendon, CurveMode::Mode mode>
 MTU<Activation, Tendon, mode>::MTU (std::string id)
 :id_(id), emDelay_(.0), c1_(0.), c2_(0.), shapeFactor_(0.), activation_(0.), 
 optimalFibreLength_(0.), pennationAngle_(0.), tendonSlackLength_(0.), 
-percentageChange_(0.), fibreLength_(0.), 
+percentageChange_(0.), fibreLength_(0.), muscleTendonLength_(0.),
 fibreVelocity_(0.), damping_(0.), maxIsometricForce_(0.), time_(.0), timeScale_(0.),
 strengthCoefficient_(0.), muscleForce_(0.), tendonDynamic_(id)  { }
 
@@ -51,6 +51,7 @@ MTU<Activation, Tendon, mode>::MTU (const MTU<Activation, Tendon, mode>& orig) {
     fibreVelocity_ = orig.fibreVelocity_;
     normFibreVelocity_ = orig.normFibreVelocity_;
     fibreLength_ = orig.fibreLength_;
+	muscleTendonLength_ = orig.muscleTendonLength_;
     fibreLengthTrace_ = orig.fibreLengthTrace_;
     muscleForce_ = orig.muscleForce_;
     
@@ -87,6 +88,7 @@ MTU<Activation, Tendon, mode>& MTU<Activation, Tendon, mode>::operator=(const MT
     fibreVelocity_ = orig.fibreVelocity_;
     normFibreVelocity_ = orig.normFibreVelocity_;
     fibreLength_ = orig.fibreLength_;
+	muscleTendonLength_ = orig.muscleTendonLength_;
     fibreLengthTrace_ = orig.fibreLengthTrace_;
     muscleForce_ = orig.muscleForce_;
     
@@ -175,7 +177,7 @@ void MTU<Activation, Tendon, mode>::setEmg(double emg) {
 
 template<typename Activation, typename Tendon, CurveMode::Mode mode>
 void MTU<Activation, Tendon, mode>::setMuscleTendonLength(double muscleTendonLength) {
-    
+    muscleTendonLength_ = muscleTendonLength;
    tendonDynamic_.setMuscleTendonLength(muscleTendonLength);
 }
 
@@ -276,6 +278,40 @@ void MTU<Activation, Tendon, mode>::updateMuscleForce() {
     muscleForce_ = maxIsometricForce_*strengthCoefficient_*
                    (fa*fv*activation_ + fp + damping_*normFiberVelocity)* 
                    cos(radians(pennationAngleAtT));
+}
+
+template<typename Activation, typename Tendon, CurveMode::Mode mode>
+void MTU<Activation, Tendon, mode>::updateMtuStiffness() {
+
+	double optimalFiberLengthAtT = optimalFibreLength_*(percentageChange_*(1.0 - activation_) + 1);
+	////:TODO: strong review with the code... lot of check for closeness to 0
+	double normFiberLength = fibreLength_ / optimalFiberLengthAtT;
+	//:TODO: THIS IS WRONG! timeScale_?  0.1 should be timeScale_
+	// double normFiberVelocity = timescale_ *fiberVelocity_ / optimalFiberLengthAtT;
+	double normFiberVelocity = 0.02*fibreVelocity_*0.1 / optimalFiberLengthAtT;
+
+	double fv = forceVelocityCurve_.getValue(normFiberVelocity);
+	double dfp = passiveForceLengthCurve_.getFirstDerivative(normFiberLength) / optimalFiberLengthAtT; // derivative respect to length, not normlength
+	double dfa = activeForceLengthCurve_.getFirstDerivative(normFiberLength) / optimalFiberLengthAtT;
+
+    double tendonLength_ = muscleTendonLength_ - fibreLength_;
+	double tendonStrain_ = (tendonLength_ - tendonSlackLength_) / tendonSlackLength_;
+	double tendonStiffness_ = tendonForceStrainCurve_.getFirstDerivative(tendonStrain_) / tendonSlackLength_; // derivative respect to length, not normlength
+
+	double pennationAngleAtT = computePennationAngle(optimalFibreLength_);
+
+	normFibreVelocity_ = normFiberVelocity;
+
+	// Approximation: d(cos(pennAng)) negligible
+	double muscleStiffness_ = maxIsometricForce_*strengthCoefficient_*
+		(dfa*fv*activation_ + dfp)*
+		cos(radians(pennationAngleAtT));
+    
+	cout << "Muscle stiffness: " << muscleStiffness_ << endl;
+    cout << "Tendon stiffness: " << tendonStiffness_ << endl;
+    cout << "---" << endl;
+    
+	mtuStiffness_ = (muscleStiffness_ * tendonStiffness_) / (muscleStiffness_ + tendonStiffness_);
 }
 
 

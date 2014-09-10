@@ -31,6 +31,7 @@
 #include "QueuesToStorageFiles.h"
 
 #include "ModelEvaluationOffline.h"
+#include "ModelEvaluationOfflineStiffness.h"
 #include "ModelEvaluationHybrid.h"
 
 #include <ctime>
@@ -231,11 +232,12 @@ int main(int argc, char** argv) {
     ExecutionXmlReader executionCfg(executionFile);             
     InputDataXmlReader dataLocations(inputData);
 
-    NMSModelCfg::RunMode runMode = executionCfg.getRunMode();
-   
-//    NMSModelCfg::RunMode runMode = NMSModelCfg::HybridPiecewiseActivationElasticTendonOnline;
-    switch(runMode) {
-               
+    //NMSModelCfg::RunMode runMode = executionCfg.getRunMode();
+
+    NMSModelCfg::RunMode runMode = NMSModelCfg::StiffnessOpenLoopExponentialActivationElasticTendonBiSecOffline;
+
+	switch(runMode) {
+        /*
         case NMSModelCfg::OpenLoopExponentialActivationStiffTendonOnline: {
           
             // 1. define the model
@@ -516,8 +518,53 @@ int main(int argc, char** argv) {
              break;
 
          }
-         
-         
+         */
+		 case NMSModelCfg::StiffnessOpenLoopExponentialActivationElasticTendonBiSecOffline: {
+             // 1. define the model
+             typedef NMSmodel<ExponentialActivation, ElasticTendon_BiSec, CurveMode::Offline> MyNMSmodel;
+             MyNMSmodel mySubject;
+             setupSubject(mySubject, subjectFile);
+
+             // 2. define the thread connecting with the input sources          
+             string emgFilename(dataLocations.getExcitationsFile());
+             EMGFromFile emgProducer(inputConnectors, mySubject, emgFilename, emgGeneratorFile);
+
+             vector< string > dofNames;
+             mySubject.getDoFNames(dofNames);
+             vector< string > maFilename;
+             sortMaFilenames(dataLocations.getMaFiles(), dofNames, maFilename);
+             LmtMaFromStorageFile lmtMaProducer(inputConnectors, mySubject, dataLocations.getLmtFile(), maFilename);
+
+             string externalTorqueFilename(dataLocations.getExternalTorqueFile());
+             ExternalTorquesFromStorageFile externalTorquesProducer(inputConnectors, mySubject, externalTorqueFilename);
+
+             // 2b. define the thread consuming the output sources
+             vector<string> valuesToWrite = { "Activations", "FiberLenghts", "FiberVelocities", "MuscleForces", "MtusStiffness", "Torques", "dofsStiffness" };
+             QueuesToStorageFiles queuesToStorageFiles(inputConnectors, mySubject, valuesToWrite, outputDirectory);
+
+             // 3. define the model simulator
+             vector<string> valuesToLog = { "Activations", "FiberLenghts", "FiberVelocities", "MuscleForces", "MtusStiffness", "Torques", "dofsStiffness" };
+             ModelEvaluationOfflineStiffness<MyNMSmodel, LoggerOnQueues> simulator(inputConnectors, mySubject, valuesToLog);
+
+             inputConnectors.doneWithSubscription.setCount(5);
+             CEINMS::OutputConnectors::doneWithExecution.setCount(2);
+
+             // 4. start the threads
+             std::thread emgProdThread(std::ref(emgProducer));
+             std::thread externalTorquesProdThread(std::ref(externalTorquesProducer));
+             std::thread lmtMaProdThread(std::ref(lmtMaProducer));
+             std::thread simulatorThread(std::ref(simulator));
+             std::thread queuesToStorageFilesThread(std::ref(queuesToStorageFiles));
+
+             emgProdThread.join();
+             lmtMaProdThread.join();
+             externalTorquesProdThread.join();
+             simulatorThread.join();
+             queuesToStorageFilesThread.join();
+
+             break;
+        }
+/*
          case NMSModelCfg::HybridExponentialActivationStiffTendonOnline: { 
 
              // 1. define the model
@@ -645,7 +692,7 @@ int main(int argc, char** argv) {
                break;
          } 
 
-
+         */
         default:
             std::cout << "Implementation not available yet. Verify you XML configuration file\n";
             break;

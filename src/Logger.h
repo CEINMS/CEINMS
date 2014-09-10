@@ -15,7 +15,9 @@ namespace Logger {
                 FibreLengths,
                 FibreVelocities,
                 MuscleForces,
+                MtusStiffness,
                 Torques,
+				dofsStiffness,
                 Emgs,
                 AdjustedEmgs};
 }

@@ -74,8 +74,11 @@ public:
     void updateFibreLengths_OFFLINEPREP();
     void updateFibreLengths_OFFLINEPREP(const std::vector<unsigned>& selectedMusclesIndex);
     void updateMuscleForces();
+	void updateMtuStiffness();
     void updateMuscleForces(const std::vector<unsigned>& selectedMusclesIndex);
-    void updateTorques();
+    void updateMtuStiffness(const std::vector<unsigned>& selectedMusclesIndex);
+	void updateTorques();
+	void updateDofsStiffness();
     void pushState();
     void pushState(const std::vector<unsigned>& selectedMusclesIndex);
     void updateFibreLengthTraces();
@@ -119,8 +122,9 @@ public:
     void getFiberVelocities(std::vector<double>& fiberVelocities) const;
     void getNormFiberVelocities(std::vector<double>& normFiberVelocities) const;
     void getMuscleForces(std::vector<double>& muscleForces) const;
+    void getMtusStiffness(std::vector<double>& mtusStiffness) const;
     void getTorques(std::vector<double>& torques) const;
-
+	void getDofsStiffness(std::vector<double>& dofsStiffness) const;
     // used during calibration
     void getGroupMusclesBasedOnStrengthCoefficients(std::vector<double>& values, 
                                     std::vector< std::vector< int > >& muscleGroups);
