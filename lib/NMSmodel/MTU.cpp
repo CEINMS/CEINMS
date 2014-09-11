@@ -297,13 +297,18 @@ void MTU<Activation, Tendon, mode>::updateMtuStiffness() {
     double tendonLength_ = muscleTendonLength_ - fibreLength_;
 	double tendonStrain_ = (tendonLength_ - tendonSlackLength_) / tendonSlackLength_;
 
+    if (tendonStrain_ < 0)
+    {
+        //cout << "MTU: TendonStrain_ is " << tendonStrain_ << ". Set to 0." << endl;
+        tendonStrain_ = 0;
+    }
+
     double tendonStiffness_ = maxIsometricForce_*strengthCoefficient_*
         tendonForceStrainCurve_.getFirstDerivative(tendonStrain_) / tendonSlackLength_; // derivative respect to length, not normlength
 
     if (tendonStiffness_ < 0)
     {
-        cout << "Tendon stiffness is "<<tendonStiffness_<<", set to 0. (should be > 0)" << endl;
-        tendonStiffness_ = 0;
+        cout << "Warning: tendonStiffness_ is < 0" << endl;
     }
 
 	double pennationAngleAtT = computePennationAngle(optimalFibreLength_);
@@ -315,8 +320,7 @@ void MTU<Activation, Tendon, mode>::updateMtuStiffness() {
 		(dfa*fv*activation_ + dfp)*
 		cos(radians(pennationAngleAtT));
 
-    mtuStiffness_ =  (muscleStiffness_ * tendonStiffness_) / (muscleStiffness_ + tendonStiffness_);
-       
+    mtuStiffness_ =  (muscleStiffness_ * tendonStiffness_) / (muscleStiffness_ + tendonStiffness_); 
 }
 
 
