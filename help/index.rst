@@ -50,6 +50,17 @@ CEINMS is being developed by the `Rehabilitation Engineering Group`_, `Dipartime
         :alt: Griffith logo
         :target: `Griffith University`_
 
+
+Monica Reggiani and Elena Ceseracciu acknowledge the financial support of the ICT
+programme within the Seventh Framework Programme for Research of the
+European Commission (BioMot project, grant number: 611695).
+
+.. image:: images/biomot.png
+        :height: 100pt
+        :align: center
+        :alt: BioMot logo
+        :target: `Biomot`_
+
 .. only:: html or text
 
  Release Notes

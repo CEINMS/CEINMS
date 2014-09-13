@@ -60,7 +60,7 @@ XML example
 An execution configuration file consists of a root element named ``execution`` that contains the following elements:
 
 - ``NMSmodel``: the specification of muscular model to simulate (see `NMSmodel`_)
--  an ``online`` or ``offline`` empty element, depending on: TODO: what?
+-  an ``online`` or ``offline`` empty element, that determines wheter fiber velocities are computed using a causal filter (``online``) or a non-causal filter (``offline``, recommended for most applications)
 - (optional) ``elaboratedDoFs`` to select the degrees of freedom (see :ref:`subjectDof` ) to elaborate
 
     .. note:: this feature is not implemented yet.

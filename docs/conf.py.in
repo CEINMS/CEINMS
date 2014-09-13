@@ -26,7 +26,7 @@ release = '@conf_release@' # full version string
 
 primary_domain = 'cmake'
 
-intersphinx_mapping = {}
+intersphinx_mapping = {'motonms': ('http://rehabenggroup.github.io/MOtoNMS', None)}
 extlinks = {'cmake-issue': ('http://www.cmake.org/Bug/view.php?id=%s', 'CMake issue #'),
             'cmake-commit': ('http://cmake.org/gitweb?p=cmake.git;a=commitdiff;h=%s', '')}
 
@@ -95,7 +95,7 @@ latex_elements = {}
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
   ('index', 'CEINMSUserGuide.tex', u'CEINMS User Guide Documentation',
-   u'Elena Ceseracciu', 'manual'),
+   u'Elena Ceseracciu, Monica Reggiani', 'manual'),
 ]
 
 
@@ -106,6 +106,7 @@ rst_epilog = """
 .. _`Rehabilitation Engineering Group`: http://reg.gest.unipd.it
 .. _`Centre For Musculoskeletal Research`: http://www.griffith.edu.au/health/musculoskeletal-research
 .. _`Griffith University`: http://www.griffith.edu.au/
+.. _`BioMot`: http://www.biomotproject.eu/
 """
 latex_show_pagerefs = 'true'
 latex_show_urls = 'footnote'

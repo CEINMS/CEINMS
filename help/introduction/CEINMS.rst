@@ -116,7 +116,8 @@ For each muscle :math:`j`, the parameters :math:`\alpha_j^{act}`,  :math:`\beta_
 Contraction dynamics
 ~~~~~~~~~~~~~~~~~~~~
 
-Musculotendon kinematics and muscle activation (:num:`Fig. #calibration`) are used as input for a modified Hill-type muscle model, which consists of an active force generating component, the muscle fibres, in series with a passive one, the tendon. The muscle fibre force depends on three main factors: :math:`f_a(\widetilde{l}_m)` is the active force-length relation that expresses the ability of muscle fibres to produce force at different lengths; :math:`f_p(\widetilde{l}_m)` is the passive force-length relation that represents the force response of the fibres to strain; and finally, :math:`f_v(\widetilde{v}_m)`  accounts for the force contribution of the fibres contraction velocity. These curves, represented in :num:`Fig. #forcelengthcurves` -a,b, are normalised to maximum isometric muscle force (:math:`F^{max}`), optimal fibre length (:math:`L_m^0` ), and maximum muscle contraction velocity (:math:`v^{max}`). The optimal fibre length decreases as the activation increases, and this interaction is considered in the computation of the active force. The force (:math:`F^{mt}`) produced by the musculotendon unit (MTU), is a function of muscle activation and muscle kinematics and is given by,
+Musculotendon kinematics and muscle activation (:num:`Fig. #calibration`) are used as input for a modified Hill-type muscle model, which consists of an active force generating component, the muscle fibres, in series with a passive one, the tendon. The muscle fibre force depends on three main factors: :math:`f_a(\widetilde{l}_m)` is the active force-length relation that expresses the ability of muscle fibres to produce force at different lengths; :math:`f_p(\widetilde{l}_m)` is the passive force-length relation that represents the force response of the fibres to strain; and finally, :math:`f_v(\widetilde{v}_m)`  accounts for the force contribution of the fibres contraction velocity. These curves, represented in :num:`Fig. #forcelengthcurves` -a,b, are normalised to maximum isometric muscle force (:math:`F^{max}`), to optimal fibre length (:math:`L_m^0` ) for a), and maximum muscle contraction velocity (:math:`v^{max}`) for b).
+The optimal fibre length decreases as the activation increases, and this interaction is considered in the computation of the active force :cite:`huijing1995important`: curves for different levels of activation are shown, with :math:`1.0` being :math:`100\%` activation. The force (:math:`F^{mt}`) produced by the musculotendon unit (MTU), is a function of muscle activation and muscle kinematics and is given by,
 
 .. math:: F^{mt} = F^t = F^{max}[f_a(\widetilde{l}_m) \cdot f_v(\widetilde{v}_m) \cdot a + f_p(\widetilde{l}_m) + d_m \cdot \widetilde{v}_m] \cdot \cos \varphi
    :label: force
@@ -181,8 +182,7 @@ Although a complete comparison of the all proposed implementations of the elasti
 
 .. only:: html
 
-Bibliography
-============
+    .. rubric:: Bibliography
 
 .. bibliography:: literature.bib
-   :all:
+    :cited:

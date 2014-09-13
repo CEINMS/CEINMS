@@ -107,7 +107,7 @@ The parameters common to all muscles are:
 - ``emDelay`` the electromechanical delay (:math:`d` in :ref:`introActivationDynamics`)
 - ``percentageChange`` the percentage change in optimal fibre length depending on activation (:math:`\gamma` in :ref:`introContractionDynamics`)
 - ``damping`` the muscle damping coefficient (:math:`d_m` in :ref:`introContractionDynamics`)
-- three ``curve`` elements, describing the normalized force/length and force/velocity curves shown in :num:`Fig. #forcelengthcurves`-a,b) in section :ref:`introContractionDynamics`. Each ``curve`` has a name, a list of y-coordinates, and the corresponding x-coordinates that can be interpolated to provide the complete curves.
+- three ``curve`` elements, describing the normalized force/length and force/velocity curves shown in figure :ref:`forcelengthcurves`) in section :ref:`introContractionDynamics`. Each ``curve`` has a name, a list of y-coordinates, and the corresponding x-coordinates that can be interpolated to provide the complete curves.
 
 mtu
 ===
