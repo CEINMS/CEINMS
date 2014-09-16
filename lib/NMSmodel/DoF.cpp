@@ -103,8 +103,8 @@ void DoF<Activation, Tendon, mode>::updateDofStiffness() {
 	vector<double>::const_iterator currentMomentArm;
 	currentMomentArm = momentArms_.begin();
 	for (unsigned int i = 0; i < muscles_.size(); ++i) {
-		// Approximation: d(momentArm) negligible
-		dofStiffness_ += muscles_.at(i)->getMtuStiffness() * pow((*currentMomentArm),2);
+		// Approximation! d(momentArm) negligible             -->                 Add (moment arm / angle) derivative here -> |   
+        dofStiffness_ += muscles_.at(i)->getMtuStiffness() * pow((*currentMomentArm), 2) + muscles_.at(i)->getMuscleForce() * 0;
 		currentMomentArm++;
 	}
 }
