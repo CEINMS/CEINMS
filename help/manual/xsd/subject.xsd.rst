@@ -121,9 +121,7 @@ Each muscle tendon unit is further described by the following, muscle-specific p
 - ``pennationAngle`` is the pennation angle of the fibre at its optimal length (:math:`\varphi_0` in :ref:`introContractionDynamics`)
 - ``tendonSlackLength`` is the tendon slack length (:math:`l_{ts}` in :ref:`introContractionDynamics`)
 - ``maxIsometricForce`` is the maximum isometric muscle force (:math:`F^{max}` in :ref:`introContractionDynamics`)
-- ``strengthCoefficient``
-
-.. todo:: write something here
+- ``strengthCoefficient`` is a multiplicative factor for ``maxIsometricForce``; the rationale for its inclusion is that, instead of calibrating the ``maxIsometricForce`` parameter for each muscle, you may want to keep it fixed and calibrate a reduced number of ``strength coefficient`` parameters instead, that can be shared by multiple muscles (e.g., belonging to the same muscle group - this is under the assumption that muscles in the same group develop in the same way). 
 
 
 .. _subjectDof:

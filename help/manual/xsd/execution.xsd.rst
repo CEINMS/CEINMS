@@ -1,3 +1,5 @@
+.. _executionConfigFile:
+
 Execution configuration file
 ##############################
 
@@ -50,7 +52,7 @@ XML example
          </activation>
       </NMSmodel>
 
-      <online/>
+      <offline/>
 
       <elaboratedDoFs>
       </elaboratedDoFs>
@@ -72,7 +74,7 @@ NMSmodel
 
 This is the specification of the type of muscular model to use among the ones described in :ref:`introNMSmodels` and the desired operation mode:
 
-- ``type``: the operation mode might contain an ``openLoop`` empty element, or an ``hybrid`` element  TODO: check if they match what we wrote in the introduction
+- ``type``: the operation mode might contain an ``openLoop`` empty element, or an ``hybrid`` element
 - ``tendon``: the behaviour of the tendon: it can be (see :ref:`introTendonModels` )
 
     - ``stiff`` (ST) rigid tendon
@@ -87,13 +89,11 @@ This is the specification of the type of muscular model to use among the ones de
 hybrid
 ======
 
-.. todo:: add intro theory?
+The hybrid execution modality (see :ref:`introHybrid`) configuration is provided here:
 
-The hybrid execution modality configuration is provided here:
-
-- ``alpha`` weight for TODO revise everything
-- ``beta`` weight for
-- ``gamma`` weight for
+- ``alpha`` weight for the sum of the squared difference between experimental joint moments provided as :ref:`input data <prepareDataInputData>` and the joint moments estimated by CEINMS
+- ``beta`` weight for the sum of the squared difference between experimental and predicted muscle excitations
+- ``gamma`` weight for the sum of squared muscle excitations
 - ``trackedMuscles`` list of muscles for which an EMG reference signal to "track" is provided
 - ``predictedMuscles`` list of muscles for which no EMG signal is available, therefore activation is only predicted using static optimization techniques
 - ``algorithm`` the optimization algorithm that solves the hybrid static optimization problem, see :ref:`optimizationalgorithm`

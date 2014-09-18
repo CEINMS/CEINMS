@@ -57,10 +57,6 @@ Maximum voluntary contractions (MVC) acquisitions
 Since your subject's model should be independent from the electrode configuration you use during an acquisition session, you need to normalize each muscle's EMG data to a repeatable reference value.
 Currently, the most common way among CEINMS users to acquire these reference values is by having the subject perform, **for each acquisition session**, a set of tasks in which one or more muscles are maximally contracted isometrically (no motion occurring), according to a pre-defined protocol.
 
-In the following, a list of tasks suggested for lower limb EMG normalization is provided:
-
-.. todo:: add list
-
 
 Exporting and converting data
 =============================
@@ -221,15 +217,8 @@ Examples of such scripts for inverse kinematics and inverse dynamics are availab
 
     Performing these steps automatically does not ensure that the results are correct. You should **always** check the results and, if they do not look plausible, check that that the template setup files are correct for your type of data/experiments, and that the setup files are generated correctly.
 
+You may also want to automatize the creation of :ref:`trial (input) data description files <inputDataDescFile>`.
 
-
-
-Creating the subject description
-================================
-
-.. todo::
-
-    write something here or remove this section
 
 .. only:: html
 

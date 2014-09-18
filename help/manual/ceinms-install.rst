@@ -1,4 +1,6 @@
+.. _installCeinms:
+
 CEINMS installation instructions
 ################################
 
-Sadly, nothing here yet, but maybe we could start creating packages using cpack (only executables and, if needed, shared libraries - dev is still too messy, and most of the implementation is exposed because of the templates)
+Please use the provided installation packages for Linux and Windows, according to your computer's architecture.

@@ -52,8 +52,7 @@ Examples of most common cases:
 
 - one-to-one mapping is represented as a single input signal with weight 1
 - the mean of two signals is represented as a list of the two signals, each with weight 0.5
-- an unknown excitation is represented as an empty element. (TODO: reference the hybrid case, deep muscles, etc)
-
+- an unknown excitation is represented as an empty element.
 
 
 XSD grammar

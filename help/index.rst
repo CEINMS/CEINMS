@@ -26,7 +26,6 @@ Reference Manuals
    /manual/ceinms-preparedata
    /manual/ceinms-usingceinmscalibrate
    /manual/ceinms-usingceinms
-   /manual/ceinms-faq
 
 #################
 Acknowledgements

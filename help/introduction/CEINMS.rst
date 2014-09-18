@@ -1,10 +1,12 @@
 CEINMS
 =======
 
+.. _ceinmsOverview:
+
 Overview
 --------
 
-CEINMS is the result of an interdisciplinary collaboration among the biomechanics and the computer science worlds.
+CEINMS (Calibrated EMG-Informed Neuromusculoskeletal modelling toolbox) is the result of an interdisciplinary collaboration among the biomechanics and the computer science worlds.
 Inspired by early electromyography-driven (EMG-driven) methods :cite:`hansen2006anatomy` used in the biomechanical community, Lloyd and colleagues developed algorithms and software to calibrate EMG-driven, or now called EMG-informed, neuromusculoskeletal models to match each individual's characteristics :cite:`buchanan2004neuromusculoskeletal,gerus2013subject,lloyd2003emg,lloyd1996model,lloyd2001strategies,lloyd2008neuromusculoskeletal,sartori2013hybrid,sartori2012emg,winby2013correlation,winby2009muscle`
 
 Fundamental to these calibrated methods was the ability to validate the outputs against other data not used for calibration. All these algorithms and software were collected and integrated together to create CEINMS.
@@ -14,11 +16,9 @@ CEINMS was designed and written to be flexible and generic software, that is, gi
 #. *Full-predictive open-loop mode.* The experimentally recorded EMG signals and 3D joint angles are used as input to a neuromusculoskeletal model to directly drive the computations of the musculotendon forces :cite:`gerus2013subject,lloyd2003emg,lloyd1996model,lloyd2001strategies,lloyd2008neuromusculoskeletal,sartori2012emg,winby2013correlation,winby2009muscle` (:num:`Fig. #figoverview`).
 #. *Hybrid mode.* The excitation patterns of muscles from which it is not practical or possible to routinely collect EMG signals (e.g. deep muscles) are constructed using optimization algorithms. Then, the constructed excitations, experimental EMGs, and 3D joint angles are used as input for the neuromusculoskeletal model :cite:`sartori2013hybrid`.
 #. *EMG-assisted mode.* This mode is a more generalizable form of the Hybrid mode. It uses optimization to adjust both the excitations determined from experimentally recorded EMG signals and to determine the excitations of muscles without experimental EMG. Then the muscle excitations, coupled with 3D joint angles, are used as input to the neuromusculoskeletal model.
-#. *Full optimization-driven closed-loop mode.* In this mode, without the aid of experimental EMG data, an optimization algorithm is used to construct all the muscle excitations to drive the neuromusculoskeletal model :cite:`erdemir2007model,tsirakos1997inverse`. Importantly, the different operation modes can be executed on the same neuromusculoskeletal model, allowing a consistent comparison among the different neural solutions. Fundamental to the current EMG-informed methods and the above modes of operation, CEINMS can be calibrated to the individual subject (:num:`Fig. #calibration`) :cite:`lloyd2003emg`. This is a selected operation procedure in CEINMS, so it can run un-calibrated or calibrated state.
+#. *Full optimization-driven closed-loop mode.* In this mode, without the aid of experimental EMG data, an optimization algorithm is used to construct all the muscle excitations to drive the neuromusculoskeletal model :cite:`erdemir2007model,tsirakos1997inverse`.
 
-The aim of calibration is to determine the values for a set of parameters for each musculotendon unit. The first parameter set defines the musculotendon unit's activation dynamics (:num:`Fig. #calibration` and :num:`Fig. #processingflow`), which characterise the transformation of muscle excitation to muscle activation. The second parameter set define the musculotendon contraction dynamics (:num:`Fig. #calibration` and :num:`Fig. #processingflow`), which transform the muscle activation and musculotendon kinematics into force :cite:`buchanan2004neuromusculoskeletal,gerus2013subject,lloyd2003emg,lloyd1996model,lloyd2001strategies,lloyd2008neuromusculoskeletal,sartori2013hybrid,sartori2012emg,winby2013correlation`. These parameters may change non-linearly across individuals, therefore an optimization algorithm, such as *simulated annealing* :cite:`goffe1994global` is employed to alter the values of the parameters to enable close tracking of the experimental joint moments and/or excitations derived from EMG signals, acquired during the execution of different motor tasks :cite:`buchanan2004neuromusculoskeletal,gerus2013subject,lloyd2003emg,lloyd1996model,lloyd2001strategies,lloyd2008neuromusculoskeletal,sartori2013hybrid,sartori2012emg,winby2013correlation,winby2009muscle`. Various calibration control functions (e.g. minimize maximum activation, minimize maximum joint contact forces etc.) can also be implemented to direct the final set of model parameters :cite:`gerus2013subject,sartori2013hybrid`. Finally, during calibration, the parameters are also constrained to vary within predefined boundaries to ensure that the muscles operate in their physiological range.
-
-The result of the calibration is a subject-specific neuromusculoskeletal (NMS) model, which reflects the musculotendon physiology, activation and contraction dynamics for an individual. Finally, CEINMS can be validated with a novel set of input data, which has not been used for the calibration process, and run with any of the four execution modes.
+Importantly, the different operation modes can be executed on the same neuromusculoskeletal model, allowing a consistent comparison among the different neural solutions. Fundamental to the current EMG-informed methods and the above modes of operation, CEINMS can be calibrated to the individual subject (:num:`Fig. #figcalibration`) :cite:`lloyd2003emg`. This is a selected operation procedure in CEINMS, so it can run un-calibrated or calibrated state.
 
 .. _figoverview:
 
@@ -30,7 +30,17 @@ The result of the calibration is a subject-specific neuromusculoskeletal (NMS) m
 
    The schematic structure of CEINMS using the open-loop full predictive mode.
 
-.. _calibration:
+
+.. _introCalibration:
+
+Calibration
+~~~~~~~~~~~
+
+The aim of calibration is to determine the values for a set of parameters for each musculotendon unit. The first parameter set defines the musculotendon unit's activation dynamics (:num:`Fig. #calibration` and :num:`Fig. #processingflow`), which characterise the transformation of muscle excitation to muscle activation. The second parameter set define the musculotendon contraction dynamics (:num:`Fig. #calibration` and :num:`Fig. #processingflow`), which transform the muscle activation and musculotendon kinematics into force :cite:`buchanan2004neuromusculoskeletal,gerus2013subject,lloyd2003emg,lloyd1996model,lloyd2001strategies,lloyd2008neuromusculoskeletal,sartori2013hybrid,sartori2012emg,winby2013correlation`. These parameters may change non-linearly across individuals, therefore an optimization algorithm, such as *simulated annealing* :cite:`goffe1994global` is employed to alter the values of the parameters to enable close tracking of the experimental joint moments and/or excitations derived from EMG signals, acquired during the execution of different motor tasks :cite:`buchanan2004neuromusculoskeletal,gerus2013subject,lloyd2003emg,lloyd1996model,lloyd2001strategies,lloyd2008neuromusculoskeletal,sartori2013hybrid,sartori2012emg,winby2013correlation,winby2009muscle`. Various calibration control functions (e.g. minimize maximum activation, minimize maximum joint contact forces etc.) can also be implemented to direct the final set of model parameters :cite:`gerus2013subject,sartori2013hybrid`. Finally, during calibration, the parameters are also constrained to vary within predefined boundaries to ensure that the muscles operate in their physiological range.
+
+The result of the calibration is a subject-specific neuromusculoskeletal (NMS) model, which reflects the musculotendon physiology, activation and contraction dynamics for an individual. Finally, CEINMS can be validated with a novel set of input data, which has not been used for the calibration process, and run with any of the four execution modes.
+
+.. _figcalibration:
 
 .. figure:: ../images/calibration.png
    :align: center
@@ -52,12 +62,29 @@ The result of the calibration is a subject-specific neuromusculoskeletal (NMS) m
 
    General data processing flow showing activation dynamics and contraction dynamics.
 
+
+.. _introHybrid:
+
+Hybrid mode
+~~~~~~~~~~~~
+
+Except for operation *full-predictive open-loop* mode, the operation modes require the solution of an optimization problem. For all problems, the objective function is defined as:
+
+.. math::
+
+    F_{obj} = \alpha*\sum_{k \in DOFs}(\tau_k-\tilde{\tau_k})^2+\beta*\sum_{j \in MTUs}(e_j-\tilde{e_j})^2+\gamma*\sum_{j \in MTUs}(e_j^2)
+
+where :math:`\tau_k` is the moment at joint :math:`k` as estimated by CEINMS, :math:`\tilde{\tau_k}` is the experimental moment at joint :math:`k`, :math:`e_j` is the estimated excitation for MTU :math:`j`, and :math:`\tilde{e_j}` is the experimental excitation for MTU :math:`j`.
+
+Changing the weight ratios :math:`\alpha, \beta, \gamma` of the objective function will result in different behaviours, seamlessy shifting from static optimization to EMG-assisted mode (see :ref:`using_ceinms`).
+
+
 .. _introNMSmodels:
 
 Neuromusculoskeletal models used in CEINMS
 ------------------------------------------
 
-What follows is a description of all the various EMG-informed models that have been included in CEINMS. CEINMS implements two different models of the activation dynamics, which convert the neural drive to the muscle activation :cite:`zajac1988muscle`, and three models of the muscle contraction dynamics, which represent the transformation between the muscle activation  and muscle kinematics in force (:num:`Fig. #calibration`).
+What follows is a description of all the various EMG-informed models that have been included in CEINMS. CEINMS implements two different models of the activation dynamics, which convert the neural drive to the muscle activation :cite:`zajac1988muscle`, and three models of the muscle contraction dynamics, which represent the transformation between the muscle activation  and muscle kinematics in force (:num:`Fig. #figcalibration`).
 
 .. _introActivationDynamics:
 
@@ -71,7 +98,7 @@ Neural activation is derived from muscle excitation by modelling the muscle’s 
 .. math:: u_j(t) = \alpha e_j(t-d) - \beta_1 u_j(t-1) -\beta_2 u_j(t-2)
    :label: neuralactivation
 
-where :math:`e_j(t)` is the :math:`j`-th muscle excitation at time :math:`t`, :math:`u_j(t)` is the neural activation, :math:`\alpha` is the muscle gain coefficient, :math:`\beta_1` and :math:`\beta_2` are the recursive coefficients, and :math:`d` is the electromechanical delay. A stable solution for this is obtained including the following constrains :cite:`buchanan2004neuromusculoskeletal,lloyd2003emg`
+where :math:`e_j(t)` is the :math:`j`-th muscle excitation at time :math:`t`, :math:`u_j(t)` is the neural activation, :math:`\alpha` is the muscle gain coefficient, :math:`\beta_1` and :math:`\beta_2` are the recursive coefficients, and :math:`d` is the electromechanical delay. A stable solution for this is obtained including the following constraints :cite:`buchanan2004neuromusculoskeletal,lloyd2003emg`
 
 .. math::
 
