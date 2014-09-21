@@ -207,6 +207,87 @@ Although a complete comparison of the all proposed implementations of the elasti
    Estimation of muscle fibre length using three different tendon models. (a) The integration elastic tendon model (IET) and the equilibrium elastic tendon model (EET) produce the same estimation for the fibre length of the gastrocnemius medialis muscle. (b) The estimation of IET and EET is different because of problems in the integration of the fibre velocity in the IET model. The fibre length estimated by IIT is greater than the one estimated by the stiff tendon model (ST), while the EET model has behaviour very close to the stiff model, which is compatible with the small ratio :math:`l_{ts} /l_{mt}`.
 
 
+Appendices
+----------
+
+.. _introSimAnnealing:
+
+Appendix A: Simulated Annealing
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+In this section we present the simulated annealing algorithm proposed by :cite:`Corana:1987` and that we use for the calibration process.
+Part of this section is an extract from :cite:`Goffe:1994`.
+
+.. code-block:: none
+    :linenos:
+
+    X = X_0
+    CALCULATE f(X)
+    X_opt = X
+    f_opt = f(X)
+
+    DO UNTIL convergence
+        DO NT times
+            DO NS times
+                DO k = 1, ... , n
+                x'_k = x_k + r * v_k, r in [-1,1)
+                CALCULATE f(X')
+                IF f(X') < f(X) THEN
+                    X = X'
+                END IF
+                IF f(X') >= f(X) THEN
+                    apply Metropolis criteria
+                    IF accepted: X = X'
+                END IF
+                IF f(X') > f_opt THEN
+                    X_opt = X, f_opt = f(X_opt)
+                END IF
+            END DO
+        END DO
+        ADJUST V such half of all trials are accepted
+    END DO
+    X*_h =X
+    increase h index
+    IF |f(X*_l) - f_opt| < eps, for each l=h, h-1, ... , h-N_eps        THEN
+        REPORT X_opt, f_opt, V
+        STOP
+    ELSE
+        T=r_T ... T, reduce T
+        X = X_opt, start at the current best optimum
+    END IF
+    CONTINUE
+
+
+If ``f(X')`` is greater then or equal to ``f(X)``, the Metropolis criterion decides on acceptance (lines 15 - 16).
+The value
+
+.. math::   p=e^{\left(\mathit{f'}-\mathit{f}\right)/T}
+    :label: transitionProbability
+
+is computed and compared to ``p'``, a uniformly distributed random number from ``[0,1)``. If ``p`` is greater then ``p'``, the new point is accepted. ``X`` is updated with ``X`` and the algorithm moves uphill (line 17).
+Otherwise, ``X'`` is rejected. Two factors decrease the probability of an uphill move: lower temperature
+and larger differences in the function values.
+
+Every ``NS`` steps through all the elements of ``X``, the step length vector ``V`` is 
+adjusted so that half of all moves are accepted (line 24).
+The goal is to sample the function widely. If a greater percentage of points are accepted for ``x_k``, then the 
+relevant element of ``V`` is enlarged. For a given temperature, this increases the number of rejections and
+decreases the percentage of acceptances. Every ``NT`` times through the above loops, the temperature ``T``
+is reduced (line 32). The new temperature is given by
+
+.. math::  T'=r_T \cdot T
+    :label: newTemperature
+
+where ``rT`` ranges in ``[0,1)``. A lower temperature makes a given uphill move less likely, so the number of rejections increase and the step lengths decline. After a change in the temperature, the ``X`` vector is reset to the current ``X_opt`` (line 33).
+This selection of the starting point together with a smaller steps and focuses search efforts on the most promising area.
+
+After the temperature reduction, we define ``X*_h=X`` where ``X`` is the vector used 
+in the last function evaluation and ``h`` is increased every ``N_T`` times (lines 26 - 27).
+The algorithm ends by comparing ``f(X*_l)`` with ``f_opt``, where ``l=h, h-1, ... , h-N_eps``. 
+If all the ``N_eps`` differences are less then ``epsilon``, the algorithm terminates (lines 28 - 30). 
+This criterion helps to ensure that global minimum is reached.
+
+
 .. only:: html
 
     .. rubric:: Bibliography
