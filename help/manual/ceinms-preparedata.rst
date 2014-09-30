@@ -40,7 +40,7 @@ The specifications for CEINMS input files however are more relaxed than OpenSim 
     - nRows=1264
     - dataRows 1264
 
-- the data section begins with with a line containing tab-delimited or space-delimited labels for each column. The first column is *time*, followed by the list of muscle names or degrees of freedom that identify the data (note that these labels must match the names written in the XML configuration files, i.e., degrees of freedom and muscle names must match the :ref:`subjectDescFile`, and muscle activations must match the *inputSignals* in :ref:`excitationsDescFile`. The rows below this line of column labels must be the corresponding values of each of these quantities at the time represented by the first number in each row.
+- the data section begins with with a line containing tab-delimited or space-delimited labels for each column. The first column is *time*, followed by the list of muscle names or degrees of freedom that identify the data (note that these labels must match the names written in the XML configuration files, i.e., degrees of freedom and muscle names must match the :ref:`subjectDescFile`, and muscle activations must match the *inputSignals* in :ref:`excitationsDescFile`). The rows below this line of column labels must be the corresponding values of each of these quantities at the time represented by the first number in each row.
 
 
 Additional acquisitions
@@ -88,7 +88,7 @@ Data organization
 
 MOtoNMS requires that input C3D files are located inside an ``InputData`` directory, or any of its subdirectory; processed data will be saved into an ``ElaboratedData`` directory, keeping the same folder organization, as explained in the MOtoNMS manual :ref:`motonms:DataOrganization` page. 
 
-We suggest to enforce the same data organization for dealing with OpenSim and CEINMS processing: inside the ``ElaboratedData``, along with ``sessionData``, ``staticElaborations``, and ``dynamicElaborations``, we suggest you create a folder for each of the processing steps involved (e.g., Inverse Kinematics, CEINMS). This allows to automatize the most time-consuming tasks (i.e., preparing configuration files and pre-processing data) as will be discussed in `Batch processing scripts`_).
+We suggest to enforce the same data organization for dealing with OpenSim and CEINMS processing: inside the ``ElaboratedData``, along with ``sessionData``, ``staticElaborations``, and ``dynamicElaborations``, we suggest you create a folder for each of the processing steps involved (e.g., Inverse Kinematics, CEINMS). This allows to automatize the most time-consuming tasks (i.e., preparing configuration files and pre-processing data) as will be discussed in `Batch processing scripts`_.
 
 
 

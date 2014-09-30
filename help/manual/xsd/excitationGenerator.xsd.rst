@@ -39,7 +39,7 @@ XML example
 
 An excitations mapping description file consists of a root element named ``excitationGenerator`` that contains the following elements:
 
-- ``inputSignals``: a list of identifiers for the input signals that are selected or combined to generate the excitation patterns for the model's MTUs. The identifiers need to match the labels that will be present in the excitations data file ( see :ref:`prepareDataInputData` ). Optionally, a ``type`` attribute can be added to specify the nature of these input signals *(e.g., *EMGenvelopes*, *synergies*, ...)
+- ``inputSignals``: a list of identifiers for the input signals that are selected or combined to generate the excitation patterns for the model's MTUs. The identifiers need to match the labels that will be present in the excitations data file ( see :ref:`prepareDataInputData` ). Optionally, a ``type`` attribute can be added to specify the nature of these input signals (e.g., *EMGenvelopes*, *synergies*, ...)
 - ``mapping``: a list of `excitation`_ elements
 
 excitation

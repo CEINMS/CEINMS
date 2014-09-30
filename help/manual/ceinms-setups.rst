@@ -8,6 +8,12 @@ CEINMS is entirely configured through XML files. Each file type is described by 
 Configuration files are presented in the following sections. An example of each file is provided and explained, and the corresponding grammar scheme is reported.
 Files are divided into three categories:
 
+.. only:: latex
+
+    - :doc:`Execution (configuration parameters for a CEINMS simulation) </manual/ceinms-setups-execution>`
+    - :doc:`Calibration (configuration parameters for a CEINMS calibration) </manual/ceinms-setups-calibration>`
+    - :doc:`Data description (representation of the subject model and experimental data) </manual/ceinms-setups-commondata>`
+
 .. toctree::
    :maxdepth: 1
 

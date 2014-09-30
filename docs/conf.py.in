@@ -47,8 +47,8 @@ extensions = ['sphinx.ext.intersphinx',
 templates_path = ['@conf_path@/templates']
 
 # numfig:
-# numfig_number_figures = True
-# numfig_figure_caption_prefix = "Figure"
+numfig_number_figures = @numfig_number_figures@
+numfig_figure_caption_prefix = "Figure"
 
 # ceinms_manuals = sorted(glob.glob(r'@conf_docs@/manual/*.rst'))
 # ceinms_manual_description = re.compile('^\.\. cmake-manual-description:(.*)$')
@@ -89,6 +89,7 @@ html_favicon = '@conf_path@/static/ceinms-favicon.ico'
 
 # -- Options for LaTeX output ---------------------------------------------
 latex_elements = {}
+#latex_elements = {'preamble':'\\usepackage{caption}\n\\captionsetup[figure]{labelformat=empty}'}
 
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title,
@@ -108,6 +109,6 @@ rst_epilog = """
 .. _`Griffith University`: http://www.griffith.edu.au/
 .. _`BioMot`: http://www.biomotproject.eu/
 """
-latex_show_pagerefs = 'true'
+latex_show_pagerefs = @latex_show_pagerefs@
 latex_show_urls = 'footnote'
 latex_use_parts = 'true'
