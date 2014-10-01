@@ -19,6 +19,19 @@ using std::endl;
 #include "validation.h"
 using namespace CalibrationXsd;
 
+inline bool isAbsolute(const char *path) {
+    if (path[0] == '/' || path[0] == '\\') {
+        return true;
+    }
+    std::string str(path);
+    if (str.length()>1) {
+        if (str[1] == ':') {
+            return true;
+        }
+    }
+    return false;
+};
+
 CalibrationXmlReader::CalibrationXmlReader(const string& filename)
 :runMode_(0), optimizationAlgorithm_(0) {
 
@@ -200,7 +213,10 @@ void CalibrationXmlReader::readCalibrationTrialList() {
     CalibrationType::trialSet_type& myTrialSet(calibrationPointer_->trialSet());
     TrialSetType::iterator it = myTrialSet.begin();
     for(it; it != myTrialSet.end(); ++it)
-        calibrationTrials_.push_back(filepath_ + *it); //TODO: check that the provided location is not absolute
+    if (isAbsolute((*it).c_str()))
+        calibrationTrials_.push_back(*it);
+    else
+        calibrationTrials_.push_back(filepath_ + *it);
 }
 
 

@@ -8,7 +8,7 @@
       <T>20</T>
       <NS>15</NS>
       <NT>5</NT>
-      <epsilon>1.E-3</epsilon>
+      <epsilon>1.E-5</epsilon>
       <maxNoEval>200000</maxNoEval>
     </simulatedAnnealing>
   </algorithm>
@@ -33,9 +33,6 @@
             <objectiveFunction>
                 <minimizeTorqueError/>
             </objectiveFunction>
-            <computationMode>
-	            <fast/>
-            </computationMode> 
             <parameterSet>
 	            <parameter>
 	                <name>c1</name>
@@ -89,8 +86,7 @@
         </step> 
     </calibrationSteps>
 
-  <trialsDirectory>/home/co/Dropbox/Ricerca/versioning/ceinms/TestData/unix_undersampled</trialsDirectory>
-  <trialSet>_CrossOvers1_</trialSet>
+  <trialSet>../../TestData/sto/_CrossOvers1_/crossovers1.xml</trialSet>
 
 
 </calibration>
