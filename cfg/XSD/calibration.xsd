@@ -61,7 +61,7 @@
     </xs:choice>
   </xs:complexType>
   <xs:simpleType name="DoFsType">
-    <xs:list itemType="xs:string"/>
+    <xs:list itemType="xs:token"/>
   </xs:simpleType>
   <xs:simpleType name="TwoDoublesType">
     <xs:list itemType="xs:double"/>
@@ -74,7 +74,7 @@
   </xs:complexType>
   
   <xs:simpleType name="MuscleListType">
-    <xs:list itemType="xs:string"/>
+    <xs:list itemType="xs:token"/>
   </xs:simpleType>
   <xs:complexType name="MuscleGroupsType">
     <xs:sequence>
@@ -83,7 +83,7 @@
   </xs:complexType>
   <xs:complexType name="ParameterType">
     <xs:sequence>
-      <xs:element name="name" type="xs:string"/>
+      <xs:element name="name" type="xs:token"/>
       <xs:choice>
         <xs:element name="muscleGroups" type="MuscleGroupsType"/>
         <xs:element name="global" type="GlobalParameterType"/>

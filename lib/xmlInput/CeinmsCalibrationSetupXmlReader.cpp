@@ -16,7 +16,7 @@ using std::endl;
 
 #include "CeinmsCalibrationSetupXmlReader.h"
 #include "validation.h"
-
+#include <boost/algorithm/string.hpp>
 #include "ceinmsCalibrationSetup-schema.hxx"
 
 inline bool isAbsolute(const char *path) {
@@ -30,6 +30,12 @@ inline bool isAbsolute(const char *path) {
         }
     }
     return false;
+};
+
+static void trim(std::string& fileName)
+{
+    boost::trim(fileName);
+    boost::trim_if(fileName, boost::is_any_of("\""));
 };
 
 CeinmsCalibrationSetupXmlReader::CeinmsCalibrationSetupXmlReader(const string& filename)
@@ -74,6 +80,7 @@ void CeinmsCalibrationSetupXmlReader::readXml() {
 std::string CeinmsCalibrationSetupXmlReader::getSubjectFile()
 {
     std::string fileName(*(ceinmsCalibrationSetupPointer_->subjectFile().begin()));
+    trim(fileName);
     if (isAbsolute(fileName.c_str()))
         return fileName;
     else
@@ -83,6 +90,7 @@ std::string CeinmsCalibrationSetupXmlReader::getSubjectFile()
 std::string CeinmsCalibrationSetupXmlReader::getCalibrationFile()
 {
     std::string fileName(*(ceinmsCalibrationSetupPointer_->calibrationFile().begin()));
+    trim(fileName);
     if (isAbsolute(fileName.c_str()))
         return fileName;
     else
@@ -92,6 +100,7 @@ std::string CeinmsCalibrationSetupXmlReader::getCalibrationFile()
 std::string CeinmsCalibrationSetupXmlReader::getExcitationGeneratorFile()
 {
     std::string fileName(*(ceinmsCalibrationSetupPointer_->excitationGeneratorFile().begin()));
+    trim(fileName);
     if (isAbsolute(fileName.c_str()))
         return fileName;
     else
@@ -101,6 +110,7 @@ std::string CeinmsCalibrationSetupXmlReader::getExcitationGeneratorFile()
 std::string CeinmsCalibrationSetupXmlReader::getOutputSubjectFile()
 {
     std::string fileName(*(ceinmsCalibrationSetupPointer_->outputSubjectFile().begin()));
+    trim(fileName);
     if (isAbsolute(fileName.c_str()))
         return fileName;
     else

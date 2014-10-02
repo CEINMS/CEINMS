@@ -17,6 +17,7 @@ using std::endl;
 #include "calibration.hxx"
 #include "calibration-schema.hxx"
 #include "validation.h"
+#include <boost/algorithm/string.hpp>
 using namespace CalibrationXsd;
 
 inline bool isAbsolute(const char *path) {
@@ -30,6 +31,12 @@ inline bool isAbsolute(const char *path) {
         }
     }
     return false;
+};
+
+static void trim(std::string& fileName)
+{
+    boost::trim(fileName);
+    boost::trim_if(fileName, boost::is_any_of("\""));
 };
 
 CalibrationXmlReader::CalibrationXmlReader(const string& filename)
@@ -212,11 +219,15 @@ void CalibrationXmlReader::readCalibrationTrialList() {
     
     CalibrationType::trialSet_type& myTrialSet(calibrationPointer_->trialSet());
     TrialSetType::iterator it = myTrialSet.begin();
-    for(it; it != myTrialSet.end(); ++it)
-    if (isAbsolute((*it).c_str()))
-        calibrationTrials_.push_back(*it);
-    else
-        calibrationTrials_.push_back(filepath_ + *it);
+    for (it; it != myTrialSet.end(); ++it)
+    {
+        std::string fileName = (*it);
+        trim(fileName);
+        if (isAbsolute(fileName.c_str()))
+            calibrationTrials_.push_back(fileName);
+        else
+            calibrationTrials_.push_back(filepath_ + fileName);
+    }
 }
 
 

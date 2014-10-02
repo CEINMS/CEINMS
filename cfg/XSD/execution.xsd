@@ -38,7 +38,7 @@
   </xs:complexType>
   <xs:complexType name="OpenLoopType"/>
   <xs:simpleType name="MuscleListType">
-    <xs:list itemType="xs:string"/>
+    <xs:list itemType="xs:token"/>
   </xs:simpleType>
   <xs:complexType name="HybridType">
     <xs:sequence>
@@ -64,7 +64,7 @@
     </xs:sequence>
   </xs:complexType>
   <xs:simpleType name="ElaboratedDoFsType">
-    <xs:list itemType="xs:string"/>
+    <xs:list itemType="xs:token"/>
   </xs:simpleType>
   <xs:complexType name="ExecutionElementType"/>
   <xs:complexType name="FileType"/>

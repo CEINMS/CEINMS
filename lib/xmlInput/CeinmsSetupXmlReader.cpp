@@ -17,7 +17,7 @@ using std::endl;
 
 #include "CeinmsSetupXmlReader.h"
 #include "validation.h"
-
+#include <boost/algorithm/string.hpp>
 #include "ceinmsSetup-schema.hxx"
 
 inline bool isAbsolute(const char *path) {
@@ -31,6 +31,12 @@ inline bool isAbsolute(const char *path) {
         }
     }
     return false;
+};
+
+static void trim(std::string& fileName)
+{
+    boost::trim(fileName);
+    boost::trim_if(fileName, boost::is_any_of("\""));
 };
 
 CeinmsSetupXmlReader::CeinmsSetupXmlReader(const string& filename)
@@ -76,6 +82,7 @@ void CeinmsSetupXmlReader::readXml() {
 std::string CeinmsSetupXmlReader::getSubjectFile()
 {
     std::string fileName(*(ceinmsSetupPointer_->subjectFile().begin()));
+    trim(fileName);
      if (isAbsolute(fileName.c_str()))
             return fileName;
         else
@@ -85,6 +92,7 @@ std::string CeinmsSetupXmlReader::getSubjectFile()
 std::string CeinmsSetupXmlReader::getInputDataFile()
 {
     std::string fileName(*(ceinmsSetupPointer_->inputDataFile().begin()));
+    trim(fileName);
     if (isAbsolute(fileName.c_str()))
         return fileName;
     else
@@ -94,6 +102,7 @@ std::string CeinmsSetupXmlReader::getInputDataFile()
 std::string CeinmsSetupXmlReader::getExecutionFile()
 {
     std::string fileName(*(ceinmsSetupPointer_->executionFile().begin()));
+    trim(fileName);
     if (isAbsolute(fileName.c_str()))
         return fileName;
     else
@@ -103,6 +112,7 @@ std::string CeinmsSetupXmlReader::getExecutionFile()
 std::string CeinmsSetupXmlReader::getExcitationGeneratorFile()
 {
     std::string fileName(*(ceinmsSetupPointer_->excitationGeneratorFile().begin()));
+    trim(fileName);
     if (isAbsolute(fileName.c_str()))
         return fileName;
     else
@@ -112,6 +122,7 @@ std::string CeinmsSetupXmlReader::getExcitationGeneratorFile()
 std::string CeinmsSetupXmlReader::getOutputDirectory()
 {
     std::string fileName(*(ceinmsSetupPointer_->outputDirectory().begin()));
+    trim(fileName);
     if (isAbsolute(fileName.c_str()))
         return fileName;
     else

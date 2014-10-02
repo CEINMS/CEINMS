@@ -16,6 +16,7 @@ using std::map;
 using std::cout;
 using std::endl;
 #include "inputData-schema.hxx"
+#include <boost/algorithm/string.hpp>
 #include "validation.h"
 
 inline bool isAbsolute(const char *path) {
@@ -29,6 +30,12 @@ inline bool isAbsolute(const char *path) {
         }
     }
     return false;
+};
+
+static void trim(std::string& fileName)
+{
+    boost::trim(fileName);
+    boost::trim_if(fileName, boost::is_any_of("\""));
 };
 
 InputDataXmlReader::InputDataXmlReader(const string& filename)
@@ -73,6 +80,7 @@ void InputDataXmlReader::readXml() {
 std::string InputDataXmlReader::getLmtFile()
 {
     std::string fileName(*(inputDataPointer_->muscleTendonLengthFile().begin()));
+    trim(fileName);
      if (isAbsolute(fileName.c_str()))
             return fileName;
         else
@@ -84,11 +92,10 @@ std::map<std::string, std::string> InputDataXmlReader::getMaFiles()
     map<string, string> result;
     for (auto it : inputDataPointer_->momentArmsFiles().begin()->momentArmsFile())
     {
-        std::string pathToMaFile;
-        if (isAbsolute(it.c_str()))
-            pathToMaFile = it;
-        else
-            pathToMaFile = filepath_ + it;
+        std::string pathToMaFile = it.c_str();
+        trim(pathToMaFile);
+        if (!isAbsolute(pathToMaFile.c_str()))
+            pathToMaFile = filepath_ + pathToMaFile;
         result.insert(std::pair<string, string>(it.dofName(), pathToMaFile));
     }
     // return filepath_ + *(inputDataPointer_->momentArmsDirectory().begin());
@@ -98,6 +105,7 @@ std::map<std::string, std::string> InputDataXmlReader::getMaFiles()
 std::string InputDataXmlReader::getExcitationsFile()
 {
     std::string fileName(*(inputDataPointer_->excitationsFile().begin()));
+    trim(fileName);
     if (isAbsolute(fileName.c_str()))
         return fileName;
     else
@@ -109,6 +117,7 @@ std::string InputDataXmlReader::getExternalTorqueFile()
     if (inputDataPointer_->externalTorquesFile().size() < 1)
         return "";
     std::string fileName(*(inputDataPointer_->externalTorquesFile().begin()));
+    trim(fileName);
     if (isAbsolute(fileName.c_str()))
         return fileName;
     else

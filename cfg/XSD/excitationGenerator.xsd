@@ -7,20 +7,20 @@
   </xs:annotation>
 
   <xs:simpleType name="StringListType">
-    <xs:list itemType="xs:string"/>
+    <xs:list itemType="xs:token"/>
   </xs:simpleType>
 
   <xs:complexType name="InputSignalsType">
     <xs:simpleContent>
         <xs:extension base="StringListType">
-          <xs:attribute type="xs:string" name="type"/>
+          <xs:attribute type="xs:token" name="type"/>
         </xs:extension>
      </xs:simpleContent>
   </xs:complexType>
 
   <xs:complexType name="InputType">
     <xs:simpleContent>
-        <xs:extension base="xs:string">
+        <xs:extension base="xs:token">
           <xs:attribute type="xs:double" name="weight" use="required"/>
         </xs:extension>
     </xs:simpleContent>
@@ -34,7 +34,7 @@
     <xs:sequence>
       <xs:element name="input" maxOccurs="unbounded" minOccurs="0" type="InputType"/>
     </xs:sequence>
-    <xs:attribute type="xs:string" name="id" use="required"/>
+    <xs:attribute type="xs:token" name="id" use="required"/>
   </xs:complexType>
 
   <xs:complexType name="ExcitationListType">
