@@ -14,7 +14,8 @@ XML example
 .. code-block:: xml
 
     <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-    <calibration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="calibration.xsd">
+    <calibration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                 xsi:noNamespaceSchemaLocation="calibration.xsd">
 
       <algorithm>
         <simulatedAnnealing>
@@ -80,12 +81,14 @@ XML example
                     <parameter>
                         <name>strengthCoefficient</name>
                         <muscleGroups>
-                            <muscles>addbrev_r addlong_r addmag1_r addmag2_r addmag3_r </muscles>
+                            <muscles>addbrev_r addlong_r addmag1_r
+                                     addmag2_r addmag3_r </muscles>
                             <muscles>bicfemlh_r semimem_r semiten_r sar_r</muscles>
                             <muscles>bicfemsh_r</muscles>
                             <muscles>gaslat_r gasmed_r </muscles>
                             <muscles>gmax1_r gmax2_r gmax3_r</muscles>
-                            <muscles>gmed1_r gmed2_r gmed3_r gmin1_r gmin2_r gmin3_r</muscles>
+                            <muscles>gmed1_r gmed2_r gmed3_r
+                                     gmin1_r gmin2_r gmin3_r</muscles>
                             <muscles>gra_r recfem_r tfl_r</muscles>
                             <muscles>illiacus_r psoas_r</muscles>
                             <muscles>perbrev_r perlong_r perter_r tibant_r</muscles>

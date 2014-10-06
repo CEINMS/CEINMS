@@ -13,7 +13,8 @@ XML example
 .. code-block:: xml
 
     <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-    <execution xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="execution.xsd">
+    <execution xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+               xsi:noNamespaceSchemaLocation="execution.xsd">
       <NMSmodel>
          <type>
             <hybrid>

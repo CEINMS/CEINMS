@@ -13,15 +13,18 @@ XML example
 .. code-block:: xml
 
     <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-    <subject xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="subject.xsd">
+    <subject xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:noNamespaceSchemaLocation="subject.xsd">
         <mtuDefault>
             <emDelay>0.015</emDelay>
             <percentageChange>0.15</percentageChange>
             <damping>0.1</damping>
             <curve>
                 <name>activeForceLength</name>
-                <xPoints>-5 0 0.401 0.402 0.4035 0.52725 0.62875 0.71875 0.86125 1.045 1.2175 1.43875 1.61875 1.62 1.621 2.2 5</xPoints>
-                <yPoints>0 0 0 0 0 0.226667 0.636667 0.856667 0.95 0.993333 0.77 0.246667 0 0 0 0 0</yPoints>
+                <xPoints>-5 0 0.401 0.402 0.4035 0.52725 0.62875 0.71875 0.86125 1.045
+                          1.2175 1.43875 1.61875 1.62 1.621 2.2 5</xPoints>
+                <yPoints>0 0 0 0 0 0.226667 0.636667 0.856667 0.95 0.993333 0.77
+                         0.246667 0 0 0 0 0</yPoints>
             </curve>
             <curve>
                 <name>passiveForceLength</name>
@@ -64,23 +67,38 @@ XML example
         <dofSet>
             <dof>
                 <name>hip_flexion_r</name>
-                <mtuNameSet>add_brev_r add_long_r add_mag1_r add_mag2_r add_mag3_r bifemlh_r glut_max1_r glut_max2_r glut_max3_r glut_med1_r glut_med2_r glut_med3_r glut_min1_r glut_min2_r glut_min3_r grac_r iliacus_r psoas_r rect_fem_r sar_r semimem_r semiten_r tfl_r</mtuNameSet>
+                <mtuNameSet>add_brev_r add_long_r add_mag1_r add_mag2_r add_mag3_r
+                            bifemlh_r glut_max1_r glut_max2_r glut_max3_r glut_med1_r
+                            glut_med2_r glut_med3_r glut_min1_r glut_min2_r 
+                            glut_min3_r grac_r iliacus_r psoas_r rect_fem_r 
+                            sar_r semimem_r semiten_r tfl_r</mtuNameSet>
             </dof>
             <dof>
                 <name>hip_adduction_r</name>
-                <mtuNameSet>add_brev_r add_long_r add_mag1_r add_mag2_r add_mag3_r bifemlh_r glut_max1_r glut_max2_r glut_max3_r glut_med1_r glut_med2_r glut_med3_r glut_min1_r glut_min2_r glut_min3_r grac_r iliacus_r psoas_r rect_fem_r sar_r semimem_r semiten_r tfl_r</mtuNameSet>
+                <mtuNameSet>add_brev_r add_long_r add_mag1_r add_mag2_r add_mag3_r
+                            bifemlh_r glut_max1_r glut_max2_r glut_max3_r glut_med1_r
+                            glut_med2_r glut_med3_r glut_min1_r glut_min2_r
+                            glut_min3_r grac_r iliacus_r psoas_r rect_fem_r
+                            sar_r semimem_r semiten_r tfl_r</mtuNameSet>
             </dof>
             <dof>
                 <name>hip_rotation_r</name>
-                <mtuNameSet>add_brev_r add_long_r add_mag1_r add_mag2_r add_mag3_r bifemlh_r glut_max1_r glut_max2_r glut_max3_r glut_med1_r glut_med2_r glut_med3_r glut_min1_r glut_min2_r glut_min3_r grac_r iliacus_r psoas_r rect_fem_r sar_r semimem_r semiten_r tfl_r</mtuNameSet>
+                <mtuNameSet>add_brev_r add_long_r add_mag1_r add_mag2_r add_mag3_r
+                            bifemlh_r glut_max1_r glut_max2_r glut_max3_r glut_med1_r
+                            glut_med2_r glut_med3_r glut_min1_r glut_min2_r
+                            glut_min3_r grac_r iliacus_r psoas_r rect_fem_r
+                            sar_r semimem_r semiten_r tfl_r</mtuNameSet>
             </dof>
             <dof>
                 <name>knee_angle_r</name>
-                <mtuNameSet>bifemlh_r bifemsh_r lat_gas_r med_gas_r grac_r rect_fem_r sar_r semimem_r semiten_r tfl_r vas_int_r vas_lat_r vas_med_r</mtuNameSet>
+                <mtuNameSet>bifemlh_r bifemsh_r lat_gas_r med_gas_r grac_r
+                            rect_fem_r sar_r semimem_r semiten_r tfl_r
+                            vas_int_r vas_lat_r vas_med_r</mtuNameSet>
             </dof>
             <dof>
                 <name>ankle_angle_r</name>
-                <mtuNameSet>lat_gas_r med_gas_r per_brev_r per_long_r per_tert_r soleus_r tib_ant_r</mtuNameSet>
+                <mtuNameSet>lat_gas_r med_gas_r per_brev_r per_long_r
+                            per_tert_r soleus_r tib_ant_r</mtuNameSet>
             </dof>
         </dofSet>
         <calibrationInfo>

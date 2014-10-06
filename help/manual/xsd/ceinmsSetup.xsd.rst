@@ -16,7 +16,8 @@ CEINMS setup XML example
 .. code-block:: xml
 
     <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-    <ceinms xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="ceinmsSetup.xsd">
+    <ceinms xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xsi:noNamespaceSchemaLocation="ceinmsSetup.xsd">
       <subjectFile>subjectCalibrated.xml</subjectFile>
       <inputDataFile>../TestData/walking1/walking1.xml</inputDataFile>
       <executionFile>Execution/executionTest.xml</executionFile>

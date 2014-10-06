@@ -13,7 +13,8 @@ XML example
 .. code-block:: xml
 
     <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-    <excitationGenerator xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="excitationGenerator.xsd">
+    <excitationGenerator xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                         xsi:noNamespaceSchemaLocation="excitationGenerator.xsd">
 
     <inputSignals type="EMG">addmag_r bicfemlh_r gaslat_r gasmed_r
                 gmax_r gmed_r gra_r perlong_r
