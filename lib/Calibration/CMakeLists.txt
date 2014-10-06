@@ -13,7 +13,6 @@ set(Calibration_HEADERS TrialData.h
                         SimAnnealParameters/StrengthCoefficients_ShapeFactor_C1_C2_TendonSlackLength_single.h
                         SimAnnealParameters/StrengthCoefficients_Single_ShapeFactor_C1_C2_TendonSlackLength_use_last_Dof_only.h
                         TorqueComputationModes/ComputationMode_Default.h
-                        TorqueComputationModes/ComputationMode_Fast.h
                         )
 set(Calibration_SOURCES )
 
@@ -25,8 +24,7 @@ set(Calibration_TEMPLATE_IMPLEMENTATION
                             SimAnnealParameters/ParametersFromXml.cpp
                             SimAnnealParameters/StrengthCoefficients_ShapeFactor_C1_C2_TendonSlackLength_single.cpp
                             SimAnnealParameters/StrengthCoefficients_Single_ShapeFactor_C1_C2_TendonSlackLength_use_last_Dof_only.cpp
-                            TorqueComputationModes/ComputationMode_Default.cpp
-                            TorqueComputationModes/ComputationMode_Fast.cpp)
+                            TorqueComputationModes/ComputationMode_Default.cpp)
 
 set_source_files_properties( ${Calibration_TEMPLATE_IMPLEMENTATION} PROPERTIES HEADER_FILE_ONLY TRUE)
 
