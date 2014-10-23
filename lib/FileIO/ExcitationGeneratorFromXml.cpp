@@ -43,7 +43,12 @@ ExcitationGeneratorFromXml::ExcitationGeneratorFromXml(const std::string& xmlFil
             Component currentComponent;
             currentComponent.weight=inputIt.weight();
             std::vector<std::string>::iterator positionInInputSignalsList=std::find(inputSignalsNames_.begin(), inputSignalsNames_.end(), inputIt.data());
-            currentComponent.index= positionInInputSignalsList - inputSignalsNames_.begin();//TODO check what to do if iterator == end()
+            if (positionInInputSignalsList == inputSignalsNames_.end())
+            {
+                std::cout << "Excitation generator: could not find " << inputIt.data() << " input signal" << std::endl;
+                exit(EXIT_FAILURE);
+            }
+            currentComponent.index= positionInInputSignalsList - inputSignalsNames_.begin();
             excitationComponentsVector.push_back(currentComponent);
         }
         weights_.push_back(excitationComponentsVector);
