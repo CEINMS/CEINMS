@@ -147,10 +147,10 @@ Each muscle tendon unit is further described by the following, muscle-specific p
 dof
 ===
 
-Each degree of freedom (broadly speaking, a *joint* of the model) is thus defined:
+Each degree of freedom is thus defined:
 
 - ``name`` the identifier for the degree of freedom
-- ``mtuNameSet`` a list of the muscles that act on the joint
+- ``mtuNameSet`` a list of the muscles that act on it
 
 
 calibrationInfo

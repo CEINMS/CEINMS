@@ -7,7 +7,7 @@ Overview
 --------
 
 CEINMS (Calibrated EMG-Informed Neuromusculoskeletal modelling toolbox) is the result of an interdisciplinary collaboration among the biomechanics and the computer science worlds.
-Inspired by early electromyography-driven (EMG-driven) methods :cite:`hansen2006anatomy` used in the biomechanical community, Lloyd and colleagues developed algorithms and software to calibrate EMG-driven, or now called EMG-informed, neuromusculoskeletal models to match each individual's characteristics :cite:`buchanan2004neuromusculoskeletal,gerus2013subject,lloyd2003emg,lloyd1996model,lloyd2001strategies,lloyd2008neuromusculoskeletal,sartori2013hybrid,sartori2012emg,winby2013correlation,winby2009muscle`
+Inspired by early electromyography-driven (EMG-driven) methods :cite:`McGill1992395` used in the biomechanical community, Lloyd and colleagues developed algorithms and software to calibrate EMG-driven, or now called EMG-informed, neuromusculoskeletal models to match each individual's characteristics :cite:`buchanan2004neuromusculoskeletal,gerus2013subject,lloyd2003emg,lloyd1996model,lloyd2001strategies,lloyd2008neuromusculoskeletal,sartori2013hybrid,sartori2012emg,winby2013correlation,winby2009muscle`
 
 Fundamental to these calibrated methods was the ability to validate the outputs against other data not used for calibration. All these algorithms and software were collected and integrated together to create CEINMS.
 
