@@ -53,7 +53,6 @@ set_source_files_properties(XmlWriter.cpp PROPERTIES HEADER_FILE_ONLY TRUE)
 add_executable( CEINMScalibrate ${CEINMScalibrate_SOURCES} ${CEINMScalibrate_HEADERS})
 target_link_libraries( CEINMScalibrate
       xmlInput
-      Calibration
       NMSmodel
       FileIO
       InputConnectors
@@ -61,6 +60,9 @@ target_link_libraries( CEINMScalibrate
       ${Boost_PROGRAM_OPTIONS_LIBRARY}
 )
 
+if (NOT CMAKE_VERSION VERSION_LESS 3.0.0)
+    target_link_libraries(CEINMScalibrate Calibration)
+endif()
 
 install(TARGETS CEINMS CEINMScalibrate
         RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})

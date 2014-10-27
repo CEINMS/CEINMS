@@ -14,7 +14,6 @@ set(Calibration_HEADERS TrialData.h
                         SimAnnealParameters/StrengthCoefficients_Single_ShapeFactor_C1_C2_TendonSlackLength_use_last_Dof_only.h
                         TorqueComputationModes/ComputationMode_Default.h
                         )
-set(Calibration_SOURCES )
 
 set(Calibration_TEMPLATE_IMPLEMENTATION
                             TrialData.cpp
@@ -29,15 +28,20 @@ set(Calibration_TEMPLATE_IMPLEMENTATION
 set_source_files_properties( ${Calibration_TEMPLATE_IMPLEMENTATION} PROPERTIES HEADER_FILE_ONLY TRUE)
 
 source_group("Header Files" FILES ${Calibration_HEADERS})
-source_group("Source Files" FILES ${Calibration_SOURCES} ${Calibration_TEMPLATE_IMPLEMENTATION})
+source_group("Source Files" FILES ${Calibration_TEMPLATE_IMPLEMENTATION})
+if (CMAKE_VERSION VERSION_LESS 3.0.0)
+    add_library(Calibration ${Calibration_HEADERS} ${Calibration_TEMPLATE_IMPLEMENTATION})
+    target_include_directories( Calibration
+                        PRIVATE ${NMSmodel_INCLUDE_DIRS}
+                                ${Curve_INCLUDE_DIRS}
+                                ${FileIO_INCLUDE_DIRS}
+                                ${ceinms_common_INCLUDE_DIRS})
+else()
+    add_library(Calibration INTERFACE)
+    target_link_libraries( Calibration
+                      INTERFACE FileIO ceinms_common NMSmodel Curve)
+endif()
 
-add_library(Calibration STATIC ${Calibration_SOURCES} ${Calibration_HEADERS} ${Calibration_TEMPLATE_IMPLEMENTATION})
-target_link_libraries(Calibration xmlInput FileIO)
-target_include_directories( Calibration
-                            PRIVATE ${NMSmodel_INCLUDE_DIRS}
-                                    ${Curve_INCLUDE_DIRS}
-                                    ${FileIO_INCLUDE_DIRS}
-                                    ${ceinms_common_INCLUDE_DIRS})
 
 # Save path to include directory for "internal" usage
 set(Calibration_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/ObjectiveFunctions ${CMAKE_CURRENT_SOURCE_DIR}/SimAnnealParameters  ${CMAKE_CURRENT_SOURCE_DIR}/TorqueComputationModes CACHE STRING "Include directories for Calibration library")
