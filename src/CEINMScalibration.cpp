@@ -181,7 +181,12 @@ TrialData readTrialData(std::string inputDataFilename, NMSmodel& mySubject, std:
     lmtMaProdThread.join();
     externalTorquesProdThread.join();
     queuesToTrialDataThread.join();
-    delete inputConnectors;
+
+    if (queuesToTrialData.getTrialData().noLmtSteps_ < 1)
+    {
+        std::cout << "ERROR: No data was read for trial " << trialId << std::endl;
+        exit(EXIT_FAILURE);
+    }
     return queuesToTrialData.getTrialData();
 };
 

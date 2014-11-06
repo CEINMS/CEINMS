@@ -25,6 +25,9 @@ void QueuesToTrialData::operator()() {
 
     CEINMS::OutputConnectors::doneWithExecution.wait();
 
+
+    if (!inputConnectors_.externalTorquesAvailable)
+        return;
     double externalTorqueTime = std::numeric_limits<double>::lowest();
     bool lmtRunning = true;
     bool torqueRunning = true;
