@@ -20,10 +20,10 @@ XML example
       <algorithm>
         <simulatedAnnealing>
           <noEpsilon>4</noEpsilon>
-          <rt>0.3</rt>
-          <T>20</T>
-          <NS>15</NS>
-          <NT>5</NT>
+          <rt>0.1</rt>
+          <T>200000</T>
+          <NS>30</NS>
+          <NT>20</NT>
           <epsilon>1.E-5</epsilon>
           <maxNoEval>200000</maxNoEval>
         </simulatedAnnealing>
