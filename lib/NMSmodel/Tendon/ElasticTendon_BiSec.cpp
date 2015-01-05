@@ -368,7 +368,7 @@ double ElasticTendon_BiSec::computeMuscleForce(double fibreLength) {
                                    (1.0 - activation_) + 1 ); 
           
     double normFiberLength   = fibreLength / optimalFiberLengthAtT;
-    double normFiberVelocity = (fibreLength - fibreLengthT1_) / optimalFiberLengthAtT;
+    double normFiberVelocity = (fibreLength - fibreLengthT1_)/timeScale_ / optimalFiberLengthAtT/10;
     double fv = forceVelocityCurve_.getValue(normFiberVelocity);
     double fp = passiveForceLengthCurve_.getValue(normFiberLength);
     double fa = activeForceLengthCurve_.getValue(normFiberLength);
