@@ -36,6 +36,13 @@ XML example
                 <xPoints>-10 -1 -0.6 -0.3 -0.1 0 0.1 0.3 0.6 0.8 10</xPoints>
                 <yPoints>0 0 0.08 0.2 0.55 1 1.4 1.6 1.7 1.75 1.75</yPoints>
             </curve>
+            <curve>
+                <name>tendonForceStrain</name>
+                <xPoints>-10 -0.002 -0.001 0 0.00131 0.00281 0.00431 0.00581
+                    0.00731 0.00881 0.0103 0.0118 0.0123 9.2 9.201 9.202 20</xPoints>
+                <yPoints>0 0 0 0 0.0108 0.0257 0.0435 0.0652 0.0915
+                         0.123 0.161 0.208 0.227 345 345 345 345</yPoints>
+            </curve>
         </mtuDefault>
         <mtuSet>
             <mtu>
@@ -125,7 +132,7 @@ The parameters common to all muscles are:
 - ``emDelay`` the electromechanical delay (:math:`d` in :ref:`introActivationDynamics`)
 - ``percentageChange`` the percentage change in optimal fibre length depending on activation (:math:`\gamma` in :ref:`introContractionDynamics`)
 - ``damping`` the muscle damping coefficient (:math:`d_m` in :ref:`introContractionDynamics`)
-- three ``curve`` elements, describing the normalized force/length and force/velocity curves shown in the :ref:`active and passive force curves <forcelengthcurves>`) figure in section :ref:`introContractionDynamics`. Each ``curve`` has a name, a list of y-coordinates, and the corresponding x-coordinates that can be interpolated to provide the complete curves.
+- four ``curve`` elements, describing the normalized force/length (active and passive), normalized force/velocity, normalized tendon force/strain curves shown in the :ref:`active and passive force curves <forcelengthcurves>`) figure in section :ref:`introContractionDynamics`. Each ``curve`` has a name, a list of y-coordinates, and the corresponding x-coordinates that can be interpolated to provide the complete curves.
 
 mtu
 ===
