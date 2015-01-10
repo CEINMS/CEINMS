@@ -265,15 +265,16 @@ void MTU<Activation, Tendon, mode>::updateMuscleForce() {
     double normFiberLength   = fibreLength_/optimalFiberLengthAtT;
   //:TODO: THIS IS WRONG! timeScale_?  0.1 should be timeScale_
     // double normFiberVelocity = timescale_ *fiberVelocity_ / optimalFiberLengthAtT;
-    double normFiberVelocity = fibreVelocity_*0.1*timeScale_/optimalFiberLengthAtT;
+    double normFiberVelocityAtT = std::max(fibreVelocity_, 10.0)*0.1/optimalFiberLengthAtT;
+    double normFiberVelocity=fibreVelocity_*0.1/optimalFibreLength_;
 
-    double fv = forceVelocityCurve_.getValue(normFiberVelocity);
+    double fv = forceVelocityCurve_.getValue(normFiberVelocityAtT);
     double fp = passiveForceLengthCurve_.getValue(normFiberLength);
     double fa = activeForceLengthCurve_.getValue(normFiberLength);
     double pennationAngleAtT = computePennationAngle(optimalFibreLength_); //this is correct
 //    double pennationAngleAtT = computePennationAngle(optimalFiberLengthAtT); //this is the one we used since the new version...
 
-    normFibreVelocity_= normFiberVelocity;
+    normFibreVelocity_= normFiberVelocityAtT;
     muscleForce_ = maxIsometricForce_*strengthCoefficient_*
                    (fa*fv*activation_ + fp + damping_*normFiberVelocity)* 
                    cos(radians(pennationAngleAtT));
