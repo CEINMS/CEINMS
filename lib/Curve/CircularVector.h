@@ -27,6 +27,7 @@ public:
     void pop_back();
     unsigned getMaxsize() { return size_; }
     unsigned size() const;
+    bool empty();
 private:
     void rotateR();
     void rotateL();

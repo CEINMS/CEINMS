@@ -105,20 +105,30 @@ void Curve<mode, T>::removeLastPointNoUpdate() {
 
 
 template <CurveMode::Mode mode,  CurveMode::Interpolation T>
-void Curve<mode, T>::addPoint(double x, double y)  {
+bool Curve<mode, T>::addPoint(double x, double y)  {
 
-  x_.push_back(x);
-  y_.push_back(y);
+  if(x_.empty() || x>x_.back())
+  {
+      x_.push_back(x);
+      y_.push_back(y);
 
-  computeCoefficients(Int2Type<T>());
+      computeCoefficients(Int2Type<T>());
+      return true;
+  }
+  else return false;
 }
 
 
 template <CurveMode::Mode mode,  CurveMode::Interpolation T>
-void Curve<mode, T>::addPointOnly(double x, double y)
+bool Curve<mode, T>::addPointOnly(double x, double y)
 {
-  x_.push_back(x);
-  y_.push_back(y);
+  if(x_.empty() || x>x_.back())
+  {
+      x_.push_back(x);
+      y_.push_back(y);
+      return true;
+  }
+  else return false;
 }
 
 
@@ -325,6 +335,8 @@ double Curve<mode, T>::getFirstDerivative(double xalue) const  {
 	
 	int n = x_.size();
 	
+        if (n < 1)
+            return 0;
 	  
 	// Now see if the abscissa is out of range of the function
 	

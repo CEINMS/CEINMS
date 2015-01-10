@@ -137,3 +137,10 @@ bool CircularVector<T>::isEmpty() {
 
     return (count_ == 0);
 }
+
+
+template<typename T>
+bool CircularVector<T>::empty()
+{
+      return size()==0;
+};
