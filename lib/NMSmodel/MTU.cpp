@@ -262,19 +262,20 @@ void MTU<Activation, Tendon, mode>::updateMuscleForce() {
 
     double optimalFiberLengthAtT = optimalFibreLength_*(percentageChange_*(1.0 - activation_) + 1); 
 ////:TODO: strong review with the code... lot of check for closeness to 0
-    double normFiberLength   = fibreLength_/optimalFiberLengthAtT;
+    double normFiberLengthAtT   = fibreLength_/optimalFiberLengthAtT;
+    double normFiberLength   = fibreLength_/optimalFibreLength_;
   //:TODO: THIS IS WRONG! timeScale_?  0.1 should be timeScale_
     // double normFiberVelocity = timescale_ *fiberVelocity_ / optimalFiberLengthAtT;
     double normFiberVelocityAtT = std::max(fibreVelocity_, 10.0)*0.1/optimalFiberLengthAtT;
     double normFiberVelocity=fibreVelocity_*0.1/optimalFibreLength_;
 
-    double fv = forceVelocityCurve_.getValue(normFiberVelocityAtT);
+    double fv = forceVelocityCurve_.getValue(normFiberVelocity);
     double fp = passiveForceLengthCurve_.getValue(normFiberLength);
-    double fa = activeForceLengthCurve_.getValue(normFiberLength);
+    double fa = activeForceLengthCurve_.getValue(normFiberLengthAtT);
     double pennationAngleAtT = computePennationAngle(optimalFibreLength_); //this is correct
 //    double pennationAngleAtT = computePennationAngle(optimalFiberLengthAtT); //this is the one we used since the new version...
 
-    normFibreVelocity_= normFiberVelocityAtT;
+    normFibreVelocity_= normFiberVelocity;
     muscleForce_ = maxIsometricForce_*strengthCoefficient_*
                    (fa*fv*activation_ + fp + damping_*normFiberVelocity)* 
                    cos(radians(pennationAngleAtT));

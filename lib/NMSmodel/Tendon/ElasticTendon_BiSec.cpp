@@ -367,11 +367,15 @@ double ElasticTendon_BiSec::computeMuscleForce(double fibreLength) {
     double optimalFiberLengthAtT = optimalFibreLength_ * (percentageChange_ *
                                    (1.0 - activation_) + 1 ); 
           
-    double normFiberLength   = fibreLength / optimalFiberLengthAtT;
-    double normFiberVelocity = (fibreLength - fibreLengthT1_)/timeScale_ / optimalFiberLengthAtT/10;
+    double normFiberLength   = fibreLength / optimalFibreLength_;
+    double normFiberLengthAtT   = fibreLength / optimalFiberLengthAtT;
+    double normFiberVelocity = (fibreLength - fibreLengthT1_)/timeScale_ / optimalFibreLength_/10;
+    double normFiberVelocityAtT = (fibreLength - fibreLengthT1_)/timeScale_ / optimalFiberLengthAtT/10;
+
+
     double fv = forceVelocityCurve_.getValue(normFiberVelocity);
     double fp = passiveForceLengthCurve_.getValue(normFiberLength);
-    double fa = activeForceLengthCurve_.getValue(normFiberLength);
+    double fa = activeForceLengthCurve_.getValue(normFiberLengthAtT);
     double pennationAngleAtT = PennationAngle::compute(fibreLength, optimalFibreLength_, pennationAngle_);
 
     
