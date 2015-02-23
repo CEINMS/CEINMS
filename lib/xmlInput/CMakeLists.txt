@@ -132,7 +132,16 @@ target_include_directories(xmlInput PRIVATE ${ceinms_common_INCLUDE_DIRS} impl P
 set(xmlInput_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR} ${XSD_INCLUDE_DIR} ${XERCES_INCLUDE_DIR} CACHE INTERNAL "Include directory for xmlInput library")
 mark_as_advanced(xmlInput_INCLUDE_DIRS)
 
-install(FILES ${xmlInput_HEADERS} ${xmlInput_GENERATED_HEADERS} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}) #should add namespace
+install(FILES   ${xmlInput_HEADERS}
+                ${schemas_GENERATED_HEADERS}
+                ${subject_GENERATED_HEADERS}
+                ${excitationGenerator_GENERATED_HEADERS}
+                ${calibration_GENERATED_HEADERS}
+                ${execution_GENERATED_HEADERS}
+                ${inputData_GENERATED_HEADERS}
+                ${ceinmsSetup_GENERATED_HEADERS}
+                ${ceinmsCalibrationSetup_GENERATED_HEADERS}
+        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}) #should add namespace
 install(TARGETS xmlInput
         EXPORT CEINMSTargets
         RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
