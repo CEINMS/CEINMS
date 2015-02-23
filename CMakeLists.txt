@@ -41,6 +41,16 @@ if(MSVC)
     set(CMAKE_DEBUG_POSTFIX "d")
 endif(MSVC)
 
+option(CEINMS_VERBOSE_DEBUG "Print debug messages" OFF)
+option(CEINMS_VERBOSE_DEEP_DEBUG "Print LOTS of debug messages" OFF)
+if (CEINMS_VERBOSE_DEBUG)
+    add_definitions(/DDEBUG)
+endif()
+
+if (CEINMS_VERBOSE_DEEP_DEBUG)
+    add_definitions(/DDEEP_DEBUG)
+endif()
+
 add_subdirectory(lib)
 add_subdirectory(src)
 add_subdirectory(docs)
