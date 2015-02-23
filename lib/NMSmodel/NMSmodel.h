@@ -103,6 +103,7 @@ public:
     void setOptimalFibreLengths(const std::vector<double>&  optimalFibreLengths);
     
     // called	for control purpose
+    std::vector<std::string> getMuscleNames() const {return muscleNames_;}
     void getMuscleNames(std::vector<std::string>& muscleNames) const { muscleNames = muscleNames_; }
     void getMuscleNamesOnDofs (std::vector<std::vector<std::string> >& muscleNamesOnDofs) const;
     void getMuscleNamesOnDofs(std::map< std::string, std::vector<std::string> >& muscleNamesOnDofs) const;
