@@ -94,9 +94,10 @@ void ParametersFromXml<NMSmodelT>::getUpperLowerBounds(std::vector<double>& uppe
     upperBounds.clear(); lowerBounds.clear();
     for(typename ParametersMap::const_iterator it(parameters_.begin()); it != parameters_.end(); ++it) {
         if(it->second.boundaryType == Parameter::RelativeToSubjectValue) {
-            std::vector<double> coefficients;
+            std::vector<double> coefficients, groupedCoefficients;
             getCoefficients(it->first, coefficients);
-            for(std::vector<double>::const_iterator cIt(coefficients.begin()); cIt != coefficients.end(); ++cIt) {
+            groupValues(it->second.muscleGroups, coefficients, groupedCoefficients);
+            for(std::vector<double>::const_iterator cIt(groupedCoefficients.begin()); cIt != groupedCoefficients.end(); ++cIt) {
                 double upperBoundValue = *cIt * (it->second.upperLimit);
                 double lowerBoundValue = *cIt * (it->second.lowerLimit);
                 upperBounds.push_back(upperBoundValue);
