@@ -13,6 +13,7 @@
 
 #include "SetupDataStructure.h"
 #include "Activation/ExponentialActivation.h"
+#include "Activation/PiecewiseActivation.h"
 #include "ErrorMinimizerAnnealing.h"
 #include "HybridWeightings.h"
 #include "Curve.h"
@@ -580,71 +581,387 @@ int main(int argc, char** argv) {
              simulatorThread.join();
              queuesToStorageFilesThread.join();
              break;
-         } 
+        } 
          
-           case NMSModelCfg::HybridExponentialActivationElasticTendonBiSecOnline: { 
-               // 1. define the model
-               typedef NMSmodel<ExponentialActivation, ElasticTendon_BiSec, CurveMode::Online> MyNMSmodel;
-               MyNMSmodel mySubject;
-               setupSubject(mySubject, subjectFile);
+        case NMSModelCfg::HybridExponentialActivationElasticTendonBiSecOnline: { 
+            // 1. define the model
+            typedef NMSmodel<ExponentialActivation, ElasticTendon_BiSec, CurveMode::Online> MyNMSmodel;
+            MyNMSmodel mySubject;
+            setupSubject(mySubject, subjectFile);
 
-               // 2. define the thread connecting with the input sources          
-               string emgFilename(dataLocations.getExcitationsFile());
-               EMGFromFile emgProducer(inputConnectors, mySubject, emgFilename, emgGeneratorFile);
+            // 2. define the thread connecting with the input sources          
+            string emgFilename(dataLocations.getExcitationsFile());
+            EMGFromFile emgProducer(inputConnectors, mySubject, emgFilename, emgGeneratorFile);
 
-               vector< string > dofNames;
-               mySubject.getDoFNames(dofNames);
-               vector< string > maFilename;
-               sortMaFilenames(dataLocations.getMaFiles(), dofNames, maFilename);
-               LmtMaFromStorageFile lmtMaProducer(inputConnectors, mySubject, dataLocations.getLmtFile(), maFilename);
+            vector< string > dofNames;
+            mySubject.getDoFNames(dofNames);
+            vector< string > maFilename;
+            sortMaFilenames(dataLocations.getMaFiles(), dofNames, maFilename);
+            LmtMaFromStorageFile lmtMaProducer(inputConnectors, mySubject, dataLocations.getLmtFile(), maFilename);
 
-               string externalTorqueFilename(dataLocations.getExternalTorqueFile());
-               ExternalTorquesFromStorageFile externalTorquesProducer(inputConnectors, mySubject, externalTorqueFilename);
+            string externalTorqueFilename(dataLocations.getExternalTorqueFile());
+            ExternalTorquesFromStorageFile externalTorquesProducer(inputConnectors, mySubject, externalTorqueFilename);
 
-               // 2b. define the thread consuming the output sources
-               vector<string> valuesToWrite = { "Activations", "FiberLenghts", "FiberVelocities", "MuscleForces", "Torques", "AdjustedEmgs" };
-               QueuesToStorageFiles queuesToStorageFiles(inputConnectors, mySubject, valuesToWrite, outputDirectory);
+            // 2b. define the thread consuming the output sources
+            vector<string> valuesToWrite = { "Activations", "FiberLenghts", "FiberVelocities", "MuscleForces", "Torques", "AdjustedEmgs" };
+            QueuesToStorageFiles queuesToStorageFiles(inputConnectors, mySubject, valuesToWrite, outputDirectory);
 
-               // 3. define the model simulator
-               vector<string> valuesToLog = { "Activations", "FiberLenghts", "FiberVelocities", "MuscleForces", "Torques", "AdjustedEmgs" };
+            // 3. define the model simulator
+            vector<string> valuesToLog = { "Activations", "FiberLenghts", "FiberVelocities", "MuscleForces", "Torques", "AdjustedEmgs" };
 
-               inputConnectors.doneWithSubscription.setCount(5);
-               CEINMS::OutputConnectors::doneWithExecution.setCount(2);
+            inputConnectors.doneWithSubscription.setCount(5);
+            CEINMS::OutputConnectors::doneWithExecution.setCount(2);
 
-               // 4. define the optimiser
-               typedef Hybrid::ErrorMinimizerAnnealing<MyNMSmodel> MyErrorMinimizer;
-               MyErrorMinimizer errorMinimizer(mySubject);
-               HybridWeightings weightings;
-               executionCfg.getHybridWeightings(weightings.alpha, weightings.beta, weightings.gamma);
-               errorMinimizer.setWeightings(weightings);
-               vector<string> toPredict, toTrack;
-               executionCfg.getMusclesToPredict(toPredict);
-               executionCfg.getMusclesToTrack(toTrack);
-               errorMinimizer.setMusclesNamesWithEmgToPredict(toPredict);
-               errorMinimizer.setMusclesNamesWithEmgToTrack(toTrack);
-               double rt, t, epsilon;
-               unsigned noEpsilon, ns, nt, maxNoEval;
-               executionCfg.getAnnealingParameters(nt, ns, rt, t, maxNoEval, epsilon, noEpsilon);
-               errorMinimizer.setAnnealingParameters(nt, ns, rt, t, maxNoEval, epsilon, noEpsilon);
+            // 4. define the optimiser
+            typedef Hybrid::ErrorMinimizerAnnealing<MyNMSmodel> MyErrorMinimizer;
+            MyErrorMinimizer errorMinimizer(mySubject);
+            HybridWeightings weightings;
+            executionCfg.getHybridWeightings(weightings.alpha, weightings.beta, weightings.gamma);
+            errorMinimizer.setWeightings(weightings);
+            vector<string> toPredict, toTrack;
+            executionCfg.getMusclesToPredict(toPredict);
+            executionCfg.getMusclesToTrack(toTrack);
+            errorMinimizer.setMusclesNamesWithEmgToPredict(toPredict);
+            errorMinimizer.setMusclesNamesWithEmgToTrack(toTrack);
+            double rt, t, epsilon;
+            unsigned noEpsilon, ns, nt, maxNoEval;
+            executionCfg.getAnnealingParameters(nt, ns, rt, t, maxNoEval, epsilon, noEpsilon);
+            errorMinimizer.setAnnealingParameters(nt, ns, rt, t, maxNoEval, epsilon, noEpsilon);
 
-               ModelEvaluationHybrid<MyNMSmodel, MyErrorMinimizer, LoggerOnQueues> simulator(inputConnectors, mySubject, errorMinimizer, valuesToLog);
+            ModelEvaluationHybrid<MyNMSmodel, MyErrorMinimizer, LoggerOnQueues> simulator(inputConnectors, mySubject, errorMinimizer, valuesToLog);
 
 
-               // 5. start the threads
-               std::thread emgProdThread(std::ref(emgProducer));
-               std::thread externalTorquesProdThread(std::ref(externalTorquesProducer));
-               std::thread lmtMaProdThread(std::ref(lmtMaProducer));
-               std::thread simulatorThread(std::ref(simulator));
-               std::thread queuesToStorageFilesThread(std::ref(queuesToStorageFiles));
+            // 5. start the threads
+            std::thread emgProdThread(std::ref(emgProducer));
+            std::thread externalTorquesProdThread(std::ref(externalTorquesProducer));
+            std::thread lmtMaProdThread(std::ref(lmtMaProducer));
+            std::thread simulatorThread(std::ref(simulator));
+            std::thread queuesToStorageFilesThread(std::ref(queuesToStorageFiles));
 
-               emgProdThread.join();
-               lmtMaProdThread.join();
-               externalTorquesProdThread.join();
-               simulatorThread.join();
-               queuesToStorageFilesThread.join();
-               break;
-         } 
+            emgProdThread.join();
+            lmtMaProdThread.join();
+            externalTorquesProdThread.join();
+            simulatorThread.join();
+            queuesToStorageFilesThread.join();
+            break;
+        } 
 
+
+        case NMSModelCfg::OpenLoopPiecewiseActivationStiffTendonOnline: {
+
+            // 1. define the model
+            typedef NMSmodel<PiecewiseActivation, StiffTendon, CurveMode::Online> MyNMSmodel;
+            MyNMSmodel mySubject;
+            setupSubject(mySubject, subjectFile);
+
+            // 2. define the thread connecting with the input sources          
+            string emgFilename(dataLocations.getExcitationsFile());
+            EMGFromFile emgProducer(inputConnectors, mySubject, emgFilename, emgGeneratorFile);
+
+            vector< string > dofNames;
+            mySubject.getDoFNames(dofNames);
+            vector< string > maFilename;
+            sortMaFilenames(dataLocations.getMaFiles(), dofNames, maFilename);
+            LmtMaFromStorageFile lmtMaProducer(inputConnectors, mySubject, dataLocations.getLmtFile(), maFilename);
+
+            string externalTorqueFilename(dataLocations.getExternalTorqueFile());
+            ExternalTorquesFromStorageFile externalTorquesProducer(inputConnectors, mySubject, externalTorqueFilename);
+
+            // 2b. define the thread consuming the output sources
+            vector<string> valuesToWrite = { "Activations", "FiberLenghts", "FiberVelocities", "MuscleForces", "Torques" };
+            QueuesToStorageFiles queuesToStorageFiles(inputConnectors, mySubject, valuesToWrite, outputDirectory);
+
+            // 3. define the model simulator
+            vector<string> valuesToLog = { "Activations", "FiberLenghts", "FiberVelocities", "MuscleForces", "Torques" };
+            ModelEvaluationOnline<MyNMSmodel, LoggerOnQueues> simulator(inputConnectors, mySubject, valuesToLog);
+
+            inputConnectors.doneWithSubscription.setCount(5);
+            CEINMS::OutputConnectors::doneWithExecution.setCount(2);
+
+            // 4. start the threads
+            std::thread emgProdThread(std::ref(emgProducer));
+            std::thread externalTorquesProdThread(std::ref(externalTorquesProducer));
+            std::thread lmtMaProdThread(std::ref(lmtMaProducer));
+            std::thread simulatorThread(std::ref(simulator));
+            std::thread queuesToStorageFilesThread(std::ref(queuesToStorageFiles));
+
+            emgProdThread.join();
+            lmtMaProdThread.join();
+            externalTorquesProdThread.join();
+            simulatorThread.join();
+            queuesToStorageFilesThread.join();
+
+            break;
+        }
+
+        case NMSModelCfg::OpenLoopPiecewiseActivationStiffTendonOffline: {
+
+            // 1. define the model
+            typedef NMSmodel<PiecewiseActivation, StiffTendon, CurveMode::Offline> MyNMSmodel;
+            MyNMSmodel mySubject;
+            setupSubject(mySubject, subjectFile);
+
+            // 2. define the thread connecting with the input sources          
+            string emgFilename(dataLocations.getExcitationsFile());
+            EMGFromFile emgProducer(inputConnectors, mySubject, emgFilename, emgGeneratorFile);
+
+            vector< string > dofNames;
+            mySubject.getDoFNames(dofNames);
+            vector< string > maFilename;
+            sortMaFilenames(dataLocations.getMaFiles(), dofNames, maFilename);
+            LmtMaFromStorageFile lmtMaProducer(inputConnectors, mySubject, dataLocations.getLmtFile(), maFilename);
+
+            string externalTorqueFilename(dataLocations.getExternalTorqueFile());
+            ExternalTorquesFromStorageFile externalTorquesProducer(inputConnectors, mySubject, externalTorqueFilename);
+
+            // 2b. define the thread consuming the output sources
+            vector<string> valuesToWrite = { "Activations", "FiberLenghts", "FiberVelocities", "MuscleForces", "Torques" };
+            QueuesToStorageFiles queuesToStorageFiles(inputConnectors, mySubject, valuesToWrite, outputDirectory);
+
+            // 3. define the model simulator
+            vector<string> valuesToLog = { "Activations", "FiberLenghts", "FiberVelocities", "MuscleForces", "Torques" };
+            ModelEvaluationOffline<MyNMSmodel, LoggerOnQueues> simulator(inputConnectors, mySubject, valuesToLog);
+
+            inputConnectors.doneWithSubscription.setCount(5);
+            CEINMS::OutputConnectors::doneWithExecution.setCount(2);
+
+            // 4. start the threads
+            std::thread emgProdThread(std::ref(emgProducer));
+            std::thread externalTorquesProdThread(std::ref(externalTorquesProducer));
+            std::thread lmtMaProdThread(std::ref(lmtMaProducer));
+            std::thread simulatorThread(std::ref(simulator));
+            std::thread queuesToStorageFilesThread(std::ref(queuesToStorageFiles));
+
+            emgProdThread.join();
+            lmtMaProdThread.join();
+            externalTorquesProdThread.join();
+            simulatorThread.join();
+            queuesToStorageFilesThread.join();
+
+            break;
+        }
+   
+        case NMSModelCfg::OpenLoopPiecewiseActivationElasticTendonBiSecOnline: {
+            
+            // 1. define the model
+            typedef NMSmodel<PiecewiseActivation, ElasticTendon_BiSec, CurveMode::Online> MyNMSmodel;
+            MyNMSmodel mySubject;
+            setupSubject(mySubject, subjectFile);
+
+            // 2. define the thread connecting with the input sources          
+            string emgFilename(dataLocations.getExcitationsFile());
+            EMGFromFile emgProducer(inputConnectors, mySubject, emgFilename, emgGeneratorFile);
+
+            vector< string > dofNames;
+            mySubject.getDoFNames(dofNames);
+            vector< string > maFilename;
+            sortMaFilenames(dataLocations.getMaFiles(), dofNames, maFilename);
+            LmtMaFromStorageFile lmtMaProducer(inputConnectors, mySubject, dataLocations.getLmtFile(), maFilename);
+
+            string externalTorqueFilename(dataLocations.getExternalTorqueFile());
+            ExternalTorquesFromStorageFile externalTorquesProducer(inputConnectors, mySubject, externalTorqueFilename);
+
+            // 2b. define the thread consuming the output sources
+            vector<string> valuesToWrite = { "Activations", "FiberLenghts", "FiberVelocities", "MuscleForces", "Torques" };
+            QueuesToStorageFiles queuesToStorageFiles(inputConnectors, mySubject, valuesToWrite, outputDirectory);
+
+            // 3. define the model simulator
+            vector<string> valuesToLog = { "Activations", "FiberLenghts", "FiberVelocities", "MuscleForces", "Torques" };
+            ModelEvaluationOnline<MyNMSmodel, LoggerOnQueues> simulator(inputConnectors, mySubject, valuesToLog);
+
+            inputConnectors.doneWithSubscription.setCount(5);
+            CEINMS::OutputConnectors::doneWithExecution.setCount(2);
+
+            // 4. start the threads
+            std::thread emgProdThread(std::ref(emgProducer));
+            std::thread externalTorquesProdThread(std::ref(externalTorquesProducer));
+            std::thread lmtMaProdThread(std::ref(lmtMaProducer));
+            std::thread simulatorThread(std::ref(simulator));
+            std::thread queuesToStorageFilesThread(std::ref(queuesToStorageFiles));
+
+            emgProdThread.join();
+            lmtMaProdThread.join();
+            externalTorquesProdThread.join();
+            simulatorThread.join();
+            queuesToStorageFilesThread.join();
+
+            break;   
+        }
+
+        case NMSModelCfg::OpenLoopPiecewiseActivationElasticTendonBiSecOffline: {
+          
+            // 1. define the model
+            typedef NMSmodel<PiecewiseActivation, ElasticTendon_BiSec, CurveMode::Offline> MyNMSmodel;
+            MyNMSmodel mySubject;
+            setupSubject(mySubject, subjectFile);
+
+            // 2. define the thread connecting with the input sources          
+            string emgFilename(dataLocations.getExcitationsFile());
+            EMGFromFile emgProducer(inputConnectors, mySubject, emgFilename, emgGeneratorFile);
+
+            vector< string > dofNames;
+            mySubject.getDoFNames(dofNames);
+            vector< string > maFilename;
+            sortMaFilenames(dataLocations.getMaFiles(), dofNames, maFilename);
+            LmtMaFromStorageFile lmtMaProducer(inputConnectors, mySubject, dataLocations.getLmtFile(), maFilename);
+
+            string externalTorqueFilename(dataLocations.getExternalTorqueFile());
+            ExternalTorquesFromStorageFile externalTorquesProducer(inputConnectors, mySubject, externalTorqueFilename);
+
+            // 2b. define the thread consuming the output sources
+            vector<string> valuesToWrite = { "Activations", "FiberLenghts", "FiberVelocities", "MuscleForces", "Torques" };
+            QueuesToStorageFiles queuesToStorageFiles(inputConnectors, mySubject, valuesToWrite, outputDirectory);
+
+            // 3. define the model simulator
+            vector<string> valuesToLog = { "Activations", "FiberLenghts", "FiberVelocities", "MuscleForces", "Torques" };
+            ModelEvaluationOffline<MyNMSmodel, LoggerOnQueues> simulator(inputConnectors, mySubject, valuesToLog);
+
+            inputConnectors.doneWithSubscription.setCount(5);
+            CEINMS::OutputConnectors::doneWithExecution.setCount(2);
+
+            // 4. start the threads
+            std::thread emgProdThread(std::ref(emgProducer));
+            std::thread externalTorquesProdThread(std::ref(externalTorquesProducer));
+            std::thread lmtMaProdThread(std::ref(lmtMaProducer));
+            std::thread simulatorThread(std::ref(simulator));
+            std::thread queuesToStorageFilesThread(std::ref(queuesToStorageFiles));
+
+            emgProdThread.join();
+            lmtMaProdThread.join();
+            externalTorquesProdThread.join();
+            simulatorThread.join();
+            queuesToStorageFilesThread.join();
+
+            break;
+        }
+
+
+        case NMSModelCfg::HybridPiecewiseActivationStiffTendonOnline: {
+            // 1. define the model
+            typedef NMSmodel<PiecewiseActivation, StiffTendon, CurveMode::Online> MyNMSmodel;
+            MyNMSmodel mySubject;
+            setupSubject(mySubject, subjectFile);
+
+            // 2. define the thread connecting with the input sources          
+            string emgFilename(dataLocations.getExcitationsFile());
+            EMGFromFile emgProducer(inputConnectors, mySubject, emgFilename, emgGeneratorFile);
+
+            vector< string > dofNames;
+            mySubject.getDoFNames(dofNames);
+            vector< string > maFilename;
+            sortMaFilenames(dataLocations.getMaFiles(), dofNames, maFilename);
+            LmtMaFromStorageFile lmtMaProducer(inputConnectors, mySubject, dataLocations.getLmtFile(), maFilename);
+
+            string externalTorqueFilename(dataLocations.getExternalTorqueFile());
+            ExternalTorquesFromStorageFile externalTorquesProducer(inputConnectors, mySubject, externalTorqueFilename);
+
+            // 2b. define the thread consuming the output sources
+            vector<string> valuesToWrite = { "Activations", "FiberLenghts", "FiberVelocities", "MuscleForces", "Torques", "AdjustedEmgs" };
+            QueuesToStorageFiles queuesToStorageFiles(inputConnectors, mySubject, valuesToWrite, outputDirectory);
+
+            // 3. define the model simulator
+            vector<string> valuesToLog = { "Activations", "FiberLenghts", "FiberVelocities", "MuscleForces", "Torques", "AdjustedEmgs" };
+
+            inputConnectors.doneWithSubscription.setCount(5);
+            CEINMS::OutputConnectors::doneWithExecution.setCount(2);
+
+            // 4. define the optimiser
+            typedef Hybrid::ErrorMinimizerAnnealing<MyNMSmodel> MyErrorMinimizer;
+            MyErrorMinimizer errorMinimizer(mySubject);
+            HybridWeightings weightings;
+            executionCfg.getHybridWeightings(weightings.alpha, weightings.beta, weightings.gamma);
+            errorMinimizer.setWeightings(weightings);
+            vector<string> toPredict, toTrack;
+            executionCfg.getMusclesToPredict(toPredict);
+            executionCfg.getMusclesToTrack(toTrack);
+            errorMinimizer.setMusclesNamesWithEmgToPredict(toPredict);
+            errorMinimizer.setMusclesNamesWithEmgToTrack(toTrack);
+            double rt, t, epsilon;
+            unsigned noEpsilon, ns, nt, maxNoEval;
+            executionCfg.getAnnealingParameters(nt, ns, rt, t, maxNoEval, epsilon, noEpsilon);
+            errorMinimizer.setAnnealingParameters(nt, ns, rt, t, maxNoEval, epsilon, noEpsilon);
+
+            ModelEvaluationHybrid<MyNMSmodel, MyErrorMinimizer, LoggerOnQueues> simulator(inputConnectors, mySubject, errorMinimizer, valuesToLog);
+
+
+            // 5. start the threads
+            std::thread emgProdThread(std::ref(emgProducer));
+            std::thread externalTorquesProdThread(std::ref(externalTorquesProducer));
+            std::thread lmtMaProdThread(std::ref(lmtMaProducer));
+            std::thread simulatorThread(std::ref(simulator));
+            std::thread queuesToStorageFilesThread(std::ref(queuesToStorageFiles));
+
+            emgProdThread.join();
+            lmtMaProdThread.join();
+            externalTorquesProdThread.join();
+            simulatorThread.join();
+            queuesToStorageFilesThread.join();
+            break;
+        }
+
+        case NMSModelCfg::HybridPiecewiseActivationElasticTendonBiSecOnline: {
+        
+            // 1. define the model
+            typedef NMSmodel<PiecewiseActivation, ElasticTendon_BiSec, CurveMode::Online> MyNMSmodel;
+            MyNMSmodel mySubject;
+            setupSubject(mySubject, subjectFile);
+
+            // 2. define the thread connecting with the input sources          
+            string emgFilename(dataLocations.getExcitationsFile());
+            EMGFromFile emgProducer(inputConnectors, mySubject, emgFilename, emgGeneratorFile);
+
+            vector< string > dofNames;
+            mySubject.getDoFNames(dofNames);
+            vector< string > maFilename;
+            sortMaFilenames(dataLocations.getMaFiles(), dofNames, maFilename);
+            LmtMaFromStorageFile lmtMaProducer(inputConnectors, mySubject, dataLocations.getLmtFile(), maFilename);
+
+            string externalTorqueFilename(dataLocations.getExternalTorqueFile());
+            ExternalTorquesFromStorageFile externalTorquesProducer(inputConnectors, mySubject, externalTorqueFilename);
+
+            // 2b. define the thread consuming the output sources
+            vector<string> valuesToWrite = { "Activations", "FiberLenghts", "FiberVelocities", "MuscleForces", "Torques", "AdjustedEmgs" };
+            QueuesToStorageFiles queuesToStorageFiles(inputConnectors, mySubject, valuesToWrite, outputDirectory);
+
+            // 3. define the model simulator
+            vector<string> valuesToLog = { "Activations", "FiberLenghts", "FiberVelocities", "MuscleForces", "Torques", "AdjustedEmgs" };
+
+            inputConnectors.doneWithSubscription.setCount(5);
+            CEINMS::OutputConnectors::doneWithExecution.setCount(2);
+
+            // 4. define the optimiser
+            typedef Hybrid::ErrorMinimizerAnnealing<MyNMSmodel> MyErrorMinimizer;
+            MyErrorMinimizer errorMinimizer(mySubject);
+            HybridWeightings weightings;
+            executionCfg.getHybridWeightings(weightings.alpha, weightings.beta, weightings.gamma);
+            errorMinimizer.setWeightings(weightings);
+            vector<string> toPredict, toTrack;
+            executionCfg.getMusclesToPredict(toPredict);
+            executionCfg.getMusclesToTrack(toTrack);
+            errorMinimizer.setMusclesNamesWithEmgToPredict(toPredict);
+            errorMinimizer.setMusclesNamesWithEmgToTrack(toTrack);
+            double rt, t, epsilon;
+            unsigned noEpsilon, ns, nt, maxNoEval;
+            executionCfg.getAnnealingParameters(nt, ns, rt, t, maxNoEval, epsilon, noEpsilon);
+            errorMinimizer.setAnnealingParameters(nt, ns, rt, t, maxNoEval, epsilon, noEpsilon);
+
+            ModelEvaluationHybrid<MyNMSmodel, MyErrorMinimizer, LoggerOnQueues> simulator(inputConnectors, mySubject, errorMinimizer, valuesToLog);
+
+
+            // 5. start the threads
+            std::thread emgProdThread(std::ref(emgProducer));
+            std::thread externalTorquesProdThread(std::ref(externalTorquesProducer));
+            std::thread lmtMaProdThread(std::ref(lmtMaProducer));
+            std::thread simulatorThread(std::ref(simulator));
+            std::thread queuesToStorageFilesThread(std::ref(queuesToStorageFiles));
+
+            emgProdThread.join();
+            lmtMaProdThread.join();
+            externalTorquesProdThread.join();
+            simulatorThread.join();
+            queuesToStorageFilesThread.join();
+            break;
+        }
 
         default:
             std::cout << "Implementation not available yet. Verify you XML configuration file\n";
