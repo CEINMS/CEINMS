@@ -24,7 +24,7 @@ set(ceinms_common_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR} CACHE STRING "Include
 mark_as_advanced(ceinms_common_INCLUDE_DIRS)
 
 # Install
-install(FILES ${common_HEADERS} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}) #should add namespace
+install(FILES ${Common_HEADERS} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}) #should add namespace
 install(TARGETS ceinms_common
         EXPORT CEINMSTargets
         RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}

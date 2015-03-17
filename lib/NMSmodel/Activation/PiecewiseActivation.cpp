@@ -38,9 +38,20 @@ void PiecewiseActivation::setShapeFactor (double shapeFactor) {
 }
 
 
-void PiecewiseActivation::setEmg(double emg) {
+bool PiecewiseActivation::setEmg(double emg) {
     
     emg_ = emg;
+    if ( emg_ > 1 )
+    {
+        emg_ = 1;
+        return false;
+    }
+    if ( emg_ < 0 )
+    {
+        emg_ = 0;
+        return false;
+    }
+    return true;
 }
 
 

@@ -19,7 +19,7 @@ public:
     
     void   setShapeFactor(double shapeFactor);
     void   setFilterParameters(double c1, double c2);
-    void   setEmg(double emg);
+    bool   setEmg(double emg);
     void   updateActivation();
     void   resetState();
     void   pushState();

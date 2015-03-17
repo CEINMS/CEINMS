@@ -169,7 +169,8 @@ void MTU<Activation, Tendon, mode>::setTime(const double& time) {
 template<typename Activation, typename Tendon, CurveMode::Mode mode>
 void MTU<Activation, Tendon, mode>::setEmg(double emg) {
  
-    activationDynamic_.setEmg(emg);
+    if ( !activationDynamic_.setEmg(emg) )
+        std::cout << "WARNING! Wrong excitation data provided for muscle " << getMuscleName() << ", it should be between 0 and 1" << std::endl;
 }
 
 

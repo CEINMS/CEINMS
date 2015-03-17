@@ -34,9 +34,20 @@ void ExponentialActivation::setShapeFactor (double shapeFactor) {
     expShapeFactor_ = exp(shapeFactor_);
 }
 
-void ExponentialActivation::setEmg (double emg) {
+bool ExponentialActivation::setEmg (double emg) {
     
     emg_ = emg;
+    if ( emg_ > 1 )
+    {
+        emg_ = 1;
+        return false;
+    }
+    if ( emg_ < 0 )
+    {
+        emg_ = 0;
+        return false;
+    }
+    return true;
 }
 
 
