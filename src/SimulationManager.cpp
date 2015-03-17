@@ -1,4 +1,13 @@
-#include "SimulationManager.h"
+//__________________________________________________________________________
+// Author(s): Claudio Pizzolato, Monica Reggiani - March 2015
+// email:  claudio.pizzolato@griffithuni.edu.au
+//
+// DO NOT REDISTRIBUTE WITHOUT PERMISSION
+//__________________________________________________________________________
+//
+
+
+
 #include "CeinmsSetupXmlReader.h"
 #include "NMSmodel.h"
 
@@ -50,7 +59,7 @@ namespace CEINMS {
     }
 
 
-    template <typename NMSmodelT, template <typename, typename> typename ModelEvaluatorT, typename LoggerT>
+    template <typename NMSmodelT, template <typename, typename> class ModelEvaluatorT, typename LoggerT>
     bool SimulationManager::runOpenLoop() {
 
         //Monica is going to kill me, but I'm declaring Input/Output connectors in the stack... it's going to work fine!
@@ -62,20 +71,20 @@ namespace CEINMS {
 
         // 2. define the thread connecting with the input sources          
         string emgFilename(dataLocations_.getExcitationsFile());
-        EMGFromFile emgProducer(inputConnectors, mySubject, emgFilename, emgGeneratorFile);
+        EMGFromFile emgProducer(inputConnectors, mySubject, emgFilename, emgGeneratorFile_);
 
         vector< string > dofNames;
         mySubject.getDoFNames(dofNames);
         vector< string > maFilename;
-        sortMaFilenames(dataLocations.getMaFiles(), dofNames, maFilename);
-        LmtMaFromStorageFile lmtMaProducer(inputConnectors, mySubject, dataLocations.getLmtFile(), maFilename);
+        sortMaFilenames(dataLocations_.getMaFiles(), dofNames, maFilename);
+        LmtMaFromStorageFile lmtMaProducer(inputConnectors, mySubject, dataLocations_.getLmtFile(), maFilename);
 
-        string externalTorqueFilename(dataLocations.getExternalTorqueFile());
+        string externalTorqueFilename(dataLocations_.getExternalTorqueFile());
         ExternalTorquesFromStorageFile externalTorquesProducer(inputConnectors, mySubject, externalTorqueFilename);
 
         // 2b. define the thread consuming the output sources
         vector<string> valuesToWrite = { "Activations", "FiberLenghts", "FiberVelocities", "MuscleForces", "Torques" };
-        QueuesToStorageFiles queuesToStorageFiles(inputConnectors, outputConnectors, mySubject, valuesToWrite, outputDirectory);
+        QueuesToStorageFiles queuesToStorageFiles(inputConnectors, outputConnectors, mySubject, valuesToWrite, outputDirectory_);
 
         // 3. define the model simulator
         vector<string> valuesToLog = { "Activations", "FiberLenghts", "FiberVelocities", "MuscleForces", "Torques" };
@@ -111,21 +120,21 @@ namespace CEINMS {
         setupSubject(mySubject, subjectFile_);
 
         // 2. define the thread connecting with the input sources          
-        string emgFilename(dataLocations.getExcitationsFile());
-        EMGFromFile emgProducer(inputConnectors, mySubject, emgFilename, emgGeneratorFile);
+        string emgFilename(dataLocations_.getExcitationsFile());
+        EMGFromFile emgProducer(inputConnectors, mySubject, emgFilename, emgGeneratorFile_);
 
         vector< string > dofNames;
         mySubject.getDoFNames(dofNames);
         vector< string > maFilename;
-        sortMaFilenames(dataLocations.getMaFiles(), dofNames, maFilename);
-        LmtMaFromStorageFile lmtMaProducer(inputConnectors, mySubject, dataLocations.getLmtFile(), maFilename);
+        sortMaFilenames(dataLocations_.getMaFiles(), dofNames, maFilename);
+        LmtMaFromStorageFile lmtMaProducer(inputConnectors, mySubject, dataLocations_.getLmtFile(), maFilename);
 
-        string externalTorqueFilename(dataLocations.getExternalTorqueFile());
+        string externalTorqueFilename(dataLocations_.getExternalTorqueFile());
         ExternalTorquesFromStorageFile externalTorquesProducer(inputConnectors, mySubject, externalTorqueFilename);
 
         // 2b. define the thread consuming the output sources
         vector<string> valuesToWrite = { "Activations", "FiberLenghts", "FiberVelocities", "MuscleForces", "Torques", "AdjustedEmgs" };
-        QueuesToStorageFiles queuesToStorageFiles(inputConnectors, outputConnectors, mySubject, valuesToWrite, outputDirectory);
+        QueuesToStorageFiles queuesToStorageFiles(inputConnectors, outputConnectors, mySubject, valuesToWrite, outputDirectory_);
 
         // 3. define the model simulator
         vector<string> valuesToLog = { "Activations", "FiberLenghts", "FiberVelocities", "MuscleForces", "Torques", "AdjustedEmgs" };
@@ -134,22 +143,22 @@ namespace CEINMS {
         outputConnectors.doneWithExecution.setCount(2);
 
         // 4. define the optimiser
-        typedef Hybrid::ErrorMinimizerAnnealing<MyNMSmodel> MyErrorMinimizer;
+        typedef Hybrid::ErrorMinimizerAnnealing<NMSmodelT> MyErrorMinimizer;
         MyErrorMinimizer errorMinimizer(mySubject);
         HybridWeightings weightings;
-        executionCfg.getHybridWeightings(weightings.alpha, weightings.beta, weightings.gamma);
+        executionCfg_.getHybridWeightings(weightings.alpha, weightings.beta, weightings.gamma);
         errorMinimizer.setWeightings(weightings);
         vector<string> toPredict, toTrack;
-        executionCfg.getMusclesToPredict(toPredict);
-        executionCfg.getMusclesToTrack(toTrack);
+        executionCfg_.getMusclesToPredict(toPredict);
+        executionCfg_.getMusclesToTrack(toTrack);
         errorMinimizer.setMusclesNamesWithEmgToPredict(toPredict);
         errorMinimizer.setMusclesNamesWithEmgToTrack(toTrack);
         double rt, t, epsilon;
         unsigned noEpsilon, ns, nt, maxNoEval;
-        executionCfg.getAnnealingParameters(nt, ns, rt, t, maxNoEval, epsilon, noEpsilon);
+        executionCfg_.getAnnealingParameters(nt, ns, rt, t, maxNoEval, epsilon, noEpsilon);
         errorMinimizer.setAnnealingParameters(nt, ns, rt, t, maxNoEval, epsilon, noEpsilon);
 
-        ModelEvaluationHybrid<MyNMSmodel, MyErrorMinimizer, LoggerOnQueues> simulator(inputConnectors, outputConnectors, mySubject, errorMinimizer, valuesToLog);
+        ModelEvaluationHybrid<NMSmodelT, MyErrorMinimizer, LoggerOnQueues> simulator(inputConnectors, outputConnectors, mySubject, errorMinimizer, valuesToLog);
 
         // 5. start the threads
         std::thread emgProdThread(std::ref(emgProducer));
@@ -235,6 +244,9 @@ namespace CEINMS {
 
         return exitFlag;
     }
+
+
+
 
 
 }
