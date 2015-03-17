@@ -20,8 +20,8 @@ void QueuesToStorageFiles::operator()() {
   
     for (auto& it:valuesToWrite_) {
 
-        auto q = CEINMS::OutputConnectors::logQueues.find(it);
-        if (q == CEINMS::OutputConnectors::logQueues.end() ) {
+        auto q = outputConnectors_.logQueues.find(it);
+        if (q == outputConnectors_.logQueues.end()) {
             std::cout << it << " queue was not found\n";
             exit(EXIT_FAILURE);
         } 
@@ -33,15 +33,15 @@ void QueuesToStorageFiles::operator()() {
     
     inputConnectors_.doneWithSubscription.wait();
     
-    CEINMS::OutputConnectors::doneWithExecution.wait();
+    outputConnectors_.doneWithExecution.wait();
     
     
       for (auto& currentValue:valuesToWrite_) {
         
-       auto currentQueue = CEINMS::OutputConnectors::logQueues.find(currentValue);
-       if (currentQueue == CEINMS::OutputConnectors::logQueues.end() ) {
-           std::cout << currentValue << " queue was not found\n";
-           exit(EXIT_FAILURE);
+          auto currentQueue = outputConnectors_.logQueues.find(currentValue);
+          if (currentQueue == outputConnectors_.logQueues.end()) {
+              std::cout << currentValue << " queue was not found\n";
+              exit(EXIT_FAILURE);
        } 
       
        
@@ -49,7 +49,7 @@ void QueuesToStorageFiles::operator()() {
        CEINMS::OutputConnectors::FrameType currentFrame;
        std::vector< CEINMS::OutputConnectors::FrameType > dataToWrite;
        currentFrame = currentQueue->second->pop(); 
-       while (currentFrame.time != CEINMS::OutputConnectors::TimePlaceholderForEndOfData) {
+       while (currentFrame.time != outputConnectors_.TimePlaceholderForEndOfData) {
          dataToWrite.push_back(currentFrame);
          currentFrame = currentQueue->second->pop();
        }

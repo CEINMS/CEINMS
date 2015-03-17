@@ -8,6 +8,8 @@
 //
 
 #include "InputConnectors.h"
+#include "OutputConnectors.h"
+using namespace CEINMS;
 
 #include <vector>
 using std::vector;
@@ -16,8 +18,8 @@ using std::string;
 
 
 template <typename Logger>
-ModelEvaluationBase<Logger>::ModelEvaluationBase(CEINMS::InputConnectors& inputConnectors, const vector<string>& valuesToLog)
-    :inputConnectors_(inputConnectors), logger(valuesToLog)
+ModelEvaluationBase<Logger>::ModelEvaluationBase(InputConnectors& inputConnectors, OutputConnectors& outputConnectors, const vector<string>& valuesToLog)
+    :inputConnectors_(inputConnectors), outputConnectors_(outputConnectors), logger(outputConnectors, valuesToLog)
 { }
 
 
@@ -90,6 +92,12 @@ template <typename Logger>
 CEINMS::InputConnectors::FrameType ModelEvaluationBase<Logger>::getExternalTorquesFromInputQueue(){
     return inputConnectors_.queueExternalTorques.pop();
 }
+
+template <typename Logger>
+void ModelEvaluationBase<Logger>::doneWithExecution(){
+    outputConnectors_.doneWithExecution.wait();
+}
+
 
 
 template <typename Logger>

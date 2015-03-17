@@ -12,16 +12,18 @@
 
 #include <vector>
 #include <string>
+#include "OutputConnectors.h"
 
 class LoggerOnQueues {
 public:
     LoggerOnQueues() = delete; 
     LoggerOnQueues(const LoggerOnQueues&) = delete;
     LoggerOnQueues& operator=(const LoggerOnQueues&) = delete; 
-    LoggerOnQueues(const std::vector< std::string > & valuesToLog); 
+    LoggerOnQueues(CEINMS::OutputConnectors& outputConnectors, const std::vector< std::string > & valuesToLog); 
     void log(double time, const std::vector< double >& dataToLog, const std::string& queuID);
 
 private:
+    CEINMS::OutputConnectors& outputConnectors_;
    
 };
 

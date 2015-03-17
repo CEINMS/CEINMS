@@ -18,7 +18,7 @@ template <typename NMSmodelT, typename ErrorMinimizerT, typename Logger>
 class ModelEvaluationHybrid : public ModelEvaluationBase<Logger> {
 
 public:
-    ModelEvaluationHybrid(CEINMS::InputConnectors& inputConnectors, NMSmodelT& subject, ErrorMinimizerT& torqueErrorMinimizer, const vector<string>& valuesToLog);
+    ModelEvaluationHybrid(CEINMS::InputConnectors& inputConnectors, CEINMS::OutputConnectors& outputConnectors, NMSmodelT& subject, ErrorMinimizerT& torqueErrorMinimizer, const vector<string>& valuesToLog);
     void setOutputDirectory(const std::string& outputDir);
     void operator()();
     

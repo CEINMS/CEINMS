@@ -8,18 +8,15 @@
 //
 
 
-#include "OutputQueues.h"
+#include "OutputConnectors.h"
 
 #include <map>
 #include <string>
 
 
 namespace CEINMS {
-  namespace OutputConnectors { 
-     
-    std::map< std::string, Concurrency::Queue< FrameType >* > logQueues; 
+    OutputConnectors::OutputConnectors() {}
     
-    Concurrency::Latch doneWithExecution; 
-    };
+    OutputConnectors::~OutputConnectors() {}
 };
 

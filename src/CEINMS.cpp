@@ -25,7 +25,7 @@
 #include "ExternalTorquesFromStorageFile.h"
 #include "ModelEvaluationOnline.h" 
 
-#include "InputConnectors.h"
+//#include "InputConnector.h"
 
 #include "LoggerOnQueues.h"
 #include "QueuesToStorageFiles.h"
@@ -52,6 +52,7 @@ using std::map;
 
 
 CEINMS::InputConnectors inputConnectors;
+CEINMS::OutputConnectors outputConnectors;
 
 template <typename T>
 void setupSubject(T& mySubject, string configurationFile) {
@@ -258,14 +259,14 @@ int main(int argc, char** argv) {
                
             // 2b. define the thread consuming the output sources
             vector<string> valuesToWrite = {"Activations", "FiberLenghts", "FiberVelocities", "MuscleForces", "Torques"};
-            QueuesToStorageFiles queuesToStorageFiles(inputConnectors, mySubject, valuesToWrite, outputDirectory);
+            QueuesToStorageFiles queuesToStorageFiles(inputConnectors, outputConnectors, mySubject, valuesToWrite, outputDirectory);
           
             // 3. define the model simulator
             vector<string> valuesToLog = {"Activations", "FiberLenghts", "FiberVelocities", "MuscleForces", "Torques"};
-            ModelEvaluationOnline<MyNMSmodel, LoggerOnQueues> simulator(inputConnectors, mySubject, valuesToLog);
+            ModelEvaluationOnline<MyNMSmodel, LoggerOnQueues> simulator(inputConnectors, outputConnectors, mySubject, valuesToLog);
      
             inputConnectors.doneWithSubscription.setCount(5);
-            CEINMS::OutputConnectors::doneWithExecution.setCount(2);
+            outputConnectors.doneWithExecution.setCount(2);
           
             // 4. start the threads
             std::thread emgProdThread(std::ref(emgProducer)); 
@@ -305,14 +306,14 @@ int main(int argc, char** argv) {
 
             // 2b. define the thread consuming the output sources
             vector<string> valuesToWrite = { "Activations", "FiberLenghts", "FiberVelocities", "MuscleForces", "Torques" };
-            QueuesToStorageFiles queuesToStorageFiles(inputConnectors, mySubject, valuesToWrite, outputDirectory);
+            QueuesToStorageFiles queuesToStorageFiles(inputConnectors, outputConnectors, mySubject, valuesToWrite, outputDirectory);
 
             // 3. define the model simulator
             vector<string> valuesToLog = { "Activations", "FiberLenghts", "FiberVelocities", "MuscleForces", "Torques" };
-            ModelEvaluationOffline<MyNMSmodel, LoggerOnQueues> simulator(inputConnectors, mySubject, valuesToLog);
+            ModelEvaluationOffline<MyNMSmodel, LoggerOnQueues> simulator(inputConnectors, outputConnectors, mySubject, valuesToLog);
 
             inputConnectors.doneWithSubscription.setCount(5);
-            CEINMS::OutputConnectors::doneWithExecution.setCount(2);
+            outputConnectors.doneWithExecution.setCount(2);
 
             // 4. start the threads
             std::thread emgProdThread(std::ref(emgProducer));
@@ -358,7 +359,7 @@ int main(int argc, char** argv) {
         //    vector<string> valuesToLog = { "Activations", "FiberLenghts", "FiberVelocities", "MuscleForces", "Torques" };
         //    ModelEvaluationOnline<MyNMSmodel, LoggerOnQueues> simulator(mySubject, valuesToLog);
 
-        //    CEINMS::InputConnectors::doneWithSubscription.setCount(5);
+        //    CEINMS::inputConnector::doneWithSubscription.setCount(5);
         //    CEINMS::OutputConnectors::doneWithExecution.setCount(2);
 
         //    // 4. start the threads
@@ -406,7 +407,7 @@ int main(int argc, char** argv) {
         //     vector<string> valuesToLog = { "Activations", "FiberLenghts", "FiberVelocities", "MuscleForces", "Torques" };
         //     ModelEvaluationOffline<MyNMSmodel, LoggerOnQueues> simulator(mySubject, valuesToLog);
 
-        //     CEINMS::InputConnectors::doneWithSubscription.setCount(5);
+        //     CEINMS::inputConnector::doneWithSubscription.setCount(5);
         //     CEINMS::OutputConnectors::doneWithExecution.setCount(2);
 
         //     // 4. start the threads
@@ -445,14 +446,14 @@ int main(int argc, char** argv) {
 
              // 2b. define the thread consuming the output sources
              vector<string> valuesToWrite = { "Activations", "FiberLenghts", "FiberVelocities", "MuscleForces", "Torques" };
-             QueuesToStorageFiles queuesToStorageFiles(inputConnectors, mySubject, valuesToWrite, outputDirectory);
+             QueuesToStorageFiles queuesToStorageFiles(inputConnectors, outputConnectors, mySubject, valuesToWrite, outputDirectory);
 
              // 3. define the model simulator
              vector<string> valuesToLog = { "Activations", "FiberLenghts", "FiberVelocities", "MuscleForces", "Torques" };
-             ModelEvaluationOnline<MyNMSmodel, LoggerOnQueues> simulator(inputConnectors, mySubject, valuesToLog);
+             ModelEvaluationOnline<MyNMSmodel, LoggerOnQueues> simulator(inputConnectors, outputConnectors, mySubject, valuesToLog);
 
              inputConnectors.doneWithSubscription.setCount(5);
-             CEINMS::OutputConnectors::doneWithExecution.setCount(2);
+             outputConnectors.doneWithExecution.setCount(2);
 
              // 4. start the threads
              std::thread emgProdThread(std::ref(emgProducer));
@@ -491,14 +492,14 @@ int main(int argc, char** argv) {
 
              // 2b. define the thread consuming the output sources
              vector<string> valuesToWrite = { "Activations", "FiberLenghts", "FiberVelocities", "MuscleForces", "Torques" };
-             QueuesToStorageFiles queuesToStorageFiles(inputConnectors, mySubject, valuesToWrite, outputDirectory);
+             QueuesToStorageFiles queuesToStorageFiles(inputConnectors, outputConnectors, mySubject, valuesToWrite, outputDirectory);
 
              // 3. define the model simulator
              vector<string> valuesToLog = { "Activations", "FiberLenghts", "FiberVelocities", "MuscleForces", "Torques" };
-             ModelEvaluationOffline<MyNMSmodel, LoggerOnQueues> simulator(inputConnectors, mySubject, valuesToLog);
+             ModelEvaluationOffline<MyNMSmodel, LoggerOnQueues> simulator(inputConnectors, outputConnectors, mySubject, valuesToLog);
 
              inputConnectors.doneWithSubscription.setCount(5);
-             CEINMS::OutputConnectors::doneWithExecution.setCount(2);
+             outputConnectors.doneWithExecution.setCount(2);
 
              // 4. start the threads
              std::thread emgProdThread(std::ref(emgProducer));
@@ -540,13 +541,13 @@ int main(int argc, char** argv) {
 
              // 2b. define the thread consuming the output sources
              vector<string> valuesToWrite = { "Activations", "FiberLenghts", "FiberVelocities", "MuscleForces", "Torques", "AdjustedEmgs" };
-             QueuesToStorageFiles queuesToStorageFiles(inputConnectors, mySubject, valuesToWrite, outputDirectory);
+             QueuesToStorageFiles queuesToStorageFiles(inputConnectors, outputConnectors, mySubject, valuesToWrite, outputDirectory);
 
              // 3. define the model simulator
              vector<string> valuesToLog = { "Activations", "FiberLenghts", "FiberVelocities", "MuscleForces", "Torques", "AdjustedEmgs" };
             
              inputConnectors.doneWithSubscription.setCount(5);
-             CEINMS::OutputConnectors::doneWithExecution.setCount(2);
+             outputConnectors.doneWithExecution.setCount(2);
 
              // 4. define the optimiser
              typedef Hybrid::ErrorMinimizerAnnealing<MyNMSmodel> MyErrorMinimizer;
@@ -564,7 +565,7 @@ int main(int argc, char** argv) {
              executionCfg.getAnnealingParameters(nt, ns, rt, t, maxNoEval, epsilon, noEpsilon);
              errorMinimizer.setAnnealingParameters(nt, ns, rt, t, maxNoEval, epsilon, noEpsilon);
              
-             ModelEvaluationHybrid<MyNMSmodel, MyErrorMinimizer, LoggerOnQueues> simulator(inputConnectors, mySubject, errorMinimizer, valuesToLog);
+             ModelEvaluationHybrid<MyNMSmodel, MyErrorMinimizer, LoggerOnQueues> simulator(inputConnectors, outputConnectors, mySubject, errorMinimizer, valuesToLog);
              
              
              // 5. start the threads
@@ -603,13 +604,13 @@ int main(int argc, char** argv) {
 
                // 2b. define the thread consuming the output sources
                vector<string> valuesToWrite = { "Activations", "FiberLenghts", "FiberVelocities", "MuscleForces", "Torques", "AdjustedEmgs" };
-               QueuesToStorageFiles queuesToStorageFiles(inputConnectors, mySubject, valuesToWrite, outputDirectory);
+               QueuesToStorageFiles queuesToStorageFiles(inputConnectors, outputConnectors, mySubject, valuesToWrite, outputDirectory);
 
                // 3. define the model simulator
                vector<string> valuesToLog = { "Activations", "FiberLenghts", "FiberVelocities", "MuscleForces", "Torques", "AdjustedEmgs" };
 
                inputConnectors.doneWithSubscription.setCount(5);
-               CEINMS::OutputConnectors::doneWithExecution.setCount(2);
+               outputConnectors.doneWithExecution.setCount(2);
 
                // 4. define the optimiser
                typedef Hybrid::ErrorMinimizerAnnealing<MyNMSmodel> MyErrorMinimizer;
@@ -627,7 +628,7 @@ int main(int argc, char** argv) {
                executionCfg.getAnnealingParameters(nt, ns, rt, t, maxNoEval, epsilon, noEpsilon);
                errorMinimizer.setAnnealingParameters(nt, ns, rt, t, maxNoEval, epsilon, noEpsilon);
 
-               ModelEvaluationHybrid<MyNMSmodel, MyErrorMinimizer, LoggerOnQueues> simulator(inputConnectors, mySubject, errorMinimizer, valuesToLog);
+               ModelEvaluationHybrid<MyNMSmodel, MyErrorMinimizer, LoggerOnQueues> simulator(inputConnectors, outputConnectors, mySubject, errorMinimizer, valuesToLog);
 
 
                // 5. start the threads
