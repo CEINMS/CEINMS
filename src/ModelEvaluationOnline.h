@@ -19,7 +19,7 @@ class ModelEvaluationOnline : public ModelEvaluationBase<Logger> {
 
 public:
     ModelEvaluationOnline() = delete;
-    ModelEvaluationOnline(CEINMS::InputConnectors& inputConnectors, NMSmodelT& subject, const std::vector< std::string >& valuesToLog); // const std::string& outputDir = "./Output");
+    ModelEvaluationOnline(CEINMS::InputConnectors& inputConnectors, CEINMS::OutputConnectors& outputConnectors, NMSmodelT& subject, const std::vector< std::string >& valuesToLog); // const std::string& outputDir = "./Output");
     void setOutputDirectory(const std::string& outputDir);
 //    void setSubject(NMSmodelT& subject);
     void operator()();

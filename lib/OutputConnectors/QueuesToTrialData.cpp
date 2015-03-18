@@ -20,11 +20,8 @@ void QueuesToTrialData::operator()() {
     for (auto& it : inputConnectors_.queueMomentArms)
         (*it).subscribe();
     inputConnectors_.queueExternalTorques.subscribe();
-
     inputConnectors_.doneWithSubscription.wait();
-
-    CEINMS::OutputConnectors::doneWithExecution.wait();
-
+    outputConnectors_.doneWithExecution.wait();
 
     if (!inputConnectors_.externalTorquesAvailable)
         return;

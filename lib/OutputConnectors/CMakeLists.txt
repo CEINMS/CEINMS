@@ -2,12 +2,12 @@
 
 # List source files
 set(OutputConnectors_SOURCES
-    OutputQueues.cpp
+    OutputConnectors.cpp
     LoggerOnQueues.cpp
     QueuesToTrialData.cpp
 )
 set(OutputConnectors_HEADERS 
-    OutputQueues.h
+    OutputConnectors.h
     LoggerOnQueues.h
     QueuesToTrialData.h
 )

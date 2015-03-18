@@ -8,8 +8,8 @@
 //
 
 
-#ifndef OutputQueues_h
-#define OutputQueues_h
+#ifndef Ceinms_OutputConnectors_h
+#define Ceinms_OutputConnectors_h
 
 #include "Queue.h"
 #include "Latch.h"
@@ -20,16 +20,17 @@
 #include <vector>
 
 namespace CEINMS {
-  namespace OutputConnectors { 
-    
-    typedef std::vector< double > DataType; 
-    typedef QueueData< DataType > FrameType; 
-    
+ class OutputConnectors {
+ public:
+    OutputConnectors();
+    virtual ~OutputConnectors();
+    OutputConnectors(const OutputConnectors&) = delete;
+    using DataType = std::vector< double > ; 
+    using FrameType = QueueData< DataType > ; 
+
     const double TimePlaceholderForEndOfData = std::numeric_limits<double>::infinity();
-    
-    extern std::map< std::string, Concurrency::Queue< FrameType >* > logQueues; 
- 
-    extern Concurrency::Latch doneWithExecution; 
+    std::map< std::string, Concurrency::Queue< FrameType >* > logQueues; 
+    Concurrency::Latch doneWithExecution; 
     };
 };
 

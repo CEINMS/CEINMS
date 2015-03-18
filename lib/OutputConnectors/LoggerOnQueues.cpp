@@ -8,16 +8,18 @@
 //
 
 #include "LoggerOnQueues.h"
-#include "OutputQueues.h"
+#include "OutputConnectors.h"
 #include <vector>
 #include <string>
 #include <iostream>
+using namespace CEINMS;
 
-LoggerOnQueues::LoggerOnQueues(const std::vector< std::string >& valuesToLog) 
+LoggerOnQueues::LoggerOnQueues(OutputConnectors& outputConnector, const std::vector< std::string >& valuesToLog):
+outputConnectors_(outputConnector)
 {
   
     for (auto& it: valuesToLog) 
-        CEINMS::OutputConnectors::logQueues.insert(std::make_pair(it, new CEINMS::Concurrency::Queue< CEINMS::OutputConnectors::FrameType>) ); 
+        outputConnectors_.logQueues.insert(std::make_pair(it, new CEINMS::Concurrency::Queue< CEINMS::OutputConnectors::FrameType>) ); 
 
   
 }
@@ -25,13 +27,13 @@ LoggerOnQueues::LoggerOnQueues(const std::vector< std::string >& valuesToLog)
 void LoggerOnQueues::log(double time, const CEINMS::OutputConnectors::DataType& dataToLog, const std::string& valueToLog)
 {
   
-    CEINMS::OutputConnectors::FrameType dataToPush;
+    OutputConnectors::FrameType dataToPush;
     dataToPush.data = dataToLog; 
     dataToPush.time = time; 
     
-    auto currentQueue = CEINMS::OutputConnectors::logQueues.find(valueToLog);
+    auto currentQueue = outputConnectors_.logQueues.find(valueToLog);
 
-    if (currentQueue == CEINMS::OutputConnectors::logQueues.end()) {
+    if (currentQueue == outputConnectors_.logQueues.end()) {
         std::cout << "queue for " << valueToLog << " was not found\n";
         exit(EXIT_FAILURE);
     }
