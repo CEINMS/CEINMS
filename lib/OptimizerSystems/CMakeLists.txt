@@ -5,6 +5,7 @@ project(OptimizationSystems)
 # List source files
 set(OptimizationSystems_HEADERS NMSmodelSystem.h
                                 ParametersInterpreter.h
+								TrialData.h
                         )
 
 set(OptimizationSystems_TEMPLATE_IMPLEMENTATION

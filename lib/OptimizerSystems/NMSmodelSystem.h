@@ -4,6 +4,7 @@
 #include "AbstractOptimizerSystem.h"
 
 #include "ParametersInterpreter.h" //TODO: rename this class
+#include "TrialData.h"
 #include <vector>
 
 namespace CEINMS {
@@ -19,6 +20,8 @@ namespace CEINMS {
         double getF() const { return f_; }
         size_t getNoParameters() { return parameterInterpreter_.getNoParameters(); }
         void getUpperLowerBounds(std::vector<double>& upperBounds, std::vector<double>& lowerBounds) const; 
+        void setTrialData(const std::vector<TrialData>& trialData) { trialData_ = trialData; }
+        void pushTrialData(const TrialData& trialData) { trialData_.emplace_back(trialData); }
 
 
     private:
@@ -29,6 +32,7 @@ namespace CEINMS {
         ParametersInterpreter<NMSmodelT> parameterInterpreter_;
         std::vector<std::string> dofsToCalibrate_;
         double f_;
+        std::vector<TrialData> trialData_;
     };
 }
 

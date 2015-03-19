@@ -57,14 +57,20 @@ namespace CEINMS {
     void NMSmodelSystem<NMSmodelT, ModelEvaluatorT, ObjectiveFunctionT>::evaluate() {
 
         //subjcet has the parameters, model evaluator just runs it
-        modelEvaluator_.evaluateSubject(subject_);
+        //first option trial-by-trial.. but it cannot do the speedup trick... 
+        std::vector<ModelEvaluatorT::EvaluationResults> evalResults;
+        for (auto& trial : trialData_) {
+            modelEvaluator_.evaluateSubject(subject_, trial);
+            //model evaluator save the results in an object that contains all the variables from the simulation
+            evalResults.emplace_back(modelEvaluator_.getResults());
+        }
 
-        //model evaluator save the results in an object that contains all the variables from the simulation
-        auto results(modelEvaluator_.getResults());
-
+        //alternatively use this.. 
+        modelEvaluator_.evaluateSubject(subject_, trialData);
+        evalResults = modelEvaluator_.getResults();
         //the objective function has the task to compare somehow external data and results of the simulation
         // external data is saved in the object, the results are passed each time
-        objectiveFunction_.calculate(results); 
+        objectiveFunction_.calculate(evalResults);
         f_ = objectiveFunction_.getValue();
         //need a way to get the breakdown of the errors from the obj function. There could be a member function that returns a vector<double>
         //and another member function that returns a vector<string> that describes the each entry of the error vector.
