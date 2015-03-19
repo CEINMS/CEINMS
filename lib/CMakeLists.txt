@@ -12,3 +12,4 @@ add_subdirectory(Concurrency) # to be substituted with external repository
 add_subdirectory(InputConnectors)
 add_subdirectory(OutputConnectors)
 add_subdirectory(Optimizers)
+add_subdirectory(OptimizerSystems)

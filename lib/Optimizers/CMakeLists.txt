@@ -23,10 +23,7 @@ add_library(Optimizers STATIC ${Optimizers_SOURCES} ${Optimizers_HEADERS} ${Opti
 
 # target_link_libraries(Calibration xmlInput FileIO)
 target_include_directories( Optimizers
-                             PRIVATE #${NMSmodel_INCLUDE_DIRS}
-                                    # ${Curve_INCLUDE_DIRS}
-                                    # ${FileIO_INCLUDE_DIRS}
-                                     ${ceinms_common_INCLUDE_DIRS})
+                             PRIVATE ${ceinms_common_INCLUDE_DIRS})
 
 # Save path to include directory for "internal" usage
 set(Optimizers_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}  ${ceinms_common_INCLUDE_DIRS} CACHE STRING "Include directories for Optimizers library")
