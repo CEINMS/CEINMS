@@ -13,18 +13,18 @@ class RosenbrockFunction : public AbstractOptimizerSystem {
 public:
     RosenbrockFunction(double a, double b);
     ~RosenbrockFunction() {}
-    void evaluate(const std::vector<double>& parameters);
-    void setStartingParameterSet(const std::vector<double>& x) { startingParameters_ = x; }
-    std::vector<double> getStartingParameterSet() const{ return startingParameters_; }
+    void evaluate();
+    void setParameters(const std::vector<double>& x) { parameters_ = x; }
+    std::vector<double> getParameters() const{ return parameters_; }
     double getF() const { return f_; }
-    unsigned getNoParameters() const { return startingParameters_.size(); }
+    unsigned getNoParameters() const { return parameters_.size(); }
     void getUpperLowerBounds(std::vector<double>& upperBounds, std::vector<double>& lowerBounds) const {
         upperBounds = upperBounds_;
         lowerBounds = lowerBounds_;
     }
 
 private:
-    std::vector<double> startingParameters_;
+    std::vector<double> parameters_;
     double a_, b_, f_;
     std::vector<double> upperBounds_, lowerBounds_;
 };
@@ -32,9 +32,9 @@ private:
 RosenbrockFunction::RosenbrockFunction(double a, double b):
 a_(a), b_(b), upperBounds_({ 10, 10 }), lowerBounds_({ -10, -10 }) { }
 
-void RosenbrockFunction::evaluate(const std::vector<double>& parameters) {
-    double x = parameters.at(0);
-    double y = parameters.at(1);
+void RosenbrockFunction::evaluate() {
+    double x = parameters_.at(0);
+    double y = parameters_.at(1);
     cout << "f(" << x << ", " << y << ") = ";
     f_ = (a_ - x)*(a_ - x) + b_*(y - x*x)*(y - x*x);
     cout << f_ << endl;
@@ -46,7 +46,7 @@ int main() {
     cout << "Testing Simulated Annealing with Rosenbrock function" << endl;
     RosenbrockFunction myFunction(1, 100);
     vector<double> startParameters({ 20, 20 });
-    myFunction.setStartingParameterSet(startParameters);
+    myFunction.setParameters(startParameters);
     SimulatedAnnealingParameters annealingParameters;
     annealingParameters.epsilon = 1e-6;
     annealingParameters.noEpsilon = 4;

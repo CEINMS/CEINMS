@@ -40,7 +40,7 @@ namespace CEINMS {
             {
 
             noParameters_ = optimizerSystem_.getNoParameters();
-            x_ = optimizerSystem_.getStartingParameterSet();
+            x_ = optimizerSystem_.getParameters();
             optimizerSystem_.getUpperLowerBounds(upperBounds_, lowerBounds_);
 
             xOpt_.resize(noParameters_);
@@ -89,8 +89,8 @@ namespace CEINMS {
                             double factorForV = (2.*rand() / static_cast<double>(RAND_MAX)-1.);
                             xp_.at(k) = x_.at(k) + v_.at(k) * factorForV;
                             checkBounds(k);
-
-                            optimizerSystem_.evaluate(xp_);
+                            optimizerSystem_.setParameters(xp_);
+                            optimizerSystem_.evaluate();
                             fp_ = optimizerSystem_.getF();
                             ++noEval;
 
@@ -164,7 +164,9 @@ namespace CEINMS {
                 x_ = xOpt_;
 
             }  /* end while */
-            optimizerSystem_.evaluate(xOpt_);
+
+            optimizerSystem_.setParameters(xOpt_);
+            optimizerSystem_.evaluate();
 //            cout << "total evaluations:" << noEval << endl;
             return 0;
         }

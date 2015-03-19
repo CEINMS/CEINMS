@@ -8,9 +8,9 @@ namespace CEINMS {
         class AbstractOptimizerSystem {
         public:
             virtual ~AbstractOptimizerSystem() {}
-            virtual void evaluate(const std::vector<double>& x) = 0;
-            virtual void setStartingParameterSet(const std::vector<double>& x) = 0;
-            virtual std::vector<double> getStartingParameterSet() const = 0;
+            virtual void evaluate() = 0;
+            virtual void setParameters(const std::vector<double>& x) = 0;
+            virtual std::vector<double> getParameters() const = 0;
             virtual double getF() const = 0;
             virtual unsigned getNoParameters() const = 0;
         };
