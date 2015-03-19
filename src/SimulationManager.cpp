@@ -62,7 +62,7 @@ namespace CEINMS {
     template <typename NMSmodelT, template <typename, typename> class ModelEvaluatorT, typename LoggerT>
     bool SimulationManager::runOpenLoop() {
 
-        //Monica is going to kill me, but I'm declaring Input/Output connectors in the stack... it's going to work fine!
+        //Monica probably won't like this
         InputConnectors inputConnectors;
         OutputConnectors outputConnectors;
 
