@@ -7,8 +7,8 @@
 //
 
 
-#ifndef ParametersFromXml_h
-#define ParametersFromXml_h
+#ifndef ParametersInterpreter_h
+#define ParametersInterpreter_h
 
 #include "Parameter.h"
 
@@ -18,19 +18,21 @@
 #include <map>
 //#include <boost/concept_check.hpp>
 
+//should try to temove this template.. maybe in future..
 template <typename NMSmodelT>
-class ParametersFromXml  {
+class ParametersInterpreter  {
     
 public:
-    typedef std::list<Parameter> ParameterSet ;
-    ParametersFromXml(NMSmodelT& subject, std::vector<std::string>& dofToCalibrate, const ParameterSet& );
-    int getNoParameters() { return noParameters_; }
-    void getStartingVectorParameters(std::vector<double>& x);
-    void setVectorParameters(const std::vector<double>& x);
-    void getUpperLowerBounds(std::vector<double>& upperBounds, std::vector<double>& lowerBounds);
+    using ParameterSet = Parameter::Set;
+    ParametersInterpreter(NMSmodelT& subject,const ParameterSet& parameterSet);
+    size_t getNoParameters() { return noParameters_; }
+    std::vector<double> getSubjectParameters();
+    void setSubjectParameters(const std::vector<double>& x);
+    void getUpperLowerBounds(std::vector<double>& upperBounds, std::vector<double>& lowerBounds) const;
     
 private:
 
+    //modify 
     typedef typename Parameter::MuscleGroups MuscleGroups;
     typedef std::vector< std::vector<unsigned> > MuscleGroupsIdx;
     typedef typename Parameter::ID ParameterID;
@@ -48,6 +50,8 @@ private:
     
 
     typedef std::map<ParameterID, ParameterDetails> ParametersMap;
+    void defineParameterDetails();
+    void setDofsToCalibrate(const std::vector<std::string> dofsToCalibrate);
     void groupValues(const MuscleGroupsIdx& muscleGroupIdx, const std::vector<double>& distributedValues, std::vector<double>& groupedValues);
     void distributeValues(const MuscleGroupsIdx& muscleGroupIdx, std::vector<double>& distributedValues, const std::vector<double>& groupedValues);
     void getMuscleGroupIndex(const MuscleGroups& muscleGroups, MuscleGroupsIdx& muscleGroupsIdx);
@@ -55,12 +59,13 @@ private:
     void getCoefficients(ParameterID parameterID, std::vector<double>& coefficients);
     void setCoefficients(ParameterID parameterID, const std::vector<double>& coefficients);
     NMSmodelT& subject_;
+    ParameterSet parameterSet_;
     ParametersMap parameters_;
     std::vector<std::string> dofNames_;
-    unsigned noParameters_;
+    size_t noParameters_;
     
 };
 
-#include "ParametersFromXml.cpp"
+#include "ParametersInterpreter.cpp"
 
 #endif

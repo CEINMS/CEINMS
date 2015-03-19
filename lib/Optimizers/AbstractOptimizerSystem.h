@@ -12,7 +12,7 @@ namespace CEINMS {
             virtual void setParameters(const std::vector<double>& x) = 0;
             virtual std::vector<double> getParameters() const = 0;
             virtual double getF() const = 0;
-            virtual unsigned getNoParameters() const = 0;
+            virtual size_t getNoParameters() const = 0;
         };
     }
 }

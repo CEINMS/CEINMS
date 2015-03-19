@@ -22,6 +22,7 @@ namespace CEINMS {
         nParameters_ = parameterInterpreter_.getNoParameters();
         //all dofs in the subject by default
         subject_.getDofNames(dofsToCalibrate_);
+        parameterInterpreter_.setDofsToCalibrate(dofsToCalibrate_);
         
     }
 
@@ -34,16 +35,22 @@ namespace CEINMS {
     }
 
     template <typename NMSmodelT, typename ModelEvaluatorT, typename ObjectiveFunctionT>
+    void NMSmodelSystem<NMSmodelT, ModelEvaluatorT, ObjectiveFunctionT>::getUpperLowerBounds(std::vector<double>& upperBounds, std::vector<double>& lowerBounds) const {
+
+        parameterInterpreter_.getUpperLowerBounds(upperBounds, lowerBounds);
+    }
+
+    template <typename NMSmodelT, typename ModelEvaluatorT, typename ObjectiveFunctionT>
     void NMSmodelSystem<NMSmodelT, ModelEvaluatorT, ObjectiveFunctionT>::setParameters(const std::vector<double>& x) {
         
         //How I think it should work..
-        parameterInterpreter_.setSubjectParameters(subject_, x);
+        parameterInterpreter_.setSubjectParameters(x);
     }
 
     template <typename NMSmodelT, typename ModelEvaluatorT, typename ObjectiveFunctionT>
     std::vector<double> NMSmodelSystem<NMSmodelT, ModelEvaluatorT, ObjectiveFunctionT>::getParameters() {
 
-        return parameterInterpreter_.getSubjectParameters(subject_);
+        return parameterInterpreter_.getSubjectParameters();
     }
 
     template <typename NMSmodelT, typename ModelEvaluatorT, typename ObjectiveFunctionT>

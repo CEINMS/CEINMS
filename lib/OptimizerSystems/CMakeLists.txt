@@ -4,12 +4,12 @@ project(OptimizationSystems)
 
 # List source files
 set(OptimizationSystems_HEADERS NMSmodelSystem.h
-                                ParametersFromXml.h
+                                ParametersInterpreter.h
                         )
 
 set(OptimizationSystems_TEMPLATE_IMPLEMENTATION
                             NMSmodelSystem.cpp
-                            ParametersFromXml.cpp)
+                            ParametersInterpreter.cpp)
 
 set_source_files_properties( ${OptimizationSystems_TEMPLATE_IMPLEMENTATION} PROPERTIES HEADER_FILE_ONLY TRUE)
 

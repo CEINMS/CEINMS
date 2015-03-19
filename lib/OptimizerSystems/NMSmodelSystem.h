@@ -3,7 +3,7 @@
 
 #include "AbstractOptimizerSystem.h"
 
-#include "ParametersFromXml.h" //TODO: rename this class
+#include "ParametersInterpreter.h" //TODO: rename this class
 #include <vector>
 
 namespace CEINMS {
@@ -17,17 +17,18 @@ namespace CEINMS {
         void setParameters(const std::vector<double>& x);
         std::vector<double> getParameters();
         double getF() const { return f_; }
-        unsigned getNoParameters() { return nParameters_; }
+        size_t getNoParameters() { return parameterInterpreter_.getNoParameters(); }
+        void getUpperLowerBounds(std::vector<double>& upperBounds, std::vector<double>& lowerBounds) const; 
+
 
     private:
 
         NMSmodelT& subject_;
         ModelEvaluatorT modelEvaluator_;
         ObjectiveFunctionT objectiveFunction_;
-        ParametersFromXml<NMSmodelT> parameterInterpreter_;
+        ParametersInterpreter<NMSmodelT> parameterInterpreter_;
         std::vector<std::string> dofsToCalibrate_;
         double f_;
-        unsigned nParameters_;
     };
 }
 

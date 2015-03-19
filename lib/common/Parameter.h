@@ -43,7 +43,7 @@ public:
     
     typedef std::list<std::string> MuscleNames;
     typedef std::list<MuscleNames> MuscleGroups;
-    typedef std::list<Parameter> ParameterSet;
+    using Set = std::list<Parameter>;
 
     void setName(const std::string& name);
     std::string getName() const { return name_;}
