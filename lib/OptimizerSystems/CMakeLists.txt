@@ -6,6 +6,7 @@ project(OptimizationSystems)
 set(OptimizationSystems_HEADERS NMSmodelSystem.h
                                 ParametersInterpreter.h
 								TrialData.h
+                                DataTable.h
                         )
 
 set(OptimizationSystems_TEMPLATE_IMPLEMENTATION
