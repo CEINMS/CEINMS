@@ -67,6 +67,7 @@ namespace CEINMS {
 
         //alternatively use this.. 
         modelEvaluator_.evaluateSubject(subject_, trialData);
+
         evalResults = modelEvaluator_.getResults();
         //the objective function has the task to compare somehow external data and results of the simulation
         // external data is saved in the object, the results are passed each time

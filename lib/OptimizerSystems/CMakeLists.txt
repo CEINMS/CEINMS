@@ -7,11 +7,13 @@ set(OptimizationSystems_HEADERS NMSmodelSystem.h
                                 ParametersInterpreter.h
 								TrialData.h
                                 DataTable.h
+                                BatchEvaluator.h
                         )
 
 set(OptimizationSystems_TEMPLATE_IMPLEMENTATION
                             NMSmodelSystem.cpp
-                            ParametersInterpreter.cpp)
+                            ParametersInterpreter.cpp
+							BatchEvaluator.cpp)
 
 set_source_files_properties( ${OptimizationSystems_TEMPLATE_IMPLEMENTATION} PROPERTIES HEADER_FILE_ONLY TRUE)
 

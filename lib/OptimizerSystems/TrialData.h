@@ -16,20 +16,21 @@
 #include <iostream>
 #include "DataTable.h"
 
+namespace CEINMS {
 
+    class TrialData {
+    public:
+        std::string id_;
+        DataTable<double> emgData;
+        DataTable<double> lmtData;
+        DataTable<double> torqueData;
 
-class TrialData {
-public:
-    std::string id_;
-    DataTable<double> emgData_;
-    DataTable<double> lmtData_;
-    DataTable<double> torqueData_;
+        size_t noDoF;
+        std::vector<std::string> dofNames;
+        std::vector<DataTable<double>> maData;
 
-    size_t noDoF_;
-    std::vector<std::string> dofNames_;
-    std::vector<DataTable<double>> maData_;
-
-};
+    };
+}
 
 /*
 std::ostream& operator<< (std::ostream& output, const TrialData& rhs) {
