@@ -20,7 +20,7 @@ namespace CEINMS {
 
     class TrialData {
     public:
-        std::string id_;
+        std::string id;
         DataTable<double> emgData;
         DataTable<double> lmtData;
         DataTable<double> torqueData;
