@@ -6,7 +6,7 @@
 #include <algorithm>
 #include <ostream>
 
-
+//TODO: insert further checks, operators + and -
 namespace CEINMS {
     template<typename T> class DataTable;
 

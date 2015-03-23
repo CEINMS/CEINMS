@@ -30,6 +30,7 @@ namespace CEINMS {
         std::vector<DataTable<double>> maData;
 
     };
+
 }
 
 /*
