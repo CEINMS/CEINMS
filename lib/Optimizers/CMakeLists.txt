@@ -31,4 +31,3 @@ mark_as_advanced(Optimizers_INCLUDE_DIRS)
 
 
 
-add_subdirectory(Test)

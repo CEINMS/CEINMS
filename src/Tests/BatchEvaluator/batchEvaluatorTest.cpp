@@ -1,10 +1,12 @@
 //#include "BatchEvaluator.h"
-#include "TrialData.h"
 #include "InputConnectors.h"
-
+#include "OutputConnectors.h"
+#include "QueuesToTrialData.h"
 #include "EMGFromFile.h"
 #include "LmtMaFromStorageFile.h"
 #include "ExternalTorquesFromStorageFile.h"
+#include "InputDataXmlReader.h"
+#include <thread>
 #include <vector>
 using std::vector;
 #include <string>
@@ -15,9 +17,13 @@ template<typename NMSmodelT>
 TrialData readTrialData(std::string inputDataFilename, NMSmodelT& mySubject, std::string trialId, std::string emgGeneratorFile)
 {
     InputDataXmlReader dataLocations(inputDataFilename);
-    CEINMS::InputConnectors* inputConnectors = new CEINMS::InputConnectors();
+    // CEINMS::InputConnectors* inputConnectors= new CEINMS::InputConnectors();
+    //CEINMS::OutputConnectors* outputConnectors = new CEINMS::OutputConnectors();
 
-    std::string emgFilename(dataLocations.getExcitationsFile());
+    std::unique_ptr<InputConnectors> inputConnectors(new InputConnectors);
+    std::unique_ptr<OutputConnectors> outputConnectors(new OutputConnectors);
+
+    string emgFilename(dataLocations.getExcitationsFile());
     EMGFromFile emgProducer(*inputConnectors, mySubject, emgFilename, emgGeneratorFile);
 
     vector< string > dofNames;
@@ -26,15 +32,14 @@ TrialData readTrialData(std::string inputDataFilename, NMSmodelT& mySubject, std
     sortMaFilenames(dataLocations.getMaFiles(), dofNames, maFilename);
     LmtMaFromStorageFile lmtMaProducer(*inputConnectors, mySubject, dataLocations.getLmtFile(), maFilename);
 
-
     string externalTorqueFilename(dataLocations.getExternalTorqueFile());
     ExternalTorquesFromStorageFile externalTorquesProducer(*inputConnectors, mySubject, externalTorqueFilename);
 
-    QueuesToTrialData queuesToTrialData(*inputConnectors, mySubject, trialId);
+    QueuesToTrialData queuesToTrialData(*inputConnectors, *outputConnectors, mySubject, trialId);
 
 
     inputConnectors->doneWithSubscription.setCount(4);
-    CEINMS::OutputConnectors::doneWithExecution.setCount(1);
+    outputConnectors->doneWithExecution.setCount(1);
 
     // 4. start the threads
     std::thread emgProdThread(std::ref(emgProducer));
@@ -53,6 +58,8 @@ TrialData readTrialData(std::string inputDataFilename, NMSmodelT& mySubject, std
         exit(EXIT_FAILURE);
     }
     return queuesToTrialData.getTrialData();
+}
+
 int main() { 
 
 

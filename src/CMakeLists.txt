@@ -1,5 +1,7 @@
 ## Authors: Monica Reggiani, Claudio Pizzolato
 
+add_subdirectory(Tests)
+
 include_directories(
   #${Producers_INCLUDE_DIRS}
   ${InputConnectors_INCLUDE_DIRS}

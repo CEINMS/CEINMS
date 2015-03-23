@@ -3,11 +3,8 @@
 project(OptimizationSystems)
 
 # List source files
-add_subdirectory(Test)
 set(OptimizationSystems_HEADERS NMSmodelSystem.h
                                 ParametersInterpreter.h
-								TrialData.h
-                                DataTable.h
                                 BatchEvaluator.h
                         )
 
@@ -27,7 +24,8 @@ target_include_directories( OptimizationSystems
                                     ${Curve_INCLUDE_DIRS}
                                     ${FileIO_INCLUDE_DIRS}
                                     ${ceinms_common_INCLUDE_DIRS}
-									${Optimizers_INCLUDE_DIRS})
+									${Optimizers_INCLUDE_DIRS}
+									${TrialData_INCLUDE_DIRS})
 
 
 # Save path to include directory for "internal" usage
