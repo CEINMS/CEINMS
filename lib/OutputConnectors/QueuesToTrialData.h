@@ -27,22 +27,27 @@ public:
 
     template<typename NMSmodel> QueuesToTrialData(CEINMS::InputConnectors& inputConnectors, CEINMS::OutputConnectors& outputConnectors, NMSmodel& subject, std::string id) : inputConnectors_(inputConnectors), outputConnectors_(outputConnectors)
     {
-        data_.id_ = id;
-        subject.getMuscleNames(data_.muscleNames_);
-        subject.getDoFNames(data_.dofNames_);
-        subject.getMuscleNamesOnDofs(data_.maMusclesNames_);
-        data_.noMuscles_ = subject.getNoMuscles();
-        data_.noDoF_ = subject.getNoDoF();
-        data_.torqueData_.resize(data_.noDoF_);
-        data_.maData_.resize(data_.maMusclesNames_.size());
-        data_.noTorqueSteps_ = data_.noLmtSteps_ = data_.noEmgSteps_ = 0;
+        data_.id = id;
+        std::string muscleNames;
+        subject.getMuscleNames(muscleNames);
+        data_.emgData.setLabels(muscleNames);
+        data_.lmtData.setLabels(muscleNames);
+
+        subject.getDoFNames(data_.dofNames);
+        data_.noDoF = data_.dofNames.size();
+        std::vector<std::vector<std::string>> maMuscleNames;
+        subject.getMuscleNamesOnDofs(maMuscleNames);
+        for (auto i(0); i < data_.noDoF; ++i)
+            data_.maData.at(i).setLabels(maMuscleNames.at(i));
+        data_.torqueData.setLabels(data_.dofNames);
+
     };
     ~QueuesToTrialData() = default;
     void operator()();
-    TrialData getTrialData();
+    CEINMS::TrialData getTrialData();
 
 private:
-    TrialData data_;
+    CEINMS::TrialData data_;
     CEINMS::InputConnectors& inputConnectors_;
     CEINMS::OutputConnectors& outputConnectors_;
     //std::vector<std::string> valuesToWrite_;

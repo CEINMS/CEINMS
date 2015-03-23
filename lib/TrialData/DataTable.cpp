@@ -2,7 +2,7 @@
 #include <stdexcept>
 
 namespace CEINMS {
-    
+
     template <typename T>
     DataTable<T>::DataTable() :
         nRows_(0), nCols_(0) {}
@@ -113,7 +113,7 @@ namespace CEINMS {
 
     template<typename T>
     std::ostream& operator<< (std::ostream & out, const DataTable<T> & rhs) {
-        
+
         out << "DataTable " << rhs.nRows_ << "x" << rhs.nCols_ << std::endl;
         out << rhs.labels_.size() << " labels" << std::endl;
         for (auto &l : rhs.labels_)
@@ -130,3 +130,4 @@ namespace CEINMS {
         }
     }
 
+}
