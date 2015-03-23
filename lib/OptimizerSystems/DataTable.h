@@ -4,7 +4,15 @@
 #include <string>
 #include <stdexcept>
 #include <algorithm>
+#include <ostream>
+
+
 namespace CEINMS {
+    template<typename T> class DataTable;
+
+    template<typename T>
+    std::ostream& operator<< (std::ostream & out, const DataTable<T> & rhs);
+
     template<typename T>
     class DataTable {
 
@@ -18,20 +26,21 @@ namespace CEINMS {
         void pushRow(T time, const std::vector<T>& values);
         void setRow(size_t row, const std::vector<T>& values);
         
-        static DataTable<T> sum(const DataTable<T>& lhs, const DataTable<T>& rhs);
-        static DataTable<T> subtract(const DataTable<T>& lhs, const DataTable<T>& rhs);
+        static DataTable sum(const DataTable& lhs, const DataTable& rhs);
+        static DataTable subtract(const DataTable& lhs, const DataTable& rhs);
 
         std::string getLabel(size_t col) const { return labels_.at(col); }
         T get(size_t row, size_t col) const { return data_.at(row, col); }
         T getTime(size_t row) const { return time_.at(row); }
-        T getStartTime() const { return time_.front() }
+        T getStartTime() const { return time_.front(); }
         T getFinalTIme() const { return time_.back(); }
         std::vector<T> getTimeColumn(size_t col) const { return time_; }
         std::vector<T> getRow(size_t row) const;
         std::vector<T> getColumn(size_t col) const;
-        size_t getNColumns() const { return nCols_ };
-        size_t getNRows() const { return nRows_ }
+        size_t getNColumns() const { return nCols_; }
+        size_t getNRows() const { return nRows_; }
 
+        friend std::ostream& operator<< <> (std::ostream& output, const DataTable& ths);
     private:
         size_t nRows_, nCols_;
         //internal implementation may be changed to something better.. e.g. nice matrices
@@ -57,7 +66,7 @@ namespace CEINMS {
     void DataTable<T>::setLabels(const std::vector<std::string>& labels) {
 
         if (!data_.empty() && labels.size() != nCols_)
-            throw std::invalid_argument("wrong number of labels. #labels " + labels.size() + " #columns " + nCols_);
+            throw std::invalid_argument("wrong number of labels.");
         labels_ = labels;
     }
 
@@ -121,7 +130,7 @@ namespace CEINMS {
     }
 
     template <typename T>
-    static DataTable<T>  DataTable<T>::sum(const DataTable<T>& lhs, const DataTable<T>& rhs) {
+    DataTable<T>  DataTable<T>::sum(const DataTable<T>& lhs, const DataTable<T>& rhs) {
 
         if (lhs.getNColumns() != rhs.getNColumns() || lhs.getNColumns() != rhs.getNColumns())
             throw std::invalid_argument("lhs and rhs differ in size");  //check just on data size.. ignore labels and time column
@@ -129,14 +138,14 @@ namespace CEINMS {
         DataTable<T> ans(lhs);
         size_t nRows(ans.getNRows());
         for (size_t row(0); row < nRows; ++row)
-            std::transform(lhs.data_.at(i).begin(), lhs.data_.at(i).end(), rhs.data_.at(i).begin(), ans.data_.at(i).begin(), [](l, r) {
+            std::transform(lhs.data_.at(row).begin(), lhs.data_.at(row).end(), rhs.data_.at(row).begin(), ans.data_.at(row).begin(), [](T l, T r) {
             return l + r;
         });
         return ans;
     }
 
     template <typename T>
-    static DataTable<T>  DataTable<T>::subtract(const DataTable<T>& lhs, const DataTable<T>& rhs) {
+    DataTable<T>  DataTable<T>::subtract(const DataTable<T>& lhs, const DataTable<T>& rhs) {
 
         if (lhs.getNColumns() != rhs.getNColumns() || lhs.getNColumns() != rhs.getNColumns())
             throw std::invalid_argument("lhs and rhs differ in size");  //check just on data size.. ignore labels and time column
@@ -144,10 +153,30 @@ namespace CEINMS {
         DataTable<T> ans(lhs);
         size_t nRows(ans.getNRows());
         for (size_t row(0); row < nRows; ++row)
-            std::transform(lhs.data_.at(i).begin(), lhs.data_.at(i).end(), rhs.data_.at(i).begin(), ans.data_.at(i).begin(), [](l, r) {
+            std::transform(lhs.data_.at(row).begin(), lhs.data_.at(row).end(), rhs.data_.at(row).begin(), ans.data_.at(row).begin(), [](T l, T r) {
             return l - r;
         });
         return ans;
+    }
+
+
+    template<typename T>
+    std::ostream& operator<< (std::ostream & out, const DataTable<T> & rhs) {
+        
+        out << "DataTable " << rhs.nRows_ << "x" << rhs.nCols_ << std::endl;
+        out << rhs.labels_.size() << " labels" << std::endl;
+        for (auto &l : rhs.labels_)
+            out << l << std::endl;
+        out << "Time column" << std::endl;
+        for (auto &t : rhs.time_)
+            out << t << std::endl;
+        out << "Data matrix" << std::endl;
+        for (auto i(0); i < rhs.nRows_; ++i) {
+            for (auto &e : rhs.data_.at(i))
+                out << e << "\t";
+            out << std::endl;
+
+        }
     }
 
 }

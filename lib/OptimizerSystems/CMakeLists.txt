@@ -3,6 +3,7 @@
 project(OptimizationSystems)
 
 # List source files
+add_subdirectory(Test)
 set(OptimizationSystems_HEADERS NMSmodelSystem.h
                                 ParametersInterpreter.h
 								TrialData.h
