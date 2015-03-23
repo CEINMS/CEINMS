@@ -7,7 +7,7 @@ namespace CEINMS {
         trials_(trials) {
         
         size_t nTrials;
-        for (size_t i(0); i < nTrials, ++i) {
+        for (size_t i(0); i < nTrials; ++i) {
             size_t nEmgRows = trials.at(i).emgData.getNRows();
             size_t nLmtRows = trials.at(i).lmtData.getNRows();
             size_t nDofs = trials.at(i).torqueData.getNColumns();
