@@ -23,8 +23,8 @@ namespace CEINMS {
 class InputConnectors {
 public:
     InputConnectors();
-    ~InputConnectors();
-    InputConnectors(const InputConnectors& inputConn) = delete;
+    virtual ~InputConnectors();
+    InputConnectors(const InputConnectors&) = delete;
     typedef QueueData< std::vector< double > > FrameType;
     Concurrency::Queue< FrameType > queueEmg;
     Concurrency::Queue< FrameType > queueLmt;

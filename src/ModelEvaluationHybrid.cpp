@@ -10,6 +10,7 @@
 #include "SimpleFileLogger.h"
 #include "StorageLogger.h"
 #include "TimeCompare.h"
+using namespace CEINMS;
 #include <iostream>
 using std::cout;
 using std::endl;
@@ -24,12 +25,13 @@ using std::string;
 
 
 template <typename NMSmodelT, typename ErrorMinimizerT, typename Logger>
-ModelEvaluationHybrid<NMSmodelT, ErrorMinimizerT, Logger>::ModelEvaluationHybrid(CEINMS::InputConnectors& inputConnectors,
+ModelEvaluationHybrid<NMSmodelT, ErrorMinimizerT, Logger>::ModelEvaluationHybrid(InputConnectors& inputConnectors,
+                                                                                 OutputConnectors& outputConnectors,
                                                                                  NMSmodelT& subject,
                                                                                  ErrorMinimizerT& torqueErrorMinimizer,
                                                                                  const vector<string>& valuesToLog
                                                                                 )
-    :ModelEvaluationBase<Logger>::ModelEvaluationBase(inputConnectors, valuesToLog), 
+    :ModelEvaluationBase<Logger>::ModelEvaluationBase(inputConnectors, outputConnectors, valuesToLog), 
     subject_(subject),
     torqueErrorMinimizer_(torqueErrorMinimizer) { 
 
@@ -180,7 +182,7 @@ void ModelEvaluationHybrid<NMSmodelT, ErrorMinimizerT, Logger>::operator()() {
     ModelEvaluationBase<Logger>::logger.log(endTime, endData, "AdjustedEmgs");
 #endif
 
-    CEINMS::OutputConnectors::doneWithExecution.wait();
+    doneWithExecution();
 #ifdef LOG  
     cout << "Estimation completed." << endl;
 #endif

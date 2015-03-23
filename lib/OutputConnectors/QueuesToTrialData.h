@@ -15,7 +15,7 @@
 #include <iostream>
 #include <fstream>
 #include <boost/filesystem.hpp>
-#include "OutputQueues.h"
+#include "OutputConnectors.h"
 #include "InputConnectors.h"
 #include "TrialData.h"
 
@@ -25,7 +25,7 @@ public:
     QueuesToTrialData(const QueuesToTrialData&)= delete;
     QueuesToTrialData& operator=(const QueuesToTrialData&) = delete;
 
-    template<typename NMSmodel> QueuesToTrialData(CEINMS::InputConnectors& inputConnectors, NMSmodel& subject, std::string id) : inputConnectors_(inputConnectors)
+    template<typename NMSmodel> QueuesToTrialData(CEINMS::InputConnectors& inputConnectors, CEINMS::OutputConnectors& outputConnectors, NMSmodel& subject, std::string id) : inputConnectors_(inputConnectors), outputConnectors_(outputConnectors)
     {
         data_.id_ = id;
         subject.getMuscleNames(data_.muscleNames_);
@@ -44,6 +44,7 @@ public:
 private:
     TrialData data_;
     CEINMS::InputConnectors& inputConnectors_;
+    CEINMS::OutputConnectors& outputConnectors_;
     //std::vector<std::string> valuesToWrite_;
     //std::vector<std::string> torqueNames_;
     //std::vector<std::string> muscleNames_;

@@ -36,7 +36,7 @@
 #include "LmtMaFromStorageFile.h"
 #include "ExternalTorquesFromStorageFile.h"
 #include "QueuesToTrialData.h"
-
+using namespace CEINMS;
 #include <string>
 using std::string;
 
@@ -150,7 +150,11 @@ template<typename NMSmodel>
 TrialData readTrialData(std::string inputDataFilename, NMSmodel& mySubject, std::string trialId, std::string emgGeneratorFile)
 {
     InputDataXmlReader dataLocations(inputDataFilename);
-    CEINMS::InputConnectors* inputConnectors= new CEINMS::InputConnectors();
+   // CEINMS::InputConnectors* inputConnectors= new CEINMS::InputConnectors();
+    //CEINMS::OutputConnectors* outputConnectors = new CEINMS::OutputConnectors();
+
+    std::unique_ptr<InputConnectors> inputConnectors(new InputConnectors);
+    std::unique_ptr<OutputConnectors> outputConnectors(new OutputConnectors);
 
     string emgFilename(dataLocations.getExcitationsFile());
     EMGFromFile emgProducer(*inputConnectors, mySubject, emgFilename, emgGeneratorFile);
@@ -161,15 +165,14 @@ TrialData readTrialData(std::string inputDataFilename, NMSmodel& mySubject, std:
     sortMaFilenames(dataLocations.getMaFiles(), dofNames, maFilename);
     LmtMaFromStorageFile lmtMaProducer(*inputConnectors, mySubject, dataLocations.getLmtFile(), maFilename);
 
-
     string externalTorqueFilename(dataLocations.getExternalTorqueFile());
-    ExternalTorquesFromStorageFile externalTorquesProducer(*inputConnectors, mySubject, externalTorqueFilename);
+    ExternalTorquesFromStorageFile externalTorquesProducer(*inputConnectors,  mySubject, externalTorqueFilename);
 
-    QueuesToTrialData queuesToTrialData(*inputConnectors, mySubject, trialId);
+    QueuesToTrialData queuesToTrialData(*inputConnectors, *outputConnectors, mySubject, trialId);
 
 
     inputConnectors->doneWithSubscription.setCount(4);
-    CEINMS::OutputConnectors::doneWithExecution.setCount(1);
+    outputConnectors->doneWithExecution.setCount(1);
 
     // 4. start the threads
     std::thread emgProdThread(std::ref(emgProducer));

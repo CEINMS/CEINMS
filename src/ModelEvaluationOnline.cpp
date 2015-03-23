@@ -24,13 +24,15 @@ using std::string;
 #include "ModelEvaluationOnline.h"
 #include "ModelEvaluationBase.h"
 #include "InputConnectors.h"
-#include "OutputQueues.h"
+#include "OutputConnectors.h"
+using namespace CEINMS;
 #define LOG_FILES
 #define LOG
 
+
 template <typename NMSmodelT, typename Logger>
-ModelEvaluationOnline<NMSmodelT, Logger>::ModelEvaluationOnline(CEINMS::InputConnectors& inputConnectors, NMSmodelT& subject, const vector<string>& valuesToLog) //const std::string& outputDir )
-:ModelEvaluationBase<Logger>::ModelEvaluationBase(inputConnectors, valuesToLog), subject_(subject)
+ModelEvaluationOnline<NMSmodelT, Logger>::ModelEvaluationOnline(InputConnectors& inputConnectors, OutputConnectors& outputConnectors, NMSmodelT& subject, const vector<string>& valuesToLog) //const std::string& outputDir )
+:ModelEvaluationBase<Logger>::ModelEvaluationBase(inputConnectors, outputConnectors, valuesToLog), subject_(subject)
 {
   subject_.getDoFNames(dofNames_);
   noDof_ = dofNames_.size(); 
@@ -162,7 +164,7 @@ void ModelEvaluationOnline<NMSmodelT, Logger>::operator()() {
       ModelEvaluationBase<Logger>::logger.log(endTime, endData, "Torques");
 #endif
       
-      CEINMS::OutputConnectors::doneWithExecution.wait();
+      doneWithExecution();
 #ifdef LOG  
    cout << "Estimation completed. " << endl;
 #endif

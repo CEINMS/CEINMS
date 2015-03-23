@@ -15,13 +15,14 @@
 #include <string>
 
 #include "InputConnectors.h"
+#include "OutputConnectors.h"
 
 template <typename Logger>
 class ModelEvaluationBase {
     
 public:  
   ModelEvaluationBase() = delete; 
-  ModelEvaluationBase(CEINMS::InputConnectors& inputConnectors, const std::vector<std::string>& valuesToLog);
+  ModelEvaluationBase(CEINMS::InputConnectors& inputConnectors, CEINMS::OutputConnectors& outputConnectors, const std::vector<std::string>& valuesToLog);
   virtual ~ModelEvaluationBase();
   virtual void operator()() = 0;
 
@@ -30,6 +31,7 @@ protected:
   void getLmtFromInputQueue(CEINMS::InputConnectors::FrameType& lmtFromQueue);
   void getMomentArmsFromInputQueue(CEINMS::InputConnectors::FrameType& momentArmsFromQueue, unsigned int whichDof);
   void getExternalTorquesFromInputQueue(CEINMS::InputConnectors::FrameType& externalTorquesFromQueue); 
+  void doneWithExecution();
 
   CEINMS::InputConnectors::FrameType getEmgFromInputQueue();
   CEINMS::InputConnectors::FrameType getLmtFromInputQueue();
@@ -44,6 +46,7 @@ protected:
 
 private:
     CEINMS::InputConnectors& inputConnectors_;
+    CEINMS::OutputConnectors& outputConnectors_;
 };
 
 #include "ModelEvaluationBase.cpp"
