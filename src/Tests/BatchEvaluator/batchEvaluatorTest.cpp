@@ -14,7 +14,7 @@ using std::string;
 
 
 template<typename NMSmodelT>
-TrialData readTrialData(std::string inputDataFilename, NMSmodelT& mySubject, std::string trialId, std::string emgGeneratorFile)
+CEINMS::TrialData readTrialData(std::string inputDataFilename, NMSmodelT& mySubject, std::string trialId, std::string emgGeneratorFile)
 {
     InputDataXmlReader dataLocations(inputDataFilename);
     // CEINMS::InputConnectors* inputConnectors= new CEINMS::InputConnectors();
