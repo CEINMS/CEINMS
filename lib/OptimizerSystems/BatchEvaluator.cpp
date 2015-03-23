@@ -1,6 +1,5 @@
-#include <vector>
-#include <algorithm>
 #include "BatchEvaluator.h"
+#include <vector>
 
 namespace CEINMS {
 
@@ -44,7 +43,7 @@ namespace CEINMS {
     }
 
     template<typename NMSmodelT>
-    Result Evaluator::evaluate(NMSmodelT& subject, const TrialData& trialData, const std::vector<unsigned> musclesToUpdate, Result previousResult) { //pass previousResult by copy, because I need a copy later
+    Result OpenLoopEvaluator::evaluate(NMSmodelT& subject, const TrialData& trialData, const std::vector<unsigned> musclesToUpdate, Result previousResult) { //pass previousResult by copy, because I need a copy later
 
         //ct trial index
         initFiberLengthTraceCurves(subject, trialData, musclesToUpdate, previousResult); //pass trial or something
@@ -119,7 +118,7 @@ namespace CEINMS {
                 cout << endl << "----------------------------------------" << endl;
 #endif
             }
-            vector<double> currentActivations;
+            std::vector<double> currentActivations;
             subject.getActivations(currentActivations);
             previousResult.activations.setRow(emgIndex, currentActivations);
 
@@ -130,7 +129,7 @@ namespace CEINMS {
 
 
     template<typename NMSmodelT>
-    void initFiberLengthTraceCurves(NMSmodelT& subject, const TrialData& trialData, const std::vector<unsigned> musclesToUpdate, Result& previousResult) {
+    void OpenLoopEvaluator::initFiberLengthTraceCurves(NMSmodelT& subject, const TrialData& trialData, const std::vector<unsigned> musclesToUpdate, Result& previousResult) {
 
 
         unsigned lmtMaIndex(0); // k is the index for lmt and ma data

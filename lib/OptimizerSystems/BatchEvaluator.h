@@ -26,9 +26,9 @@ namespace CEINMS {
 
 
 
-    class Evaluator {
+    class OpenLoopEvaluator {
     public:
-        Evaluator() = delete;
+        OpenLoopEvaluator() = delete;
         template<typename NMSmodelT>
         static Result evaluate(NMSmodelT& subject, const TrialData& trialData, const std::vector<unsigned> musclesToUpdate, Result previousResult);
     private:
@@ -40,6 +40,7 @@ namespace CEINMS {
     class BatchEvaluator{
 
     public:
+        using EvaluationResult = Result; //just to expose it
         BatchEvaluator(const std::vector<TrialData>& trials);
         template<typename NMSmodelT>
         void evaluate(NMSmodelT& subject);
@@ -54,5 +55,5 @@ namespace CEINMS {
     };    
 }
 
-//#include "BatchEvaluator.cpp"
+#include "BatchEvaluator.cpp"
 #endif

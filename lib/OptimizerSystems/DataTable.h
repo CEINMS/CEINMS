@@ -3,6 +3,7 @@
 #include <vector>
 #include <string>
 #include <stdexcept>
+#include <algorithm>
 namespace CEINMS {
     template<typename T>
     class DataTable {
@@ -16,6 +17,9 @@ namespace CEINMS {
         T& at(size_t row, size_t col);
         void pushRow(T time, const std::vector<T>& values);
         void setRow(size_t row, const std::vector<T>& values);
+        
+        static DataTable<T> sum(const DataTable<T>& lhs, const DataTable<T>& rhs);
+        static DataTable<T> subtract(const DataTable<T>& lhs, const DataTable<T>& rhs);
 
         std::string getLabel(size_t col) const { return labels_.at(col); }
         T get(size_t row, size_t col) const { return data_.at(row, col); }
@@ -114,6 +118,36 @@ namespace CEINMS {
         for (auto& row : data_)
             column.emplace_back(row.at(col));
         return column;
+    }
+
+    template <typename T>
+    static DataTable<T>  DataTable<T>::sum(const DataTable<T>& lhs, const DataTable<T>& rhs) {
+
+        if (lhs.getNColumns() != rhs.getNColumns() || lhs.getNColumns() != rhs.getNColumns())
+            throw std::invalid_argument("lhs and rhs differ in size");  //check just on data size.. ignore labels and time column
+
+        DataTable<T> ans(lhs);
+        size_t nRows(ans.getNRows());
+        for (size_t row(0); row < nRows; ++row)
+            std::transform(lhs.data_.at(i).begin(), lhs.data_.at(i).end(), rhs.data_.at(i).begin(), ans.data_.at(i).begin(), [](l, r) {
+            return l + r;
+        });
+        return ans;
+    }
+
+    template <typename T>
+    static DataTable<T>  DataTable<T>::subtract(const DataTable<T>& lhs, const DataTable<T>& rhs) {
+
+        if (lhs.getNColumns() != rhs.getNColumns() || lhs.getNColumns() != rhs.getNColumns())
+            throw std::invalid_argument("lhs and rhs differ in size");  //check just on data size.. ignore labels and time column
+
+        DataTable<T> ans(lhs);
+        size_t nRows(ans.getNRows());
+        for (size_t row(0); row < nRows; ++row)
+            std::transform(lhs.data_.at(i).begin(), lhs.data_.at(i).end(), rhs.data_.at(i).begin(), ans.data_.at(i).begin(), [](l, r) {
+            return l - r;
+        });
+        return ans;
     }
 
 }
