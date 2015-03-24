@@ -87,7 +87,7 @@ namespace CEINMS {
             throw std::invalid_argument("lhs and rhs differ in size");  //check just on data size.. ignore labels and time column
 
         DataTable<T> ans(lhs);
-        size_t nRows(ans.getNRows());
+        size_t nRows(std::min(lhs.getNRows(), rhs.getNRows()));
         for (size_t row(0); row < nRows; ++row)
             std::transform(lhs.data_.at(row).begin(), lhs.data_.at(row).end(), rhs.data_.at(row).begin(), ans.data_.at(row).begin(), [](T l, T r) {
             return l + r;
@@ -96,13 +96,13 @@ namespace CEINMS {
     }
 
     template <typename T>
-    DataTable<T>  DataTable<T>::subtract(const DataTable<T>& lhs, const DataTable<T>& rhs) {
+    DataTable<T> DataTable<T>::subtract(const DataTable<T>& lhs, const DataTable<T>& rhs) {
 
         if (lhs.getNColumns() != rhs.getNColumns() || lhs.getNColumns() != rhs.getNColumns())
             throw std::invalid_argument("lhs and rhs differ in size");  //check just on data size.. ignore labels and time column
 
         DataTable<T> ans(lhs);
-        size_t nRows(ans.getNRows());
+        size_t nRows(std::min(lhs.getNRows(), rhs.getNRows()));
         for (size_t row(0); row < nRows; ++row)
             std::transform(lhs.data_.at(row).begin(), lhs.data_.at(row).end(), rhs.data_.at(row).begin(), ans.data_.at(row).begin(), [](T l, T r) {
             return l - r;
@@ -119,7 +119,7 @@ namespace CEINMS {
                
         DataTable<T> ans(lhs);
         for (size_t r(0); r < lhs.nRows_; ++r)
-            for (size_t c(0); c < lhs.nRows_; ++c)
+            for (size_t c(0); c < lhs.nCols_; ++c)
                 ans.at(r, c) = lhs.at(r, c)*rhs.at(r, c);
         return ans;
     }
@@ -133,7 +133,7 @@ namespace CEINMS {
 
         DataTable<T> ans(lhs);
         for (size_t r(0); r < lhs.nRows_; ++r)
-            for (size_t c(0); c < lhs.nRows_; ++c)
+            for (size_t c(0); c < lhs.nCols_; ++c)
                 ans.at(r, c) = lhs.at(r, c)*scalar;
         return ans;
     }
@@ -197,7 +197,7 @@ namespace CEINMS {
     }
 
     template<typename T>
-    DataTable<T> operator* (T scalar, const DataTable<T>& rhs, ) {
+    DataTable<T> operator* (T scalar, const DataTable<T>& rhs) {
         return DataTable<T>::multiplyByScalar(rhs, scalar);
     }
 
