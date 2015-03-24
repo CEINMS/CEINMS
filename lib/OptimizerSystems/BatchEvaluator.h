@@ -15,15 +15,25 @@ namespace CEINMS {
     class Result{
     public:
 
-        DataTable<double> forces_, torques_, activations_, penalties_;
+        DataTable<double> forces, torques, activations, penalties;
         Result(size_t nMTUs, size_t nDofs, size_t nEmgs, size_t nLmtMa) :
-            forces_(nLmtMa, nMTUs),
-            torques_(nLmtMa, nDofs),
-            activations_(nEmgs, nMTUs),
-            penalties_(nLmtMa, nMTUs) {}
+            forces(nLmtMa, nMTUs),
+            torques(nLmtMa, nDofs),
+            activations(nEmgs, nMTUs),
+            penalties(nLmtMa, nMTUs) {}
+        bool equals(const Result& rhs) const {
+            return (forces      == rhs.forces      &&
+                    torques     == rhs.torques     &&
+                    activations == rhs.activations &&
+                    penalties   == rhs.penalties);
+
+        }
 
     };
 
+    bool operator==(const Result& lhs, const Result& rhs) {
+        return lhs.equals(rhs);
+    }
 
 
     class OpenLoopEvaluator {
@@ -44,7 +54,9 @@ namespace CEINMS {
         BatchEvaluator(const std::vector<TrialData>& trials);
         template<typename NMSmodelT>
         void evaluate(NMSmodelT& subject);
-        std::vector<Result> getResults() const;
+        std::vector<Result> getResults() const {
+            return results_;
+        }
 
     private:
         void updMusclesToUpdate();

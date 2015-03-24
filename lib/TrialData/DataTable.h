@@ -13,6 +13,11 @@ namespace CEINMS {
     std::ostream& operator<< (std::ostream & out, const DataTable<T> & rhs);
 
     template<typename T>
+    bool operator==(const DataTable<T>& lhs, const DataTable<T>& rhs) {
+        return lhs.equals(rhs);
+    }
+
+    template<typename T>
     class DataTable {
 
     public:
@@ -39,6 +44,7 @@ namespace CEINMS {
         size_t getNColumns() const { return nCols_; }
         size_t getNRows() const { return nRows_; }
 
+        bool equals(const DataTable& rhs) const;
         friend std::ostream& operator<< <> (std::ostream& output, const DataTable& ths);
     private:
         size_t nRows_, nCols_;

@@ -110,6 +110,16 @@ namespace CEINMS {
         return ans;
     }
 
+    template<typename T>
+    bool DataTable<T>::equals(const DataTable<T>& rhs) const {
+        return(data_   == rhs.data_   &&
+               labels_ == rhs.labels_ &&
+               time_   == rhs.time_   &&
+               nCols_  == rhs.nCols_  &&
+               nRows_  == rhs.nRows_);
+
+
+    }
 
     template<typename T>
     std::ostream& operator<< (std::ostream & out, const DataTable<T> & rhs) {
@@ -128,6 +138,10 @@ namespace CEINMS {
             out << std::endl;
 
         }
+        return out;
     }
+
+
+
 
 }

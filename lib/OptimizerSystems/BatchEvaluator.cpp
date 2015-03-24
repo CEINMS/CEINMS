@@ -1,4 +1,5 @@
 #include "BatchEvaluator.h"
+#include "TimeCompare.h"
 #include <vector>
 
 namespace CEINMS {
@@ -6,7 +7,7 @@ namespace CEINMS {
     BatchEvaluator::BatchEvaluator(const std::vector<TrialData>& trials) :
         trials_(trials) {
         
-        size_t nTrials;
+        size_t nTrials(trials.size());
         for (size_t i(0); i < nTrials; ++i) {
             size_t nEmgRows = trials.at(i).emgData.getNRows();
             size_t nLmtRows = trials.at(i).lmtData.getNRows();
@@ -29,7 +30,7 @@ namespace CEINMS {
         updMusclesToUpdate();
         subjectParametersT1_ = subjectParameters_; //for next evaluation
         for (unsigned i(0); i < trials_.size(); ++i) {
-            results_.at(i) = Evaluator::evaluate(subject, trials_.at(i), muscleToUpdate_.at(i), results_.at(i));
+            results_.at(i) = OpenLoopEvaluator::evaluate(subject, trials_.at(i), musclesToUpdate_, results_.at(i));
         }
     }
 
@@ -46,14 +47,13 @@ namespace CEINMS {
     Result OpenLoopEvaluator::evaluate(NMSmodelT& subject, const TrialData& trialData, const std::vector<unsigned> musclesToUpdate, Result previousResult) { //pass previousResult by copy, because I need a copy later
 
         //ct trial index
-        initFiberLengthTraceCurves(subject, trialData, musclesToUpdate, previousResult); //pass trial or something
-
-
-
+        initFiberLengthTraceCurves(subject, trialData, musclesToUpdate, previousResult); 
+     
         unsigned lmtMaIndex(0); // k is the index for lmt and ma data
         double lmtTime = trialData.lmtData.getStartTime();
         double emgTime = trialData.emgData.getStartTime() + subject.getGlobalEmDelay();
         bool firstLmtArrived(false);
+        
 
         // Let's start going through the EMG, lmt, and ma data...  
         for (unsigned emgIndex(0); emgIndex < trialData.emgData.getNRows(); ++emgIndex) {
@@ -65,14 +65,14 @@ namespace CEINMS {
                 subject.updateActivations(musclesToUpdate);
             }
 
-            if (TimeCompare::lessEqual(lmtTime, emgTime) && (lmtMaIndex < trialData.lmtData_.getNRows()) && (lmtMaIndex < trialData.maData_.front().getNRows())) {
+            if (TimeCompare::lessEqual(lmtTime, emgTime) && (lmtMaIndex < trialData.lmtData.getNRows()) && (lmtMaIndex < trialData.maData.front().getNRows())) {
                 firstLmtArrived = true;
                 subject.setMuscleForces(previousResult.forces.getRow(lmtMaIndex));
                 subject.setTime(emgTime);
                 subject.setEmgsSelective(trialData.emgData.getRow(emgIndex), musclesToUpdate);
                 subject.setMuscleTendonLengthsSelective(trialData.lmtData.getRow(lmtMaIndex), musclesToUpdate); //might save computation by having a set muscle tendon length selective.. to check ;)
                 for (unsigned dofIndex(0); dofIndex < trialData.noDoF; ++dofIndex)
-                    subject.setMomentArms(trialData.maData.at(j).getRow(lmtMaIndex), j);
+                    subject.setMomentArms(trialData.maData.at(dofIndex).getRow(lmtMaIndex), dofIndex);
                 subject.updateState_OFFLINE(musclesToUpdate);
                 subject.pushState(musclesToUpdate);
                 std::vector<double> currentTorques, currentForces;
@@ -84,9 +84,9 @@ namespace CEINMS {
 
                 //calcolo delle penalty modificato per accomodare l'update di un sottoinsieme di muscoli
                 std::vector<double> penaltiesAtT;
-                subject_.getMusclesPenaltyVector(penaltiesAtT);
+                subject.getMusclesPenaltyVector(penaltiesAtT);
 
-                for (auto &it : musclesToUpdate_)
+                for (auto &it : musclesToUpdate)
                     previousResult.penalties.at(lmtMaIndex, it) = penaltiesAtT.at(it);
 
 
@@ -120,8 +120,8 @@ namespace CEINMS {
             }
             std::vector<double> currentActivations;
             subject.getActivations(currentActivations);
-            previousResult.activations.setRow(emgIndex, currentActivations);
-
+            for (auto &it : musclesToUpdate)
+                previousResult.activations.at(emgIndex, it) = currentActivations.at(it);
 
         }
         return previousResult;
@@ -149,7 +149,7 @@ namespace CEINMS {
                 subject.updateActivations(musclesToUpdate);;
             }
 
-            if (TimeCompare::lessEqual(lmtTime, emgTime) && (lmtMaIndex < trialData.lmtData_.getNRows()) && (lmtMaIndex < trialData.maData_.front().getNRows())) {
+            if (TimeCompare::lessEqual(lmtTime, emgTime) && (lmtMaIndex < trialData.lmtData.getNRows()) && (lmtMaIndex < trialData.maData.front().getNRows())) {
                 firstLmtArrived = true;
                 // set emg to model, set activations of the muscles not updated
                 subject.setTime(emgTime);

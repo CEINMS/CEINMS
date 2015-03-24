@@ -28,7 +28,7 @@ public:
     template<typename NMSmodel> QueuesToTrialData(CEINMS::InputConnectors& inputConnectors, CEINMS::OutputConnectors& outputConnectors, NMSmodel& subject, std::string id) : inputConnectors_(inputConnectors), outputConnectors_(outputConnectors)
     {
         data_.id = id;
-        std::string muscleNames;
+        std::vector<std::string> muscleNames;
         subject.getMuscleNames(muscleNames);
         data_.emgData.setLabels(muscleNames);
         data_.lmtData.setLabels(muscleNames);
@@ -37,6 +37,7 @@ public:
         data_.noDoF = data_.dofNames.size();
         std::vector<std::vector<std::string>> maMuscleNames;
         subject.getMuscleNamesOnDofs(maMuscleNames);
+        data_.maData.resize(data_.noDoF);
         for (auto i(0); i < data_.noDoF; ++i)
             data_.maData.at(i).setLabels(maMuscleNames.at(i));
         data_.torqueData.setLabels(data_.dofNames);
