@@ -208,7 +208,7 @@ int main(int argc, char** argv) {
     std::cout << "NMSModelCfg " << runMode << std::endl;
     switch (runMode) {
 
-    case NMSModelCfg::OpenLoopExponentialActivationElasticTendonBiSecOffline: {
+    case NMSModelCfg::OpenLoopExponentialActivationStiffTendonOffline: {
 
         using  MyNMSmodel = NMSmodel < ExponentialActivation, StiffTendon, CurveMode::Offline >;
         MyNMSmodel mySubject;
