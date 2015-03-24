@@ -6,9 +6,8 @@ include_directories(
   ${ceinms_common_INCLUDE_DIRS}
 )
 # List source files
-set(Optimizers_HEADERS AbstractOptimizerSystem.h
-                                     AbstractOptimizer.h
-                                     SimulatedAnnealing.h
+set(Optimizers_HEADERS  AbstractOptimizer.h
+                        SimulatedAnnealing.h
                         )
 set(Optimizers_SOURCES )
 
