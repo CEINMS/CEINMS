@@ -28,6 +28,8 @@ namespace CEINMS {
         
         static DataTable sum(const DataTable& lhs, const DataTable& rhs);
         static DataTable subtract(const DataTable& lhs, const DataTable& rhs);
+        static DataTable multiplyByElement(const DataTable& lhs, const DataTable& rhs);
+        static DataTable multiplyByScalar(const DataTable& lhs, T scalar);
 
         std::string getLabel(size_t col) const { return labels_.at(col); }
         T get(size_t row, size_t col) const { return data_.at(row, col); }

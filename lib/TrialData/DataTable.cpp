@@ -110,6 +110,34 @@ namespace CEINMS {
         return ans;
     }
 
+
+    template <typename T>
+    DataTable<T>  DataTable<T>::multiplyByElement(const DataTable<T>& lhs, const DataTable<T>& rhs) {
+
+        if (lhs.getNColumns() != rhs.getNColumns() || lhs.getNColumns() != rhs.getNColumns())
+            throw std::invalid_argument("lhs and rhs differ in size");  //check just on data size.. ignore labels and time column
+               
+        DataTable<T> ans(lhs);
+        for (size_t r(0); r < lhs.nRows_; ++r)
+            for (size_t c(0); c < lhs.nRows_; ++c)
+                ans.at(r, c) = lhs.at(r, c)*rhs.at(r, c);
+        return ans;
+    }
+
+
+    template <typename T>
+    DataTable<T>  DataTable<T>::multiplyByScalar(const DataTable<T>& lhs, T scalar) {
+
+        if (lhs.getNColumns() != rhs.getNColumns() || lhs.getNColumns() != rhs.getNColumns())
+            throw std::invalid_argument("lhs and rhs differ in size");  //check just on data size.. ignore labels and time column
+
+        DataTable<T> ans(lhs);
+        for (size_t r(0); r < lhs.nRows_; ++r)
+            for (size_t c(0); c < lhs.nRows_; ++c)
+                ans.at(r, c) = lhs.at(r, c)*scalar;
+        return ans;
+    }
+
     template<typename T>
     bool DataTable<T>::equals(const DataTable<T>& rhs) const {
         return(data_   == rhs.data_   &&
@@ -158,6 +186,19 @@ namespace CEINMS {
         return DataTable<T>::subtract(lhs, rhs);
     }
 
+    template<typename T>
+    DataTable<T> operator* (const DataTable<T>& lhs, const DataTable<T>& rhs) {
+        return DataTable<T>::multiplyByElement(lhs, rhs);
+    }
 
+    template<typename T>
+    DataTable<T> operator* (const DataTable<T>& lhs, T scalar) {
+        return DataTable<T>::multiplyByScalar(lhs, scalar);
+    }
+
+    template<typename T>
+    DataTable<T> operator* (T scalar, const DataTable<T>& rhs, ) {
+        return DataTable<T>::multiplyByScalar(rhs, scalar);
+    }
 
 }
