@@ -186,9 +186,15 @@ namespace CEINMS {
             for (unsigned int a = 0; a < nEpsilon_; ++a) {
                 // we check that each DoF had a change in fOpt less than epsilon
                 if (fabs(fLatest_.at(a) - fOpt_) > epsilon_) {
+                    cout << "Return false" << endl;
+                    cout << "fLatest_.at(" << a << ") - fOpt_ = "
+                        << fLatest_.at(a) << " - " << fOpt_ << " > "
+                        << epsilon_ << endl;
                     return false;
                 }
             }
+            cout << "Return true! " << endl;
+            cout << "fOpt_ = " << fOpt_ << endl;
             return true;
         }
 

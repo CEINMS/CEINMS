@@ -81,8 +81,8 @@ namespace CEINMS {
             vector<double> torqueError;
             vector<double> penalty;
             TrialCost(size_t nDofs) :
-                torqueError(0., nDofs),
-                penalty(0., nDofs) {}
+                torqueError(nDofs, 0.),
+                penalty(nDofs, 0.) {}
 ;
         };
 
