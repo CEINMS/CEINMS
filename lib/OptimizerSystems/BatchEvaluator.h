@@ -9,31 +9,9 @@
 #include "MuscleParameters.h"
 #include "DataTable.h"
 #include "TrialData.h"
+#include "Result.h"
 
 namespace CEINMS {
-
-    class Result{
-    public:
-
-        DataTable<double> forces, torques, activations, penalties;
-        Result(size_t nMTUs, size_t nDofs, size_t nEmgs, size_t nLmtMa) :
-            forces(nLmtMa, nMTUs),
-            torques(nLmtMa, nDofs),
-            activations(nEmgs, nMTUs),
-            penalties(nLmtMa, nMTUs) {}
-        bool equals(const Result& rhs) const {
-            return (forces      == rhs.forces      &&
-                    torques     == rhs.torques     &&
-                    activations == rhs.activations &&
-                    penalties   == rhs.penalties);
-
-        }
-
-    };
-
-    bool operator==(const Result& lhs, const Result& rhs) {
-        return lhs.equals(rhs);
-    }
 
 
     class OpenLoopEvaluator {
@@ -65,6 +43,7 @@ namespace CEINMS {
         std::vector<TrialData> trials_;
         std::vector<Result> results_;
     };    
+
 }
 
 #include "BatchEvaluator.cpp"
