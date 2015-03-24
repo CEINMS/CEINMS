@@ -142,6 +142,22 @@ namespace CEINMS {
     }
 
 
+    template<typename T>
+    bool operator==(const DataTable<T>& lhs, const DataTable<T>& rhs) {
+        return lhs.equals(rhs);
+    }
+
+    template<typename T>
+    DataTable<T> operator+ (const DataTable<T>& lhs, const DataTable<T>& rhs) {
+        return DataTable<T>::sum(lhs, rhs);
+    }
+
+
+    template<typename T>
+    DataTable<T> operator- (const DataTable<T>& lhs, const DataTable<T>& rhs) {
+        return DataTable<T>::subtract(lhs, rhs);
+    }
+
 
 
 }

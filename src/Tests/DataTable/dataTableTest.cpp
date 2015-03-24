@@ -23,10 +23,10 @@ int main() {
 
     auto t2(t1);
     cout << "Subtraction" << endl;
-    cout << DataTable<double>::subtract(t2, t1);
+    cout << t2-t1;
 
     cout << "Sum" << endl;
-    cout << DataTable<double>::sum(t2, t1);
+    cout << t1+t2;
 
     cout << "Dimension initializer" << endl;
     DataTable<double> table(3, 4);

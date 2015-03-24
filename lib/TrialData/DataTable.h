@@ -12,10 +12,6 @@ namespace CEINMS {
     template<typename T>
     std::ostream& operator<< (std::ostream & out, const DataTable<T> & rhs);
 
-    template<typename T>
-    bool operator==(const DataTable<T>& lhs, const DataTable<T>& rhs) {
-        return lhs.equals(rhs);
-    }
 
     template<typename T>
     class DataTable {
