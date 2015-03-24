@@ -26,14 +26,15 @@ namespace CEINMS {
     }
 
     void MinTorqueError::updDofsToCalibrateIdx() {
- 
+        dofsToCalibrateIdx_.clear();
         for (auto& trial : trials_) {
-            dofsToCalibrateIdx_.clear();
+            vector<unsigned> indeces;
             for (auto& dof : dofsToCalibrate_){
                 auto it(find(begin(trial.dofNames), end(trial.dofNames), dof));
                 if (it != end(trial.dofNames))
-                    dofsToCalibrateIdx_.emplace_back(std::distance(begin(trial.dofNames), it));
+                    indeces.emplace_back(std::distance(begin(trial.dofNames), it));
             }
+            dofsToCalibrateIdx_.emplace_back(indeces);
         }
     }
 
@@ -103,8 +104,8 @@ namespace CEINMS {
                 for (auto& c : dofsToCalibrateIdx_.at(trialIndex))
                     trialCost.penalty.at(c) += rIt->penalties.at(r, c);
 
-            return trialCosts.emplace_back(trialCost);
-        };
+            trialCosts.emplace_back(trialCost);
+        }
 
 
         for (size_t trialIndex(0); trialIndex < trials_.size(); ++trialIndex) {
