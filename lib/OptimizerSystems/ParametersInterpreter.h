@@ -24,12 +24,12 @@ class ParametersInterpreter  {
     
 public:
     using ParameterSet = Parameter::Set;
-    ParametersInterpreter(NMSmodelT& subject,const ParameterSet& parameterSet);
-    size_t getNoParameters() { return noParameters_; }
-    std::vector<double> getSubjectParameters();
+    ParametersInterpreter(NMSmodelT& subject, const ParameterSet& parameterSet, const std::vector<std::string>& dofsToCalibrate);
+    size_t getNoParameters() const { return noParameters_; }
+    std::vector<double> getSubjectParameters() const;
     void setSubjectParameters(const std::vector<double>& x);
     void getUpperLowerBounds(std::vector<double>& upperBounds, std::vector<double>& lowerBounds) const;
-    
+    void setDofsToCalibrate(const std::vector<std::string> dofsToCalibrate);
 private:
 
     //modify 
@@ -51,12 +51,12 @@ private:
 
     typedef std::map<ParameterID, ParameterDetails> ParametersMap;
     void defineParameterDetails();
-    void setDofsToCalibrate(const std::vector<std::string> dofsToCalibrate);
-    void groupValues(const MuscleGroupsIdx& muscleGroupIdx, const std::vector<double>& distributedValues, std::vector<double>& groupedValues);
+    
+    void groupValues(const MuscleGroupsIdx& muscleGroupIdx, const std::vector<double>& distributedValues, std::vector<double>& groupedValues) const;
     void distributeValues(const MuscleGroupsIdx& muscleGroupIdx, std::vector<double>& distributedValues, const std::vector<double>& groupedValues);
     void getMuscleGroupIndex(const MuscleGroups& muscleGroups, MuscleGroupsIdx& muscleGroupsIdx);
     void getMuscleGroupIndex(ParameterAssignment parameterAssignment, MuscleGroupsIdx& muscleGroupsIdx);
-    void getCoefficients(ParameterID parameterID, std::vector<double>& coefficients);
+    void getCoefficients(ParameterID parameterID, std::vector<double>& coefficients) const;
     void setCoefficients(ParameterID parameterID, const std::vector<double>& coefficients);
     NMSmodelT& subject_;
     ParameterSet parameterSet_;

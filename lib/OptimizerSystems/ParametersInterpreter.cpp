@@ -12,11 +12,10 @@
 #include <algorithm>
 
 template <typename NMSmodelT>
-ParametersInterpreter<NMSmodelT>::ParametersInterpreter(NMSmodelT& subject, const ParameterSet& parameterSet):
-subject_(subject), parameterSet_(parameterSet)
+ParametersInterpreter<NMSmodelT>::ParametersInterpreter(NMSmodelT& subject, const ParameterSet& parameterSet, const std::vector<std::string>& dofsToCalibrate) :
+subject_(subject), parameterSet_(parameterSet), dofNames_(dofsToCalibrate)
 {
-    
-    
+    defineParameterDetails();
 }
 
 
@@ -30,7 +29,7 @@ void ParametersInterpreter<NMSmodelT>::setDofsToCalibrate(const std::vector<std:
 template<typename NMSmodelT>
 void ParametersInterpreter<NMSmodelT>::defineParameterDetails() {
 
-    for (ParameterSet::const_iterator it(parameterSet.begin()); it != parameterSet.end(); ++it) {
+    for (ParameterSet::const_iterator it(parameterSet_.begin()); it != parameterSet_.end(); ++it) {
     //    std::cout << "Parameter " << it->getName() << std::endl;
         ParameterDetails parameterDetails;
         ParameterID parameterId = it->getID();
@@ -52,7 +51,7 @@ void ParametersInterpreter<NMSmodelT>::defineParameterDetails() {
 
         std::pair<typename ParametersMap::iterator, bool> ret;
         ret = parameters_.insert(std::pair<ParameterID, ParameterDetails>(parameterId, parameterDetails));
-        if (ret.second == false)
+  //      if (ret.second == false)
    //         std::cout << "parameter " << it->getName() << " already existed - skipped\n";
     }
 
@@ -67,7 +66,7 @@ void ParametersInterpreter<NMSmodelT>::defineParameterDetails() {
 
 
 template<typename NMSmodelT>
-std::vector<double> ParametersInterpreter<NMSmodelT>::getSubjectParameters() {
+std::vector<double> ParametersInterpreter<NMSmodelT>::getSubjectParameters() const{
 
     std::vector<double> x;
     for(typename ParametersMap::const_iterator it(parameters_.begin()); it != parameters_.end(); ++it) {
@@ -130,7 +129,7 @@ void ParametersInterpreter<NMSmodelT>::getUpperLowerBounds(std::vector<double>& 
 
 
 template<typename NMSmodelT>
-void ParametersInterpreter<NMSmodelT>::groupValues(const MuscleGroupsIdx& muscleGroupsIdx, const std::vector<double>& distributedValues, std::vector<double>& groupedValues) {
+void ParametersInterpreter<NMSmodelT>::groupValues(const MuscleGroupsIdx& muscleGroupsIdx, const std::vector<double>& distributedValues, std::vector<double>& groupedValues) const{
  
     groupedValues.clear();
     for(typename MuscleGroupsIdx::const_iterator it(muscleGroupsIdx.begin()); it != muscleGroupsIdx.end(); ++it)
@@ -189,7 +188,7 @@ void ParametersInterpreter<NMSmodelT>::getMuscleGroupIndex(ParameterAssignment p
 
 
 template<typename NMSmodelT>
-void ParametersInterpreter<NMSmodelT>::getCoefficients(ParameterID parameterID, std::vector<double>& coefficients) {
+void ParametersInterpreter<NMSmodelT>::getCoefficients(ParameterID parameterID, std::vector<double>& coefficients) const {
         
      switch(parameterID) {
             case Parameter::C1: 
