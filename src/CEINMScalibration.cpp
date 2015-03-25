@@ -51,6 +51,7 @@ using std::list;
 #include <stdlib.h>
 
 #include <ctime>
+#include <chrono>
 
 #include <CeinmsCalibrationSetupXmlReader.h>
 
@@ -295,7 +296,10 @@ int main(int argc, char** argv){
                         currentCalibrationStep.getParameterSet(parameterSet);
                         MyParameters parameterPolicy(mySubject, dofsToCalibrate, parameterSet);
                         MyOptimizator optimizator(parameterPolicy, torqueComputation, simanParameters);
+                        auto timeBegin = std::chrono::high_resolution_clock::now();
                         optimizator.optimize();
+                        auto timeEnd = std::chrono::high_resolution_clock::now();
+                        std::cout << std::chrono::duration_cast<std::chrono::milliseconds>(timeEnd - timeBegin).count() << "ms" << std::endl;
                     }
                     break;
                     default:
