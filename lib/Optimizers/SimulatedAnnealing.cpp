@@ -20,6 +20,9 @@ using std::vector;
 using std::string;
 #include <time.h>
 #include <limits>
+
+#define LOG_SIMULATED_ANNEALING
+
 namespace CEINMS {
     namespace Optimizers {
 
@@ -83,16 +86,30 @@ namespace CEINMS {
                         // DO i = 1, n
                         for (int k = 0; k < noParameters_; ++k) {
                             // x'_i = x_i + r v_i
+
+
                             xp_ = x_;
 
-                            // :TODO: perche' mettono (2*rand()-1.0) invece di rand()?
                             double factorForV = (2.*rand() / static_cast<double>(RAND_MAX)-1.);
                             xp_.at(k) = x_.at(k) + v_.at(k) * factorForV;
                             checkBounds(k);
+
+#ifdef LOG_SIMULATED_ANNEALING
+                            cout << "xp_ : ";
+                            for (auto& val : xp_)
+                                cout << val << " ";
+                            cout << endl;
+#endif
+
                             optimizerSystem_.setParameters(xp_);
                             optimizerSystem_.evaluate();
                             fp_ = optimizerSystem_.getF();
                             ++noEval;
+
+#ifdef LOG_SIMULATED_ANNEALING
+                            cout << "fp_ : " << fp_ << endl;
+                            cout << "evalNo " << noEval << endl;
+#endif       
 
                             // if f' < f then
                             if (fp_ < f_) {

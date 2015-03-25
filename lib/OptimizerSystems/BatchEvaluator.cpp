@@ -90,12 +90,6 @@ namespace CEINMS {
                 for (auto &it : musclesToUpdate)
                     previousResult.penalties.at(lmtMaIndex, it) = penaltiesAtT.at(it);
 
-
-                //TODO: questo va spostato in obje function
-                //                    penalties.at(ct).at(k) = 0;
-                //                  for (unsigned j = 0; j < subject_.getNoMuscles(); ++j)
-                //                    penalties.at(ct).at(k) += penaltyDataT1_.at(ct).at(k).at(j);
-                //fine calcolo penalties
                 ++lmtMaIndex;
                 if (lmtMaIndex < trialData.lmtData.getNRows())
                     lmtTime = trialData.lmtData.getTime(lmtMaIndex);
