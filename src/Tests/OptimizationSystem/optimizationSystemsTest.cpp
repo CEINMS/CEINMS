@@ -35,6 +35,7 @@ using std::cout;
 using std::endl;
 #include <list>
 using std::list;
+#include <chrono>
 
 template <typename T>
 void setupSubject(T& mySubject, string configurationFile) {
@@ -232,8 +233,10 @@ int main(int argc, char** argv) {
                 calibrationXmlReader.getOptimizationAlgorithmParameters(simanParameters);
                 CEINMS::Optimizers::SimulatedAnnealing<MySystem> optimizer(system, simanParameters);
 
+                auto timeBegin = std::chrono::high_resolution_clock::now();
                 optimizer.optimize();
-
+                auto timeEnd = std::chrono::high_resolution_clock::now();
+                std::cout << std::chrono::duration_cast<std::chrono::milliseconds>(timeEnd - timeBegin).count() << "ms" << std::endl;
             }
                 break;
             default:

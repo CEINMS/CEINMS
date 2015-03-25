@@ -80,10 +80,10 @@ namespace CEINMS {
         class TrialCost {
         public:
             vector<double> torqueError;
-            vector<double> penalty;
+            double penalty;
             TrialCost(size_t nDofs) :
                 torqueError(nDofs, 0.),
-                penalty(nDofs, 0.) {}
+                penalty(0.) {}
 ;
         };
 
@@ -101,8 +101,8 @@ namespace CEINMS {
                     trialCost.torqueError.at(c) += squaredDiff.at(r, c);
 
             for (size_t r(0); r < rIt->penalties.getNRows(); ++r)
-                for (auto& c : dofsToCalibrateIdx_.at(trialIndex))
-                    trialCost.penalty.at(c) += rIt->penalties.at(r, c);
+                for (size_t c(0); c < rIt->penalties.getNColumns(); ++c)
+                    trialCost.penalty += rIt->penalties.at(r, c);
 
             trialCosts.emplace_back(trialCost);
         }
@@ -111,7 +111,7 @@ namespace CEINMS {
         for (size_t trialIndex(0); trialIndex < trials_.size(); ++trialIndex) {
             for (auto& dofIdx : dofsToCalibrateIdx_.at(trialIndex))
                 f_ += (trialCosts.at(trialIndex).torqueError.at(dofIdx) / torqueVariance_.at(trialIndex).at(dofIdx) +
-                       trialCosts.at(trialIndex).penalty.at(dofIdx)) / trials_.at(trialIndex).torqueData.getNRows();
+                       trialCosts.at(trialIndex).penalty) / trials_.at(trialIndex).torqueData.getNRows();
             }
         
     }

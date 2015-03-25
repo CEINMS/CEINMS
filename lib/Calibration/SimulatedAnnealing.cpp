@@ -98,12 +98,12 @@ void SimulatedAnnealing<ParametersT, ObjectiveFunctionT, TorquesComputationT>
           // io penso abbia piu` senso metterlo fuori
           // (condizione while)
       
-#ifdef LOG_SIMULATED_ANNEALING
+//#ifdef LOG_SIMULATED_ANNEALING
                 cout << "x_ : ";
                 for (unsigned int it = 0; it < x_.size(); ++it)
                     cout << x_.at(it) << " ";
                 cout << endl;
-#endif
+//#endif
           // x'_i = x_i + r v_i
                 xp_ = x_;
 
@@ -127,10 +127,10 @@ void SimulatedAnnealing<ParametersT, ObjectiveFunctionT, TorquesComputationT>
                 objectiveFunction_.evalFp();
                 ++noEval;
           
-#ifdef LOG_SIMULATED_ANNEALING
+//#ifdef LOG_SIMULATED_ANNEALING
                 cout << "eval no. " << noEval << endl; 
                 objectiveFunction_.printFs();
-#endif
+//#endif
           
             // if f' < f then
                 if(objectiveFunction_.isFacceptable()) {
