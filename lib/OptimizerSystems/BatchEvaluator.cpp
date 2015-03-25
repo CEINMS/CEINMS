@@ -1,4 +1,5 @@
-
+#include <future>
+#include <thread>
 
 #include "TimeCompare.h"
 #include <vector>
@@ -30,11 +31,30 @@ namespace CEINMS {
         subject.getMusclesParameters(subjectParameters_);
         updMusclesToUpdate();
         subjectParametersT1_ = subjectParameters_; //for next evaluation
+        
         for (unsigned i(0); i < trials_.size(); ++i) {
             OpenLoopEvaluator::evaluate(subject, trials_.at(i), musclesToUpdate_, results_.at(i));
         }
     }
 
+
+    template<typename NMSmodelT>
+    void BatchEvaluator::evaluateParallel(NMSmodelT& subject) {
+
+        subject.getMusclesParameters(subjectParameters_);
+        updMusclesToUpdate();
+        subjectParametersT1_ = subjectParameters_; //for next evaluation
+        std::vector<std::future<void>> futures;
+        for (unsigned i(0); i < trials_.size(); ++i) {
+            auto fut(std::async(std::launch::async, [=](){
+                OpenLoopEvaluator::evaluate(NMSmodelT(subject), trials_.at(i), musclesToUpdate_, results_.at(i)); }
+            ));
+            futures.push_back(std::move(fut));
+        }
+
+        for (auto& f : futures)
+            f.wait();
+    }
 
 
     void BatchEvaluator::updMusclesToUpdate() {

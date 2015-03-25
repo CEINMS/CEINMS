@@ -32,6 +32,8 @@ namespace CEINMS {
         BatchEvaluator(const std::vector<TrialData>& trials);
         template<typename NMSmodelT>
         void evaluate(NMSmodelT& subject);
+        template<typename NMSmodelT>
+        void evaluateParallel(NMSmodelT& subject);
         std::vector<Result> getResults() const {
             return results_;
         }

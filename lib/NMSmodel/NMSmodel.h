@@ -43,7 +43,7 @@ public:
     typedef typename std::vector<DoFtype>::const_iterator vectorDoFconstItr;
      
     NMSmodel() {}
-    NMSmodel(const NMSmodel& orig) { std::cout << "YOU SHOULD NOT BE HERE!"; exit(EXIT_FAILURE);}
+    NMSmodel(const NMSmodel& orig);// { std::cout << "YOU SHOULD NOT BE HERE!"; exit(EXIT_FAILURE); }
     virtual ~NMSmodel() {}
     bool haveThisMuscle(const std::string& currentMuscle, vectorMTUitr& found);
     bool haveTheseMuscles(const std::vector<std::string>& musclesNames);

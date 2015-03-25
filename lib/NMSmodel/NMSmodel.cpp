@@ -25,6 +25,25 @@ using std::string;
 //#define DEBUG
 #define CHECKS
 
+
+template <typename Activation, typename Tendon, CurveMode::Mode mode>
+NMSmodel<Activation, Tendon, mode>::NMSmodel(const NMSmodel<Activation, Tendon, mode>& orig) :
+muscles_(orig.muscles_), muscleNames_(orig.muscleNames_), dofNames_(orig.dofNames_)
+{
+
+    std::map<std::string, std::vector<std::string>> dofsToMuscles;
+    orig.getMuscleNamesOnDofs(dofsToMuscles);
+    for (auto& d : dofNames_) {
+        DoFtype dof(d);
+        for (auto& m : dofsToMuscles[d]) {
+            auto i(std::distance(muscleNames_.begin(), std::find(muscleNames_.begin(), muscleNames_.end(), m)));
+            dof.addNewMuscle(muscles_.begin() + i);
+        }
+        dofs_.emplace_back(dof);
+    }
+}
+
+
 template <typename Activation, typename Tendon, CurveMode::Mode mode>
 void NMSmodel<Activation, Tendon, mode>::addMuscle(const MTUtype& muscle) {
 
