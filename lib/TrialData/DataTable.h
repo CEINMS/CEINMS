@@ -37,7 +37,8 @@ namespace CEINMS {
         T getStartTime() const { return time_.front(); }
         T getFinalTIme() const { return time_.back(); }
         std::vector<T> getTimeColumn(size_t col) const { return time_; }
-        std::vector<T> getRow(size_t row) const;
+        const std::vector<T>& getRow(size_t row) const; //return const ref is bad.. checking for performance       
+
         std::vector<T> getColumn(size_t col) const;
         size_t getNColumns() const { return nCols_; }
         size_t getNRows() const { return nRows_; }

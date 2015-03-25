@@ -65,7 +65,7 @@ namespace CEINMS {
     }
 
     template <typename T>
-    std::vector<T> DataTable<T>::getRow(size_t row) const {
+    const std::vector<T>& DataTable<T>::getRow(size_t row) const {
 
         return data_.at(row);
     }

@@ -31,7 +31,7 @@ namespace CEINMS {
         updMusclesToUpdate();
         subjectParametersT1_ = subjectParameters_; //for next evaluation
         for (unsigned i(0); i < trials_.size(); ++i) {
-            results_.at(i) = OpenLoopEvaluator::evaluate(subject, trials_.at(i), musclesToUpdate_, results_.at(i));
+            OpenLoopEvaluator::evaluate(subject, trials_.at(i), musclesToUpdate_, results_.at(i));
         }
     }
 
@@ -45,7 +45,7 @@ namespace CEINMS {
     }
 
     template<typename NMSmodelT>
-    Result OpenLoopEvaluator::evaluate(NMSmodelT& subject, const TrialData& trialData, const std::vector<unsigned> musclesToUpdate, Result previousResult) { //pass previousResult by copy, because I need a copy later
+    void OpenLoopEvaluator::evaluate(NMSmodelT& subject, const TrialData& trialData, const std::vector<unsigned> musclesToUpdate, Result& previousResult) { //pass previousResult by copy, because I need a copy later
 
         //ct trial index
         initFiberLengthTraceCurves(subject, trialData, musclesToUpdate, previousResult); 
@@ -119,7 +119,6 @@ namespace CEINMS {
                 previousResult.activations.at(emgIndex, it) = currentActivations.at(it);
 
         }
-        return previousResult;
     }
 
 

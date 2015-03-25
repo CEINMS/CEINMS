@@ -465,7 +465,7 @@ void NMSmodel<Activation, Tendon, mode>::getActivations(vector<double>& activati
     activations.reserve(muscles_.size());
     vectorMTUconstItr muscleIt = muscles_.begin();
     for (muscleIt = muscles_.begin(); muscleIt < muscles_.end(); ++muscleIt) 
-        activations.push_back(muscleIt->getActivation());
+        activations.emplace_back(muscleIt->getActivation());
     
 }
 
@@ -979,9 +979,11 @@ double NMSmodel<Activation, Tendon, mode>::getMusclesPenalty(vector<unsigned>& s
 template <typename Activation, typename Tendon, CurveMode::Mode mode>
 void NMSmodel<Activation, Tendon, mode>::getMusclesPenaltyVector(vector<double>& penalties) const {
  
+    penalties.clear();
+    penalties.reserve(muscles_.size());
     vectorMTUconstItr muscleIt = muscles_.begin();
     for (muscleIt = muscles_.begin(); muscleIt < muscles_.end(); ++muscleIt) 
-        penalties.push_back(muscleIt->getPenalty());    
+        penalties.emplace_back(muscleIt->getPenalty());    
 }
 
 
