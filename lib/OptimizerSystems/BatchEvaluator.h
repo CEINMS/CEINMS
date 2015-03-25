@@ -18,10 +18,10 @@ namespace CEINMS {
     public:
         OpenLoopEvaluator() = delete;
         template<typename NMSmodelT>
-        static void evaluate(NMSmodelT& subject, const TrialData& trialData, const std::vector<unsigned> musclesToUpdate, Result& previousResult);
+        static void evaluate(NMSmodelT&& subject, const TrialData& trialData, const std::vector<unsigned> musclesToUpdate, Result& previousResult);
     private:
         template<typename NMSmodelT>
-        static void initFiberLengthTraceCurves(NMSmodelT& subject, const TrialData& trialData, const std::vector<unsigned> musclesToUpdate, Result& previousResult);
+        static void initFiberLengthTraceCurves(NMSmodelT&& subject, const TrialData& trialData, const std::vector<unsigned> musclesToUpdate, Result& previousResult);
     };
 
 

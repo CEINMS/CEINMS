@@ -49,7 +49,7 @@ namespace CEINMS {
             auto fut(std::async(std::launch::async, [=](){
                 OpenLoopEvaluator::evaluate(NMSmodelT(subject), trials_.at(i), musclesToUpdate_, results_.at(i)); }
             ));
-            futures.push_back(std::move(fut));
+            futures.emplace_back(std::move(fut));
         }
 
         for (auto& f : futures)
@@ -65,7 +65,7 @@ namespace CEINMS {
     }
 
     template<typename NMSmodelT>
-    void OpenLoopEvaluator::evaluate(NMSmodelT& subject, const TrialData& trialData, const std::vector<unsigned> musclesToUpdate, Result& previousResult) { //pass previousResult by copy, because I need a copy later
+    void OpenLoopEvaluator::evaluate(NMSmodelT&& subject, const TrialData& trialData, const std::vector<unsigned> musclesToUpdate, Result& previousResult) { //pass previousResult by copy, because I need a copy later
 
         //ct trial index
         initFiberLengthTraceCurves(subject, trialData, musclesToUpdate, previousResult); 
@@ -143,7 +143,7 @@ namespace CEINMS {
 
 
     template<typename NMSmodelT>
-    void OpenLoopEvaluator::initFiberLengthTraceCurves(NMSmodelT& subject, const TrialData& trialData, const std::vector<unsigned> musclesToUpdate, Result& previousResult) {
+    void OpenLoopEvaluator::initFiberLengthTraceCurves(NMSmodelT&& subject, const TrialData& trialData, const std::vector<unsigned> musclesToUpdate, Result& previousResult) {
 
 
         unsigned lmtMaIndex(0); // k is the index for lmt and ma data

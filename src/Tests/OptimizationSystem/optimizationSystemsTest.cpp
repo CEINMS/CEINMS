@@ -247,6 +247,48 @@ int main(int argc, char** argv) {
 
     } //end case
         break;
+
+
+
+    case NMSModelCfg::OpenLoopExponentialActivationElasticTendonBiSecOffline: {
+
+        using  MyNMSmodel = NMSmodel < ExponentialActivation, ElasticTendon_BiSec, CurveMode::Offline >;
+        MyNMSmodel mySubject;
+        setupSubject(mySubject, uncalibratedSubjectXmlFile);
+        for (list<string>::iterator trialIt = calibrationTrialIDs.begin(); trialIt != calibrationTrialIDs.end(); ++trialIt)
+            trials.push_back(readTrialData(*trialIt, mySubject, *trialIt, emgGeneratorFile));
+        CalibrationStep currentCalibrationStep;
+        while (calibrationXmlReader.popNextCalibrationStep(currentCalibrationStep)) {
+            std::cout << "CalibrationStepCfg " << currentCalibrationStep.getStepCfg() << std::endl;
+            switch (currentCalibrationStep.getStepCfg()) {
+            case CalibrationCfg::MinimizeTorqueErrorParameterSetDefault: {
+                CEINMS::MinTorqueError objFun;
+                vector<string> dofsToCalibrate;
+                currentCalibrationStep.getDofNames(dofsToCalibrate);
+                ParameterSet parameterSet;
+                currentCalibrationStep.getParameterSet(parameterSet);
+                using MySystem = CEINMS::NMSmodelSystem < MyNMSmodel, CEINMS::MinTorqueError >;
+                MySystem system(mySubject, trials, CEINMS::MinTorqueError(), parameterSet, dofsToCalibrate);
+
+                SimulatedAnnealingParameters simanParameters;
+                calibrationXmlReader.getOptimizationAlgorithmParameters(simanParameters);
+                CEINMS::Optimizers::SimulatedAnnealing<MySystem> optimizer(system, simanParameters);
+
+                auto timeBegin = std::chrono::high_resolution_clock::now();
+                optimizer.optimize();
+                auto timeEnd = std::chrono::high_resolution_clock::now();
+                std::cout << std::chrono::duration_cast<std::chrono::milliseconds>(timeEnd - timeBegin).count() << "ms" << std::endl;
+            }
+                break;
+            default:
+                std::cerr << "Calibration Step not valid\n";
+            }
+        } //end while
+
+
+    } //end case
+        break;
+
     }
     return 0;
 }
