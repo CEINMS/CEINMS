@@ -86,12 +86,14 @@ namespace CEINMS {
         if (lhs.getNColumns() != rhs.getNColumns() || lhs.getNColumns() != rhs.getNColumns())
             throw std::invalid_argument("lhs and rhs differ in size");  //check just on data size.. ignore labels and time column
 
-        DataTable<T> ans(lhs);
+        DataTable<T> ans(lhs.getNRows() < rhs.getNRows() ? lhs.getNRows() : rhs.getNRows(), lhs.getNColumns());
         size_t nRows(std::min(lhs.getNRows(), rhs.getNRows()));
         for (size_t row(0); row < nRows; ++row)
             std::transform(lhs.data_.at(row).begin(), lhs.data_.at(row).end(), rhs.data_.at(row).begin(), ans.data_.at(row).begin(), [](T l, T r) {
             return l + r;
         });
+        ans.labels_ = lhs.labels_;
+        ans.time_.assign(lhs.time_.begin(), lhs.time_.begin() + ans.nRows_);
         return ans;
     }
 
@@ -101,12 +103,15 @@ namespace CEINMS {
         if (lhs.getNColumns() != rhs.getNColumns() || lhs.getNColumns() != rhs.getNColumns())
             throw std::invalid_argument("lhs and rhs differ in size");  //check just on data size.. ignore labels and time column
 
-        DataTable<T> ans(lhs);
-        size_t nRows(std::min(lhs.getNRows(), rhs.getNRows()));
+        //initialise with nRows equals to the minmum of the two arguments
+        DataTable<T> ans(lhs.getNRows() < rhs.getNRows() ? lhs.getNRows() : rhs.getNRows(), lhs.getNColumns());
+        size_t nRows(ans.getNRows());
         for (size_t row(0); row < nRows; ++row)
             std::transform(lhs.data_.at(row).begin(), lhs.data_.at(row).end(), rhs.data_.at(row).begin(), ans.data_.at(row).begin(), [](T l, T r) {
             return l - r;
         });
+        ans.labels_ = lhs.labels_;
+        ans.time_.assign(lhs.time_.begin(), lhs.time_.begin() + ans.nRows_);
         return ans;
     }
 
@@ -117,10 +122,12 @@ namespace CEINMS {
         if (lhs.getNColumns() != rhs.getNColumns() || lhs.getNColumns() != rhs.getNColumns())
             throw std::invalid_argument("lhs and rhs differ in size");  //check just on data size.. ignore labels and time column
                
-        DataTable<T> ans(lhs);
+        DataTable<T> ans(lhs.getNRows() < rhs.getNRows() ? lhs.getNRows() : rhs.getNRows(), lhs.getNColumns());
         for (size_t r(0); r < lhs.nRows_; ++r)
             for (size_t c(0); c < lhs.nCols_; ++c)
                 ans.at(r, c) = lhs.at(r, c)*rhs.at(r, c);
+        ans.labels_ = lhs.labels_;
+        ans.time_.assign(lhs.time_.begin(), lhs.time_.begin() + ans.nRows_);
         return ans;
     }
 
@@ -131,10 +138,12 @@ namespace CEINMS {
         if (lhs.getNColumns() != rhs.getNColumns() || lhs.getNColumns() != rhs.getNColumns())
             throw std::invalid_argument("lhs and rhs differ in size");  //check just on data size.. ignore labels and time column
 
-        DataTable<T> ans(lhs);
+        DataTable<T> ans(lhs.getNRows() < rhs.getNRows() ? lhs.getNRows() : rhs.getNRows(), lhs.getNColumns());
         for (size_t r(0); r < lhs.nRows_; ++r)
             for (size_t c(0); c < lhs.nCols_; ++c)
                 ans.at(r, c) = lhs.at(r, c)*scalar;
+        ans.labels_ = lhs.labels_;
+        ans.time_.assign(lhs.time_.begin(), lhs.time_.begin()+ans.nRows_);
         return ans;
     }
 

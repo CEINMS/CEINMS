@@ -20,6 +20,7 @@ namespace CEINMS {
         DataTable();
         DataTable(size_t nRows, size_t nCols); //do not include time column
         void setLabels(const std::vector<std::string>& labels); //do not include time column
+        std::vector<std::string> getLabels() { return labels_; }
         void set(T value, size_t row, size_t col);
         const T& at(size_t row, size_t col) const;
         T& at(size_t row, size_t col);

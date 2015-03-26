@@ -32,5 +32,20 @@ int main() {
     DataTable<double> table(3, 4);
     std::cout << table;
 
+    cout << endl << "-------------" << endl;
+    cout << "Sum with different row numbers" << endl;
+    t2.pushRow(4, { 7, 7, 7 });
+    t2.setRow(1, { 3, 3, 3 });
+    cout << "Table 1:" << endl;
+    cout << t1 << endl;
+
+    cout << "Table 2:" << endl;
+    cout << t2 << endl;
+
+    cout << "Table 1 minus Table 2:" << endl;
+    cout << t1 - t2;
+
+    cout << "Table 2 minus Table 1:" << endl;
+    cout << t2 - t1;
     return 0;
 }
