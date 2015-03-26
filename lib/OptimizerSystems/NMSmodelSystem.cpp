@@ -68,9 +68,9 @@ namespace CEINMS {
     void NMSmodelSystem<NMSmodelT, ObjectiveFunctionT>::evaluate() {
 
         //subject has the parameters, model evaluator just runs it
-     //   batchEvaluator_.evaluateParallel(subject_, mockSubjects_);
+        batchEvaluator_.evaluateParallel(subject_, mockSubjects_);
         //batchEvaluator_.evaluateParallel(subject_);
-        batchEvaluator_.evaluate(subject_);
+ //       batchEvaluator_.evaluate(subject_);
         auto results = batchEvaluator_.getResults();
 
         objectiveFunction_.calculate(results);
