@@ -260,6 +260,26 @@ void ElasticTendon_BiSec::setTendonSlackLength (double tendonSlackLength) {
 }
 
 
+void ElasticTendon_BiSec::setPennationAngle(double pennationAngle) {
+
+    pennationAngle_ = pennationAngle;
+    resetState();
+}
+
+
+void ElasticTendon_BiSec::setMaxIsometricForce(double maxIsometricForce) {
+
+    maxIsometricForce_ = maxIsometricForce;
+    resetState();
+}
+
+
+void ElasticTendon_BiSec::setOptimalFibreLength(double optimalFibreLength) {
+
+    optimalFibreLength_ = optimalFibreLength;
+    resetState();
+}
+
 void ElasticTendon_BiSec::resetState() {
 
     muscleTendonLength_ = 0.0;

@@ -749,6 +749,23 @@ void ElasticTendon<mode>::setTendonSlackLength (double tendonSlackLength) {
 
 
 template <CurveMode::Mode mode>
+void ElasticTendon<mode>::setPennationAngle(double pennationAngle) {
+
+    pennationAngle_ = pennationAngle;
+    resetState();
+}
+
+
+
+template <CurveMode::Mode mode>
+void ElasticTendon<mode>::setMaxIsometricForce(double maxIsometricForce) {
+
+    maxIsometricForce_ = maxIsometricForce;
+    resetState();
+}
+
+
+template <CurveMode::Mode mode>
 void ElasticTendon<mode>::resetState() {
 
     muscleTendonLength_ = 0.0;

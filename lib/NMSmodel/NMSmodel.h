@@ -143,7 +143,8 @@ public:
     double getMusclesPenalty() const;
     double getMusclesPenalty(std::vector<unsigned>& selectedMusclesIndex) const;
     void getMusclesPenaltyVector(std::vector<double>& penalties) const;
-    void getMusclesParameters(std::vector< MuscleParameters >& parameters);
+    void getMusclesParameters(std::vector< MuscleParameters >& parameters) const;
+    void setMusclesParameters(const std::vector< MuscleParameters >& parameters);
     void setMuscleForces(const std::vector<double>& muscleTendonForces);
     void getMomentArmsOnDof(std::vector<double>& momentArms, unsigned whichDof) const;
     void getOptimalFibreLengths(std::vector<double>& optimalFibreLengths) const;

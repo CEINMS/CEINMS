@@ -1015,8 +1015,8 @@ double NMSmodel<Activation, Tendon, mode>::getGlobalEmDelay() const {
 
 
 template <typename Activation, typename Tendon, CurveMode::Mode mode>
-void NMSmodel<Activation, Tendon, mode>::getMusclesParameters(vector<MuscleParameters>& parameters) {
-
+void NMSmodel<Activation, Tendon, mode>::getMusclesParameters(vector<MuscleParameters>& parameters) const {
+    //this stuff with muscle parameters should be a call to the mtu instead..
     parameters.clear();
     parameters.resize(muscles_.size());
     
@@ -1032,6 +1032,32 @@ void NMSmodel<Activation, Tendon, mode>::getMusclesParameters(vector<MuscleParam
         parameters.at(i).setEmDelay(muscles_.at(i).getEmDelay());
     }
 }
+
+
+template <typename Activation, typename Tendon, CurveMode::Mode mode>
+void NMSmodel<Activation, Tendon, mode>::setMusclesParameters(const vector<MuscleParameters>& parameters)  {
+    //carefull with this.. there's no control over the order of muscles.. 
+    
+    auto mIt(std::begin(muscles_));
+    auto pIt(std::cbegin(parameters));
+    for (pIt; pIt != std::cend(parameters); ++pIt, ++mIt){
+        mIt->setC1(pIt->getC1());
+        mIt->setC2(pIt->getC2());
+        mIt->setShapeFactor(pIt->getShapeFactor());
+        mIt->setOptimalFibreLength(pIt->getOptimalFiberLength());
+        mIt->setPennationAngle(pIt->getPennationAngle());
+        mIt->setTendonSlackLength(pIt->getTendonSlackLenght());
+        mIt->setMaxIsometricForce(pIt->getMaxIsometricForce());
+        mIt->setStrengthCoefficient(pIt->getStrengthCoefficient());
+        mIt->setEmDelay(pIt->getEmDelay());
+
+    };
+
+
+}
+
+
+
 
 
 template <typename Activation, typename Tendon, CurveMode::Mode mode>

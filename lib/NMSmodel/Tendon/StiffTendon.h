@@ -49,9 +49,11 @@ public:
     double getPenalty() const { return .0;}
 
     double getFibreLength() { return fibreLength_;}
-    void setStrengthCoefficient(double strengthCoefficient) { };
+    void setStrengthCoefficient(double strengthCoefficient) { /*intentionally left blank*/ };
     void setTendonSlackLength(double tendonSlackLength) { tendonSlackLength_ = tendonSlackLength; }
     void setOptimalFibreLength(double optimalFibreLength) { optimalFibreLength_ = optimalFibreLength; }
+    void setPennationAngle(double pennationAngle) { pennationAngle_ = pennationAngle; }
+    void setMaxIsometricForce(double maxIsometricForce) {/*intentionally left blank*/ };
     void setCurves(const CurveOffline& activeForceLengthCurve, 
                    const CurveOffline& passiveForceLengthCurve, 
                    const CurveOffline& forceVelocityCurve,
