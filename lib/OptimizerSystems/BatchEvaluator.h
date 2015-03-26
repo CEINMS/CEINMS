@@ -1,6 +1,7 @@
 #ifndef Ceinms_BatchEvaluator_h
 #define Ceinms_BatchEvaluator_h
 
+#include <memory>
 #include <vector>
 #include <map>
 #include <string>
@@ -34,6 +35,9 @@ namespace CEINMS {
         void evaluate(NMSmodelT& subject);
         template<typename NMSmodelT>
         void evaluateParallel(NMSmodelT& subject);
+        template<typename NMSmodelT>
+        void evaluateParallel(NMSmodelT& subject, std::vector<NMSmodelT>& mockSubjects);
+
         std::vector<Result> getResults() const {
             return results_;
         }

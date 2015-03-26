@@ -39,6 +39,27 @@ namespace CEINMS {
 
 
     template<typename NMSmodelT>
+    void BatchEvaluator::evaluateParallel(NMSmodelT& subject, std::vector<NMSmodelT>& mockSubjects) {
+
+        subject.getMusclesParameters(subjectParameters_);
+        updMusclesToUpdate();
+        subjectParametersT1_ = subjectParameters_; //for next evaluation
+        for (auto& s : mockSubjects)
+            s.setMusclesParameters(subjectParameters_);
+        std::vector<std::future<void>> futures;
+        for (unsigned i(0); i < trials_.size(); ++i) {
+            auto fut(std::async(std::launch::async, [=, &mockSubjects](){
+                OpenLoopEvaluator::evaluate(mockSubjects.at(i), trials_.at(i), musclesToUpdate_, results_.at(i));
+            }));
+            futures.emplace_back(std::move(fut));
+        }
+
+        for (auto& f : futures)
+            f.wait();
+
+    }
+
+    template<typename NMSmodelT>
     void BatchEvaluator::evaluateParallel(NMSmodelT& subject) {
 
         subject.getMusclesParameters(subjectParameters_);

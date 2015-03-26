@@ -27,6 +27,13 @@ namespace CEINMS {
         objectiveFunction_.setDofsToCalibrate(dofsToCalibrate_);
         objectiveFunction_.setTrials(trials);
         
+        //the following is the trick for the parallel evaluation
+        //and avoids copying NMSmodelT objects later on
+        auto nTrials(trials.size());
+        for (auto i(0.); i < nTrials; ++i) 
+            mockSubjects_.emplace_back(NMSmodelT(subject));
+        
+
     }
 
     //NOTE: when using global o single parameters, only the calibrating dofs are considered
@@ -61,7 +68,9 @@ namespace CEINMS {
     void NMSmodelSystem<NMSmodelT, ObjectiveFunctionT>::evaluate() {
 
         //subject has the parameters, model evaluator just runs it
-        batchEvaluator_.evaluateParallel(subject_);
+     //   batchEvaluator_.evaluateParallel(subject_, mockSubjects_);
+        //batchEvaluator_.evaluateParallel(subject_);
+        batchEvaluator_.evaluate(subject_);
         auto results = batchEvaluator_.getResults();
 
         objectiveFunction_.calculate(results);

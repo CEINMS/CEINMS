@@ -30,6 +30,7 @@ namespace CEINMS {
     private:
 
         size_t nParameters_;
+        std::vector<NMSmodelT> mockSubjects_;
         NMSmodelT& subject_;
         BatchEvaluator batchEvaluator_;
         ObjectiveFunctionT objectiveFunction_;
