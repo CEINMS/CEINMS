@@ -162,10 +162,7 @@ namespace CEINMS {
 
                     // Adjust V such that half of all trial are accepted
 
-                    vector<double> c;
-                    c.resize(noParameters_);
-                    for (int h = 0; h < noParameters_; ++h)
-                        c.at(h) = 2.;
+                    const vector<double> c(noParameters_, 2.);
 
                     for (int h = 0; h < noParameters_; ++h) {
                         double ratio = static_cast<double>(noAccepted_.at(h)) / ns_;
