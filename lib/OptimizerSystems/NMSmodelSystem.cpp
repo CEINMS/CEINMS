@@ -71,7 +71,7 @@ namespace CEINMS {
         batchEvaluator_.evaluateParallel(subject_, mockSubjects_);
         //batchEvaluator_.evaluateParallel(subject_);
  //       batchEvaluator_.evaluate(subject_);
-        auto results = batchEvaluator_.getResults();
+        auto results(batchEvaluator_.getResults());
 
         objectiveFunction_.calculate(results);
         f_ = objectiveFunction_.getValue();

@@ -221,7 +221,7 @@ int main(int argc, char** argv) {
             std::cout << "CalibrationStepCfg " << currentCalibrationStep.getStepCfg() << std::endl;
             switch (currentCalibrationStep.getStepCfg()) {
             case CalibrationCfg::MinimizeTorqueErrorParameterSetDefault: {
-                CEINMS::MinTorqueError objFun;
+              
                 vector<string> dofsToCalibrate;
                 currentCalibrationStep.getDofNames(dofsToCalibrate);
                 ParameterSet parameterSet;
