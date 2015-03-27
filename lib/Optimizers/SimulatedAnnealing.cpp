@@ -86,7 +86,12 @@ namespace CEINMS {
                         // DO i = 1, n
                         for (int k = 0; k < noParameters_; ++k) {
                             // x'_i = x_i + r v_i
-
+#ifdef LOG_SIMULATED_ANNEALING
+                            cout << "\n----\n";
+                            cout << "\ni: " << i << "/" << nt_
+                                << " j: " << j << "/" << ns_
+                                << " k: " << k << "/" << noParameters_ << endl;
+#endif
 
                             xp_ = x_;
 
@@ -95,6 +100,12 @@ namespace CEINMS {
                             checkBounds(k);
 
 #ifdef LOG_SIMULATED_ANNEALING
+                            cout << "factorForV " << factorForV << endl;
+                            cout << "x_ : ";
+                            for (auto& val : x_)
+                                cout << val << " ";
+                            cout << endl;
+
                             cout << "xp_ : ";
                             for (auto& val : xp_)
                                 cout << val << " ";
@@ -157,14 +168,25 @@ namespace CEINMS {
                         c.at(h) = 2.;
 
                     for (int h = 0; h < noParameters_; ++h) {
-                        double ratio = noAccepted_.at(h) / ns_;
-                        if (ratio > 0.6)
+                        double ratio = static_cast<double>(noAccepted_.at(h)) / ns_;
+                        if (ratio > 0.6) 
                             v_.at(h) = v_.at(h) * (1 + c.at(h) * (ratio - 0.6) / 0.4);
                         else if (ratio < 0.4)
                             v_.at(h) = v_.at(h) / (1 + c.at(h) * ((0.4 - ratio) / 0.4));
                         if (v_.at(h) >(upperBounds_.at(h) - lowerBounds_.at(h)))
                             v_.at(h) = upperBounds_.at(h) - lowerBounds_.at(h);
                     }
+
+#ifdef LOG_SIMULATED_ANNEALING
+                    cout << "v_ : ";
+                    for (auto& val : v_)
+                        cout << val << " ";
+                    cout << endl;
+                    cout << "noAccepted_ : ";
+                    for (auto& val : noAccepted_)
+                        cout << val << " ";
+                    cout << endl;
+#endif
 
                     for (int h = 0; h < noParameters_; ++h)
                         noAccepted_.at(h) = 0.;

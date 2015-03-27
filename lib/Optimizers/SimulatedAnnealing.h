@@ -31,7 +31,7 @@ namespace CEINMS {
             std::vector<double> xp_;
             std::vector<double> v_;
             std::vector<double> fLatest_;
-            std::vector<int>    noAccepted_;
+            std::vector<unsigned>    noAccepted_;
             int                 noParameters_;
             double              f_, fp_, fOpt_;
             //annealing parameters    

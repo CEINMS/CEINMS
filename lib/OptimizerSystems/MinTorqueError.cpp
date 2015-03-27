@@ -44,8 +44,8 @@ namespace CEINMS {
             double ans(0);
             for (auto& e : v)
                 ans += e;
-            auto avg(ans/v.size()); 
-            auto var(0), ep(0);
+            double avg(ans/v.size()); 
+            double var(0), ep(0);
             for (auto& e : v) {
                 var += (e - avg)*(e - avg);
                 ep += (e - avg);
@@ -111,7 +111,7 @@ namespace CEINMS {
         for (size_t trialIndex(0); trialIndex < trials_.size(); ++trialIndex) {
             for (auto& dofIdx : dofsToCalibrateIdx_.at(trialIndex))
                 f_ += (trialCosts.at(trialIndex).torqueError.at(dofIdx) / torqueVariance_.at(trialIndex).at(dofIdx) +
-                       trialCosts.at(trialIndex).penalty) / trials_.at(trialIndex).torqueData.getNRows();
+                       trialCosts.at(trialIndex).penalty) / results.at(trialIndex).torques.getNRows();
             }
         
     }
