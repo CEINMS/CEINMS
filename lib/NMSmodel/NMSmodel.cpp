@@ -1038,9 +1038,9 @@ template <typename Activation, typename Tendon, CurveMode::Mode mode>
 void NMSmodel<Activation, Tendon, mode>::setMusclesParameters(const vector<MuscleParameters>& parameters)  {
     //carefull with this.. there's no control over the order of muscles.. 
     
-    auto mIt(std::begin(muscles_));
-    auto pIt(std::cbegin(parameters));
-    for (pIt; pIt != std::cend(parameters); ++pIt, ++mIt){
+    auto mIt(muscles_.begin());
+    auto pIt(parameters.cbegin());
+    for (pIt; pIt != parameters.cend(); ++pIt, ++mIt){
         mIt->setC1(pIt->getC1());
         mIt->setC2(pIt->getC2());
         mIt->setShapeFactor(pIt->getShapeFactor());

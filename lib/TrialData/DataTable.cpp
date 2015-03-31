@@ -135,10 +135,7 @@ namespace CEINMS {
     template <typename T>
     DataTable<T>  DataTable<T>::multiplyByScalar(const DataTable<T>& lhs, T scalar) {
 
-        if (lhs.getNColumns() != rhs.getNColumns() || lhs.getNColumns() != rhs.getNColumns())
-            throw std::invalid_argument("lhs and rhs differ in size");  //check just on data size.. ignore labels and time column
-
-        DataTable<T> ans(lhs.getNRows() < rhs.getNRows() ? lhs.getNRows() : rhs.getNRows(), lhs.getNColumns());
+        DataTable<T> ans(lhs.getNRows());
         for (size_t r(0); r < lhs.nRows_; ++r)
             for (size_t c(0); c < lhs.nCols_; ++c)
                 ans.at(r, c) = lhs.at(r, c)*scalar;
