@@ -221,7 +221,7 @@ void ModelEvaluationOffline<NMSmodelT, Logger>::operator()() {
     ModelEvaluationBase<Logger>::logger.log(endTime, endData, "Torques");
 #endif
 
-    doneWithExecution();
+    this->doneWithExecution();
 #ifdef LOG  
     cout << "Estimation completed. " << endl;
 #endif

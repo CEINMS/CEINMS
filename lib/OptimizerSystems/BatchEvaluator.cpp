@@ -198,7 +198,7 @@ namespace CEINMS {
                 subject.updateFibreLengths_OFFLINEPREP(musclesToUpdate);
 
                 //save activations for the next iteration
-                vector<double> currentActivations;
+                std::vector<double> currentActivations;
                 subject.getActivations(currentActivations);
                 previousResult.activations.setRow(emgIndex, currentActivations);
 

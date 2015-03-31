@@ -2,9 +2,7 @@
 
 #include <algorithm>
 using std::begin;
-using std::cbegin;
 using std::end;
-using std::cend;
 using std::find;
 
 #include <vector>
@@ -88,10 +86,10 @@ namespace CEINMS {
         };
 
         std::vector<TrialCost> trialCosts;
-        auto tIt(cbegin(trials_));
-        auto rIt(cbegin(results));
-        for (tIt; tIt != cend(trials_); ++tIt, ++rIt) {
-            auto trialIndex(std::distance(cbegin(trials_), tIt));
+        auto tIt(trials_.cbegin());
+        auto rIt(results.cbegin());
+        for (tIt; tIt != trials_.cend(); ++tIt, ++rIt) {
+            auto trialIndex(std::distance(trials_.cbegin(), tIt));
             auto diff(tIt->torqueData - rIt->torques);
             auto squaredDiff(diff*diff);
 
