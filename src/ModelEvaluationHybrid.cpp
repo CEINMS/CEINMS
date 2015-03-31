@@ -182,7 +182,7 @@ void ModelEvaluationHybrid<NMSmodelT, ErrorMinimizerT, Logger>::operator()() {
     ModelEvaluationBase<Logger>::logger.log(endTime, endData, "AdjustedEmgs");
 #endif
 
-    doneWithExecution();
+    this->doneWithExecution();
 #ifdef LOG  
     cout << "Estimation completed." << endl;
 #endif

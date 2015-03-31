@@ -177,7 +177,7 @@ void ParametersInterpreter<NMSmodelT>::getMuscleGroupIndex(ParameterAssignment p
     std::vector<unsigned> musclesIndexList;
     subject_.getMusclesIndexFromDofs(musclesIndexList, dofNames_);
     if(parameterAssignment == Parameter::Single) {
-        for(vector<unsigned>::const_iterator it(musclesIndexList.begin()); it != musclesIndexList.end(); ++it) {
+        for(std::vector<unsigned>::const_iterator it(musclesIndexList.begin()); it != musclesIndexList.end(); ++it) {
             std::vector<unsigned> m; m.push_back(*it);
             muscleGroupsIdx.push_back(m);
         }
