@@ -9,6 +9,7 @@
 
 #ifndef Ceinms_SimulationManager_h
 #define Ceinms_SimulationManager_h
+#include "SetupDataStructure.h"
 #include "CeinmsSetupXmlReader.h"
 #include "InputDataXmlReader.h"
 #include "ExecutionXmlReader.h"
