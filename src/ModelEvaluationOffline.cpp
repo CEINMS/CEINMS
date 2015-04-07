@@ -162,7 +162,7 @@ void ModelEvaluationOffline<NMSmodelT, Logger>::operator()() {
         subject_.setMuscleTendonLengths(lmtFrameFromQueue.data);
         for (unsigned int i = 0; i < noDof_; ++i)
             subject_.setMomentArms(momentArmsFrameFromQueue.at(i).data, i);
-        subject_.updateState(); //shouldn't it be updateState_OFFLINE?
+        subject_.updateState_OFFLINE();
         subject_.pushState();
 #ifdef LOG_FILES
         //:TODO: Improve as now you are defining two times what you want to log 
