@@ -19,7 +19,7 @@ set_source_files_properties( ${JointContactModels_TEMPLATE_IMPLEMENTATION} PROPE
 source_group("Header Files" FILES ${JointContactModels_HEADERS})
 source_group("Source Files" FILES ${JointContactModels_TEMPLATE_IMPLEMENTATION} ${JointContactModels_SOURCES})
 
-add_library(JointContactModels ${JointContactModels_HEADERS} ${JointContactModels_TEMPLATE_IMPLEMENTATION} ${JointContactModels_SOURCES})
+add_library(JointContactModels STATIC ${JointContactModels_HEADERS} ${JointContactModels_TEMPLATE_IMPLEMENTATION} ${JointContactModels_SOURCES})
 target_include_directories( JointContactModels
                             PRIVATE 
                                    ${OPENSIM_INCLUDE_DIRS}       
@@ -32,7 +32,9 @@ target_include_directories( JointContactModels
 								#	${TrialData_INCLUDE_DIRS}
                                     )
 
-target_link_libraries(JointContactModels ${OPENSIM_LIBRARIES})
+target_link_libraries(JointContactModels optimized ${OPENSIM_LIBRARIES})
+target_link_libraries(JointContactModels debug ${OPENSIM_LIBRARIES_DEBUG})
+
 # Save path to include directory for "internal" usage
 set(JointContactModels_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR} 
 #${CMAKE_CURRENT_SOURCE_DIR}/ObjectiveFunctions ${CMAKE_CURRENT_SOURCE_DIR}/SimAnnealParameters  ${CMAKE_CURRENT_SOURCE_DIR}/TorqueComputationModes 

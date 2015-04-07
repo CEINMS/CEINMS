@@ -34,13 +34,12 @@ MESSAGE( STATUS "SimTK Include path: ${SIMTK_INCLUDE_DIRS}")
 #MESSAGE( STATUS "OpenSim Lib path: ${OPENSIM_LIBS_DIR}")
 		  
 #why?
-find_path(OPENSIM_DLL_DIR 
-		  NAMES
-			  osimCommon.dll
+#find_path(OPENSIM_DLL_DIR 
+#		    osimCommon.dll
 #			  id
-          PATHS ${OPENSIM_POSSIBLE_DIRECTORIES}
-          PATH_SUFFIXES bin)
-MESSAGE( STATUS "OpenSim dll path: ${OPENSIM_DLL_DIR}")	  
+ #         PATHS ${OPENSIM_POSSIBLE_DIRECTORIES}
+  #        PATH_SUFFIXES bin NO_DEFAULT_PATH)
+#MESSAGE( STATUS "OpenSim dll path: ${OPENSIM_DLL_DIR}")	  
 
 #SET(OPENSIM_LIBRARY_DIRS ${OPENSIM_LIBS_DIR} ${OPENSIM_DLL_DIR})
 #MESSAGE( STATUS "OpenSim Library path: ${OPENSIM_LIBRARY_DIRS}")
@@ -56,47 +55,98 @@ find_library(osimSimulation
              PATHS ${OPENSIM_POSSIBLE_DIRECTORIES}
              PATH_SUFFIXES sdk/lib lib)
 
+find_library(osimSimulation_d
+             NAMES osimSimulation_d
+             PATHS ${OPENSIM_POSSIBLE_DIRECTORIES}
+             PATH_SUFFIXES sdk/lib lib)
+             
+             
 find_library(osimCommon
              NAMES osimCommon
              PATHS ${OPENSIM_POSSIBLE_DIRECTORIES}
              PATH_SUFFIXES sdk/lib lib)
 
+ find_library(osimCommon_d
+             NAMES osimCommon_d
+             PATHS ${OPENSIM_POSSIBLE_DIRECTORIES}
+             PATH_SUFFIXES sdk/lib lib)
+             
 find_library(osimActuators
              NAMES osimActuators
              PATHS ${OPENSIM_POSSIBLE_DIRECTORIES}
              PATH_SUFFIXES sdk/lib lib)
 
+ find_library(osimActuators_d
+             NAMES osimActuators_d
+             PATHS ${OPENSIM_POSSIBLE_DIRECTORIES}
+             PATH_SUFFIXES sdk/lib lib)
+
+             
 find_library(osimAnalyses
              NAMES osimAnalyses
              PATHS ${OPENSIM_POSSIBLE_DIRECTORIES}
              PATH_SUFFIXES sdk/lib lib)
 
+ find_library(osimAnalyses_d
+             NAMES osimAnalyses_d
+             PATHS ${OPENSIM_POSSIBLE_DIRECTORIES}
+             PATH_SUFFIXES sdk/lib lib)
+
+             
 find_library(osimTools
              NAMES osimTools
              PATHS ${OPENSIM_POSSIBLE_DIRECTORIES}
              PATH_SUFFIXES sdk/lib lib)
 
+ find_library(osimTools_d
+             NAMES osimTools_d
+             PATHS ${OPENSIM_POSSIBLE_DIRECTORIES}
+             PATH_SUFFIXES sdk/lib lib)
+
+             
 find_library(${NameSpace}SimTKcommon
              NAMES ${NameSpace}SimTKcommon SimTKcommon
              PATHS ${OPENSIM_POSSIBLE_DIRECTORIES}
              PATH_SUFFIXES sdk/lib lib)
 
+ find_library(${NameSpace}SimTKcommon_d
+             NAMES ${NameSpace}SimTKcommon_d SimTKcommon_d
+             PATHS ${OPENSIM_POSSIBLE_DIRECTORIES}
+             PATH_SUFFIXES sdk/lib lib)
+
+             
 find_library(${NameSpace}SimTKmath
              NAMES ${NameSpace}SimTKmath SimTKmath
              PATHS ${OPENSIM_POSSIBLE_DIRECTORIES}
              PATH_SUFFIXES sdk/lib lib)
 
+ find_library(${NameSpace}SimTKmath_d
+             NAMES ${NameSpace}SimTKmath_d SimTKmath_d
+             PATHS ${OPENSIM_POSSIBLE_DIRECTORIES}
+             PATH_SUFFIXES sdk/lib lib)
+
+             
 find_library(${NameSpace}SimTKsimbody SimTKsimbody
              NAMES ${NameSpace}SimTKsimbody
              PATHS ${OPENSIM_POSSIBLE_DIRECTORIES}
              PATH_SUFFIXES sdk/lib lib)
-#does this exist?
+
+ find_library(${NameSpace}SimTKsimbody_d SimTKsimbody_d
+             NAMES ${NameSpace}SimTKsimbody_d
+             PATHS ${OPENSIM_POSSIBLE_DIRECTORIES}
+             PATH_SUFFIXES sdk/lib lib)
+
+             #does this exist?
 find_library(SimTKlapack
              NAMES SimTKlapack lapack
              PATHS ${OPENSIM_POSSIBLE_DIRECTORIES}
              PATH_SUFFIXES sdk/lib lib)
 
+
+             
 set(OPENSIM_LIBRARIES ${osimSimulation} ${osimCommon} ${osimActuators} ${osimAnalyses} ${osimTools} ${${NameSpace}SimTKcommon} ${${NameSpace}SimTKmath} ${${NameSpace}SimTKsimbody} ${${NameSpace}SimTKlapack} ${SimTKlapack})
+
+set(OPENSIM_LIBRARIES_DEBUG ${osimSimulation_d} ${osimCommon_d} ${osimActuators_d} ${osimAnalyses_d} ${osimTools_d} ${${NameSpace}SimTKcommon_d} ${${NameSpace}SimTKmath_d} ${${NameSpace}SimTKsimbody_d} ${${NameSpace}SimTKlapack} ${SimTKlapack})
 
 
 #IF(WIN32)
