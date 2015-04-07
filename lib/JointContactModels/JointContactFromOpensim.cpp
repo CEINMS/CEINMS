@@ -3,6 +3,7 @@
 using std::vector;
 #include <string>
 using std::string;
+#include <iostream>
 
 #include "ArrayConverter.h"
 
@@ -13,10 +14,11 @@ namespace CEINMS {
         nCoordinates_(model_.getNumCoordinates()),
         nBodies_(model_.getBodySet().getSize()),
         nMuscles_(model_.getMuscles().getSize()),
-        state_(model_.initializeState()) {        
+        state_(model_.initializeState()),
+        mobilizerForces_(model_.updForceSubsystem(), model_.getMatterSubsystem()),
+        reactionForcesInG_(nCoordinates_, SimTK::SpatialVec(SimTK::Vec3(.0), SimTK::Vec3(.0))){
 
-        //blank..
-       
+       //blank
     }
 
     void JointContactFromOpensim::setQ(const vector<double>& q) {
@@ -40,7 +42,7 @@ namespace CEINMS {
     }
 
 
-    void JointContactFromOpensim::addExternalForceToMobilizedBodyPoint(const ExternalForce& externalForce) {
+    void JointContactFromOpensim::addExternalForce(const ExternalForce& externalForce) {
 
         externalForces_.push_front(externalForce);
     }
@@ -78,25 +80,58 @@ namespace CEINMS {
         estimatedJointMoments_.assign(estimatedJointMoments.cbegin(), estimatedJointMoments.cend());
     }
     
+    void JointContactFromOpensim::applyExternalForces(SimTK::Vector_<SimTK::SpatialVec>& forces) const {
+        //precondition: forces has to have size equal to nBodies
+        for (auto& f : externalForces_) {
+            SimTK::Vec3 pAppliedBodyInB, fAppliedBodyInG;
+            //transform position in body and force in ground
+            
+            model_.getSimbodyEngine().transformPosition(state_,
+                                                        model_.getBodySet().get(f.point.first),
+                                                        f.point.second,
+                                                        model_.getBodySet().get(f.targetBody),
+                                                        pAppliedBodyInB);
+        
+            model_.getSimbodyEngine().transform(state_,
+                                                model_.getBodySet().get(f.force.first),
+                                                f.force.second,
+                                                model_.getGroundBody(),
+                                                fAppliedBodyInG);
+
+            SimTK::MobilizedBodyIndex index(f.targetBody);
+            model_.getMatterSubsystem().getMobilizedBody(index).applyForceToBodyPoint(state_, 
+                                                                                      pAppliedBodyInB, 
+                                                                                      fAppliedBodyInG, 
+                                                                                      forces);
+        }
+    }
 
     void JointContactFromOpensim::calculateReactionForces() {
-
+        std::cout << "calculateReactionForces not tested yet\n";
+        exit(EXIT_FAILURE);
         //1 create the appropriate external force vector
         SimTK::Vector_<SimTK::SpatialVec> appliedBodyForces(nBodies_, SimTK::SpatialVec(SimTK::Vec3(.0), model_.getGravity()));
         applyExternalForces(appliedBodyForces);
 
         //2 disable muscle forces
         for (size_t i(0); i < nMuscles_; ++i)
-            model_.updForceSet().get(i).setDisabled(s, true);
+            model_.updForceSet().get(i).setDisabled(state_, true);
 
         //3 calculate ID
-        model_.getMultibodySystem().realize(s, SimTK::Stage::Velocity);
+        model_.getMultibodySystem().realize(state_, SimTK::Stage::Velocity);
         SimTK::Vector residualMobilityForces;
         model_.getMultibodySystem().getMatterSubsystem().calcResidualForceIgnoringConstraints(state_, SimTK::Vector(), appliedBodyForces, state_.updQDotDot(), residualMobilityForces);
 
         //4 apply id 
 
 
+
+    }
+
+    void JointContactFromOpensim::calculateID(const VecSPVec& appliedBodyForces, const SimTK::Vector& appliedMobilityForces, SimTK::Vector& residualMobilityForces) {
+
+        model_.getMultibodySystem().realize(state_, SimTK::Stage::Velocity);
+        model_.getMatterSubsystem().calcResidualForceIgnoringConstraints(state_, appliedMobilityForces, appliedBodyForces, state_.updQDotDot(), residualMobilityForces);
 
     }
 
@@ -111,21 +146,22 @@ namespace CEINMS {
             model_.updForceSet().get(i).setDisabled(state_, true);
 
         //3 calculate ID
-        model_.getMultibodySystem().realize(state_, SimTK::Stage::Velocity);
         SimTK::Vector residualMobilityForces;
-        model_.getMultibodySystem().getMatterSubsystem().calcResidualForceIgnoringConstraints(state_, SimTK::Vector(), appliedBodyForces, state_.updQDotDot(), residualMobilityForces);
+        calculateID(appliedBodyForces, SimTK::Vector(), residualMobilityForces);
 
-        //4 transform torques in ground reference
-        
-        //5 apply id results to model 
-        //5.1 calculate torques to bodies
-    //    model_.getMultibodySystem().getMatterSubsystem().addInBodyTorque()
-        //5.2 apply body torques to the system
-//        model_.getMultibodySystem().getMatterSubsystem().getMobilizedBody(index).applyBodyTorque();
-        //5.3 calculate reaction forces/intersegmental forces
-        //      model_.getMultibodySystem().getMatterSubsystem().calcMobilizerReactionForces
+        //4 apply id results to model 
+        //4.1 apply generalised forces to the system
+        mobilizerForces_.setAllMobilityForces(state_, residualMobilityForces);
+        model_.getMultibodySystem().realize(state_, SimTK::Stage::Acceleration);
+        //4.2 calc reaction forces
+        model_.getMultibodySystem().getMatterSubsystem().calcMobilizerReactionForces(state_, reactionForcesInG_);
+        mobilizerForces_.clearAllMobilityForces(state_);
+
+    }
 
 
+    void JointContactFromOpensim::getAllReactionForces(SimTK::Vector_<SimTK::SpatialVec>& reactionForces) const {
+        reactionForces = reactionForcesInG_;
     }
 
 }
