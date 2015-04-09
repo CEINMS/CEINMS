@@ -5,15 +5,9 @@
 #include <vector>
 #include <list>
 #include <OpenSim/OpenSim.h>
+#include "ExternalForce.h"
 
 namespace CEINMS {
-
-    struct ExternalForce {
-        unsigned targetBody;                     //target reference system indicesed to body
-        std::pair<unsigned, SimTK::Vec3> point;  //reference system index and point vector
-        std::pair<unsigned, SimTK::Vec3> force;  //reference system index and force vector
-
-    };
 
     class JointContactFromOpensim {
     public:
@@ -22,10 +16,15 @@ namespace CEINMS {
         JointContactFromOpensim(const OpenSim::Model& model);
 
         void setMuscleForces(const std::vector<double>& forces);
-        void addExternalForce(const ExternalForce& externalForce); 
-        void setQ(const std::vector<double>& q);
-        void setQd(const std::vector<double>& qd);
-        void setQdd(const std::vector<double>& qdd);
+        void addExternalForce(const ExternalForce& externalForce);
+
+        template<typename T>
+        void setQ(const T& q);
+        template<typename T>
+        void setQd(const T& qd);
+        template<typename T>
+        void setQdd(const T& qdd);
+        void setTime(double time) { state_.updTime() = time; }
         void setEstimatedJointMoments(const std::vector<double>& estimatedJointMoments);
         void calculateReactionForces();
         void calculateIntersegmentalForces();
@@ -36,6 +35,8 @@ namespace CEINMS {
         void getBodyNamesFromOsimModel(std::vector<std::string>& names) const;
         void getCoordinateNamesFromOsimModel(std::vector<std::string>& names) const;
 
+        SimTK::Vector getMobilityForces() const {   return residualMobilityForces_; }
+
         void clearExternalForces() { externalForces_.clear(); }
 
     private:
@@ -43,6 +44,8 @@ namespace CEINMS {
         void calculateID(const VecSPVec& appliedBodyForces, const SimTK::Vector& appliedMobilityForces, SimTK::Vector& residualMobilityForces);
 
         void applyExternalForces(VecSPVec& forces) const;
+        void applyGravity(VecSPVec& forces) const;
+
         OpenSim::Model model_;
         SimTK::State state_;
         std::size_t nCoordinates_, nBodies_, nMuscles_;
@@ -50,7 +53,30 @@ namespace CEINMS {
         std::vector<double> estimatedJointMoments_;
         SimTK::Force::DiscreteForces mobilizerForces_;
         SimTK::Vector_<SimTK::SpatialVec> reactionForcesInG_;
+        SimTK::Vector residualMobilityForces_;
     };
+
+    template<typename T>
+    void JointContactFromOpensim::setQ(const T& q) {
+        for (size_t i(0); i < nCoordinates_; ++i) {
+            state_.updQ()[i] = q[i];
+        }
+    }
+
+    template<typename T>
+    void JointContactFromOpensim::setQd(const T& qd) {
+        for (size_t i(0); i < nCoordinates_; ++i) {
+            state_.updU()[i] = qd[i];
+        }
+    }
+
+    template<typename T>
+    void JointContactFromOpensim::setQdd(const T& qdd) {
+        for (size_t i(0); i < nCoordinates_; ++i) {
+            state_.updUDot()[i] = qdd[i];
+        }
+    }
+
 }
 
 #endif

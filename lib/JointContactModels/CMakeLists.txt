@@ -4,6 +4,7 @@ project(JointContactModels)
 
 # List source files
 set(JointContactModels_HEADERS JointContactFromOpensim.h
+							   ExternalForce.h
 
                         )
 
@@ -12,6 +13,7 @@ set(JointContactModels_TEMPLATE_IMPLEMENTATION
 							)
                             
 set(JointContactModels_SOURCES JointContactFromOpensim.cpp
+							   ExternalForce.cpp
 )
 
 set_source_files_properties( ${JointContactModels_TEMPLATE_IMPLEMENTATION} PROPERTIES HEADER_FILE_ONLY TRUE)
