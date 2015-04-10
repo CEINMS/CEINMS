@@ -103,6 +103,8 @@ int main() {
         model.addComponent(f); //model should take care of the pointers and delete them on destruction.. hopefully
     }
 
+    //you should create a derived class of OpenSim::Force, which has a reference to a queue (for real time) or an internal storage..
+    //everytime a force is requested it pops it
 
     Storage idSto, qSto, qdSto, qddSto;
     OpenSim::Array<std::string> labels;

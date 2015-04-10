@@ -15,9 +15,14 @@ namespace CEINMS {
         nCoordinates_(model_.getNumCoordinates()),
         nBodies_(model_.getNumBodies()),
         nMuscles_(model_.getMuscles().getSize()),
-        mobilizerForces_(model_.updForceSubsystem(), model_.getMatterSubsystem()),
+        mobilizerForces_(),
+//        mobilizerForces_(model_.updForceSubsystem(), model_.getMatterSubsystem()),
         reactionForcesInG_(nCoordinates_, SimTK::SpatialVec(SimTK::Vec3(.0), SimTK::Vec3(.0))){
-        
+       
+            
+        std::cout << model_.updForceSubsystem().adoptForce(SimTK::Force::DiscreteForces());
+           // adoptForce(mobilizerForces_);
+
        //blank
     }
 
@@ -147,45 +152,34 @@ namespace CEINMS {
 
     void JointContactFromOpensim::calculateIntersegmentalForces() {
 
-    //    model_.setGravity(SimTK::Vec3(.0));
+    //  todo: improve muscle disabling.. at the moment it assumes just muscles are in the force set
         for (size_t i(0); i < nMuscles_; ++i)
             model_.updForceSet().get(i).setDisabled(state_, true);
-        //1 create the appropriate external force vector
+
+        //realize the system, so all the forces as gravitational, inertial, and external forces are applied
         model_.getMultibodySystem().realize(state_, SimTK::Stage::Dynamics);
-   /*     for (auto i(0); i < nBodies_; ++i)
-            std::cout << "Centrifugal Forces " << i << " "
-            << model_.getMultibodySystem().getMatterSubsystem().getTotalCentrifugalForces(state_, SimTK::MobilizedBodyIndex(i)) << std::endl;
-   */     
-  //            SimTK::Vector_<SimTK::SpatialVec> appliedBodyForces(nBodies_, SimTK::SpatialVec(SimTK::Vec3(.0), SimTK::Vec3(.0)));
-        
         SimTK::Vector_<SimTK::SpatialVec> appliedBodyForces(model_.getMultibodySystem().getRigidBodyForces(state_, SimTK::Stage::Dynamics));
         const SimTK::Vector &appliedMobilityForces = model_.getMultibodySystem().getMobilityForces(state_, SimTK::Stage::Dynamics);
+        applyExternalForces(appliedBodyForces);
+  //      std::cout << appliedBodyForces.size() << appliedBodyForces << std::endl;
+     //   SimTK::Vector residualMobilityForces(nCoordinates_);
 
-        //     std::cout << "nBodies " << nBodies_ << std::endl;
-    //    std::cout << appliedMobilityForces.size() << std::endl << appliedMobilityForces << std::endl;
-
-//        applyExternalForces(appliedBodyForces);
-    //    applyGravity(appliedBodyForces);
-        std::cout << appliedBodyForces.size() << appliedBodyForces << std::endl;
-
-        //2 disable muscle forces
-
-        //3 calculate ID
-        SimTK::Vector residualMobilityForces(nCoordinates_);
-       // SimTK::Vector appliedMobilityForces;
+        //todo: make the solves a member variable.. osim solver works, while my function call doesn't .. who knows..
         OpenSim::InverseDynamicsSolver idSolver(model_);
         residualMobilityForces_ = idSolver.solve(state_, state_.getUDot(), appliedMobilityForces, appliedBodyForces);
 //        calculateID(appliedBodyForces, appliedMobilityForces, residualMobilityForces);
-      //  residualMobilityForces_ = residualMobilityForces;
-//        std::cout << "ID result " << std::endl;
-//        std::cout << residualMobilityForces << std::endl;
+
         //4 apply id results to model 
         //4.1 apply generalised forces to the system
-  //      mobilizerForces_.setAllMobilityForces(state_, residualMobilityForces);
-   //     model_.getMultibodySystem().realize(state_, SimTK::Stage::Acceleration);
+       
+     //   mobilizerF.setAllMobilityForces(state_, residualMobilityForces_);
+  //      mobilizerForces_.setAllMobilityForces(state_, residualMobilityForces_);
+ 
+
+        //       model_.getMultibodySystem().realize(state_, SimTK::Stage::Acceleration);
         //4.2 calc reaction forces
-   //     model_.getMultibodySystem().getMatterSubsystem().calcMobilizerReactionForces(state_, reactionForcesInG_);
-    //    mobilizerForces_.clearAllMobilityForces(state_);
+  //      model_.getMultibodySystem().getMatterSubsystem().calcMobilizerReactionForces(state_, reactionForcesInG_);
+//        mobilizerForces_.clearAllMobilityForces(state_);
 
     }
 
