@@ -67,7 +67,7 @@ std::vector<OpenSim::ExternalForce*> parseXmlForExternalForces(const string& xml
 */
 int main() {
 
-    string baseDir("C:/Users/Claudio/versioning/ceinms/src/Tests/JointContactModel/Data/");
+    string baseDir("C:/Users/S2849511/coding/versioning/ceinms/src/Tests/JointContactModel/Data/");
     string externalLoadsFilename(baseDir + "ExtForcesSetup.xml");
     string modelFilename(baseDir + "model.osim");
 
@@ -106,15 +106,11 @@ int main() {
     //you should create a derived class of OpenSim::Force, which has a reference to a queue (for real time) or an internal storage..
     //everytime a force is requested it pops it
 
-    Storage idSto, qSto, qdSto, qddSto;
     OpenSim::Array<std::string> labels;
     model.getCoordinateSet().getNames(labels);
     labels.insert(0, "time");
+    Storage idSto;
     idSto.setColumnLabels(labels);
-    qSto.setColumnLabels(labels);
-    qdSto.setColumnLabels(labels);
-    qddSto.setColumnLabels(labels);
-
     const OpenSim::BodySet& bodies(model.getBodySet());
     for (auto t : timeColumn) {
 
@@ -133,17 +129,14 @@ int main() {
         OpenSim::Array<double> q;
         kinematicsSplines.evaluate(q, 0, t);
         jointContactModel.setQ(q);
-        qSto.append(t, q);
 
         OpenSim::Array<double> qd;
         kinematicsSplines.evaluate(qd, 1, t);
         jointContactModel.setQd(qd);
-        qdSto.append(t, qd);
 
         OpenSim::Array<double> qdd;
         kinematicsSplines.evaluate(qdd, 2, t);
         jointContactModel.setQdd(qdd);
-        qddSto.append(t, qdd);
 
         jointContactModel.calculateIntersegmentalForces();
 //        JointContactFromOpensim::VecSPVec reactionForces;
@@ -158,14 +151,11 @@ int main() {
     }
 
     idSto.print("id_fromCeinms_wG.sto");
-    qSto.print("q.sto");
-    qdSto.print("qd.sto");
-    qddSto.print("qdd.sto");
 
 
-    Storage kin(kinematicsFilename);
-    model.getSimbodyEngine().convertDegreesToRadians(kin);
-    kin.print("kin_rad.sto");
+ //   Storage kin(kinematicsFilename);
+ //   model.getSimbodyEngine().convertDegreesToRadians(kin);
+  //  kin.print("kin_rad.sto");
 
 /*    OpenSim::Array<string> muscleNames;
     model.getMuscles().getNames(muscleNames);

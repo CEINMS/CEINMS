@@ -4,6 +4,8 @@ using std::vector;
 #include <string>
 using std::string;
 #include <iostream>
+using std::cout;
+using std::endl;
 
 #include "ArrayConverter.h"
 #include <OpenSim/Simulation/InverseDynamicsSolver.h>
@@ -15,15 +17,28 @@ namespace CEINMS {
         nCoordinates_(model_.getNumCoordinates()),
         nBodies_(model_.getNumBodies()),
         nMuscles_(model_.getMuscles().getSize()),
-        mobilizerForces_(),
-//        mobilizerForces_(model_.updForceSubsystem(), model_.getMatterSubsystem()),
-        reactionForcesInG_(nCoordinates_, SimTK::SpatialVec(SimTK::Vec3(.0), SimTK::Vec3(.0))){
-       
-            
-        std::cout << model_.updForceSubsystem().adoptForce(SimTK::Force::DiscreteForces());
-           // adoptForce(mobilizerForces_);
+        reactionForcesInG_(nCoordinates_, SimTK::SpatialVec(SimTK::Vec3(.0), SimTK::Vec3(.0)))
+        {
+        using namespace OpenSim;
 
-       //blank
+        OpenSim::Array<string> muscleNames;
+        model_.getMuscles().getNames(muscleNames);
+        for (unsigned i(0); i < nMuscles_; ++i) {
+            muscleActuators_.push_back(dynamic_cast<Actuator_*>(&model_.updForceSet().get(muscleNames.get(i))));
+
+        }
+
+        const CoordinateSet& cs = model_.getCoordinateSet();
+        for (unsigned i(0); i < nCoordinates_; ++i) {
+            CoordinateActuator *actuator = new CoordinateActuator();
+            actuator->setCoordinate(&cs.get(i));
+            actuator->setName(cs.get(i).getName() + "_actuator");
+            actuator->setOptimalForce(1);
+            model_.updForceSet().append(actuator);
+            coordinateActuators_.push_back(actuator);
+        }
+       
+       
     }
 
 
@@ -69,27 +84,16 @@ namespace CEINMS {
         //precondition: forces has to have size equal to nBodies
         for (auto& f : externalForces_) {
             SimTK::Vec3 pAppliedBodyInB(0), fAppliedBodyInG(0);
-            //transform position in body and force in ground
-      //      std::cout << model_.getBodySet().get(f.getApplicationPointBodyIndex()).getName() << std::endl;
-      //      std::cout << model_.getBodySet().get(f.getTargetBodyIndex()).getName() << std::endl;
-
             model_.getSimbodyEngine().transformPosition(state_,
                                                         model_.getBodySet().get(f.getApplicationPointBodyIndex()),
                                                         f.getApplicationPoint(),
                                                         model_.getBodySet().get(f.getTargetBodyIndex()),
                                                         pAppliedBodyInB);
- //           std::cout << "f.getApplicationPoint() " << f.getApplicationPoint() << std::endl;
-
-  //          std::cout << "pallpliedBodyInB " << pAppliedBodyInB << std::endl;
             model_.getSimbodyEngine().transform(state_,
                                                 model_.getBodySet().get(f.getForceBodyIndex()),
                                                 f.getForce(),
                                                 model_.getGroundBody(),
                                                 fAppliedBodyInG);
- //           std::cout << "f.getForce() " << f.getForce() << std::endl;
-
- //           std::cout << "fAppliedBodyInG " << fAppliedBodyInG << std::endl;
-
             SimTK::MobilizedBodyIndex index(f.getTargetBodyIndex());
             model_.getMatterSubsystem().getMobilizedBody(index).applyForceToBodyPoint(state_, 
                                                                                       pAppliedBodyInB, 
@@ -152,34 +156,30 @@ namespace CEINMS {
 
     void JointContactFromOpensim::calculateIntersegmentalForces() {
 
-    //  todo: improve muscle disabling.. at the moment it assumes just muscles are in the force set
-        for (size_t i(0); i < nMuscles_; ++i)
-            model_.updForceSet().get(i).setDisabled(state_, true);
-
+        for (auto m : muscleActuators_)
+            m->setDisabled(state_, true);
         //realize the system, so all the forces as gravitational, inertial, and external forces are applied
         model_.getMultibodySystem().realize(state_, SimTK::Stage::Dynamics);
         SimTK::Vector_<SimTK::SpatialVec> appliedBodyForces(model_.getMultibodySystem().getRigidBodyForces(state_, SimTK::Stage::Dynamics));
-        const SimTK::Vector &appliedMobilityForces = model_.getMultibodySystem().getMobilityForces(state_, SimTK::Stage::Dynamics);
+        SimTK::Vector appliedMobilityForces(nCoordinates_, 0.);
+        //const SimTK::Vector &appliedMobilityForces = model_.getMultibodySystem().getMobilityForces(state_, SimTK::Stage::Dynamics);
         applyExternalForces(appliedBodyForces);
-  //      std::cout << appliedBodyForces.size() << appliedBodyForces << std::endl;
-     //   SimTK::Vector residualMobilityForces(nCoordinates_);
-
+  
         //todo: make the solves a member variable.. osim solver works, while my function call doesn't .. who knows..
         OpenSim::InverseDynamicsSolver idSolver(model_);
         residualMobilityForces_ = idSolver.solve(state_, state_.getUDot(), appliedMobilityForces, appliedBodyForces);
 //        calculateID(appliedBodyForces, appliedMobilityForces, residualMobilityForces);
 
-        //4 apply id results to model 
-        //4.1 apply generalised forces to the system
-       
-     //   mobilizerF.setAllMobilityForces(state_, residualMobilityForces_);
-  //      mobilizerForces_.setAllMobilityForces(state_, residualMobilityForces_);
- 
 
-        //       model_.getMultibodySystem().realize(state_, SimTK::Stage::Acceleration);
-        //4.2 calc reaction forces
-  //      model_.getMultibodySystem().getMatterSubsystem().calcMobilizerReactionForces(state_, reactionForcesInG_);
-//        mobilizerForces_.clearAllMobilityForces(state_);
+        //for (unsigned i(0); i < nCoordinates_; ++i) {
+        //    model_.updActuators().get(i).overrideForce(state_, true);
+        //    model_.updActuators().get(i).setOverrideForce(state_, -residualMobilityForces_.get(i));
+        //}
+
+        //model_.getMultibodySystem().realize(state_, SimTK::Stage::Acceleration);
+        ////4.2 calc reaction forces
+        //model_.getMultibodySystem().getMatterSubsystem().calcMobilizerReactionForces(state_, reactionForcesInG_);
+
 
     }
 

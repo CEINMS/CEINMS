@@ -51,9 +51,10 @@ namespace CEINMS {
         std::size_t nCoordinates_, nBodies_, nMuscles_;
         std::list<ExternalForce> externalForces_;
         std::vector<double> estimatedJointMoments_;
-        SimTK::Force::DiscreteForces mobilizerForces_;
         SimTK::Vector_<SimTK::SpatialVec> reactionForcesInG_;
         SimTK::Vector residualMobilityForces_;
+        std::vector<OpenSim::Actuator_*> muscleActuators_, coordinateActuators_;
+
     };
 
     template<typename T>
