@@ -5,12 +5,16 @@ using CEINMS::ExternalForce;
 
 #include <OpenSim/OpenSim.h>
 using OpenSim::Storage;
+using OpenSim::CoordinateActuator;
 #include <OpenSim/Tools/InverseDynamicsTool.h>
 
 #include <string>
 using std::string;
 #include <vector>
 using std::vector;
+#include <iostream>
+using std::cout;
+using std::endl;
 
 OpenSim::GCVSplineSet getKinematicsSplines(OpenSim::Model& model, Storage& kinematics, double fc) {
 
@@ -56,15 +60,6 @@ std::vector<OpenSim::ExternalForce*> parseXmlForExternalForces(const string& xml
 }
 
 
-/*void checkKinematicsParsing(OpenSim::GCVSplineSet& kinematicsSplines, vector<double> timecolumn) {
-    Storage qStorage, qdStorage, qddStorage;
-    for (auto t : timecolumn) {
-        OpenSim::StateVector sv;
-        kinematicsSplines.evaluate()
-        sv.setStates(t,)
-    }
-}
-*/
 int main() {
 
     string baseDir("C:/Users/S2849511/coding/versioning/ceinms/src/Tests/JointContactModel/Data/");
@@ -72,8 +67,6 @@ int main() {
     string modelFilename(baseDir + "model.osim");
 
     OpenSim::Model model(modelFilename);
-    JointContactFromOpensim jointContactModel(model);
-
     OpenSim::ExternalLoads externalLoads(model, externalLoadsFilename);
 
     //setup kinematics
@@ -89,43 +82,28 @@ int main() {
 
     auto kinematicsSplines(getKinematicsSplines(model, kinematics, fc));
 
-    //1 check kinematics parsing (position, velocity, acceleration)
- //   checkKinematicsParsing(kinematicsSplines, timeColumn);
-
-    //2 check forces parsing
-    //3 check id results
-
-    //setup external forces
     Storage externalForcesStorage(externalLoads.getDataFileName());
     auto externalForcesFromOsim(parseXmlForExternalForces(externalLoadsFilename));
+
     for (auto& f : externalForcesFromOsim) {
         f->setDataSource(externalForcesStorage);
-        model.addComponent(f); //model should take care of the pointers and delete them on destruction.. hopefully
+        model.addForce(f); //model should take care of the pointers and delete them on destruction.. hopefully
     }
 
+    JointContactFromOpensim jointContactModel(model);
     //you should create a derived class of OpenSim::Force, which has a reference to a queue (for real time) or an internal storage..
     //everytime a force is requested it pops it
 
     OpenSim::Array<std::string> labels;
     model.getCoordinateSet().getNames(labels);
     labels.insert(0, "time");
-    Storage idSto;
+    Storage idSto, intForcesSto;
     idSto.setColumnLabels(labels);
     const OpenSim::BodySet& bodies(model.getBodySet());
     for (auto t : timeColumn) {
 
-
-        for (auto& f : externalForcesFromOsim) {
-            ExternalForce force;
-            force.setTargetBody(bodies.getIndex(f->getAppliedToBodyName()));
-            force.setForceVector(f->getForceAtTime(t), bodies.getIndex(f->getForceExpressedInBodyName()));
-            force.setForceApplicationPoint(f->getPointAtTime(t), bodies.getIndex(f->getPointExpressedInBodyName()));
-            force.setTorque(f->getTorqueAtTime(t));
-      //      force.print(std::cout);
-            jointContactModel.addExternalForce(force);
-        }
         jointContactModel.setTime(t);
-
+        
         OpenSim::Array<double> q;
         kinematicsSplines.evaluate(q, 0, t);
         jointContactModel.setQ(q);
@@ -139,33 +117,22 @@ int main() {
         jointContactModel.setQdd(qdd);
 
         jointContactModel.calculateIntersegmentalForces();
-//        JointContactFromOpensim::VecSPVec reactionForces;
-//        jointContactModel.getAllReactionForces(reactionForces);
 
-//        std::cout << t << '\t' <<jointContactModel.getMobilityForces() << std::endl;
-        idSto.append(t, jointContactModel.getMobilityForces());
+  //      idSto.append(t, jointContactModel.getMobilityForces());
+    
+        //SimTK::Vector_<SimTK::Vec3> reactionForces, reactionTorques;
+        //jointContactModel.getAllReactionForces(reactionForces, reactionTorques);
+        SimTK::Vec3 reactionForce;
+        jointContactModel.getReactionForceInG("talus_r", reactionForce);
 
-        jointContactModel.clearExternalForces();
+        intForcesSto.append(t, reactionForce);
+      //  jointContactModel.clearExternalForces();
         
 
     }
 
-    idSto.print("id_fromCeinms_wG.sto");
-
-
- //   Storage kin(kinematicsFilename);
- //   model.getSimbodyEngine().convertDegreesToRadians(kin);
-  //  kin.print("kin_rad.sto");
-
-/*    OpenSim::Array<string> muscleNames;
-    model.getMuscles().getNames(muscleNames);
-    OpenSim::InverseDynamicsTool idTool;
-    idTool.setModel(model);
-    idTool.setCoordinatesFileName(kinematicsFilename);
-    idTool.setExternalLoadsFileName(externalLoadsFilename);
-    idTool.setResultsDir("IdSolution");
-    idTool.setExcludedForces(muscleNames);
-    idTool.run(); */
+//    idSto.print("id_fromCeinms.sto");
+    intForcesSto.print("ankle_intForces.sto");
     return 0;
 }
 

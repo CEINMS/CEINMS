@@ -4,20 +4,17 @@
 #include <string>
 #include <vector>
 #include <list>
+#include <memory>
 #include <OpenSim/OpenSim.h>
+#include <OpenSim/Simulation/InverseDynamicsSolver.h>
 #include "ExternalForce.h"
 
 namespace CEINMS {
 
     class JointContactFromOpensim {
     public:
-        using VecSPVec = SimTK::Vector_ < SimTK::SpatialVec > ;
-      //  JointContactFromOpensim(const std::string& modelFilename);
         JointContactFromOpensim(const OpenSim::Model& model);
-
         void setMuscleForces(const std::vector<double>& forces);
-        void addExternalForce(const ExternalForce& externalForce);
-
         template<typename T>
         void setQ(const T& q);
         template<typename T>
@@ -28,33 +25,28 @@ namespace CEINMS {
         void setEstimatedJointMoments(const std::vector<double>& estimatedJointMoments);
         void calculateReactionForces();
         void calculateIntersegmentalForces();
+        void getReactionForce(const std::string& childBodyName, SimTK::Vec3& forceOnChildInChild);
+        void getReactionForceInG(const std::string& childBodyName, SimTK::Vec3& forceOnChildInG);
 
-        void getReactionForce(const std::string& parentBodyName, const std::string& childBodyName, SimTK::Vec3& forceOnChildInGround);
-        void getAllReactionForces(SimTK::Vector_<SimTK::SpatialVec>& reactionForces) const;
+
         void getMuscleNamesFromOsimModel(std::vector<std::string>& names) const;
         void getBodyNamesFromOsimModel(std::vector<std::string>& names) const;
         void getCoordinateNamesFromOsimModel(std::vector<std::string>& names) const;
-
+        void getAllReactionForces(SimTK::Vector_<SimTK::Vec3>& reactionForces, SimTK::Vector_<SimTK::Vec3>& reactionTorques) const;
         SimTK::Vector getMobilityForces() const {   return residualMobilityForces_; }
 
-        void clearExternalForces() { externalForces_.clear(); }
-
     private:
-    //    void calculateResidualMobilityForces();
-        void calculateID(const VecSPVec& appliedBodyForces, const SimTK::Vector& appliedMobilityForces, SimTK::Vector& residualMobilityForces);
-
-        void applyExternalForces(VecSPVec& forces) const;
-        void applyGravity(VecSPVec& forces) const;
-
         OpenSim::Model model_;
         SimTK::State state_;
         std::size_t nCoordinates_, nBodies_, nMuscles_;
         std::list<ExternalForce> externalForces_;
         std::vector<double> estimatedJointMoments_;
-        SimTK::Vector_<SimTK::SpatialVec> reactionForcesInG_;
+        SimTK::Vector_<SimTK::Vec3> rForcesInG_, rTorquesInG_;
         SimTK::Vector residualMobilityForces_;
-        std::vector<OpenSim::Actuator_*> muscleActuators_, coordinateActuators_;
 
+        std::vector<OpenSim::Actuator_*> muscleActuators_;
+        std::vector<OpenSim::CoordinateActuator*> coordinateActuators_;
+        std::unique_ptr<OpenSim::InverseDynamicsSolver> idSolver_;
     };
 
     template<typename T>
