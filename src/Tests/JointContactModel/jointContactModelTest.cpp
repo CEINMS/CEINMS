@@ -118,16 +118,10 @@ int main() {
 
         jointContactModel.calculateIntersegmentalForces();
 
-  //      idSto.append(t, jointContactModel.getMobilityForces());
-    
-        //SimTK::Vector_<SimTK::Vec3> reactionForces, reactionTorques;
-        //jointContactModel.getAllReactionForces(reactionForces, reactionTorques);
         SimTK::Vec3 reactionForce;
-        jointContactModel.getReactionForceInG("talus_r", reactionForce);
+        jointContactModel.getReactionForceInG("ankle_r", reactionForce);
 
         intForcesSto.append(t, reactionForce);
-      //  jointContactModel.clearExternalForces();
-        
 
     }
 

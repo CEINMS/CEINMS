@@ -65,7 +65,6 @@ namespace CEINMS {
     }
 
 
-
     void JointContactFromOpensim::getMuscleNamesFromOsimModel(vector<string>& names) const {
 
         OpenSim::Array<string> namesOsim;
@@ -93,50 +92,81 @@ namespace CEINMS {
 
 
 
-    void JointContactFromOpensim::setEstimatedJointMoments(const vector<double>& estimatedJointMoments) {
+    void JointContactFromOpensim::setEstimatedMobilityForces(const SimTK::Vector& estimatedMobilityForces) {
 
-        estimatedJointMoments_.assign(estimatedJointMoments.cbegin(), estimatedJointMoments.cend());
+        estimatedMobilityForces_  = estimatedMobilityForces;
+    }
+
+
+    void JointContactFromOpensim::setResidualMobilityForces(const SimTK::Vector& residualMobilityForces) {
+
+        residualMobilityForces_ = residualMobilityForces;
     }
     
 
-    void JointContactFromOpensim::getReactionForce(const std::string& childBodyName, SimTK::Vec3& forceOnChildInChild) {
+    void JointContactFromOpensim::getReactionForce(const std::string& jointName, SimTK::Vec3& forceOnChildInChild) {
 
-        const OpenSim::Joint& joint(model_.getBodySet().get(childBodyName).getJoint());
-        cout << "joint name: " << joint.getName() << endl;
+        const OpenSim::Joint& joint(model_.getJointSet().get(jointName));
         unsigned idx(model_.getJointSet().getIndex(joint.getName()));
         model_.getSimbodyEngine().transform(state_,
                                             model_.getGroundBody(),
                                             rForcesInG_.get(idx),
-                                            model_.getBodySet().get(childBodyName),
+                                            joint.getBody(),
                                             forceOnChildInChild);
     }
 
 
-    void JointContactFromOpensim::getReactionForceInG(const std::string& childBodyName, SimTK::Vec3& forceOnChildInG) {
+    void JointContactFromOpensim::getReactionForceInG(const std::string& jointName, SimTK::Vec3& forceOnChildInG) {
 
-        const OpenSim::Joint& joint(model_.getBodySet().get(childBodyName).getJoint());
-        cout << "joint name: " << joint.getName() << endl;
-        unsigned idx(model_.getJointSet().getIndex(joint.getName()));
+        const OpenSim::Joint& joint(model_.getJointSet().get(jointName));
+       unsigned idx(model_.getJointSet().getIndex(joint.getName()));
         forceOnChildInG = rForcesInG_.get(idx);
     }
 
+    string JointContactFromOpensim::getJointNameOnDof(const string& dofName) {
 
-    void JointContactFromOpensim::calculateReactionForces() {
-
+        if (model_.getCoordinateSet().getIndex(dofName) < 0) {
+            cout << "Error " + dofName + " not found\n";
+            std::exit(EXIT_FAILURE);
+        }
+        return model_.getCoordinateSet().get(dofName).getJoint().getName();
 
     }
 
-
-    void JointContactFromOpensim::calculateIntersegmentalForces() {
+    //if appliedMobilityForces is 0 then it is the ID
+    void JointContactFromOpensim::calculateResidualMobilityForces(const SimTK::Vector& appliedMobilityForces) {
 
         for (auto m : muscleActuators_)
             m->setDisabled(state_, true);
         //realize the system, so all the forces as gravitational, inertial, and external forces are applied
         model_.getMultibodySystem().realize(state_, SimTK::Stage::Dynamics);
         SimTK::Vector_<SimTK::SpatialVec> appliedBodyForces(model_.getMultibodySystem().getRigidBodyForces(state_, SimTK::Stage::Dynamics));
-        SimTK::Vector appliedMobilityForces(nCoordinates_, 0.);
-  
+       
         residualMobilityForces_ = idSolver_->solve(state_, state_.getUDot(), appliedMobilityForces, appliedBodyForces);
+    }
+
+
+    //if disableMuscles is true, then intersegmental forces are calculated
+    void JointContactFromOpensim::calculateReactionForcesUsingEstimatedMobilityForces(bool disableMuscles) {
+
+        for (auto m : muscleActuators_)
+            m->setDisabled(state_, disableMuscles);
+
+        for (unsigned i(0); i < nCoordinates_; ++i)
+            coordinateActuators_.at(i)->setOverrideForce(state_, residualMobilityForces_.get(i)-estimatedMobilityForces_.get(i));
+        model_.getSimbodyEngine().computeReactions(state_, rForcesInG_, rTorquesInG_);
+    }
+
+
+    //if disableMuscles is true, then intersegmental forces are calculated
+    void JointContactFromOpensim::calculateReactionForces(bool disableMuscles) {
+
+        SimTK::Vector appliedMobilityForces(nCoordinates_, 0.); //Calculate ID
+        calculateResidualMobilityForces(appliedMobilityForces);
+       
+        for (auto m : muscleActuators_)
+            m->setDisabled(state_, disableMuscles);
+
         for (unsigned i(0); i < nCoordinates_; ++i)
             coordinateActuators_.at(i)->setOverrideForce(state_, residualMobilityForces_.get(i));
         model_.getSimbodyEngine().computeReactions(state_, rForcesInG_, rTorquesInG_);
