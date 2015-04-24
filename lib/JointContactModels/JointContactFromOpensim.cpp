@@ -42,22 +42,10 @@ namespace CEINMS {
         std::unique_ptr<InverseDynamicsSolver> p(new InverseDynamicsSolver(model_));
         idSolver_ = std::move(p);
 
-  /*      OpenSim::Array<string> bodyNames;
-
-        model_.getBodySet().getNames(bodyNames);
-        cout << bodyNames << endl << std::flush;
-
-        OpenSim::Array<string> actNames;
-
-        model_.updForceSet().getNames(actNames);
-        cout << actNames << endl << std::flush;
-        */
-
         state_ = model_.initSystem();
         for (auto c : coordinateActuators_)
             c->overrideForce(state_, true);
 
-       
         for (auto m : muscleActuators_) {
             m->setDisabled(state_, true);
             m->set_isDisabled(true);
@@ -69,8 +57,7 @@ namespace CEINMS {
 
         OpenSim::Array<string> namesOsim;
         model_.getMuscles().getNames(namesOsim);
-        ArrayConverter::toStdVector(namesOsim, names);
-        
+        ArrayConverter::toStdVector(namesOsim, names);     
     }
 
 
@@ -82,14 +69,12 @@ namespace CEINMS {
     }
 
 
-
     void JointContactFromOpensim::getBodyNamesFromOsimModel(vector<string>& names) const {
 
         OpenSim::Array<string> namesOsim;
         model_.getBodySet().getNames(namesOsim);
         ArrayConverter::toStdVector(namesOsim, names);
     }
-
 
 
     void JointContactFromOpensim::setEstimatedMobilityForces(const SimTK::Vector& estimatedMobilityForces) {
@@ -123,6 +108,7 @@ namespace CEINMS {
         forceOnChildInG = rForcesInG_.get(idx);
     }
 
+
     string JointContactFromOpensim::getJointNameOnDof(const string& dofName) {
 
         if (model_.getCoordinateSet().getIndex(dofName) < 0) {
@@ -132,6 +118,7 @@ namespace CEINMS {
         return model_.getCoordinateSet().get(dofName).getJoint().getName();
 
     }
+
 
     //if appliedMobilityForces is 0 then it is the ID
     void JointContactFromOpensim::calculateResidualMobilityForces(const SimTK::Vector& appliedMobilityForces) {
@@ -159,6 +146,7 @@ namespace CEINMS {
 
 
     //if disableMuscles is true, then intersegmental forces are calculated
+    //this also computes ID
     void JointContactFromOpensim::calculateReactionForces(bool disableMuscles) {
 
         SimTK::Vector appliedMobilityForces(nCoordinates_, 0.); //Calculate ID

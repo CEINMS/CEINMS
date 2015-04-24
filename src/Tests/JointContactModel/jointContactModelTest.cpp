@@ -61,6 +61,23 @@ std::vector<OpenSim::ExternalForce*> parseXmlForExternalForces(const string& xml
 
 
 int main() {
+    /*
+    1. Compare output of OpenSim and CEINMS intersegmental forces calculation
+        (i)   load model, disable all muscles, add external forces, load and filter kinematics
+        (ii)  create CoordinateActuators for every generalised coordinate
+        (iii) Osim: Run static opt + joint reaction analysis
+        (iv)  CEINMS: pass model in (i) to JointContactFromOpensim and calculate intersegmental forces
+        (v)   compare output from (iii) and (iv)
+    2. Compare output of OpenSim and CEINMS reaction forces calculation
+        (i)   load model, add external forces, load and filter kinematics
+        (ii)  create CoordinateActuators for every generalised coordinate
+        (iii) Osim: Run static opt + joint reaction analysis
+        (iv)  CEINMS: pass model in (i) to JointContactFromOpensim
+        (v)   get muscle forces and residual from static opt and pass them to JointContactFromOpensim
+        (vi)  calculate joint reaction forces with JointContactFromOpensim
+        (vii) compare (iii) and (vi)
+    */
+
 
     string baseDir("C:/Users/S2849511/coding/versioning/ceinms/src/Tests/JointContactModel/Data/");
     string externalLoadsFilename(baseDir + "ExtForcesSetup.xml");
@@ -91,6 +108,9 @@ int main() {
     }
 
     JointContactFromOpensim jointContactModel(model);
+    auto modelSO(model);
+  //  OpenSim::StaticOptimization staticOpt;
+  //  staticOpt.
     //you should create a derived class of OpenSim::Force, which has a reference to a queue (for real time) or an internal storage..
     //everytime a force is requested it pops it
 
@@ -100,6 +120,8 @@ int main() {
     Storage idSto, intForcesSto;
     idSto.setColumnLabels(labels);
     const OpenSim::BodySet& bodies(model.getBodySet());
+
+
     for (auto t : timeColumn) {
 
         jointContactModel.setTime(t);
@@ -116,7 +138,7 @@ int main() {
         kinematicsSplines.evaluate(qdd, 2, t);
         jointContactModel.setQdd(qdd);
 
-        jointContactModel.calculateIntersegmentalForces();
+        jointContactModel.calculateReactionForces(true);
 
         SimTK::Vec3 reactionForce;
         jointContactModel.getReactionForceInG("ankle_r", reactionForce);
