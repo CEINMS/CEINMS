@@ -31,7 +31,7 @@ T CircularVector<T>::at(unsigned i) const {
         exit(EXIT_FAILURE);
     }
     
-    return v_.at((beg_+i)%count_);
+    return v_.at((beg_+i)%size_);
     
 }
 
@@ -39,7 +39,7 @@ T CircularVector<T>::at(unsigned i) const {
 template<typename T>
 T CircularVector<T>::operator[](unsigned i) const {
   
-    return v_[(beg_+i)%count_];
+    return v_[(beg_+i)%size_];
 }
 
 template<typename T>
