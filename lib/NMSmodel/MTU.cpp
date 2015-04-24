@@ -266,8 +266,10 @@ void MTU<Activation, Tendon, mode>::updateMuscleForce() {
     double normFiberLength   = fibreLength_/optimalFibreLength_;
   //:TODO: THIS IS WRONG! timeScale_?  0.1 should be timeScale_
     // double normFiberVelocity = timescale_ *fiberVelocity_ / optimalFiberLengthAtT;
-    double normFiberVelocityAtT = std::max(fibreVelocity_, 10.0)*0.1/optimalFiberLengthAtT;
-    double normFiberVelocity=fibreVelocity_*0.1/optimalFibreLength_;
+    double maxContractionVelocity = 10.0; // should be a parameter? also, should be passed over to tendon...
+    double fiberVel = fibreVelocity_ > maxContractionVelocity ? maxContractionVelocity : fibreVelocity_;
+    fiberVel = fiberVel < -maxContractionVelocity ? -maxContractionVelocity : fiberVel;
+    double normFiberVelocity = fiberVel / maxContractionVelocity / optimalFibreLength_;
 
     double fv = forceVelocityCurve_.getValue(normFiberVelocity);
     double fp = passiveForceLengthCurve_.getValue(normFiberLength);
