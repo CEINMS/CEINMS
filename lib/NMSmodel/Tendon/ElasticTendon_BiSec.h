@@ -42,8 +42,7 @@ public:
                                       double maxIsometricForce, 
                                       double strengthCoefficient); 
 
-    void setTime(const double& time) {    timeScale_ = time - time_;
-                                          time_ = time; }
+    void setTime(const double& time) {    time_ = time; }
     void setMuscleTendonLength(double muscleTendonLength);
     void setActivation(double activation);
     void updateFibreLength();
@@ -93,13 +92,12 @@ private:
     CurveOffline passiveForceLengthCurve_;
     CurveOffline forceVelocityCurve_;
     CurveOffline tendonForceStrainCurve_;
-    
+
+    Curve<CurveMode::Offline>  fibreLengthTrace_; // TODO: Online would probably be more efficient, but it's not working right now
     double fibreLength_;
-    double fibreLengthT1_;          //valore della fiberLength al passo precedente
     double muscleTendonLength_;
     double activation_;
     double tendonPenalty_;
-    double timeScale_;
     double time_;
     std::string id_;
     

@@ -106,7 +106,6 @@ maxIsometricForce_(.0),
 strengthCoefficient_(.0),
 muscleTendonLength_(0.0),
 fibreLength_(0.0),
-fibreLengthT1_(0.0),
 activation_(0.0),
 id_("")
 { }
@@ -122,7 +121,6 @@ maxIsometricForce_(.0),
 strengthCoefficient_(.0),
 muscleTendonLength_(0.0),
 fibreLength_(0.0),
-fibreLengthT1_(0.0),
 activation_(0.0),
 id_(id) { }
 
@@ -152,7 +150,6 @@ forceVelocityCurve_(forceVelocityCurve),
 tendonForceStrainCurve_(tendonForceStrainCurve),
 muscleTendonLength_(0.0),
 fibreLength_(0.0),
-fibreLengthT1_(0.0),
 activation_(0.0),
 id_("")
 {   }
@@ -181,7 +178,6 @@ ElasticTendon_BiSec& ElasticTendon_BiSec::operator= ( const ElasticTendon_BiSec&
     
     muscleTendonLength_      = orig.muscleTendonLength_;
     fibreLength_             = orig.fibreLength_;
-    fibreLengthT1_           = orig.fibreLengthT1_;          
     activation_              = orig.activation_;
     id_                      = orig.id_;
     return *this;
@@ -225,12 +221,12 @@ void ElasticTendon_BiSec::updateFibreLength() {
     const unsigned nIter = 100;
     tendonPenalty_ = .0;
     fibreLength_ = estimateFiberLengthBiSec(tol, nIter);
+    fibreLengthTrace_.addPoint(time_, fibreLength_);
 }
 
 
 void ElasticTendon_BiSec::pushState() {
     
-    fibreLengthT1_ = fibreLength_;
 }
 
 
@@ -264,8 +260,8 @@ void ElasticTendon_BiSec::resetState() {
 
     muscleTendonLength_ = 0.0;
     fibreLength_ = 0.0;
-    fibreLengthT1_ = 0.0;
     activation_ = 0.0;
+    fibreLengthTrace_.reset();
 }
 
 
@@ -367,10 +363,11 @@ double ElasticTendon_BiSec::computeMuscleForce(double fibreLength) {
     double optimalFiberLengthAtT = optimalFibreLength_ * (percentageChange_ *
                                    (1.0 - activation_) + 1 ); 
           
+    fibreLengthTrace_.addPoint(time_, fibreLength);
     double normFiberLength   = fibreLength / optimalFibreLength_;
     double normFiberLengthAtT   = fibreLength / optimalFiberLengthAtT;
-    double normFiberVelocity = (fibreLength - fibreLengthT1_)/timeScale_;
 
+    double normFiberVelocity = fibreLengthTrace_.getFirstDerivative(time_);
     double maxContractionVelocity = 10; // TODO: should be provided by owner MTU?
     if (normFiberVelocity > maxContractionVelocity)
         normFiberVelocity = maxContractionVelocity;
@@ -387,6 +384,8 @@ double ElasticTendon_BiSec::computeMuscleForce(double fibreLength) {
     double muscleForce = maxIsometricForce_ * strengthCoefficient_ *
            (fa * fv * activation_ + fp + damping_ * normFiberVelocity)* 
            cos(radians(pennationAngleAtT));
+
+    fibreLengthTrace_.removeLastPoint();
     
 //    cout << "muscleForce " << muscleForce << endl;
     return muscleForce;
