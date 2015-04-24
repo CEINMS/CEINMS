@@ -26,13 +26,22 @@ include_directories(${Boost_INCLUDE_DIRS})
 #  ${CMAKE_SOURCE_DIR}/lib/Hybrid
 #)
 
-set(CEINMS_COMMON_SOURCES  ModelEvaluationHybrid.cpp ModelEvaluationOnline.cpp ModelEvaluationOffline.cpp ModelEvaluationBase.cpp)
+set(CEINMS_COMMON_SOURCES  ModelEvaluationHybrid.cpp ModelEvaluationOnline.cpp ModelEvaluationOffline.cpp ModelEvaluationBase.cpp SimulationManager.cpp)
 set_source_files_properties(ModelEvaluationHybrid.cpp
                             ModelEvaluationOnline.cpp
                             ModelEvaluationOffline.cpp
                             ModelEvaluationBase.cpp
+							SimulationManager.cpp
                             PROPERTIES HEADER_FILE_ONLY TRUE)
-set(CEINMS_HEADERS ModelEvaluationBase.h ModelEvaluationHybrid.h ModelEvaluationOnline.h ModelEvaluationOffline.h Logger.h SimpleFileLogger.h StorageLogger.h)
+set(CEINMS_HEADERS ModelEvaluationBase.h 
+                   ModelEvaluationHybrid.h 
+                   ModelEvaluationOnline.h 
+                   ModelEvaluationOffline.h 
+                   Logger.h 
+                   SimpleFileLogger.h 
+                   StorageLogger.h 
+                   SimulationManager.h)
+                   
 set(CEINMS_SOURCES CEINMS.cpp ${CEINMS_COMMON_SOURCES})
 ADD_EXECUTABLE( CEINMS ${CEINMS_SOURCES} ${CEINMS_HEADERS} )
 TARGET_LINK_LIBRARIES( CEINMS
