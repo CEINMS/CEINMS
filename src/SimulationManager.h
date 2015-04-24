@@ -46,16 +46,7 @@ namespace CEINMS {
 
     };
 
-    //non-member non-friend functions are the best!
-    template <typename NMSmodelT>
-    void setupSubject(NMSmodelT& mySubject, std::string subjectFile) {
 
-        SetupDataStructure<NMSmodelT> setupData(subjectFile);
-        setupData.createCurves();
-        setupData.createMuscles(mySubject);
-        setupData.createDoFs(mySubject);
-
-    }
 
     void sortMaFilenames(const std::map<std::string, std::string>& maMap, const std::vector< std::string >& dofNames, std::vector< std::string >& maDataFilenames)
     {
