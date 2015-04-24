@@ -395,8 +395,7 @@ double ElasticTendon_BiSec::computeMuscleForce(double fibreLength) {
 
 double ElasticTendon_BiSec::getFibreLengthStiff() const {
  
-    double optimalFibreLengthAtT = optimalFibreLength_ * (percentageChange_ * (1.0 - activation_) + 1 );
-    double first = optimalFibreLengthAtT * sin( radians(pennationAngle_));
+    double first = optimalFibreLength_ * sin( radians(pennationAngle_));
     double second = muscleTendonLength_ - tendonSlackLength_;
     return sqrt(first*first + second*second);     
 }

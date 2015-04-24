@@ -84,8 +84,7 @@ void StiffTendon::setActivation(double activation) {
 
 void StiffTendon::updateFibreLength() {
  
-    double optimalFibreLengthAtT = optimalFibreLength_ * (percentageChange_ * (1.0 - activation_) + 1 );
-    double first = optimalFibreLengthAtT * sin( radians(pennationAngle_));
+    double first = optimalFibreLength_ * sin( radians(pennationAngle_));
     double second = muscleTendonLength_ - tendonSlackLength_;
     fibreLength_ = sqrt(first*first + second*second);     
 }
