@@ -217,7 +217,7 @@ void ElasticTendon_BiSec::setActivation(double activation) {
 
 void ElasticTendon_BiSec::updateFibreLength() {
 
-    const double tol = .0001;
+    const double tol = .000001;
     const unsigned nIter = 100;
     tendonPenalty_ = .0;
     fibreLength_ = estimateFiberLengthBiSec(tol, nIter);
