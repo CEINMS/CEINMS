@@ -93,7 +93,7 @@ private:
     CurveOffline forceVelocityCurve_;
     CurveOffline tendonForceStrainCurve_;
 
-    Curve<CurveMode::Offline>  fibreLengthTrace_; // TODO: Online would probably be more efficient, but it's not working right now
+    Curve<CurveMode::Online>  fibreLengthTrace_;
     double fibreLength_;
     double muscleTendonLength_;
     double activation_;
