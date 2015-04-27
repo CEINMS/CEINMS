@@ -1,5 +1,5 @@
-#ifndef CEINMS_Optimizers_Simulatedannealing_h
-#define CEINMS_Optimizers_Simulatedannealing_h
+#ifndef CEINMS_Optimizers_SimulatedAnnealing_h
+#define CEINMS_Optimizers_SimulatedAnnealing_h
 
 #include "AbstractOptimizer.h"
 #include "SimulatedAnnealingParameters.h"

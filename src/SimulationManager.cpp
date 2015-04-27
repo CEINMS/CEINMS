@@ -17,7 +17,6 @@
 
 #include "Activation/ExponentialActivation.h"
 #include "Activation/PiecewiseActivation.h"
-
 #include "Curve.h"
 
 #include "EMGFromFile.h"
@@ -246,7 +245,22 @@ namespace CEINMS {
     }
 
 
-
+    void SimulationManager::sortMaFilenames(const std::map<std::string, std::string>& maMap, const std::vector< std::string >& dofNames, std::vector< std::string >& maDataFilenames)
+    {
+        int currentDof = 0;
+        for (auto& it : dofNames)
+        {
+            try
+            {
+                maDataFilenames.push_back(maMap.at(it));
+            }
+            catch (std::out_of_range)
+            {
+                std::cerr << "Could not find moment arm file for " << it << " degree of freedom" << std::endl;
+                exit(EXIT_FAILURE);
+            }
+        }
+    }
 
 
 }
