@@ -25,6 +25,7 @@ public:
                    double damping,
                    double maxIsometricForce, 
                    double strengthCoefficient,
+                   double maxContractionVelocity,
                    const CurveOffline& activeForceLengthCurve,
                    const CurveOffline& passiveForceLengthCurve, 
                    const CurveOffline& forceVelocityCurve,
@@ -40,7 +41,8 @@ public:
                                       double percentageChange,
                                       double damping, 
                                       double maxIsometricForce, 
-                                      double strengthCoefficient); 
+                                      double strengthCoefficient,
+                                      double maxContractionVelocity);
 
     void setTime(const double& time) {    time_ = time; }
     void setMuscleTendonLength(double muscleTendonLength);
@@ -88,6 +90,7 @@ private:
     double damping_;
     double maxIsometricForce_; 
     double strengthCoefficient_;
+    double maxContractionVelocity_;
     CurveOffline activeForceLengthCurve_;
     CurveOffline passiveForceLengthCurve_;
     CurveOffline forceVelocityCurve_;

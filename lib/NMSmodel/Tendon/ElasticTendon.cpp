@@ -565,6 +565,7 @@ percentageChange_(.0),
 damping_(.0),
 maxIsometricForce_(.0), 
 strengthCoefficient_(.0),
+maxContractionVelocity_(0.0),
 muscleTendonLength_(0.0),
 muscleTendonLengthT1_(0.0),
 muscleTendonVelocity_(0.0),
@@ -592,6 +593,7 @@ percentageChange_(.0),
 damping_(.0),
 maxIsometricForce_(.0), 
 strengthCoefficient_(.0),
+maxContractionVelocity_(0.0),
 muscleTendonLength_(0.0),
 muscleTendonLengthT1_(0.0),
 muscleTendonVelocity_(0.0),
@@ -618,6 +620,7 @@ ElasticTendon<mode>::ElasticTendon (double optimalFiberLength,
                               double damping, 
                               double maxIsometricForce, 
                               double strengthCoefficient, 
+                              double maxContractionVelocity,
                               const CurveOffline& activeForceLengthCurve, 
                               const CurveOffline& passiveForceLengthCurve, 
                               const CurveOffline& forceVelocityCurve,
@@ -630,6 +633,7 @@ percentageChange_(percentageChange),
 damping_(damping),
 maxIsometricForce_(maxIsometricForce), 
 strengthCoefficient_(strengthCoefficient),
+maxContractionVelocity_(maxContractionVelocity),
 activeForceLengthCurve_(activeForceLengthCurve),
 passiveForceLengthCurve_(passiveForceLengthCurve),
 forceVelocityCurve_(forceVelocityCurve),
@@ -672,6 +676,7 @@ ElasticTendon<mode>& ElasticTendon<mode>::operator= ( const ElasticTendon<mode>&
     damping_                 = orig.damping_;
     maxIsometricForce_       = orig.maxIsometricForce_;
     strengthCoefficient_     = orig.strengthCoefficient_;
+    maxContractionVelocity_  = orig.maxContractionVelocity_;
     activeForceLengthCurve_  = orig.activeForceLengthCurve_;
     passiveForceLengthCurve_ = orig.passiveForceLengthCurve_;
     forceVelocityCurve_      = orig.forceVelocityCurve_;
@@ -703,7 +708,8 @@ void ElasticTendon<mode>::setParametersToComputeForces(double optimalFiberLength
                                                  double percentageChange,
                                                  double damping, 
                                                  double maxIsometricForce, 
-                                                 double strengthCoefficient) {
+                                                 double strengthCoefficient,
+                                                 double maxContractionVelocity) {
  
     optimalFiberLength_  = optimalFiberLength;
     pennationAngle_      = pennationAngle;
@@ -712,6 +718,7 @@ void ElasticTendon<mode>::setParametersToComputeForces(double optimalFiberLength
     damping_             = damping;
     maxIsometricForce_   = maxIsometricForce;
     strengthCoefficient_ = strengthCoefficient;
+    maxContractionVelocity_ = maxContractionVelocity;
 }
 
 

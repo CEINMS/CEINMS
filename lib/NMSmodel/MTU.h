@@ -33,7 +33,8 @@ public:
                                       double percentageChange,
                                       double damping, 
                                       double maxIsometricForce, 
-                                      double strengthCoefficient); 
+                                      double strengthCoefficient,
+                                      double maxContractionVelocity=10.0);
                                    
     void setParametersToComputeActivation(double c1,
                                           double c2,
@@ -134,6 +135,7 @@ private:
     double damping_;             /**< \f$d^m\f$ */
     double maxIsometricForce_;   /**< \f$F_0^m\f$ */
     double strengthCoefficient_;  /**< \f$\delta\f$ */
+    double maxContractionVelocity_;
     CurveOffline  forceVelocityCurve_;
     CurveOffline  activeForceLengthCurve_;
     CurveOffline  passiveForceLengthCurve_;

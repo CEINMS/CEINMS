@@ -27,6 +27,7 @@ public:
                    double damping,
                    double maxIsometricForce, 
                    double strengthCoefficient,
+                   double maxContractionVelocity,
                    const CurveOffline& activeForceLengthCurve,
                    const CurveOffline& passiveForceLengthCurve, 
                    const CurveOffline& forceVelocityCurve,
@@ -40,7 +41,8 @@ public:
                                       double percentageChange,
                                       double damping, 
                                       double maxIsometricForce, 
-                                      double strengthCoefficient); 
+                                      double strengthCoefficient,
+                                      double maxContractionVelocity);
 
     void setTime(const double& time) {} // it is useless in the stiff tendon, but I need to respect the interface
     void setMuscleTendonLength(double muscleTendonLength);
@@ -62,13 +64,11 @@ public:
 
 private:
     double optimalFibreLength_;
-    double percentageChange_;
     double pennationAngle_;
     double tendonSlackLength_;
     
     double fibreLength_;
     double muscleTendonLength_;
-    double activation_;
     
     std::string id_;
     

@@ -107,6 +107,7 @@ strengthCoefficient_(.0),
 muscleTendonLength_(0.0),
 fibreLength_(0.0),
 activation_(0.0),
+maxContractionVelocity_(0.0),
 id_("")
 { }
 
@@ -122,6 +123,7 @@ strengthCoefficient_(.0),
 muscleTendonLength_(0.0),
 fibreLength_(0.0),
 activation_(0.0),
+maxContractionVelocity_(0.0),
 id_(id) { }
 
 
@@ -132,6 +134,7 @@ ElasticTendon_BiSec::ElasticTendon_BiSec (double optimalFibreLength,
                               double damping, 
                               double maxIsometricForce, 
                               double strengthCoefficient, 
+                              double maxContractionVelocity,
                               const CurveOffline& activeForceLengthCurve, 
                               const CurveOffline& passiveForceLengthCurve, 
                               const CurveOffline& forceVelocityCurve,
@@ -148,6 +151,7 @@ activeForceLengthCurve_(activeForceLengthCurve),
 passiveForceLengthCurve_(passiveForceLengthCurve),
 forceVelocityCurve_(forceVelocityCurve),
 tendonForceStrainCurve_(tendonForceStrainCurve),
+maxContractionVelocity_(maxContractionVelocity),
 muscleTendonLength_(0.0),
 fibreLength_(0.0),
 activation_(0.0),
@@ -171,6 +175,7 @@ ElasticTendon_BiSec& ElasticTendon_BiSec::operator= ( const ElasticTendon_BiSec&
     damping_                 = orig.damping_;
     maxIsometricForce_       = orig.maxIsometricForce_;
     strengthCoefficient_     = orig.strengthCoefficient_;
+    maxContractionVelocity_ = orig.maxContractionVelocity_,
     activeForceLengthCurve_  = orig.activeForceLengthCurve_;
     passiveForceLengthCurve_ = orig.passiveForceLengthCurve_;
     forceVelocityCurve_      = orig.forceVelocityCurve_;
@@ -190,7 +195,8 @@ void ElasticTendon_BiSec::setParametersToComputeForces(double optimalFiberLength
                                                  double percentageChange,
                                                  double damping, 
                                                  double maxIsometricForce, 
-                                                 double strengthCoefficient) {
+                                                 double strengthCoefficient,
+                                                 double maxContractionVelocity) {
  
     optimalFibreLength_  = optimalFiberLength;
     pennationAngle_      = pennationAngle;
@@ -199,6 +205,7 @@ void ElasticTendon_BiSec::setParametersToComputeForces(double optimalFiberLength
     damping_             = damping;
     maxIsometricForce_   = maxIsometricForce;
     strengthCoefficient_ = strengthCoefficient;
+    maxContractionVelocity_ = maxContractionVelocity;
 }
 
 
@@ -368,12 +375,11 @@ double ElasticTendon_BiSec::computeMuscleForce(double fibreLength) {
     double normFiberLengthAtT   = fibreLength / optimalFiberLengthAtT;
 
     double normFiberVelocity = fibreLengthTrace_.getFirstDerivative(time_);
-    double maxContractionVelocity = 10; // TODO: should be provided by owner MTU?
-    if (normFiberVelocity > maxContractionVelocity)
-        normFiberVelocity = maxContractionVelocity;
-    if (normFiberVelocity < -maxContractionVelocity)
-        normFiberVelocity = -maxContractionVelocity;
-    normFiberVelocity/=(optimalFibreLength_ * maxContractionVelocity);
+    if (normFiberVelocity > maxContractionVelocity_)
+        normFiberVelocity = maxContractionVelocity_;
+    if (normFiberVelocity < -maxContractionVelocity_)
+        normFiberVelocity = -maxContractionVelocity_;
+    normFiberVelocity/=(optimalFibreLength_ * maxContractionVelocity_);
 
     double fv = forceVelocityCurve_.getValue(normFiberVelocity);
     double fp = passiveForceLengthCurve_.getValue(normFiberLength);

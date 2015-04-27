@@ -85,6 +85,7 @@ public:
                   double damping,
                   double maxIsometricForce, 
                   double strengthCoefficient,
+                  double maxContractionVelocity,
                   const CurveOffline& activeForceLengthCurve,
                   const CurveOffline& passiveForceLengthCurve, 
                   const CurveOffline& forceVelocityCurve,
@@ -101,7 +102,8 @@ public:
                                       double percentageChange,
                                       double damping, 
                                       double maxIsometricForce, 
-                                      double strengthCoefficient); 
+                                      double strengthCoefficient,
+                                      double maxContractionVelocity);
 
     void setMuscleTendonLength(double muscleTendonLength, double activation, double time);
     void updateFiberLengthUsingNewActivation(double activation, double time);
@@ -130,6 +132,7 @@ private:
     double damping_;
     double maxIsometricForce_; 
     double strengthCoefficient_;
+    double maxContractionVelocity_; //TODO actually use this parameter...
     CurveOffline activeForceLengthCurve_;
     CurveOffline passiveForceLengthCurve_;
     CurveOffline forceVelocityCurve_;

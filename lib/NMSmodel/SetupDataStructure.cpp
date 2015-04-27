@@ -99,8 +99,17 @@ void SetupDataStructure<NMSmodelT>::createMuscles(NMSmodelT& mySubject) {
         double strengthCoefficient = (*i).strengthCoefficient();
         newMuscle.setParametersToComputeActivation(c1, c2, shapeFactor);
         newMuscle.setCurves(activeForceLengthCurve_, passiveForceLengthCurve_, forceVelocityCurve_, tendonForceStrain_);
-        newMuscle.setParametersToComputeForces(optimalFiberLength, pennationAngle, 
+        if ((*i).maxContractionVelocity().present())
+        {
+            double maxContractionVelocity = (*i).maxContractionVelocity().get();
+            newMuscle.setParametersToComputeForces(optimalFiberLength, pennationAngle,
+                tendonSlackLength, percentageChange, damping, maxIsometricForce, strengthCoefficient, maxContractionVelocity);
+        }
+        else // let MTU use default value for maxContractionVelocity
+        {
+            newMuscle.setParametersToComputeForces(optimalFiberLength, pennationAngle,
                 tendonSlackLength, percentageChange, damping, maxIsometricForce, strengthCoefficient);
+        }
         newMuscle.setEmDelay(emDelay);
         mySubject.addMuscle(newMuscle);
     } 

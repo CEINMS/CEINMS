@@ -23,7 +23,7 @@ MTU<Activation, Tendon, mode>::MTU()
 optimalFibreLength_(0.), pennationAngle_(0.), tendonSlackLength_(0.), 
 percentageChange_(0.), fibreLength_(0.), 
 fibreVelocity_(0.), damping_(0.), maxIsometricForce_(0.), time_(.0), timeScale_(0.),
-strengthCoefficient_(0.), muscleForce_(0.)  { }
+strengthCoefficient_(0.), muscleForce_(0.), maxContractionVelocity_(0.)  { }
 
 
 template<typename Activation, typename Tendon, CurveMode::Mode mode>
@@ -32,7 +32,7 @@ MTU<Activation, Tendon, mode>::MTU (std::string id)
 optimalFibreLength_(0.), pennationAngle_(0.), tendonSlackLength_(0.), 
 percentageChange_(0.), fibreLength_(0.), 
 fibreVelocity_(0.), damping_(0.), maxIsometricForce_(0.), time_(.0), timeScale_(0.),
-strengthCoefficient_(0.), muscleForce_(0.), tendonDynamic_(id)  { }
+strengthCoefficient_(0.), muscleForce_(0.), maxContractionVelocity_(0.), tendonDynamic_(id)  { }
 
 
 
@@ -61,6 +61,7 @@ MTU<Activation, Tendon, mode>::MTU (const MTU<Activation, Tendon, mode>& orig) {
     damping_ = orig.damping_;
     maxIsometricForce_ = orig.maxIsometricForce_;
     strengthCoefficient_ = orig.strengthCoefficient_;
+    maxContractionVelocity_ = orig.maxContractionVelocity_;
     forceVelocityCurve_ = orig.forceVelocityCurve_;
     activeForceLengthCurve_ = orig.activeForceLengthCurve_;
     passiveForceLengthCurve_ = orig.passiveForceLengthCurve_;
@@ -97,6 +98,7 @@ MTU<Activation, Tendon, mode>& MTU<Activation, Tendon, mode>::operator=(const MT
     damping_ = orig.damping_;
     maxIsometricForce_ = orig.maxIsometricForce_;
     strengthCoefficient_ = orig.strengthCoefficient_;
+    maxContractionVelocity_ = orig.maxContractionVelocity_;
     forceVelocityCurve_ = orig.forceVelocityCurve_;
     activeForceLengthCurve_ = orig.activeForceLengthCurve_;
     passiveForceLengthCurve_ = orig.passiveForceLengthCurve_;
@@ -115,7 +117,8 @@ void MTU<Activation, Tendon, mode>::setParametersToComputeForces(double optimalF
                                                                  double percentageChange,
                                                                  double damping, 
                                                                  double maxIsometricForce, 
-                                                                 double strengthCoefficient) {
+                                                                 double strengthCoefficient,
+                                                                 double maxContractionVelocity) {
     optimalFibreLength_ = optimalFibreLength;
     pennationAngle_ = pennationAngle;
     tendonSlackLength_ = tendonSlackLength;
@@ -123,6 +126,7 @@ void MTU<Activation, Tendon, mode>::setParametersToComputeForces(double optimalF
     damping_ = damping;
     maxIsometricForce_ = maxIsometricForce;
     strengthCoefficient_ = strengthCoefficient;
+    maxContractionVelocity_ = maxContractionVelocity;
  
     tendonDynamic_.setParametersToComputeForces(optimalFibreLength,
                                                 pennationAngle,
@@ -130,7 +134,8 @@ void MTU<Activation, Tendon, mode>::setParametersToComputeForces(double optimalF
                                                 percentageChange,
                                                 damping, 
                                                 maxIsometricForce, 
-                                                strengthCoefficient);
+                                                strengthCoefficient,
+                                                maxContractionVelocity);
     resetState();
 }
 
@@ -266,10 +271,9 @@ void MTU<Activation, Tendon, mode>::updateMuscleForce() {
     double normFiberLength   = fibreLength_/optimalFibreLength_;
   //:TODO: THIS IS WRONG! timeScale_?  0.1 should be timeScale_
     // double normFiberVelocity = timescale_ *fiberVelocity_ / optimalFiberLengthAtT;
-    double maxContractionVelocity = 10.0; // should be a parameter? also, should be passed over to tendon...
-    double fiberVel = fibreVelocity_ > maxContractionVelocity ? maxContractionVelocity : fibreVelocity_;
-    fiberVel = fiberVel < -maxContractionVelocity ? -maxContractionVelocity : fiberVel;
-    double normFiberVelocity = fiberVel / maxContractionVelocity / optimalFibreLength_;
+    double fiberVel = fibreVelocity_ > maxContractionVelocity_ ? maxContractionVelocity_ : fibreVelocity_;
+    fiberVel = fiberVel < -maxContractionVelocity_ ? -maxContractionVelocity_ : fiberVel;
+    double normFiberVelocity = fiberVel / maxContractionVelocity_ / optimalFibreLength_;
 
     double fv = forceVelocityCurve_.getValue(normFiberVelocity);
     double fp = passiveForceLengthCurve_.getValue(normFiberLength);
