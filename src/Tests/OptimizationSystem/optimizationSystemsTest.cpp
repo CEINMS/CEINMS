@@ -37,15 +37,6 @@ using std::endl;
 using std::list;
 #include <chrono>
 
-template <typename T>
-void setupSubject(T& mySubject, string configurationFile) {
-
-    SetupDataStructure<T> setupData(configurationFile);
-    setupData.createCurves();
-    setupData.createMuscles(mySubject);
-    setupData.createDoFs(mySubject);
-
-}
 
 void setLmtMaFilenames(const string& directory, const vector< string > dofNames, string& lmtDataFilename, vector< string >& maDataFilenames)
 {

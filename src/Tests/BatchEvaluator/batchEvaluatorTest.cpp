@@ -31,16 +31,8 @@ using std::cout;
 using std::endl;
 #include <list>
 using std::list;
+#include <algorithm>
 
-template <typename T>
-void setupSubject(T& mySubject, string configurationFile) {
-
-    SetupDataStructure<T> setupData(configurationFile);
-    setupData.createCurves();
-    setupData.createMuscles(mySubject);
-    setupData.createDoFs(mySubject);
-
-}
 
 void setLmtMaFilenames(const string& directory, const vector< string > dofNames, string& lmtDataFilename, vector< string >& maDataFilenames)
 {
@@ -133,6 +125,13 @@ void PrintUsage()
 
 }
 
+template <typename T>
+bool compareVectors(const std::vector<T>& v1, const std::vector<T>& v2) {
+   
+    return std::equal(v1.cbegin(), v1.cend(), v2.cbegin(), [](const T& a, const T& b){
+        return a.equals(b); });
+}
+
 
 int main(int argc, char** argv) {
 
@@ -223,7 +222,7 @@ int main(int argc, char** argv) {
                         batchEvaluator.evaluate(mySubject);
                         auto results2(batchEvaluator.getResults());
 
-                        cout << "Results are the same? " << (results == results2) << std::endl;
+                        cout << "Results are the same? " << compareVectors(results,results2) << std::endl;
                         std::ofstream oF1("results1.txt");
                         oF1 << results.front().activations;
                         oF1.close();
@@ -237,7 +236,7 @@ int main(int argc, char** argv) {
                         batchEvaluator.evaluate(mySubject);
                         auto results3(batchEvaluator.getResults());
 
-                        cout << "Results are the same? " << (results3 == results2) << std::endl;
+                        cout << "Results are the same? " << compareVectors(results2, results3)<< std::endl;
 
 
                     }
