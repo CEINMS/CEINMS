@@ -374,12 +374,12 @@ double ElasticTendon_BiSec::computeMuscleForce(double fibreLength) {
     double normFiberLength   = fibreLength / optimalFibreLength_;
     double normFiberLengthAtT   = fibreLength / optimalFiberLengthAtT;
 
-    double normFiberVelocity = fibreLengthTrace_.getFirstDerivative(time_);
+    double normFiberVelocity = fibreLengthTrace_.getFirstDerivative(time_)/optimalFibreLength_;
     if (normFiberVelocity > maxContractionVelocity_)
         normFiberVelocity = maxContractionVelocity_;
     if (normFiberVelocity < -maxContractionVelocity_)
         normFiberVelocity = -maxContractionVelocity_;
-    normFiberVelocity/=(optimalFibreLength_ * maxContractionVelocity_);
+    normFiberVelocity /= maxContractionVelocity_;
 
     double fv = forceVelocityCurve_.getValue(normFiberVelocity);
     double fp = passiveForceLengthCurve_.getValue(normFiberLength);
