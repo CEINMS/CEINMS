@@ -144,10 +144,12 @@ void Curve<mode, T>::computeCoefficients(Int2Type<CurveMode::Linear>) {
     
     unsigned n = x_.size();
     b_.resize(n);
+    c_.resize(n, 0.0);
+    d_.resize(n, 0.0);
     
-    if (n > 2) {
+    if (n >= 2) {
         for(unsigned k = 0; k < n-1; ++k)
-            b_.at(k) = (y_.at(k) - y_.at(k-1))/(x_.at(k) - x_.at(k-1));
+            b_.at(k) = (y_.at(k+1) - y_.at(k))/(x_.at(k+1) - x_.at(k));
         b_.at(n-1) = b_.at(n-2);
     }
 }
