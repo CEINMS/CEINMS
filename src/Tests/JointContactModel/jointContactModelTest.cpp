@@ -60,6 +60,127 @@ std::vector<OpenSim::ExternalForce*> parseXmlForExternalForces(const string& xml
 }
 
 
+//this is already done internally in JointContactFromOpensim, so we just do it for the test
+void prepareModelForIntersegmentalForces(OpenSim::Model& model) {
+    
+    const OpenSim::CoordinateSet& cs = model.getCoordinateSet();
+    model.updForceSet().setSize(0); //remove all actuators from the model
+    for (unsigned i(0); i < model.getNumCoordinates(); ++i) {
+        CoordinateActuator *actuator = new CoordinateActuator();
+        actuator->setCoordinate(&cs.get(i));
+        string actuatorName(cs.get(i).getName() + "_actuator");
+        actuator->setName(actuatorName);
+        actuator->setOptimalForce(1);
+        actuator->setMaxControl(100000);
+        actuator->setMinControl(-100000);
+        model.addForce(actuator);
+    }
+}
+
+void calculateIntersegmentaForcesWithCEINMS(const OpenSim::Model& model, const OpenSim::GCVSplineSet& kinematicsSplines, const vector<double>& timeColumn) {
+
+    JointContactFromOpensim jointContactModel(model);
+    auto modelSO(model);
+    string jointName("ankle_r");
+    //  OpenSim::StaticOptimization staticOpt;
+    //  staticOpt.
+    //you should create a derived class of OpenSim::Force, which has a reference to a queue (for real time) or an internal storage..
+    //everytime a force is requested it pops it
+
+    OpenSim::Array<std::string> labels;
+    model.getCoordinateSet().getNames(labels);
+    labels.insert(0, "time");
+    Storage idSto, intForcesSto;
+    idSto.setColumnLabels(labels);
+    const OpenSim::BodySet& bodies(model.getBodySet());
+
+
+    for (auto t : timeColumn) {
+
+        jointContactModel.setTime(t);
+
+        OpenSim::Array<double> q;
+        kinematicsSplines.evaluate(q, 0, t);
+        jointContactModel.setQ(q);
+
+        OpenSim::Array<double> qd;
+        kinematicsSplines.evaluate(qd, 1, t);
+        jointContactModel.setQd(qd);
+
+        OpenSim::Array<double> qdd;
+        kinematicsSplines.evaluate(qdd, 2, t);
+        jointContactModel.setQdd(qdd);
+
+        jointContactModel.calculateReactionForces(true);
+
+        SimTK::Vec3 reactionForce;
+        jointContactModel.getReactionForceInG(jointName, reactionForce);
+        idSto.append(t, jointContactModel.getMobilityForces());
+        intForcesSto.append(t, reactionForce);
+
+    }
+
+    string parentBodyName(model.getJointSet().get(jointName).getParentName());
+    string childBodyName(model.getJointSet().get(jointName).getBody().getName());
+    string columnName(jointName + "_on_" + childBodyName + "_in_" + model.getGroundBody().getName());
+    OpenSim::Array<std::string> intForcesLabels;
+    intForcesLabels.append("time");
+    intForcesLabels.append(columnName + "_fx");
+    intForcesLabels.append(columnName + "_fy");
+    intForcesLabels.append(columnName + "_fz");
+    intForcesSto.setColumnLabels(intForcesLabels);
+    intForcesSto.print("ankle_intForces.sto");
+    idSto.print("id_fromCeinms.sto");
+
+}
+
+//copy the model
+void  calculateIntersegmentaForcesWithOpensim(OpenSim::Model model, const OpenSim::Storage& kinematics, const string& externalLoadsFilename, const vector<double>& timeColumn) {
+    
+    double firstTime = timeColumn.front();
+    double lastTime = timeColumn.back();
+    prepareModelForIntersegmentalForces(model);
+    OpenSim::Model modelJR = model;
+    SimTK::State state = model.initSystem();
+
+    auto setupAnalTool([&](OpenSim::AnalyzeTool& analTool, const SimTK::State& modelState){
+  //      analTool.setCoordinatesFileName(kinematicsFilename);
+        analTool.setStatesFromMotion(modelState, kinematics, true);
+        analTool.setExternalLoadsFileName(externalLoadsFilename);
+        analTool.setStartTime(firstTime);
+        analTool.setFinalTime(lastTime);
+        analTool.setPrintResultFiles(true);
+        analTool.setSolveForEquilibrium(false);
+        analTool.setLowpassCutoffFrequency(8);
+        analTool.setReplaceForceSet(true);
+    });
+
+
+    //static opt
+    OpenSim::StaticOptimization* sopt = new  OpenSim::StaticOptimization(&model);
+    model.addAnalysis(sopt);
+    OpenSim::AnalyzeTool analiseToolForSO(model);
+    setupAnalTool(analiseToolForSO, state);
+    analiseToolForSO.run();
+    model.removeAnalysis(sopt, false);
+    
+    //joint reaction
+    SimTK::State stateJR = modelJR.initSystem();
+    OpenSim::JointReaction* jreact = new OpenSim::JointReaction(&modelJR);
+    modelJR.addAnalysis(jreact);
+    OpenSim::Array<string> jointNames;
+    jreact->setForcesFileName("_StaticOptimization_force.sto");
+    jointNames.append("ankle_r");
+    jreact->setJointNames(jointNames);
+    jreact->print("JRsetup.xml");
+    jreact->setName("JointReaction");
+    OpenSim::AnalyzeTool analiseToolForJR(modelJR);
+    setupAnalTool(analiseToolForJR, stateJR);
+    analiseToolForJR.run();
+   
+}
+
+
 int main() {
     /*
     1. Compare output of OpenSim and CEINMS intersegmental forces calculation
@@ -96,59 +217,21 @@ int main() {
     kinematics.getTimeColumn(timeColumnOS);
     vector<double> timeColumn;
     ArrayConverter::toStdVector(timeColumnOS, timeColumn);
-
     auto kinematicsSplines(getKinematicsSplines(model, kinematics, fc));
 
+    //setup external forces
     Storage externalForcesStorage(externalLoads.getDataFileName());
     auto externalForcesFromOsim(parseXmlForExternalForces(externalLoadsFilename));
-
     for (auto& f : externalForcesFromOsim) {
         f->setDataSource(externalForcesStorage);
         model.addForce(f); //model should take care of the pointers and delete them on destruction.. hopefully
     }
 
-    JointContactFromOpensim jointContactModel(model);
-    auto modelSO(model);
-  //  OpenSim::StaticOptimization staticOpt;
-  //  staticOpt.
-    //you should create a derived class of OpenSim::Force, which has a reference to a queue (for real time) or an internal storage..
-    //everytime a force is requested it pops it
-
-    OpenSim::Array<std::string> labels;
-    model.getCoordinateSet().getNames(labels);
-    labels.insert(0, "time");
-    Storage idSto, intForcesSto;
-    idSto.setColumnLabels(labels);
-    const OpenSim::BodySet& bodies(model.getBodySet());
+    calculateIntersegmentaForcesWithCEINMS(model, kinematicsSplines, timeColumn);
+    cout << "----------\nOsim static opt\n------------\n";
+ //   calculateIntersegmentaForcesWithOpensim(model, kinematics, externalLoadsFilename, timeColumn);
 
 
-    for (auto t : timeColumn) {
-
-        jointContactModel.setTime(t);
-        
-        OpenSim::Array<double> q;
-        kinematicsSplines.evaluate(q, 0, t);
-        jointContactModel.setQ(q);
-
-        OpenSim::Array<double> qd;
-        kinematicsSplines.evaluate(qd, 1, t);
-        jointContactModel.setQd(qd);
-
-        OpenSim::Array<double> qdd;
-        kinematicsSplines.evaluate(qdd, 2, t);
-        jointContactModel.setQdd(qdd);
-
-        jointContactModel.calculateReactionForces(true);
-
-        SimTK::Vec3 reactionForce;
-        jointContactModel.getReactionForceInG("ankle_r", reactionForce);
-
-        intForcesSto.append(t, reactionForce);
-
-    }
-
-//    idSto.print("id_fromCeinms.sto");
-    intForcesSto.print("ankle_intForces.sto");
     return 0;
 }
 
