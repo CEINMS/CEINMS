@@ -37,13 +37,12 @@ void QueuesToTrialData::operator()() {
             CEINMS::InputConnectors::FrameType lmtFrameFromQueue = inputConnectors_.queueLmt.pop();
             if (lmtFrameFromQueue.time < std::numeric_limits<double>::infinity())
             {
-                data_.lmtTimeSteps_.push_back(lmtFrameFromQueue.time);
-                data_.lmtData_.push_back(lmtFrameFromQueue.data);
-                data_.noLmtSteps_++;
+                data_.lmtData.pushRow(lmtFrameFromQueue.time, lmtFrameFromQueue.data);
+
                 // 2. read moment arms data
                 for (unsigned int i = 0; i < inputConnectors_.queueMomentArms.size(); ++i) {
                     CEINMS::InputConnectors::FrameType momentArmsFrameFromQueue = (*inputConnectors_.queueMomentArms.at(i)).pop();
-                    data_.maData_.at(i).push_back(momentArmsFrameFromQueue.data);
+                    data_.maData.at(i).pushRow(momentArmsFrameFromQueue.time, momentArmsFrameFromQueue.data);
                 }
             }
             else
@@ -56,10 +55,7 @@ void QueuesToTrialData::operator()() {
             CEINMS::InputConnectors::FrameType externalTorquesFrameFromQueue = inputConnectors_.queueExternalTorques.pop();
             if (externalTorquesFrameFromQueue.time < std::numeric_limits<double>::infinity())
             {
-                data_.torqueTimeSteps_.push_back(externalTorquesFrameFromQueue.time);
-                data_.noTorqueSteps_++;
-                for (size_t iDof = 0; iDof < externalTorquesFrameFromQueue.data.size(); ++iDof)
-                    data_.torqueData_.at(iDof).push_back(externalTorquesFrameFromQueue.data.at(iDof));
+                data_.torqueData.pushRow(externalTorquesFrameFromQueue.time, externalTorquesFrameFromQueue.data);
             }
             else
                 torqueRunning = false;
@@ -71,9 +67,7 @@ void QueuesToTrialData::operator()() {
             CEINMS::InputConnectors::FrameType emgFrameFromQueue = inputConnectors_.queueEmg.pop();
             if (emgFrameFromQueue.time < std::numeric_limits<double>::infinity())
             {
-                data_.emgTimeSteps_.push_back(emgFrameFromQueue.time);
-                data_.emgData_.push_back(emgFrameFromQueue.data);
-                data_.noEmgSteps_++;
+                data_.emgData.pushRow(emgFrameFromQueue.time, emgFrameFromQueue.data);
             }
             else
                 emgRunning = false;
@@ -82,7 +76,7 @@ void QueuesToTrialData::operator()() {
     } while (lmtRunning || emgRunning || torqueRunning);
 }
 
-TrialData QueuesToTrialData::getTrialData()
+CEINMS::TrialData QueuesToTrialData::getTrialData()
 {
     return data_;
 }

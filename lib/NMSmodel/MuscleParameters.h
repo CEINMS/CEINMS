@@ -6,7 +6,7 @@
 //__________________________________________________________________________
 //
 
-
+//TODO: this should be in MTU class
 #ifndef MuscleParameters_h
 #define MuscleParameters_h
 

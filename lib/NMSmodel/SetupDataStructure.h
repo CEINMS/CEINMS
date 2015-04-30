@@ -36,6 +36,17 @@ private:
     CurveOffline tendonForceStrain_;
 };
 
+//non-member non-friend functions are the best!
+template <typename NMSmodelT>
+void setupSubject(NMSmodelT& mySubject, std::string subjectFile) {
+
+    SetupDataStructure<NMSmodelT> setupData(subjectFile);
+    setupData.createCurves();
+    setupData.createMuscles(mySubject);
+    setupData.createDoFs(mySubject);
+
+}
+
 #include "SetupDataStructure.cpp"
 
 #endif

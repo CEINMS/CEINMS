@@ -25,6 +25,25 @@ using std::string;
 //#define DEBUG
 #define CHECKS
 
+
+template <typename Activation, typename Tendon, CurveMode::Mode mode>
+NMSmodel<Activation, Tendon, mode>::NMSmodel(const NMSmodel<Activation, Tendon, mode>& orig) :
+muscles_(orig.muscles_), muscleNames_(orig.muscleNames_), dofNames_(orig.dofNames_)
+{
+
+    std::map<std::string, std::vector<std::string>> dofsToMuscles;
+    orig.getMuscleNamesOnDofs(dofsToMuscles);
+    for (auto& d : dofNames_) {
+        DoFtype dof(d);
+        for (auto& m : dofsToMuscles[d]) {
+            auto i(std::distance(muscleNames_.begin(), std::find(muscleNames_.begin(), muscleNames_.end(), m)));
+            dof.addNewMuscle(muscles_.begin() + i);
+        }
+        dofs_.emplace_back(dof);
+    }
+}
+
+
 template <typename Activation, typename Tendon, CurveMode::Mode mode>
 void NMSmodel<Activation, Tendon, mode>::addMuscle(const MTUtype& muscle) {
 
@@ -465,7 +484,7 @@ void NMSmodel<Activation, Tendon, mode>::getActivations(vector<double>& activati
     activations.reserve(muscles_.size());
     vectorMTUconstItr muscleIt = muscles_.begin();
     for (muscleIt = muscles_.begin(); muscleIt < muscles_.end(); ++muscleIt) 
-        activations.push_back(muscleIt->getActivation());
+        activations.emplace_back(muscleIt->getActivation());
     
 }
 
@@ -477,7 +496,7 @@ void NMSmodel<Activation, Tendon, mode>::getEmgs(vector<double>& currentEMGData)
     currentEMGData.reserve(muscles_.size());
     vectorMTUconstItr muscleIt = muscles_.begin();
     for (muscleIt = muscles_.begin(); muscleIt != muscles_.end(); ++muscleIt) 
-        currentEMGData.push_back(muscleIt->getEmg());
+        currentEMGData.emplace_back(muscleIt->getEmg());
     
 }
 
@@ -489,7 +508,7 @@ void NMSmodel<Activation, Tendon, mode>::getPastEmgs(vector<double>& pastEMGData
     pastEMGData.reserve(muscles_.size());
     vectorMTUconstItr muscleIt = muscles_.begin();
     for (muscleIt = muscles_.begin(); muscleIt != muscles_.end(); ++muscleIt) 
-        pastEMGData.push_back(muscleIt->getPastEmg());
+        pastEMGData.emplace_back(muscleIt->getPastEmg());
 }
 
 
@@ -500,7 +519,7 @@ void NMSmodel<Activation, Tendon, mode>::getNeuralActivations( std::vector<doubl
     neuralActivations.reserve(muscles_.size());
     vectorMTUconstItr muscleIt = muscles_.begin();
     for (muscleIt = muscles_.begin(); muscleIt != muscles_.end(); ++muscleIt) 
-        neuralActivations.push_back(muscleIt->getNeuralActivation());
+        neuralActivations.emplace_back(muscleIt->getNeuralActivation());
 }
 
 
@@ -511,7 +530,7 @@ void NMSmodel<Activation, Tendon, mode>::getFiberLengths(vector<double>& fibreLe
     fibreLengths.reserve(muscles_.size());
     vectorMTUconstItr muscleIt = muscles_.begin();
     for (muscleIt = muscles_.begin(); muscleIt < muscles_.end(); ++muscleIt) 
-        fibreLengths.push_back(muscleIt->getFiberLength());
+        fibreLengths.emplace_back(muscleIt->getFiberLength());
     
 }
 
@@ -523,7 +542,7 @@ void NMSmodel<Activation, Tendon, mode>::getFiberVelocities(vector<double>& fibe
     fiberVelocities.reserve(muscles_.size());
     vectorMTUconstItr muscleIt = muscles_.begin();
     for (muscleIt = muscles_.begin(); muscleIt < muscles_.end(); ++muscleIt) 
-        fiberVelocities.push_back(muscleIt->getFiberVelocity());
+        fiberVelocities.emplace_back(muscleIt->getFiberVelocity());
     
 }
 
@@ -535,7 +554,7 @@ void NMSmodel<Activation, Tendon, mode>::getNormFiberVelocities(vector<double>& 
     normFiberVelocities.reserve(muscles_.size());
     vectorMTUconstItr muscleIt = muscles_.begin();          
     for (muscleIt = muscles_.begin(); muscleIt < muscles_.end(); ++muscleIt) 
-        normFiberVelocities.push_back(muscleIt->getNormFiberVelocity());               
+        normFiberVelocities.emplace_back(muscleIt->getNormFiberVelocity());               
 }                                                                           
 
 
@@ -546,7 +565,7 @@ void NMSmodel<Activation, Tendon, mode>::getMuscleForces(vector<double>& muscleF
     muscleForces.reserve(muscles_.size());
     vectorMTUconstItr muscleIt = muscles_.begin();
     for (muscleIt = muscles_.begin(); muscleIt != muscles_.end(); ++muscleIt) 
-        muscleForces.push_back(muscleIt->getMuscleForce());
+        muscleForces.emplace_back(muscleIt->getMuscleForce());
 }
 
 
@@ -557,7 +576,7 @@ void NMSmodel<Activation, Tendon, mode>::getTorques(vector<double>& torques) con
     torques.reserve(dofs_.size());
     vectorDoFconstItr dofIt = dofs_.begin();
     for (dofIt = dofs_.begin(); dofIt < dofs_.end(); ++dofIt) 
-        torques.push_back(dofIt->getTorque());
+        torques.emplace_back(dofIt->getTorque());
 }
 
 
@@ -568,7 +587,7 @@ void NMSmodel<Activation, Tendon, mode>::getStrengthCoefficients(vector<double>&
     strengthCoefficients.reserve(muscles_.size());
     vectorMTUconstItr muscleIt = muscles_.begin();
     for (muscleIt = muscles_.begin(); muscleIt < muscles_.end(); ++muscleIt) 
-        strengthCoefficients.push_back(muscleIt->getStrengthCoefficient());
+        strengthCoefficients.emplace_back(muscleIt->getStrengthCoefficient());
 }
 
 
@@ -579,7 +598,7 @@ void NMSmodel<Activation, Tendon, mode>::getTendonSlackLengths(vector<double>& t
     tendonSlackLengths.reserve(muscles_.size());
     vectorMTUconstItr muscleIt = muscles_.begin();
     for (muscleIt = muscles_.begin(); muscleIt < muscles_.end(); ++muscleIt) 
-        tendonSlackLengths.push_back(muscleIt->getTendonSlackLength());
+        tendonSlackLengths.emplace_back(muscleIt->getTendonSlackLength());
 }
 
 
@@ -590,7 +609,7 @@ void NMSmodel<Activation, Tendon, mode>::getOptimalFibreLengths(vector<double>& 
     optimalFibreLengths.reserve(muscles_.size());
     vectorMTUconstItr muscleIt = muscles_.begin();
     for (muscleIt = muscles_.begin(); muscleIt < muscles_.end(); ++muscleIt) 
-        optimalFibreLengths.push_back(muscleIt->getOptimalFibreLength());
+        optimalFibreLengths.emplace_back(muscleIt->getOptimalFibreLength());
 }
 
 
@@ -601,7 +620,7 @@ void NMSmodel<Activation, Tendon, mode>::getShapeFactors(vector<double>& shapeFa
     shapeFactors.reserve(muscles_.size());
     vectorMTUconstItr muscleIt = muscles_.begin();
     for (muscleIt = muscles_.begin(); muscleIt < muscles_.end(); ++muscleIt) 
-        shapeFactors.push_back(muscleIt->getShapeFactor());
+        shapeFactors.emplace_back(muscleIt->getShapeFactor());
 }
 
 
@@ -612,7 +631,7 @@ void NMSmodel<Activation, Tendon, mode>::getC1Coefficients(vector<double>& c1Coe
     c1Coefficients.reserve(muscles_.size());
     vectorMTUconstItr muscleIt = muscles_.begin();
     for (muscleIt = muscles_.begin(); muscleIt < muscles_.end(); ++muscleIt) 
-        c1Coefficients.push_back(muscleIt->getC1());
+        c1Coefficients.emplace_back(muscleIt->getC1());
 }
 
 
@@ -623,7 +642,7 @@ void NMSmodel<Activation, Tendon, mode>::getC2Coefficients(vector<double>& c2Coe
     c2Coefficients.reserve(muscles_.size());
     vectorMTUconstItr muscleIt = muscles_.begin();
     for (muscleIt = muscles_.begin(); muscleIt < muscles_.end(); ++muscleIt) 
-        c2Coefficients.push_back(muscleIt->getC2());
+        c2Coefficients.emplace_back(muscleIt->getC2());
 }
 
 
@@ -631,12 +650,13 @@ template <typename Activation, typename Tendon, CurveMode::Mode mode>
 void NMSmodel<Activation, Tendon, mode>::getMusclesIndexOnDof(vector<unsigned>& musclesIndex, unsigned whichDof) const {
     
     musclesIndex.clear();
+    musclesIndex.reserve(muscles_.size());
     vector<string> muscleNamesOnDof;
     dofs_.at(whichDof).getMusclesNamesOnDof(muscleNamesOnDof);
     vector<string>::const_iterator mnIt = muscleNamesOnDof.begin(), pos;
     for(mnIt; mnIt != muscleNamesOnDof.end(); ++mnIt) {
         pos = std::find(muscleNames_.begin(), muscleNames_.end(), *mnIt);
-        musclesIndex.push_back(std::distance(muscleNames_.begin(), pos));
+        musclesIndex.emplace_back(std::distance(muscleNames_.begin(), pos));
     } 
  }
 
@@ -648,7 +668,7 @@ void NMSmodel<Activation, Tendon, mode>::getMuscleNamesOnDofs(vector<vector<stri
 	for(vectorDoFconstItr it(dofs_.begin()); it != dofs_.end(); ++it) {
 		vector<string> muscleNamesOnDof;
 		it->getMusclesNamesOnDof(muscleNamesOnDof);
-		muscleNamesOnDofs.push_back(muscleNamesOnDof);
+		muscleNamesOnDofs.emplace_back(muscleNamesOnDof);
 	}
 }
 
@@ -979,9 +999,11 @@ double NMSmodel<Activation, Tendon, mode>::getMusclesPenalty(vector<unsigned>& s
 template <typename Activation, typename Tendon, CurveMode::Mode mode>
 void NMSmodel<Activation, Tendon, mode>::getMusclesPenaltyVector(vector<double>& penalties) const {
  
+    penalties.clear();
+    penalties.reserve(muscles_.size());
     vectorMTUconstItr muscleIt = muscles_.begin();
     for (muscleIt = muscles_.begin(); muscleIt < muscles_.end(); ++muscleIt) 
-        penalties.push_back(muscleIt->getPenalty());    
+        penalties.emplace_back(muscleIt->getPenalty());    
 }
 
 
@@ -993,8 +1015,8 @@ double NMSmodel<Activation, Tendon, mode>::getGlobalEmDelay() const {
 
 
 template <typename Activation, typename Tendon, CurveMode::Mode mode>
-void NMSmodel<Activation, Tendon, mode>::getMusclesParameters(vector<MuscleParameters>& parameters) {
-
+void NMSmodel<Activation, Tendon, mode>::getMusclesParameters(vector<MuscleParameters>& parameters) const {
+    //this stuff with muscle parameters should be a call to the mtu instead..
     parameters.clear();
     parameters.resize(muscles_.size());
     
@@ -1010,6 +1032,32 @@ void NMSmodel<Activation, Tendon, mode>::getMusclesParameters(vector<MuscleParam
         parameters.at(i).setEmDelay(muscles_.at(i).getEmDelay());
     }
 }
+
+
+template <typename Activation, typename Tendon, CurveMode::Mode mode>
+void NMSmodel<Activation, Tendon, mode>::setMusclesParameters(const vector<MuscleParameters>& parameters)  {
+    //carefull with this.. there's no control over the order of muscles.. 
+    
+    auto mIt(muscles_.begin());
+    auto pIt(parameters.cbegin());
+    for (pIt; pIt != parameters.cend(); ++pIt, ++mIt){
+        mIt->setC1(pIt->getC1());
+        mIt->setC2(pIt->getC2());
+        mIt->setShapeFactor(pIt->getShapeFactor());
+        mIt->setOptimalFibreLength(pIt->getOptimalFiberLength());
+        mIt->setPennationAngle(pIt->getPennationAngle());
+        mIt->setTendonSlackLength(pIt->getTendonSlackLenght());
+        mIt->setMaxIsometricForce(pIt->getMaxIsometricForce());
+        mIt->setStrengthCoefficient(pIt->getStrengthCoefficient());
+        mIt->setEmDelay(pIt->getEmDelay());
+
+    };
+
+
+}
+
+
+
 
 
 template <typename Activation, typename Tendon, CurveMode::Mode mode>

@@ -78,7 +78,10 @@ public:
     double getTendonSlackLength() const {return tendonSlackLength_;};
     void   setOptimalFibreLength(double optimalFibreLength);
     double getOptimalFibreLength() const { return optimalFibreLength_;}
+    void   setPennationAngle(double pennationAngle);
     double getPennationAngle() const {return pennationAngle_; }
+    double getMaxIsometricForce() const { return maxIsometricForce_; }
+    void   setMaxIsometricForce(double maxIsometricForce);
 
     double getFiberLength() const {return fibreLength_;}
     double getFiberVelocity() const {return fibreVelocity_; }
@@ -86,7 +89,7 @@ public:
     double getMuscleForce() const {return muscleForce_;}
     double getPercentageChange() const { return percentageChange_;}
     double getDamping() const {return damping_;}
-    double getMaxIsometricForce() const { return maxIsometricForce_;}
+    
     
 
   

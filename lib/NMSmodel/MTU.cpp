@@ -393,6 +393,25 @@ void MTU<Activation, Tendon, mode>::setOptimalFibreLength(double optimalFiberLen
 
 
 template<typename Activation, typename Tendon, CurveMode::Mode mode>
+void MTU<Activation, Tendon, mode>::setPennationAngle(double pennationAngle) {
+
+    pennationAngle_ = pennationAngle;
+    tendonDynamic_.setPennationAngle(pennationAngle_);
+    resetState();
+}
+
+
+template<typename Activation, typename Tendon, CurveMode::Mode mode>
+void MTU<Activation, Tendon, mode>::setMaxIsometricForce(double maxIsometricForce) {
+
+    maxIsometricForce_ = maxIsometricForce;
+    tendonDynamic_.setMaxIsometricForce(maxIsometricForce_);
+    resetState();
+}
+
+
+
+template<typename Activation, typename Tendon, CurveMode::Mode mode>
 double MTU<Activation, Tendon, mode>::getPenalty() const {
   
     double penalty(tendonDynamic_.getPenalty());

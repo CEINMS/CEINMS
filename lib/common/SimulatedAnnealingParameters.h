@@ -11,7 +11,7 @@
 
 struct SimulatedAnnealingParameters {
     
-    int noEpsilon, NS, NT, maxNoEval;
+    unsigned noEpsilon, NS, NT, maxNoEval;
     double rt, T, epsilon;
     
 };

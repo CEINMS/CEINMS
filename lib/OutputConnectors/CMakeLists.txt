@@ -33,7 +33,7 @@ target_include_directories(OutputConnectors
                                         ${ceinms_common_INCLUDE_DIRS}
                                         ${InputConnectors_INCLUDE_DIRS}
                                         ${Concurrency_INCLUDE_DIRS}
-                                        ${Calibration_INCLUDE_DIRS}
+                                        ${TrialData_INCLUDE_DIRS}
                                 PUBLIC ${Boost_INCLUDE_DIRS})
 
 # Save path to include directory for "internal" usage

@@ -14,30 +14,24 @@
 #include <map>
 #include <string>
 #include <iostream>
+#include "DataTable.h"
 
-class TrialData {
-public:
+namespace CEINMS {
 
- // void crop( const double from, const double to);
-  std::string id_; // OK
-  int noMuscles_; // OK
-  int noEmgSteps_; // OK
-  std::vector< std::string > muscleNames_;
-  std::vector< double > emgTimeSteps_;  // OK
-  std::vector< std::vector < double > > emgData_; // OK 
-  int noLmtSteps_; // OK
-  std::vector< double > lmtTimeSteps_; // OK
-  std::vector< std::vector < double > > lmtData_; // OK
-  int noDoF_; // OK
-  std::vector<std::string> dofNames_; // OK 
-  // each ma has a different matrix
-  std::map<std::string, std::vector<std::string> > maMusclesNames_;
-  std::vector< std::vector < std::vector < double > > > maData_; // OK 
-  unsigned int noTorqueSteps_;
-  std::vector< double > torqueTimeSteps_; // OK
-  std::vector< std::vector < double > > torqueData_;
- // friend std::ostream& operator<< (std::ostream& output, const TrialData& b);
-};
+    class TrialData {
+    public:
+        std::string id;
+        DataTable<double> emgData;
+        DataTable<double> lmtData;
+        DataTable<double> torqueData;
+
+        size_t noDoF;
+        std::vector<std::string> dofNames;
+        std::vector<DataTable<double>> maData;
+
+    };
+
+}
 
 /*
 std::ostream& operator<< (std::ostream& output, const TrialData& rhs) {

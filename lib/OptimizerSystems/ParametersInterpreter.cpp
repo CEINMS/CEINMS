@@ -6,30 +6,43 @@
 //__________________________________________________________________________
 //
 
-
 #include "Parameter.h"
 #include <iostream>
 #include <vector>
 #include <algorithm>
 
+template <typename NMSmodelT>
+ParametersInterpreter<NMSmodelT>::ParametersInterpreter(NMSmodelT& subject, const ParameterSet& parameterSet, const std::vector<std::string>& dofsToCalibrate) :
+subject_(subject), parameterSet_(parameterSet), dofNames_(dofsToCalibrate)
+{
+    defineParameterDetails();
+}
+
 
 template<typename NMSmodelT>
-ParametersFromXml<NMSmodelT>::ParametersFromXml(NMSmodelT& subject, std::vector< std::string >& dofToCalibrate, const ParameterSet& parameterSet)
-:subject_(subject), dofNames_(dofToCalibrate) {
-    
-    for(ParameterSet::const_iterator it(parameterSet.begin()); it != parameterSet.end(); ++it) {
-        std::cout << "Parameter " << it->getName() << std::endl;
+void ParametersInterpreter<NMSmodelT>::setDofsToCalibrate(const std::vector<std::string> dofsToCalibrate) {
+
+    dofNames_ = dofsToCalibrate;
+    defineParameterDetails();
+}
+
+template<typename NMSmodelT>
+void ParametersInterpreter<NMSmodelT>::defineParameterDetails() {
+
+    for (ParameterSet::const_iterator it(parameterSet_.begin()); it != parameterSet_.end(); ++it) {
+    //    std::cout << "Parameter " << it->getName() << std::endl;
         ParameterDetails parameterDetails;
         ParameterID parameterId = it->getID();
 
         ParameterAssignment assignment = it->getAssignment();
-        if(assignment == Parameter::Grouped) {
+        if (assignment == Parameter::Grouped) {
             MuscleGroups muscleGroups;
             it->getMuscleGroups(muscleGroups);
             getMuscleGroupIndex(muscleGroups, parameterDetails.muscleGroups);
-        } else
+        }
+        else
             getMuscleGroupIndex(assignment, parameterDetails.muscleGroups);
-        
+
         parameterDetails.boundaryType = it->getBoundariesType();
         parameterDetails.lowerLimit = it->getLowerLimit();
         parameterDetails.upperLimit = it->getUpperLimit();
@@ -37,23 +50,25 @@ ParametersFromXml<NMSmodelT>::ParametersFromXml(NMSmodelT& subject, std::vector<
         parameterDetails.name = it->getName();
 
         std::pair<typename ParametersMap::iterator, bool> ret;
-        ret = parameters_.insert(std::pair<ParameterID, ParameterDetails> (parameterId, parameterDetails));
-        if (ret.second == false) 
-            std::cout << "parameter " << it->getName() << " already existed - skipped\n";
+        ret = parameters_.insert(std::pair<ParameterID, ParameterDetails>(parameterId, parameterDetails));
+  //      if (ret.second == false)
+   //         std::cout << "parameter " << it->getName() << " already existed - skipped\n";
     }
-    
+
     noParameters_ = 0;
-    for(typename ParametersMap::const_iterator it(parameters_.begin()); it != parameters_.end(); ++it)
+    for (typename ParametersMap::const_iterator it(parameters_.begin()); it != parameters_.end(); ++it)
         noParameters_ += it->second.muscleGroups.size();
-    
-    std::cout << "Number of Parameters " << noParameters_ << std::endl;
+
+  //  std::cout << "Number of Parameters " << noParameters_ << std::endl;
+
 }
 
 
-template<typename NMSmodelT>
-void ParametersFromXml<NMSmodelT>::getStartingVectorParameters(std::vector< double >& x) {
 
-	x.clear();
+template<typename NMSmodelT>
+std::vector<double> ParametersInterpreter<NMSmodelT>::getSubjectParameters() const{
+
+    std::vector<double> x;
     for(typename ParametersMap::const_iterator it(parameters_.begin()); it != parameters_.end(); ++it) {
        
         std::vector<double> coefficients, groupedCoefficients;
@@ -61,11 +76,12 @@ void ParametersFromXml<NMSmodelT>::getStartingVectorParameters(std::vector< doub
 		groupValues(it->second.muscleGroups, coefficients, groupedCoefficients);
 		x.insert(x.end(), groupedCoefficients.begin(), groupedCoefficients.end());
 	}
+    return x;
 }
 
 
 template<typename NMSmodelT>
-void ParametersFromXml<NMSmodelT>::setVectorParameters(const std::vector<double>& x) {
+void ParametersInterpreter<NMSmodelT>::setSubjectParameters(const std::vector<double>& x) {
     
     
     unsigned count = 0;
@@ -89,7 +105,7 @@ void ParametersFromXml<NMSmodelT>::setVectorParameters(const std::vector<double>
 
 
 template<typename NMSmodelT>
-void ParametersFromXml<NMSmodelT>::getUpperLowerBounds(std::vector<double>& upperBounds, std::vector<double>& lowerBounds) {
+void ParametersInterpreter<NMSmodelT>::getUpperLowerBounds(std::vector<double>& upperBounds, std::vector<double>& lowerBounds) const {
 
     upperBounds.clear(); lowerBounds.clear();
     for(typename ParametersMap::const_iterator it(parameters_.begin()); it != parameters_.end(); ++it) {
@@ -113,7 +129,7 @@ void ParametersFromXml<NMSmodelT>::getUpperLowerBounds(std::vector<double>& uppe
 
 
 template<typename NMSmodelT>
-void ParametersFromXml<NMSmodelT>::groupValues(const MuscleGroupsIdx& muscleGroupsIdx, const std::vector<double>& distributedValues, std::vector<double>& groupedValues) {
+void ParametersInterpreter<NMSmodelT>::groupValues(const MuscleGroupsIdx& muscleGroupsIdx, const std::vector<double>& distributedValues, std::vector<double>& groupedValues) const{
  
     groupedValues.clear();
     for(typename MuscleGroupsIdx::const_iterator it(muscleGroupsIdx.begin()); it != muscleGroupsIdx.end(); ++it)
@@ -122,7 +138,7 @@ void ParametersFromXml<NMSmodelT>::groupValues(const MuscleGroupsIdx& muscleGrou
 
 
 template<typename NMSmodelT>
-void ParametersFromXml<NMSmodelT>::distributeValues(const MuscleGroupsIdx& muscleGroupsIdx, std::vector<double>& distributedValues, const std::vector<double>& groupedValues) {
+void ParametersInterpreter<NMSmodelT>::distributeValues(const MuscleGroupsIdx& muscleGroupsIdx, std::vector<double>& distributedValues, const std::vector<double>& groupedValues) {
 
     for(unsigned i = 0; i < muscleGroupsIdx.size(); ++i)
         for(std::vector<unsigned>::const_iterator it(muscleGroupsIdx.at(i).begin()); it != muscleGroupsIdx.at(i).end(); ++it)
@@ -131,7 +147,7 @@ void ParametersFromXml<NMSmodelT>::distributeValues(const MuscleGroupsIdx& muscl
 
 
 template<typename NMSmodelT>
-void ParametersFromXml<NMSmodelT>::getMuscleGroupIndex(const MuscleGroups& muscleGroups, MuscleGroupsIdx& muscleGroupsIdx) {
+void ParametersInterpreter<NMSmodelT>::getMuscleGroupIndex(const MuscleGroups& muscleGroups, MuscleGroupsIdx& muscleGroupsIdx) {
     
     muscleGroupsIdx.clear();
     std::vector<std::string> muscleNames;
@@ -155,13 +171,13 @@ void ParametersFromXml<NMSmodelT>::getMuscleGroupIndex(const MuscleGroups& muscl
 
 //NOTE: when using global o single parameters, only the calibrating dofs are considered
 template<typename NMSmodelT>
-void ParametersFromXml<NMSmodelT>::getMuscleGroupIndex(ParameterAssignment parameterAssignment, MuscleGroupsIdx& muscleGroupsIdx) {
+void ParametersInterpreter<NMSmodelT>::getMuscleGroupIndex(ParameterAssignment parameterAssignment, MuscleGroupsIdx& muscleGroupsIdx) {
 
     muscleGroupsIdx.clear();
     std::vector<unsigned> musclesIndexList;
     subject_.getMusclesIndexFromDofs(musclesIndexList, dofNames_);
     if(parameterAssignment == Parameter::Single) {
-        for(vector<unsigned>::const_iterator it(musclesIndexList.begin()); it != musclesIndexList.end(); ++it) {
+        for(std::vector<unsigned>::const_iterator it(musclesIndexList.begin()); it != musclesIndexList.end(); ++it) {
             std::vector<unsigned> m; m.push_back(*it);
             muscleGroupsIdx.push_back(m);
         }
@@ -172,7 +188,7 @@ void ParametersFromXml<NMSmodelT>::getMuscleGroupIndex(ParameterAssignment param
 
 
 template<typename NMSmodelT>
-void ParametersFromXml<NMSmodelT>::getCoefficients(ParameterID parameterID, std::vector<double>& coefficients) {
+void ParametersInterpreter<NMSmodelT>::getCoefficients(ParameterID parameterID, std::vector<double>& coefficients) const {
         
      switch(parameterID) {
             case Parameter::C1: 
@@ -208,7 +224,7 @@ void ParametersFromXml<NMSmodelT>::getCoefficients(ParameterID parameterID, std:
 
 
 template<typename NMSmodelT>
-void ParametersFromXml<NMSmodelT>::setCoefficients(ParameterID parameterID, const std::vector<double>& coefficients) {
+void ParametersInterpreter<NMSmodelT>::setCoefficients(ParameterID parameterID, const std::vector<double>& coefficients) {
     
       switch(parameterID) {
             case Parameter::C1: 

@@ -53,7 +53,9 @@ public:
     double getFibreLength() { return fibreLength_;}
     void setStrengthCoefficient(double strengthCoefficient);
     void setTendonSlackLength(double tendonSlackLength);
-    void setOptimalFibreLength(double optimalFibreLength) { optimalFibreLength_ = optimalFibreLength; }
+    void setOptimalFibreLength(double optimalFibreLength);
+    void setPennationAngle(double pennationAngle);
+    void setMaxIsometricForce(double maxIsometricForce);
     void setCurves(const CurveOffline& activeForceLengthCurve, 
                    const CurveOffline& passiveForceLengthCurve, 
                    const CurveOffline& forceVelocityCurve,
