@@ -146,7 +146,7 @@ void Curve<mode, T>::computeCoefficients(Int2Type<CurveMode::Linear>) {
     b_.resize(n);
     c_.resize(n, 0.0);
     d_.resize(n, 0.0);
-    
+ 
     if (n >= 2) {
         for(unsigned k = 0; k < n-1; ++k)
             b_.at(k) = (y_.at(k+1) - y_.at(k))/(x_.at(k+1) - x_.at(k));
@@ -271,7 +271,9 @@ unsigned Curve<mode, T>::getAbscissaPoint(double xValue) const{
     const unsigned n = x_.size();
     unsigned k = 0; 
     if (n == 2)
-        k = 0;    
+        k = 0;   
+    else if (xValue <= x_.front()) k = 0;
+    else if (xValue >= x_.back()) k = n - 1;
     else k = (std::distance(x_.begin(), std::lower_bound(x_.begin(), x_.end(), xValue)) - 1);
 
   //  std::cout << "k, k1 "<< k << " " <<k1 << std::endl;
@@ -318,7 +320,7 @@ double Curve<mode, T>::getValue(double xalue, unsigned abscissaPoint, Int2Type<C
   
     const unsigned k(abscissaPoint);
     double dx = xalue - x_.at(k);
-    return b_.at(k)*dx;
+    return b_.at(k)*dx + y_.at(k);
     
 }
 
