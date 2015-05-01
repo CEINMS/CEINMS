@@ -94,7 +94,19 @@ void SetupDataStructure<NMSmodelT>::createMuscles(NMSmodelT& mySubject) {
         double c2 = (*i).c2();
         double shapeFactor = (*i).shapeFactor();
         double optimalFiberLength = (*i).optimalFibreLength();
-        double pennationAngle = (*i).pennationAngle();
+
+        MTUType::pennationAngle_type& pennAngle((*i).pennationAngle());   
+        double pennationAngle = pennAngle;
+        switch (pennAngle.unit()) {
+            case AngleInputType::unit_type::deg :
+                cout << "Converted " << muscleName << " pennation angle from degrees to radians: " << pennAngle << " -> ";
+                pennAngle = radians(pennAngle);
+                cout << pennAngle << endl;
+                break;
+            default:
+                cout << "Assuming " << muscleName << " pennation angle in radians: " << pennAngle <<  endl;
+                break;
+        }
         double tendonSlackLength = (*i).tendonSlackLength();
         double strengthCoefficient = (*i).strengthCoefficient();
         newMuscle.setParametersToComputeActivation(c1, c2, shapeFactor);
