@@ -18,9 +18,17 @@ public:
     CircularVector(const CircularVector<T>& rhs); 
     CircularVector<T>& operator=(const CircularVector<T>& rhs);
     CircularVector<T>& operator=(const std::vector<T>& rhs);
-    T operator[](unsigned i) const;
-    T at(unsigned i) const;
-    T back() { return at((count_-1)); }
+    const T& operator[](unsigned i) const;
+    T& operator[](unsigned i);
+    const T& at(unsigned i) const;
+    T& at(unsigned i);
+
+    T& back() { return at((count_-1)); }
+    const T& back() const { return at((count_ - 1)); }
+
+    T& front() { return at(0); }
+    const T& front() const { return at(0); }
+
     void resizeMax(unsigned i);
     void clear();
     void push_back(const T& e);

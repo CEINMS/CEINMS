@@ -2,7 +2,18 @@
 #include <vector>
 #include <fstream>
 #include <string>
+#define _USE_MATH_DEFINES
+#include <math.h>
 
+
+std::vector<double> getRange(double min, double max, unsigned nPoints) {
+
+    std::vector<double> x;
+    double dx = (max - min) / static_cast<double>(nPoints);
+    for (unsigned i(0); i <= nPoints; ++i)
+        x.push_back(min + i*dx);
+    return x;
+}
 
 template <typename T>
 void printCurve(const T& curve, const std::string& filename, double startX, double endX, unsigned nPoints = 1000) {
@@ -17,10 +28,53 @@ void printCurve(const T& curve, const std::string& filename, double startX, doub
 
 }
 
-int main() {
+
+template <typename T>
+void printCurveDerivative(const T& curve, const std::string& filename, double startX, double endX, unsigned nPoints = 1000) {
+
+    std::ofstream oF(filename);
+    double increment((endX - startX) / static_cast<double>(nPoints));
+    for (unsigned i(0); i <= nPoints; ++i) {
+        double x = startX + i*increment;
+        oF << x << "," << curve.getFirstDerivative(x) << std::endl;
+    }
+    oF.close();
+
+}
 
 
-    Curve<CurveMode::Mode::Offline, CurveMode::Interpolation::Linear> activeForceLength, passiveForceLength, forceVelocity, tendonForceLength;
+template <typename T, typename U>
+void compareCurve(const T& curve, U&& function, const std::string& filename, double startX, double endX, unsigned nPoints = 1000) {
+
+    std::ofstream oF(filename);
+    oF << "x,y1,y2\n";
+    auto xVals = getRange(startX, endX, nPoints);
+    
+    for (auto x : xVals) 
+        oF << x << "," << curve.getValue(x) << "," << function(x) << std::endl;
+    
+    oF.close();
+
+}
+
+
+template<typename Lambda, typename CurveT>
+void createCurve(std::vector<double> xPoints, Lambda&& function, CurveT& curve){
+    
+    curve.reset();
+    for (auto x : xPoints) {
+        curve.addPointOnly(x, std::forward<Lambda>(function)(x));
+    }
+    curve.refresh();
+   
+}
+
+
+
+
+void testMuscleCurves() {
+
+     Curve<CurveMode::Mode::Offline, CurveMode::Interpolation::Cubic> activeForceLength, passiveForceLength, forceVelocity, tendonForceLength;
 
     std::vector<double> afX{ -5, 0, 0.401, 0.402, 0.4035, 0.52725, 0.62875, 0.71875, 0.86125, 1.045, 1.2175, 1.43875, 1.61875, 1.62, 1.621, 2.2, 5 };
     std::vector<double> afY{ 0, 0, 0, 0, 0, 0.226667, 0.636667, 0.856667, 0.95, 0.993333, 0.77, 0.246667, 0, 0, 0, 0, 0 };
@@ -43,7 +97,28 @@ int main() {
     std::vector<double> tfY{ 0, 0, 0, 0, 0.0108, 0.0257, 0.0435, 0.0652, 0.0915, 0.123, 0.161, 0.208, 0.227, 345, 345, 345, 345 };
     tendonForceLength.resetPointsWith(tfX, tfY);
     printCurve(tendonForceLength, "tf.txt", -10, 20);
+}
 
+int main() {
+
+    using MyCurve = Curve < CurveMode::Mode::Offline, CurveMode::Interpolation::Linear > ;
+  //  std::vector<double> x(getRange(-M_PI, M_PI, 10));
+    
+    MyCurve sinCurve;
+    auto sinFun([](double x){return std::sin(x); });
+    createCurve(getRange(-M_PI, M_PI, 100), sinFun, sinCurve);
+    compareCurve(sinCurve, sinFun,  "sin.txt", -4, 4);
+    printCurveDerivative(sinCurve, "sinD.txt", -4, 4);
+
+
+    MyCurve lineCurve;
+    auto lineFun([](double x){
+        double m = 1, q = 0; 
+        return m*x + q;
+    });
+    createCurve(getRange(-1, 1, 2), lineFun, lineCurve);
+    compareCurve(lineCurve, lineFun, "line.txt", -4, 4);
+    printCurveDerivative(lineCurve, "lineD.txt", -4, 4);
 
     return 0;
 

@@ -24,7 +24,7 @@ CircularVector<T>::CircularVector()
 
 
 template<typename T>
-T CircularVector<T>::at(unsigned i) const { 
+const T& CircularVector<T>::at(unsigned i) const { 
 
     if(i >= count_) {
         std::cout << "CircularVector out of range\n";
@@ -37,10 +37,30 @@ T CircularVector<T>::at(unsigned i) const {
 
 
 template<typename T>
-T CircularVector<T>::operator[](unsigned i) const {
+T& CircularVector<T>::at(unsigned i) {
+
+    if (i >= count_) {
+        std::cout << "CircularVector out of range\n";
+        exit(EXIT_FAILURE);
+    }
+
+    return v_.at((beg_ + i) % count_);
+
+}
+
+template<typename T>
+const T& CircularVector<T>::operator[](unsigned i) const {
   
     return v_[(beg_+i)%size_];
 }
+
+
+template<typename T>
+T& CircularVector<T>::operator[](unsigned i) {
+
+    return v_[(beg_ + i) % count_];
+}
+
 
 template<typename T>
 CircularVector<T>& CircularVector<T>::operator=(const CircularVector<T>& rhs) {
