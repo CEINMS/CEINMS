@@ -14,6 +14,8 @@
 #include <string>
 #include "subject.hxx" // TODO: we should find a way to only include this from xmlInput
 #include "Curve.h"
+#define _USE_MATH_DEFINES
+#include <math.h>
 
 template<typename NMSmodelT>
 class SetupDataStructure{
@@ -45,6 +47,11 @@ void setupSubject(NMSmodelT& mySubject, std::string subjectFile) {
     setupData.createMuscles(mySubject);
     setupData.createDoFs(mySubject);
 
+}
+
+inline double radians(double d) {
+
+    return d * M_PI / 180;
 }
 
 #include "SetupDataStructure.cpp"

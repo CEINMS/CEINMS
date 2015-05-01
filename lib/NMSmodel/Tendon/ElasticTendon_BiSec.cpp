@@ -18,6 +18,8 @@ using std::endl;
 #include <functional>
 //#include <boost/concept_check.hpp>
 #include "WDBsolver.h"
+#include "../MTUutils.h" //don't know why it doesn't show up without the parent dir..
+
 //#define DEEP_DEBUG
 //#define DEBUG
 
@@ -25,76 +27,7 @@ using std::endl;
 //     return (T(0) < val) - (val < T(0));
 // }
 
-inline double radians (double d) {
-return d * M_PI / 180;
-}
 
-inline double degrees (double r) {
-return r * 180/ M_PI;
-}
-
-class PennationAngle {
-
-public:
-    static double compute(double fibreLength, double optimalFibreLength, double pennationAngle) {
-    double value = optimalFibreLength*sin(radians(pennationAngle) )/fibreLength;
-    if (value <= 0.0)
-        return (0.0);
-    else if (value >= 1.0)
-        return (90.0);
-    return (degrees(asin(value)));
-    }
-};
-/*
-
-struct TendonSplinePoints {
-
-    static void getX(vector<double>& x) {
-    
-        x.clear();
-        x.push_back(-10);
-        x.push_back(-0.002);
-        x.push_back(-0.001);
-        x.push_back(0);
-        x.push_back(0.00131);
-        x.push_back(0.00281);
-        x.push_back(0.00431);
-        x.push_back(0.00581);
-        x.push_back(0.00731);
-        x.push_back(0.00881);
-        x.push_back(0.0103);
-        x.push_back(0.0118);
-        x.push_back(0.0123);
-        x.push_back(9.2);
-        x.push_back(9.201);
-        x.push_back(9.202);
-        x.push_back(20);
-    }
-
-    static void getY(vector<double>& y) {
-     
-        y.clear();
-        y.push_back(0);
-        y.push_back(0);
-        y.push_back(0);
-        y.push_back(0);
-        y.push_back(0.0108);
-        y.push_back(0.0257);
-        y.push_back(0.0435);
-        y.push_back(0.0652);
-        y.push_back(0.0915);
-        y.push_back(0.123);
-        y.push_back(0.161);
-        y.push_back(0.208);
-        y.push_back(0.227);
-        y.push_back(345);
-        y.push_back(345);
-        y.push_back(345);
-        y.push_back(345);
-    }
-    
-};
-*/
 
 ElasticTendon_BiSec::ElasticTendon_BiSec():
 optimalFibreLength_(.0),
@@ -367,8 +300,8 @@ double ElasticTendon_BiSec::evaluateForceError(double fiberLength) {
 
 double ElasticTendon_BiSec::computeTendonForce(double fibreLength) {
     
-    double pennationAngleAtT = PennationAngle::compute(fibreLength, optimalFibreLength_, pennationAngle_);
-    double tendonLength = muscleTendonLength_ - fibreLength*cos(radians(pennationAngleAtT));  
+    double pennationAngleAtT = ceinms::PennationAngle::compute(fibreLength, optimalFibreLength_, pennationAngle_);
+    double tendonLength = muscleTendonLength_ - fibreLength*cos(pennationAngleAtT);  
     double tendonStrain = (tendonLength - tendonSlackLength_)/tendonSlackLength_;
     double tendonForce = strengthCoefficient_*maxIsometricForce_*
                           tendonForceStrainCurve_.getValue(tendonStrain);
@@ -404,12 +337,12 @@ double ElasticTendon_BiSec::computeMuscleForce(double fibreLength) {
     double fv = forceVelocityCurve_.getValue(normFiberVelocity);
     double fp = passiveForceLengthCurve_.getValue(normFiberLength);
     double fa = activeForceLengthCurve_.getValue(normFiberLengthAtT);
-    double pennationAngleAtT = PennationAngle::compute(fibreLength, optimalFibreLength_, pennationAngle_);
+    double pennationAngleAtT = ceinms::PennationAngle::compute(fibreLength, optimalFibreLength_, pennationAngle_);
 
     
     double muscleForce = maxIsometricForce_ * strengthCoefficient_ *
            (fa * fv * activation_ + fp + damping_ * normFiberVelocity)* 
-           cos(radians(pennationAngleAtT));
+           cos(pennationAngleAtT);
 
     fibreLengthTrace_.removeLastPoint();
     
@@ -420,7 +353,7 @@ double ElasticTendon_BiSec::computeMuscleForce(double fibreLength) {
 
 double ElasticTendon_BiSec::getFibreLengthStiff() const {
  
-    double first = optimalFibreLength_ * sin( radians(pennationAngle_));
+    double first = optimalFibreLength_ * sin( pennationAngle_);
     double second = muscleTendonLength_ - tendonSlackLength_;
     return sqrt(first*first + second*second);     
 }

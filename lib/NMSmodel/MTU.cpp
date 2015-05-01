@@ -5,17 +5,7 @@ using std::endl;
 #include <stdlib.h>
 #define _USE_MATH_DEFINES
 #include <math.h>
-
-inline double radians (double d) {
-
-    return d * M_PI / 180;
-}
-
-inline double degrees (double r) {
-
-    return r * 180/ M_PI;
-}
-
+#include "MTUutils.h"
 
 template<typename Activation, typename Tendon, CurveMode::Mode mode>
 MTU<Activation, Tendon, mode>::MTU() 
@@ -287,7 +277,7 @@ void MTU<Activation, Tendon, mode>::updateMuscleForce() {
     normFibreVelocity_= normFiberVelocity;
     muscleForce_ = maxIsometricForce_*strengthCoefficient_*
                    (fa*fv*activation_ + fp + damping_*normFiberVelocity)* 
-                   cos(radians(pennationAngleAtT));
+                   cos(pennationAngleAtT);
 }
 
 
@@ -425,13 +415,8 @@ double MTU<Activation, Tendon, mode>::getPenalty() const {
 template<typename Activation, typename Tendon, CurveMode::Mode mode>
 inline double MTU<Activation, Tendon, mode>::computePennationAngle(double optimalFiberLength) {
 
-   double value = optimalFiberLength*sin(radians(pennationAngle_) )/fibreLength_;
+   return ceinms::PennationAngle::compute(fibreLength_, optimalFiberLength, pennationAngle_);
 
-   if (value <= 0.0)
-        return (0.0);
-    else if (value >= 1.0)
-        return (90.0);
-    return (degrees(asin(value)));
 }
 
 

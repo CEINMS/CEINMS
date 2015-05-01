@@ -14,13 +14,6 @@
 #define _USE_MATH_DEFINES
 #include <math.h>
 
-inline double radians (double d) {
-return d * M_PI / 180;
-}
-
-inline double degrees (double r) {
-return r * 180/ M_PI;
-}
 
 StiffTendon::StiffTendon()
 {
@@ -82,7 +75,7 @@ void StiffTendon::setActivation(double activation) {
 
 void StiffTendon::updateFibreLength() {
  
-    double first = optimalFibreLength_ * sin( radians(pennationAngle_));
+    double first = optimalFibreLength_ * sin( pennationAngle_);
     double second = muscleTendonLength_ - tendonSlackLength_;
     fibreLength_ = sqrt(first*first + second*second);     
 }
