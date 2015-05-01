@@ -81,7 +81,14 @@ private:
 
     double getValue(double xValue, unsigned abscissaPoint, Int2Type<CurveMode::Cubic>) const;
     double getValue(double xValue, unsigned abscissaPoint, Int2Type<CurveMode::Linear>) const;
+
+    double getFirstDerivative(double xValue, unsigned abscissaPoint, Int2Type<CurveMode::Cubic>) const;
+    double getFirstDerivative(double xValue, unsigned abscissaPoint, Int2Type<CurveMode::Linear>) const;
+
     unsigned getAbscissaPoint(double xValue) const;
+    unsigned getAbscissaPoint(double xValue, Int2Type<CurveMode::Online>) const;
+    unsigned getAbscissaPoint(double xValue, Int2Type<CurveMode::Offline>) const;
+
 
     typedef typename Select<mode, std::vector<double>, CircularVector<double> >::Result VectorType;  
     VectorType x_;

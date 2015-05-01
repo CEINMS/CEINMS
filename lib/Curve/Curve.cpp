@@ -133,9 +133,9 @@ void Curve<mode, T>::refresh()
 void Curve<mode, T>::computeCoefficients(Int2Type<CurveMode::Linear>) { 
     
     unsigned n = x_.size();
-    b_.resize(n);
-    c_.resize(n, 0.0);
-    d_.resize(n, 0.0);
+    b_.resize(n, .0);
+    c_.resize(n, .0);
+    d_.resize(n, .0);
 
     if (n >= 2) {
         for(unsigned k = 0; k < n-1; ++k)
@@ -234,41 +234,44 @@ void Curve<mode, T>::computeCoefficients(Int2Type<CurveMode::Cubic>) {
 template <CurveMode::Mode mode,  CurveMode::Interpolation T>
 unsigned Curve<mode, T>::getAbscissaPoint(double xValue) const{
     
-  
-  /*  const unsigned n = x_.size();
-    unsigned k = 0; 
-    if (n == 2)
-        k = 0;    
-    else {  // Do a binary search to find which two spline control points the abscissa is between   
-    
-        unsigned i = 0;
-        unsigned j = n;
-        while (1) {
-            
-            k = (i+j)/2;
-            if (xValue < x_.at(k))
-                j = k;
-            else if (xValue > x_.at(k+1))
-                i = k;
-            else
-                break;
-        }
-    }
-    return k;*/
-  
-
-    
     const unsigned n = x_.size();
     unsigned k = 0; 
     if (n == 2)
         k = 0;   
     else if (xValue <= x_.front()) k = 0;
     else if (xValue >= x_.back()) k = n - 1;
-    else k = (std::distance(x_.begin(), std::lower_bound(x_.begin(), x_.end(), xValue)) - 1);
+    else k = getAbscissaPoint(xValue, Int2Type<mode>());
 
   //  std::cout << "k, k1 "<< k << " " <<k1 << std::endl;
     
     return k;
+}
+
+
+//the circular vector does't have iterators.. so in the meantime we fix it like this
+template <CurveMode::Mode mode, CurveMode::Interpolation T>
+unsigned Curve<mode, T>::getAbscissaPoint(double xValue, Int2Type<CurveMode::Online>) const {
+
+    unsigned i = 0;
+    unsigned j = x_.size();
+    unsigned k = 0;
+    while (1) {
+        k = (i + j) / 2;
+        if (xValue < x_.at(k))
+            j = k;
+        else if (xValue > x_.at(k + 1))
+            i = k;
+        else
+            break;
+    }
+    return k;
+}
+
+
+template <CurveMode::Mode mode, CurveMode::Interpolation T>
+unsigned Curve<mode, T>::getAbscissaPoint(double xValue, Int2Type<CurveMode::Offline>) const {
+
+    return std::distance(x_.begin(), std::lower_bound(x_.begin(), x_.end(), xValue)) - 1;
 }
 
 
@@ -324,48 +327,38 @@ double Curve<mode, T>::getValue(double xalue, unsigned abscissaPoint, Int2Type<C
 */
 
 template <CurveMode::Mode mode,  CurveMode::Interpolation T>
-double Curve<mode, T>::getFirstDerivative(double xalue) const  {
+double Curve<mode, T>::getFirstDerivative(double xValue) const  {
 
 	
 	int n = x_.size();
+    double yValue(.0);
+	if ( xValue < x_.at(0)) 
+	  yValue =  b_.at(0);	  
+	else if ( xValue > x_.at(n-1))  
+	  yValue = b_.at(n-1);
+    else if (n == 1) 
+        yValue = .0;
+    else yValue = getFirstDerivative(xValue, getAbscissaPoint(xValue), Int2Type<T>());
 	
-	  
-	// Now see if the abscissa is out of range of the function
-	
-	if ( xalue < x_.at(0)) 
-	  return b_.at(0);
-	  
-	if ( xalue > x_.at(n-1))  
-	  return b_.at(n-1);
-	  
-	
-  if (n == 1) 
-    return 0;
-	
-	int k = 0; 
-  if (n == 2)
-    k = 0;    
-  else { 
-	  // Do a binary search to find which two spline control points the abscissa
-	  // is between   
-	
-	  int i = 0;
-	  int j = n;
-	  
-	  while (1)
-	  {
-		  k = (i+j)/2;
-		  if (xalue < x_.at(k))
-			  j = k;
-		  else if (xalue > x_.at(k+1))
-			  i = k;
-		  else
-			  break;
-	  }   
-	} 
-	double dx = xalue - x_.at(k);
-	return (b_.at(k) + dx * ( 2.0 * c_.at(k) + 3.0 * dx * d_.at(k)));
+	return yValue;
 	 
+}
+
+
+template <CurveMode::Mode mode, CurveMode::Interpolation T>
+double Curve<mode, T>::getFirstDerivative(double xValue, unsigned abscissaPoint, Int2Type<CurveMode::Cubic>) const {
+
+    unsigned k(abscissaPoint);
+    double dx = xValue - x_.at(k);
+    return (b_.at(k) + dx * (2.0 * c_.at(k) + 3.0 * dx * d_.at(k)));
+
+}
+
+
+template <CurveMode::Mode mode, CurveMode::Interpolation T>
+double Curve<mode, T>::getFirstDerivative(double xValue, unsigned abscissaPoint, Int2Type<CurveMode::Linear>) const {
+
+    return b_.at(abscissaPoint);
 }
 
 
