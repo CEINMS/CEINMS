@@ -300,7 +300,7 @@ double ElasticTendon_BiSec::evaluateForceError(double fiberLength) {
 
 double ElasticTendon_BiSec::computeTendonForce(double fibreLength) {
     
-    double pennationAngleAtT = ceinms::PennationAngle::compute(fibreLength, optimalFibreLength_, pennationAngle_);
+    double pennationAngleAtT = CEINMS::PennationAngle::compute(fibreLength, optimalFibreLength_, pennationAngle_);
     double tendonLength = muscleTendonLength_ - fibreLength*cos(pennationAngleAtT);  
     double tendonStrain = (tendonLength - tendonSlackLength_)/tendonSlackLength_;
     double tendonForce = strengthCoefficient_*maxIsometricForce_*
@@ -337,7 +337,7 @@ double ElasticTendon_BiSec::computeMuscleForce(double fibreLength) {
     double fv = forceVelocityCurve_.getValue(normFiberVelocity);
     double fp = passiveForceLengthCurve_.getValue(normFiberLength);
     double fa = activeForceLengthCurve_.getValue(normFiberLengthAtT);
-    double pennationAngleAtT = ceinms::PennationAngle::compute(fibreLength, optimalFibreLength_, pennationAngle_);
+    double pennationAngleAtT = CEINMS::PennationAngle::compute(fibreLength, optimalFibreLength_, pennationAngle_);
 
     
     double muscleForce = maxIsometricForce_ * strengthCoefficient_ *

@@ -10,7 +10,6 @@ set(Tendon_HEADERS
   Tendon/ElasticTendon.h
   Tendon/ElasticTendon_BiSec.h
   Tendon/StiffTendon.h
-  MTUutils.h
 )
 
 set(Activation_SOURCES
@@ -22,7 +21,7 @@ set(Activation_HEADERS
   Activation/PiecewiseActivation.h
 )
 
-set(NMS_SOURCES NMSmodel.cpp MuscleParameters.cpp)
+set(NMS_SOURCES NMSmodel.cpp MuscleParameters.cpp MTUutils.cpp)
 set(NMS_HEADERS NMSmodel.h MuscleParameters.h MTU.h DoF.h SetupDataStructure.h NMSmodelPolicyTemplates.h MTUutils.h)
 set(NMS_TEMPLATE_IMPLEMENTATION MTU.cpp DoF.cpp SetupDataStructure.cpp)
 set_source_files_properties( ${NMS_TEMPLATE_IMPLEMENTATION} PROPERTIES HEADER_FILE_ONLY TRUE)

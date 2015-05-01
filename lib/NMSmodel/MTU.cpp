@@ -415,7 +415,7 @@ double MTU<Activation, Tendon, mode>::getPenalty() const {
 template<typename Activation, typename Tendon, CurveMode::Mode mode>
 inline double MTU<Activation, Tendon, mode>::computePennationAngle(double optimalFiberLength) {
 
-   return ceinms::PennationAngle::compute(fibreLength_, optimalFiberLength, pennationAngle_);
+   return CEINMS::PennationAngle::compute(fibreLength_, optimalFiberLength, pennationAngle_);
 
 }
 

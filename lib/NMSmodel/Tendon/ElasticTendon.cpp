@@ -110,7 +110,7 @@ optimalFiberLengthAtT_(.0)
 
 double LDFM::computePennationAngle() const {
     
-    return ceinms::PennationAngle::compute(fiberLength_, optimalFiberLengthAtT_, pennationAngle_);
+    return CEINMS::PennationAngle::compute(fiberLength_, optimalFiberLengthAtT_, pennationAngle_);
 }
 
 
