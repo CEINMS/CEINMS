@@ -24,6 +24,14 @@ CircularVector<T>::CircularVector()
 
 
 template<typename T>
+CircularVector<T>::CircularVector(size_t maxSize)
+    :size_(maxSize), count_(0), beg_(0) {
+
+    v_.resize(size_);
+}
+
+
+template<typename T>
 const T& CircularVector<T>::at(unsigned i) const { 
 
     if(i >= count_) {
@@ -44,7 +52,7 @@ T& CircularVector<T>::at(unsigned i) {
         exit(EXIT_FAILURE);
     }
 
-    return v_.at((beg_ + i) % count_);
+    return v_.at((beg_ + i) % size_);
 
 }
 
@@ -58,7 +66,7 @@ const T& CircularVector<T>::operator[](unsigned i) const {
 template<typename T>
 T& CircularVector<T>::operator[](unsigned i) {
 
-    return v_[(beg_ + i) % count_];
+    return v_[(beg_ + i) % size_];
 }
 
 
