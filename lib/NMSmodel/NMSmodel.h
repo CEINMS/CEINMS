@@ -101,6 +101,7 @@ public:
     void setTendonSlackLengths(const std::vector<double>& tendonSlackLengths);
     void setActivations(const std::vector<double>& activations);
     void setOptimalFibreLengths(const std::vector<double>&  optimalFibreLengths);
+    void setTendonTolerance(double tolerance = 0.0);
     
     // called	for control purpose
     std::vector<std::string> getMuscleNames() const {return muscleNames_;}

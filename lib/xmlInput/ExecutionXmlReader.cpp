@@ -17,7 +17,7 @@ using std::endl;
 #include "validation.h"
 
 ExecutionXmlReader::ExecutionXmlReader(const string& filename)
-:runMode_(0) {
+:runMode_(0), tolerance_(0.0) {
 
 	try {
         std::auto_ptr<ExecutionType> executionPointer(parseAndValidate<ExecutionType>(filename, execution_schema, sizeof(execution_schema)));
@@ -57,7 +57,11 @@ void ExecutionXmlReader::readXml() {
         else if (myElsaticOpt.present())
             runMode_ += NMSModelCfg::ElasticTendon;
         else if (myElsaticBiSecOpt.present())
+        {
             runMode_ += NMSModelCfg::ElasticTendonBiSec;
+            if (myElsaticBiSecOpt->tolerance().present())
+                tolerance_ = myElsaticBiSecOpt->tolerance().get();
+        }
         else {
             cout << "invalid XML: TendonType not found\n";
             exit(EXIT_FAILURE);

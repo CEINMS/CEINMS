@@ -5,7 +5,11 @@
   <xs:annotation>
     <xs:documentation xml:lang="en"/>
   </xs:annotation>
-  <xs:complexType name="TendonElementType"/>
+  <xs:complexType name="TendonElementType">
+    <xs:sequence>
+      <xs:element name="tolerance" minOccurs="0" maxOccurs="1" type="xs:double"/>
+    </xs:sequence>
+  </xs:complexType>
   <xs:complexType name="TendonType">
     <xs:choice>
       <xs:element name="stiff" type="TendonElementType"/>

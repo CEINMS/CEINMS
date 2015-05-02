@@ -116,6 +116,7 @@ public:
                    const CurveOffline& tendonForceStrainCurve);
    
     void resetState();
+    void setTolerance(double tolerance = 0.0){};
     
 private:
     double getInitialFiberLength(double time);

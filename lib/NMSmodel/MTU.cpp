@@ -415,6 +415,11 @@ inline double MTU<Activation, Tendon, mode>::computePennationAngle(double optima
     return (degrees(asin(value)));
 }
 
+template<typename Activation, typename Tendon, CurveMode::Mode mode>
+void MTU<Activation, Tendon, mode>::setTendonTolerance(double tolerance) {
+
+    tendonDynamic_.setTolerance(tolerance);
+}
 
 template<typename Activation, typename Tendon, CurveMode::Mode mode>
 std::ostream& operator<< (std::ostream& output, const MTU<Activation, Tendon, mode>& m)

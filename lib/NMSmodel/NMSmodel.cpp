@@ -922,6 +922,11 @@ void NMSmodel<Activation, Tendon, mode>::setOptimalFibreLengths(const vector<dou
         muscleIt->setOptimalFibreLength(*optimalFibreLengthIt);
 }
 
+template <typename Activation, typename Tendon, CurveMode::Mode mode>
+void NMSmodel<Activation, Tendon, mode>::setTendonTolerance(double tolerance) {
+    for (auto &muscleIt : muscles_)
+        muscleIt.setTendonTolerance(tolerance);
+}
 
 template <typename Activation, typename Tendon, CurveMode::Mode mode>
 void NMSmodel<Activation, Tendon, mode>::resetFibreLengthTraces() {

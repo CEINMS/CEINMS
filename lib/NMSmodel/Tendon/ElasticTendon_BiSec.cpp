@@ -108,7 +108,8 @@ muscleTendonLength_(0.0),
 fibreLength_(0.0),
 activation_(0.0),
 maxContractionVelocity_(0.0),
-id_("")
+id_(""),
+tolerance_(.000001)
 { }
 
 
@@ -124,6 +125,7 @@ muscleTendonLength_(0.0),
 fibreLength_(0.0),
 activation_(0.0),
 maxContractionVelocity_(0.0),
+tolerance_(.000001),
 id_(id) { }
 
 
@@ -155,7 +157,8 @@ maxContractionVelocity_(maxContractionVelocity),
 muscleTendonLength_(0.0),
 fibreLength_(0.0),
 activation_(0.0),
-id_("")
+id_(""),
+tolerance_(.000001)
 {   }
 
 
@@ -185,6 +188,7 @@ ElasticTendon_BiSec& ElasticTendon_BiSec::operator= ( const ElasticTendon_BiSec&
     fibreLength_             = orig.fibreLength_;
     activation_              = orig.activation_;
     id_                      = orig.id_;
+    tolerance_               = orig.tolerance_;
     return *this;
 }
 
@@ -224,10 +228,9 @@ void ElasticTendon_BiSec::setActivation(double activation) {
 
 void ElasticTendon_BiSec::updateFibreLength() {
 
-    const double tol = .000001;
     const unsigned nIter = 100;
     tendonPenalty_ = .0;
-    fibreLength_ = estimateFiberLengthBiSec(tol, nIter);
+    fibreLength_ = estimateFiberLengthBiSec(tolerance_, nIter);
     fibreLengthTrace_.addPoint(time_, fibreLength_);
 }
 
@@ -248,6 +251,10 @@ void ElasticTendon_BiSec::setCurves(const CurveOffline& activeForceLengthCurve,
     tendonForceStrainCurve_  = tendonForceStrainCurve;
 }
 
+void ElasticTendon_BiSec::setTolerance(double tolerance){
+    if (tolerance > 0.0)
+        tolerance_ = tolerance;
+}
 
 void ElasticTendon_BiSec::setStrengthCoefficient (double strengthCoefficient) {
     

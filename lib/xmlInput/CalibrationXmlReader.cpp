@@ -101,8 +101,12 @@ void CalibrationXmlReader::readNMSmodelCfg() {
             runMode_ += NMSModelCfg::StiffTendon;
         else if(myElsaticOpt.present())
             runMode_ += NMSModelCfg::ElasticTendon;
-        else if(myElsaticBiSecOpt.present())
+        else if (myElsaticBiSecOpt.present())
+        {
             runMode_ += NMSModelCfg::ElasticTendonBiSec;
+            if (myElsaticBiSecOpt->tolerance().present())
+                tolerance_ = myElsaticBiSecOpt->tolerance().get();
+        }
         else {
             cout << "invalid XML: TendonType not found\n";
             exit(EXIT_FAILURE);

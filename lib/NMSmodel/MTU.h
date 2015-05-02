@@ -88,7 +88,7 @@ public:
     double getDamping() const {return damping_;}
     double getMaxIsometricForce() const { return maxIsometricForce_;}
     
-
+    void setTendonTolerance(double tolerance = 0.0);
   
     void   setMuscleForce(double muscleForce) {muscleForce_ = muscleForce;}
     void   updateFibreLengthTrace();
