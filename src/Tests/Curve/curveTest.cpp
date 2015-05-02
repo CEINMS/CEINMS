@@ -9,11 +9,13 @@
 std::vector<double> getRange(double min, double max, unsigned nPoints) {
 
     std::vector<double> x;
-    double dx = (max - min) / static_cast<double>(nPoints);
-    for (unsigned i(0); i <= nPoints; ++i)
+    double dx = (max - min) / static_cast<double>(nPoints-1);
+    for (unsigned i(0); i < nPoints; ++i)
         x.push_back(min + i*dx);
     return x;
 }
+
+
 
 template <typename T>
 void printCurve(const T& curve, const std::string& filename, double startX, double endX, unsigned nPoints = 1000) {
@@ -99,9 +101,58 @@ void testMuscleCurves() {
     printCurve(tendonForceLength, "tf.txt", -10, 20);
 }
 
+
+
+void testCircularVector() {
+
+    CircularVector<double, 10> cv10;
+    std::cout << "Circular vector size 10" << std::endl;
+    std::cout << "1 - store numbers from 0 to 9" << std::endl;
+    for (auto x : getRange(0, 9, 10))
+        cv10.push_back(x);
+    std::cout << cv10 << std::endl;
+    std::cout << "2 - push number 10 in the vector" << std::endl
+              << "    the vector should print numbers from 1 to 10" << std::endl;
+    cv10.push_back(10);
+    std::cout << cv10 << std::endl;
+    std::cout << "3 - remove last entry" << std::endl
+              << "    the vector should print numbers from 1 to 9" << std::endl;
+    cv10.pop_back();
+    std::cout << cv10 << std::endl;
+    std::cout << "4 - clear vector" << std::endl
+              << "    the vector should print nothing" << std::endl;
+    cv10.clear();
+    std::cout << cv10<< std::endl;
+    std::cout << "5 - try to remove more elements, even if it is empty" << std::endl
+              << "    the vector should print nothing" << std::endl;
+    cv10.pop_back();
+    std::cout << cv10 << std::endl;
+    std::cout << "6 - add 5 elements 1 to 5" << std::endl
+              << "    the vector should print numbers from 1 to 5" << std::endl;
+    for (auto x : getRange(1, 5, 5))
+        cv10.push_back(x);
+    std::cout << cv10 << std::endl;
+    std::cout << "7 - add 500 elements 1001 to 1500" << std::endl
+              << "    the vector should print numbers from 1491 to 1500" << std::endl;
+    for (auto x : getRange(1001, 1500, 500))
+        cv10.push_back(x);
+    std::cout << cv10 << std::endl;
+    std::cout << "8 - remove last 3 elements" << std::endl
+              << "    the vector should print numbers from 1491 to 1497" << std::endl;
+    for (unsigned i(0); i < 3; ++i)
+        cv10.pop_back();
+    std::cout << cv10 << std::endl;
+
+    std::cout << "9 - ask for size" << std::endl
+              << "    size should be equal 7" << std::endl;
+    std::cout << cv10.size() << std::endl;
+
+}
+
+
 int main() {
 
-    using MyCurve = Curve < CurveMode::Mode::Offline, CurveMode::Interpolation::Linear > ;
+  /*  using MyCurve = Curve < CurveMode::Mode::Online, CurveMode::Interpolation::Linear > ;
   //  std::vector<double> x(getRange(-M_PI, M_PI, 10));
     
     MyCurve sinCurve;
@@ -119,7 +170,9 @@ int main() {
     createCurve(getRange(-1, 1, 2), lineFun, lineCurve);
     compareCurve(lineCurve, lineFun, "line.txt", -4, 4);
     printCurveDerivative(lineCurve, "lineD.txt", -4, 4);
+    */
 
+    testCircularVector();
     return 0;
 
 }
