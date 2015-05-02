@@ -74,8 +74,17 @@ namespace Logger {
             case FibreLengths:
                 filename = "fiberLengths.csv";
                 break;
+            case NormFibreLengths:
+                filename = "normFiberLengths.csv";
+                break;
             case FibreVelocities:
                 filename = "fiberVelocities.csv";
+                break;
+            case NormFibreVelocities:
+                filename = "normFiberVelocities.csv";
+                break;
+            case PennationAngles:
+                filename = "pennationAngles.csv";
                 break;
             case MuscleForces:
                 filename = "muscleTendonForces.csv";
@@ -124,8 +133,17 @@ namespace Logger {
             case FibreLengths:
                 subject_.getFiberLengths(data);
                 break;
+            case NormFibreLengths:
+                subject_.getNormFiberLengths(data);
+                break;
             case FibreVelocities:
                 subject_.getFiberVelocities(data);
+                break;
+            case NormFibreVelocities:
+                subject_.getNormFiberVelocities(data);
+                break;
+            case PennationAngles:
+                subject_.getPennationAnglesAtT(data);
                 break;
             case MuscleForces:
                 subject_.getMuscleForces(data);

@@ -81,12 +81,20 @@ namespace CEINMS {
         string externalTorqueFilename(dataLocations_.getExternalTorqueFile());
         ExternalTorquesFromStorageFile externalTorquesProducer(inputConnectors, mySubject, externalTorqueFilename);
 
+        vector<string> dataToLog = { "Activations",
+                                     "FiberLenghts", 
+                                     "NormFiberLengths",
+                                     "FiberVelocities", 
+                                     "NormFiberVelocities",
+                                     "PennationAngles",
+                                     "MuscleForces", 
+                                     "Torques" };
         // 2b. define the thread consuming the output sources
-        vector<string> valuesToWrite = { "Activations", "FiberLenghts", "FiberVelocities", "MuscleForces", "Torques" };
+        vector<string> valuesToWrite = dataToLog;
         QueuesToStorageFiles queuesToStorageFiles(inputConnectors, outputConnectors, mySubject, valuesToWrite, outputDirectory_);
 
         // 3. define the model simulator
-        vector<string> valuesToLog = { "Activations", "FiberLenghts", "FiberVelocities", "MuscleForces", "Torques" };
+        vector<string> valuesToLog = dataToLog;
         ModelEvaluatorT<NMSmodelT, LoggerT>  simulator(inputConnectors, outputConnectors, mySubject, valuesToLog);
 
         inputConnectors.doneWithSubscription.setCount(5);
@@ -130,13 +138,21 @@ namespace CEINMS {
 
         string externalTorqueFilename(dataLocations_.getExternalTorqueFile());
         ExternalTorquesFromStorageFile externalTorquesProducer(inputConnectors, mySubject, externalTorqueFilename);
-
+        vector<string> dataToLog = { "Activations",
+            "FiberLenghts",
+            "NormFiberLengths",
+            "FiberVelocities",
+            "NormFiberVelocities",
+            "PennationAngles",
+            "MuscleForces",
+            "Torques",
+            "AdjustedEmgs" };
         // 2b. define the thread consuming the output sources
-        vector<string> valuesToWrite = { "Activations", "FiberLenghts", "FiberVelocities", "MuscleForces", "Torques", "AdjustedEmgs" };
+        vector<string> valuesToWrite = dataToLog;
         QueuesToStorageFiles queuesToStorageFiles(inputConnectors, outputConnectors, mySubject, valuesToWrite, outputDirectory_);
 
         // 3. define the model simulator
-        vector<string> valuesToLog = { "Activations", "FiberLenghts", "FiberVelocities", "MuscleForces", "Torques", "AdjustedEmgs" };
+        vector<string> valuesToLog = dataToLog;
 
         inputConnectors.doneWithSubscription.setCount(5);
         outputConnectors.doneWithExecution.setCount(2);

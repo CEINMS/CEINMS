@@ -11,7 +11,7 @@ template<typename Activation, typename Tendon, CurveMode::Mode mode>
 MTU<Activation, Tendon, mode>::MTU() 
 :id_(""), emDelay_(.0), c1_(0.), c2_(0.), shapeFactor_(0.), activation_(0.), 
 optimalFibreLength_(0.), pennationAngle_(0.), tendonSlackLength_(0.), 
-percentageChange_(0.), fibreLength_(0.), 
+percentageChange_(0.), fibreLength_(0.), pennationAngleAtT_(0.),
 fibreVelocity_(0.), damping_(0.), maxIsometricForce_(0.), time_(.0), timeScale_(0.),
 strengthCoefficient_(0.), muscleForce_(0.), maxContractionVelocity_(0.)  { }
 
@@ -20,7 +20,7 @@ template<typename Activation, typename Tendon, CurveMode::Mode mode>
 MTU<Activation, Tendon, mode>::MTU (std::string id)
 :id_(id), emDelay_(.0), c1_(0.), c2_(0.), shapeFactor_(0.), activation_(0.), 
 optimalFibreLength_(0.), pennationAngle_(0.), tendonSlackLength_(0.), 
-percentageChange_(0.), fibreLength_(0.), 
+percentageChange_(0.), fibreLength_(0.), pennationAngleAtT_(0.),
 fibreVelocity_(0.), damping_(0.), maxIsometricForce_(0.), time_(.0), timeScale_(0.),
 strengthCoefficient_(0.), muscleForce_(0.), maxContractionVelocity_(0.), tendonDynamic_(id)  { }
 
@@ -43,7 +43,8 @@ MTU<Activation, Tendon, mode>::MTU (const MTU<Activation, Tendon, mode>& orig) {
     fibreLength_ = orig.fibreLength_;
     fibreLengthTrace_ = orig.fibreLengthTrace_;
     muscleForce_ = orig.muscleForce_;
-    
+    pennationAngleAtT_ = orig.pennationAngleAtT_;
+
     optimalFibreLength_ = orig.optimalFibreLength_;
     pennationAngle_ = orig.pennationAngle_;
     tendonSlackLength_ = orig.tendonSlackLength_;
@@ -80,6 +81,7 @@ MTU<Activation, Tendon, mode>& MTU<Activation, Tendon, mode>::operator=(const MT
     fibreLength_ = orig.fibreLength_;
     fibreLengthTrace_ = orig.fibreLengthTrace_;
     muscleForce_ = orig.muscleForce_;
+    pennationAngleAtT_ = orig.pennationAngleAtT_;
     
     optimalFibreLength_ = orig.optimalFibreLength_;
     pennationAngle_ = orig.pennationAngle_;
@@ -275,6 +277,7 @@ void MTU<Activation, Tendon, mode>::updateMuscleForce() {
 //    double pennationAngleAtT = computePennationAngle(optimalFiberLengthAtT); //this is the one we used since the new version...
 
     normFibreVelocity_= normFiberVelocity;
+    pennationAngleAtT_ = pennationAngleAtT; //for logging
     muscleForce_ = maxIsometricForce_*strengthCoefficient_*
                    (fa*fv*activation_ + fp + damping_*normFiberVelocity)* 
                    cos(pennationAngleAtT);
