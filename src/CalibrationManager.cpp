@@ -50,7 +50,7 @@ namespace CEINMS {
     bool CalibrationManager::runOpenLoop() {
         bool exitflag(false);
         NMSmodelT mySubject;
-        setupSubject(mySubject, uncalibratedSubjectFile_);
+        setupSubject(mySubject, uncalibratedSubjectFile_, calibrationXmlReader_.getTolerance());
 
         vector<TrialData> trials;
         for (list<string>::iterator trialIt = calibrationTrialIDs_.begin(); trialIt != calibrationTrialIDs_.end(); ++trialIt)

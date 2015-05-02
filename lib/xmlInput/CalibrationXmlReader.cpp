@@ -40,7 +40,7 @@ static void trim(std::string& fileName)
 };
 
 CalibrationXmlReader::CalibrationXmlReader(const string& filename)
-:runMode_(0), optimizationAlgorithm_(0) {
+    :runMode_(0), optimizationAlgorithm_(0), tolerance_(1e-6) {
 
     try {
         std::auto_ptr<CalibrationType> calibrationPointer(parseAndValidate<CalibrationType>(filename, calibration_schema, sizeof(calibration_schema)));

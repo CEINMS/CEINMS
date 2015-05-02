@@ -40,7 +40,7 @@ private:
 
 //non-member non-friend functions are the best!
 template <typename NMSmodelT>
-void setupSubject(NMSmodelT& mySubject, std::string subjectFile, double tolerance = 0.0) {
+void setupSubject(NMSmodelT& mySubject, std::string subjectFile, double tolerance = 1e-6) {
 
     SetupDataStructure<NMSmodelT> setupData(subjectFile);
     setupData.createCurves();

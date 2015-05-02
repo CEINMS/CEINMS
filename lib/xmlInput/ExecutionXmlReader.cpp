@@ -17,7 +17,7 @@ using std::endl;
 #include "validation.h"
 
 ExecutionXmlReader::ExecutionXmlReader(const string& filename)
-:runMode_(0), tolerance_(0.0) {
+    :runMode_(0), tolerance_(1e-6) {
 
 	try {
         std::auto_ptr<ExecutionType> executionPointer(parseAndValidate<ExecutionType>(filename, execution_schema, sizeof(execution_schema)));
