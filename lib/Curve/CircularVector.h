@@ -15,6 +15,7 @@ class CircularVector {
     
 public:
     CircularVector();
+    CircularVector(size_t maxSize);
     CircularVector(const CircularVector<T>& rhs); 
     CircularVector<T>& operator=(const CircularVector<T>& rhs);
     CircularVector<T>& operator=(const std::vector<T>& rhs);

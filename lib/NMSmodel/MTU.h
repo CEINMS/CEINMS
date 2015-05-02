@@ -84,8 +84,10 @@ public:
     void   setMaxIsometricForce(double maxIsometricForce);
 
     double getFiberLength() const {return fibreLength_;}
+    double getNormFiberLength() const { return fibreLength_ / optimalFibreLength_; }
     double getFiberVelocity() const {return fibreVelocity_; }
-    double getNormFiberVelocity() const {return normFibreVelocity_; } 
+    double getNormFiberVelocity() const {return normFibreVelocity_; }
+    double getPennationAngleAtT() const { return pennationAngleAtT_; };
     double getMuscleForce() const {return muscleForce_;}
     double getPercentageChange() const { return percentageChange_;}
     double getDamping() const {return damping_;}
@@ -127,6 +129,7 @@ private:
     double fibreVelocity_;       /**< \f$v^m\f$ */
     double normFibreVelocity_; 
     double fibreLength_;         /**< \f$l^m\f$ */    
+    double pennationAngleAtT_;
     CurveT  fibreLengthTrace_;
     double muscleForce_;    /**< \f$F^{mt}\f$ */
     

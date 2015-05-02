@@ -534,6 +534,15 @@ void NMSmodel<Activation, Tendon, mode>::getFiberLengths(vector<double>& fibreLe
     
 }
 
+template <typename Activation, typename Tendon, CurveMode::Mode mode>
+void NMSmodel<Activation, Tendon, mode>::getNormFiberLengths(std::vector<double>& normFiberLengths) const {
+
+    normFiberLengths.clear();
+    normFiberLengths.reserve(muscles_.size());
+    vectorMTUconstItr muscleIt = muscles_.begin();
+    for (muscleIt = muscles_.begin(); muscleIt < muscles_.end(); ++muscleIt)
+        normFiberLengths.emplace_back(muscleIt->getNormFiberLength());
+}
 
 template <typename Activation, typename Tendon, CurveMode::Mode mode>
 void NMSmodel<Activation, Tendon, mode>::getFiberVelocities(vector<double>& fiberVelocities) const {
@@ -556,6 +565,18 @@ void NMSmodel<Activation, Tendon, mode>::getNormFiberVelocities(vector<double>& 
     for (muscleIt = muscles_.begin(); muscleIt < muscles_.end(); ++muscleIt) 
         normFiberVelocities.emplace_back(muscleIt->getNormFiberVelocity());               
 }                                                                           
+
+
+template <typename Activation, typename Tendon, CurveMode::Mode mode>
+void NMSmodel<Activation, Tendon, mode>::getPennationAnglesAtT(vector<double>& pennationAnglesAtT) const {
+
+    pennationAnglesAtT.clear();
+    pennationAnglesAtT.reserve(muscles_.size());
+    vectorMTUconstItr muscleIt = muscles_.begin();
+    for (muscleIt = muscles_.begin(); muscleIt < muscles_.end(); ++muscleIt)
+        pennationAnglesAtT.emplace_back(muscleIt->getPennationAngleAtT());
+}
+
 
 
 template <typename Activation, typename Tendon, CurveMode::Mode mode>

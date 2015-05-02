@@ -15,9 +15,7 @@
 
 namespace CurveMode {
     enum Mode{Online, Offline};
-    enum Interpolation{Cubic, Linear};
-
-    
+    enum Interpolation{Cubic, Linear};  
 };
 
 

@@ -118,8 +118,10 @@ public:
     void getActivations(std::vector<double>& activations) const;
     void getNeuralActivations( std::vector<double>& neuralActivations) const;
     void getFiberLengths(std::vector<double>& fiberLengths) const;
+    void getNormFiberLengths(std::vector<double>& fiberLengths) const;
     void getFiberVelocities(std::vector<double>& fiberVelocities) const;
     void getNormFiberVelocities(std::vector<double>& normFiberVelocities) const;
+    void getPennationAnglesAtT(std::vector<double>& pennationAnglesAtT) const; //instant pennationangle
     void getMuscleForces(std::vector<double>& muscleForces) const;
     void getTorques(std::vector<double>& torques) const;
 
