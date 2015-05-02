@@ -43,6 +43,37 @@ namespace CEINMS {
         std::string outputDirectory_;
         std::string emgGeneratorFile_;
     };
+<<<<<<< HEAD
+=======
+
+    //non-member non-friend functions are the best!
+    template <typename NMSmodelT>
+    void setupSubject(NMSmodelT& mySubject, std::string subjectFile, double tolerance=0.0) {
+
+        SetupDataStructure<NMSmodelT> setupData(subjectFile);
+        setupData.createCurves();
+        setupData.createMuscles(mySubject);
+        setupData.createDoFs(mySubject);
+        mySubject.setTendonTolerance(tolerance);
+    }
+
+    void sortMaFilenames(const std::map<std::string, std::string>& maMap, const std::vector< std::string >& dofNames, std::vector< std::string >& maDataFilenames)
+    {
+        int currentDof = 0;
+        for (auto& it : dofNames)
+        {
+            try
+            {
+                maDataFilenames.push_back(maMap.at(it));
+            }
+            catch (std::out_of_range)
+            {
+                std::cerr << "Could not find moment arm file for " << it << " degree of freedom" << std::endl;
+                exit(EXIT_FAILURE);
+            }
+        }
+    }
+>>>>>>> testsEquilibriumElastic
 }
 
 

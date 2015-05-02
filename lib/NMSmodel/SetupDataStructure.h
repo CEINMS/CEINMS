@@ -38,13 +38,13 @@ private:
 
 //non-member non-friend functions are the best!
 template <typename NMSmodelT>
-void setupSubject(NMSmodelT& mySubject, std::string subjectFile) {
+void setupSubject(NMSmodelT& mySubject, std::string subjectFile, double tolerance = 0.0) {
 
     SetupDataStructure<NMSmodelT> setupData(subjectFile);
     setupData.createCurves();
     setupData.createMuscles(mySubject);
     setupData.createDoFs(mySubject);
-
+    mySubject.setTendonTolerance(tolerance);
 }
 
 #include "SetupDataStructure.cpp"

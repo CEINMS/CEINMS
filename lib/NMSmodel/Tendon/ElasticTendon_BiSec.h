@@ -60,7 +60,8 @@ public:
                    const CurveOffline& passiveForceLengthCurve, 
                    const CurveOffline& forceVelocityCurve,
                    const CurveOffline& tendonForceStrainCurve);
-                   
+    void setTolerance(double tolerance = 0.0);
+    double getTolerance() const;
     void pushState();
     void resetState();
     
@@ -104,6 +105,7 @@ private:
     double activation_;
     double tendonPenalty_;
     double time_;
+    double tolerance_;
     std::string id_;
     
 };

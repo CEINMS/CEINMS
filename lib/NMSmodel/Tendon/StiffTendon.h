@@ -64,6 +64,8 @@ public:
     void pushState() {};
     void resetState();
 
+    void setTolerance(double tolerance = 0.0){};
+
 private:
     double optimalFibreLength_;
     double pennationAngle_;
