@@ -18,26 +18,10 @@ using std::endl;
 #include "calibration-schema.hxx"
 #include "validation.h"
 #include <boost/algorithm/string.hpp>
+#include "FileUtils.h"
 using namespace CalibrationXsd;
 
-inline bool isAbsolute(const char *path) {
-    if (path[0] == '/' || path[0] == '\\') {
-        return true;
-    }
-    std::string str(path);
-    if (str.length()>1) {
-        if (str[1] == ':') {
-            return true;
-        }
-    }
-    return false;
-};
 
-static void trim(std::string& fileName)
-{
-    boost::trim(fileName);
-    boost::trim_if(fileName, boost::is_any_of("\""));
-};
 
 CalibrationXmlReader::CalibrationXmlReader(const string& filename)
     :runMode_(0), optimizationAlgorithm_(0), tolerance_(1e-6) {
@@ -226,8 +210,8 @@ void CalibrationXmlReader::readCalibrationTrialList() {
     for (it; it != myTrialSet.end(); ++it)
     {
         std::string fileName = (*it);
-        trim(fileName);
-        if (isAbsolute(fileName.c_str()))
+        FileUtils::trim(fileName);
+        if (FileUtils::isAbsolute(fileName.c_str()))
             calibrationTrials_.push_back(fileName);
         else
             calibrationTrials_.push_back(filepath_ + fileName);

@@ -12,9 +12,13 @@
 
 #include <string>
 
-class FileUtils {
-public:
-static std::string getFile ( const std::string& aPath, const std::string& mask );
+namespace FileUtils {
+
+std::string getFile ( const std::string& aPath, const std::string& mask );
+bool isAbsolute(const char *path);
+void trim(std::string& fileName);
+
+
 };
 
 #endif
