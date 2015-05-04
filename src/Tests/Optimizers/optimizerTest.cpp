@@ -17,7 +17,7 @@ public:
     void setParameters(const std::vector<double>& x) { parameters_ = x; }
     std::vector<double> getParameters() const{ return parameters_; }
     double getF() const { return f_; }
-    unsigned getNoParameters() const { return parameters_.size(); }
+    size_t getNoParameters() const { return parameters_.size(); }
     void getUpperLowerBounds(std::vector<double>& upperBounds, std::vector<double>& lowerBounds) const {
         upperBounds = upperBounds_;
         lowerBounds = lowerBounds_;
