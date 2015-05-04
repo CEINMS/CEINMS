@@ -14,8 +14,7 @@ source_group("Source files" FILES ${Concurrency_TEMPLATE_IMPLEMENTATIONS} ${Conc
 include_directories(include)
 add_library(Concurrency ${Concurrency_HEADERS} ${Concurrency_TEMPLATE_IMPLEMENTATIONS} ${Concurrency_SOURCES} )
 
-set(Concurrency_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}" CACHE PATH "Include directory for Concurrency library" FORCE)
-mark_as_advanced(Concurrency_INCLUDE_DIRS)
+set(Concurrency_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}" CACHE INTERNAL "Include directory for Concurrency library")
 
 install(FILES ${Concurrency_HEADERS} ${Concurrency_TEMPLATE_IMPLEMENTATIONS}
         DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})

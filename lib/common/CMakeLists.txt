@@ -20,8 +20,7 @@ target_link_libraries(ceinms_common LINK_PRIVATE ${Boost_FILESYSTEM_LIBRARY} ${B
 target_include_directories(ceinms_common PUBLIC ${Boost_INCLUDE_DIRS})
 
 # Save path to include directory for "internal" usage
-set(ceinms_common_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR} CACHE STRING "Include directory for library of common files")
-mark_as_advanced(ceinms_common_INCLUDE_DIRS)
+set(ceinms_common_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR} CACHE INTERNAL "Include directory for library of common files")
 
 # Install
 install(FILES ${Common_HEADERS} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}) #should add namespace
