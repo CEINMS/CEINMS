@@ -35,7 +35,7 @@ void ParametersInterpreter<NMSmodelT>::defineParameterDetails() {
         ParameterID parameterId = it->getID();
 
         ParameterAssignment assignment = it->getAssignment();
-        if (assignment == Parameter::Grouped) {
+        if (assignment == Parameter::Grouped || (assignment == Parameter::Single && it->hasMuscleGroups())) {
             MuscleGroups muscleGroups;
             it->getMuscleGroups(muscleGroups);
             getMuscleGroupIndex(muscleGroups, parameterDetails.muscleGroups);

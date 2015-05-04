@@ -52,6 +52,7 @@ public:
     Assignment getAssignment() const {return assignment_;}
     Boundaries getBoundariesType() const {return boundariesType_;}
     void getMuscleGroups(MuscleGroups& muscleGroups) const { muscleGroups = muscleGroups_;}
+    bool hasMuscleGroups() const { return !muscleGroups_.empty(); }
     ID getID() const;
     void pushMuscleGroup(const MuscleNames& group);
     void setBoundariesType(Boundaries boundaries);

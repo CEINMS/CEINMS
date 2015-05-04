@@ -58,7 +58,11 @@
   </xs:simpleType>
   <xs:complexType name="ObjectiveFunctionElementType"/>
   <xs:complexType name="GlobalParameterType"/>
-  <xs:complexType name="SingleParameterType"/>
+
+  <xs:simpleType name="SingleParameterType">
+    <xs:list itemType="xs:token"/>
+  </xs:simpleType>
+  
   <xs:complexType name="ObjectiveFunctionType">
     <xs:choice>
       <xs:element name="minimizeTorqueError" type="ObjectiveFunctionElementType"/>

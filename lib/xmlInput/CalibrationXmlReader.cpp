@@ -168,8 +168,14 @@ void CalibrationXmlReader::readParameter(ParameterType& parameterType, Parameter
     ParameterType::muscleGroups_optional& myMuscleGroupsOpt(parameterType.muscleGroups());
     ParameterType::global_optional& myGlobaleParameterOpt(parameterType.global());
     ParameterType::single_optional& mySingleParameterOpt(parameterType.single());
-    if(mySingleParameterOpt.present())
+    if (mySingleParameterOpt.present()) {
         parameter.setAssignment(Parameter::Single);
+        
+        auto it(parameterType.single()->begin());
+        for (it; it != parameterType.single()->end(); ++it)
+            parameter.pushMuscleGroup(Parameter::MuscleNames{ *it });
+
+    }
     else if (myGlobaleParameterOpt.present())
         parameter.setAssignment(Parameter::Global);
     else if (myMuscleGroupsOpt.present()) {
