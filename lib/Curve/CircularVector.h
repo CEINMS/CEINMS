@@ -16,8 +16,8 @@ class CircularVector {
 public:
     using container_type = std::array < T, N > ;
     CircularVector();
-    CircularVector(const CircularVector<T, N>& rhs); 
-    CircularVector<T, N>& operator=(const CircularVector<T, N>& rhs);
+    CircularVector(const CircularVector& rhs); 
+    CircularVector& operator=(const CircularVector& rhs);
 //    CircularVector<T, N>& operator=(const std::vector<T>& rhs);
     const T& operator[](unsigned i) const;
     T& operator[](unsigned i);

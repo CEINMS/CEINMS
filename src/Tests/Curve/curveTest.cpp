@@ -152,8 +152,8 @@ void testCircularVector() {
 
 int main() {
 
-  /*  using MyCurve = Curve < CurveMode::Mode::Online, CurveMode::Interpolation::Linear > ;
-  //  std::vector<double> x(getRange(-M_PI, M_PI, 10));
+    using MyCurve = Curve < CurveMode::Mode::Online, CurveMode::Interpolation::Linear > ;
+    std::vector<double> x(getRange(-M_PI, M_PI, 10));
     
     MyCurve sinCurve;
     auto sinFun([](double x){return std::sin(x); });
@@ -170,7 +170,7 @@ int main() {
     createCurve(getRange(-1, 1, 2), lineFun, lineCurve);
     compareCurve(lineCurve, lineFun, "line.txt", -4, 4);
     printCurveDerivative(lineCurve, "lineD.txt", -4, 4);
-    */
+   
 
     testCircularVector();
     return 0;
