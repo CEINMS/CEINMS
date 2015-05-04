@@ -60,7 +60,7 @@ public:
                    const CurveOffline& passiveForceLengthCurve, 
                    const CurveOffline& forceVelocityCurve,
                    const CurveOffline& tendonForceStrainCurve) { };
-                   
+    void setMaxContractionVelocity(double maxContractionVelocity) {/*empty*/ }
     void pushState() {};
     void resetState();
 

@@ -34,6 +34,7 @@ public:
         PennationAngle,   
         TendonSlackLength,
         MaxIsometricForce,
+        MaxContractionVelocity,
         StrengthCoefficient,
         EmDelay,
         Damping,

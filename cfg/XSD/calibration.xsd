@@ -76,6 +76,24 @@
        <xs:element name="range" type="TwoDoublesType"/>
     </xs:sequence>
   </xs:complexType>
+
+
+  <xs:simpleType name="ParameterName">
+    <xs:restriction base="xs:token">
+      <xs:enumeration value="c1"/>
+      <xs:enumeration value="c2"/>
+      <xs:enumeration value="shapeFactor"/>
+      <xs:enumeration value="optimalFibreLength"/>
+      <xs:enumeration value="pennationAngle"/>
+      <xs:enumeration value="tendonSlackLength"/>
+      <xs:enumeration value="maxContractionVelocity"/>
+      <xs:enumeration value="maxIsometricForce"/>
+      <xs:enumeration value="strengthCoefficient"/>
+      <xs:enumeration value="emDelay"/>
+      <xs:enumeration value="percentageChange"/>
+      <xs:enumeration value="damping"/>
+    </xs:restriction>
+  </xs:simpleType>
   
   <xs:simpleType name="MuscleListType">
     <xs:list itemType="xs:token"/>
@@ -87,7 +105,7 @@
   </xs:complexType>
   <xs:complexType name="ParameterType">
     <xs:sequence>
-      <xs:element name="name" type="xs:token"/>
+      <xs:element name="name" type="ParameterName"/>
       <xs:choice>
         <xs:element name="muscleGroups" type="MuscleGroupsType"/>
         <xs:element name="global" type="GlobalParameterType"/>

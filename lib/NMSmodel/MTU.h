@@ -82,6 +82,8 @@ public:
     double getPennationAngle() const {return pennationAngle_; }
     double getMaxIsometricForce() const { return maxIsometricForce_; }
     void   setMaxIsometricForce(double maxIsometricForce);
+    double getMaxContractionVelocity() const { return maxContractionVelocity_; }
+    void   setMaxContractionVelocity(double maxContractionVelocity);
 
     double getFiberLength() const {return fibreLength_;}
     double getNormFiberLength() const { return fibreLength_ / optimalFibreLength_; }

@@ -219,6 +219,9 @@ void ParametersInterpreter<NMSmodelT>::getCoefficients(ParameterID parameterID, 
             case Parameter::TendonSlackLength:
                 subject_.getTendonSlackLengths(coefficients);
                 break;
+            case Parameter::MaxContractionVelocity:
+                subject_.getMaxContractionVelocities(coefficients);
+                break;
         }
 }
 
@@ -254,6 +257,9 @@ void ParametersInterpreter<NMSmodelT>::setCoefficients(ParameterID parameterID, 
                 break;
             case Parameter::TendonSlackLength:
                 subject_.setTendonSlackLengths(coefficients);
+                break;
+            case Parameter::MaxContractionVelocity:
+                subject_.setMaxContractionVelocities(coefficients);
                 break;
         }
 }

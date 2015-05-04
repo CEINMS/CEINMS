@@ -403,6 +403,14 @@ void MTU<Activation, Tendon, mode>::setMaxIsometricForce(double maxIsometricForc
 }
 
 
+template<typename Activation, typename Tendon, CurveMode::Mode mode>
+void MTU<Activation, Tendon, mode>::setMaxContractionVelocity(double maxContractionVelocity) {
+
+    maxContractionVelocity_ = maxContractionVelocity;
+    tendonDynamic_.setMaxContractionVelocity(maxContractionVelocity_);
+    resetState();
+}
+
 
 template<typename Activation, typename Tendon, CurveMode::Mode mode>
 double MTU<Activation, Tendon, mode>::getPenalty() const {

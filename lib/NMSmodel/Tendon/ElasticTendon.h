@@ -112,6 +112,7 @@ public:
     void setTendonSlackLength(double tendonSlackLength);
     void setPennationAngle(double pennationAngle);
     void setMaxIsometricForce(double maxIsometricForce);
+    void setMaxContractionVelocity(double maxContractionVelocity);
     void setCurves(const CurveOffline& activeForceLengthCurve, 
                    const CurveOffline& passiveForceLengthCurve, 
                    const CurveOffline& forceVelocityCurve,

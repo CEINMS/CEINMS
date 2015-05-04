@@ -223,6 +223,13 @@ void ElasticTendon_BiSec::setOptimalFibreLength(double optimalFibreLength) {
     resetState();
 }
 
+
+void ElasticTendon_BiSec::setMaxContractionVelocity(double maxContractionVelocity) {
+
+    maxContractionVelocity_ = maxContractionVelocity;
+    resetState();
+}
+
 void ElasticTendon_BiSec::resetState() {
 
     muscleTendonLength_ = 0.0;

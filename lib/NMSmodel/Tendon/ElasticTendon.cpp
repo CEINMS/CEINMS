@@ -753,6 +753,14 @@ void ElasticTendon<mode>::setMaxIsometricForce(double maxIsometricForce) {
 
 
 template <CurveMode::Mode mode>
+void ElasticTendon<mode>::setMaxContractionVelocity(double maxContractionVelocity) {
+
+    maxContractionVelocity_ = maxContractionVelocity;
+    resetState();
+}
+
+
+template <CurveMode::Mode mode>
 void ElasticTendon<mode>::resetState() {
 
     muscleTendonLength_ = 0.0;
