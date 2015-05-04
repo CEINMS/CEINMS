@@ -99,7 +99,7 @@ private:
     CurveOffline forceVelocityCurve_;
     CurveOffline tendonForceStrainCurve_;
 
-    Curve<CurveMode::Online>  fibreLengthTrace_;
+    Curve<CurveMode::Online, CurveMode::Cubic, 3>  fibreLengthTrace_;
     double fibreLength_;
     double muscleTendonLength_;
     double activation_;
