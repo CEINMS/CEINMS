@@ -49,11 +49,6 @@ void setupSubject(NMSmodelT& mySubject, std::string subjectFile, double toleranc
     mySubject.setTendonTolerance(tolerance);
 }
 
-inline double radians(double d) {
-
-    return d * M_PI / 180;
-}
-
 #include "SetupDataStructure.cpp"
 
 #endif

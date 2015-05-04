@@ -134,25 +134,6 @@ namespace CEINMS {
                 ++lmtMaIndex;
                 if (lmtMaIndex < trialData.lmtData.getNRows())
                     lmtTime = trialData.lmtData.getTime(lmtMaIndex);
-
-
-#ifdef DEBUG
-                cout << endl << endl << "EmgTime: " << emgTime << endl << "EMG" << endl;
-
-                for (unsigned int l = 0; l < trials_.at(ct).emgData_.at(i).size(); ++l)
-                    cout << trials_.at(ct).emgData_.at(i).at(l) << "\t";
-                cout << endl << "LmtTime: " << lmtTime << endl;
-
-                for (unsigned int l = 0; l < trials_.at(ct).lmtData_.at(k).size(); ++l)
-                    cout << trials_.at(ct).lmtData_.at(k).at(l) << "\t";
-                cout << endl << "MomentArms" << endl;
-
-                for (unsigned int l = 0; l < trials_.at(ct).maData_.at(0).at(k).size(); ++l)
-                    cout << trials_.at(ct).maData_.at(0).at(k).at(l) << "\t";
-                cout << "\ncurrent torque: " << currentTorques.at(0);
-
-                cout << endl << "----------------------------------------" << endl;
-#endif
             }
             std::vector<double> currentActivations;
             subject.getActivations(currentActivations);

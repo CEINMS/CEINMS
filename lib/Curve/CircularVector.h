@@ -9,6 +9,7 @@
 #ifndef CircularVector_h
 #define CircularVector_h
 #include <array>
+#include <iostream>
 
 template<typename T, size_t N = 15>
 class CircularVector {
