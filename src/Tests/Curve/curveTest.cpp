@@ -152,15 +152,26 @@ void testCircularVector() {
 
 int main() {
 
-    using MyCurve = Curve < CurveMode::Mode::Online, CurveMode::Interpolation::Linear > ;
+    using MyCurve = Curve < CurveMode::Mode::Online, CurveMode::Interpolation::Cubic, 3 > ;
     std::vector<double> x(getRange(-M_PI, M_PI, 10));
     
     MyCurve sinCurve;
     auto sinFun([](double x){return std::sin(x); });
+    auto cosFun([](double x){return std::cos(x); });
     createCurve(getRange(-M_PI, M_PI, 100), sinFun, sinCurve);
     compareCurve(sinCurve, sinFun,  "sin.txt", -4, 4);
     printCurveDerivative(sinCurve, "sinD.txt", -4, 4);
 
+
+    std::ofstream oF("lastPointDerivative.txt");
+    oF << "x,y\'_curve,y\'\n";
+    auto xRange(getRange(-M_PI, M_PI, 100));
+    MyCurve sinCurve2;
+    for (auto x : xRange) {
+        sinCurve2.addPoint(x, std::sin(x));
+        oF << x << "," << sinCurve2.getFirstDerivative(x) << ","<< std::cos(x) << std::endl;
+    }
+    oF.close();
 
     MyCurve lineCurve;
     auto lineFun([](double x){
