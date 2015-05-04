@@ -17,27 +17,9 @@ using std::endl;
 
 #include "CeinmsSetupXmlReader.h"
 #include "validation.h"
-#include <boost/algorithm/string.hpp>
 #include "ceinmsSetup-schema.hxx"
+#include "FileUtils.h"
 
-inline bool isAbsolute(const char *path) {
-    if (path[0] == '/' || path[0] == '\\') {
-        return true;
-    }
-    std::string str(path);
-    if (str.length()>1) {
-        if (str[1] == ':') {
-            return true;
-        }
-    }
-    return false;
-};
-
-static void trim(std::string& fileName)
-{
-    boost::trim(fileName);
-    boost::trim_if(fileName, boost::is_any_of("\""));
-};
 
 CeinmsSetupXmlReader::CeinmsSetupXmlReader(const string& filename)
 {
@@ -82,8 +64,8 @@ void CeinmsSetupXmlReader::readXml() {
 std::string CeinmsSetupXmlReader::getSubjectFile()
 {
     std::string fileName(*(ceinmsSetupPointer_->subjectFile().begin()));
-    trim(fileName);
-     if (isAbsolute(fileName.c_str()))
+    FileUtils::trim(fileName);
+    if (FileUtils::isAbsolute(fileName.c_str()))
             return fileName;
         else
             return filepath_ + fileName;
@@ -92,8 +74,8 @@ std::string CeinmsSetupXmlReader::getSubjectFile()
 std::string CeinmsSetupXmlReader::getInputDataFile()
 {
     std::string fileName(*(ceinmsSetupPointer_->inputDataFile().begin()));
-    trim(fileName);
-    if (isAbsolute(fileName.c_str()))
+    FileUtils::trim(fileName);
+    if (FileUtils::isAbsolute(fileName.c_str()))
         return fileName;
     else
         return filepath_ + fileName;
@@ -102,8 +84,8 @@ std::string CeinmsSetupXmlReader::getInputDataFile()
 std::string CeinmsSetupXmlReader::getExecutionFile()
 {
     std::string fileName(*(ceinmsSetupPointer_->executionFile().begin()));
-    trim(fileName);
-    if (isAbsolute(fileName.c_str()))
+    FileUtils::trim(fileName);
+    if (FileUtils::isAbsolute(fileName.c_str()))
         return fileName;
     else
         return filepath_ + fileName;
@@ -112,8 +94,8 @@ std::string CeinmsSetupXmlReader::getExecutionFile()
 std::string CeinmsSetupXmlReader::getExcitationGeneratorFile()
 {
     std::string fileName(*(ceinmsSetupPointer_->excitationGeneratorFile().begin()));
-    trim(fileName);
-    if (isAbsolute(fileName.c_str()))
+    FileUtils::trim(fileName);
+    if (FileUtils::isAbsolute(fileName.c_str()))
         return fileName;
     else
         return filepath_ + fileName;
@@ -122,8 +104,8 @@ std::string CeinmsSetupXmlReader::getExcitationGeneratorFile()
 std::string CeinmsSetupXmlReader::getOutputDirectory()
 {
     std::string fileName(*(ceinmsSetupPointer_->outputDirectory().begin()));
-    trim(fileName);
-    if (isAbsolute(fileName.c_str()))
+    FileUtils::trim(fileName);
+    if (FileUtils::isAbsolute(fileName.c_str()))
         return fileName;
     else
         return filepath_ + fileName;

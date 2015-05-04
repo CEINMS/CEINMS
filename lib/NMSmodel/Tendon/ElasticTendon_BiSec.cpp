@@ -18,6 +18,8 @@ using std::endl;
 #include <functional>
 //#include <boost/concept_check.hpp>
 #include "WDBsolver.h"
+#include "../MTUutils.h" //don't know why it doesn't show up without the parent dir..
+
 //#define DEEP_DEBUG
 //#define DEBUG
 
@@ -25,76 +27,7 @@ using std::endl;
 //     return (T(0) < val) - (val < T(0));
 // }
 
-inline double radians (double d) {
-return d * M_PI / 180;
-}
 
-inline double degrees (double r) {
-return r * 180/ M_PI;
-}
-
-class PennationAngle {
-
-public:
-    static double compute(double fibreLength, double optimalFibreLength, double pennationAngle) {
-    double value = optimalFibreLength*sin(radians(pennationAngle) )/fibreLength;
-    if (value <= 0.0)
-        return (0.0);
-    else if (value >= 1.0)
-        return (90.0);
-    return (degrees(asin(value)));
-    }
-};
-/*
-
-struct TendonSplinePoints {
-
-    static void getX(vector<double>& x) {
-    
-        x.clear();
-        x.push_back(-10);
-        x.push_back(-0.002);
-        x.push_back(-0.001);
-        x.push_back(0);
-        x.push_back(0.00131);
-        x.push_back(0.00281);
-        x.push_back(0.00431);
-        x.push_back(0.00581);
-        x.push_back(0.00731);
-        x.push_back(0.00881);
-        x.push_back(0.0103);
-        x.push_back(0.0118);
-        x.push_back(0.0123);
-        x.push_back(9.2);
-        x.push_back(9.201);
-        x.push_back(9.202);
-        x.push_back(20);
-    }
-
-    static void getY(vector<double>& y) {
-     
-        y.clear();
-        y.push_back(0);
-        y.push_back(0);
-        y.push_back(0);
-        y.push_back(0);
-        y.push_back(0.0108);
-        y.push_back(0.0257);
-        y.push_back(0.0435);
-        y.push_back(0.0652);
-        y.push_back(0.0915);
-        y.push_back(0.123);
-        y.push_back(0.161);
-        y.push_back(0.208);
-        y.push_back(0.227);
-        y.push_back(345);
-        y.push_back(345);
-        y.push_back(345);
-        y.push_back(345);
-    }
-    
-};
-*/
 
 ElasticTendon_BiSec::ElasticTendon_BiSec():
 optimalFibreLength_(.0),
@@ -106,9 +39,10 @@ maxIsometricForce_(.0),
 strengthCoefficient_(.0),
 muscleTendonLength_(0.0),
 fibreLength_(0.0),
-fibreLengthT1_(0.0),
 activation_(0.0),
-id_("")
+maxContractionVelocity_(0.0),
+id_(""),
+tolerance_(.000001)
 { }
 
 
@@ -122,8 +56,9 @@ maxIsometricForce_(.0),
 strengthCoefficient_(.0),
 muscleTendonLength_(0.0),
 fibreLength_(0.0),
-fibreLengthT1_(0.0),
 activation_(0.0),
+maxContractionVelocity_(0.0),
+tolerance_(.000001),
 id_(id) { }
 
 
@@ -134,6 +69,7 @@ ElasticTendon_BiSec::ElasticTendon_BiSec (double optimalFibreLength,
                               double damping, 
                               double maxIsometricForce, 
                               double strengthCoefficient, 
+                              double maxContractionVelocity,
                               const CurveOffline& activeForceLengthCurve, 
                               const CurveOffline& passiveForceLengthCurve, 
                               const CurveOffline& forceVelocityCurve,
@@ -150,11 +86,12 @@ activeForceLengthCurve_(activeForceLengthCurve),
 passiveForceLengthCurve_(passiveForceLengthCurve),
 forceVelocityCurve_(forceVelocityCurve),
 tendonForceStrainCurve_(tendonForceStrainCurve),
+maxContractionVelocity_(maxContractionVelocity),
 muscleTendonLength_(0.0),
 fibreLength_(0.0),
-fibreLengthT1_(0.0),
 activation_(0.0),
-id_("")
+id_(""),
+tolerance_(.000001)
 {   }
 
 
@@ -174,6 +111,7 @@ ElasticTendon_BiSec& ElasticTendon_BiSec::operator= ( const ElasticTendon_BiSec&
     damping_                 = orig.damping_;
     maxIsometricForce_       = orig.maxIsometricForce_;
     strengthCoefficient_     = orig.strengthCoefficient_;
+    maxContractionVelocity_ = orig.maxContractionVelocity_,
     activeForceLengthCurve_  = orig.activeForceLengthCurve_;
     passiveForceLengthCurve_ = orig.passiveForceLengthCurve_;
     forceVelocityCurve_      = orig.forceVelocityCurve_;
@@ -181,9 +119,9 @@ ElasticTendon_BiSec& ElasticTendon_BiSec::operator= ( const ElasticTendon_BiSec&
     
     muscleTendonLength_      = orig.muscleTendonLength_;
     fibreLength_             = orig.fibreLength_;
-    fibreLengthT1_           = orig.fibreLengthT1_;          
     activation_              = orig.activation_;
     id_                      = orig.id_;
+    tolerance_               = orig.tolerance_;
     return *this;
 }
 
@@ -194,7 +132,8 @@ void ElasticTendon_BiSec::setParametersToComputeForces(double optimalFiberLength
                                                  double percentageChange,
                                                  double damping, 
                                                  double maxIsometricForce, 
-                                                 double strengthCoefficient) {
+                                                 double strengthCoefficient,
+                                                 double maxContractionVelocity) {
  
     optimalFibreLength_  = optimalFiberLength;
     pennationAngle_      = pennationAngle;
@@ -203,6 +142,7 @@ void ElasticTendon_BiSec::setParametersToComputeForces(double optimalFiberLength
     damping_             = damping;
     maxIsometricForce_   = maxIsometricForce;
     strengthCoefficient_ = strengthCoefficient;
+    maxContractionVelocity_ = maxContractionVelocity;
 }
 
 
@@ -221,16 +161,15 @@ void ElasticTendon_BiSec::setActivation(double activation) {
 
 void ElasticTendon_BiSec::updateFibreLength() {
 
-    const double tol = .0001;
     const unsigned nIter = 100;
     tendonPenalty_ = .0;
-    fibreLength_ = estimateFiberLengthBiSec(tol, nIter);
+    fibreLength_ = estimateFiberLengthBiSec(tolerance_, nIter);
+    fibreLengthTrace_.addPoint(time_, fibreLength_);
 }
 
 
 void ElasticTendon_BiSec::pushState() {
     
-    fibreLengthT1_ = fibreLength_;
 }
 
 
@@ -245,6 +184,10 @@ void ElasticTendon_BiSec::setCurves(const CurveOffline& activeForceLengthCurve,
     tendonForceStrainCurve_  = tendonForceStrainCurve;
 }
 
+void ElasticTendon_BiSec::setTolerance(double tolerance){
+    if (tolerance > 0.0)
+        tolerance_ = tolerance;
+}
 
 void ElasticTendon_BiSec::setStrengthCoefficient (double strengthCoefficient) {
     
@@ -280,12 +223,19 @@ void ElasticTendon_BiSec::setOptimalFibreLength(double optimalFibreLength) {
     resetState();
 }
 
+
+void ElasticTendon_BiSec::setMaxContractionVelocity(double maxContractionVelocity) {
+
+    maxContractionVelocity_ = maxContractionVelocity;
+    resetState();
+}
+
 void ElasticTendon_BiSec::resetState() {
 
     muscleTendonLength_ = 0.0;
     fibreLength_ = 0.0;
-    fibreLengthT1_ = 0.0;
     activation_ = 0.0;
+    fibreLengthTrace_.reset();
 }
 
 
@@ -364,8 +314,8 @@ double ElasticTendon_BiSec::evaluateForceError(double fiberLength) {
 
 double ElasticTendon_BiSec::computeTendonForce(double fibreLength) {
     
-    double pennationAngleAtT = PennationAngle::compute(fibreLength, optimalFibreLength_, pennationAngle_);
-    double tendonLength = muscleTendonLength_ - fibreLength*cos(radians(pennationAngleAtT));  
+    double pennationAngleAtT = CEINMS::PennationAngle::compute(fibreLength, optimalFibreLength_, pennationAngle_);
+    double tendonLength = muscleTendonLength_ - fibreLength*cos(pennationAngleAtT);  
     double tendonStrain = (tendonLength - tendonSlackLength_)/tendonSlackLength_;
     double tendonForce = strengthCoefficient_*maxIsometricForce_*
                           tendonForceStrainCurve_.getValue(tendonStrain);
@@ -387,17 +337,28 @@ double ElasticTendon_BiSec::computeMuscleForce(double fibreLength) {
     double optimalFiberLengthAtT = optimalFibreLength_ * (percentageChange_ *
                                    (1.0 - activation_) + 1 ); 
           
-    double normFiberLength   = fibreLength / optimalFiberLengthAtT;
-    double normFiberVelocity = (fibreLength - fibreLengthT1_) / optimalFiberLengthAtT;
+    fibreLengthTrace_.addPoint(time_, fibreLength);
+    double normFiberLength   = fibreLength / optimalFibreLength_;
+    double normFiberLengthAtT   = fibreLength / optimalFiberLengthAtT;
+
+    double normFiberVelocity = fibreLengthTrace_.getFirstDerivative(time_)/optimalFibreLength_;
+    if (normFiberVelocity > maxContractionVelocity_)
+        normFiberVelocity = maxContractionVelocity_;
+    if (normFiberVelocity < -maxContractionVelocity_)
+        normFiberVelocity = -maxContractionVelocity_;
+    normFiberVelocity /= maxContractionVelocity_;
+
     double fv = forceVelocityCurve_.getValue(normFiberVelocity);
     double fp = passiveForceLengthCurve_.getValue(normFiberLength);
-    double fa = activeForceLengthCurve_.getValue(normFiberLength);
-    double pennationAngleAtT = PennationAngle::compute(fibreLength, optimalFibreLength_, pennationAngle_);
+    double fa = activeForceLengthCurve_.getValue(normFiberLengthAtT);
+    double pennationAngleAtT = CEINMS::PennationAngle::compute(fibreLength, optimalFibreLength_, pennationAngle_);
 
     
     double muscleForce = maxIsometricForce_ * strengthCoefficient_ *
            (fa * fv * activation_ + fp + damping_ * normFiberVelocity)* 
-           cos(radians(pennationAngleAtT));
+           cos(pennationAngleAtT);
+
+    fibreLengthTrace_.removeLastPoint();
     
 //    cout << "muscleForce " << muscleForce << endl;
     return muscleForce;
@@ -406,8 +367,7 @@ double ElasticTendon_BiSec::computeMuscleForce(double fibreLength) {
 
 double ElasticTendon_BiSec::getFibreLengthStiff() const {
  
-    double optimalFibreLengthAtT = optimalFibreLength_ * (percentageChange_ * (1.0 - activation_) + 1 );
-    double first = optimalFibreLengthAtT * sin( radians(pennationAngle_));
+    double first = optimalFibreLength_ * sin( pennationAngle_);
     double second = muscleTendonLength_ - tendonSlackLength_;
     return sqrt(first*first + second*second);     
 }

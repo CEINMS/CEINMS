@@ -16,27 +16,9 @@ using std::map;
 using std::cout;
 using std::endl;
 #include "inputData-schema.hxx"
-#include <boost/algorithm/string.hpp>
+
 #include "validation.h"
-
-inline bool isAbsolute(const char *path) {
-    if (path[0] == '/' || path[0] == '\\') {
-        return true;
-    }
-    std::string str(path);
-    if (str.length()>1) {
-        if (str[1] == ':') {
-            return true;
-        }
-    }
-    return false;
-};
-
-static void trim(std::string& fileName)
-{
-    boost::trim(fileName);
-    boost::trim_if(fileName, boost::is_any_of("\""));
-};
+#include "FileUtils.h"
 
 InputDataXmlReader::InputDataXmlReader(const string& filename)
 {
@@ -80,8 +62,8 @@ void InputDataXmlReader::readXml() {
 std::string InputDataXmlReader::getLmtFile()
 {
     std::string fileName(*(inputDataPointer_->muscleTendonLengthFile().begin()));
-    trim(fileName);
-     if (isAbsolute(fileName.c_str()))
+    FileUtils::trim(fileName);
+    if (FileUtils::isAbsolute(fileName.c_str()))
             return fileName;
         else
             return filepath_ + fileName;
@@ -93,8 +75,8 @@ std::map<std::string, std::string> InputDataXmlReader::getMaFiles()
     for (auto it : inputDataPointer_->momentArmsFiles().begin()->momentArmsFile())
     {
         std::string pathToMaFile = it.c_str();
-        trim(pathToMaFile);
-        if (!isAbsolute(pathToMaFile.c_str()))
+        FileUtils::trim(pathToMaFile);
+        if (!FileUtils::isAbsolute(pathToMaFile.c_str()))
             pathToMaFile = filepath_ + pathToMaFile;
         result.insert(std::pair<string, string>(it.dofName(), pathToMaFile));
     }
@@ -105,8 +87,8 @@ std::map<std::string, std::string> InputDataXmlReader::getMaFiles()
 std::string InputDataXmlReader::getExcitationsFile()
 {
     std::string fileName(*(inputDataPointer_->excitationsFile().begin()));
-    trim(fileName);
-    if (isAbsolute(fileName.c_str()))
+    FileUtils::trim(fileName);
+    if (FileUtils::isAbsolute(fileName.c_str()))
         return fileName;
     else
         return filepath_ + fileName;
@@ -117,8 +99,8 @@ std::string InputDataXmlReader::getExternalTorqueFile()
     if (inputDataPointer_->externalTorquesFile().size() < 1)
         return "";
     std::string fileName(*(inputDataPointer_->externalTorquesFile().begin()));
-    trim(fileName);
-    if (isAbsolute(fileName.c_str()))
+    FileUtils::trim(fileName);
+    if (FileUtils::isAbsolute(fileName.c_str()))
         return fileName;
     else
         return filepath_ + fileName;

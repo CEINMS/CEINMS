@@ -21,6 +21,7 @@ class ExecutionXmlReader {
 public:
     ExecutionXmlReader(const std::string& filename);
     NMSModelCfg::RunMode getRunMode() const;
+    double getTolerance() const { return tolerance_; };
     void getMusclesToPredict(std::vector<std::string>& musclesToPredict);
     void getMusclesToTrack(std::vector<std::string>& musclesToTrack);
     void getHybridWeightings(double& alpha, double& beta, double& gamma);
@@ -28,7 +29,7 @@ public:
     
 private:
     void readXml();
-    
+    double tolerance_;
     unsigned runMode_;
     std::auto_ptr<ExecutionType> executionPointer_;
 };

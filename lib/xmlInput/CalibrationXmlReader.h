@@ -56,6 +56,7 @@ public:
     void getOptimizationAlgorithmParameters(SimulatedAnnealingParameters& parameters) const;  //overload this function when adding new opt algorithms
     bool popNextCalibrationStep(CalibrationStep& calibrationStep); 
     void getCalibrationTrials(std::list<std::string>& trials) const;
+    double getTolerance() const { return tolerance_; };
     friend std::ostream& operator<< (std::ostream& output, const CalibrationXmlReader& b);
     
 private:
@@ -74,7 +75,7 @@ private:
     std::auto_ptr<CalibrationXsd::CalibrationType> calibrationPointer_;    
     SimulatedAnnealingParameters simanParameters_;
     std::string filepath_;
-    
+    double tolerance_;
 };
 
 #endif

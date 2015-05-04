@@ -67,6 +67,7 @@ void XmlWriter::setParameters(NMSmodelT& subject) {
         (*i).optimalFibreLength(currentMuscle.getOptimalFibreLength());
         (*i).pennationAngle(currentMuscle.getPennationAngle());
         (*i).tendonSlackLength(currentMuscle.getTendonSlackLength());
+        (*i).maxContractionVelocity(currentMuscle.getMaxContractionVelocity());
         mtuDefault.percentageChange(currentMuscle.getPercentageChange());
         mtuDefault.damping(currentMuscle.getDamping());
         mtuDefault.emDelay(currentMuscle.getEmDelay());

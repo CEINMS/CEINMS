@@ -5,34 +5,24 @@ using std::endl;
 #include <stdlib.h>
 #define _USE_MATH_DEFINES
 #include <math.h>
-
-inline double radians (double d) {
-
-    return d * M_PI / 180;
-}
-
-inline double degrees (double r) {
-
-    return r * 180/ M_PI;
-}
-
+#include "MTUutils.h"
 
 template<typename Activation, typename Tendon, CurveMode::Mode mode>
 MTU<Activation, Tendon, mode>::MTU() 
 :id_(""), emDelay_(.0), c1_(0.), c2_(0.), shapeFactor_(0.), activation_(0.), 
 optimalFibreLength_(0.), pennationAngle_(0.), tendonSlackLength_(0.), 
-percentageChange_(0.), fibreLength_(0.), 
+percentageChange_(0.), fibreLength_(0.), pennationAngleAtT_(0.),
 fibreVelocity_(0.), damping_(0.), maxIsometricForce_(0.), time_(.0), timeScale_(0.),
-strengthCoefficient_(0.), muscleForce_(0.)  { }
+strengthCoefficient_(0.), muscleForce_(0.), maxContractionVelocity_(0.)  { }
 
 
 template<typename Activation, typename Tendon, CurveMode::Mode mode>
 MTU<Activation, Tendon, mode>::MTU (std::string id)
 :id_(id), emDelay_(.0), c1_(0.), c2_(0.), shapeFactor_(0.), activation_(0.), 
 optimalFibreLength_(0.), pennationAngle_(0.), tendonSlackLength_(0.), 
-percentageChange_(0.), fibreLength_(0.), 
+percentageChange_(0.), fibreLength_(0.), pennationAngleAtT_(0.),
 fibreVelocity_(0.), damping_(0.), maxIsometricForce_(0.), time_(.0), timeScale_(0.),
-strengthCoefficient_(0.), muscleForce_(0.), tendonDynamic_(id)  { }
+strengthCoefficient_(0.), muscleForce_(0.), maxContractionVelocity_(0.), tendonDynamic_(id)  { }
 
 
 
@@ -53,7 +43,8 @@ MTU<Activation, Tendon, mode>::MTU (const MTU<Activation, Tendon, mode>& orig) {
     fibreLength_ = orig.fibreLength_;
     fibreLengthTrace_ = orig.fibreLengthTrace_;
     muscleForce_ = orig.muscleForce_;
-    
+    pennationAngleAtT_ = orig.pennationAngleAtT_;
+
     optimalFibreLength_ = orig.optimalFibreLength_;
     pennationAngle_ = orig.pennationAngle_;
     tendonSlackLength_ = orig.tendonSlackLength_;
@@ -61,6 +52,7 @@ MTU<Activation, Tendon, mode>::MTU (const MTU<Activation, Tendon, mode>& orig) {
     damping_ = orig.damping_;
     maxIsometricForce_ = orig.maxIsometricForce_;
     strengthCoefficient_ = orig.strengthCoefficient_;
+    maxContractionVelocity_ = orig.maxContractionVelocity_;
     forceVelocityCurve_ = orig.forceVelocityCurve_;
     activeForceLengthCurve_ = orig.activeForceLengthCurve_;
     passiveForceLengthCurve_ = orig.passiveForceLengthCurve_;
@@ -89,6 +81,7 @@ MTU<Activation, Tendon, mode>& MTU<Activation, Tendon, mode>::operator=(const MT
     fibreLength_ = orig.fibreLength_;
     fibreLengthTrace_ = orig.fibreLengthTrace_;
     muscleForce_ = orig.muscleForce_;
+    pennationAngleAtT_ = orig.pennationAngleAtT_;
     
     optimalFibreLength_ = orig.optimalFibreLength_;
     pennationAngle_ = orig.pennationAngle_;
@@ -97,6 +90,7 @@ MTU<Activation, Tendon, mode>& MTU<Activation, Tendon, mode>::operator=(const MT
     damping_ = orig.damping_;
     maxIsometricForce_ = orig.maxIsometricForce_;
     strengthCoefficient_ = orig.strengthCoefficient_;
+    maxContractionVelocity_ = orig.maxContractionVelocity_;
     forceVelocityCurve_ = orig.forceVelocityCurve_;
     activeForceLengthCurve_ = orig.activeForceLengthCurve_;
     passiveForceLengthCurve_ = orig.passiveForceLengthCurve_;
@@ -115,7 +109,8 @@ void MTU<Activation, Tendon, mode>::setParametersToComputeForces(double optimalF
                                                                  double percentageChange,
                                                                  double damping, 
                                                                  double maxIsometricForce, 
-                                                                 double strengthCoefficient) {
+                                                                 double strengthCoefficient,
+                                                                 double maxContractionVelocity) {
     optimalFibreLength_ = optimalFibreLength;
     pennationAngle_ = pennationAngle;
     tendonSlackLength_ = tendonSlackLength;
@@ -123,6 +118,7 @@ void MTU<Activation, Tendon, mode>::setParametersToComputeForces(double optimalF
     damping_ = damping;
     maxIsometricForce_ = maxIsometricForce;
     strengthCoefficient_ = strengthCoefficient;
+    maxContractionVelocity_ = maxContractionVelocity;
  
     tendonDynamic_.setParametersToComputeForces(optimalFibreLength,
                                                 pennationAngle,
@@ -130,7 +126,8 @@ void MTU<Activation, Tendon, mode>::setParametersToComputeForces(double optimalF
                                                 percentageChange,
                                                 damping, 
                                                 maxIsometricForce, 
-                                                strengthCoefficient);
+                                                strengthCoefficient,
+                                                maxContractionVelocity);
     resetState();
 }
 
@@ -262,21 +259,28 @@ void MTU<Activation, Tendon, mode>::updateMuscleForce() {
 
     double optimalFiberLengthAtT = optimalFibreLength_*(percentageChange_*(1.0 - activation_) + 1); 
 ////:TODO: strong review with the code... lot of check for closeness to 0
-    double normFiberLength   = fibreLength_/optimalFiberLengthAtT;
+    double normFiberLengthAtT   = fibreLength_/optimalFiberLengthAtT;
+    double normFiberLength   = fibreLength_/optimalFibreLength_;
   //:TODO: THIS IS WRONG! timeScale_?  0.1 should be timeScale_
     // double normFiberVelocity = timescale_ *fiberVelocity_ / optimalFiberLengthAtT;
-    double normFiberVelocity = 0.02*fibreVelocity_*0.1/optimalFiberLengthAtT;
+    double fiberVel = fibreVelocity_ / optimalFibreLength_;
+    if (fiberVel > maxContractionVelocity_ )
+        fiberVel = maxContractionVelocity_;
+    if (fiberVel < -maxContractionVelocity_)
+        fiberVel = -maxContractionVelocity_;
+    double normFiberVelocity = fiberVel / maxContractionVelocity_;
 
     double fv = forceVelocityCurve_.getValue(normFiberVelocity);
     double fp = passiveForceLengthCurve_.getValue(normFiberLength);
-    double fa = activeForceLengthCurve_.getValue(normFiberLength);
+    double fa = activeForceLengthCurve_.getValue(normFiberLengthAtT);
     double pennationAngleAtT = computePennationAngle(optimalFibreLength_); //this is correct
 //    double pennationAngleAtT = computePennationAngle(optimalFiberLengthAtT); //this is the one we used since the new version...
 
     normFibreVelocity_= normFiberVelocity;
+    pennationAngleAtT_ = pennationAngleAtT; //for logging
     muscleForce_ = maxIsometricForce_*strengthCoefficient_*
                    (fa*fv*activation_ + fp + damping_*normFiberVelocity)* 
-                   cos(radians(pennationAngleAtT));
+                   cos(pennationAngleAtT);
 }
 
 
@@ -399,6 +403,14 @@ void MTU<Activation, Tendon, mode>::setMaxIsometricForce(double maxIsometricForc
 }
 
 
+template<typename Activation, typename Tendon, CurveMode::Mode mode>
+void MTU<Activation, Tendon, mode>::setMaxContractionVelocity(double maxContractionVelocity) {
+
+    maxContractionVelocity_ = maxContractionVelocity;
+    tendonDynamic_.setMaxContractionVelocity(maxContractionVelocity_);
+    resetState();
+}
+
 
 template<typename Activation, typename Tendon, CurveMode::Mode mode>
 double MTU<Activation, Tendon, mode>::getPenalty() const {
@@ -414,15 +426,15 @@ double MTU<Activation, Tendon, mode>::getPenalty() const {
 template<typename Activation, typename Tendon, CurveMode::Mode mode>
 inline double MTU<Activation, Tendon, mode>::computePennationAngle(double optimalFiberLength) {
 
-   double value = optimalFiberLength*sin(radians(pennationAngle_) )/fibreLength_;
+   return CEINMS::PennationAngle::compute(fibreLength_, optimalFiberLength, pennationAngle_);
 
-   if (value <= 0.0)
-        return (0.0);
-    else if (value >= 1.0)
-        return (90.0);
-    return (degrees(asin(value)));
 }
 
+template<typename Activation, typename Tendon, CurveMode::Mode mode>
+void MTU<Activation, Tendon, mode>::setTendonTolerance(double tolerance) {
+
+    tendonDynamic_.setTolerance(tolerance);
+}
 
 template<typename Activation, typename Tendon, CurveMode::Mode mode>
 std::ostream& operator<< (std::ostream& output, const MTU<Activation, Tendon, mode>& m)

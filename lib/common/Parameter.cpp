@@ -24,18 +24,19 @@ void Parameter::setName(const string& name) {
 Parameter::ID Parameter::getID() const{
 
     ID id;
-    if     (boost::iequals(name_, "c1"))                  id = C1;
-    else if(boost::iequals(name_, "c2"))                  id = C2;
-    else if(boost::iequals(name_, "shapeFactor"))         id = ShapeFactor;
-    else if(boost::iequals(name_, "optimalFibreLength"))  id = OptimalFibreLength;
-    else if(boost::iequals(name_, "pennationAngle"))      id = PennationAngle;
-    else if(boost::iequals(name_, "tendonSlackLength"))   id = TendonSlackLength;
-    else if(boost::iequals(name_, "maxIsometricForce"))   id = MaxIsometricForce;
-    else if(boost::iequals(name_, "strengthCoefficient")) id = StrengthCoefficient;
-    else if(boost::iequals(name_, "emDelay"))             id = EmDelay;
-    else if(boost::iequals(name_, "damping"))             id = Damping;
-    else if(boost::iequals(name_, "percentageChange"))    id = PercentageChange;
-    else                                                  id = NotFound;
+    if     (boost::iequals(name_, "c1"))                     id = C1;
+    else if(boost::iequals(name_, "c2"))                     id = C2;
+    else if(boost::iequals(name_, "shapeFactor"))            id = ShapeFactor;
+    else if(boost::iequals(name_, "optimalFibreLength"))     id = OptimalFibreLength;
+    else if(boost::iequals(name_, "pennationAngle"))         id = PennationAngle;
+    else if(boost::iequals(name_, "tendonSlackLength"))      id = TendonSlackLength;
+    else if(boost::iequals(name_, "maxContractionVelocity")) id = MaxContractionVelocity;
+    else if(boost::iequals(name_, "maxIsometricForce"))      id = MaxIsometricForce;
+    else if(boost::iequals(name_, "strengthCoefficient"))    id = StrengthCoefficient;
+    else if(boost::iequals(name_, "emDelay"))                id = EmDelay;
+    else if(boost::iequals(name_, "damping"))                id = Damping;
+    else if(boost::iequals(name_, "percentageChange"))       id = PercentageChange;
+    else                                                     id = NotFound;
     
     return id;
 

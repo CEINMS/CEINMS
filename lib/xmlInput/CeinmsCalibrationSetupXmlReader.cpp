@@ -16,27 +16,8 @@ using std::endl;
 
 #include "CeinmsCalibrationSetupXmlReader.h"
 #include "validation.h"
-#include <boost/algorithm/string.hpp>
 #include "ceinmsCalibrationSetup-schema.hxx"
-
-inline bool isAbsolute(const char *path) {
-    if (path[0] == '/' || path[0] == '\\') {
-        return true;
-    }
-    std::string str(path);
-    if (str.length()>1) {
-        if (str[1] == ':') {
-            return true;
-        }
-    }
-    return false;
-};
-
-static void trim(std::string& fileName)
-{
-    boost::trim(fileName);
-    boost::trim_if(fileName, boost::is_any_of("\""));
-};
+#include "FileUtils.h"
 
 CeinmsCalibrationSetupXmlReader::CeinmsCalibrationSetupXmlReader(const string& filename)
 {
@@ -80,8 +61,8 @@ void CeinmsCalibrationSetupXmlReader::readXml() {
 std::string CeinmsCalibrationSetupXmlReader::getSubjectFile()
 {
     std::string fileName(*(ceinmsCalibrationSetupPointer_->subjectFile().begin()));
-    trim(fileName);
-    if (isAbsolute(fileName.c_str()))
+    FileUtils::trim(fileName);
+    if (FileUtils::isAbsolute(fileName.c_str()))
         return fileName;
     else
         return filepath_ + fileName;
@@ -90,8 +71,8 @@ std::string CeinmsCalibrationSetupXmlReader::getSubjectFile()
 std::string CeinmsCalibrationSetupXmlReader::getCalibrationFile()
 {
     std::string fileName(*(ceinmsCalibrationSetupPointer_->calibrationFile().begin()));
-    trim(fileName);
-    if (isAbsolute(fileName.c_str()))
+    FileUtils::trim(fileName);
+    if (FileUtils::isAbsolute(fileName.c_str()))
         return fileName;
     else
         return filepath_ + fileName;
@@ -100,8 +81,8 @@ std::string CeinmsCalibrationSetupXmlReader::getCalibrationFile()
 std::string CeinmsCalibrationSetupXmlReader::getExcitationGeneratorFile()
 {
     std::string fileName(*(ceinmsCalibrationSetupPointer_->excitationGeneratorFile().begin()));
-    trim(fileName);
-    if (isAbsolute(fileName.c_str()))
+    FileUtils::trim(fileName);
+    if (FileUtils::isAbsolute(fileName.c_str()))
         return fileName;
     else
         return filepath_ + fileName;
@@ -110,8 +91,8 @@ std::string CeinmsCalibrationSetupXmlReader::getExcitationGeneratorFile()
 std::string CeinmsCalibrationSetupXmlReader::getOutputSubjectFile()
 {
     std::string fileName(*(ceinmsCalibrationSetupPointer_->outputSubjectFile().begin()));
-    trim(fileName);
-    if (isAbsolute(fileName.c_str()))
+    FileUtils::trim(fileName);
+    if (FileUtils::isAbsolute(fileName.c_str()))
         return fileName;
     else
         return filepath_ + fileName;

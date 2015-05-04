@@ -17,7 +17,6 @@
 
 #include "Activation/ExponentialActivation.h"
 #include "Activation/PiecewiseActivation.h"
-
 #include "Curve.h"
 
 #include "EMGFromFile.h"
@@ -67,7 +66,7 @@ namespace CEINMS {
         OutputConnectors outputConnectors;
 
         NMSmodelT mySubject;
-        setupSubject(mySubject, subjectFile_);
+        setupSubject(mySubject, subjectFile_, executionCfg_.getTolerance());
 
         // 2. define the thread connecting with the input sources          
         string emgFilename(dataLocations_.getExcitationsFile());
@@ -82,12 +81,20 @@ namespace CEINMS {
         string externalTorqueFilename(dataLocations_.getExternalTorqueFile());
         ExternalTorquesFromStorageFile externalTorquesProducer(inputConnectors, mySubject, externalTorqueFilename);
 
+        vector<string> dataToLog = { "Activations",
+                                     "FiberLenghts", 
+                                     "NormFiberLengths",
+                                     "FiberVelocities", 
+                                     "NormFiberVelocities",
+                                     "PennationAngles",
+                                     "MuscleForces", 
+                                     "Torques" };
         // 2b. define the thread consuming the output sources
-        vector<string> valuesToWrite = { "Activations", "FiberLenghts", "FiberVelocities", "MuscleForces", "Torques" };
+        vector<string> valuesToWrite = dataToLog;
         QueuesToStorageFiles queuesToStorageFiles(inputConnectors, outputConnectors, mySubject, valuesToWrite, outputDirectory_);
 
         // 3. define the model simulator
-        vector<string> valuesToLog = { "Activations", "FiberLenghts", "FiberVelocities", "MuscleForces", "Torques" };
+        vector<string> valuesToLog = dataToLog;
         ModelEvaluatorT<NMSmodelT, LoggerT>  simulator(inputConnectors, outputConnectors, mySubject, valuesToLog);
 
         inputConnectors.doneWithSubscription.setCount(5);
@@ -131,13 +138,21 @@ namespace CEINMS {
 
         string externalTorqueFilename(dataLocations_.getExternalTorqueFile());
         ExternalTorquesFromStorageFile externalTorquesProducer(inputConnectors, mySubject, externalTorqueFilename);
-
+        vector<string> dataToLog = { "Activations",
+            "FiberLenghts",
+            "NormFiberLengths",
+            "FiberVelocities",
+            "NormFiberVelocities",
+            "PennationAngles",
+            "MuscleForces",
+            "Torques",
+            "AdjustedEmgs" };
         // 2b. define the thread consuming the output sources
-        vector<string> valuesToWrite = { "Activations", "FiberLenghts", "FiberVelocities", "MuscleForces", "Torques", "AdjustedEmgs" };
+        vector<string> valuesToWrite = dataToLog;
         QueuesToStorageFiles queuesToStorageFiles(inputConnectors, outputConnectors, mySubject, valuesToWrite, outputDirectory_);
 
         // 3. define the model simulator
-        vector<string> valuesToLog = { "Activations", "FiberLenghts", "FiberVelocities", "MuscleForces", "Torques", "AdjustedEmgs" };
+        vector<string> valuesToLog = dataToLog;
 
         inputConnectors.doneWithSubscription.setCount(5);
         outputConnectors.doneWithExecution.setCount(2);
@@ -246,7 +261,22 @@ namespace CEINMS {
     }
 
 
-
+    void SimulationManager::sortMaFilenames(const std::map<std::string, std::string>& maMap, const std::vector< std::string >& dofNames, std::vector< std::string >& maDataFilenames)
+    {
+        int currentDof = 0;
+        for (auto& it : dofNames)
+        {
+            try
+            {
+                maDataFilenames.push_back(maMap.at(it));
+            }
+            catch (std::out_of_range)
+            {
+                std::cerr << "Could not find moment arm file for " << it << " degree of freedom" << std::endl;
+                exit(EXIT_FAILURE);
+            }
+        }
+    }
 
 
 }

@@ -171,8 +171,14 @@ void ModelEvaluationOffline<NMSmodelT, Logger>::operator()() {
         ModelEvaluationBase<Logger>::logger.log(emgTime, data, "Activations");
         subject_.getFiberLengths(data);
         ModelEvaluationBase<Logger>::logger.log(emgTime, data, "FiberLenghts");
+        subject_.getNormFiberLengths(data);
+        ModelEvaluationBase<Logger>::logger.log(emgTime, data, "NormFiberLengths");
         subject_.getFiberVelocities(data);
         ModelEvaluationBase<Logger>::logger.log(emgTime, data, "FiberVelocities");
+        subject_.getNormFiberVelocities(data);
+        ModelEvaluationBase<Logger>::logger.log(emgTime, data, "NormFiberVelocities");
+        subject_.getPennationAnglesAtT(data);
+        ModelEvaluationBase<Logger>::logger.log(emgTime, data, "PennationAngles");
         subject_.getMuscleForces(data);
         ModelEvaluationBase<Logger>::logger.log(emgTime, data, "MuscleForces");
         subject_.getTorques(data);
@@ -216,7 +222,10 @@ void ModelEvaluationOffline<NMSmodelT, Logger>::operator()() {
     double endTime = std::numeric_limits<double>::infinity();
     ModelEvaluationBase<Logger>::logger.log(endTime, endData, "Activations");
     ModelEvaluationBase<Logger>::logger.log(endTime, endData, "FiberLenghts");
+    ModelEvaluationBase<Logger>::logger.log(endTime, endData, "NormFiberLengths");
     ModelEvaluationBase<Logger>::logger.log(endTime, endData, "FiberVelocities");
+    ModelEvaluationBase<Logger>::logger.log(endTime, endData, "NormFiberVelocities");
+    ModelEvaluationBase<Logger>::logger.log(endTime, endData, "PennationAngles");
     ModelEvaluationBase<Logger>::logger.log(endTime, endData, "MuscleForces");
     ModelEvaluationBase<Logger>::logger.log(endTime, endData, "Torques");
 #endif

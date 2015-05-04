@@ -25,6 +25,7 @@ public:
                    double damping,
                    double maxIsometricForce, 
                    double strengthCoefficient,
+                   double maxContractionVelocity,
                    const CurveOffline& activeForceLengthCurve,
                    const CurveOffline& passiveForceLengthCurve, 
                    const CurveOffline& forceVelocityCurve,
@@ -40,9 +41,10 @@ public:
                                       double percentageChange,
                                       double damping, 
                                       double maxIsometricForce, 
-                                      double strengthCoefficient); 
+                                      double strengthCoefficient,
+                                      double maxContractionVelocity);
 
-    void setTime(const double& time) {} 
+    void setTime(const double& time) {    time_ = time; }
     void setMuscleTendonLength(double muscleTendonLength);
     void setActivation(double activation);
     void updateFibreLength();
@@ -54,11 +56,13 @@ public:
     void setOptimalFibreLength(double optimalFibreLength);
     void setPennationAngle(double pennationAngle);
     void setMaxIsometricForce(double maxIsometricForce);
+    void setMaxContractionVelocity(double maxContractionVelocity);
     void setCurves(const CurveOffline& activeForceLengthCurve, 
                    const CurveOffline& passiveForceLengthCurve, 
                    const CurveOffline& forceVelocityCurve,
                    const CurveOffline& tendonForceStrainCurve);
-                   
+    void setTolerance(double tolerance);
+    double getTolerance() const;
     void pushState();
     void resetState();
     
@@ -90,17 +94,19 @@ private:
     double damping_;
     double maxIsometricForce_; 
     double strengthCoefficient_;
+    double maxContractionVelocity_;
     CurveOffline activeForceLengthCurve_;
     CurveOffline passiveForceLengthCurve_;
     CurveOffline forceVelocityCurve_;
     CurveOffline tendonForceStrainCurve_;
-    
+
+    Curve<CurveMode::Online, CurveMode::Cubic, 3>  fibreLengthTrace_;
     double fibreLength_;
-    double fibreLengthT1_;          //valore della fiberLength al passo precedente
     double muscleTendonLength_;
     double activation_;
     double tendonPenalty_;
-    
+    double time_;
+    double tolerance_;
     std::string id_;
     
 };

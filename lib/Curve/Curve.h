@@ -15,9 +15,7 @@
 
 namespace CurveMode {
     enum Mode{Online, Offline};
-    enum Interpolation{Cubic, Linear};
-
-    
+    enum Interpolation{Cubic, Linear};  
 };
 
 
@@ -42,15 +40,15 @@ struct Select<CurveMode::Online, T, U> {
 }; 
 
 
-template <CurveMode::Mode mode,  CurveMode::Interpolation T>
+template <CurveMode::Mode mode,  CurveMode::Interpolation T, size_t N>
 class Curve;
 
 
-template <CurveMode::Mode mode,  CurveMode::Interpolation T>
-std::ostream& operator<< (std::ostream& output, const Curve<mode, T>& c);
+template <CurveMode::Mode mode, CurveMode::Interpolation T, size_t N>
+std::ostream& operator<< (std::ostream& output, const Curve<mode, T, N>& c);
 
 
-template <CurveMode::Mode mode, CurveMode::Interpolation T = CurveMode::Cubic>
+template <CurveMode::Mode mode, CurveMode::Interpolation T = CurveMode::Cubic, size_t N = 15>
 class Curve {
 
 public:
@@ -62,8 +60,8 @@ public:
     Curve& operator=(const Curve& orig);
     void reset();
     // add a new points and compute again coefficients
-    void addPoint(double x, double y);
-    void addPointOnly(double x, double y);
+    bool addPoint(double x, double y);
+    bool addPointOnly(double x, double y);
     void resetPointsWith(const std::vector<double>& x, const std::vector<double> &y);
     void refresh(); 
     // remove last point of the Curve_c and compute again coefficients
@@ -81,9 +79,16 @@ private:
 
     double getValue(double xValue, unsigned abscissaPoint, Int2Type<CurveMode::Cubic>) const;
     double getValue(double xValue, unsigned abscissaPoint, Int2Type<CurveMode::Linear>) const;
-    unsigned getAbscissaPoint(double xValue) const;
 
-    typedef typename Select<mode, std::vector<double>, CircularVector<double> >::Result VectorType;  
+    double getFirstDerivative(double xValue, unsigned abscissaPoint, Int2Type<CurveMode::Cubic>) const;
+    double getFirstDerivative(double xValue, unsigned abscissaPoint, Int2Type<CurveMode::Linear>) const;
+
+    unsigned getAbscissaPoint(double xValue) const;
+    unsigned getAbscissaPoint(double xValue, Int2Type<CurveMode::Online>) const;
+    unsigned getAbscissaPoint(double xValue, Int2Type<CurveMode::Offline>) const;
+
+
+    typedef typename Select<mode, std::vector<double>, CircularVector<double, N> >::Result VectorType;  
     VectorType x_;
     VectorType y_;
     std::vector<double>    b_;

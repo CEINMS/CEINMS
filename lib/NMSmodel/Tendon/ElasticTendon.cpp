@@ -16,29 +16,9 @@ using std::vector;
 #include "float.h"
 
 #include "Curve.h"
-
+#include "../MTUutils.h"
 #define DEBUG
 
-inline double radians (double d) {
-return d * M_PI / 180;
-}
-
-inline double degrees (double r) {
-return r * 180/ M_PI;
-}
-
-class PennationAngle {
-
-public:
-    static double compute(double fiberLength, double optimalFiberLength, double pennationAngle) {
-    double value = optimalFiberLength*sin(radians(pennationAngle) )/fiberLength;
-    if (value <= 0.0)
-        return (0.0);
-    else if (value >= 1.0)
-        return (90.0);
-    return (degrees(asin(value)));
-    }
-};
 
 
 /*
@@ -130,7 +110,7 @@ optimalFiberLengthAtT_(.0)
 
 double LDFM::computePennationAngle() const {
     
-    return PennationAngle::compute(fiberLength_, optimalFiberLengthAtT_, pennationAngle_);
+    return CEINMS::PennationAngle::compute(fiberLength_, optimalFiberLengthAtT_, pennationAngle_);
 }
 
 
@@ -149,7 +129,7 @@ void LDFM::setInitConditions(double muscleTendonLength, double muscleTendonVeloc
     * And if you are including passive muscle force, you start in the middle
     * of the combined force-length curve.
     */                
-    double muscleThick = optimalFiberLength_  * sin(radians(pennationAngle_));
+    double muscleThick = optimalFiberLength_  * sin(pennationAngle_);
     optimalFiberLengthAtT_ = optimalFiberLength_ * (percentageChange_ * (1.0 - activation) + 1 );
     
     if (muscleTendonLength_ < tendonSlackLength_) {
@@ -158,7 +138,7 @@ void LDFM::setInitConditions(double muscleTendonLength, double muscleTendonVeloc
     } 
     else {
         fiberLength_  = optimalFiberLength_;
-        double cf = cos(radians(computePennationAngle()));
+        double cf = cos(computePennationAngle());
         tendonLength_ = muscleTendonLength_ - fiberLength_*cf;
 
         /* Check to make sure tendon is not shorter than its slack length. If it is,
@@ -240,7 +220,7 @@ double LDFM::estimateFiberLength() {
             /* determine how much the muscle and tendon lengths have to
              * change to make the errorforce zero.   */
             
-            double lengthChange = fabs( errorForce/(fiberStiffness_/cos(radians(computePennationAngle())) + tendonStiffness_) );
+            double lengthChange = fabs( errorForce/(fiberStiffness_/cos(computePennationAngle()) + tendonStiffness_) );
             
             if (fabs(lengthChange/ optimalFiberLength_) > 0.5)
                 lengthChange = 0.5 * optimalFiberLength_ ;
@@ -260,7 +240,7 @@ double LDFM::estimateFiberLength() {
             
 //        optimalFiberLengthAtT_ = optimalFiberLength_ * (percentageChange_ * (1.0 - activation_) + 1 );
 //        double pennationAngleAtT = computePennationAngle();
-        tendonLength_ = muscleTendonLength_ - fiberLength_ * cos(radians(computePennationAngle() )); 
+        tendonLength_ = muscleTendonLength_ - fiberLength_ * cos(computePennationAngle() ); 
         errorForceOld = errorForce;
         runCondition = fabs(errorForce) > (relTolerance*(maxIsometricForce_*strengthCoefficient_));
                             
@@ -269,7 +249,7 @@ double LDFM::estimateFiberLength() {
         */
         
         if (tendonLength_ < tendonSlackLength_) {
-            fiberLength_ = (muscleTendonLength_ - tendonLength_)/cos(radians(computePennationAngle()));
+            fiberLength_ = (muscleTendonLength_ - tendonLength_)/cos(computePennationAngle());
             tendonLength_ = tendonSlackLength_;
         }
         
@@ -296,7 +276,7 @@ void LDFM::updateInitConditions() {
     if( (fiberStiffness_ + tendonStiffness_)!= 0 )
         beta = fiberStiffness_ / (fiberStiffness_ + tendonStiffness_);
     tendonVelocity_ = muscleTendonVelocity_* beta;
-    double cf = cos(radians(computePennationAngle()));
+    double cf = cos(computePennationAngle());
     fiberVelocity_ = (1.0 - beta) * cf * muscleTendonVelocity_;
 }
 
@@ -315,7 +295,7 @@ void LDFM::computeMuscleTendonForce() {
     
     double pennationAngleAtT = computePennationAngle();
     muscleTendonForce_ = maxIsometricForce_ * strengthCoefficient_ *
-                                (fa * fv * activation_ + fp + damping_ * normFiberVelocity) * cos(radians(pennationAngleAtT));
+                                (fa * fv * activation_ + fp + damping_ * normFiberVelocity) * cos(pennationAngleAtT);
    
 }
 
@@ -362,7 +342,7 @@ double LDFM::oldEstimation(double muscleTendonLength, double muscleTendonVelocit
 
                 
 
-    mthick = optimalFiberLength_ * sin(radians(pennationAngle_));
+    mthick = optimalFiberLength_ * sin(pennationAngle_);
                 
     if (muscleTendonLength_ < tendonSlackLength_)
     {
@@ -372,7 +352,7 @@ double LDFM::oldEstimation(double muscleTendonLength, double muscleTendonVelocit
     else
     {
         fiberLength_ = optimalFiberLength_;
-        cf = cos(radians(computePennationAngle()));  
+        cf = cos(computePennationAngle());  
         tendonLength_=muscleTendonLength_ - fiberLength_*cf;
 
 
@@ -406,7 +386,7 @@ double LDFM::oldEstimation(double muscleTendonLength, double muscleTendonVelocit
     * curve, and the velocities are guessed again.
     */
 
-    mthick = optimalFiberLength_  * sin(radians(pennationAngle_));
+    mthick = optimalFiberLength_  * sin(pennationAngle_);
 
 
     for (j=0; j<2; j++)
@@ -507,7 +487,7 @@ double LDFM::oldEstimation(double muscleTendonLength, double muscleTendonVelocit
                                             fiberLength_ -= lengthchange;
                                 }
                                 
-                                cf = cos(radians(computePennationAngle()));  
+                                cf = cos(computePennationAngle());  
                                 tendonLength_ = muscleTendonLength_ - fiberLength_*cf;
                                 olderrorforce = errorforce;
                                 
@@ -565,6 +545,7 @@ percentageChange_(.0),
 damping_(.0),
 maxIsometricForce_(.0), 
 strengthCoefficient_(.0),
+maxContractionVelocity_(0.0),
 muscleTendonLength_(0.0),
 muscleTendonLengthT1_(0.0),
 muscleTendonVelocity_(0.0),
@@ -592,6 +573,7 @@ percentageChange_(.0),
 damping_(.0),
 maxIsometricForce_(.0), 
 strengthCoefficient_(.0),
+maxContractionVelocity_(0.0),
 muscleTendonLength_(0.0),
 muscleTendonLengthT1_(0.0),
 muscleTendonVelocity_(0.0),
@@ -618,6 +600,7 @@ ElasticTendon<mode>::ElasticTendon (double optimalFiberLength,
                               double damping, 
                               double maxIsometricForce, 
                               double strengthCoefficient, 
+                              double maxContractionVelocity,
                               const CurveOffline& activeForceLengthCurve, 
                               const CurveOffline& passiveForceLengthCurve, 
                               const CurveOffline& forceVelocityCurve,
@@ -630,6 +613,7 @@ percentageChange_(percentageChange),
 damping_(damping),
 maxIsometricForce_(maxIsometricForce), 
 strengthCoefficient_(strengthCoefficient),
+maxContractionVelocity_(maxContractionVelocity),
 activeForceLengthCurve_(activeForceLengthCurve),
 passiveForceLengthCurve_(passiveForceLengthCurve),
 forceVelocityCurve_(forceVelocityCurve),
@@ -672,6 +656,7 @@ ElasticTendon<mode>& ElasticTendon<mode>::operator= ( const ElasticTendon<mode>&
     damping_                 = orig.damping_;
     maxIsometricForce_       = orig.maxIsometricForce_;
     strengthCoefficient_     = orig.strengthCoefficient_;
+    maxContractionVelocity_  = orig.maxContractionVelocity_;
     activeForceLengthCurve_  = orig.activeForceLengthCurve_;
     passiveForceLengthCurve_ = orig.passiveForceLengthCurve_;
     forceVelocityCurve_      = orig.forceVelocityCurve_;
@@ -703,7 +688,8 @@ void ElasticTendon<mode>::setParametersToComputeForces(double optimalFiberLength
                                                  double percentageChange,
                                                  double damping, 
                                                  double maxIsometricForce, 
-                                                 double strengthCoefficient) {
+                                                 double strengthCoefficient,
+                                                 double maxContractionVelocity) {
  
     optimalFiberLength_  = optimalFiberLength;
     pennationAngle_      = pennationAngle;
@@ -712,6 +698,7 @@ void ElasticTendon<mode>::setParametersToComputeForces(double optimalFiberLength
     damping_             = damping;
     maxIsometricForce_   = maxIsometricForce;
     strengthCoefficient_ = strengthCoefficient;
+    maxContractionVelocity_ = maxContractionVelocity;
 }
 
 
@@ -761,6 +748,14 @@ template <CurveMode::Mode mode>
 void ElasticTendon<mode>::setMaxIsometricForce(double maxIsometricForce) {
 
     maxIsometricForce_ = maxIsometricForce;
+    resetState();
+}
+
+
+template <CurveMode::Mode mode>
+void ElasticTendon<mode>::setMaxContractionVelocity(double maxContractionVelocity) {
+
+    maxContractionVelocity_ = maxContractionVelocity;
     resetState();
 }
 

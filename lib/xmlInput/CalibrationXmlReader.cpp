@@ -18,29 +18,13 @@ using std::endl;
 #include "calibration-schema.hxx"
 #include "validation.h"
 #include <boost/algorithm/string.hpp>
+#include "FileUtils.h"
 using namespace CalibrationXsd;
 
-inline bool isAbsolute(const char *path) {
-    if (path[0] == '/' || path[0] == '\\') {
-        return true;
-    }
-    std::string str(path);
-    if (str.length()>1) {
-        if (str[1] == ':') {
-            return true;
-        }
-    }
-    return false;
-};
 
-static void trim(std::string& fileName)
-{
-    boost::trim(fileName);
-    boost::trim_if(fileName, boost::is_any_of("\""));
-};
 
 CalibrationXmlReader::CalibrationXmlReader(const string& filename)
-:runMode_(0), optimizationAlgorithm_(0) {
+    :runMode_(0), optimizationAlgorithm_(0), tolerance_(1e-6) {
 
     try {
         std::auto_ptr<CalibrationType> calibrationPointer(parseAndValidate<CalibrationType>(filename, calibration_schema, sizeof(calibration_schema)));
@@ -101,8 +85,12 @@ void CalibrationXmlReader::readNMSmodelCfg() {
             runMode_ += NMSModelCfg::StiffTendon;
         else if(myElsaticOpt.present())
             runMode_ += NMSModelCfg::ElasticTendon;
-        else if(myElsaticBiSecOpt.present())
+        else if (myElsaticBiSecOpt.present())
+        {
             runMode_ += NMSModelCfg::ElasticTendonBiSec;
+            if (myElsaticBiSecOpt->tolerance().present())
+                tolerance_ = myElsaticBiSecOpt->tolerance().get();
+        }
         else {
             cout << "invalid XML: TendonType not found\n";
             exit(EXIT_FAILURE);
@@ -180,8 +168,14 @@ void CalibrationXmlReader::readParameter(ParameterType& parameterType, Parameter
     ParameterType::muscleGroups_optional& myMuscleGroupsOpt(parameterType.muscleGroups());
     ParameterType::global_optional& myGlobaleParameterOpt(parameterType.global());
     ParameterType::single_optional& mySingleParameterOpt(parameterType.single());
-    if(mySingleParameterOpt.present())
+    if (mySingleParameterOpt.present()) {
         parameter.setAssignment(Parameter::Single);
+        
+        auto it(parameterType.single()->begin());
+        for (it; it != parameterType.single()->end(); ++it)
+            parameter.pushMuscleGroup(Parameter::MuscleNames{ *it });
+
+    }
     else if (myGlobaleParameterOpt.present())
         parameter.setAssignment(Parameter::Global);
     else if (myMuscleGroupsOpt.present()) {
@@ -222,8 +216,8 @@ void CalibrationXmlReader::readCalibrationTrialList() {
     for (it; it != myTrialSet.end(); ++it)
     {
         std::string fileName = (*it);
-        trim(fileName);
-        if (isAbsolute(fileName.c_str()))
+        FileUtils::trim(fileName);
+        if (FileUtils::isAbsolute(fileName.c_str()))
             calibrationTrials_.push_back(fileName);
         else
             calibrationTrials_.push_back(filepath_ + fileName);

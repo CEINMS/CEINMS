@@ -33,7 +33,8 @@ public:
                                       double percentageChange,
                                       double damping, 
                                       double maxIsometricForce, 
-                                      double strengthCoefficient); 
+                                      double strengthCoefficient,
+                                      double maxContractionVelocity=10.0);
                                    
     void setParametersToComputeActivation(double c1,
                                           double c2,
@@ -81,16 +82,20 @@ public:
     double getPennationAngle() const {return pennationAngle_; }
     double getMaxIsometricForce() const { return maxIsometricForce_; }
     void   setMaxIsometricForce(double maxIsometricForce);
+    double getMaxContractionVelocity() const { return maxContractionVelocity_; }
+    void   setMaxContractionVelocity(double maxContractionVelocity);
 
     double getFiberLength() const {return fibreLength_;}
+    double getNormFiberLength() const { return fibreLength_ / optimalFibreLength_; }
     double getFiberVelocity() const {return fibreVelocity_; }
-    double getNormFiberVelocity() const {return normFibreVelocity_; } 
+    double getNormFiberVelocity() const {return normFibreVelocity_; }
+    double getPennationAngleAtT() const { return pennationAngleAtT_; };
     double getMuscleForce() const {return muscleForce_;}
     double getPercentageChange() const { return percentageChange_;}
     double getDamping() const {return damping_;}
     
     
-
+    void setTendonTolerance(double tolerance = 0.0);
   
     void   setMuscleForce(double muscleForce) {muscleForce_ = muscleForce;}
     void   updateFibreLengthTrace();
@@ -126,6 +131,7 @@ private:
     double fibreVelocity_;       /**< \f$v^m\f$ */
     double normFibreVelocity_; 
     double fibreLength_;         /**< \f$l^m\f$ */    
+    double pennationAngleAtT_;
     CurveT  fibreLengthTrace_;
     double muscleForce_;    /**< \f$F^{mt}\f$ */
     
@@ -137,6 +143,7 @@ private:
     double damping_;             /**< \f$d^m\f$ */
     double maxIsometricForce_;   /**< \f$F_0^m\f$ */
     double strengthCoefficient_;  /**< \f$\delta\f$ */
+    double maxContractionVelocity_;
     CurveOffline  forceVelocityCurve_;
     CurveOffline  activeForceLengthCurve_;
     CurveOffline  passiveForceLengthCurve_;

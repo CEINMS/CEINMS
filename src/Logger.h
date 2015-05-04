@@ -13,7 +13,10 @@
 namespace Logger {
     enum LogID{Activations,
                 FibreLengths,
+                NormFibreLengths,
                 FibreVelocities,
+                NormFibreVelocities,
+                PennationAngles,
                 MuscleForces,
                 Torques,
                 Emgs,

@@ -51,15 +51,14 @@ namespace CEINMS {
             return ((var - ep*ep / v.size()) / (v.size() - 1)); //adjust roundoff error.. apparently
         });
 
-
         torqueVariance_.clear();
         //trialDataVariance: first dimension is the trial, second dimension is the DoF
         for (auto& trial : trials_) {
             auto dofNamesFromTrial = trial.dofNames;
-            std::vector<double> trialVariance;
+            std::vector<double> trialVariance(trial.noDoF, .0);
             for (auto& name : dofsToCalibrate_) {
                 auto i(std::distance(dofNamesFromTrial.begin(),(std::find(dofNamesFromTrial.begin(), dofNamesFromTrial.end(), name))));
-                trialVariance.emplace_back(getVariance(trial.torqueData.getColumn(i)));
+                trialVariance.at(i) = getVariance(trial.torqueData.getColumn(i));
             }
             torqueVariance_.emplace_back(trialVariance);
         }

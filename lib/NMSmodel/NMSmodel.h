@@ -101,6 +101,8 @@ public:
     void setTendonSlackLengths(const std::vector<double>& tendonSlackLengths);
     void setActivations(const std::vector<double>& activations);
     void setOptimalFibreLengths(const std::vector<double>&  optimalFibreLengths);
+    void setTendonTolerance(double tolerance = 0.0);
+    void setMaxContractionVelocities(const std::vector<double>& maxContractionVelocities);
     
     // called	for control purpose
     std::vector<std::string> getMuscleNames() const {return muscleNames_;}
@@ -117,8 +119,10 @@ public:
     void getActivations(std::vector<double>& activations) const;
     void getNeuralActivations( std::vector<double>& neuralActivations) const;
     void getFiberLengths(std::vector<double>& fiberLengths) const;
+    void getNormFiberLengths(std::vector<double>& fiberLengths) const;
     void getFiberVelocities(std::vector<double>& fiberVelocities) const;
     void getNormFiberVelocities(std::vector<double>& normFiberVelocities) const;
+    void getPennationAnglesAtT(std::vector<double>& pennationAnglesAtT) const; //instant pennationangle
     void getMuscleForces(std::vector<double>& muscleForces) const;
     void getTorques(std::vector<double>& torques) const;
 
@@ -148,6 +152,8 @@ public:
     void setMuscleForces(const std::vector<double>& muscleTendonForces);
     void getMomentArmsOnDof(std::vector<double>& momentArms, unsigned whichDof) const;
     void getOptimalFibreLengths(std::vector<double>& optimalFibreLengths) const;
+    void getMaxContractionVelocities(std::vector<double>& maxContractionVelocities) const;
+
     
     double getGlobalEmDelay() const; //NOTE: this will be replaced by singular muscles emdelay
     
