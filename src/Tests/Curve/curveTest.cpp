@@ -1,4 +1,5 @@
 #include "Curve.h"
+using namespace ceinms;
 #include <vector>
 #include <fstream>
 #include <string>
