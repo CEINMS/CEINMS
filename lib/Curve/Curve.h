@@ -61,7 +61,7 @@ public:
     void reset();
     // add a new points and compute again coefficients
     bool addPoint(double x, double y);
-    bool addPointOnly(double x, double y);
+    bool addPointNoUpdate(double x, double y);
     void resetPointsWith(const std::vector<double>& x, const std::vector<double> &y);
     void refresh(); 
     // remove last point of the Curve_c and compute again coefficients

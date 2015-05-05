@@ -200,7 +200,7 @@ void MTU<Activation, Tendon, mode>::updateFibreLength() {
     
     tendonDynamic_.updateFibreLength();
     fibreLength_ = tendonDynamic_.getFibreLength();
-    fibreLengthTrace_.addPointOnly(time_, fibreLength_);
+    fibreLengthTrace_.addPointNoUpdate(time_, fibreLength_);
 }
 
 
@@ -247,7 +247,7 @@ void MTU<Activation, Tendon, mode>::updateFibreLengthAndVelocity_HYBRID() {
     
     updateFibreLength_OFFLINE();
     fibreLengthTrace_.removeLastPointNoUpdate();
-    fibreLengthTrace_.addPointOnly(time_, fibreLength_);
+    fibreLengthTrace_.addPointNoUpdate(time_, fibreLength_);
     fibreLengthTrace_.refresh();
     updateFibreVelocity_OFFLINE();
 }

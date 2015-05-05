@@ -120,7 +120,7 @@ bool Curve<mode, T, N>::addPoint(double x, double y)  {
 
 
 template <CurveMode::Mode mode, CurveMode::Interpolation T, size_t N>
-bool Curve<mode, T, N>::addPointOnly(double x, double y)
+bool Curve<mode, T, N>::addPointNoUpdate(double x, double y)
 {
   if(x_.empty() || x>x_.back())
   {

@@ -64,7 +64,7 @@ void createCurve(std::vector<double> xPoints, Lambda&& function, CurveT& curve){
     
     curve.reset();
     for (auto x : xPoints) {
-        curve.addPointOnly(x, std::forward<Lambda>(function)(x));
+        curve.addPointNoUpdate(x, std::forward<Lambda>(function)(x));
     }
     curve.refresh();
    

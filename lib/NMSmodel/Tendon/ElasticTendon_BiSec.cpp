@@ -357,7 +357,7 @@ double ElasticTendon_BiSec::computeMuscleForce(double fibreLength) {
            (fa * fv * activation_ + fp + damping_ * normFiberVelocity)* 
            cos(pennationAngleAtT);
 
-    fibreLengthTrace_.removeLastPoint();
+    fibreLengthTrace_.removeLastPointNoUpdate();
     
 //    cout << "muscleForce " << muscleForce << endl;
     return muscleForce;
