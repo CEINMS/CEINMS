@@ -885,7 +885,7 @@ namespace ceinms {
 
         double optimalFiberLengthAtT = optimalFiberLength_ * (percentageChange_ * (1.0 - activationAtT) + 1.0);
         double normFiberLength = fiberLength / optimalFiberLengthAtT;
-        double pennationAngleAtT = CEINMS::PennationAngle::compute(fiberLength, optimalFiberLength_, pennationAngle_);
+        double pennationAngleAtT = ceinms::PennationAngle::compute(fiberLength, optimalFiberLength_, pennationAngle_);
         double ca = cos(radians(pennationAngleAtT));
         double tendonLength = muscleTendonLengthAtT - fiberLength*ca;
         double tendonStrain = (tendonLength - tendonSlackLength_) / tendonSlackLength_;
@@ -906,7 +906,7 @@ namespace ceinms {
             double first = optimalFiberLengthAtT * sin(radians(pennationAngleAtT));
             double second = muscleTendonLength_ - tendonSlackLength_;
             double fiberLength = sqrt(first * first + second * second);
-            pennationAngleAtT = CEINMS::PennationAngle::compute(fiberLength, optimalFiberLengthAtT, pennationAngle_);
+            pennationAngleAtT = ceinms::PennationAngle::compute(fiberLength, optimalFiberLengthAtT, pennationAngle_);
             ca = cos(radians(pennationAngleAtT));
             normFiberVelocity = lmtTimescale*(muscleTendonVelocityAtT / optimalFiberLengthAtT) * ca;
 #ifdef DEBUG
@@ -934,7 +934,7 @@ namespace ceinms {
                 double first = optimalFiberLengthAtT * sin(radians(pennationAngleAtT));
                 double second = muscleTendonLength_ - tendonSlackLength_;
                 double fiberLength = sqrt(first * first + second * second);
-                pennationAngleAtT = CEINMS::PennationAngle::compute(fiberLength, optimalFiberLengthAtT, pennationAngle_);
+                pennationAngleAtT = ceinms::PennationAngle::compute(fiberLength, optimalFiberLengthAtT, pennationAngle_);
                 ca = cos(radians(pennationAngleAtT));
                 normFiberVelocity = lmtTimescale*(muscleTendonVelocityAtT / optimalFiberLengthAtT) * ca;
 #ifdef DEBUG
