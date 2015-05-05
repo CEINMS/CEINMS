@@ -14,8 +14,7 @@
 #include <string>
 #include "subject.hxx" // TODO: we should find a way to only include this from xmlInput
 #include "Curve.h"
-#define _USE_MATH_DEFINES
-#include <math.h>
+#include <cmath>
 
 template<typename NMSmodelT>
 class SetupDataStructure{

@@ -6,8 +6,7 @@
 //__________________________________________________________________________
 //
 
-#define _USE_MATH_DEFINES
-#include <math.h>
+#include <cmath>
 #include <vector>
 using std::vector;
 #include "float.h"

@@ -1,8 +1,7 @@
 #ifndef ceinms_MTUutils_h
 #define ceinms_MTUutils_h
 
-#define _USE_MATH_DEFINES
-#include <math.h>
+#include <cmath>
 
 namespace CEINMS {
 

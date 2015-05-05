@@ -8,8 +8,9 @@ using std::endl;
 #include <string>
 using std::string;
 
-#define _USE_MATH_DEFINES
-#include <math.h>
+#include <cmath>
+using std::sin;
+using std::cos;
 #include <vector>
 //#include <boost/config/no_tr1/complex.hpp>
 using std::vector;

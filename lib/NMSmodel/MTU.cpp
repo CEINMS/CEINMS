@@ -3,8 +3,8 @@
 using std::cout;
 using std::endl;
 #include <stdlib.h>
-#define _USE_MATH_DEFINES
-#include <math.h>
+#include <cmath>
+using std::cos;
 #include "MTUutils.h"
 
 template<typename Activation, typename Tendon, CurveMode::Mode mode>
