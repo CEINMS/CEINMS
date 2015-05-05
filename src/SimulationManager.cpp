@@ -1,12 +1,30 @@
-//__________________________________________________________________________
-// Author(s): Claudio Pizzolato, Monica Reggiani - March 2015
-// email:  claudio.pizzolato@griffithuni.edu.au
-//
-// DO NOT REDISTRIBUTE WITHOUT PERMISSION
-//__________________________________________________________________________
-//
-
-
+/* -------------------------------------------------------------------------- *
+ * CEINMS is a standalone toolbox for neuromusculoskeletal modelling and      *
+ * simulation. CEINMS can also be used as a plugin for OpenSim either         *
+ * through the OpenSim GUI or API. See https://simtk.org/home/ceinms and the  *
+ * NOTICE file for more information. CEINMS development was coordinated       *
+ * through Griffith University and supported by the Australian National       *
+ * Health and Medical Research Council (NHMRC), the US National Institutes of *
+ * Health (NIH), and the European Union Framework Programme 7 (EU FP7). Also  *
+ * see the PROJECTS file for more information about the funding projects.     *
+ *                                                                            *
+ * Copyright (c) 2010-2015 Griffith University and the Contributors           *
+ *                                                                            *
+ * CEINMS Contributors: C. Pizzolato, M. Reggiani, M. Sartori,                *
+ *                      E. Ceseracciu, and D.G. Lloyd                         *
+ *                                                                            *
+ * Author(s): C. Pizzolato, M. Reggiani                                       *
+ *                                                                            *
+ * CEINMS is licensed under the Apache License, Version 2.0 (the "License").  *
+ * You may not use this file except in compliance with the License. You may   *
+ * obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0.*
+ *                                                                            *
+ * Unless required by applicable law or agreed to in writing, software        *
+ * distributed under the License is distributed on an "AS IS" BASIS,          *
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.   *
+ * See the License for the specific language governing permissions and        *
+ * limitations under the License.                                             *
+ * -------------------------------------------------------------------------- */
 
 #include "CeinmsSetupXmlReader.h"
 #include "NMSmodel.h"
@@ -23,7 +41,7 @@
 #include "LmtMaFromStorageFile.h"
 #include "ExternalTorquesFromStorageFile.h"
 
-#include "ModelEvaluationOnline.h" 
+#include "ModelEvaluationOnline.h"
 #include "ModelEvaluationOffline.h"
 #include "ModelEvaluationHybrid.h"
 
@@ -47,7 +65,7 @@ namespace ceinms {
 
 
     SimulationManager::SimulationManager(const string& setupFilename):
-        ceinmsSetup_(setupFilename), 
+        ceinmsSetup_(setupFilename),
         dataLocations_(ceinmsSetup_.getInputDataFile()),
         executionCfg_(ceinmsSetup_.getExecutionFile()),
         subjectFile_(ceinmsSetup_.getSubjectFile()),
@@ -68,7 +86,7 @@ namespace ceinms {
         NMSmodelT mySubject;
         setupSubject(mySubject, subjectFile_, executionCfg_.getTolerance());
 
-        // 2. define the thread connecting with the input sources          
+        // 2. define the thread connecting with the input sources
         string emgFilename(dataLocations_.getExcitationsFile());
         EMGFromFile emgProducer(inputConnectors, mySubject, emgFilename, emgGeneratorFile_);
 
@@ -82,12 +100,12 @@ namespace ceinms {
         ExternalTorquesFromStorageFile externalTorquesProducer(inputConnectors, mySubject, externalTorqueFilename);
 
         vector<string> dataToLog = { "Activations",
-                                     "FiberLenghts", 
+                                     "FiberLenghts",
                                      "NormFiberLengths",
-                                     "FiberVelocities", 
+                                     "FiberVelocities",
                                      "NormFiberVelocities",
                                      "PennationAngles",
-                                     "MuscleForces", 
+                                     "MuscleForces",
                                      "Torques" };
         // 2b. define the thread consuming the output sources
         vector<string> valuesToWrite = dataToLog;
@@ -126,7 +144,7 @@ namespace ceinms {
         NMSmodelT mySubject;
         setupSubject(mySubject, subjectFile_);
 
-        // 2. define the thread connecting with the input sources          
+        // 2. define the thread connecting with the input sources
         string emgFilename(dataLocations_.getExcitationsFile());
         EMGFromFile emgProducer(inputConnectors, mySubject, emgFilename, emgGeneratorFile_);
 
@@ -200,55 +218,55 @@ namespace ceinms {
         NMSModelCfg::RunMode runMode = executionCfg_.getRunMode();
         switch (runMode) {
 
-        case NMSModelCfg::OpenLoopExponentialActivationStiffTendonOnline: 
+        case NMSModelCfg::OpenLoopExponentialActivationStiffTendonOnline:
             exitFlag = runOpenLoop < NMSmodel<ExponentialActivation, StiffTendon, CurveMode::Online>, ModelEvaluationOnline, LoggerOnQueues > ();
             break;
-        
-        case NMSModelCfg::OpenLoopExponentialActivationStiffTendonOffline: 
+
+        case NMSModelCfg::OpenLoopExponentialActivationStiffTendonOffline:
             exitFlag = runOpenLoop < NMSmodel<ExponentialActivation, StiffTendon, CurveMode::Offline>, ModelEvaluationOffline, LoggerOnQueues >();
             break;
-        
-        case NMSModelCfg::OpenLoopExponentialActivationElasticTendonBiSecOnline: 
+
+        case NMSModelCfg::OpenLoopExponentialActivationElasticTendonBiSecOnline:
             exitFlag = runOpenLoop<NMSmodel<ExponentialActivation, ElasticTendon_BiSec, CurveMode::Online>, ModelEvaluationOnline, LoggerOnQueues>();
             break;
-        
-        case NMSModelCfg::OpenLoopExponentialActivationElasticTendonBiSecOffline: 
+
+        case NMSModelCfg::OpenLoopExponentialActivationElasticTendonBiSecOffline:
             exitFlag = runOpenLoop<NMSmodel<ExponentialActivation, ElasticTendon_BiSec, CurveMode::Offline>, ModelEvaluationOffline, LoggerOnQueues >();
             break;
 
-        case NMSModelCfg::OpenLoopPiecewiseActivationStiffTendonOnline: 
+        case NMSModelCfg::OpenLoopPiecewiseActivationStiffTendonOnline:
             exitFlag = runOpenLoop<NMSmodel<PiecewiseActivation, StiffTendon, CurveMode::Online>, ModelEvaluationOnline, LoggerOnQueues>();
             break;
-        
-        case NMSModelCfg::OpenLoopPiecewiseActivationStiffTendonOffline: 
+
+        case NMSModelCfg::OpenLoopPiecewiseActivationStiffTendonOffline:
             exitFlag = runOpenLoop<NMSmodel<PiecewiseActivation, StiffTendon, CurveMode::Offline>, ModelEvaluationOffline, LoggerOnQueues >();
             break;
-        
-        case NMSModelCfg::OpenLoopPiecewiseActivationElasticTendonBiSecOnline: 
+
+        case NMSModelCfg::OpenLoopPiecewiseActivationElasticTendonBiSecOnline:
             exitFlag = runOpenLoop<NMSmodel<PiecewiseActivation, ElasticTendon_BiSec, CurveMode::Online>, ModelEvaluationOnline, LoggerOnQueues>();
             break;
-        
-        case NMSModelCfg::OpenLoopPiecewiseActivationElasticTendonBiSecOffline: 
+
+        case NMSModelCfg::OpenLoopPiecewiseActivationElasticTendonBiSecOffline:
             exitFlag = runOpenLoop<NMSmodel<PiecewiseActivation, ElasticTendon_BiSec, CurveMode::Offline>, ModelEvaluationOffline, LoggerOnQueues >();
             break;
-        
-        case NMSModelCfg::HybridExponentialActivationStiffTendonOnline: 
+
+        case NMSModelCfg::HybridExponentialActivationStiffTendonOnline:
             exitFlag = runHybrid<NMSmodel<ExponentialActivation, StiffTendon, CurveMode::Online>>();
             break;
-        
-        case NMSModelCfg::HybridExponentialActivationElasticTendonBiSecOnline: 
+
+        case NMSModelCfg::HybridExponentialActivationElasticTendonBiSecOnline:
             exitFlag = runHybrid<NMSmodel<ExponentialActivation, ElasticTendon_BiSec, CurveMode::Online>>();
             break;
-        
-        case NMSModelCfg::HybridPiecewiseActivationStiffTendonOnline: 
+
+        case NMSModelCfg::HybridPiecewiseActivationStiffTendonOnline:
             exitFlag = runHybrid<NMSmodel<PiecewiseActivation, StiffTendon, CurveMode::Online>>();
             break;
-        
 
-        case NMSModelCfg::HybridPiecewiseActivationElasticTendonBiSecOnline: 
+
+        case NMSModelCfg::HybridPiecewiseActivationElasticTendonBiSecOnline:
             exitFlag = runHybrid<NMSmodel<PiecewiseActivation, ElasticTendon_BiSec, CurveMode::Online>>();
             break;
-        
+
 
         default:
             cout << "Implementation not available yet. Verify you XML configuration file" << endl;

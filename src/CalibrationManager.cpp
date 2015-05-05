@@ -1,3 +1,31 @@
+/* -------------------------------------------------------------------------- *
+ * CEINMS is a standalone toolbox for neuromusculoskeletal modelling and      *
+ * simulation. CEINMS can also be used as a plugin for OpenSim either         *
+ * through the OpenSim GUI or API. See https://simtk.org/home/ceinms and the  *
+ * NOTICE file for more information. CEINMS development was coordinated       *
+ * through Griffith University and supported by the Australian National       *
+ * Health and Medical Research Council (NHMRC), the US National Institutes of *
+ * Health (NIH), and the European Union Framework Programme 7 (EU FP7). Also  *
+ * see the PROJECTS file for more information about the funding projects.     *
+ *                                                                            *
+ * Copyright (c) 2010-2015 Griffith University and the Contributors           *
+ *                                                                            *
+ * CEINMS Contributors: C. Pizzolato, M. Reggiani, M. Sartori,                *
+ *                      E. Ceseracciu, and D.G. Lloyd                         *
+ *                                                                            *
+ * Author(s):                                                                 *
+ *                                                                            *
+ * CEINMS is licensed under the Apache License, Version 2.0 (the "License").  *
+ * You may not use this file except in compliance with the License. You may   *
+ * obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0.*
+ *                                                                            *
+ * Unless required by applicable law or agreed to in writing, software        *
+ * distributed under the License is distributed on an "AS IS" BASIS,          *
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.   *
+ * See the License for the specific language governing permissions and        *
+ * limitations under the License.                                             *
+ * -------------------------------------------------------------------------- */
+
 #include <string>
 using std::string;
 #include <iostream>
@@ -82,7 +110,7 @@ namespace ceinms {
         return exitflag;
     }
 
-    
+
     template <typename NMSmodelT>
     bool  CalibrationManager::runHybrid() {
         cout << "Implementation not available in calibration yet. Verify you XML configuration file" << endl;
@@ -158,7 +186,7 @@ namespace ceinms {
 
     template<typename NMSmodelT>
     TrialData CalibrationManager::readTrialData(const string& inputDataFilename, NMSmodelT& mySubject, const string& trialId, const string& emgGeneratorFile) {
-        
+
         InputDataXmlReader dataLocations(inputDataFilename);
 
         std::unique_ptr<InputConnectors> inputConnectors(new InputConnectors);
@@ -201,9 +229,9 @@ namespace ceinms {
     }
 
     template<typename NMSmodelT>
-    void CalibrationManager::writeXml(NMSmodelT& mySubject, 
-                                      const string& uncalibratedSubjectXmlFile, 
-                                      const string& calibrationXmlFile, 
+    void CalibrationManager::writeXml(NMSmodelT& mySubject,
+                                      const string& uncalibratedSubjectXmlFile,
+                                      const string& calibrationXmlFile,
                                       const string& newCalibratedSubjectXmlFile) {
         XmlWriter xmlWriter(uncalibratedSubjectXmlFile);
         xmlWriter.setParameters(mySubject);
@@ -212,9 +240,9 @@ namespace ceinms {
         xmlWriter.write();
     }
 
-    void CalibrationManager::sortMaFilenames(const std::map<std::string, 
-                                             std::string>& maMap, 
-                                             const std::vector< std::string >& dofNames, 
+    void CalibrationManager::sortMaFilenames(const std::map<std::string,
+                                             std::string>& maMap,
+                                             const std::vector< std::string >& dofNames,
                                              std::vector< std::string >& maDataFilenames) {
 
         int currentDof = 0;

@@ -1,11 +1,30 @@
-//__________________________________________________________________________
-// Author(s): Claudio Pizzolato, Monica Reggiani - September 2013
-// email:  claudio.pizzolato@griffithuni.edu.au
-//         monica.reggiani@gmail.com
-//
-// DO NOT REDISTRIBUTE WITHOUT PERMISSION
-//__________________________________________________________________________
-//
+/* -------------------------------------------------------------------------- *
+ * CEINMS is a standalone toolbox for neuromusculoskeletal modelling and      *
+ * simulation. CEINMS can also be used as a plugin for OpenSim either         *
+ * through the OpenSim GUI or API. See https://simtk.org/home/ceinms and the  *
+ * NOTICE file for more information. CEINMS development was coordinated       *
+ * through Griffith University and supported by the Australian National       *
+ * Health and Medical Research Council (NHMRC), the US National Institutes of *
+ * Health (NIH), and the European Union Framework Programme 7 (EU FP7). Also  *
+ * see the PROJECTS file for more information about the funding projects.     *
+ *                                                                            *
+ * Copyright (c) 2010-2015 Griffith University and the Contributors           *
+ *                                                                            *
+ * CEINMS Contributors: C. Pizzolato, M. Reggiani, M. Sartori,                *
+ *                      E. Ceseracciu, and D.G. Lloyd                         *
+ *                                                                            *
+ * Author(s): C. Pizzolato, M. Reggiani                                       *
+ *                                                                            *
+ * CEINMS is licensed under the Apache License, Version 2.0 (the "License").  *
+ * You may not use this file except in compliance with the License. You may   *
+ * obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0.*
+ *                                                                            *
+ * Unless required by applicable law or agreed to in writing, software        *
+ * distributed under the License is distributed on an "AS IS" BASIS,          *
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.   *
+ * See the License for the specific language governing permissions and        *
+ * limitations under the License.                                             *
+ * -------------------------------------------------------------------------- */
 
 #include "Curve.h"
 #include <iostream>
@@ -183,7 +202,7 @@ namespace ceinms {
             }
 
             // End conditions. Third derivatives at x_.at(0) and x_.at(n-1)
-            // are obtained from divided differences. 
+            // are obtained from divided differences.
 
             b_.at(0) = -d_.at(0);
             b_.at(nm1) = -d_.at(nm1 - 1);
@@ -198,7 +217,7 @@ namespace ceinms {
                 c_.at(nm1) = -c_.at(nm1) * d_.at(nm1 - 1) * d_.at(nm1 - 1) / (x_.at(nm1) - x_.at(n - 4));
             }
 
-            // Forward elimination 
+            // Forward elimination
             for (unsigned i = 1; i < n; ++i) {
                 double t = d_.at(i - 1) / b_.at(i - 1);
                 b_.at(i) -= t * d_.at(i - 1);
@@ -396,7 +415,7 @@ namespace ceinms {
             k = 0;
         else {
             // Do a binary search to find which two spline control points the abscissa
-            // is between   
+            // is between
 
             int i = 0;
             int j = n;
@@ -439,4 +458,3 @@ namespace ceinms {
         return output;
     }
 }
- 
