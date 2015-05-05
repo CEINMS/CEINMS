@@ -1,8 +1,8 @@
-#ifndef CEINMS_Optimizers_AbstractOptimizerSystem_h
-#define CEINMS_Optimizers_AbstractOptimizerSystem_h
+#ifndef ceinms_Optimizers_AbstractOptimizerSystem_h
+#define ceinms_Optimizers_AbstractOptimizerSystem_h
 #include <vector>
 
-namespace CEINMS {
+namespace ceinms {
     namespace Optimizers {
 
         class AbstractOptimizerSystem {

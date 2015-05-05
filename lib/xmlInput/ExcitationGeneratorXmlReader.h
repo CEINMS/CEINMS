@@ -6,21 +6,22 @@
 //__________________________________________________________________________
 //
 
-#ifndef ExcitationGeneratorXmlReader_h
-#define ExcitationGeneratorXmlReader_h
+#ifndef ceinms_ExcitationGeneratorXmlReader_h
+#define ceinms_ExcitationGeneratorXmlReader_h
 
 #include "excitationGenerator.hxx"
 #include <string>
 
+namespace ceinms {
+    class ExcitationGeneratorXmlReader {
 
-class ExcitationGeneratorXmlReader {
-
-public:
-    ExcitationGeneratorXmlReader(const std::string& filename);
-    std::auto_ptr<excitationGenerator> getExcitationGenerator();
-    friend std::ostream& operator<< (std::ostream& output, const ExcitationGeneratorXmlReader& b);
-private:
-    std::auto_ptr<excitationGenerator> excitationGenPointer_;
-};
+    public:
+        ExcitationGeneratorXmlReader(const std::string& filename);
+        std::auto_ptr<ExcitationGeneratorXsd::excitationGenerator> getExcitationGenerator();
+        friend std::ostream& operator<< (std::ostream& output, const ExcitationGeneratorXmlReader& b);
+    private:
+        std::auto_ptr<ExcitationGeneratorXsd::excitationGenerator> excitationGenPointer_;
+    };
+}
 
 #endif

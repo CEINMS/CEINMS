@@ -7,8 +7,8 @@
 //__________________________________________________________________________
 //
 
-#ifndef TrialData_h
-#define TrialData_h
+#ifndef ceinms_TrialData_h
+#define ceinms_TrialData_h
 
 #include <vector>
 #include <map>
@@ -16,7 +16,7 @@
 #include <iostream>
 #include "DataTable.h"
 
-namespace CEINMS {
+namespace ceinms {
 
     class TrialData {
     public:
@@ -30,7 +30,6 @@ namespace CEINMS {
         std::vector<DataTable<double>> maData;
 
     };
-
 }
 
 /*

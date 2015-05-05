@@ -1,8 +1,9 @@
-#ifndef HybridWeightings_h
-#define HybridWeightings_h
+#ifndef ceinms_HybridWeightings_h
+#define ceinms_HybridWeightings_h
 
-struct HybridWeightings {
-    double alpha, beta, gamma;
-};
-
+namespace ceinms {
+    struct HybridWeightings {
+        double alpha, beta, gamma;
+    };
+}
 #endif

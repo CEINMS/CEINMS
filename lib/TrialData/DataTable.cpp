@@ -1,7 +1,7 @@
 #include <algorithm>
 #include <stdexcept>
 
-namespace CEINMS {
+namespace ceinms {
 
     template <typename T>
     DataTable<T>::DataTable() :
@@ -121,7 +121,7 @@ namespace CEINMS {
 
         if (lhs.getNColumns() != rhs.getNColumns() || lhs.getNColumns() != rhs.getNColumns())
             throw std::invalid_argument("lhs and rhs differ in size");  //check just on data size.. ignore labels and time column
-               
+
         DataTable<T> ans(lhs.getNRows() < rhs.getNRows() ? lhs.getNRows() : rhs.getNRows(), lhs.getNColumns());
         for (size_t r(0); r < lhs.nRows_; ++r)
             for (size_t c(0); c < lhs.nCols_; ++c)
@@ -140,17 +140,17 @@ namespace CEINMS {
             for (size_t c(0); c < lhs.nCols_; ++c)
                 ans.at(r, c) = lhs.at(r, c)*scalar;
         ans.labels_ = lhs.labels_;
-        ans.time_.assign(lhs.time_.begin(), lhs.time_.begin()+ans.nRows_);
+        ans.time_.assign(lhs.time_.begin(), lhs.time_.begin() + ans.nRows_);
         return ans;
     }
 
     template<typename T>
     bool DataTable<T>::equals(const DataTable<T>& rhs) const {
-        return(data_   == rhs.data_   &&
-               labels_ == rhs.labels_ &&
-               time_   == rhs.time_   &&
-               nCols_  == rhs.nCols_  &&
-               nRows_  == rhs.nRows_);
+        return(data_ == rhs.data_   &&
+            labels_ == rhs.labels_ &&
+            time_ == rhs.time_   &&
+            nCols_ == rhs.nCols_  &&
+            nRows_ == rhs.nRows_);
 
 
     }

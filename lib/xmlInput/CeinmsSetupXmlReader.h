@@ -7,29 +7,30 @@
 //
 
 
-#ifndef CeinmsSetupXmlReader_h
-#define CeinmsSetupXmlReader_h
+#ifndef ceinms_SetupXmlReader_h
+#define ceinms_SetupXmlReader_h
 
 #include <string>
 #include <map>
 #include "ceinmsSetup.hxx"
 
+namespace ceinms {
+    class CeinmsSetupXmlReader {
 
-class CeinmsSetupXmlReader {
+    public:
+        CeinmsSetupXmlReader(const std::string& filename);
+        std::string getSubjectFile();
+        std::string getInputDataFile();
+        std::string getExecutionFile();
+        std::string getExcitationGeneratorFile();
+        std::string getOutputDirectory();
+        static bool writeTemplateCeinmsSetupFile(const std::string& templateFile);
 
-public:
-    CeinmsSetupXmlReader(const std::string& filename);
-    std::string getSubjectFile();
-    std::string getInputDataFile();
-    std::string getExecutionFile();
-    std::string getExcitationGeneratorFile();
-    std::string getOutputDirectory();
-    static bool writeTemplateCeinmsSetupFile(const std::string& templateFile);
-
-private:
-    void readXml();
-    std::string filepath_;
-    std::auto_ptr<CeinmsType> ceinmsSetupPointer_;
-};
+    private:
+        void readXml();
+        std::string filepath_;
+        std::auto_ptr<CeinmsSetupXsd::CeinmsType> ceinmsSetupPointer_;
+    };
+}
 
 #endif

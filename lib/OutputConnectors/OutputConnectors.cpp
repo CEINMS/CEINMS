@@ -9,14 +9,13 @@
 
 
 #include "OutputConnectors.h"
-
 #include <map>
 #include <string>
 
 
-namespace CEINMS {
+namespace ceinms {
+
     OutputConnectors::OutputConnectors() {}
-    
     OutputConnectors::~OutputConnectors() {}
-};
+}
 

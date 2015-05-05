@@ -8,8 +8,8 @@
 //
 
 
-#ifndef ModelEvaluationBase_h
-#define ModelEvaluationBase_h
+#ifndef ceinms_ModelEvaluationBase_h
+#define ceinms_ModelEvaluationBase_h
 
 #include <vector>
 #include <string>
@@ -17,37 +17,39 @@
 #include "InputConnectors.h"
 #include "OutputConnectors.h"
 
-template <typename Logger>
-class ModelEvaluationBase {
-    
-public:  
-  ModelEvaluationBase() = delete; 
-  ModelEvaluationBase(CEINMS::InputConnectors& inputConnectors, CEINMS::OutputConnectors& outputConnectors, const std::vector<std::string>& valuesToLog);
-  virtual ~ModelEvaluationBase();
-  virtual void operator()() = 0;
+namespace ceinms {
+    template <typename Logger>
+    class ModelEvaluationBase {
 
-protected:
-  void getEmgFromInputQueue(CEINMS::InputConnectors::FrameType& emgFromQueue);
-  void getLmtFromInputQueue(CEINMS::InputConnectors::FrameType& lmtFromQueue);
-  void getMomentArmsFromInputQueue(CEINMS::InputConnectors::FrameType& momentArmsFromQueue, unsigned int whichDof);
-  void getExternalTorquesFromInputQueue(CEINMS::InputConnectors::FrameType& externalTorquesFromQueue); 
-  void doneWithExecution();
+    public:
+        ModelEvaluationBase() = delete;
+        ModelEvaluationBase(InputConnectors& inputConnectors, OutputConnectors& outputConnectors, const std::vector<std::string>& valuesToLog);
+        virtual ~ModelEvaluationBase();
+        virtual void operator()() = 0;
 
-  CEINMS::InputConnectors::FrameType getEmgFromInputQueue();
-  CEINMS::InputConnectors::FrameType getLmtFromInputQueue();
-  CEINMS::InputConnectors::FrameType getMomentArmsFromInputQueue(unsigned int whichDof);
-  CEINMS::InputConnectors::FrameType getExternalTorquesFromInputQueue();
+    protected:
+        void getEmgFromInputQueue(InputConnectors::FrameType& emgFromQueue);
+        void getLmtFromInputQueue(InputConnectors::FrameType& lmtFromQueue);
+        void getMomentArmsFromInputQueue(InputConnectors::FrameType& momentArmsFromQueue, unsigned int whichDof);
+        void getExternalTorquesFromInputQueue(InputConnectors::FrameType& externalTorquesFromQueue);
+        void doneWithExecution();
 
-  void subscribeToInputConnectors();
-  bool externalTorquesAvailable() const;
-  float getGlobalTimeLimit() const;
+        InputConnectors::FrameType getEmgFromInputQueue();
+        InputConnectors::FrameType getLmtFromInputQueue();
+        InputConnectors::FrameType getMomentArmsFromInputQueue(unsigned int whichDof);
+        InputConnectors::FrameType getExternalTorquesFromInputQueue();
 
-  Logger logger; 
+        void subscribeToInputConnectors();
+        bool externalTorquesAvailable() const;
+        float getGlobalTimeLimit() const;
 
-private:
-    CEINMS::InputConnectors& inputConnectors_;
-    CEINMS::OutputConnectors& outputConnectors_;
-};
+        Logger logger;
+
+    private:
+        InputConnectors& inputConnectors_;
+        OutputConnectors& outputConnectors_;
+    };
+}
 
 #include "ModelEvaluationBase.cpp"
 #endif

@@ -1,17 +1,16 @@
-#ifndef Ceinms_DataTable_h
-#define Ceinms_DataTable_h
+#ifndef ceinms_DataTable_h
+#define ceinms_DataTable_h
 #include <vector>
 #include <string>
 
 #include <ostream>
 
 //TODO: insert further checks, operators + and -
-namespace CEINMS {
+namespace ceinms {
     template<typename T> class DataTable;
 
     template<typename T>
     std::ostream& operator<< (std::ostream & out, const DataTable<T> & rhs);
-
 
     template<typename T>
     class DataTable {
@@ -26,7 +25,7 @@ namespace CEINMS {
         T& at(size_t row, size_t col);
         void pushRow(T time, const std::vector<T>& values);
         void setRow(size_t row, const std::vector<T>& values);
-        
+
         static DataTable sum(const DataTable& lhs, const DataTable& rhs);
         static DataTable subtract(const DataTable& lhs, const DataTable& rhs);
         static DataTable multiplyByElement(const DataTable& lhs, const DataTable& rhs);
@@ -52,10 +51,8 @@ namespace CEINMS {
         std::vector<std::vector<T>> data_;
         std::vector<T> time_;
         std::vector<std::string> labels_;
-
-
     };
-
 }
+
 #include "DataTable.cpp"
 #endif

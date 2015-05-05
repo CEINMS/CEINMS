@@ -1,10 +1,11 @@
-#ifndef Ceinms_MinTorqueError_h
-#define Ceinms_MinTorqueError_h
+#ifndef ceinms_MinTorqueError_h
+#define ceinms_MinTorqueError_h
 #include <vector>
 #include <limits>
 #include "TrialData.h"
 #include "Result.h"
-namespace CEINMS {
+
+namespace ceinms {
 
     class MinTorqueError {
     public:

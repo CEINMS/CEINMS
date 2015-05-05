@@ -17,17 +17,16 @@ using std::vector;
 #include "QueueData.h"
 #include <cstdlib>
 
+namespace ceinms {
+    void EMGFromX::updateEmg(const vector<double>& currentEmgData, double currentTime)
+    {
+        QueueData< vector<double> > emgDataToPush;
+        emgDataToPush.data = currentEmgData;
+        emgDataToPush.time = currentTime;
+        inputConnectors_.queueEmg.push(emgDataToPush);
+    }
 
-void EMGFromX::updateEmg(const vector<double>& currentEmgData, double currentTime)
-{
-  QueueData< vector<double> > emgDataToPush; 
-  emgDataToPush.data = currentEmgData;
-  emgDataToPush.time = currentTime; 
-  inputConnectors_.queueEmg.push(emgDataToPush);
+
+    EMGFromX::~EMGFromX() { }
+
 }
-
-
-EMGFromX::~EMGFromX() { }
-
-
-

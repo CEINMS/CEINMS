@@ -7,27 +7,27 @@
 //
 
 
-#ifndef InputDataXmlReader_h
-#define InputDataXmlReader_h
+#ifndef ceinms_InputDataXmlReader_h
+#define ceinms_InputDataXmlReader_h
 
 #include <string>
 #include <map>
 #include "inputData.hxx"
 
+namespace ceinms {
+    class InputDataXmlReader {
+    public:
+        InputDataXmlReader(const std::string& filename);
+        std::string getLmtFile();
+        std::map<std::string, std::string> getMaFiles();
+        std::string getExcitationsFile();
+        std::string getExternalTorqueFile();
 
-class InputDataXmlReader {
-
-public:
-    InputDataXmlReader(const std::string& filename);
-    std::string getLmtFile();
-    std::map<std::string, std::string> getMaFiles();
-    std::string getExcitationsFile();
-    std::string getExternalTorqueFile();
-
-private:
-    void readXml();
-    std::string filepath_;
-    std::auto_ptr<InputDataType> inputDataPointer_;
-};
+    private:
+        void readXml();
+        std::string filepath_;
+        std::auto_ptr<InputDataXsd::InputDataType> inputDataPointer_;
+    };
+}
 
 #endif

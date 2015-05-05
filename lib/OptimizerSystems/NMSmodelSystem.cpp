@@ -2,8 +2,7 @@
 #include <string>
 #include <limits>
 
-//ideally, 
-namespace CEINMS {
+namespace ceinms {
 
     template <typename NMSmodelT, typename ObjectiveFunctionT>
     NMSmodelSystem<NMSmodelT, ObjectiveFunctionT>::
@@ -14,11 +13,10 @@ namespace CEINMS {
         const std::vector<std::string>& dofsToCalibrate) :
         subject_(subject),
         batchEvaluator_(trials),
-        objectiveFunction_(objectiveFunction), 
+        objectiveFunction_(objectiveFunction),
         parameterInterpreter_(subject, parameterSet, dofsToCalibrate),
         dofsToCalibrate_(dofsToCalibrate),
-        f_(std::numeric_limits<double>::max())
-    {
+        f_(std::numeric_limits<double>::max()) {
 
         nParameters_ = parameterInterpreter_.getNoParameters();
         //all dofs in the subject by default
@@ -26,25 +24,25 @@ namespace CEINMS {
         //parameterInterpreter_.setDofsToCalibrate(dofsToCalibrate_);
         objectiveFunction_.setDofsToCalibrate(dofsToCalibrate_);
         objectiveFunction_.setTrials(trials);
-        
+
         //the following is the trick for the parallel evaluation
         //and avoids copying NMSmodelT objects later on
         auto nTrials(trials.size());
-        for (auto i(0.); i < nTrials; ++i) 
+        for (auto i(0.); i < nTrials; ++i)
             mockSubjects_.emplace_back(NMSmodelT(subject));
-        
+
 
     }
 
     //NOTE: when using global o single parameters, only the calibrating dofs are considered
- /*   template <typename NMSmodelT, typename ObjectiveFunctionT>
-    void NMSmodelSystem<NMSmodelT, ObjectiveFunctionT>::setDofsToCalibrate(const std::vector<std::string>& dofsToCalibrate) {
+    /*   template <typename NMSmodelT, typename ObjectiveFunctionT>
+       void NMSmodelSystem<NMSmodelT, ObjectiveFunctionT>::setDofsToCalibrate(const std::vector<std::string>& dofsToCalibrate) {
 
-        dofsToCalibrate_ = dofsToCalibrate;
-        parameterInterpreter_.setDofsToCalibrate(dofsToCalibrate_); 
-        objectiveFunction_.setDofsToCalibrate(dofsToCalibrate_);
-    }
-    */
+       dofsToCalibrate_ = dofsToCalibrate;
+       parameterInterpreter_.setDofsToCalibrate(dofsToCalibrate_);
+       objectiveFunction_.setDofsToCalibrate(dofsToCalibrate_);
+       }
+       */
     template <typename NMSmodelT, typename ObjectiveFunctionT>
     void NMSmodelSystem<NMSmodelT, ObjectiveFunctionT>::getUpperLowerBounds(std::vector<double>& upperBounds, std::vector<double>& lowerBounds) const {
 
@@ -53,7 +51,7 @@ namespace CEINMS {
 
     template <typename NMSmodelT, typename ObjectiveFunctionT>
     void NMSmodelSystem<NMSmodelT, ObjectiveFunctionT>::setParameters(const std::vector<double>& x) {
-        
+
         //How I think it should work..
         parameterInterpreter_.setSubjectParameters(x);
     }
@@ -70,18 +68,14 @@ namespace CEINMS {
         //subject has the parameters, model evaluator just runs it
         batchEvaluator_.evaluateParallel(subject_, mockSubjects_);
         //batchEvaluator_.evaluateParallel(subject_);
- //       batchEvaluator_.evaluate(subject_);
+        //       batchEvaluator_.evaluate(subject_);
         auto results(batchEvaluator_.getResults());
 
         objectiveFunction_.calculate(results);
         f_ = objectiveFunction_.getValue();
-  //      std::cout << "f = " << f_ << endl;
+        //      std::cout << "f = " << f_ << endl;
         //need a way to get the breakdown of the errors from the obj function. There could be a member function that returns a vector<double>
         //and another member function that returns a vector<string> that describes the each entry of the error vector.
         //this is necessary for stats/error control.. 
     }
-
-
-
-
 }

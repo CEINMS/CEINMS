@@ -17,7 +17,7 @@
 #include "TrialData.h"
 
 
-namespace CEINMS {
+namespace ceinms {
 
     class CalibrationManager {
 

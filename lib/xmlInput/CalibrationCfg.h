@@ -6,31 +6,29 @@
 //__________________________________________________________________________
 //
 
-#ifndef CalibrationCfg_h
-#define CalibrationCfg_h
+#ifndef ceinms_CalibrationCfg_h
+#define ceinms_CalibrationCfg_h
 
-namespace CalibrationCfg{
-    
-    //Objective Function
-    const unsigned MinimizeTorqueError = 100;
-    
-    //Algorithm
-    const unsigned Siman = 1;
-    
-    
-    const unsigned Nop = 0;
-                
-    
-    enum OptimizationAlgorithm {
-        
-        SimulatedAnnealing = 1
-    };
-    
-    enum Step{
-        MinimizeTorqueErrorParameterSetDefault = 100,
-        Empty = -1
-                 
-                 };
-};
+namespace ceinms {
+    namespace CalibrationCfg{
+
+        //Objective Function
+        const unsigned MinimizeTorqueError = 100;
+
+        //Algorithm
+        const unsigned Siman = 1;
+        const unsigned Nop = 0;
+
+        enum OptimizationAlgorithm {
+            SimulatedAnnealing = 1
+        };
+
+        enum Step{
+            MinimizeTorqueErrorParameterSetDefault = 100,
+            Empty = -1
+
+        };
+    }
+}
 
 #endif

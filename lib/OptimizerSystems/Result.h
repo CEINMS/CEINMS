@@ -1,12 +1,11 @@
-#ifndef Ceinms_Result_h
-#define Ceinms_Result_h
+#ifndef ceinms_Result_h
+#define ceinms_Result_h
 
 #include "DataTable.h"
 
-namespace CEINMS {
+namespace ceinms {
     class Result{
     public:
-
         DataTable<double> forces, torques, activations, penalties;
         Result(size_t nMTUs, size_t nDofs, size_t nEmgs, size_t nLmtMa) :
             forces(nLmtMa, nMTUs),
@@ -18,10 +17,7 @@ namespace CEINMS {
                 torques == rhs.torques     &&
                 activations == rhs.activations &&
                 penalties == rhs.penalties);
-
         }
-
     };
-
 }
 #endif

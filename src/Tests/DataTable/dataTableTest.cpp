@@ -3,7 +3,7 @@
 using std::cout;
 using std::endl;
 
-using CEINMS::DataTable;
+using ceinms::DataTable;
 
 int main() {
     

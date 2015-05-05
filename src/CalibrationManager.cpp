@@ -32,7 +32,7 @@ using std::vector;
 #include "XmlWriter.h"
 #include "FileUtils.h"
 
-namespace CEINMS {
+namespace ceinms {
 
 
     CalibrationManager::CalibrationManager(const string& setupFilename) :
@@ -72,7 +72,7 @@ namespace CEINMS {
 
                     SimulatedAnnealingParameters simanParameters;
                     calibrationXmlReader_.getOptimizationAlgorithmParameters(simanParameters);
-                    CEINMS::Optimizers::SimulatedAnnealing<MySystem> optimizer(system, simanParameters);
+                    Optimizers::SimulatedAnnealing<MySystem> optimizer(system, simanParameters);
                     exitflag = optimizer.optimize();
                 }   break;
 

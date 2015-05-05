@@ -7,16 +7,16 @@
 //__________________________________________________________________________
 //
 
-#ifndef policyTemplates_h
-#define policyTemplates_h
+#ifndef ceinms_policyTemplates_h
+#define ceinms_policyTemplates_h
 
 #include "EMGDataFromFile.h"
 #include "ExcitationGeneratorFromXml.h"
 
 
-
-template 
-class EMGDataFromFile<ExcitationGeneratorFromXml>;
-
+namespace ceinms {
+    template
+    class EMGDataFromFile < ExcitationGeneratorFromXml > ;
+}
 
 #endif

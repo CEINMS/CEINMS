@@ -7,32 +7,33 @@
 //
 
 
-#ifndef ModelEvaluationOnline_h
-#define ModelEvaluationOnline_h
+#ifndef ceinms_ModelEvaluationOnline_h
+#define ceinms_ModelEvaluationOnline_h
 
 #include <vector>
 #include <string>
 #include "ModelEvaluationBase.h"
 
-template <typename NMSmodelT, typename Logger>
-class ModelEvaluationOnline : public ModelEvaluationBase<Logger> {
+namespace ceinms {
+    template <typename NMSmodelT, typename Logger>
+    class ModelEvaluationOnline : public ModelEvaluationBase < Logger > {
 
-public:
-    ModelEvaluationOnline() = delete;
-    ModelEvaluationOnline(CEINMS::InputConnectors& inputConnectors, CEINMS::OutputConnectors& outputConnectors, NMSmodelT& subject, const std::vector< std::string >& valuesToLog); // const std::string& outputDir = "./Output");
-    void setOutputDirectory(const std::string& outputDir);
-//    void setSubject(NMSmodelT& subject);
-    void operator()();
-    
-private:
-    NMSmodelT& subject_;
-    std::string outputDir_;
-    std::vector< std::string > dofNames_;
-    std::vector< std::string > dofNamesWithExtTorque_;
-    unsigned noDof_;
-    double globalEmDelay_;
-};
+    public:
+        ModelEvaluationOnline() = delete;
+        ModelEvaluationOnline(InputConnectors& inputConnectors, OutputConnectors& outputConnectors, NMSmodelT& subject, const std::vector< std::string >& valuesToLog); // const std::string& outputDir = "./Output");
+        void setOutputDirectory(const std::string& outputDir);
+        //    void setSubject(NMSmodelT& subject);
+        void operator()();
+
+    private:
+        NMSmodelT& subject_;
+        std::string outputDir_;
+        std::vector< std::string > dofNames_;
+        std::vector< std::string > dofNamesWithExtTorque_;
+        unsigned noDof_;
+        double globalEmDelay_;
+    };
+}
 
 #include "ModelEvaluationOnline.cpp"
-
 #endif

@@ -4,11 +4,11 @@
 #include "TimeCompare.h"
 #include <vector>
 
-namespace CEINMS {
+namespace ceinms {
 
     BatchEvaluator::BatchEvaluator(const std::vector<TrialData>& trials) :
         trials_(trials) {
-        
+
         size_t nTrials(trials.size());
         for (size_t i(0); i < nTrials; ++i) {
             size_t nEmgRows = trials.at(i).emgData.getNRows();
@@ -18,7 +18,7 @@ namespace CEINMS {
             results_.emplace_back(Result(nMTUs, nDofs, nEmgRows, nLmtRows));
         }
         size_t nMusclesInSubject(trials.front().lmtData.getNColumns());
-       
+
         //I need to resize them, otherwise I get an error at the first execution, because they are different in length
         subjectParametersT1_.resize(nMusclesInSubject);
         subjectParameters_.resize(nMusclesInSubject);
@@ -31,7 +31,7 @@ namespace CEINMS {
         subject.getMusclesParameters(subjectParameters_);
         updMusclesToUpdate();
         subjectParametersT1_ = subjectParameters_; //for next evaluation
-        
+
         for (unsigned i(0); i < trials_.size(); ++i) {
             OpenLoopEvaluator::evaluate(subject, trials_.at(i), musclesToUpdate_, results_.at(i));
         }
@@ -89,13 +89,13 @@ namespace CEINMS {
     void OpenLoopEvaluator::evaluate(NMSmodelT&& subject, const TrialData& trialData, const std::vector<unsigned> musclesToUpdate, Result& previousResult) { //pass previousResult by copy, because I need a copy later
 
         //ct trial index
-        initFiberLengthTraceCurves(subject, trialData, musclesToUpdate, previousResult); 
-     
+        initFiberLengthTraceCurves(subject, trialData, musclesToUpdate, previousResult);
+
         unsigned lmtMaIndex(0); // k is the index for lmt and ma data
         double lmtTime = trialData.lmtData.getStartTime();
         double emgTime = trialData.emgData.getStartTime() + subject.getGlobalEmDelay();
         bool firstLmtArrived(false);
-        
+
 
         // Let's start going through the EMG, lmt, and ma data...  
         for (unsigned emgIndex(0); emgIndex < trialData.emgData.getNRows(); ++emgIndex) {

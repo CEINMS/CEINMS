@@ -1,8 +1,7 @@
 #include "MTUutils.h"
 #include <cmath>
 
-namespace CEINMS {
-
+namespace ceinms {
     namespace PennationAngle {
 
         double compute(double fibreLength, double optimalFibreLength, double pennationAngle) {

@@ -6,13 +6,15 @@
 //__________________________________________________________________________
 //
 
-#ifndef Utilities_h
-#define Utilities_h
+#ifndef ceinms_Utilities_h
+#define ceinms_Utilities_h
 
 #include <vector>
 #include <string>
 
-std::string findFile(const std::string& pattern, const std::string& directoryPath);
+namespace ceinms {
+    std::string findFile(const std::string& pattern, const std::string& directoryPath);
+    std::vector<std::size_t> findMapping(const std::vector<std::string>& subset, const std::vector<std::string>& set);
+}
 
-std::vector<std::size_t> findMapping(const std::vector<std::string>& subset, const std::vector<std::string>& set);
 #endif

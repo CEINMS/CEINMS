@@ -1,10 +1,10 @@
 #include "BatchEvaluator.h"
 #include "TrialData.h"
-using CEINMS::TrialData;
+using ceinms::TrialData;
 #include "InputConnectors.h"
-using CEINMS::InputConnectors;
+using ceinms::InputConnectors;
 #include "OutputConnectors.h"
-using CEINMS::OutputConnectors;
+using ceinms::OutputConnectors;
 #include "QueuesToTrialData.h"
 #include "EMGFromFile.h"
 #include "LmtMaFromStorageFile.h"
@@ -32,18 +32,19 @@ using std::endl;
 #include <list>
 using std::list;
 #include <algorithm>
-
+#include "Utilities.h"
+using namespace ceinms;
 
 void setLmtMaFilenames(const string& directory, const vector< string > dofNames, string& lmtDataFilename, vector< string >& maDataFilenames)
 {
     std::string pattern{ "_Length.sto" };
-    lmtDataFilename = directory + "/" + findFile(pattern, directory);
+    lmtDataFilename = directory + "/" + ceinms::findFile(pattern, directory);
 
     int currentDof = 0;
     for (auto& it : dofNames)
     {
         std::string pattern = "_MomentArm_" + it + ".sto";
-        std::string maDataFilename = directory + "/" + findFile(pattern, directory);
+        std::string maDataFilename = directory + "/" + ceinms::findFile(pattern, directory);
         maDataFilenames.push_back(maDataFilename);
     }
 }
@@ -67,7 +68,7 @@ void sortMaFilenames(const std::map<string, string>& maMap, const vector< string
 
 
 template<typename NMSmodelT>
-CEINMS::TrialData readTrialData(std::string inputDataFilename, NMSmodelT& mySubject, std::string trialId, std::string emgGeneratorFile)
+ceinms::TrialData readTrialData(std::string inputDataFilename, NMSmodelT& mySubject, std::string trialId, std::string emgGeneratorFile)
 {
     InputDataXmlReader dataLocations(inputDataFilename);
     // CEINMS::InputConnectors* inputConnectors= new CEINMS::InputConnectors();
@@ -165,7 +166,7 @@ int main(int argc, char** argv) {
                 // Print a default setup file
             }
             else if ((option == "-PrintSetup") || (option == "-PS")) {
-                if (CeinmsCalibrationSetupXmlReader::writeTemplateCeinmsCalibrationSetupFile("defaultCeinmsCalibrationSetupFile.xml"))
+                if (ceinms::CeinmsCalibrationSetupXmlReader::writeTemplateCeinmsCalibrationSetupFile("defaultCeinmsCalibrationSetupFile.xml"))
                 {
                     std::cout << "Wrote template setup file to defaultCeinmsCalibrationSetupFile.xml" << std::endl;
                     return 0;
@@ -215,7 +216,7 @@ int main(int argc, char** argv) {
                 std::cout << "CalibrationStepCfg " << currentCalibrationStep.getStepCfg() << std::endl;
                 switch (currentCalibrationStep.getStepCfg()) {
                     case CalibrationCfg::MinimizeTorqueErrorParameterSetDefault: {
-                        CEINMS::BatchEvaluator batchEvaluator(trials);  
+                        BatchEvaluator batchEvaluator(trials);  
                         batchEvaluator.evaluate(mySubject);
                         auto results(batchEvaluator.getResults());
 

@@ -91,7 +91,7 @@ int main(int argc, char** argv){
                 // Print a default setup file
             }
             else if ((option == "-PrintSetup") || (option == "-PS")) {
-                if (CeinmsCalibrationSetupXmlReader::writeTemplateCeinmsCalibrationSetupFile("defaultCeinmsCalibrationSetupFile.xml"))
+                if (ceinms::CeinmsCalibrationSetupXmlReader::writeTemplateCeinmsCalibrationSetupFile("defaultCeinmsCalibrationSetupFile.xml"))
                 {
                     std::cout << "Wrote template setup file to defaultCeinmsCalibrationSetupFile.xml" << std::endl;
                     return 0;
@@ -110,7 +110,7 @@ int main(int argc, char** argv){
         }
     }
 
-    CEINMS::CalibrationManager calibrationManager(setupFileName);
+    ceinms::CalibrationManager calibrationManager(setupFileName);
     auto timeBegin = std::chrono::high_resolution_clock::now();
     bool exitflag = calibrationManager.run();
     auto timeEnd = std::chrono::high_resolution_clock::now();

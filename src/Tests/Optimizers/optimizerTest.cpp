@@ -6,7 +6,8 @@ using std::vector;
 #include <iostream>
 using std::cout;
 using std::endl;
-using namespace CEINMS::Optimizers;
+using ceinms::Optimizers::AbstractOptimizerSystem;
+using ceinms::Optimizers::SimulatedAnnealing;
 
 class RosenbrockFunction : public AbstractOptimizerSystem {
 
@@ -47,7 +48,7 @@ int main() {
     RosenbrockFunction myFunction(1, 100);
     vector<double> startParameters({ 20, 20 });
     myFunction.setParameters(startParameters);
-    SimulatedAnnealingParameters annealingParameters;
+    ceinms::SimulatedAnnealingParameters annealingParameters;
     annealingParameters.epsilon = 1e-6;
     annealingParameters.noEpsilon = 4;
     annealingParameters.maxNoEval = 200000;

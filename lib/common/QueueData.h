@@ -6,13 +6,14 @@
 //__________________________________________________________________________
 //
 
-#ifndef QueueData_h
-#define QueueData_h
+#ifndef ceinms_QueueData_h
+#define ceinms_QueueData_h
 
-template <typename T>
-struct QueueData {
-  double time;
-  T data;
-};
-
+namespace ceinms {
+    template <typename T>
+    struct QueueData {
+        double time;
+        T data;
+    };
+}
 #endif

@@ -1,7 +1,7 @@
 #include "LmtMaFromStorageFile.h"
-
 #include "DataFromStorageFile.h"
 #include "InputConnectors.h"
+#include "Utilities.h"
 
 #include <iostream>
 using std::cout;
@@ -12,57 +12,52 @@ using std::string;
 using std::vector;
 #include <cstdlib>
 
-#include "Utilities.h"
-
 #define LOG
 
-
-void LmtMaFromStorageFile::operator()()
-{
-  // 1. wait - if required - for the required subscriptions to happen
-  inputConnectors_.doneWithSubscription.wait();
-  
-  double time;  
-  while (lmtData_.areStillData())
-  {    
-    lmtData_.readNextData();
-    auto newLmtData = lmtData_.getCurrentData();
-    time=lmtData_.getCurrentTime(); //lmt and momentArms times are equal, ALWAYS!    
-    
-    vector<double> selectedLmtData(musclesNames_.size());
-    for (int i=0; i < musclesNames_.size(); ++i)
-      selectedLmtData.at(i) = newLmtData.at(musclePositionInLmtStorage_.at(i));
-
-    updateLmt(selectedLmtData, time);
-    
-    for (unsigned int currentDof = 0; currentDof < dofNames_.size(); ++currentDof)
+namespace ceinms {
+    void LmtMaFromStorageFile::operator()()
     {
-      
-      (*maDataStorageFiles_.at(currentDof)).readNextData();
-      auto newMaData = (*maDataStorageFiles_.at(currentDof)).getCurrentData();
-      
-      vector<double> selectedMaData(musclePositionsInMaStorages_.at(currentDof).size()); 
-      for (int i = 0; i < selectedMaData.size(); ++i)
-        selectedMaData.at(i) = newMaData.at(musclePositionsInMaStorages_.at(currentDof).at(i)); 
-      
-      updateMomentArms(selectedMaData, time, currentDof);
-    }
-  }
-    
-  vector<double> endOfData;
-  updateLmt(endOfData, std::numeric_limits<double>::infinity());
-  for (unsigned int i = 0; i < dofNames_.size(); ++i)
-      updateMomentArms(endOfData, std::numeric_limits<double>::infinity(), i);
+        // 1. wait - if required - for the required subscriptions to happen
+        inputConnectors_.doneWithSubscription.wait();
 
-  //SyncTools::Shared::lmtProducingDone.notify(); //used for validate curve only
- 
-    
+        double time;
+        while (lmtData_.areStillData())
+        {
+            lmtData_.readNextData();
+            auto newLmtData = lmtData_.getCurrentData();
+            time = lmtData_.getCurrentTime(); //lmt and momentArms times are equal, ALWAYS!    
+
+            vector<double> selectedLmtData(musclesNames_.size());
+            for (int i = 0; i < musclesNames_.size(); ++i)
+                selectedLmtData.at(i) = newLmtData.at(musclePositionInLmtStorage_.at(i));
+
+            updateLmt(selectedLmtData, time);
+
+            for (unsigned int currentDof = 0; currentDof < dofNames_.size(); ++currentDof)
+            {
+
+                (*maDataStorageFiles_.at(currentDof)).readNextData();
+                auto newMaData = (*maDataStorageFiles_.at(currentDof)).getCurrentData();
+
+                vector<double> selectedMaData(musclePositionsInMaStorages_.at(currentDof).size());
+                for (int i = 0; i < selectedMaData.size(); ++i)
+                    selectedMaData.at(i) = newMaData.at(musclePositionsInMaStorages_.at(currentDof).at(i));
+
+                updateMomentArms(selectedMaData, time, currentDof);
+            }
+        }
+
+        vector<double> endOfData;
+        updateLmt(endOfData, std::numeric_limits<double>::infinity());
+        for (unsigned int i = 0; i < dofNames_.size(); ++i)
+            updateMomentArms(endOfData, std::numeric_limits<double>::infinity(), i);
+
+        //SyncTools::Shared::lmtProducingDone.notify(); //used for validate curve only
+
+
 #ifdef LOG  
-  cout << "\nLmtMa: lmtMa DONE\n";
+        cout << "\nLmtMa: lmtMa DONE\n";
 #endif
-  
-}
-  
-  
- 
 
+    }
+}

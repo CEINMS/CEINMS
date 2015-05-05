@@ -6,14 +6,15 @@
 //__________________________________________________________________________
 //
 
-#ifndef SimulatedAnnealingParameters_h
-#define SimulatedAnnealingParameters_h
+#ifndef ceinms_SimulatedAnnealingParameters_h
+#define ceinms_SimulatedAnnealingParameters_h
 
-struct SimulatedAnnealingParameters {
-    
-    unsigned noEpsilon, NS, NT, maxNoEval;
-    double rt, T, epsilon;
-    
-};
+namespace ceinms {
+    struct SimulatedAnnealingParameters {
 
+        unsigned noEpsilon, NS, NT, maxNoEval;
+        double rt, T, epsilon;
+
+    };
+}
 #endif

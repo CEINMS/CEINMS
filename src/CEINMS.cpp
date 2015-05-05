@@ -104,7 +104,7 @@ int main(int argc, char** argv) {
                 // Print a default setup file
             }
             else if ((option == "-PrintSetup") || (option == "-PS")) {
-                if (CeinmsSetupXmlReader::writeTemplateCeinmsSetupFile("defaultCeinmsSetupFile.xml"))
+                if (ceinms::CeinmsSetupXmlReader::writeTemplateCeinmsSetupFile("defaultCeinmsSetupFile.xml"))
                 {
                     std::cout << "Wrote template setup file to defaultCeinmsSetupFile.xml" << std::endl;
                     return 0;
@@ -123,7 +123,7 @@ int main(int argc, char** argv) {
         }
     }
     
-    CEINMS::SimulationManager simulation(setupFileName);
+    ceinms::SimulationManager simulation(setupFileName);
     bool flag = simulation.run();
 
     return flag;

@@ -36,107 +36,104 @@ using std::stringstream;
 //  currentData_ = orig.currentData_;
 //  currentTimeStep_ = orig.currentTimeStep_;
 //}
+namespace ceinms {
+    DataFromFile::DataFromFile(const string& dataFilename)
+        :dataFile_(dataFilename.c_str()) {
+        if (!dataFile_.is_open()) {
+            cout << "ERROR: " << dataFilename << " could not be open\n";
+            exit(EXIT_FAILURE);
+        }
 
-DataFromFile::DataFromFile(const string& dataFilename)
-:dataFile_(dataFilename.c_str()) {
-  if (!dataFile_.is_open()) {
-    cout << "ERROR: " << dataFilename << " could not be open\n";
-    exit(EXIT_FAILURE);
-  }
-  
-  dataFileName_ = dataFilename;
-  
-  // reading number of columns/rows
-  string trash;
-  dataFile_ >> trash;
-  int noColumns;
-  dataFile_ >> noColumns;
-  noMuscles_ = noColumns-1;
-  dataFile_ >> trash;
-  dataFile_ >> noTimeSteps_;
+        dataFileName_ = dataFilename;
 
-  // reading muscles
-  string line;
-  getline(dataFile_, line, '\n'); getline(dataFile_, line, '\n');  
-  stringstream myStream(line);
-  string nextMuscleName;
-    // the first is the "Time"
-  string timeName;
-  myStream >> timeName;
-    // then we have their names 
+        // reading number of columns/rows
+        string trash;
+        dataFile_ >> trash;
+        int noColumns;
+        dataFile_ >> noColumns;
+        noMuscles_ = noColumns - 1;
+        dataFile_ >> trash;
+        dataFile_ >> noTimeSteps_;
 
-  int noReadMuscles=0;
-  do {
-    myStream >> nextMuscleName;
-    muscleNames_.push_back(nextMuscleName); 
-  } while (!myStream.eof() && ++noReadMuscles<noMuscles_);
-  
+        // reading muscles
+        string line;
+        getline(dataFile_, line, '\n'); getline(dataFile_, line, '\n');
+        stringstream myStream(line);
+        string nextMuscleName;
+        // the first is the "Time"
+        string timeName;
+        myStream >> timeName;
+        // then we have their names 
 
-  if (noMuscles_ != muscleNames_.size()) {
-    cout << "\nSomething is wrong in " << dataFileName_ << endl << noMuscles_ << " muscles should be in the file "
-         << "and we have : " << muscleNames_.size() << endl;
-    for(vector<string>::iterator it = muscleNames_.begin(); it != muscleNames_.end(); ++it)
-      cout << *it << " -\n";
-    exit(EXIT_FAILURE);
-  } 
-
-  currentData_.resize(noMuscles_);
-  currentDataTime_ = 0.;
-  currentTimeStep_ = 0;
-  
-}
-
-void DataFromFile::readNextData()  {
-
-  // read time for the data currently stored in DataFromFile
-  string line;
-  getline(dataFile_, line, '\n');
-  stringstream myStream(line);
-  double value;
-  currentData_.clear();
-  //  cout << "\ndatafromfile check 1\n";
-  myStream >>  currentDataTime_;
-  //    cout << "\ndatafromfile check 1b\n";
-  int noReadMuscles=0;
-  do {
-    myStream >> value;
-  //  cout << "datafromfile in " << dataFileName_  << ": value "<< value << endl;
-    currentData_.push_back(value); 
-  } while (!myStream.eof() && ++noReadMuscles<noMuscles_);
-  //    cout << "\ndatafromfile check 2\n";
-  if(currentData_.size() != muscleNames_.size())
-  {
-    cout << "\nERROR: in" << dataFileName_ << " at time step " << currentTimeStep_ << " you have " << currentData_.size() << " input.\nYou need " << muscleNames_.size() << endl;
-    exit(EXIT_FAILURE);
-  }
-/*
-  dataFile_ >>  currentDataTime_;
-  // and then store their value
-  for (int i = 0; i < noMuscles_; ++i) {
-    double value;
-    dataFile_ >> value; 
-    currentData_.at(i) = value;
-  } 
-  */
-  ++currentTimeStep_;
-}
-
-const vector<double>& DataFromFile::getCurrentData() const 
-{
-//  if(currentData_.size() == muscleNames_.size())
-    return currentData_;
-/*  else
-  {
-    cout << "\nERROR: in" << dataFileName_ << " at time step " << currentTimeStep_ << " you have " << currentData_.size() << " input.\nYou need " << muscleNames_.size() << endl;
-    exit(EXIT_FAILURE);
-  }*/
-}
+        int noReadMuscles = 0;
+        do {
+            myStream >> nextMuscleName;
+            muscleNames_.push_back(nextMuscleName);
+        } while (!myStream.eof() && ++noReadMuscles < noMuscles_);
 
 
+        if (noMuscles_ != muscleNames_.size()) {
+            cout << "\nSomething is wrong in " << dataFileName_ << endl << noMuscles_ << " muscles should be in the file "
+                << "and we have : " << muscleNames_.size() << endl;
+            for (vector<string>::iterator it = muscleNames_.begin(); it != muscleNames_.end(); ++it)
+                cout << *it << " -\n";
+            exit(EXIT_FAILURE);
+        }
+
+        currentData_.resize(noMuscles_);
+        currentDataTime_ = 0.;
+        currentTimeStep_ = 0;
+
+    }
+
+    void DataFromFile::readNextData()  {
+
+        // read time for the data currently stored in DataFromFile
+        string line;
+        getline(dataFile_, line, '\n');
+        stringstream myStream(line);
+        double value;
+        currentData_.clear();
+        //  cout << "\ndatafromfile check 1\n";
+        myStream >> currentDataTime_;
+        //    cout << "\ndatafromfile check 1b\n";
+        int noReadMuscles = 0;
+        do {
+            myStream >> value;
+            //  cout << "datafromfile in " << dataFileName_  << ": value "<< value << endl;
+            currentData_.push_back(value);
+        } while (!myStream.eof() && ++noReadMuscles < noMuscles_);
+        //    cout << "\ndatafromfile check 2\n";
+        if (currentData_.size() != muscleNames_.size())
+        {
+            cout << "\nERROR: in" << dataFileName_ << " at time step " << currentTimeStep_ << " you have " << currentData_.size() << " input.\nYou need " << muscleNames_.size() << endl;
+            exit(EXIT_FAILURE);
+        }
+        /*
+          dataFile_ >>  currentDataTime_;
+          // and then store their value
+          for (int i = 0; i < noMuscles_; ++i) {
+          double value;
+          dataFile_ >> value;
+          currentData_.at(i) = value;
+          }
+          */
+        ++currentTimeStep_;
+    }
+
+    const vector<double>& DataFromFile::getCurrentData() const
+    {
+        //  if(currentData_.size() == muscleNames_.size())
+        return currentData_;
+        /*  else
+          {
+          cout << "\nERROR: in" << dataFileName_ << " at time step " << currentTimeStep_ << " you have " << currentData_.size() << " input.\nYou need " << muscleNames_.size() << endl;
+          exit(EXIT_FAILURE);
+          }*/
+    }
 
 
-
-
-DataFromFile::~DataFromFile() {
-  dataFile_.close();
+    DataFromFile::~DataFromFile() {
+        dataFile_.close();
+    }
 }

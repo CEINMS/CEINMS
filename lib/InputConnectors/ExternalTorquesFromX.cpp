@@ -20,19 +20,18 @@ using std::string;
 using std::vector;
 #include <cstdlib>
 
+namespace ceinms {
+    void ExternalTorquesFromX::updateExternalTorques(const vector<double>& currentExternalTorquesData, double currentTime)
+    {
+        QueueData< vector<double> > externalTorquesDataToPush;
+        externalTorquesDataToPush.data = currentExternalTorquesData;
+        externalTorquesDataToPush.time = currentTime;
+        inputConnectors_.queueExternalTorques.push(externalTorquesDataToPush);
+    }
 
-void ExternalTorquesFromX::updateExternalTorques(const vector<double>& currentExternalTorquesData, double currentTime)
-{
-  QueueData< vector<double> > externalTorquesDataToPush;
-  externalTorquesDataToPush.data = currentExternalTorquesData;
-  externalTorquesDataToPush.time = currentTime; 
-  inputConnectors_.queueExternalTorques.push(externalTorquesDataToPush);
+
+    ExternalTorquesFromX::~ExternalTorquesFromX() { }
 }
-
-
-
-ExternalTorquesFromX::~ExternalTorquesFromX() { }
-
 
 
 

@@ -8,31 +8,33 @@
 //
 
 
-#ifndef ExternalTorquesFromX_h
-#define ExternalTorquesFromX_h
+#ifndef ceinms_ExternalTorquesFromX_h
+#define ceinms_ExternalTorquesFromX_h
 
 #include <vector>
 #include <string>
 #include "InputConnectors.h"
 
-class ExternalTorquesFromX
-{
-public:
-  template <typename NMSModelT>
-  ExternalTorquesFromX(CEINMS::InputConnectors& inputConnectors, const NMSModelT& subject);
-  virtual ~ExternalTorquesFromX();
-  virtual void operator()() {};
-  void updateExternalTorques(const std::vector<double>& currentExternalTorquesData, double currentTime); 
-protected:
-  std::vector< std::string > dofNames_;
-  CEINMS::InputConnectors& inputConnectors_;
-};
+namespace ceinms {
+    class ExternalTorquesFromX
+    {
+    public:
+        template <typename NMSModelT>
+        ExternalTorquesFromX(InputConnectors& inputConnectors, const NMSModelT& subject);
+        virtual ~ExternalTorquesFromX();
+        virtual void operator()() {};
+        void updateExternalTorques(const std::vector<double>& currentExternalTorquesData, double currentTime);
+    protected:
+        std::vector< std::string > dofNames_;
+        InputConnectors& inputConnectors_;
+    };
 
 
-template <typename NMSModelT>
-ExternalTorquesFromX::ExternalTorquesFromX(CEINMS::InputConnectors& inputConnectors, const NMSModelT& subject) :inputConnectors_(inputConnectors)
-{
-  subject.getDoFNames(dofNames_);  
+    template <typename NMSModelT>
+    ExternalTorquesFromX::ExternalTorquesFromX(InputConnectors& inputConnectors, const NMSModelT& subject) :inputConnectors_(inputConnectors)
+    {
+        subject.getDoFNames(dofNames_);
+    }
 }
 
 #endif

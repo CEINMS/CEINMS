@@ -7,32 +7,33 @@
 //
 
 
-#ifndef ModelEvaluationHybrid_h
-#define ModelEvaluationHybrid_h
+#ifndef ceinms_ModelEvaluationHybrid_h
+#define ceinms_ModelEvaluationHybrid_h
 
 #include <vector>
 #include <string>
 #include "ModelEvaluationBase.h"
 
-template <typename NMSmodelT, typename ErrorMinimizerT, typename Logger>
-class ModelEvaluationHybrid : public ModelEvaluationBase<Logger> {
+namespace ceinms {
+    template <typename NMSmodelT, typename ErrorMinimizerT, typename Logger>
+    class ModelEvaluationHybrid : public ModelEvaluationBase < Logger > {
 
-public:
-    ModelEvaluationHybrid(CEINMS::InputConnectors& inputConnectors, CEINMS::OutputConnectors& outputConnectors, NMSmodelT& subject, ErrorMinimizerT& torqueErrorMinimizer, const vector<string>& valuesToLog);
-    void setOutputDirectory(const std::string& outputDir);
-    void operator()();
-    
-private:
-    NMSmodelT& subject_;
-    std::string outputDir_;
-    ErrorMinimizerT& torqueErrorMinimizer_;
-    std::vector< std::string > dofNames_;
-    std::vector< std::string > dofNamesWithExtTorque_;
-    unsigned noDof_;
-    double globalEmDelay_;
+    public:
+        ModelEvaluationHybrid(InputConnectors& inputConnectors, OutputConnectors& outputConnectors, NMSmodelT& subject, ErrorMinimizerT& torqueErrorMinimizer, const vector<string>& valuesToLog);
+        void setOutputDirectory(const std::string& outputDir);
+        void operator()();
 
-};
+    private:
+        NMSmodelT& subject_;
+        std::string outputDir_;
+        ErrorMinimizerT& torqueErrorMinimizer_;
+        std::vector< std::string > dofNames_;
+        std::vector< std::string > dofNamesWithExtTorque_;
+        unsigned noDof_;
+        double globalEmDelay_;
+
+    };
+}
 
 #include "ModelEvaluationHybrid.cpp"
-
 #endif

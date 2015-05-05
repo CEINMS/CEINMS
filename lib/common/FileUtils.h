@@ -7,18 +7,19 @@
 //__________________________________________________________________________
 //
 
-#ifndef FileUtils_h
-#define FileUtils_h
+#ifndef ceinms_FileUtils_h
+#define ceinms_FileUtils_h
 
 #include <string>
 
-namespace FileUtils {
+namespace ceinms {
+    namespace FileUtils {
 
-std::string getFile ( const std::string& aPath, const std::string& mask );
-bool isAbsolute(const char *path);
-void trim(std::string& fileName);
+        std::string getFile(const std::string& aPath, const std::string& mask);
+        bool isAbsolute(const char *path);
+        void trim(std::string& fileName);
 
-
-};
+    }
+}
 
 #endif

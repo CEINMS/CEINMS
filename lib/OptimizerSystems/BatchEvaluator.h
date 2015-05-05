@@ -1,5 +1,5 @@
-#ifndef Ceinms_BatchEvaluator_h
-#define Ceinms_BatchEvaluator_h
+#ifndef ceinms_BatchEvaluator_h
+#define ceinms_BatchEvaluator_h
 
 #include <vector>
 #include <map>
@@ -11,8 +11,7 @@
 #include "TrialData.h"
 #include "Result.h"
 
-namespace CEINMS {
-
+namespace ceinms {
 
     class OpenLoopEvaluator {
     public:
@@ -47,8 +46,7 @@ namespace CEINMS {
         std::vector<unsigned> musclesToUpdate_;
         std::vector<TrialData> trials_;
         std::vector<Result> results_;
-    };    
-
+    };
 }
 
 #include "BatchEvaluator.cpp"

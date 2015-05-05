@@ -23,7 +23,7 @@ using std::string;
 
 //#define LOG_SIMULATED_ANNEALING
 
-namespace CEINMS {
+namespace ceinms {
     namespace Optimizers {
 
         template<typename OptimizerSystem>
@@ -40,7 +40,7 @@ namespace CEINMS {
             f_(std::numeric_limits<double>::max()),
             fp_(std::numeric_limits<double>::max()),
             fOpt_(std::numeric_limits<double>::max())
-            {
+        {
 
             noParameters_ = optimizerSystem_.getNoParameters();
             x_ = optimizerSystem_.getParameters();
@@ -59,7 +59,7 @@ namespace CEINMS {
         }
 
 
-            template<typename OptimizerSystem>
+        template<typename OptimizerSystem>
         void SimulatedAnnealing<OptimizerSystem>::checkBounds(int k) {
 
             if ((xp_.at(k) < lowerBounds_.at(k)) ||
@@ -166,7 +166,7 @@ namespace CEINMS {
 
                     for (int h = 0; h < noParameters_; ++h) {
                         double ratio = static_cast<double>(noAccepted_.at(h)) / ns_;
-                        if (ratio > 0.6) 
+                        if (ratio > 0.6)
                             v_.at(h) = v_.at(h) * (1 + c.at(h) * (ratio - 0.6) / 0.4);
                         else if (ratio < 0.4)
                             v_.at(h) = v_.at(h) / (1 + c.at(h) * ((0.4 - ratio) / 0.4));
@@ -198,12 +198,12 @@ namespace CEINMS {
                 updateFandFlatest();
                 // restart
                 x_ = xOpt_;
-                
+
             }  /* end while */
 
             optimizerSystem_.setParameters(xOpt_);
             optimizerSystem_.evaluate();
-//            cout << "total evaluations:" << noEval << endl;
+            //            cout << "total evaluations:" << noEval << endl;
             return 0;
         }
 
@@ -216,7 +216,7 @@ namespace CEINMS {
 
         template <typename OptimizerSystem>
         bool SimulatedAnnealing<OptimizerSystem>::doTerminate() {
-     
+
             fLatest_.at(0) = f_;
 
             for (unsigned int a = 0; a < nEpsilon_; ++a) {
@@ -235,7 +235,6 @@ namespace CEINMS {
         }
 
 
-
         template<typename OptimizerSystem>
         void SimulatedAnnealing<OptimizerSystem>::updateFandFlatest() {
             for (unsigned int a = 1; a < nEpsilon_; ++a)
@@ -243,5 +242,5 @@ namespace CEINMS {
 
             f_ = fOpt_;
         }
-
-    }}
+    }
+}

@@ -7,26 +7,26 @@
 //__________________________________________________________________________
 //
 
-#ifndef LoggerOnQueues_h
-#define LoggerOnQueues_h
+#ifndef ceinms_LoggerOnQueues_h
+#define ceinms_LoggerOnQueues_h
 
 #include <vector>
 #include <string>
 #include "OutputConnectors.h"
 
-class LoggerOnQueues {
-public:
-    LoggerOnQueues() = delete; 
-    LoggerOnQueues(const LoggerOnQueues&) = delete;
-    LoggerOnQueues& operator=(const LoggerOnQueues&) = delete; 
-    LoggerOnQueues(CEINMS::OutputConnectors& outputConnectors, const std::vector< std::string > & valuesToLog); 
-    void log(double time, const std::vector< double >& dataToLog, const std::string& queuID);
+namespace ceinms {
+    class LoggerOnQueues {
+    public:
+        LoggerOnQueues() = delete;
+        LoggerOnQueues(const LoggerOnQueues&) = delete;
+        LoggerOnQueues& operator=(const LoggerOnQueues&) = delete;
+        LoggerOnQueues(OutputConnectors& outputConnectors, const std::vector< std::string > & valuesToLog);
+        void log(double time, const std::vector< double >& dataToLog, const std::string& queuID);
 
-private:
-    CEINMS::OutputConnectors& outputConnectors_;
-   
-};
+    private:
+        OutputConnectors& outputConnectors_;
 
-
+    };
+}
 
 #endif

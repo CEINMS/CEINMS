@@ -7,8 +7,8 @@
 //
 
 
-#ifndef Ceinms_SimulationManager_h
-#define Ceinms_SimulationManager_h
+#ifndef ceinms_SimulationManager_h
+#define ceinms_SimulationManager_h
 #include "SetupDataStructure.h"
 #include "CeinmsSetupXmlReader.h"
 #include "InputDataXmlReader.h"
@@ -18,7 +18,7 @@
 #include <map>
 #include <iostream>
 
-namespace CEINMS {
+namespace ceinms {
     class SimulationManager {
 
     public:
@@ -44,7 +44,6 @@ namespace CEINMS {
         std::string emgGeneratorFile_;
     };
 }
-
 
 #include "SimulationManager.cpp"
 #endif

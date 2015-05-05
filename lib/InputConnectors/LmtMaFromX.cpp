@@ -19,25 +19,22 @@ using std::string;
 using std::vector;
 #include <cstdlib>
 
+namespace ceinms {
+    void LmtMaFromX::updateLmt(const vector<double>& currentLmtData, double currentTime)
+    {
+        QueueData< vector<double> > lmtDataToPush;
+        lmtDataToPush.data = currentLmtData;
+        lmtDataToPush.time = currentTime;
+        inputConnectors_.queueLmt.push(lmtDataToPush);
+    }
 
-void LmtMaFromX::updateLmt(const vector<double>& currentLmtData, double currentTime)
-{
-  QueueData< vector<double> > lmtDataToPush;
-  lmtDataToPush.data = currentLmtData; 
-  lmtDataToPush.time = currentTime; 
-  inputConnectors_.queueLmt.push(lmtDataToPush);
+    void LmtMaFromX::updateMomentArms(const vector<double>& currentMomentArmsData, double currentTime, unsigned int whichDof)
+    {
+        QueueData< vector<double> > momentArmsDataToPush;
+        momentArmsDataToPush.data = currentMomentArmsData;
+        momentArmsDataToPush.time = currentTime;
+        (*inputConnectors_.queueMomentArms.at(whichDof)).push(momentArmsDataToPush);
+    }
+
+    LmtMaFromX::~LmtMaFromX() { }
 }
-
-void LmtMaFromX::updateMomentArms(const vector<double>& currentMomentArmsData, double currentTime, unsigned int whichDof)
-{
-  QueueData< vector<double> > momentArmsDataToPush; 
-  momentArmsDataToPush.data = currentMomentArmsData; 
-  momentArmsDataToPush.time = currentTime; 
-  (*inputConnectors_.queueMomentArms.at(whichDof)).push(momentArmsDataToPush);
-}
-
-LmtMaFromX::~LmtMaFromX() { }
-
-
-
-

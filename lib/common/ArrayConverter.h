@@ -6,28 +6,29 @@
 //__________________________________________________________________________
 //
 
-#ifndef ArrayConverter_h
-#define ArrayConverter_h
+#ifndef ceinms_ArrayConverter_h
+#define ceinms_ArrayConverter_h
 
 #include <vector>
 
-class ArrayConverter{
-public:
-    template<typename T>
-    static void toStdVector(const OpenSim::Array<T>& srcArray, std::vector<T>& dstVector) {
-        dstVector.clear();
-        int size = srcArray.getSize();
-        dstVector.resize(size);
-        for(int i = 0; i < size; ++i)
-        dstVector.at(i) = srcArray.get(i);
+namespace ceinms {
+    namespace ArrayConverter{
+        
+        template<typename T>
+        void toStdVector(const OpenSim::Array<T>& srcArray, std::vector<T>& dstVector) {
+            dstVector.clear();
+            int size = srcArray.getSize();
+            dstVector.resize(size);
+            for (int i = 0; i < size; ++i)
+                dstVector.at(i) = srcArray.get(i);
+        }
+        
+        template<typename T>
+        void fromStdVector(OpenSim::Array<T>& dstArray, const std::vector<T>& srcVector) {
+            for (typename std::vector<T>::const_iterator it(srcVector.begin()); it != srcVector.end(); ++it)
+                dstArray.append(*it);
+        }
     }
-    template<typename T>
-    static void fromStdVector(OpenSim::Array<T>& dstArray, const std::vector<T>& srcVector) {
-        for(typename std::vector<T>::const_iterator it(srcVector.begin()); it != srcVector.end(); ++it)
-            dstArray.append(*it);
-    }
-
-
-};
+}
 
 #endif

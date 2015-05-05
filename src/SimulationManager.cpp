@@ -43,7 +43,7 @@ using std::string;
 using std::cout;
 using std::endl;
 
-namespace CEINMS {
+namespace ceinms {
 
 
     SimulationManager::SimulationManager(const string& setupFilename):

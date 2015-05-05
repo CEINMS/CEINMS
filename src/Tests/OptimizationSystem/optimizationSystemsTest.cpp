@@ -4,11 +4,11 @@
 #include "TrialData.h"
 #include "SimulatedAnnealing.h"
 
-using CEINMS::TrialData;
+using ceinms::TrialData;
 #include "InputConnectors.h"
-using CEINMS::InputConnectors;
+using ceinms::InputConnectors;
 #include "OutputConnectors.h"
-using CEINMS::OutputConnectors;
+using ceinms::OutputConnectors;
 #include "QueuesToTrialData.h"
 #include "EMGFromFile.h"
 #include "LmtMaFromStorageFile.h"
@@ -36,18 +36,19 @@ using std::endl;
 #include <list>
 using std::list;
 #include <chrono>
-
+#include "Utilities.h"
+using namespace ceinms;
 
 void setLmtMaFilenames(const string& directory, const vector< string > dofNames, string& lmtDataFilename, vector< string >& maDataFilenames)
 {
     std::string pattern{ "_Length.sto" };
-    lmtDataFilename = directory + "/" + findFile(pattern, directory);
+    lmtDataFilename = directory + "/" + ceinms::findFile(pattern, directory);
 
     int currentDof = 0;
     for (auto& it : dofNames)
     {
         std::string pattern = "_MomentArm_" + it + ".sto";
-        std::string maDataFilename = directory + "/" + findFile(pattern, directory);
+        std::string maDataFilename = directory + "/" + ceinms::findFile(pattern, directory);
         maDataFilenames.push_back(maDataFilename);
     }
 }
@@ -71,7 +72,7 @@ void sortMaFilenames(const std::map<string, string>& maMap, const vector< string
 
 
 template<typename NMSmodelT>
-CEINMS::TrialData readTrialData(std::string inputDataFilename, NMSmodelT& mySubject, std::string trialId, std::string emgGeneratorFile)
+TrialData readTrialData(std::string inputDataFilename, NMSmodelT& mySubject, std::string trialId, std::string emgGeneratorFile)
 {
     InputDataXmlReader dataLocations(inputDataFilename);
     // CEINMS::InputConnectors* inputConnectors= new CEINMS::InputConnectors();
@@ -217,12 +218,12 @@ int main(int argc, char** argv) {
                 currentCalibrationStep.getDofNames(dofsToCalibrate);
                 ParameterSet parameterSet;
                 currentCalibrationStep.getParameterSet(parameterSet);
-                using MySystem = CEINMS::NMSmodelSystem < MyNMSmodel, CEINMS::MinTorqueError > ;
-                MySystem system(mySubject, trials, CEINMS::MinTorqueError(), parameterSet, dofsToCalibrate);
+                using MySystem = NMSmodelSystem < MyNMSmodel, MinTorqueError > ;
+                MySystem system(mySubject, trials, MinTorqueError(), parameterSet, dofsToCalibrate);
 
                 SimulatedAnnealingParameters simanParameters;
                 calibrationXmlReader.getOptimizationAlgorithmParameters(simanParameters);
-                CEINMS::Optimizers::SimulatedAnnealing<MySystem> optimizer(system, simanParameters);
+                Optimizers::SimulatedAnnealing<MySystem> optimizer(system, simanParameters);
 
                 auto timeBegin = std::chrono::high_resolution_clock::now();
                 optimizer.optimize();
@@ -253,17 +254,17 @@ int main(int argc, char** argv) {
             std::cout << "CalibrationStepCfg " << currentCalibrationStep.getStepCfg() << std::endl;
             switch (currentCalibrationStep.getStepCfg()) {
             case CalibrationCfg::MinimizeTorqueErrorParameterSetDefault: {
-                CEINMS::MinTorqueError objFun;
+                MinTorqueError objFun;
                 vector<string> dofsToCalibrate;
                 currentCalibrationStep.getDofNames(dofsToCalibrate);
                 ParameterSet parameterSet;
                 currentCalibrationStep.getParameterSet(parameterSet);
-                using MySystem = CEINMS::NMSmodelSystem < MyNMSmodel, CEINMS::MinTorqueError >;
-                MySystem system(mySubject, trials, CEINMS::MinTorqueError(), parameterSet, dofsToCalibrate);
+                using MySystem = NMSmodelSystem < MyNMSmodel, MinTorqueError >;
+                MySystem system(mySubject, trials, MinTorqueError(), parameterSet, dofsToCalibrate);
 
                 SimulatedAnnealingParameters simanParameters;
                 calibrationXmlReader.getOptimizationAlgorithmParameters(simanParameters);
-                CEINMS::Optimizers::SimulatedAnnealing<MySystem> optimizer(system, simanParameters);
+                Optimizers::SimulatedAnnealing<MySystem> optimizer(system, simanParameters);
 
                 auto timeBegin = std::chrono::high_resolution_clock::now();
                 optimizer.optimize();

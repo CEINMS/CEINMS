@@ -6,21 +6,23 @@
 //__________________________________________________________________________
 //
 
-#ifndef CeinmsLogger_h
-#define CeinmsLogger_h
+#ifndef ceinms_Logger_h
+#define ceinms_Logger_h
 
-
-namespace Logger {
-    enum LogID{Activations,
-                FibreLengths,
-                NormFibreLengths,
-                FibreVelocities,
-                NormFibreVelocities,
-                PennationAngles,
-                MuscleForces,
-                Torques,
-                Emgs,
-                AdjustedEmgs};
+namespace ceinms {
+    namespace Logger {
+        enum LogID{
+            Activations,
+            FibreLengths,
+            NormFibreLengths,
+            FibreVelocities,
+            NormFibreVelocities,
+            PennationAngles,
+            MuscleForces,
+            Torques,
+            Emgs,
+            AdjustedEmgs
+        };
+    }
 }
-
 #endif

@@ -3,7 +3,7 @@
 
 #include <cmath>
 
-namespace CEINMS {
+namespace ceinms {
 
     namespace PennationAngle {
 

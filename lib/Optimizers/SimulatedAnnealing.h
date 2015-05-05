@@ -1,11 +1,11 @@
-#ifndef CEINMS_Optimizers_SimulatedAnnealing_h
-#define CEINMS_Optimizers_SimulatedAnnealing_h
+#ifndef ceinms_Optimizers_SimulatedAnnealing_h
+#define ceinms_Optimizers_SimulatedAnnealing_h
 
 #include "AbstractOptimizer.h"
 #include "SimulatedAnnealingParameters.h"
 #include <vector>
 
-namespace CEINMS {
+namespace ceinms {
     namespace Optimizers {
 
         template<typename OptimizerSystem>
@@ -47,5 +47,6 @@ namespace CEINMS {
 
     }
 }
+
 #include "SimulatedAnnealing.cpp"
 #endif
