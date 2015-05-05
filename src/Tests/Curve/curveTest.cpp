@@ -3,7 +3,7 @@
 #include <fstream>
 #include <string>
 #define _USE_MATH_DEFINES
-#include <cmath>
+#include <math.h>
 
 
 std::vector<double> getRange(double min, double max, unsigned nPoints) {
@@ -154,7 +154,7 @@ int main() {
 
     using MyCurve = Curve < CurveMode::Mode::Online, CurveMode::Interpolation::Cubic, 3 > ;
     std::vector<double> x(getRange(-M_PI, M_PI, 10));
-    
+
     MyCurve sinCurve;
     auto sinFun([](double x){return std::sin(x); });
     auto cosFun([](double x){return std::cos(x); });
