@@ -61,18 +61,19 @@ std::vector<OpenSim::ExternalForce*> parseXmlForExternalForces(const string& xml
 
 
 //this is already done internally in JointContactFromOpensim, so we just do it for the test
-void prepareModelForIntersegmentalForces(OpenSim::Model& model) {
+void addCoordinateActuators(OpenSim::Model& model, double control, bool removeMuscles) {
     
     const OpenSim::CoordinateSet& cs = model.getCoordinateSet();
-    model.updForceSet().setSize(0); //remove all actuators from the model
+    if (removeMuscles)
+        model.updForceSet().setSize(0); //remove all actuators from the model
     for (unsigned i(0); i < model.getNumCoordinates(); ++i) {
         CoordinateActuator *actuator = new CoordinateActuator();
         actuator->setCoordinate(&cs.get(i));
         string actuatorName(cs.get(i).getName() + "_actuator");
         actuator->setName(actuatorName);
         actuator->setOptimalForce(1);
-        actuator->setMaxControl(100000);
-        actuator->setMinControl(-100000);
+        actuator->setMaxControl(control);
+        actuator->setMinControl(-control);
         model.addForce(actuator);
     }
 }
@@ -139,7 +140,7 @@ void  calculateIntersegmentaForcesWithOpensim(OpenSim::Model model, const OpenSi
     
     double firstTime = timeColumn.front();
     double lastTime = timeColumn.back();
-    prepareModelForIntersegmentalForces(model);
+    addCoordinateActuators(model, 100000, true);
     OpenSim::Model modelJR = model;
     SimTK::State state = model.initSystem();
 
@@ -181,6 +182,56 @@ void  calculateIntersegmentaForcesWithOpensim(OpenSim::Model model, const OpenSi
 }
 
 
+void  calculateContactForcesWithOpensim(OpenSim::Model model, const OpenSim::Storage& kinematics, const string& externalLoadsFilename, const vector<double>& timeColumn) {
+
+    for (unsigned i(0); i < model.getMuscles().getSize(); ++i) {
+        auto f = model.getMuscles().get(i).getMaxIsometricForce();
+        model.getMuscles().get(i).setMaxIsometricForce(f*3.0);
+    }
+
+    double firstTime = timeColumn.front();
+    double lastTime = timeColumn.back();
+    addCoordinateActuators(model, 10000, false);
+    OpenSim::Model modelJR = model;
+    SimTK::State state = model.initSystem();
+
+    auto setupAnalTool([&](OpenSim::AnalyzeTool& analTool, const SimTK::State& modelState){
+        //      analTool.setCoordinatesFileName(kinematicsFilename);
+        analTool.setStatesFromMotion(modelState, kinematics, true);
+        analTool.setExternalLoadsFileName(externalLoadsFilename);
+        analTool.setStartTime(firstTime);
+        analTool.setFinalTime(lastTime);
+        analTool.setPrintResultFiles(true);
+        analTool.setSolveForEquilibrium(false);
+        analTool.setLowpassCutoffFrequency(8);
+        analTool.setReplaceForceSet(true);
+    });
+
+
+    //static opt
+    OpenSim::StaticOptimization* sopt = new  OpenSim::StaticOptimization(&model);
+    model.addAnalysis(sopt);
+    OpenSim::AnalyzeTool analiseToolForSO(model);
+    setupAnalTool(analiseToolForSO, state);
+    analiseToolForSO.run();
+    model.removeAnalysis(sopt, false);
+
+    //joint reaction
+    SimTK::State stateJR = modelJR.initSystem();
+    OpenSim::JointReaction* jreact = new OpenSim::JointReaction(&modelJR);
+    modelJR.addAnalysis(jreact);
+    OpenSim::Array<string> jointNames;
+    jreact->setForcesFileName("_StaticOptimization_force.sto");
+    jointNames.append("ankle_r");
+    jreact->setJointNames(jointNames);
+    jreact->print("JRsetup.xml");
+    jreact->setName("JointReaction_CF");
+    OpenSim::AnalyzeTool analiseToolForJR(modelJR);
+    setupAnalTool(analiseToolForJR, stateJR);
+    analiseToolForJR.run();
+
+}
+
 int main() {
     /*
     1. Compare output of OpenSim and CEINMS intersegmental forces calculation
@@ -189,14 +240,14 @@ int main() {
         (iii) Osim: Run static opt + joint reaction analysis
         (iv)  CEINMS: pass model in (i) to JointContactFromOpensim and calculate intersegmental forces
         (v)   compare output from (iii) and (iv)
-    2. Compare output of OpenSim and CEINMS reaction forces calculation
+    2. Compare output of OpenSim and CEINMS reaction forces calculation, 
+       same muscle forces and residual calculated in OpenSim should give the same results in CEINMS 
         (i)   load model, add external forces, load and filter kinematics
-        (ii)  create CoordinateActuators for every generalised coordinate
-        (iii) Osim: Run static opt + joint reaction analysis
-        (iv)  CEINMS: pass model in (i) to JointContactFromOpensim
-        (v)   get muscle forces and residual from static opt and pass them to JointContactFromOpensim
-        (vi)  calculate joint reaction forces with JointContactFromOpensim
-        (vii) compare (iii) and (vi)
+        (ii)  Osim: Run static opt + joint reaction analysis
+        (iii) CEINMS: pass model in (i) to JointContactFromOpensim
+        (iv)  get muscle forces and residual from (ii) and pass them to JointContactFromOpensim
+        (v)   calculate joint reaction forces with JointContactFromOpensim
+        (vi)  compare (ii) and (v)
     */
 
 
@@ -227,9 +278,17 @@ int main() {
         model.addForce(f); //model should take care of the pointers and delete them on destruction.. hopefully
     }
 
-    calculateIntersegmentaForcesWithCEINMS(model, kinematicsSplines, timeColumn);
-    cout << "----------\nOsim static opt\n------------\n";
- //   calculateIntersegmentaForcesWithOpensim(model, kinematics, externalLoadsFilename, timeColumn);
+    // 1. Compare output of OpenSim and CEINMS intersegmental forces calculation
+    // successfully tested
+    if (false) {
+        calculateIntersegmentaForcesWithCEINMS(model, kinematicsSplines, timeColumn);
+        cout << "----------\nOsim static opt\n------------\n";
+        calculateIntersegmentaForcesWithOpensim(model, kinematics, externalLoadsFilename, timeColumn);
+    }
+    //  2. Compare output of OpenSim and CEINMS reaction forces calculation, 
+    //     same muscle forces and residual calculated in OpenSim should give the same results in CEINMS
+    calculateContactForcesWithOpensim(model, kinematics, externalLoadsFilename, timeColumn);
+
 
 
     return 0;
