@@ -54,6 +54,7 @@ set(xmlInput_SOURCES    ExecutionXmlReader.cpp
                         InputDataXmlReader.cpp
                         CeinmsSetupXmlReader.cpp
                         CeinmsCalibrationSetupXmlReader.cpp
+						ContactModelXmlReader.cpp
                         )
 
 set(schemas_GENERATED_SOURCES  ${CMAKE_CURRENT_BINARY_DIR}/execution-schema.cxx
@@ -76,6 +77,7 @@ set(xmlInput_HEADERS    ExecutionXmlReader.h
                         InputDataXmlReader.h
                         CeinmsSetupXmlReader.h
                         CeinmsCalibrationSetupXmlReader.h
+						ContactModelXmlReader.h
                         )
 
 set(xmlInput_IMPL_HEADERS   impl/grammar-input-stream.hxx

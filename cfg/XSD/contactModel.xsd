@@ -11,12 +11,14 @@
   </xs:simpleType>
 
   <xs:complexType name="FromOpenSimType">
-    <xs:sequence>
-        <xs:element maxOccurs="1" name="osimModel" type="xs:token"/>
-        <xs:element maxOccurs="1" name="motion" type="xs:token"/>
-        <xs:element maxOccurs="1" name="externalLoads" type="xs:token"/>
-        <xs:element maxOccurs="1" name="joints" type="JointsType"/>
-    </xs:sequence>
+    <xs:choice maxOccurs="unbounded">
+      <xs:sequence>
+        <xs:element maxOccurs="1" minOccurs="1" name="osimModel" type="xs:token"/>
+        <xs:element maxOccurs="1" minOccurs="1" name="motion" type="xs:token"/>
+        <xs:element maxOccurs="1" minOccurs="1" name="externalLoads" type="xs:token"/>
+        <xs:element maxOccurs="1" minOccurs="1" name="joints" type="JointsType"/>
+      </xs:sequence>
+    </xs:choice>
   </xs:complexType>
 
   <xs:complexType name="ContactModelType">

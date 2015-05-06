@@ -9,8 +9,7 @@ using std::endl;
 
 #include "ArrayConverter.h"
 
-
-namespace CEINMS {
+namespace ceinms {
  
     JointContactFromOpensim::JointContactFromOpensim(const OpenSim::Model& model) :
         model_(model),

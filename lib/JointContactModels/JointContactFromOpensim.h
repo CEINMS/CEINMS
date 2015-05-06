@@ -9,7 +9,7 @@
 #include <OpenSim/Simulation/InverseDynamicsSolver.h>
 #include "ExternalForce.h"
 
-namespace CEINMS {
+namespace ceinms {
 
     class JointContactFromOpensim {
     public:

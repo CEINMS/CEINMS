@@ -1,7 +1,8 @@
 #include "JointContactFromOpensim.h"
-using CEINMS::JointContactFromOpensim;
-using CEINMS::ExternalForce;
 #include "ArrayConverter.h"
+#include "ContactModelXmlReader.h"
+using namespace ceinms;
+
 
 #include <OpenSim/OpenSim.h>
 using OpenSim::Storage;
@@ -233,6 +234,17 @@ void  calculateContactForcesWithOpensim(OpenSim::Model model, const OpenSim::Sto
 }
 
 int main() {
+
+    string xmlFilename("C:/Users/S2849511/Dropbox/Ricerca/Data/ContactModelTest/contactModel.xml");
+    ContactModelXmlReader xmlReader(xmlFilename);
+    ContactModelFromOpenSimSetup setup = xmlReader.getContactModelSetupOsim();
+    cout << setup.osimModel << endl;
+    cout << setup.motion << endl;
+    cout << setup.externalLoads << endl;
+    for (auto i : setup.joints)
+        cout << i << endl;
+
+
     /*
     1. Compare output of OpenSim and CEINMS intersegmental forces calculation
         (i)   load model, disable all muscles, add external forces, load and filter kinematics
@@ -250,6 +262,7 @@ int main() {
         (vi)  compare (ii) and (v)
     */
 
+    /*
 
     string baseDir("C:/Users/S2849511/coding/versioning/ceinms/src/Tests/JointContactModel/Data/");
     string externalLoadsFilename(baseDir + "ExtForcesSetup.xml");
@@ -288,7 +301,7 @@ int main() {
     //  2. Compare output of OpenSim and CEINMS reaction forces calculation, 
     //     same muscle forces and residual calculated in OpenSim should give the same results in CEINMS
     calculateContactForcesWithOpensim(model, kinematics, externalLoadsFilename, timeColumn);
-
+    */
 
 
     return 0;
