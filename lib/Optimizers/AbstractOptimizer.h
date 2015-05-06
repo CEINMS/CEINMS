@@ -13,7 +13,7 @@
  * CEINMS Contributors: C. Pizzolato, M. Reggiani, M. Sartori,                *
  *                      E. Ceseracciu, and D.G. Lloyd                         *
  *                                                                            *
- * Author(s):                                                                 *
+ * Author(s): C. Pizzolato, M. Reggiani, E. Ceseracciu                        *
  *                                                                            *
  * CEINMS is licensed under the Apache License, Version 2.0 (the "License").  *
  * You may not use this file except in compliance with the License. You may   *
@@ -25,7 +25,7 @@
  * See the License for the specific language governing permissions and        *
  * limitations under the License.                                             *
  * -------------------------------------------------------------------------- */
- 
+
 #ifndef ceinms_Optimizers_AbstractOptimizer_h
 #define ceinms_Optimizers_AbstractOptimizer_h
 #include <vector>

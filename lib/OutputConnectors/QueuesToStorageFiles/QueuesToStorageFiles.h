@@ -13,7 +13,7 @@
  * CEINMS Contributors: C. Pizzolato, M. Reggiani, M. Sartori,                *
  *                      E. Ceseracciu, and D.G. Lloyd                         *
  *                                                                            *
- * Author(s): C. Pizzolato, M. Reggiani                                       *
+ * Author(s): E. Ceseracciu, C. Pizzolato, M. Reggiani                        *
  *                                                                            *
  * CEINMS is licensed under the Apache License, Version 2.0 (the "License").  *
  * You may not use this file except in compliance with the License. You may   *
