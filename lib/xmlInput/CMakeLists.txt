@@ -35,13 +35,13 @@ schema_to_bin(${CMAKE_SOURCE_DIR}/cfg/XSD/ceinmsCalibrationSetup.xsd)
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
 # Generate c++ code for xsd schema files
-xsd_schema(subject_GENERATED ${CMAKE_SOURCE_DIR}/cfg/XSD/subject.xsd --generate-serialization)
-xsd_schema(excitationGenerator_GENERATED ${CMAKE_SOURCE_DIR}/cfg/XSD/excitationGenerator.xsd --generate-serialization)
+xsd_schema(subject_GENERATED ${CMAKE_SOURCE_DIR}/cfg/XSD/subject.xsd --generate-serialization --namespace-map =SubjectXsd)
+xsd_schema(excitationGenerator_GENERATED ${CMAKE_SOURCE_DIR}/cfg/XSD/excitationGenerator.xsd --generate-serialization --namespace-map =ExcitationGeneratorXsd)
 xsd_schema(calibration_GENERATED ${CMAKE_SOURCE_DIR}/cfg/XSD/calibration.xsd --generate-serialization --namespace-map =CalibrationXsd)
-xsd_schema(execution_GENERATED ${CMAKE_SOURCE_DIR}/cfg/XSD/execution.xsd --generate-serialization)
-xsd_schema(inputData_GENERATED ${CMAKE_SOURCE_DIR}/cfg/XSD/inputData.xsd --generate-serialization)
-xsd_schema(ceinmsSetup_GENERATED ${CMAKE_SOURCE_DIR}/cfg/XSD/ceinmsSetup.xsd --generate-serialization)
-xsd_schema(ceinmsCalibrationSetup_GENERATED ${CMAKE_SOURCE_DIR}/cfg/XSD/ceinmsCalibrationSetup.xsd --generate-serialization)
+xsd_schema(execution_GENERATED ${CMAKE_SOURCE_DIR}/cfg/XSD/execution.xsd --generate-serialization --namespace-map =ExecutionXsd)
+xsd_schema(inputData_GENERATED ${CMAKE_SOURCE_DIR}/cfg/XSD/inputData.xsd --generate-serialization --namespace-map =InputDataXsd)
+xsd_schema(ceinmsSetup_GENERATED ${CMAKE_SOURCE_DIR}/cfg/XSD/ceinmsSetup.xsd --generate-serialization --namespace-map =CeinmsSetupXsd)
+xsd_schema(ceinmsCalibrationSetup_GENERATED ${CMAKE_SOURCE_DIR}/cfg/XSD/ceinmsCalibrationSetup.xsd --generate-serialization --namespace-map =CeinmsCalibrationSetupXsd)
 
 set(xmlInput_SOURCES    ExecutionXmlReader.cpp
                         CalibrationXmlReader.cpp
@@ -130,7 +130,6 @@ target_link_libraries(xmlInput ceinms_common ${XERCES_LIBRARIES})
 target_include_directories(xmlInput PRIVATE ${ceinms_common_INCLUDE_DIRS} impl PUBLIC ${XSD_INCLUDE_DIR} ${XERCES_INCLUDE_DIR})
 
 set(xmlInput_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR} ${XSD_INCLUDE_DIR} ${XERCES_INCLUDE_DIR} CACHE INTERNAL "Include directory for xmlInput library")
-mark_as_advanced(xmlInput_INCLUDE_DIRS)
 
 install(FILES   ${xmlInput_HEADERS}
                 ${schemas_GENERATED_HEADERS}

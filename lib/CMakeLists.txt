@@ -7,11 +7,12 @@ add_subdirectory(Curve)
 add_subdirectory(OdeInt)
 add_subdirectory(RootSolvers)
 add_subdirectory(NMSmodel)
+add_subdirectory(TrialData)
 #add_subdirectory(Calibration)
 add_subdirectory(Concurrency) # to be substituted with external repository
 add_subdirectory(InputConnectors)
 add_subdirectory(OutputConnectors)
 add_subdirectory(Optimizers)
 add_subdirectory(OptimizerSystems)
-add_subdirectory(TrialData)
 add_subdirectory(JointContactModels)
+

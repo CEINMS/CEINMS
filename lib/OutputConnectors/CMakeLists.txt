@@ -37,8 +37,7 @@ target_include_directories(OutputConnectors
                                 PUBLIC ${Boost_INCLUDE_DIRS})
 
 # Save path to include directory for "internal" usage
-set(OutputConnectors_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/QueuesToStorageFiles CACHE STRING "Include directories for OutputConnectors library" FORCE)
-mark_as_advanced(OutputConnectors_INCLUDE_DIRS)
+set(OutputConnectors_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/QueuesToStorageFiles CACHE INTERNAL "Include directories for OutputConnectors library")
 
 # Install
 install(FILES ${OutputConnectors_HEADERS} ${QueuesToStorageFiles_HEADERS} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}) #should add namespace

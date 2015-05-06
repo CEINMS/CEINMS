@@ -1,12 +1,30 @@
-//__________________________________________________________________________
-// Author(s): Claudio Pizzolato, Monica Reggiani - October 2013
-// email:  claudio.pizzolato@griffithuni.edu.au
-//         monica.reggiani@gmail.com
-//
-// DO NOT REDISTRIBUTE WITHOUT PERMISSION
-//__________________________________________________________________________
-//
-
+/* -------------------------------------------------------------------------- *
+ * CEINMS is a standalone toolbox for neuromusculoskeletal modelling and      *
+ * simulation. CEINMS can also be used as a plugin for OpenSim either         *
+ * through the OpenSim GUI or API. See https://simtk.org/home/ceinms and the  *
+ * NOTICE file for more information. CEINMS development was coordinated       *
+ * through Griffith University and supported by the Australian National       *
+ * Health and Medical Research Council (NHMRC), the US National Institutes of *
+ * Health (NIH), and the European Union Framework Programme 7 (EU FP7). Also  *
+ * see the PROJECTS file for more information about the funding projects.     *
+ *                                                                            *
+ * Copyright (c) 2010-2015 Griffith University and the Contributors           *
+ *                                                                            *
+ * CEINMS Contributors: C. Pizzolato, M. Reggiani, M. Sartori,                *
+ *                      E. Ceseracciu, and D.G. Lloyd                         *
+ *                                                                            *
+ * Author(s): C. Pizzolato, M. Reggiani                                       *
+ *                                                                            *
+ * CEINMS is licensed under the Apache License, Version 2.0 (the "License").  *
+ * You may not use this file except in compliance with the License. You may   *
+ * obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0.*
+ *                                                                            *
+ * Unless required by applicable law or agreed to in writing, software        *
+ * distributed under the License is distributed on an "AS IS" BASIS,          *
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.   *
+ * See the License for the specific language governing permissions and        *
+ * limitations under the License.                                             *
+ * -------------------------------------------------------------------------- */
 
 #include <iostream>
 using std::cout;
@@ -23,7 +41,7 @@ using std::string;
 
 //#define LOG_SIMULATED_ANNEALING
 
-namespace CEINMS {
+namespace ceinms {
     namespace Optimizers {
 
         template<typename OptimizerSystem>
@@ -40,7 +58,7 @@ namespace CEINMS {
             f_(std::numeric_limits<double>::max()),
             fp_(std::numeric_limits<double>::max()),
             fOpt_(std::numeric_limits<double>::max())
-            {
+        {
 
             noParameters_ = optimizerSystem_.getNoParameters();
             x_ = optimizerSystem_.getParameters();
@@ -59,7 +77,7 @@ namespace CEINMS {
         }
 
 
-            template<typename OptimizerSystem>
+        template<typename OptimizerSystem>
         void SimulatedAnnealing<OptimizerSystem>::checkBounds(int k) {
 
             if ((xp_.at(k) < lowerBounds_.at(k)) ||
@@ -120,7 +138,7 @@ namespace CEINMS {
 #ifdef LOG_SIMULATED_ANNEALING
                             cout << "fp_ : " << fp_ << endl;
                             cout << "evalNo " << noEval << endl;
-#endif       
+#endif
 
                             // if f' < f then
                             if (fp_ < f_) {
@@ -166,7 +184,7 @@ namespace CEINMS {
 
                     for (int h = 0; h < noParameters_; ++h) {
                         double ratio = static_cast<double>(noAccepted_.at(h)) / ns_;
-                        if (ratio > 0.6) 
+                        if (ratio > 0.6)
                             v_.at(h) = v_.at(h) * (1 + c.at(h) * (ratio - 0.6) / 0.4);
                         else if (ratio < 0.4)
                             v_.at(h) = v_.at(h) / (1 + c.at(h) * ((0.4 - ratio) / 0.4));
@@ -198,12 +216,12 @@ namespace CEINMS {
                 updateFandFlatest();
                 // restart
                 x_ = xOpt_;
-                
+
             }  /* end while */
 
             optimizerSystem_.setParameters(xOpt_);
             optimizerSystem_.evaluate();
-//            cout << "total evaluations:" << noEval << endl;
+            //            cout << "total evaluations:" << noEval << endl;
             return 0;
         }
 
@@ -216,7 +234,7 @@ namespace CEINMS {
 
         template <typename OptimizerSystem>
         bool SimulatedAnnealing<OptimizerSystem>::doTerminate() {
-     
+
             fLatest_.at(0) = f_;
 
             for (unsigned int a = 0; a < nEpsilon_; ++a) {
@@ -235,7 +253,6 @@ namespace CEINMS {
         }
 
 
-
         template<typename OptimizerSystem>
         void SimulatedAnnealing<OptimizerSystem>::updateFandFlatest() {
             for (unsigned int a = 1; a < nEpsilon_; ++a)
@@ -243,5 +260,5 @@ namespace CEINMS {
 
             f_ = fOpt_;
         }
-
-    }}
+    }
+}

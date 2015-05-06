@@ -1,3 +1,31 @@
+/* -------------------------------------------------------------------------- *
+ * CEINMS is a standalone toolbox for neuromusculoskeletal modelling and      *
+ * simulation. CEINMS can also be used as a plugin for OpenSim either         *
+ * through the OpenSim GUI or API. See https://simtk.org/home/ceinms and the  *
+ * NOTICE file for more information. CEINMS development was coordinated       *
+ * through Griffith University and supported by the Australian National       *
+ * Health and Medical Research Council (NHMRC), the US National Institutes of *
+ * Health (NIH), and the European Union Framework Programme 7 (EU FP7). Also  *
+ * see the PROJECTS file for more information about the funding projects.     *
+ *                                                                            *
+ * Copyright (c) 2010-2015 Griffith University and the Contributors           *
+ *                                                                            *
+ * CEINMS Contributors: C. Pizzolato, M. Reggiani, M. Sartori,                *
+ *                      E. Ceseracciu, and D.G. Lloyd                         *
+ *                                                                            *
+ * Author(s): C. Pizzolato                                                    *
+ *                                                                            *
+ * CEINMS is licensed under the Apache License, Version 2.0 (the "License").  *
+ * You may not use this file except in compliance with the License. You may   *
+ * obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0.*
+ *                                                                            *
+ * Unless required by applicable law or agreed to in writing, software        *
+ * distributed under the License is distributed on an "AS IS" BASIS,          *
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.   *
+ * See the License for the specific language governing permissions and        *
+ * limitations under the License.                                             *
+ * -------------------------------------------------------------------------- */
+
 #include "SimulatedAnnealing.h"
 #include "AbstractOptimizerSystem.h"
 #include "SimulatedAnnealingParameters.h"
@@ -6,7 +34,8 @@ using std::vector;
 #include <iostream>
 using std::cout;
 using std::endl;
-using namespace CEINMS::Optimizers;
+using ceinms::Optimizers::AbstractOptimizerSystem;
+using ceinms::Optimizers::SimulatedAnnealing;
 
 class RosenbrockFunction : public AbstractOptimizerSystem {
 
@@ -17,7 +46,7 @@ public:
     void setParameters(const std::vector<double>& x) { parameters_ = x; }
     std::vector<double> getParameters() const{ return parameters_; }
     double getF() const { return f_; }
-    unsigned getNoParameters() const { return parameters_.size(); }
+    size_t getNoParameters() const { return parameters_.size(); }
     void getUpperLowerBounds(std::vector<double>& upperBounds, std::vector<double>& lowerBounds) const {
         upperBounds = upperBounds_;
         lowerBounds = lowerBounds_;
@@ -47,7 +76,7 @@ int main() {
     RosenbrockFunction myFunction(1, 100);
     vector<double> startParameters({ 20, 20 });
     myFunction.setParameters(startParameters);
-    SimulatedAnnealingParameters annealingParameters;
+    ceinms::SimulatedAnnealingParameters annealingParameters;
     annealingParameters.epsilon = 1e-6;
     annealingParameters.noEpsilon = 4;
     annealingParameters.maxNoEval = 200000;
@@ -62,6 +91,6 @@ int main() {
    // vector<double> x({ 1, 1 });
    // myFunction.evaluate(x);
     cout << "Found minimum: f(" << x.at(0) << ", " << x.at(1) << ") = " << myFunction.getF() << endl;
-    
+
 
 }

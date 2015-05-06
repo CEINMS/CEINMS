@@ -1,14 +1,42 @@
+/* -------------------------------------------------------------------------- *
+ * CEINMS is a standalone toolbox for neuromusculoskeletal modelling and      *
+ * simulation. CEINMS can also be used as a plugin for OpenSim either         *
+ * through the OpenSim GUI or API. See https://simtk.org/home/ceinms and the  *
+ * NOTICE file for more information. CEINMS development was coordinated       *
+ * through Griffith University and supported by the Australian National       *
+ * Health and Medical Research Council (NHMRC), the US National Institutes of *
+ * Health (NIH), and the European Union Framework Programme 7 (EU FP7). Also  *
+ * see the PROJECTS file for more information about the funding projects.     *
+ *                                                                            *
+ * Copyright (c) 2010-2015 Griffith University and the Contributors           *
+ *                                                                            *
+ * CEINMS Contributors: C. Pizzolato, M. Reggiani, M. Sartori,                *
+ *                      E. Ceseracciu, and D.G. Lloyd                         *
+ *                                                                            *
+ * Author(s): C. Pizzolato                                                    *
+ *                                                                            *
+ * CEINMS is licensed under the Apache License, Version 2.0 (the "License").  *
+ * You may not use this file except in compliance with the License. You may   *
+ * obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0.*
+ *                                                                            *
+ * Unless required by applicable law or agreed to in writing, software        *
+ * distributed under the License is distributed on an "AS IS" BASIS,          *
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.   *
+ * See the License for the specific language governing permissions and        *
+ * limitations under the License.                                             *
+ * -------------------------------------------------------------------------- */
+
 #include "NMSmodelSystem.h"
 #include "MinTorqueError.h"
 #include "BatchEvaluator.h"
 #include "TrialData.h"
 #include "SimulatedAnnealing.h"
 
-using CEINMS::TrialData;
+using ceinms::TrialData;
 #include "InputConnectors.h"
-using CEINMS::InputConnectors;
+using ceinms::InputConnectors;
 #include "OutputConnectors.h"
-using CEINMS::OutputConnectors;
+using ceinms::OutputConnectors;
 #include "QueuesToTrialData.h"
 #include "EMGFromFile.h"
 #include "LmtMaFromStorageFile.h"
@@ -36,18 +64,19 @@ using std::endl;
 #include <list>
 using std::list;
 #include <chrono>
-
+#include "Utilities.h"
+using namespace ceinms;
 
 void setLmtMaFilenames(const string& directory, const vector< string > dofNames, string& lmtDataFilename, vector< string >& maDataFilenames)
 {
     std::string pattern{ "_Length.sto" };
-    lmtDataFilename = directory + "/" + findFile(pattern, directory);
+    lmtDataFilename = directory + "/" + ceinms::findFile(pattern, directory);
 
     int currentDof = 0;
     for (auto& it : dofNames)
     {
         std::string pattern = "_MomentArm_" + it + ".sto";
-        std::string maDataFilename = directory + "/" + findFile(pattern, directory);
+        std::string maDataFilename = directory + "/" + ceinms::findFile(pattern, directory);
         maDataFilenames.push_back(maDataFilename);
     }
 }
@@ -71,7 +100,7 @@ void sortMaFilenames(const std::map<string, string>& maMap, const vector< string
 
 
 template<typename NMSmodelT>
-CEINMS::TrialData readTrialData(std::string inputDataFilename, NMSmodelT& mySubject, std::string trialId, std::string emgGeneratorFile)
+TrialData readTrialData(std::string inputDataFilename, NMSmodelT& mySubject, std::string trialId, std::string emgGeneratorFile)
 {
     InputDataXmlReader dataLocations(inputDataFilename);
     // CEINMS::InputConnectors* inputConnectors= new CEINMS::InputConnectors();
@@ -212,17 +241,17 @@ int main(int argc, char** argv) {
             std::cout << "CalibrationStepCfg " << currentCalibrationStep.getStepCfg() << std::endl;
             switch (currentCalibrationStep.getStepCfg()) {
             case CalibrationCfg::MinimizeTorqueErrorParameterSetDefault: {
-              
+
                 vector<string> dofsToCalibrate;
                 currentCalibrationStep.getDofNames(dofsToCalibrate);
                 ParameterSet parameterSet;
                 currentCalibrationStep.getParameterSet(parameterSet);
-                using MySystem = CEINMS::NMSmodelSystem < MyNMSmodel, CEINMS::MinTorqueError > ;
-                MySystem system(mySubject, trials, CEINMS::MinTorqueError(), parameterSet, dofsToCalibrate);
+                using MySystem = NMSmodelSystem < MyNMSmodel, MinTorqueError > ;
+                MySystem system(mySubject, trials, MinTorqueError(), parameterSet, dofsToCalibrate);
 
                 SimulatedAnnealingParameters simanParameters;
                 calibrationXmlReader.getOptimizationAlgorithmParameters(simanParameters);
-                CEINMS::Optimizers::SimulatedAnnealing<MySystem> optimizer(system, simanParameters);
+                Optimizers::SimulatedAnnealing<MySystem> optimizer(system, simanParameters);
 
                 auto timeBegin = std::chrono::high_resolution_clock::now();
                 optimizer.optimize();
@@ -253,17 +282,17 @@ int main(int argc, char** argv) {
             std::cout << "CalibrationStepCfg " << currentCalibrationStep.getStepCfg() << std::endl;
             switch (currentCalibrationStep.getStepCfg()) {
             case CalibrationCfg::MinimizeTorqueErrorParameterSetDefault: {
-                CEINMS::MinTorqueError objFun;
+                MinTorqueError objFun;
                 vector<string> dofsToCalibrate;
                 currentCalibrationStep.getDofNames(dofsToCalibrate);
                 ParameterSet parameterSet;
                 currentCalibrationStep.getParameterSet(parameterSet);
-                using MySystem = CEINMS::NMSmodelSystem < MyNMSmodel, CEINMS::MinTorqueError >;
-                MySystem system(mySubject, trials, CEINMS::MinTorqueError(), parameterSet, dofsToCalibrate);
+                using MySystem = NMSmodelSystem < MyNMSmodel, MinTorqueError >;
+                MySystem system(mySubject, trials, MinTorqueError(), parameterSet, dofsToCalibrate);
 
                 SimulatedAnnealingParameters simanParameters;
                 calibrationXmlReader.getOptimizationAlgorithmParameters(simanParameters);
-                CEINMS::Optimizers::SimulatedAnnealing<MySystem> optimizer(system, simanParameters);
+                Optimizers::SimulatedAnnealing<MySystem> optimizer(system, simanParameters);
 
                 auto timeBegin = std::chrono::high_resolution_clock::now();
                 optimizer.optimize();

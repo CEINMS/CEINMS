@@ -1,7 +1,35 @@
+/* -------------------------------------------------------------------------- *
+ * CEINMS is a standalone toolbox for neuromusculoskeletal modelling and      *
+ * simulation. CEINMS can also be used as a plugin for OpenSim either         *
+ * through the OpenSim GUI or API. See https://simtk.org/home/ceinms and the  *
+ * NOTICE file for more information. CEINMS development was coordinated       *
+ * through Griffith University and supported by the Australian National       *
+ * Health and Medical Research Council (NHMRC), the US National Institutes of *
+ * Health (NIH), and the European Union Framework Programme 7 (EU FP7). Also  *
+ * see the PROJECTS file for more information about the funding projects.     *
+ *                                                                            *
+ * Copyright (c) 2010-2015 Griffith University and the Contributors           *
+ *                                                                            *
+ * CEINMS Contributors: C. Pizzolato, M. Reggiani, M. Sartori,                *
+ *                      E. Ceseracciu, and D.G. Lloyd                         *
+ *                                                                            *
+ * Author(s): C. Pizzolato                                                    *
+ *                                                                            *
+ * CEINMS is licensed under the Apache License, Version 2.0 (the "License").  *
+ * You may not use this file except in compliance with the License. You may   *
+ * obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0.*
+ *                                                                            *
+ * Unless required by applicable law or agreed to in writing, software        *
+ * distributed under the License is distributed on an "AS IS" BASIS,          *
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.   *
+ * See the License for the specific language governing permissions and        *
+ * limitations under the License.                                             *
+ * -------------------------------------------------------------------------- */
+
 #include <algorithm>
 #include <stdexcept>
 
-namespace CEINMS {
+namespace ceinms {
 
     template <typename T>
     DataTable<T>::DataTable() :
@@ -121,7 +149,7 @@ namespace CEINMS {
 
         if (lhs.getNColumns() != rhs.getNColumns() || lhs.getNColumns() != rhs.getNColumns())
             throw std::invalid_argument("lhs and rhs differ in size");  //check just on data size.. ignore labels and time column
-               
+
         DataTable<T> ans(lhs.getNRows() < rhs.getNRows() ? lhs.getNRows() : rhs.getNRows(), lhs.getNColumns());
         for (size_t r(0); r < lhs.nRows_; ++r)
             for (size_t c(0); c < lhs.nCols_; ++c)
@@ -140,17 +168,17 @@ namespace CEINMS {
             for (size_t c(0); c < lhs.nCols_; ++c)
                 ans.at(r, c) = lhs.at(r, c)*scalar;
         ans.labels_ = lhs.labels_;
-        ans.time_.assign(lhs.time_.begin(), lhs.time_.begin()+ans.nRows_);
+        ans.time_.assign(lhs.time_.begin(), lhs.time_.begin() + ans.nRows_);
         return ans;
     }
 
     template<typename T>
     bool DataTable<T>::equals(const DataTable<T>& rhs) const {
-        return(data_   == rhs.data_   &&
-               labels_ == rhs.labels_ &&
-               time_   == rhs.time_   &&
-               nCols_  == rhs.nCols_  &&
-               nRows_  == rhs.nRows_);
+        return(data_ == rhs.data_   &&
+            labels_ == rhs.labels_ &&
+            time_ == rhs.time_   &&
+            nCols_ == rhs.nCols_  &&
+            nRows_ == rhs.nRows_);
 
 
     }

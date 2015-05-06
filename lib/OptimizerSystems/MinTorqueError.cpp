@@ -1,14 +1,41 @@
+/* -------------------------------------------------------------------------- *
+ * CEINMS is a standalone toolbox for neuromusculoskeletal modelling and      *
+ * simulation. CEINMS can also be used as a plugin for OpenSim either         *
+ * through the OpenSim GUI or API. See https://simtk.org/home/ceinms and the  *
+ * NOTICE file for more information. CEINMS development was coordinated       *
+ * through Griffith University and supported by the Australian National       *
+ * Health and Medical Research Council (NHMRC), the US National Institutes of *
+ * Health (NIH), and the European Union Framework Programme 7 (EU FP7). Also  *
+ * see the PROJECTS file for more information about the funding projects.     *
+ *                                                                            *
+ * Copyright (c) 2010-2015 Griffith University and the Contributors           *
+ *                                                                            *
+ * CEINMS Contributors: C. Pizzolato, M. Reggiani, M. Sartori,                *
+ *                      E. Ceseracciu, and D.G. Lloyd                         *
+ *                                                                            *
+ * Author(s): C. Pizzolato, M. Reggiani, D.G. Lloyd                           *
+ *                                                                            *
+ * CEINMS is licensed under the Apache License, Version 2.0 (the "License").  *
+ * You may not use this file except in compliance with the License. You may   *
+ * obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0.*
+ *                                                                            *
+ * Unless required by applicable law or agreed to in writing, software        *
+ * distributed under the License is distributed on an "AS IS" BASIS,          *
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.   *
+ * See the License for the specific language governing permissions and        *
+ * limitations under the License.                                             *
+ * -------------------------------------------------------------------------- */
+
 #include "MinTorqueError.h"
 
 #include <algorithm>
 using std::begin;
 using std::end;
 using std::find;
-
 #include <vector>
 using std::vector;
 
-namespace CEINMS {
+namespace ceinms {
 
     void MinTorqueError::setDofsToCalibrate(const std::vector<std::string>& dofsToCalibrate) {
 
@@ -42,7 +69,7 @@ namespace CEINMS {
             double ans(0);
             for (auto& e : v)
                 ans += e;
-            double avg(ans/v.size()); 
+            double avg(ans / v.size());
             double var(0), ep(0);
             for (auto& e : v) {
                 var += (e - avg)*(e - avg);
@@ -57,7 +84,7 @@ namespace CEINMS {
             auto dofNamesFromTrial = trial.dofNames;
             std::vector<double> trialVariance(trial.noDoF, .0);
             for (auto& name : dofsToCalibrate_) {
-                auto i(std::distance(dofNamesFromTrial.begin(),(std::find(dofNamesFromTrial.begin(), dofNamesFromTrial.end(), name))));
+                auto i(std::distance(dofNamesFromTrial.begin(), (std::find(dofNamesFromTrial.begin(), dofNamesFromTrial.end(), name))));
                 trialVariance.at(i) = getVariance(trial.torqueData.getColumn(i));
             }
             torqueVariance_.emplace_back(trialVariance);
@@ -70,7 +97,7 @@ namespace CEINMS {
     void MinTorqueError::calculate(const std::vector<Result>& results) {
         //reset f
         f_ = 0;
-        
+
         using TrialDataIt = std::vector<TrialData>::const_iterator;
         using ResultIt = std::vector<Result>::const_iterator;
 
@@ -81,7 +108,7 @@ namespace CEINMS {
             TrialCost(size_t nDofs) :
                 torqueError(nDofs, 0.),
                 penalty(0.) {}
-;
+            ;
         };
 
         std::vector<TrialCost> trialCosts;
@@ -108,11 +135,7 @@ namespace CEINMS {
         for (size_t trialIndex(0); trialIndex < trials_.size(); ++trialIndex) {
             for (auto& dofIdx : dofsToCalibrateIdx_.at(trialIndex))
                 f_ += (trialCosts.at(trialIndex).torqueError.at(dofIdx) / torqueVariance_.at(trialIndex).at(dofIdx) +
-                       trialCosts.at(trialIndex).penalty) / results.at(trialIndex).torques.getNRows();
-            }
-        
+                trialCosts.at(trialIndex).penalty) / results.at(trialIndex).torques.getNRows();
+        }
     }
-
-
-
 }

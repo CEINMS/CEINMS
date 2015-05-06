@@ -1,14 +1,42 @@
+/* -------------------------------------------------------------------------- *
+ * CEINMS is a standalone toolbox for neuromusculoskeletal modelling and      *
+ * simulation. CEINMS can also be used as a plugin for OpenSim either         *
+ * through the OpenSim GUI or API. See https://simtk.org/home/ceinms and the  *
+ * NOTICE file for more information. CEINMS development was coordinated       *
+ * through Griffith University and supported by the Australian National       *
+ * Health and Medical Research Council (NHMRC), the US National Institutes of *
+ * Health (NIH), and the European Union Framework Programme 7 (EU FP7). Also  *
+ * see the PROJECTS file for more information about the funding projects.     *
+ *                                                                            *
+ * Copyright (c) 2010-2015 Griffith University and the Contributors           *
+ *                                                                            *
+ * CEINMS Contributors: C. Pizzolato, M. Reggiani, M. Sartori,                *
+ *                      E. Ceseracciu, and D.G. Lloyd                         *
+ *                                                                            *
+ * Author(s): C. Pizzolato                                                    *
+ *                                                                            *
+ * CEINMS is licensed under the Apache License, Version 2.0 (the "License").  *
+ * You may not use this file except in compliance with the License. You may   *
+ * obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0.*
+ *                                                                            *
+ * Unless required by applicable law or agreed to in writing, software        *
+ * distributed under the License is distributed on an "AS IS" BASIS,          *
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.   *
+ * See the License for the specific language governing permissions and        *
+ * limitations under the License.                                             *
+ * -------------------------------------------------------------------------- */
+
 #include <future>
 #include <thread>
 
 #include "TimeCompare.h"
 #include <vector>
 
-namespace CEINMS {
+namespace ceinms {
 
     BatchEvaluator::BatchEvaluator(const std::vector<TrialData>& trials) :
         trials_(trials) {
-        
+
         size_t nTrials(trials.size());
         for (size_t i(0); i < nTrials; ++i) {
             size_t nEmgRows = trials.at(i).emgData.getNRows();
@@ -18,7 +46,7 @@ namespace CEINMS {
             results_.emplace_back(Result(nMTUs, nDofs, nEmgRows, nLmtRows));
         }
         size_t nMusclesInSubject(trials.front().lmtData.getNColumns());
-       
+
         //I need to resize them, otherwise I get an error at the first execution, because they are different in length
         subjectParametersT1_.resize(nMusclesInSubject);
         subjectParameters_.resize(nMusclesInSubject);
@@ -31,7 +59,7 @@ namespace CEINMS {
         subject.getMusclesParameters(subjectParameters_);
         updMusclesToUpdate();
         subjectParametersT1_ = subjectParameters_; //for next evaluation
-        
+
         for (unsigned i(0); i < trials_.size(); ++i) {
             OpenLoopEvaluator::evaluate(subject, trials_.at(i), musclesToUpdate_, results_.at(i));
         }
@@ -89,15 +117,15 @@ namespace CEINMS {
     void OpenLoopEvaluator::evaluate(NMSmodelT&& subject, const TrialData& trialData, const std::vector<unsigned> musclesToUpdate, Result& previousResult) { //pass previousResult by copy, because I need a copy later
 
         //ct trial index
-        initFiberLengthTraceCurves(subject, trialData, musclesToUpdate, previousResult); 
-     
+        initFiberLengthTraceCurves(subject, trialData, musclesToUpdate, previousResult);
+
         unsigned lmtMaIndex(0); // k is the index for lmt and ma data
         double lmtTime = trialData.lmtData.getStartTime();
         double emgTime = trialData.emgData.getStartTime() + subject.getGlobalEmDelay();
         bool firstLmtArrived(false);
-        
 
-        // Let's start going through the EMG, lmt, and ma data...  
+
+        // Let's start going through the EMG, lmt, and ma data...
         for (unsigned emgIndex(0); emgIndex < trialData.emgData.getNRows(); ++emgIndex) {
 
             emgTime = trialData.emgData.getTime(emgIndex);
@@ -134,25 +162,6 @@ namespace CEINMS {
                 ++lmtMaIndex;
                 if (lmtMaIndex < trialData.lmtData.getNRows())
                     lmtTime = trialData.lmtData.getTime(lmtMaIndex);
-
-
-#ifdef DEBUG
-                cout << endl << endl << "EmgTime: " << emgTime << endl << "EMG" << endl;
-
-                for (unsigned int l = 0; l < trials_.at(ct).emgData_.at(i).size(); ++l)
-                    cout << trials_.at(ct).emgData_.at(i).at(l) << "\t";
-                cout << endl << "LmtTime: " << lmtTime << endl;
-
-                for (unsigned int l = 0; l < trials_.at(ct).lmtData_.at(k).size(); ++l)
-                    cout << trials_.at(ct).lmtData_.at(k).at(l) << "\t";
-                cout << endl << "MomentArms" << endl;
-
-                for (unsigned int l = 0; l < trials_.at(ct).maData_.at(0).at(k).size(); ++l)
-                    cout << trials_.at(ct).maData_.at(0).at(k).at(l) << "\t";
-                cout << "\ncurrent torque: " << currentTorques.at(0);
-
-                cout << endl << "----------------------------------------" << endl;
-#endif
             }
             std::vector<double> currentActivations;
             subject.getActivations(currentActivations);
@@ -193,7 +202,7 @@ namespace CEINMS {
                 subject.updateActivations(musclesToUpdate);
 
 
-                // set lmt 
+                // set lmt
                 subject.setMuscleTendonLengthsSelective(trialData.lmtData.getRow(lmtMaIndex), musclesToUpdate);
                 subject.updateFibreLengths_OFFLINEPREP(musclesToUpdate);
 

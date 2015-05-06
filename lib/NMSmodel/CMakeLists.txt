@@ -56,8 +56,7 @@ target_include_directories(NMSmodel PRIVATE ${Curve_INCLUDE_DIRS}
                                     )
 target_link_libraries(NMSmodel xmlInput)
 # Save path to include directory for "internal" usage
-set(NMSmodel_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}/Activation" "${CMAKE_CURRENT_SOURCE_DIR}/Tendon" CACHE STRING "Include directory for NMSmodel library")
-mark_as_advanced(NMSmodel_INCLUDE_DIRS)
+set(NMSmodel_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}/Activation" "${CMAKE_CURRENT_SOURCE_DIR}/Tendon" CACHE INTERNAL "Include directory for NMSmodel library")
 
 # Install
 install(FILES ${Activation_HEADERS} ${NMS_HEADERS} ${Tendon_HEADERS} ${NMS_TEMPLATE_IMPLEMENTATION} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}) #should add namespace
