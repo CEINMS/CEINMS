@@ -5,11 +5,13 @@ set(OutputConnectors_SOURCES
     OutputConnectors.cpp
     LoggerOnQueues.cpp
     QueuesToTrialData.cpp
+    QueuesToContactForces.cpp
 )
 set(OutputConnectors_HEADERS 
     OutputConnectors.h
     LoggerOnQueues.h
     QueuesToTrialData.h
+    QueuesToContactForces.h
 )
 
 set(QueuesToStorageFiles_SOURCES
@@ -27,14 +29,17 @@ add_library(OutputConnectors STATIC
   ${QueuesToStorageFiles_SOURCES}
   ${QueuesToStorageFiles_HEADERS}
 )
-target_link_libraries(OutputConnectors ${Boost_FILESYSTEM_LIBRARY})
+target_link_libraries(OutputConnectors JointContactModels ${Boost_FILESYSTEM_LIBRARY} ${OPENSIM_LIBRARIES})
 target_include_directories(OutputConnectors
                                 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}
                                         ${ceinms_common_INCLUDE_DIRS}
                                         ${InputConnectors_INCLUDE_DIRS}
                                         ${Concurrency_INCLUDE_DIRS}
                                         ${TrialData_INCLUDE_DIRS}
-                                PUBLIC ${Boost_INCLUDE_DIRS})
+										${JointContactModels_INCLUDE_DIRS}
+                                PUBLIC  ${Boost_INCLUDE_DIRS}
+								        ${OPENSIM_INCLUDE_DIRS}
+                                        ${SIMTK_INCLUDE_DIRS})
 
 # Save path to include directory for "internal" usage
 set(OutputConnectors_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/QueuesToStorageFiles CACHE INTERNAL "Include directories for OutputConnectors library")
