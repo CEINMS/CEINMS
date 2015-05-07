@@ -78,6 +78,7 @@ namespace ceinms {
         void setPennationAngle(double pennationAngle);
         void setMaxIsometricForce(double maxIsometricForce);
         void setMaxContractionVelocity(double maxContractionVelocity);
+        void setDamping(double damping);
         void setCurves(const CurveOffline& activeForceLengthCurve,
             const CurveOffline& passiveForceLengthCurve,
             const CurveOffline& forceVelocityCurve,

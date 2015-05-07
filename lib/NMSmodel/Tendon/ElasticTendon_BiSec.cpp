@@ -249,6 +249,12 @@ namespace ceinms {
         resetState();
     }
 
+    void ElasticTendon_BiSec::setDamping(double damping) {
+
+        damping_ = damping;
+        resetState();
+    }
+
     void ElasticTendon_BiSec::resetState() {
 
         muscleTendonLength_ = 0.0;

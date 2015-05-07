@@ -33,6 +33,7 @@
       <xs:element name="pennationAngle" type="AngleInputType"/>
       <xs:element name="tendonSlackLength" type="xs:double"/>
       <xs:element minOccurs="0" name="maxContractionVelocity" type="xs:double"/>
+      <xs:element minOccurs="0" name="damping" type="xs:double"/>
       <xs:element name="maxIsometricForce" type="xs:double"/>
       <xs:element name="strengthCoefficient" type="xs:double"/>
     </xs:sequence>

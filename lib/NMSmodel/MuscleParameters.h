@@ -46,6 +46,7 @@ namespace ceinms {
         double getMaxIsometricForce() const      { return maxIsometricForce_; }
         double getStrengthCoefficient() const    { return strengthCoefficient_; }
         double getEmDelay() const                { return emDelay_; }
+        double getDamping() const                { return damping_; }
 
         void setC1(double c1)                                   { c1_ = c1; }
         void setC2(double c2)                                   { c2_ = c2; }
@@ -57,6 +58,7 @@ namespace ceinms {
         void setMaxIsometricForce(double maxIsometricForce)     { maxIsometricForce_ = maxIsometricForce; }
         void setStrengthCoefficient(double strengthCoefficient) { strengthCoefficient_ = strengthCoefficient; }
         void setEmDelay(double emDelay)                         { emDelay_ = emDelay; }
+        void setDamping(double damping)                         { damping_ = damping; }
 
     private:
         double c1_;
@@ -69,6 +71,7 @@ namespace ceinms {
         double maxIsometricForce_;
         double strengthCoefficient_;
         double emDelay_;
+        double damping_;
     };
 }
 

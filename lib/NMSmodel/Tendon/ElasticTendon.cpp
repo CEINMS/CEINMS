@@ -721,6 +721,12 @@ namespace ceinms {
         resetState();
     }
 
+    template <CurveMode::Mode mode>
+    void ElasticTendon<mode>::setDamping(double damping) {
+
+        damping_ = damping;
+        resetState();
+    }
 
 
     template <CurveMode::Mode mode>

@@ -79,6 +79,7 @@ namespace ceinms {
             const CurveOffline& forceVelocityCurve,
             const CurveOffline& tendonForceStrainCurve) { };
         void setMaxContractionVelocity(double maxContractionVelocity) {/*empty*/ }
+        void setDamping(double damping)  {/*empty*/ };
         void pushState() {};
         void resetState();
 

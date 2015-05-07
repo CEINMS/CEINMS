@@ -121,7 +121,12 @@ namespace ceinms {
             else
                 emDelay = mtuDefault.emDelay();
             double percentageChange = mtuDefault.percentageChange();
-            double damping = mtuDefault.damping();
+            MTUType::damping_optional& dampingOpt((*i).damping());
+            double damping;
+            if (dampingOpt.present())
+                damping = (*i).damping().get();
+            else
+                damping = mtuDefault.damping();
             double maxIsometricForce = (*i).maxIsometricForce();
             double c1 = (*i).c1();
             double c2 = (*i).c2();

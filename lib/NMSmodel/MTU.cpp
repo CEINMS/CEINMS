@@ -440,6 +440,13 @@ namespace ceinms {
         resetState();
     }
 
+    template<typename Activation, typename Tendon, CurveMode::Mode mode>
+    void MTU<Activation, Tendon, mode>::setDamping(double damping) {
+        damping_ = damping;
+        tendonDynamic_.setDamping(damping_);
+        resetState();
+    }
+
 
     template<typename Activation, typename Tendon, CurveMode::Mode mode>
     double MTU<Activation, Tendon, mode>::getPenalty() const {

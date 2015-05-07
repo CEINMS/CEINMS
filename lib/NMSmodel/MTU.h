@@ -122,6 +122,7 @@ namespace ceinms {
         double getMuscleForce() const { return muscleForce_; }
         double getPercentageChange() const { return percentageChange_; }
         double getDamping() const { return damping_; }
+        void   setDamping(double damping);
 
 
         void setTendonTolerance(double tolerance = 0.0);

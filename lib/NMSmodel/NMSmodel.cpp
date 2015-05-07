@@ -697,6 +697,16 @@ namespace ceinms {
             maxContractionVelocities.emplace_back(muscleIt->getMaxContractionVelocity());
     }
 
+    template <typename Activation, typename Tendon, CurveMode::Mode mode>
+    void NMSmodel<Activation, Tendon, mode>::getDampings(vector<double>& dampings) const {
+
+        dampings.clear();
+        dampings.reserve(muscles_.size());
+        vectorMTUconstItr muscleIt = muscles_.begin();
+        for (muscleIt = muscles_.begin(); muscleIt != muscles_.end(); ++muscleIt)
+            dampings.emplace_back(muscleIt->getDamping());
+    }
+
 
     template <typename Activation, typename Tendon, CurveMode::Mode mode>
     void NMSmodel<Activation, Tendon, mode>::getMusclesIndexOnDof(vector<unsigned>& musclesIndex, unsigned whichDof) const {
@@ -1005,6 +1015,15 @@ namespace ceinms {
             muscleIt->setMaxContractionVelocity(*it);
     }
 
+    template <typename Activation, typename Tendon, CurveMode::Mode mode>
+    void NMSmodel<Activation, Tendon, mode>::setDampings(const vector<double>& dampings) {
+
+        vectorMTUitr muscleIt = muscles_.begin();
+        vector<double>::const_iterator it = dampings.begin();
+        for (muscleIt = muscles_.begin(); muscleIt != muscles_.end(); ++muscleIt, ++it)
+            muscleIt->setDamping(*it);
+    }
+
 
     template <typename Activation, typename Tendon, CurveMode::Mode mode>
     void NMSmodel<Activation, Tendon, mode>::setTendonTolerance(double tolerance) {
@@ -1100,6 +1119,7 @@ namespace ceinms {
             parameters.at(i).setStrengthCoefficient(muscles_.at(i).getStrengthCoefficient());
             parameters.at(i).setEmDelay(muscles_.at(i).getEmDelay());
             parameters.at(i).setMaxContractionVelocity(muscles_.at(i).getMaxContractionVelocity());
+            parameters.at(i).setDamping(muscles_.at(i).getDamping());
         }
     }
 
@@ -1121,6 +1141,7 @@ namespace ceinms {
             mIt->setStrengthCoefficient(pIt->getStrengthCoefficient());
             mIt->setEmDelay(pIt->getEmDelay());
             mIt->setMaxContractionVelocity(pIt->getMaxContractionVelocity());
+            mIt->setDamping(pIt->getDamping());
 
         }
     }

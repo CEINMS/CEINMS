@@ -219,6 +219,7 @@ namespace ceinms {
             subject_.getC2Coefficients(coefficients);
             break;
         case Parameter::Damping:
+            subject_.getDampings(coefficients);
             break;
         case Parameter::EmDelay:
             break;
@@ -258,6 +259,7 @@ namespace ceinms {
             subject_.setC2Coefficients(coefficients);
             break;
         case Parameter::Damping:
+            subject_.setDampings(coefficients);
             break;
         case Parameter::EmDelay:
             break;
