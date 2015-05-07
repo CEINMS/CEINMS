@@ -32,11 +32,6 @@
 #include "TimeCompare.h"
 #include <vector>
 
-#define LOG //
-#include <iostream> //
-using std::cout; //
-using std::endl; //
-
 namespace ceinms {
 
     BatchEvaluator::BatchEvaluator(const std::vector<TrialData>& trials) :
@@ -130,11 +125,8 @@ namespace ceinms {
         double emgTime = trialData.emgData.getStartTime() + emDelay;
         bool firstLmtArrived(false);
 
-
         // Let's start going through the EMG, lmt, and ma data...
         for (unsigned emgIndex(0); emgIndex < trialData.emgData.getNRows(); ++emgIndex) {
-
-
 
             emgTime = trialData.emgData.getTime(emgIndex) + emDelay;
             if (!firstLmtArrived && TimeCompare::less(emgTime, lmtTime)) {
@@ -151,8 +143,8 @@ namespace ceinms {
 
                 subject.setActivations(previousResult.activations.getRow(emgIndex));
                 subject.setEmgsSelective(trialData.emgData.getRow(emgIndex), musclesToUpdate);
-              //  subject.setMuscleTendonLengthsSelective(trialData.lmtData.getRow(lmtMaIndex), musclesToUpdate); //might save computation by having a set muscle tendon length selective.. to check ;)
-                subject.setMuscleTendonLengths(trialData.lmtData.getRow(lmtMaIndex)); 
+                subject.setMuscleTendonLengthsSelective(trialData.lmtData.getRow(lmtMaIndex), musclesToUpdate); //might save computation by having a set muscle tendon length selective.. to check ;)
+             //   subject.setMuscleTendonLengths(trialData.lmtData.getRow(lmtMaIndex)); 
                 for (unsigned dofIndex(0); dofIndex < trialData.noDoF; ++dofIndex)
                     subject.setMomentArms(trialData.maData.at(dofIndex).getRow(lmtMaIndex), dofIndex);
                 subject.updateState_OFFLINE(musclesToUpdate);
@@ -170,48 +162,6 @@ namespace ceinms {
 
                 for (auto &it : musclesToUpdate)
                     previousResult.penalties.at(lmtMaIndex, it) = penaltiesAtT.at(it);
-
-
-#ifdef LOG
-                vector<double> emgFromSubject;
-                subject.getEmgs(emgFromSubject);
-                cout << endl << endl << "EmgTime: " << emgTime << endl << "EMG" << endl;
-                for (auto& it : emgFromSubject)
-                    cout << it << "\t";
-
-                cout << endl << "Activations: " << endl;
-                vector<double> cActivations;
-                subject.getActivations(cActivations);
-                for (auto& it : cActivations)
-                    cout << it << "\t";
-
-                cout << endl << "LmtTime: " << lmtTime << endl << "Lmt" << endl;
-                for (auto& it : trialData.lmtData.getRow(lmtMaIndex))
-                    cout << it << "\t";
-
-                vector<double> cMuscleForces;
-                subject.getMuscleForces(cMuscleForces);
-                cout << endl << "Muscle forces: " << endl;
-                for (auto& it : cMuscleForces)
-                    cout << it << "\t";
-
-
-                vector<string> dofNames;
-                subject.getDoFNames(dofNames);
-                for (unsigned int j = 0; j < dofNames.size(); ++j) {
-                    cout << endl << "MomentArms on: " << dofNames.at(j) << endl;
-                    for (auto& it : trialData.maData.at(j).getRow(lmtMaIndex))
-                        cout << it << "\t";
-                }
-
-                vector<double> cTorques;
-                subject.getTorques(cTorques);
-                for (unsigned int i = 0; i < cTorques.size(); ++i) {
-                    cout << "\nCurrent Torque on " << dofNames.at(i) << " ";
-                    cout << cTorques.at(i);
-                }
-                cout << endl << "----------------------------------------" << endl;
-#endif
 
                 ++lmtMaIndex;
                 if (lmtMaIndex < trialData.lmtData.getNRows())
@@ -258,10 +208,8 @@ namespace ceinms {
                 subject.setEmgsSelective(trialData.emgData.getRow(emgIndex), musclesToUpdate);
                 subject.updateActivations(musclesToUpdate);
 
-
                 // set lmt
-              //  subject.setMuscleTendonLengthsSelective(trialData.lmtData.getRow(lmtMaIndex), musclesToUpdate);
-                subject.setMuscleTendonLengths(trialData.lmtData.getRow(lmtMaIndex));
+                subject.setMuscleTendonLengthsSelective(trialData.lmtData.getRow(lmtMaIndex), musclesToUpdate);
                 subject.updateFibreLengths_OFFLINEPREP(musclesToUpdate);
                 
                 //save activations for the next iteration
