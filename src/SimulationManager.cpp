@@ -181,11 +181,11 @@ namespace ceinms {
         HybridWeightings weightings;
         executionCfg_.getHybridWeightings(weightings.alpha, weightings.beta, weightings.gamma);
         errorMinimizer.setWeightings(weightings);
-        vector<string> toPredict, toTrack;
-        executionCfg_.getMusclesToPredict(toPredict);
-        executionCfg_.getMusclesToTrack(toTrack);
-        errorMinimizer.setMusclesNamesWithEmgToPredict(toPredict);
-        errorMinimizer.setMusclesNamesWithEmgToTrack(toTrack);
+        vector<string> toSynth, toAdjust;
+        executionCfg_.getMusclesToSynthesise(toSynth);
+        executionCfg_.getMusclesToAdjust(toAdjust);
+        errorMinimizer.setMusclesNamesWithEmgToPredict(toSynth);
+        errorMinimizer.setMusclesNamesWithEmgToTrack(toAdjust);
         double rt, t, epsilon;
         unsigned noEpsilon, ns, nt, maxNoEval;
         executionCfg_.getAnnealingParameters(nt, ns, rt, t, maxNoEval, epsilon, noEpsilon);

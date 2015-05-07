@@ -41,8 +41,8 @@ namespace ceinms {
         ExecutionXmlReader(const std::string& filename);
         NMSModelCfg::RunMode getRunMode() const;
         double getTolerance() const { return tolerance_; };
-        void getMusclesToPredict(std::vector<std::string>& musclesToPredict);
-        void getMusclesToTrack(std::vector<std::string>& musclesToTrack);
+        void getMusclesToSynthesise(std::vector<std::string>& musclesToSynthesise);
+        void getMusclesToAdjust(std::vector<std::string>& musclesToAdjust);
         void getHybridWeightings(double& alpha, double& beta, double& gamma);
         void getAnnealingParameters(unsigned& nt, unsigned& ns, double& rt, double& t, unsigned& maxNoEval, double& epsilon, unsigned& noEpsilon) const;
 

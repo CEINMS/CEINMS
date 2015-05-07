@@ -97,7 +97,7 @@ namespace ceinms {
                 }
                 //      cout << endl;
 
-                fp_ = hybridParameters_.alpha*torqueLeastSquaresFitting + hybridParameters_.beta*emgTracking + hybridParameters_.gamma*emgSum;
+                fp_ = hybridParameters_.alpha*torqueLeastSquaresFitting + hybridParameters_.beta*emgSum + hybridParameters_.gamma*emgTracking;
 
                 /*      cout << "torquesFitting " << torqueLeastSquaresFitting << endl;
                       cout << "trackEMG_ " << emgTracking << endl;

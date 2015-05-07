@@ -145,7 +145,7 @@ namespace ceinms {
     }
 
 
-    void ExecutionXmlReader::getMusclesToPredict(std::vector<std::string>& musclesToPredict) {
+    void ExecutionXmlReader::getMusclesToSynthesise(std::vector<std::string>& musclesToSynthesise) {
 
         ExecutionType::NMSmodel_type& myModel(executionPointer_->NMSmodel());
         ExecutionType::NMSmodel_type::type_type& myType(myModel.type());
@@ -155,15 +155,14 @@ namespace ceinms {
             exit(EXIT_FAILURE);
         }
 
-
-        musclesToPredict.clear();
-        HybridType::predictedMuscles_type& predictedMuscles(myType.hybrid()->predictedMuscles());
-        for (unsigned mi = 0; mi < predictedMuscles.size(); ++mi)
-            musclesToPredict.push_back(predictedMuscles.at(mi));
+        musclesToSynthesise.clear();
+        HybridType::synthMTUs_type& synthMTUs(myType.hybrid()->synthMTUs());
+        for (unsigned mi = 0; mi < synthMTUs.size(); ++mi)
+            musclesToSynthesise.push_back(synthMTUs.at(mi));
     }
 
 
-    void ExecutionXmlReader::getMusclesToTrack(std::vector<std::string>& musclesToTrack) {
+    void ExecutionXmlReader::getMusclesToAdjust(std::vector<std::string>& musclesToAdjust) {
 
         ExecutionType::NMSmodel_type& myModel(executionPointer_->NMSmodel());
         ExecutionType::NMSmodel_type::type_type& myType(myModel.type());
@@ -174,10 +173,10 @@ namespace ceinms {
         }
 
 
-        musclesToTrack.clear();
-        HybridType::trackedMuscles_type& trackedMuscles(myType.hybrid()->trackedMuscles());
-        for (unsigned mi = 0; mi < trackedMuscles.size(); ++mi)
-            musclesToTrack.push_back(trackedMuscles.at(mi));
+        musclesToAdjust.clear();
+        HybridType::adjustMTUs_type& adjustMTUs(myType.hybrid()->adjustMTUs());
+        for (unsigned mi = 0; mi < adjustMTUs.size(); ++mi)
+            musclesToAdjust.push_back(adjustMTUs.at(mi));
     }
 
     void ExecutionXmlReader::getHybridWeightings(double& alpha, double& beta, double& gamma) {

@@ -49,8 +49,8 @@
       <xs:element name="alpha" type="xs:double"/>
       <xs:element name="beta" type="xs:double"/>
       <xs:element name="gamma" type="xs:double"/>
-      <xs:element name="trackedMuscles" type="MuscleListType"/>
-      <xs:element name="predictedMuscles" type="MuscleListType"/>
+      <xs:element name="synthMTUs" type="MuscleListType"/>
+      <xs:element name="adjustMTUs" type="MuscleListType"/>
       <xs:element name="algorithm" type="HybridAlgorithmType"/>
     </xs:sequence>
   </xs:complexType>
