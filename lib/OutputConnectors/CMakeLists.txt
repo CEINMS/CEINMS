@@ -5,7 +5,6 @@ set(OutputConnectors_SOURCES
     OutputConnectors.cpp
     LoggerOnQueues.cpp
     QueuesToTrialData.cpp
-    QueuesToContactForces.cpp
 )
 set(OutputConnectors_HEADERS 
     OutputConnectors.h
@@ -22,10 +21,22 @@ set(QueuesToStorageFiles_HEADERS
   QueuesToStorageFiles/QueuesToStorageFiles.h
 )
 
+
+set(OutputConnectors_TEMPLATE_IMPLEMENTATION
+	QueuesToContactForces.cpp
+							)
+  
+set_source_files_properties( ${OutputConnectors_TEMPLATE_IMPLEMENTATION} PROPERTIES HEADER_FILE_ONLY TRUE)
+
+source_group("Header Files" FILES ${OutputConnectors_HEADERS} ${QueuesToStorageFiles_HEADERS})
+source_group("Source Files" FILES ${OutputConnectors_TEMPLATE_IMPLEMENTATION} ${OutputConnectors_HEADERS} ${QueuesToStorageFiles_SOURCES})
+
+
 # Define target
 add_library(OutputConnectors STATIC
   ${OutputConnectors_SOURCES}
   ${OutputConnectors_HEADERS}
+  ${OutputConnectors_TEMPLATE_IMPLEMENTATION}
   ${QueuesToStorageFiles_SOURCES}
   ${QueuesToStorageFiles_HEADERS}
 )

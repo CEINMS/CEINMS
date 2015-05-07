@@ -13,7 +13,7 @@ namespace ceinms {
 
     class JointContactFromOpensim {
     public:
-        JointContactFromOpensim(const OpenSim::Model& model);
+        JointContactFromOpensim(OpenSim::Model& model);
 
         void setMuscleForces(const std::vector<double>& forces);
         template<typename T>
@@ -23,6 +23,8 @@ namespace ceinms {
         template<typename T>
         void setQdd(const T& qdd);
         void setTime(double time) { state_.updTime() = time; }
+
+        void setState(SimTK::State& state) { state_ = state; }
         
         void setEstimatedMobilityForces(const SimTK::Vector& estimatedMobilityForces); //this is what CEINMS predicts
         void setResidualMobilityForces(const SimTK::Vector& residualMobilityForces);  //this is ID from external file
@@ -43,7 +45,7 @@ namespace ceinms {
     private:
         void calculateResidualMobilityForces(const SimTK::Vector& appliedMobilityForces);
 
-        OpenSim::Model model_;
+        OpenSim::Model& model_;
         SimTK::State state_;
         std::size_t nCoordinates_, nBodies_, nMuscles_;
         

@@ -11,7 +11,7 @@ using std::endl;
 
 namespace ceinms {
  
-    JointContactFromOpensim::JointContactFromOpensim(const OpenSim::Model& model) :
+    JointContactFromOpensim::JointContactFromOpensim(OpenSim::Model& model) :
         model_(model),
         nCoordinates_(model_.getNumCoordinates()),
         nBodies_(model_.getNumBodies()),

@@ -79,7 +79,9 @@ void addCoordinateActuators(OpenSim::Model& model, double control, bool removeMu
     }
 }
 
-void calculateIntersegmentaForcesWithCEINMS(const OpenSim::Model& model, const OpenSim::GCVSplineSet& kinematicsSplines, const vector<double>& timeColumn) {
+void calculateIntersegmentaForcesWithCEINMS(const OpenSim::Model& aModel, const OpenSim::GCVSplineSet& kinematicsSplines, const vector<double>& timeColumn) {
+    
+    OpenSim::Model model(aModel);
 
     JointContactFromOpensim jointContactModel(model);
     auto modelSO(model);
