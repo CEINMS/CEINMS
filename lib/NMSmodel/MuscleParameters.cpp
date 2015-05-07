@@ -52,6 +52,7 @@ namespace ceinms {
                 tendonSlackLength_ == other.tendonSlackLength_      &&
                 maxIsometricForce_ == other.maxIsometricForce_      &&
                 strengthCoefficient_ == other.strengthCoefficient_  &&
+                maxContractionVelocity_ == other.maxContractionVelocity_ &&
                 emDelay_ == other.emDelay_;
     }
 

@@ -42,6 +42,7 @@ namespace ceinms {
         double getOptimalFiberLength() const     { return optimalFiberLength_; }
         double getPennationAngle() const         { return pennationAngle_; }
         double getTendonSlackLenght() const      { return tendonSlackLength_; }
+        double getMaxContractionVelocity() const { return maxContractionVelocity_; }
         double getMaxIsometricForce() const      { return maxIsometricForce_; }
         double getStrengthCoefficient() const    { return strengthCoefficient_; }
         double getEmDelay() const                { return emDelay_; }
@@ -52,6 +53,7 @@ namespace ceinms {
         void setOptimalFiberLength(double optimalFiberLength)   { optimalFiberLength_ = optimalFiberLength; }
         void setPennationAngle(double pennationAngle)           { pennationAngle_ = pennationAngle; }
         void setTendonSlackLength(double tendonSlackLength)     { tendonSlackLength_ = tendonSlackLength; }
+        void setMaxContractionVelocity(double maxContractionVelocity) { maxContractionVelocity_ = maxContractionVelocity; }
         void setMaxIsometricForce(double maxIsometricForce)     { maxIsometricForce_ = maxIsometricForce; }
         void setStrengthCoefficient(double strengthCoefficient) { strengthCoefficient_ = strengthCoefficient; }
         void setEmDelay(double emDelay)                         { emDelay_ = emDelay; }
@@ -63,6 +65,7 @@ namespace ceinms {
         double optimalFiberLength_;
         double pennationAngle_;
         double tendonSlackLength_;
+        double maxContractionVelocity_;
         double maxIsometricForce_;
         double strengthCoefficient_;
         double emDelay_;

@@ -1099,6 +1099,7 @@ namespace ceinms {
             parameters.at(i).setMaxIsometricForce(muscles_.at(i).getMaxIsometricForce());
             parameters.at(i).setStrengthCoefficient(muscles_.at(i).getStrengthCoefficient());
             parameters.at(i).setEmDelay(muscles_.at(i).getEmDelay());
+            parameters.at(i).setMaxContractionVelocity(muscles_.at(i).getMaxContractionVelocity());
         }
     }
 
@@ -1119,6 +1120,7 @@ namespace ceinms {
             mIt->setMaxIsometricForce(pIt->getMaxIsometricForce());
             mIt->setStrengthCoefficient(pIt->getStrengthCoefficient());
             mIt->setEmDelay(pIt->getEmDelay());
+            mIt->setMaxContractionVelocity(pIt->getMaxContractionVelocity());
 
         }
     }
