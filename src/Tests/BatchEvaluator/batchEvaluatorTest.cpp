@@ -28,6 +28,7 @@
 
 #include "BatchEvaluator.h"
 #include "TrialData.h"
+#include "MinTorqueError.h"
 using ceinms::TrialData;
 #include "InputConnectors.h"
 using ceinms::InputConnectors;
@@ -247,7 +248,11 @@ int main(int argc, char** argv) {
                         BatchEvaluator batchEvaluator(trials);
                         batchEvaluator.evaluate(mySubject);
                         auto results(batchEvaluator.getResults());
-
+                        MinTorqueError error;
+                        error.setDofsToCalibrate(mySubject.getDoFNames());
+                        error.setTrials(trials);
+                        error.calculate(results);
+                        std::cout << "error value: " << error.getValue();
      //                   batchEvaluator.evaluate(mySubject);
      //                   auto results2(batchEvaluator.getResults());
 

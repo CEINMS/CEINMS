@@ -40,7 +40,7 @@ using SubjectXsd::SubjectType;
 namespace ceinms {
     SubjectXmlReader::SubjectXmlReader(const std::string& filename)
     {
-
+        std::cout << "Reading subject file: " << filename << " ." << std::endl;
         try {
             subjectPointer_ = parseAndValidate<SubjectType>(filename, subject_schema, sizeof(subject_schema));
         }

@@ -130,6 +130,7 @@ namespace ceinms {
         void getMuscleNamesOnDofs(std::map< std::string, std::vector<std::string> >& muscleNamesOnDofs) const;
         int  getNoMuscles() const { return muscles_.size(); }
         void getDoFNames(std::vector<std::string>& dofNames) const { dofNames = dofNames_; }
+        std::vector<std::string> getDoFNames() const { return dofNames_; };
         int  getNoDoF() const { return dofs_.size(); }
 
         // called for get computed data
