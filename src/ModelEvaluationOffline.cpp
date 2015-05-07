@@ -112,8 +112,9 @@ namespace ceinms {
             double emgTime = emgIt.time + globalEmDelay_;
             subject_.setTime(emgTime);
             subject_.setEmgs(emgIt.data);
-            subject_.updateActivations();
+            if (lmtIt == lmtDataFromQueue_.begin()) subject_.updateActivations();
             if (TimeCompare::lessEqual(lmtIt->time, emgTime) && lmtIt != lmtDataFromQueue_.end()) {
+                subject_.updateActivations();
                 subject_.setMuscleTendonLengths(lmtIt->data);
                 subject_.updateFibreLengths_OFFLINEPREP();
                 ++lmtIt;
@@ -208,8 +209,20 @@ namespace ceinms {
             for (auto& it : emgFrameFromQueue.data)
                 cout << it << "\t";
 
+            cout << endl << "Activations: " << endl;
+            vector<double> cActivations;
+            subject_.getActivations(cActivations);
+            for (auto& it : cActivations)
+                cout << it << "\t";
+
             cout << endl << "LmtTime: " << lmtMaTime << endl << "Lmt" << endl;
             for (auto& it : lmtFrameFromQueue.data)
+                cout << it << "\t";
+
+            vector<double> cMuscleForces;
+            subject_.getMuscleForces(cMuscleForces);
+            cout << endl << "Muscle forces: " << endl;
+            for (auto& it : cMuscleForces)
                 cout << it << "\t";
 
             for (unsigned int j = 0; j < dofNames_.size(); ++j) {
@@ -218,6 +231,7 @@ namespace ceinms {
                     cout << it << "\t";
             }
 
+            cout << endl << "External Torques: ";
             for (auto& it : externalTorquesFrameFromQueue.data)
                 cout << it << " ";
 

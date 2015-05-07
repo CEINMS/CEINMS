@@ -248,24 +248,24 @@ int main(int argc, char** argv) {
                         batchEvaluator.evaluate(mySubject);
                         auto results(batchEvaluator.getResults());
 
-                        batchEvaluator.evaluate(mySubject);
-                        auto results2(batchEvaluator.getResults());
+     //                   batchEvaluator.evaluate(mySubject);
+     //                   auto results2(batchEvaluator.getResults());
 
-                        cout << "Results are the same? " << compareVectors(results,results2) << std::endl;
-                        std::ofstream oF1("results1.txt");
-                        oF1 << results.front().activations;
+         //               cout << "Results are the same? " << compareVectors(results,results2) << std::endl;
+                        std::ofstream oF1("results_forces.txt");
+                        oF1 << results.front().forces;
                         oF1.close();
 
-                        std::ofstream oF2("results2.txt");
-                        oF2 << results2.front().activations;
+                        std::ofstream oF2("results_activations.txt");
+                        oF2 << results.front().activations;
                         oF2.close();
 
 
 
-                        batchEvaluator.evaluate(mySubject);
-                        auto results3(batchEvaluator.getResults());
+      //                  batchEvaluator.evaluate(mySubject);
+       //                 auto results3(batchEvaluator.getResults());
 
-                        cout << "Results are the same? " << compareVectors(results2, results3)<< std::endl;
+        //                cout << "Results are the same? " << compareVectors(results2, results3)<< std::endl;
 
 
                     }
