@@ -26,14 +26,14 @@
  * limitations under the License.                                             *
  * -------------------------------------------------------------------------- */
 
-#include "EMGFromX.h"
-#include "InputConnectors.h"
+#include "ceinms/EMGFromX.h"
+#include "ceinms/InputConnectors.h"
 
 #include <string>
 using std::string;
 #include <vector>
 using std::vector;
-#include "QueueData.h"
+#include "ceinms/QueueData.h"
 #include <cstdlib>
 
 namespace ceinms {

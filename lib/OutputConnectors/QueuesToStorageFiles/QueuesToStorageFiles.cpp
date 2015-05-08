@@ -26,8 +26,8 @@
  * limitations under the License.                                             *
  * -------------------------------------------------------------------------- */
 
-#include "QueuesToStorageFiles.h"
-#include "InputConnectors.h"
+#include "ceinms/QueuesToStorageFiles.h"
+#include "ceinms/InputConnectors.h"
 
 namespace ceinms {
     void QueuesToStorageFiles::addLog(std::string valueName)

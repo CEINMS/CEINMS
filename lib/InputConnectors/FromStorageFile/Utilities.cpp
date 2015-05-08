@@ -26,7 +26,7 @@
  * limitations under the License.                                             *
  * -------------------------------------------------------------------------- */
 
-#include "Utilities.h"
+#include "ceinms/Utilities.h"
 
 #include <iostream>
 #include <boost/filesystem.hpp>

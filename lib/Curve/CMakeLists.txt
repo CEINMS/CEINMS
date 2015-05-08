@@ -1,16 +1,16 @@
 # Author: Elena Ceseracciu
 
 # List source files
-set(Curve_HEADERS   Curve.h
-                    CircularVector.h)
+set(Curve_HEADERS   ceinms/Curve.h
+                    ceinms/CircularVector.h)
 set(Curve_TEMPLATE_IMPLEMENTATION
-                    Curve.cpp
-                    CircularVector.cpp)
+                    ceinms/Curve.cpp
+                    ceinms/CircularVector.cpp)
 
 set_source_files_properties( ${Curve_TEMPLATE_IMPLEMENTATION} PROPERTIES HEADER_FILE_ONLY TRUE)
 
 # Save path to include directory for "internal" usage
-set(Curve_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR} CACHE INTERNAL "Include directory for Curve library")
+set(Curve_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}" CACHE INTERNAL "Include directory for Curve library")
 
 if (NOT CMAKE_VERSION VERSION_LESS 3.0.0)
      add_library(Curve INTERFACE)
@@ -22,4 +22,4 @@ if (NOT CMAKE_VERSION VERSION_LESS 3.0.0)
 endif()
 
 # Install
-install(FILES ${Curve_HEADERS} ${Curve_TEMPLATE_IMPLEMENTATION} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}) #should add namespace
+install(FILES ${Curve_HEADERS} ${Curve_TEMPLATE_IMPLEMENTATION} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/ceinms)

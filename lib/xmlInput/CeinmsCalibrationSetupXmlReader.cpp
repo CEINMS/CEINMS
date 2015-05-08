@@ -34,12 +34,12 @@ using std::map;
 using std::cout;
 using std::endl;
 
-#include "CeinmsCalibrationSetupXmlReader.h"
+#include "ceinms/CeinmsCalibrationSetupXmlReader.h"
 #include "validation.h"
 #include "ceinmsCalibrationSetup-schema.hxx"
 using CeinmsCalibrationSetupXsd::CeinmsCalibrationType;
 
-#include "FileUtils.h"
+#include "ceinms/FileUtils.h"
 
 namespace ceinms {
     CeinmsCalibrationSetupXmlReader::CeinmsCalibrationSetupXmlReader(const string& filename)

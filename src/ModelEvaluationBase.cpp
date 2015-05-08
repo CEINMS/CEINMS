@@ -26,8 +26,8 @@
  * limitations under the License.                                             *
  * -------------------------------------------------------------------------- */
 
-#include "InputConnectors.h"
-#include "OutputConnectors.h"
+#include "ceinms/InputConnectors.h"
+#include "ceinms/OutputConnectors.h"
 
 #include <vector>
 using std::vector;

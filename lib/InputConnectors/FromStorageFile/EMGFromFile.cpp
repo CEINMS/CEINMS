@@ -26,7 +26,7 @@
  * limitations under the License.                                             *
  * -------------------------------------------------------------------------- */
 
-#include "EMGFromFile.h"
+#include "ceinms/EMGFromFile.h"
 
 #include <string>
 using std::string;

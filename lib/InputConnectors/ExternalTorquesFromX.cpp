@@ -26,8 +26,8 @@
  * limitations under the License.                                             *
  * -------------------------------------------------------------------------- */
 
-#include "ExternalTorquesFromX.h"
-#include "InputConnectors.h"
+#include "ceinms/ExternalTorquesFromX.h"
+#include "ceinms/InputConnectors.h"
 
 #include <iostream>
 using std::cout;

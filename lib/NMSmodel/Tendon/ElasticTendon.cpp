@@ -26,10 +26,10 @@
  * limitations under the License.                                             *
  * -------------------------------------------------------------------------- */
 
-#include "ElasticTendon.h"
-#include "StiffTendon.h"
-#include "Odeint.h"
-#include "StepperDopr5.h"
+#include "ceinms/Tendon/ElasticTendon.h"
+#include "ceinms/Tendon/StiffTendon.h"
+#include "ceinms/Odeint.h"
+#include "ceinms/StepperDopr5.h"
 #include <iostream>
 using std::cout;
 using std::endl;
@@ -40,12 +40,11 @@ using std::string;
 using std::sin;
 using std::cos;
 #include <vector>
-//#include <boost/config/no_tr1/complex.hpp>
 using std::vector;
 #include "float.h"
 
-#include "Curve.h"
-#include "../MTUutils.h"
+#include "ceinms/Curve.h"
+#include "ceinms/MTUutils.h"
 #define DEBUG
 
 

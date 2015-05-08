@@ -30,7 +30,7 @@
 #include <boost/filesystem.hpp>
 #include <boost/algorithm/string.hpp>
 #include <iostream>
-#include "FileUtils.h"
+#include "ceinms/FileUtils.h"
 
 namespace ceinms {
     namespace FileUtils {

@@ -35,11 +35,11 @@ using std::cout;
 using std::endl;
 #include <fstream>
 
-#include "CeinmsSetupXmlReader.h"
+#include "ceinms/CeinmsSetupXmlReader.h"
 #include "validation.h"
 #include "ceinmsSetup-schema.hxx"
 using CeinmsSetupXsd::CeinmsType;
-#include "FileUtils.h"
+#include "ceinms/FileUtils.h"
 
 namespace ceinms {
     CeinmsSetupXmlReader::CeinmsSetupXmlReader(const string& filename)

@@ -26,8 +26,8 @@
  * limitations under the License.                                             *
  * -------------------------------------------------------------------------- */
 
-#include "LoggerOnQueues.h"
-#include "OutputConnectors.h"
+#include "ceinms/LoggerOnQueues.h"
+#include "ceinms/OutputConnectors.h"
 #include <vector>
 #include <string>
 #include <iostream>

@@ -26,9 +26,9 @@
  * limitations under the License.                                             *
  * -------------------------------------------------------------------------- */
 
-#include "SimulatedAnnealing.h"
-#include "AbstractOptimizerSystem.h"
-#include "SimulatedAnnealingParameters.h"
+#include "ceinms/SimulatedAnnealing.h"
+#include "ceinms/AbstractOptimizerSystem.h"
+#include "ceinms/SimulatedAnnealingParameters.h"
 #include <vector>
 using std::vector;
 #include <iostream>

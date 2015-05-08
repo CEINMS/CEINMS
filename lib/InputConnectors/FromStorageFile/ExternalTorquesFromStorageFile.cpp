@@ -26,10 +26,10 @@
  * limitations under the License.                                             *
  * -------------------------------------------------------------------------- */
 
-#include "ExternalTorquesFromStorageFile.h"
-#include "ExternalTorquesFromX.h"
-#include "DataFromStorageFile.h"
-#include "InputConnectors.h"
+#include "ceinms/ExternalTorquesFromStorageFile.h"
+#include "ceinms/ExternalTorquesFromX.h"
+#include "ceinms/DataFromStorageFile.h"
+#include "ceinms/InputConnectors.h"
 
 
 #include <iostream>
@@ -40,7 +40,7 @@ using std::string;
 #include <vector>
 using std::vector;
 #include <cstdlib>
-#include "Utilities.h"
+#include "ceinms/Utilities.h"
 
 #define LOG
 

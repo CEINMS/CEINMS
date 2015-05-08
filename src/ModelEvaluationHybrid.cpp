@@ -28,7 +28,7 @@
 
 #include "SimpleFileLogger.h"
 #include "StorageLogger.h"
-#include "TimeCompare.h"
+#include "ceinms/TimeCompare.h"
 
 #include <iostream>
 using std::cout;

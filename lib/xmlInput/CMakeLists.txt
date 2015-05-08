@@ -61,15 +61,15 @@ set(schemas_GENERATED_SOURCES  ${CMAKE_CURRENT_BINARY_DIR}/execution-schema.cxx
                                 ${CMAKE_CURRENT_BINARY_DIR}/ceinmsSetup-schema.cxx
                                 ${CMAKE_CURRENT_BINARY_DIR}/ceinmsCalibrationSetup-schema.cxx)
 
-set(xmlInput_HEADERS    ExecutionXmlReader.h
-                        NMSmodelConfig.h
-                        CalibrationXmlReader.h
-                        CalibrationCfg.h
-                        SubjectXmlReader.h
-                        ExcitationGeneratorXmlReader.h
-                        InputDataXmlReader.h
-                        CeinmsSetupXmlReader.h
-                        CeinmsCalibrationSetupXmlReader.h
+set(xmlInput_HEADERS    ceinms/ExecutionXmlReader.h
+                        ceinms/NMSmodelConfig.h
+                        ceinms/CalibrationXmlReader.h
+                        ceinms/CalibrationCfg.h
+                        ceinms/SubjectXmlReader.h
+                        ceinms/ExcitationGeneratorXmlReader.h
+                        ceinms/InputDataXmlReader.h
+                        ceinms/CeinmsSetupXmlReader.h
+                        ceinms/CeinmsCalibrationSetupXmlReader.h
                         )
 
 set(xmlInput_IMPL_HEADERS   impl/grammar-input-stream.hxx
@@ -127,9 +127,9 @@ add_library(xmlInput STATIC ${xmlInput_SOURCES}
                             )
 
 target_link_libraries(xmlInput ceinms_common ${XERCES_LIBRARIES})
-target_include_directories(xmlInput PRIVATE ${ceinms_common_INCLUDE_DIRS} impl PUBLIC ${XSD_INCLUDE_DIR} ${XERCES_INCLUDE_DIR})
+target_include_directories(xmlInput PRIVATE ceinms ${ceinms_common_INCLUDE_DIRS} impl PUBLIC ${XSD_INCLUDE_DIR} ${XERCES_INCLUDE_DIR})
 
-set(xmlInput_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR} ${XSD_INCLUDE_DIR} ${XERCES_INCLUDE_DIR} CACHE INTERNAL "Include directory for xmlInput library")
+set(xmlInput_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}" ${CMAKE_CURRENT_BINARY_DIR} ${XSD_INCLUDE_DIR} ${XERCES_INCLUDE_DIR} CACHE INTERNAL "Include directory for xmlInput library")
 
 install(FILES   ${xmlInput_HEADERS}
                 ${schemas_GENERATED_HEADERS}
@@ -140,7 +140,7 @@ install(FILES   ${xmlInput_HEADERS}
                 ${inputData_GENERATED_HEADERS}
                 ${ceinmsSetup_GENERATED_HEADERS}
                 ${ceinmsCalibrationSetup_GENERATED_HEADERS}
-        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}) #should add namespace
+        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/ceinms)
 install(TARGETS xmlInput
         EXPORT CEINMSTargets
         RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}

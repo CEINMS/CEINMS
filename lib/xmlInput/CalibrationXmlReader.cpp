@@ -26,7 +26,7 @@
  * limitations under the License.                                             *
  * -------------------------------------------------------------------------- */
 
-#include "CalibrationXmlReader.h"
+#include "ceinms/CalibrationXmlReader.h"
 
 #include <string>
 using std::string;
@@ -38,7 +38,7 @@ using std::endl;
 #include "calibration-schema.hxx"
 #include "validation.h"
 #include <boost/algorithm/string.hpp>
-#include "FileUtils.h"
+#include "ceinms/FileUtils.h"
 using namespace CalibrationXsd;
 
 namespace ceinms {

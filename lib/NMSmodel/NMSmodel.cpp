@@ -33,11 +33,11 @@ using std::endl;
 using std::vector;
 #include <map>
 using std::map;
-#include "NMSmodel.h"
+#include "ceinms/NMSmodel.h"
 #include <string>
 using std::string;
-#include "DoF.h"
-#include "MuscleParameters.h"
+#include "ceinms/DoF.h"
+#include "ceinms/MuscleParameters.h"
 
 #include <algorithm>
 
@@ -1167,4 +1167,4 @@ namespace ceinms {
     }
 }
 
-#include "NMSmodelPolicyTemplates.h"
+#include "ceinms/NMSmodelPolicyTemplates.h"

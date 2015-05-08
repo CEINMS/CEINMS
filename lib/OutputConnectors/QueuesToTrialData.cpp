@@ -26,8 +26,8 @@
  * limitations under the License.                                             *
  * -------------------------------------------------------------------------- */
 
-#include "QueuesToTrialData.h"
-#include "InputConnectors.h"
+#include "ceinms/QueuesToTrialData.h"
+#include "ceinms/InputConnectors.h"
 
 namespace ceinms {
     void QueuesToTrialData::operator()() {

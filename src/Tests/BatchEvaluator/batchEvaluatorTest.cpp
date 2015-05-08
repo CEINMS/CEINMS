@@ -26,30 +26,30 @@
  * limitations under the License.                                             *
  * -------------------------------------------------------------------------- */
 
-#include "BatchEvaluator.h"
-#include "TrialData.h"
-#include "MinTorqueError.h"
+#include "ceinms/BatchEvaluator.h"
+#include "ceinms/TrialData.h"
+#include "ceinms/MinTorqueError.h"
 using ceinms::TrialData;
-#include "InputConnectors.h"
+#include "ceinms/InputConnectors.h"
 using ceinms::InputConnectors;
-#include "OutputConnectors.h"
+#include "ceinms/OutputConnectors.h"
 using ceinms::OutputConnectors;
-#include "QueuesToTrialData.h"
-#include "EMGFromFile.h"
-#include "LmtMaFromStorageFile.h"
-#include "CeinmsCalibrationSetupXmlReader.h"
-#include "CalibrationXmlReader.h"
-#include "ExternalTorquesFromStorageFile.h"
-#include "InputDataXmlReader.h"
-#include "Curve.h"
-#include "NMSmodel.h"
-#include "Activation/ExponentialActivation.h"
-#include "Activation/PiecewiseActivation.h"
+#include "ceinms/QueuesToTrialData.h"
+#include "ceinms/EMGFromFile.h"
+#include "ceinms/LmtMaFromStorageFile.h"
+#include "ceinms/CeinmsCalibrationSetupXmlReader.h"
+#include "ceinms/CalibrationXmlReader.h"
+#include "ceinms/ExternalTorquesFromStorageFile.h"
+#include "ceinms/InputDataXmlReader.h"
+#include "ceinms/Curve.h"
+#include "ceinms/NMSmodel.h"
+#include "ceinms/Activation/ExponentialActivation.h"
+#include "ceinms/Activation/PiecewiseActivation.h"
 //Tendon Policies
-#include "Tendon/StiffTendon.h"
-#include "Tendon/ElasticTendon.h"
-#include "Tendon/ElasticTendon_BiSec.h"
-#include "SetupDataStructure.h"
+#include "ceinms/Tendon/StiffTendon.h"
+#include "ceinms/Tendon/ElasticTendon.h"
+#include "ceinms/Tendon/ElasticTendon_BiSec.h"
+#include "ceinms/SetupDataStructure.h"
 #include <thread>
 #include <vector>
 using std::vector;
@@ -61,7 +61,7 @@ using std::endl;
 #include <list>
 using std::list;
 #include <algorithm>
-#include "Utilities.h"
+#include "ceinms/Utilities.h"
 using namespace ceinms;
 
 void setLmtMaFilenames(const string& directory, const vector< string > dofNames, string& lmtDataFilename, vector< string >& maDataFilenames)

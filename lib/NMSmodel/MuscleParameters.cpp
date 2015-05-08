@@ -27,7 +27,7 @@
  * -------------------------------------------------------------------------- */
 
 #include <limits>
-#include "MuscleParameters.h"
+#include "ceinms/MuscleParameters.h"
 
 static const double dblLow(std::numeric_limits<double>::lowest());
 

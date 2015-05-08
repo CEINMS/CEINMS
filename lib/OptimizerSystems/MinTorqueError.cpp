@@ -26,7 +26,7 @@
  * limitations under the License.                                             *
  * -------------------------------------------------------------------------- */
 
-#include "MinTorqueError.h"
+#include "ceinms/MinTorqueError.h"
 
 #include <algorithm>
 using std::begin;

@@ -37,28 +37,28 @@ using std::list;
 using std::vector;
 #include <thread>
 
-#include "NMSmodel.h"
+#include "ceinms/NMSmodel.h"
 
-#include "Tendon/StiffTendon.h"
-#include "Tendon/ElasticTendon.h"
-#include "Tendon/ElasticTendon_BiSec.h"
-#include "Activation/ExponentialActivation.h"
-#include "Activation/PiecewiseActivation.h"
-#include "MinTorqueError.h"
-#include "SimulatedAnnealing.h"
-#include "NMSmodelSystem.h"
-#include "Curve.h"
-#include "InputDataXmlReader.h"
-#include "EMGFromFile.h"
-#include "ExternalTorquesFromStorageFile.h"
-#include "LmtMaFromStorageFile.h"
+#include "ceinms/Tendon/StiffTendon.h"
+#include "ceinms/Tendon/ElasticTendon.h"
+#include "ceinms/Tendon/ElasticTendon_BiSec.h"
+#include "ceinms/Activation/ExponentialActivation.h"
+#include "ceinms/Activation/PiecewiseActivation.h"
+#include "ceinms/MinTorqueError.h"
+#include "ceinms/SimulatedAnnealing.h"
+#include "ceinms/NMSmodelSystem.h"
+#include "ceinms/Curve.h"
+#include "ceinms/InputDataXmlReader.h"
+#include "ceinms/EMGFromFile.h"
+#include "ceinms/ExternalTorquesFromStorageFile.h"
+#include "ceinms/LmtMaFromStorageFile.h"
 
-#include "QueuesToTrialData.h"
-#include "InputConnectors.h"
-#include "OutputConnectors.h"
+#include "ceinms/QueuesToTrialData.h"
+#include "ceinms/InputConnectors.h"
+#include "ceinms/OutputConnectors.h"
 
 #include "XmlWriter.h"
-#include "FileUtils.h"
+#include "ceinms/FileUtils.h"
 
 namespace ceinms {
 

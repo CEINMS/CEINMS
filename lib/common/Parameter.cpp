@@ -26,7 +26,7 @@
  * limitations under the License.                                             *
  * -------------------------------------------------------------------------- */
 
-#include "Parameter.h"
+#include "ceinms/Parameter.h"
 #include <iostream>
 #include <string>
 using std::string;

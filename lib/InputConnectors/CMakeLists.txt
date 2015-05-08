@@ -8,10 +8,10 @@ set(FromStorageFile_SOURCES
   FromStorageFile/Utilities.cpp
 )
 set(FromStorageFile_HEADERS
-  FromStorageFile/EMGFromFile.h
-  FromStorageFile/ExternalTorquesFromStorageFile.h
-  FromStorageFile/LmtMaFromStorageFile.h
-  FromStorageFile/Utilities.h
+  ceinms/EMGFromFile.h
+  ceinms/ExternalTorquesFromStorageFile.h
+  ceinms/LmtMaFromStorageFile.h
+  ceinms/Utilities.h
 )
 
 set(InputConnectors_SOURCES
@@ -21,10 +21,10 @@ set(InputConnectors_SOURCES
   InputConnectors.cpp
 )
 set(InputConnectors_HEADERS
-  EMGFromX.h
-  ExternalTorquesFromX.h
-  LmtMaFromX.h
-  InputConnectors.h
+  ceinms/EMGFromX.h
+  ceinms/ExternalTorquesFromX.h
+  ceinms/LmtMaFromX.h
+  ceinms/InputConnectors.h
 )
 
 source_group("Headers" FILES ${InputConnectors_HEADERS} ${FromStorageFile_HEADERS} )
@@ -39,19 +39,18 @@ add_library(InputConnectors STATIC
 )
 target_link_libraries(InputConnectors FileIO Concurrency ${Boost_FILESYSTEM_LIBRARY})
 target_include_directories(InputConnectors
-                                PRIVATE     FromStorageFile
-                                            ${CMAKE_CURRENT_SOURCE_DIR}
+                                PRIVATE     ${CMAKE_CURRENT_SOURCE_DIR}
                                             ${ceinms_common_INCLUDE_DIRS}
                                             ${FileIO_INCLUDE_DIRS}
                                             ${Concurrency_INCLUDE_DIRS}
                                             ${Boost_INCLUDE_DIRS})
 
 # Save path to include directory for "internal" usage
-set(InputConnectors_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/FromStorageFile  CACHE INTERNAL "Include directories for InputConnectors library")
+set(InputConnectors_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}"  CACHE INTERNAL "Include directories for InputConnectors library")
 
 
 # Install
-install(FILES ${FromStorageFile_HEADERS} ${InputConnectors_HEADERS} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}) #should add namespace
+install(FILES ${FromStorageFile_HEADERS} ${InputConnectors_HEADERS} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/ceinms)
 install(TARGETS InputConnectors
         EXPORT CEINMSTargets
         RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}

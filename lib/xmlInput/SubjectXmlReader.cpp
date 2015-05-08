@@ -32,7 +32,7 @@ using std::string;
 using std::cout;
 using std::endl;
 
-#include "SubjectXmlReader.h"
+#include "ceinms/SubjectXmlReader.h"
 #include "validation.h"
 #include "subject-schema.hxx"
 using SubjectXsd::SubjectType;

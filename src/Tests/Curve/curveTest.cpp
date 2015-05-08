@@ -26,7 +26,7 @@
  * limitations under the License.                                             *
  * -------------------------------------------------------------------------- */
 
-#include "Curve.h"
+#include "ceinms/Curve.h"
 using namespace ceinms;
 #include <vector>
 #include <fstream>

@@ -28,7 +28,7 @@
 
 #include "SimpleFileLogger.h"
 #include "StorageLogger.h"
-#include "TimeCompare.h"
+#include "ceinms/TimeCompare.h"
 
 #include <iostream>
 using std::cout;
@@ -40,8 +40,8 @@ using std::string;
 
 #include "ModelEvaluationOffline.h"
 #include "ModelEvaluationBase.h"
-#include "InputConnectors.h"
-#include "OutputConnectors.h"
+#include "ceinms/InputConnectors.h"
+#include "ceinms/OutputConnectors.h"
 #define LOG_FILES
 #define LOG
 

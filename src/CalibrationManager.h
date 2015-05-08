@@ -30,10 +30,10 @@
 #define Ceinms_CalibrationManager_h
 #include <string>
 #include <list>
-#include "CeinmsCalibrationSetupXmlReader.h"
-#include "CalibrationXmlReader.h"
-#include "InputDataXmlReader.h"
-#include "TrialData.h"
+#include "ceinms/CeinmsCalibrationSetupXmlReader.h"
+#include "ceinms/CalibrationXmlReader.h"
+#include "ceinms/InputDataXmlReader.h"
+#include "ceinms/TrialData.h"
 
 
 namespace ceinms {

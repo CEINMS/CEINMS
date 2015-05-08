@@ -37,7 +37,7 @@ using std::endl;
 using std::stringstream;
 #include <stdlib.h>
 
-#include "DataFromStorageFile.h"
+#include "ceinms/DataFromStorageFile.h"
 
 namespace ceinms {
     DataFromStorageFile::DataFromStorageFile(const string& dataFilename)
