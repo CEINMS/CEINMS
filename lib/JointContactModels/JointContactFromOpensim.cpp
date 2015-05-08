@@ -11,14 +11,28 @@ using std::endl;
 
 namespace ceinms {
  
-    JointContactFromOpensim::JointContactFromOpensim(OpenSim::Model& model) :
-        model_(model),
-        nCoordinates_(model_.getNumCoordinates()),
-        nBodies_(model_.getNumBodies()),
-        nMuscles_(model_.getMuscles().getSize()),
-        rForcesInG_(nBodies_), rTorquesInG_(nBodies_)
+    JointContactFromOpensim::JointContactFromOpensim(const std::string& modelFilename, std::vector<OpenSim::Force*> externalForces) :
+        model_(modelFilename)
         {
         using namespace OpenSim;
+
+        
+        Model modelCopy(modelFilename);
+        modelCopy.initSystem();
+        nCoordinates_ = modelCopy.getNumCoordinates();
+        nBodies_ = modelCopy.getNumBodies();
+        nMuscles_ = modelCopy.getMuscles().getSize();
+        rForcesInG_.resize(nBodies_);
+        rTorquesInG_.resize(nBodies_);
+
+
+        //model_.updForceSet().setMemoryOwner(false);
+        //1. add extForces to the model, hopefully I won't have problems with queues and opensim
+        for (auto &force : externalForces) {
+            cout << "models add force\n" << std::flush;
+            model_.addForce(force);
+        }
+
 
         OpenSim::Array<string> muscleNames;
         model_.getMuscles().getNames(muscleNames);
@@ -155,6 +169,7 @@ namespace ceinms {
         for (auto m : muscleActuators_)
             m->setDisabled(state_, disableMuscles);
 
+        std::cout << "Num of coordinates " << nCoordinates_ << endl << std::flush;
         for (unsigned i(0); i < nCoordinates_; ++i)
             coordinateActuators_.at(i)->setOverrideForce(state_, residualMobilityForces_.get(i));
         model_.getSimbodyEngine().computeReactions(state_, rForcesInG_, rTorquesInG_);

@@ -142,7 +142,7 @@ namespace ceinms {
         inputMuscleForcesQueue_(inputMuscleForcesQueue),
         outputContactForcesQueue_(outputContactForcesQueue),
         latches_(latches),
-        model_(osimModelFilename),
+        modelFilename_(osimModelFilename),
         jointsToLog_(jointsToLog)
 
     {
@@ -211,13 +211,8 @@ namespace ceinms {
         }));
 
 
-        model_.updForceSet().setMemoryOwner(false);
-        //1. add extForces to the model, hopefully I won't have problems with queues and opensim
-        for (auto &force : extForces_) {
-            cout << "models add force\n" << std::flush;
-            model_.addForce(force);
-        }
-
+ 
+        JointContactFromOpensim jointContactModel(modelFilename_, extForces_);
         //2. call the latch, say that we are done with initialisations
         for (auto& l : latches_)
             l->wait();
@@ -225,7 +220,7 @@ namespace ceinms {
 
 
 //        model_.setUseVisualizer(true);
-        JointContactFromOpensim jointContactModel(model_);
+
         
         bool runCondition(true);
         while (runCondition) {
@@ -242,8 +237,8 @@ namespace ceinms {
 
                 jointContactModel.calculateReactionForces(true);
                 SimTK::Vec3 reactionForce;
-                jointContactModel.getReactionForceInG(jointsToLog_.front(), reactionForce);
-                cout << "reaction force " << reactionForce << endl;
+          //      jointContactModel.getReactionForceInG(jointsToLog_.front(), reactionForce);
+          //      cout << "reaction force " << reactionForce << endl;
             //    model_.updVisualizer().show(state);
             }
         }

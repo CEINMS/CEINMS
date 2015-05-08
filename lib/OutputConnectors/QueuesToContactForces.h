@@ -119,12 +119,13 @@ namespace ceinms {
         Q2& inputExternalForcesQueue_;
         Q3& inputMuscleForcesQueue_;
         Q4& outputContactForcesQueue_;
+        std::string modelFilename_;
         std::vector<std::unique_ptr<L>>& latches_;
         std::vector<std::string> jointsToLog_, dofNames_, musclesNames_;
-        OpenSim::Model model_;
+        //OpenSim::Model model_;
         using QueueForce = Concurrency::Queue < QueueData<ExternalForceData> > ;
         std::vector<std::shared_ptr<QueueForce>> forceQueues_;
-        std::vector<OpenSim::ExternalForceFromQueue*> extForces_;
+        std::vector<OpenSim::Force*> extForces_;
         void parseExternalLoadsXml(const std::string& externalLoadsXmlFilename);
     };
 }

@@ -13,7 +13,7 @@ namespace ceinms {
 
     class JointContactFromOpensim {
     public:
-        JointContactFromOpensim(OpenSim::Model& model);
+        JointContactFromOpensim(const std::string& modelFilename, std::vector<OpenSim::Force*> externalForces);
 
         void setMuscleForces(const std::vector<double>& forces);
         template<typename T>
@@ -45,7 +45,7 @@ namespace ceinms {
     private:
         void calculateResidualMobilityForces(const SimTK::Vector& appliedMobilityForces);
 
-        OpenSim::Model& model_;
+        OpenSim::Model model_;
         SimTK::State state_;
         std::size_t nCoordinates_, nBodies_, nMuscles_;
         
