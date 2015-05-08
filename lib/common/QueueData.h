@@ -29,11 +29,32 @@
 #ifndef ceinms_QueueData_h
 #define ceinms_QueueData_h
 
+#include <ostream> //
+#include <vector> //
+
 namespace ceinms {
     template <typename T>
     struct QueueData {
         double time;
         T data;
     };
+    /* REMOVE AFTER DEBUG
+    template<typename T>
+    std::ostream& operator<< (std::ostream& os, const QueueData<T>& queueData) {
+        os << "Time: " << queueData.time << std::endl;
+        os << "Data: " << queueData.data << std::endl;
+        return os;
+    }
+
+    template<typename T>
+    std::ostream& operator<< (std::ostream& os, const std::vector<T>& data) {
+
+        for (auto& v : data)
+            os << v << " ";
+        os << std::endl;
+        return os;
+    }
+
+    */
 }
 #endif
