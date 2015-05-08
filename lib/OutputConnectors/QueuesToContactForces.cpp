@@ -4,36 +4,40 @@
 #include <thread>
 #include <limits>
 #include <future>
-
+#include <algorithm>
 #include <iostream> //
 
 namespace OpenSim {
 
     ExternalForceFromQueue::ExternalForceFromQueue
-        (ExternalForceQueue& externalForceQueue,
+        (std::shared_ptr<ExternalForceQueue> externalForceQueue,
         const std::string& appliedToBodyName,
         const std::string& forceExpressedInBodyName,
         const std::string& pointExpressedInBodyName) :
         externalForceQueue_(externalForceQueue),
         appliedToBody_(nullptr),
         forceExpressedInBody_(nullptr),
-        pointExpressedInBody_(nullptr)
+        pointExpressedInBody_(nullptr),
+        lastTime_(std::numeric_limits<double>::lowest()),
+        isSubscribed(false)
     {
         setAppliedToBodyName(appliedToBodyName);
         setForceExpressedInBodyName(forceExpressedInBodyName);
         setPointExpressedInBodyName(pointExpressedInBodyName);
-        externalForceQueue_.subscribe();
+        
     }
 
 
-    ExternalForceFromQueue::ExternalForceFromQueue(ExternalForceQueue& externalForceQueue, SimTK::Xml::Element& node) :
+    ExternalForceFromQueue::ExternalForceFromQueue(std::shared_ptr<ExternalForceQueue> externalForceQueue, SimTK::Xml::Element& node) :
         externalForceQueue_(externalForceQueue),
         appliedToBody_(nullptr),
         forceExpressedInBody_(nullptr),
-        pointExpressedInBody_(nullptr)
+        pointExpressedInBody_(nullptr),
+        lastTime_(std::numeric_limits<double>::lowest()),
+        isSubscribed(false)
     {
         ExternalForce::updateFromXMLNode(node);
-        externalForceQueue_.subscribe();
+      
     }
 
     /*
@@ -47,27 +51,62 @@ namespace OpenSim {
     }
     */
 
+    ceinms::ExternalForceData ExternalForceFromQueue::getForceDataFromPastValues(double time) const {
+
+        auto it(std::lower_bound(pastForces_.begin(), pastForces_.end(), time, [](
+            ceinms::QueueData<ceinms::ExternalForceData>& lhs,
+            double t){ return lhs.time < t; }));
+        
+        std::cout << "time from past values: " << it->time << std::endl << std::flush;
+        return it->data;
+
+    }
+
+
+    ceinms::ExternalForceData ExternalForceFromQueue::getForceDataFromQueue(double time) const {
+
+        ExternalForceQueue::type forceData;
+        while (time > lastTime_){
+            forceData = externalForceQueue_->pop();
+            std::cout << "Time from force queue: " << forceData.time << std::endl << std::flush;
+            pastForces_.push_back(forceData);
+            lastTime_ = forceData.time;
+        }
+        return forceData.data;
+    }
+
+
     void ExternalForceFromQueue::computeForce(
         const SimTK::State& state,
         SimTK::Vector_<SimTK::SpatialVec>& bodyForces,
         SimTK::Vector& generalizedForces) const
     {
+        std::cout << "compute force\n" << std::flush;
         double time(state.getTime());
-        ExternalForceQueue::type forceData(externalForceQueue_.pop());
-        while (forceData.time < time)
-            forceData = externalForceQueue_.pop();
+        std::cout << "Time " << time << std::endl << std::flush;
+        ceinms::ExternalForceData forceData;
+        if (time <= lastTime_)
+            forceData = getForceDataFromPastValues(time);
+        else
+            forceData = getForceDataFromQueue(time);
+        
 
         const SimbodyEngine& engine = getModel().getSimbodyEngine();
-        engine.transform(state, *forceExpressedInBody_, forceData.data.grf, engine.getGroundBody(), forceData.data.grf);
-        engine.transformPosition(state, *pointExpressedInBody_, forceData.data.cop, *appliedToBody_, forceData.data.cop);
-        ExternalForce::applyForceToPoint(state, *appliedToBody_, forceData.data.cop, forceData.data.grf, bodyForces);
-        engine.transform(state, *forceExpressedInBody_, forceData.data.moments, engine.getGroundBody(), forceData.data.moments);
-        ExternalForce::applyTorque(state, *appliedToBody_, forceData.data.moments, bodyForces);
+        engine.transform(state, *forceExpressedInBody_, forceData.grf, engine.getGroundBody(), forceData.grf);
+        engine.transformPosition(state, *pointExpressedInBody_, forceData.cop, *appliedToBody_, forceData.cop);
+        ExternalForce::applyForceToPoint(state, *appliedToBody_, forceData.cop, forceData.grf, bodyForces);
+        engine.transform(state, *forceExpressedInBody_, forceData.moments, engine.getGroundBody(), forceData.moments);
+        ExternalForce::applyTorque(state, *appliedToBody_, forceData.moments, bodyForces);
     }
  
 
     void ExternalForceFromQueue::connectToModel(Model& model) {
 
+    //    std::cout << "Connecting to model\n" << std::flush;
+        if (!isSubscribed) {
+            externalForceQueue_->subscribe();
+            isSubscribed = true;
+        }
         Super::connectToModel(model);
         const std::string& appliedToBodyName = get_applied_to_body();
         const std::string& forceExpressedInBodyName = get_force_expressed_in_body();
@@ -123,8 +162,9 @@ namespace ceinms {
         for (extForceElementIter; extForceElementIter != root.element_begin("objects")->element_end(); ++extForceElementIter) {
             forceQueues_.emplace_back(new QueueForce());
         //    OpenSim::ExternalForceFromQueue<QueueForce>* ef = 
-             extForces_.push_back(new OpenSim::ExternalForceFromQueue(*(forceQueues_.back()), *extForceElementIter));
+             extForces_.push_back(new OpenSim::ExternalForceFromQueue(forceQueues_.back(), *extForceElementIter));
         }
+        cout << "Number of external forces: " << extForces_.size() << std::endl << std::flush;
     }
 
 
@@ -136,13 +176,9 @@ namespace ceinms {
         inputStateQueue_.subscribe();
         inputMuscleForcesQueue_.subscribe();
 
-
-
-
-
         //3. start the thread to move forces from Q2 to forceQueues_
    
-        auto fut(std::async(std::launch::async, [=](){
+        auto fut(std::async(std::launch::async, [&](){
             
             inputExternalForcesQueue_.subscribe();
             for (auto& l : latches_)
@@ -150,36 +186,72 @@ namespace ceinms {
 
             bool runCondition(true);
             do {
-                cout << "Waiting for frame" << endl;
+    //            cout << "Waiting for frame" << endl;
                 QueueData<std::vector<ExternalForceData>> forces(inputExternalForcesQueue_.pop());
-                if (!forces.data.empty()) {
-                    std::cout << "Splitting forces\n";
+                if (forces.time < std::numeric_limits<double>::infinity()) {
                     for (size_t i(0); i < forces.data.size(); ++i) {
-                        QueueData<ExternalForceData> currentForce{ forces.time, forces.data.at(i) };
+                        QueueData<ExternalForceData> currentForce;
+                        currentForce.time = forces.time;
+                        currentForce.data = forces.data.at(i);
                         forceQueues_.at(i)->push(currentForce);
+              //          std::cout << "Splitting forces\nTime: " << currentForce.time << std::endl << std::flush;
+
                     }
+
                 }
                 else {
                     runCondition = false;
                     QueueData<ExternalForceData> eof;
                     eof.time = std::numeric_limits<double>::infinity();
+                    eof.data.id = 99;
                     for (auto& forceQueue : forceQueues_)
                         forceQueue->push(eof);
                 }
             } while (runCondition);
         }));
-   
+
+
+        model_.updForceSet().setMemoryOwner(false);
+        //1. add extForces to the model, hopefully I won't have problems with queues and opensim
+        for (auto &force : extForces_) {
+            cout << "models add force\n" << std::flush;
+            model_.addForce(force);
+        }
+
         //2. call the latch, say that we are done with initialisations
         for (auto& l : latches_)
             l->wait();
 
-        //1. add extForces to the model, hopefully I won't have problems with queues and opensim
-        for (auto &force : extForces_)
-            model_.addForce(force);
 
+
+//        model_.setUseVisualizer(true);
         JointContactFromOpensim jointContactModel(model_);
         
+        bool runCondition(true);
+        while (runCondition) {
+            SimTK::State state(inputStateQueue_.pop());
+      //      std::cout << "Reading state from queue. Time: " << state.getTime() << std::endl << std::flush;
+
+            if (state.getTime() == std::numeric_limits<double>::infinity())
+                runCondition = false;
+            if (runCondition) {
+                jointContactModel.setTime(state.getTime());
+                jointContactModel.setQ(state.getQ());
+                jointContactModel.setQd(state.getQDot());
+                jointContactModel.setQdd(state.getQDotDot());
+
+                jointContactModel.calculateReactionForces(true);
+                SimTK::Vec3 reactionForce;
+                jointContactModel.getReactionForceInG(jointsToLog_.front(), reactionForce);
+                cout << "reaction force " << reactionForce << endl;
+            //    model_.updVisualizer().show(state);
+            }
+        }
+
+
+
         //4. start the loop to synchronise everything and calculate JCF..
+       // model_.updVisualizer().show(state);
 
 
 

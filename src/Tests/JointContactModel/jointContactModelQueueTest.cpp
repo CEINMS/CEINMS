@@ -76,10 +76,10 @@ int main() {
         Queue<MuscleForcesData>,
         Queue<ContactForcesData>,
         Latch> contactForcesEstimator(
-        std::ref(stateQueue),
-        std::ref(externalForcesQueue),
-        std::ref(muscleForcesQueue),
-        std::ref(outputContactForcesQueue),
+        stateQueue,
+        externalForcesQueue,
+        muscleForcesQueue,
+        outputContactForcesQueue,
         latches,
         subject,
         osimFilename,
@@ -130,7 +130,7 @@ int main() {
             stateQueue.push(state);
         }
 
-        state.setTime(std::numeric_limits<double>::max());  //eof
+        state.setTime(std::numeric_limits<double>::infinity());  //eof
         stateQueue.push(state);
     }));
 
@@ -157,15 +157,19 @@ int main() {
                 currentExtForce.cop = externalLoads.get(i).getPointAtTime(t);
                 currentExtForce.moments = externalLoads.get(i).getTorqueAtTime(t);
                 forces.data.push_back(currentExtForce);
+        //        cout << "Pushing external force on queue "<<
+         //           "Time " << t << endl << "values: " 
+          //          << currentExtForce << endl << std::flush;
             }
-            //     cout << "Pushing external force on queue\n";
+           
             externalForcesQueue.push(forces);
+       //     cout << "externalForcesQueue " << externalForcesQueue << std::flush;
         }
         ForcesData eoForces;
-        eoForces.time = std::numeric_limits<double>::max();
+        eoForces.time = std::numeric_limits<double>::infinity();
         externalForcesQueue.push(eoForces); //eof
     }));
- //   cout << externalForcesQueue;
+    //cout << "externalForcesQueue " << externalForcesQueue;
 
 
     //launch thread for contact forces

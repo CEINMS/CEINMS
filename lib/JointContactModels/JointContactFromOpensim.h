@@ -24,7 +24,7 @@ namespace ceinms {
         void setQdd(const T& qdd);
         void setTime(double time) { state_.updTime() = time; }
 
-        void setState(SimTK::State& state) { state_ = state; }
+        void setState(const SimTK::State& state) { state_ = state; }
         
         void setEstimatedMobilityForces(const SimTK::Vector& estimatedMobilityForces); //this is what CEINMS predicts
         void setResidualMobilityForces(const SimTK::Vector& residualMobilityForces);  //this is ID from external file

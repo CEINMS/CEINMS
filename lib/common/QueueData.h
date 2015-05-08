@@ -33,12 +33,26 @@
 #include <vector> //
 
 namespace ceinms {
+
+    template <typename T>
+    struct QueueData;
+
+    template<typename T>
+    bool operator<(const QueueData<T>& lhs, const QueueData<T>& rhs) {
+        return lhs.time < rhs.time;
+
+    }
+
     template <typename T>
     struct QueueData {
         double time;
         T data;
+    //    friend bool operator< <>(const QueueData<T>& lhs, const QueueData<T>& rhs);
     };
-    /* REMOVE AFTER DEBUG
+
+
+    //REMOVE AFTER DEBUG
+     
     template<typename T>
     std::ostream& operator<< (std::ostream& os, const QueueData<T>& queueData) {
         os << "Time: " << queueData.time << std::endl;
@@ -55,6 +69,6 @@ namespace ceinms {
         return os;
     }
 
-    */
+    
 }
 #endif

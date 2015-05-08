@@ -60,11 +60,11 @@ namespace OpenSim {
     public:
         using ExternalForceQueue = ceinms::Concurrency::Queue < ceinms::QueueData<ceinms::ExternalForceData> > ;
         ExternalForceFromQueue() = delete;
-        ExternalForceFromQueue(ExternalForceQueue& externalForceQueue,
+        ExternalForceFromQueue(std::shared_ptr<ExternalForceQueue> externalForceQueue,
             const std::string& appliedToBodyName,
             const std::string& forceExpressedInBodyName,
             const std::string& pointExpressedInBodyName);
-        ExternalForceFromQueue(ExternalForceQueue& externalForceQueue, SimTK::Xml::Element& aNode);
+        ExternalForceFromQueue(std::shared_ptr<ExternalForceQueue> externalForceQueue, SimTK::Xml::Element& aNode);
         virtual ~ExternalForceFromQueue();
     protected:
         virtual void computeForce(const SimTK::State& state,
@@ -72,7 +72,12 @@ namespace OpenSim {
             SimTK::Vector& generalizedForces) const override;
         void connectToModel(Model& model) override;
     private:
-        ExternalForceQueue& externalForceQueue_;
+        bool isSubscribed;
+        ceinms::ExternalForceData getForceDataFromPastValues(double time) const;
+        ceinms::ExternalForceData getForceDataFromQueue(double time) const;
+        std::shared_ptr<ExternalForceQueue> externalForceQueue_;
+        mutable std::list<ceinms::QueueData<ceinms::ExternalForceData> > pastForces_;
+        mutable double lastTime_;
         SimTK::ReferencePtr<const Body> appliedToBody_;
         SimTK::ReferencePtr<const Body> forceExpressedInBody_;
         SimTK::ReferencePtr<const Body> pointExpressedInBody_;
@@ -109,6 +114,7 @@ namespace ceinms {
         void operator()();
 
     private:
+
         Q1& inputStateQueue_;
         Q2& inputExternalForcesQueue_;
         Q3& inputMuscleForcesQueue_;
@@ -117,7 +123,7 @@ namespace ceinms {
         std::vector<std::string> jointsToLog_, dofNames_, musclesNames_;
         OpenSim::Model model_;
         using QueueForce = Concurrency::Queue < QueueData<ExternalForceData> > ;
-        std::vector<std::unique_ptr<QueueForce>> forceQueues_;
+        std::vector<std::shared_ptr<QueueForce>> forceQueues_;
         std::vector<OpenSim::ExternalForceFromQueue*> extForces_;
         void parseExternalLoadsXml(const std::string& externalLoadsXmlFilename);
     };
