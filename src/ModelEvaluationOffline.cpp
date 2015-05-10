@@ -113,7 +113,7 @@ namespace ceinms {
             subject_.setTime(emgTime);
             subject_.setEmgs(emgIt.data);
             if (lmtIt == lmtDataFromQueue_.begin()) subject_.updateActivations();
-            if (TimeCompare::lessEqual(lmtIt->time, emgTime) && lmtIt != lmtDataFromQueue_.end()) {
+            if (lmtIt != lmtDataFromQueue_.end() && TimeCompare::lessEqual(lmtIt->time, emgTime)) {
                 subject_.updateActivations();
                 subject_.setMuscleTendonLengths(lmtIt->data);
                 subject_.updateFibreLengths_OFFLINEPREP();
