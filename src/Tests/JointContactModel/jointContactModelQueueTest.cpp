@@ -48,7 +48,8 @@ int main() {
     using MuscleForcesData = QueueData < std::vector<double> > ;
     using ContactForcesData = QueueData < std::vector<double> >;
     using ForcesData = QueueData < std::vector<ExternalForceData> > ;
-    Queue<SimTK::State> stateQueue;
+    using StateData = QueueData < GeneralisedCoordinates > ;
+    Queue<StateData> stateQueue;
     Queue<ForcesData> externalForcesQueue;
     Queue<MuscleForcesData> muscleForcesQueue;
     Queue<ContactForcesData> outputContactForcesQueue;
@@ -71,7 +72,7 @@ int main() {
 
 
     QueuesToContactForces<
-        Queue<SimTK::State>,
+        Queue<StateData>,
         Queue<ForcesData>,
         Queue<MuscleForcesData>,
         Queue<ContactForcesData>,
@@ -84,14 +85,16 @@ int main() {
         subject,
         osimFilename,
         externalLoadsFilename,
-        { "ankle_angle_l" });
+        { "ankle_r" });
 
     //1 run state producer
     // init model to get the correct state structure
     OpenSim::Model model(osimFilename);
-    SimTK::State state(model.initSystem());
+    model.initSystem();
+    GeneralisedCoordinates generalisedCoordinates(model.getNumCoordinates());
 
     OpenSim::ExternalLoads externalLoads(model, externalLoadsFilename);
+    externalLoads.invokeConnectToModel(model);
     string kinematicsFilename(externalLoads.getExternalLoadsModelKinematicsFileName());
     OpenSim::Storage kinematics(kinematicsFilename);
     double firstTime(kinematics.getFirstTime());
@@ -110,34 +113,43 @@ int main() {
         
         //push states into queue
         for (auto t : timeColumn) {
-            state.setTime(t);
+           
             OpenSim::Array<double> q;
+            vector<double> stdQ;
             kinematicsSplines.evaluate(q, 0, t);
-            for (size_t i(0); i < model.getNumCoordinates(); ++i)
-                state.updQ()[i] = q[i];
+            ArrayConverter::toStdVector(q, stdQ);
+            generalisedCoordinates.setQ(stdQ);
 
             OpenSim::Array<double> qd;
+            vector<double> stdQd;
             kinematicsSplines.evaluate(qd, 1, t);
-            for (size_t i(0); i < model.getNumCoordinates(); ++i)
-                state.updQDot()[i] = qd[i];
+            ArrayConverter::toStdVector(qd, stdQd);
+            generalisedCoordinates.setQd(stdQd);
 
             OpenSim::Array<double> qdd;
+            vector<double> stdQdd;
             kinematicsSplines.evaluate(qdd, 2, t);
-            for (size_t i(0); i < model.getNumCoordinates(); ++i)
-                state.updQDotDot()[i] = qdd[i];
+            ArrayConverter::toStdVector(qdd, stdQdd);
+            generalisedCoordinates.setQdd(stdQdd);
 
+            StateData state{ t, generalisedCoordinates };
+
+      /*      std::cout << "State from producer\n" <<
+                "Time: " << state.getTime() << std::endl <<
+                "Q:   " << state.updQ() << endl <<
+                "Qd:  " << state.updQDot() << endl <<
+                "Qdd: " << state.updQDotDot() << endl <<
+                endl << std::flush;*/
             //    cout << "Pushing state on queue\n";
             stateQueue.push(state);
         }
-
-        state.setTime(std::numeric_limits<double>::infinity());  //eof
+        StateData state{ std::numeric_limits<double>::infinity(), 0 };
         stateQueue.push(state);
     }));
 
 //    cout << stateQueue;
     // push external forces to queue
   //  OpenSim::ExternalLoads externalLoads(model, externalLoadsXmlFilename);
-
 
     OpenSim::Storage externalForcesStorage(externalLoads.getDataFileName());
     OpenSim::Array<double> timeColumnExternalLoadsOS;
@@ -146,6 +158,7 @@ int main() {
     ceinms::ArrayConverter::toStdVector(timeColumnExternalLoadsOS, timeColumnExternalLoads);
     auto forcesThread(std::async(std::launch::async, [&](){
 
+//        model.initSystem();
         for (auto& l : latches)
             l->wait();
         for (auto t : timeColumnExternalLoads) {
@@ -156,20 +169,29 @@ int main() {
                 currentExtForce.grf = externalLoads.get(i).getForceAtTime(t);
                 currentExtForce.cop = externalLoads.get(i).getPointAtTime(t);
                 currentExtForce.moments = externalLoads.get(i).getTorqueAtTime(t);
+                
+
+              /*  currentExtForce.grf = 0;
+                currentExtForce.cop = 0;
+                currentExtForce.moments = 0;*/
+          //     cout << currentExtForce << endl << std::flush;
+                
                 forces.data.push_back(currentExtForce);
-        //        cout << "Pushing external force on queue "<<
+
+                //     cout << "Pushing external force on queue "<<
          //           "Time " << t << endl << "values: " 
           //          << currentExtForce << endl << std::flush;
             }
            
             externalForcesQueue.push(forces);
+
        //     cout << "externalForcesQueue " << externalForcesQueue << std::flush;
         }
         ForcesData eoForces;
         eoForces.time = std::numeric_limits<double>::infinity();
         externalForcesQueue.push(eoForces); //eof
     }));
-    //cout << "externalForcesQueue " << externalForcesQueue;
+ //   cout << "externalForcesQueue " << externalForcesQueue;
 
 
     //launch thread for contact forces

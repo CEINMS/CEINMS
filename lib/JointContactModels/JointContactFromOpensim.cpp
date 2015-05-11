@@ -55,6 +55,7 @@ namespace ceinms {
         std::unique_ptr<InverseDynamicsSolver> p(new InverseDynamicsSolver(model_));
         idSolver_ = std::move(p);
 
+
         state_ = model_.initSystem();
         for (auto c : coordinateActuators_)
             c->overrideForce(state_, true);
@@ -86,6 +87,14 @@ namespace ceinms {
 
         OpenSim::Array<string> namesOsim;
         model_.getBodySet().getNames(namesOsim);
+        ArrayConverter::toStdVector(namesOsim, names);
+    }
+
+
+    void JointContactFromOpensim::getJointNamesFromOsimModel(vector<string>& names) const {
+
+        OpenSim::Array<string> namesOsim;
+        model_.getJointSet().getNames(namesOsim);
         ArrayConverter::toStdVector(namesOsim, names);
     }
 
@@ -169,9 +178,15 @@ namespace ceinms {
         for (auto m : muscleActuators_)
             m->setDisabled(state_, disableMuscles);
 
-        std::cout << "Num of coordinates " << nCoordinates_ << endl << std::flush;
+    //    std::cout << "Num of coordinates " << nCoordinates_ << endl << std::flush;
         for (unsigned i(0); i < nCoordinates_; ++i)
             coordinateActuators_.at(i)->setOverrideForce(state_, residualMobilityForces_.get(i));
+        std::cout << "State: " <<
+            "Time: " << state_.getTime() << std::endl <<
+            "Q:   " << state_.updQ() << endl << 
+            "Qd:  " << state_.updQDot() << endl <<
+            "Qdd: " << state_.updQDotDot() << endl <<
+            endl << std::flush;
         model_.getSimbodyEngine().computeReactions(state_, rForcesInG_, rTorquesInG_);
     }
 

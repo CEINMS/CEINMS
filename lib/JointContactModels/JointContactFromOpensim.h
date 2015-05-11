@@ -38,6 +38,8 @@ namespace ceinms {
         void getMuscleNamesFromOsimModel(std::vector<std::string>& names) const;
         void getBodyNamesFromOsimModel(std::vector<std::string>& names) const;
         void getCoordinateNamesFromOsimModel(std::vector<std::string>& names) const;
+        void getJointNamesFromOsimModel(std::vector<std::string>& names) const;
+
         std::string getJointNameOnDof(const std::string& dofName);
         void getAllReactionForces(SimTK::Vector_<SimTK::Vec3>& reactionForces, SimTK::Vector_<SimTK::Vec3>& reactionTorques) const;
         SimTK::Vector getMobilityForces() const {   return residualMobilityForces_; }

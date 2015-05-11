@@ -81,6 +81,7 @@ namespace OpenSim {
         SimTK::ReferencePtr<const Body> appliedToBody_;
         SimTK::ReferencePtr<const Body> forceExpressedInBody_;
         SimTK::ReferencePtr<const Body> pointExpressedInBody_;
+        mutable bool runCondition_;
 
 
     };
@@ -89,6 +90,33 @@ namespace OpenSim {
 
 namespace ceinms {
    
+    class GeneralisedCoordinates {
+    private:
+        size_t nCoordinates_;
+        std::vector<double> q_, qd_, qdd_;
+
+    public:
+        GeneralisedCoordinates(size_t nCoordinates) :
+            nCoordinates_(nCoordinates), 
+            q_(nCoordinates, .0),
+            qd_(nCoordinates, .0),
+            qdd_(nCoordinates, .0)
+            {}
+        void setQ(const std::vector<double>& q) {
+            q_ = q;
+        }
+        void setQd(const std::vector<double>& qd) {
+            qd_ = qd;
+        }
+        void setQdd(const std::vector<double>& qdd) {
+            qdd_ = qdd;
+        }
+
+        std::vector<double> getQ() const { return q_; }
+        std::vector<double> getQd() const { return qd_; }
+        std::vector<double> getQdd() const { return qdd_; }
+        
+    };
 
 
     template<typename Q1, typename Q2, typename Q3, typename Q4, typename L>
