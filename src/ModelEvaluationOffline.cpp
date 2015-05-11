@@ -110,11 +110,11 @@ namespace ceinms {
         auto lmtIt(lmtDataFromQueue_.begin());
         for (auto emgIt : emgDataFromQueue_) {
             double emgTime = emgIt.time + globalEmDelay_;
-            subject_.setTime(emgTime);
+//            subject_.setTime(emgTime);
             subject_.setEmgs(emgIt.data);
-            if (lmtIt == lmtDataFromQueue_.begin()) subject_.updateActivations();
+            subject_.updateActivations();
             if (lmtIt != lmtDataFromQueue_.end() && TimeCompare::lessEqual(lmtIt->time, emgTime)) {
-                subject_.updateActivations();
+                subject_.setTime(lmtIt->time);
                 subject_.setMuscleTendonLengths(lmtIt->data);
                 subject_.updateFibreLengths_OFFLINEPREP();
                 ++lmtIt;
@@ -170,7 +170,7 @@ namespace ceinms {
                 emgTime = emgFrameFromQueue.time + globalEmDelay_;
                 runCondition = runCondition && !emgFrameFromQueue.data.empty();
                 if (!TimeCompare::less(emgTime, lmtMaTime)) firstLmtArrived = true;
-                if (!firstLmtArrived && runCondition) {
+                if ( runCondition) {
                     subject_.setTime(emgTime);
                     subject_.setEmgs(emgFrameFromQueue.data);
                     subject_.updateActivations();
@@ -178,8 +178,8 @@ namespace ceinms {
                 }
             }
 
-            subject_.setTime(emgTime);
-            subject_.setEmgs(emgFrameFromQueue.data);
+            subject_.setTime(lmtMaTime);
+            //subject_.setEmgs(emgFrameFromQueue.data);
             subject_.setMuscleTendonLengths(lmtFrameFromQueue.data);
             for (unsigned int i = 0; i < noDof_; ++i)
                 subject_.setMomentArms(momentArmsFrameFromQueue.at(i).data, i);
@@ -189,21 +189,21 @@ namespace ceinms {
             //:TODO: Improve as now you are defining two times what you want to log
             vector<double> data;
             subject_.getActivations(data);
-            ModelEvaluationBase<Logger>::logger.log(emgTime, data, "Activations");
+            ModelEvaluationBase<Logger>::logger.log(lmtMaTime, data, "Activations");
             subject_.getFiberLengths(data);
-            ModelEvaluationBase<Logger>::logger.log(emgTime, data, "FiberLenghts");
+            ModelEvaluationBase<Logger>::logger.log(lmtMaTime, data, "FiberLenghts");
             subject_.getNormFiberLengths(data);
-            ModelEvaluationBase<Logger>::logger.log(emgTime, data, "NormFiberLengths");
+            ModelEvaluationBase<Logger>::logger.log(lmtMaTime, data, "NormFiberLengths");
             subject_.getFiberVelocities(data);
-            ModelEvaluationBase<Logger>::logger.log(emgTime, data, "FiberVelocities");
+            ModelEvaluationBase<Logger>::logger.log(lmtMaTime, data, "FiberVelocities");
             subject_.getNormFiberVelocities(data);
-            ModelEvaluationBase<Logger>::logger.log(emgTime, data, "NormFiberVelocities");
+            ModelEvaluationBase<Logger>::logger.log(lmtMaTime, data, "NormFiberVelocities");
             subject_.getPennationAnglesAtT(data);
-            ModelEvaluationBase<Logger>::logger.log(emgTime, data, "PennationAngles");
+            ModelEvaluationBase<Logger>::logger.log(lmtMaTime, data, "PennationAngles");
             subject_.getMuscleForces(data);
-            ModelEvaluationBase<Logger>::logger.log(emgTime, data, "MuscleForces");
+            ModelEvaluationBase<Logger>::logger.log(lmtMaTime, data, "MuscleForces");
             subject_.getTorques(data);
-            ModelEvaluationBase<Logger>::logger.log(emgTime, data, "Torques");
+            ModelEvaluationBase<Logger>::logger.log(lmtMaTime, data, "Torques");
 #endif
 
 #ifdef LOG
