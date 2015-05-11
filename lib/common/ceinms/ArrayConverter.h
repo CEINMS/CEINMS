@@ -34,8 +34,8 @@
 namespace ceinms {
     namespace ArrayConverter{
 
-        template<typename T>
-        void toStdVector(const OpenSim::Array<T>& srcArray, std::vector<T>& dstVector) {
+        template<typename T, typename U>
+        void toStdVector(const T& srcArray, U& dstVector) {
             dstVector.clear();
             int size = srcArray.getSize();
             dstVector.resize(size);
@@ -43,9 +43,9 @@ namespace ceinms {
                 dstVector.at(i) = srcArray.get(i);
         }
 
-        template<typename T>
-        void fromStdVector(OpenSim::Array<T>& dstArray, const std::vector<T>& srcVector) {
-            for (typename std::vector<T>::const_iterator it(srcVector.begin()); it != srcVector.end(); ++it)
+        template<typename T, typename U>
+        void fromStdVector(T& dstArray, const U& srcVector) {
+            for (typename U::const_iterator it(srcVector.begin()); it != srcVector.end(); ++it)
                 dstArray.append(*it);
         }
     }

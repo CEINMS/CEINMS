@@ -32,9 +32,12 @@
 #include "ceinms/concurrency/Queue.h"
 #include "ceinms/concurrency/Latch.h"
 #include "ceinms/QueueData.h"
+#include "ceinms/ExternalForceData.h"
+#include "ceinms/GeneralisedCoordinatesData.h"
 
 #include <list>
 #include <vector>
+#include <limits>
 
 namespace ceinms {
     class InputConnectors {
@@ -50,10 +53,18 @@ namespace ceinms {
         Concurrency::Latch doneWithSubscription;
 
         //queues for joint contact forces
+        using ExternalForcesFrame = QueueData < std::vector<ExternalForceData> >;
+        using ExternalForcesQueue = Concurrency::Queue < ExternalForcesFrame >;
+        ExternalForcesQueue queueExternalForces;
 
+
+        using GeneralisedCoordinatesFrame = QueueData < GeneralisedCoordinatesData >;
+        using GeneralisedCoordinatesQueue = Concurrency::Queue < GeneralisedCoordinatesFrame >;
+        GeneralisedCoordinatesQueue queueGeneralisedCoordinates;
 
         double globalTimeLimit;
         bool externalTorquesAvailable;
+        const double TimePlaceholderForEndOfData = std::numeric_limits<double>::infinity();
     };
 }
 

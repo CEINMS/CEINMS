@@ -26,8 +26,8 @@
 * limitations under the License.                                             *
 * -------------------------------------------------------------------------- */
 
-#ifndef Ceinms_ExternalForceData_h
-#define Ceinms_ExternalForceData_h
+#ifndef ceinms_ExternalForceData_h
+#define ceinms_ExternalForceData_h
 #include <ostream>
 #include <utility>
 #include <SimTKcommon.h>

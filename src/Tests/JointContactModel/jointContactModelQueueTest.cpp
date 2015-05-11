@@ -54,7 +54,6 @@ OpenSim::GCVSplineSet getKinematicsSplines(OpenSim::Model& model, OpenSim::Stora
     }
     // Create differentiable splines of the coordinate data
     OpenSim::GCVSplineSet kinematicsSplines(5, &kinematics);
-
     //Functions must correspond to model coordinates and their order for the solver
     OpenSim::Array<string> coordinateNamesOS;
     model.getCoordinateSet().getNames(coordinateNamesOS);

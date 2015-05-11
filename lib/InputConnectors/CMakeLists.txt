@@ -6,24 +6,32 @@ set(FromStorageFile_SOURCES
   FromStorageFile/ExternalTorquesFromStorageFile.cpp
   FromStorageFile/LmtMaFromStorageFile.cpp
   FromStorageFile/Utilities.cpp
+  FromStorageFile/ExternalForcesFromStorageFile.cpp
+  FromStorageFile/GeneralisedCoordinatesFromStorageFile.cpp
 )
 set(FromStorageFile_HEADERS
   ceinms/EMGFromFile.h
   ceinms/ExternalTorquesFromStorageFile.h
   ceinms/LmtMaFromStorageFile.h
   ceinms/Utilities.h
+  ceinms/ExternalForcesFromStorageFile.h
+  ceinms/GeneralisedCoordinatesFromStorageFile.h
 )
 
 set(InputConnectors_SOURCES
   EMGFromX.cpp
   ExternalTorquesFromX.cpp
   LmtMaFromX.cpp
+  ExternalForcesFromX.cpp
+  GeneralisedCoordinatesFromX.cpp
   InputConnectors.cpp
 )
 set(InputConnectors_HEADERS
   ceinms/EMGFromX.h
   ceinms/ExternalTorquesFromX.h
   ceinms/LmtMaFromX.h
+  ceinms/ExternalForcesFromX.h
+  ceinms/GeneralisedCoordinatesFromX.h
   ceinms/InputConnectors.h
 )
 
@@ -37,13 +45,16 @@ add_library(InputConnectors STATIC
   ${InputConnectors_HEADERS}
   ${FromStorageFile_HEADERS}
 )
-target_link_libraries(InputConnectors FileIO Concurrency ${Boost_FILESYSTEM_LIBRARY})
+target_link_libraries(InputConnectors FileIO Concurrency ${Boost_FILESYSTEM_LIBRARY} ${OPENSIM_LIBRARIES})
 target_include_directories(InputConnectors
                                 PRIVATE     ${CMAKE_CURRENT_SOURCE_DIR}
                                             ${ceinms_common_INCLUDE_DIRS}
                                             ${FileIO_INCLUDE_DIRS}
                                             ${Concurrency_INCLUDE_DIRS}
-                                            ${Boost_INCLUDE_DIRS})
+                                            ${Boost_INCLUDE_DIRS}
+								PUBLIC
+											${OPENSIM_INCLUDE_DIRS}
+											${SIMTK_INCLUDE_DIRS})
 
 # Save path to include directory for "internal" usage
 set(InputConnectors_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}"  CACHE INTERNAL "Include directories for InputConnectors library")
