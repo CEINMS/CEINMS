@@ -129,7 +129,7 @@ namespace ceinms {
         for (unsigned emgIndex(0); emgIndex < trialData.emgData.getNRows(); ++emgIndex) {
 
             emgTime = trialData.emgData.getTime(emgIndex) + emDelay;
-            if (!firstLmtArrived && TimeCompare::less(emgTime, lmtTime)) {
+            if ( TimeCompare::less(emgTime, lmtTime)) {
                 subject.setActivations(previousResult.activations.getRow(emgIndex));
                 subject.setEmgsSelective(trialData.emgData.getRow(emgIndex), musclesToUpdate);
                 subject.updateActivations(musclesToUpdate);
@@ -139,7 +139,7 @@ namespace ceinms {
             if (TimeCompare::lessEqual(lmtTime, emgTime) && (lmtMaIndex < trialData.lmtData.getNRows()) && (lmtMaIndex < trialData.maData.front().getNRows())) {
                 firstLmtArrived = true;
                 subject.setMuscleForces(previousResult.forces.getRow(lmtMaIndex));
-                subject.setTime(emgTime);
+                subject.setTime(lmtTime);
 
                 subject.setActivations(previousResult.activations.getRow(emgIndex));
                 subject.setEmgsSelective(trialData.emgData.getRow(emgIndex), musclesToUpdate);
@@ -193,8 +193,7 @@ namespace ceinms {
         for (unsigned emgIndex(0); emgIndex < trialData.emgData.getNRows(); ++emgIndex) {
 
             emgTime = trialData.emgData.getTime(emgIndex) + emDelay;
-            if (!firstLmtArrived && TimeCompare::less(emgTime, lmtTime)) {
-                subject.setTime(emgTime);
+            if (TimeCompare::less(emgTime, lmtTime)) {
                 subject.setActivations(previousResult.activations.getRow(emgIndex));
                 subject.setEmgsSelective(trialData.emgData.getRow(emgIndex), musclesToUpdate);
                 subject.updateActivations(musclesToUpdate);;
@@ -203,7 +202,7 @@ namespace ceinms {
             if (TimeCompare::lessEqual(lmtTime, emgTime) && (lmtMaIndex < trialData.lmtData.getNRows()) && (lmtMaIndex < trialData.maData.front().getNRows())) {
                 firstLmtArrived = true;
                 // set emg to model, set activations of the muscles not updated
-                subject.setTime(emgTime);
+                subject.setTime(lmtTime);
                 subject.setActivations(previousResult.activations.getRow(emgIndex));
                 subject.setEmgsSelective(trialData.emgData.getRow(emgIndex), musclesToUpdate);
                 subject.updateActivations(musclesToUpdate);
