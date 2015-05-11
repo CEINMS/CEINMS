@@ -16,5 +16,6 @@ TARGET_LINK_LIBRARIES(Test_BatchEvaluator
       NMSmodel
       InputConnectors
       OutputConnectors
+      OptimizationSystems
       Concurrency)
 

@@ -26,7 +26,7 @@
  * limitations under the License.                                             *
  * -------------------------------------------------------------------------- */
 
-#include "Result.h"
+#include "ceinms/Result.h"
 
 namespace ceinms {
 

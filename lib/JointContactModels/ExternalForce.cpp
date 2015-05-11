@@ -1,10 +1,10 @@
-#include "ExternalForce.h"
+#include "ceinms/ExternalForce.h"
 #include <SimTK/include/SimTKmath.h>
 using SimTK::Vec3;
 #include <utility>
 using std::pair;
 
-namespace CEINMS {
+namespace ceinms {
 
     ExternalForce::ExternalForce() :
         targetBody_(0),

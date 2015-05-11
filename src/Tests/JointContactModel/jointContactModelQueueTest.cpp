@@ -1,17 +1,17 @@
-#include "QueuesToContactForces.h"
-#include "Queue.h"
-#include "Latch.h"
+#include "ceinms/QueuesToContactForces.h"
+#include "ceinms/concurrency/Queue.h"
+#include "ceinms/concurrency/Latch.h"
 using namespace ceinms;
 using ceinms::Concurrency::Queue;
 using ceinms::Concurrency::Latch;
-#include "NMSmodel.h"
-#include "Activation/ExponentialActivation.h"
-#include "Tendon/ElasticTendon_BiSec.h"
-#include "Curve.h"
+#include "ceinms/NMSmodel.h"
+#include "ceinms/Activation/ExponentialActivation.h"
+#include "ceinms/Tendon/ElasticTendon_BiSec.h"
+#include "ceinms/Curve.h"
 #include <OpenSim/OpenSim.h>
 #include <vector>
 #include <memory>
-#include "ArrayConverter.h"
+#include "ceinms/ArrayConverter.h"
 
 
 OpenSim::GCVSplineSet getKinematicsSplines(OpenSim::Model& model, OpenSim::Storage& kinematics, double fc) {

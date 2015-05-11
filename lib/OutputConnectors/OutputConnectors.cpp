@@ -26,7 +26,7 @@
  * limitations under the License.                                             *
  * -------------------------------------------------------------------------- */
 
-#include "OutputConnectors.h"
+#include "ceinms/OutputConnectors.h"
 #include <map>
 #include <string>
 

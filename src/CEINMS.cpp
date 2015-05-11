@@ -26,9 +26,9 @@
  * limitations under the License.                                             *
  * -------------------------------------------------------------------------- */
 
-#include "Utilities.h"
-#include "FileUtils.h"
-#include "CeinmsSetupXmlReader.h"
+#include "ceinms/Utilities.h"
+#include "ceinms/FileUtils.h"
+#include "ceinms/CeinmsSetupXmlReader.h"
 #include "SimulationManager.h"
 #include <ctime>
 

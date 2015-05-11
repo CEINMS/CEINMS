@@ -32,8 +32,8 @@
 #include <vector>
 #include <string>
 
-#include "InputConnectors.h"
-#include "OutputConnectors.h"
+#include "ceinms/InputConnectors.h"
+#include "ceinms/OutputConnectors.h"
 
 namespace ceinms {
     template <typename Logger>

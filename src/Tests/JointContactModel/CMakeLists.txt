@@ -9,11 +9,11 @@ include_directories(
 	${NMSmodel_INCLUDE_DIRS}
 	${Curve_INCLUDE_DIRS})
 
-add_executable(Test_JointContactModel jointContactModelTest.cpp)
+#add_executable(Test_JointContactModel jointContactModelTest.cpp)
 
-target_link_libraries(Test_JointContactModel  JointContactModels xmlInput optimized ${OPENSIM_LIBRARIES})
+#target_link_libraries(Test_JointContactModel  JointContactModels xmlInput optimized ${OPENSIM_LIBRARIES})
 
-target_link_libraries(Test_JointContactModel  JointContactModels xmlInput debug ${OPENSIM_LIBRARIES_DEBUG})
+#target_link_libraries(Test_JointContactModel  JointContactModels xmlInput debug ${OPENSIM_LIBRARIES_DEBUG})
 
 
 add_executable(Test_JointContactModelQueues jointContactModelQueueTest.cpp)

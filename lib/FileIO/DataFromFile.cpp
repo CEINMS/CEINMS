@@ -37,7 +37,7 @@ using std::endl;
 using std::stringstream;
 #include <stdlib.h>
 
-#include "DataFromFile.h"
+#include "ceinms/DataFromFile.h"
 
 //DataFromFile::DataFromFile(const DataFromFile& orig)
 //:dataFile_(orig.dataFilename_.c_str()) {

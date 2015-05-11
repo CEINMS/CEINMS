@@ -37,7 +37,7 @@ using std::endl;
 using std::stringstream;
 #include <stdlib.h>
 
-#include "EMGDataFromFile.h"
+#include "ceinms/EMGDataFromFile.h"
 
 namespace ceinms {
     template <typename EMGgenerator>

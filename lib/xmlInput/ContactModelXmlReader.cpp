@@ -26,7 +26,7 @@
 * limitations under the License.                                             *
 * -------------------------------------------------------------------------- */
 
-#include "ContactModelXmlReader.h"
+#include "ceinms/ContactModelXmlReader.h"
 #include <string>
 using std::string;
 #include <iostream>
@@ -35,7 +35,7 @@ using std::endl;
 #include <list>
 using std::list;
 
-#include "FileUtils.h"
+#include "ceinms/FileUtils.h"
 #include "contactModel-schema.hxx"
 #include "validation.h"
 

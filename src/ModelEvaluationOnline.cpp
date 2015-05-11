@@ -38,11 +38,11 @@ using std::vector;
 #include <boost/concept_check.hpp>
 using std::string;
 
-#include "TimeCompare.h"
+#include "ceinms/TimeCompare.h"
 #include "ModelEvaluationOnline.h"
 #include "ModelEvaluationBase.h"
-#include "InputConnectors.h"
-#include "OutputConnectors.h"
+#include "ceinms/InputConnectors.h"
+#include "ceinms/OutputConnectors.h"
 
 #define LOG_FILES
 #define LOG

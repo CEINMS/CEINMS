@@ -33,11 +33,11 @@ using std::vector;
 #include <iostream>
 using std::cout;
 using std::endl;
-#include "ElasticTendon_BiSec.h"
+#include "ceinms/Tendon/ElasticTendon_BiSec.h"
 #include <functional>
 //#include <boost/concept_check.hpp>
-#include "WDBsolver.h"
-#include "../MTUutils.h" //don't know why it doesn't show up without the parent dir..
+#include "ceinms/WDBsolver.h"
+#include "ceinms/MTUutils.h"
 
 //#define DEEP_DEBUG
 //#define DEBUG
@@ -246,6 +246,12 @@ namespace ceinms {
     void ElasticTendon_BiSec::setMaxContractionVelocity(double maxContractionVelocity) {
 
         maxContractionVelocity_ = maxContractionVelocity;
+        resetState();
+    }
+
+    void ElasticTendon_BiSec::setDamping(double damping) {
+
+        damping_ = damping;
         resetState();
     }
 

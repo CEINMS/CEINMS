@@ -26,10 +26,10 @@
  * limitations under the License.                                             *
  * -------------------------------------------------------------------------- */
 
-#include "LmtMaFromStorageFile.h"
-#include "DataFromStorageFile.h"
-#include "InputConnectors.h"
-#include "Utilities.h"
+#include "ceinms/LmtMaFromStorageFile.h"
+#include "ceinms/DataFromStorageFile.h"
+#include "ceinms/InputConnectors.h"
+#include "ceinms/Utilities.h"
 
 #include <iostream>
 using std::cout;

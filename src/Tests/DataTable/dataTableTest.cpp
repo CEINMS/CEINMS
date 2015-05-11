@@ -26,7 +26,7 @@
  * limitations under the License.                                             *
  * -------------------------------------------------------------------------- */
 
-#include "DataTable.h"
+#include "ceinms/DataTable.h"
 #include <iostream>
 using std::cout;
 using std::endl;

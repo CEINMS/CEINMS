@@ -26,34 +26,34 @@
  * limitations under the License.                                             *
  * -------------------------------------------------------------------------- */
 
-#include "CeinmsSetupXmlReader.h"
-#include "NMSmodel.h"
+#include "ceinms/CeinmsSetupXmlReader.h"
+#include "ceinms/NMSmodel.h"
 
-#include "Tendon/StiffTendon.h"
-#include "Tendon/ElasticTendon.h"
-#include "Tendon/ElasticTendon_BiSec.h"
+#include "ceinms/Tendon/StiffTendon.h"
+#include "ceinms/Tendon/ElasticTendon.h"
+#include "ceinms/Tendon/ElasticTendon_BiSec.h"
 
-#include "Activation/ExponentialActivation.h"
-#include "Activation/PiecewiseActivation.h"
-#include "Curve.h"
+#include "ceinms/Activation/ExponentialActivation.h"
+#include "ceinms/Activation/PiecewiseActivation.h"
+#include "ceinms/Curve.h"
 
-#include "EMGFromFile.h"
-#include "LmtMaFromStorageFile.h"
-#include "ExternalTorquesFromStorageFile.h"
+#include "ceinms/EMGFromFile.h"
+#include "ceinms/LmtMaFromStorageFile.h"
+#include "ceinms/ExternalTorquesFromStorageFile.h"
 
 #include "ModelEvaluationOnline.h"
 #include "ModelEvaluationOffline.h"
 #include "ModelEvaluationHybrid.h"
 
 //Hybrid optimiser
-#include "ErrorMinimizerAnnealing.h"
-#include "HybridWeightings.h"
+#include "ceinms/ErrorMinimizerAnnealing.h"
+#include "ceinms/HybridWeightings.h"
 
-#include "InputConnectors.h"
-#include "OutputConnectors.h"
+#include "ceinms/InputConnectors.h"
+#include "ceinms/OutputConnectors.h"
 
-#include "LoggerOnQueues.h"
-#include "QueuesToStorageFiles.h"
+#include "ceinms/LoggerOnQueues.h"
+#include "ceinms/QueuesToStorageFiles.h"
 #include <string>
 using std::string;
 

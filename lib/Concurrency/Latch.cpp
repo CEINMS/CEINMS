@@ -28,7 +28,7 @@
 
 #include <iostream>
 #include <algorithm>
-#include "Latch.h"
+#include "ceinms/concurrency/Latch.h"
 
 namespace ceinms{
     namespace Concurrency{

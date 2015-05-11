@@ -26,13 +26,13 @@
  * limitations under the License.                                             *
  * -------------------------------------------------------------------------- */
 
-#include "ExcitationGeneratorFromXml.h"
+#include "ceinms/ExcitationGeneratorFromXml.h"
 #include "excitationGenerator.hxx"
 using ExcitationGeneratorXsd::excitationGenerator;
 using ExcitationGeneratorXsd::ExcitationListType;
 using ExcitationGeneratorXsd::ExcitationType;
 
-#include "ExcitationGeneratorXmlReader.h"
+#include "ceinms/ExcitationGeneratorXmlReader.h"
 #include <vector>
 using std::vector;
 #include <string>

@@ -26,8 +26,8 @@
  * limitations under the License.                                             *
  * -------------------------------------------------------------------------- */
 
-#include "LmtMaFromX.h"
-#include "InputConnectors.h"
+#include "ceinms/LmtMaFromX.h"
+#include "ceinms/InputConnectors.h"
 
 using std::cout;
 using std::endl;

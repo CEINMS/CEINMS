@@ -3,18 +3,18 @@
 project(OptimizationSystems)
 
 # List source files
-set(OptimizationSystems_HEADERS NMSmodelSystem.h
-                                ParametersInterpreter.h
-                                BatchEvaluator.h
-                                AbstractOptimizerSystem.h
-                                MinTorqueError.h
-								Result.h
+set(OptimizationSystems_HEADERS ceinms/NMSmodelSystem.h
+                                ceinms/ParametersInterpreter.h
+                                ceinms/BatchEvaluator.h
+                                ceinms/AbstractOptimizerSystem.h
+                                ceinms/MinTorqueError.h
+								ceinms/Result.h
                         )
 
 set(OptimizationSystems_TEMPLATE_IMPLEMENTATION
-                            NMSmodelSystem.cpp
-                            ParametersInterpreter.cpp
-							BatchEvaluator.cpp
+                            ceinms/NMSmodelSystem.cpp
+                            ceinms/ParametersInterpreter.cpp
+							ceinms/BatchEvaluator.cpp
 							)
                             
 set(OptimizationSystems_SOURCES MinTorqueError.cpp Result.cpp
@@ -27,7 +27,8 @@ source_group("Source Files" FILES ${OptimizationSystems_TEMPLATE_IMPLEMENTATION}
 
 add_library(OptimizationSystems ${OptimizationSystems_HEADERS} ${OptimizationSystems_TEMPLATE_IMPLEMENTATION} ${OptimizationSystems_SOURCES})
 target_include_directories( OptimizationSystems
-                            PRIVATE ${NMSmodel_INCLUDE_DIRS}
+                            PRIVATE ceinms
+                                    ${NMSmodel_INCLUDE_DIRS}
                                     ${Curve_INCLUDE_DIRS}
                                     ${FileIO_INCLUDE_DIRS}
                                     ${ceinms_common_INCLUDE_DIRS}
@@ -36,9 +37,8 @@ target_include_directories( OptimizationSystems
 
 
 # Save path to include directory for "internal" usage
-set(OptimizationSystems_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR} 
-#${CMAKE_CURRENT_SOURCE_DIR}/ObjectiveFunctions ${CMAKE_CURRENT_SOURCE_DIR}/SimAnnealParameters  ${CMAKE_CURRENT_SOURCE_DIR}/TorqueComputationModes 
-CACHE INTERNAL "Include directories for OptimizationSystems library")
+set(OptimizationSystems_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}"
+        CACHE INTERNAL "Include directories for OptimizationSystems library")
 
 #Install
 #install(FILES ${OptimizationSystems_HEADERS} ${OptimizationSystems_TEMPLATE_IMPLEMENTATION} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}) #should add namespace

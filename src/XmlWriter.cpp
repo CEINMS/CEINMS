@@ -92,9 +92,11 @@ namespace ceinms {
             (*i).pennationAngle(currentMuscle.getPennationAngle());
             (*i).tendonSlackLength(currentMuscle.getTendonSlackLength());
             (*i).maxContractionVelocity(currentMuscle.getMaxContractionVelocity());
-            mtuDefault.percentageChange(currentMuscle.getPercentageChange());
-            mtuDefault.damping(currentMuscle.getDamping());
-            mtuDefault.emDelay(currentMuscle.getEmDelay());
+            if (currentMuscle.getDamping() != mtuDefault.damping())
+                (*i).damping(currentMuscle.getDamping());
+//            mtuDefault.percentageChange(currentMuscle.getPercentageChange());
+//            mtuDefault.damping(currentMuscle.getDamping());
+//          mtuDefault.emDelay(currentMuscle.getEmDelay());
             //  (*i).emDelay(currentMuscle.getEmDelay());
             //NOTE: single emDelay not available yet
             (*i).maxIsometricForce(currentMuscle.getMaxIsometricForce());

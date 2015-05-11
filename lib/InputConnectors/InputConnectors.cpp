@@ -26,7 +26,7 @@
  * limitations under the License.                                             *
  * -------------------------------------------------------------------------- */
 
-#include "InputConnectors.h"
+#include "ceinms/InputConnectors.h"
 #include <vector>
 
 namespace ceinms {

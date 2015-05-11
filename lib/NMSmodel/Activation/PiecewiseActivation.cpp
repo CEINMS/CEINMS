@@ -26,7 +26,7 @@
  * limitations under the License.                                             *
  * -------------------------------------------------------------------------- */
 
-#include "PiecewiseActivation.h"
+#include "ceinms/Activation/PiecewiseActivation.h"
 #include <cmath>
 
 

@@ -7,6 +7,7 @@ add_subdirectory(Curve)
 add_subdirectory(OdeInt)
 add_subdirectory(RootSolvers)
 add_subdirectory(NMSmodel)
+add_subdirectory(Hybrid)
 add_subdirectory(TrialData)
 #add_subdirectory(Calibration)
 add_subdirectory(Concurrency) # to be substituted with external repository

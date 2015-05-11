@@ -26,7 +26,7 @@
  * limitations under the License.                                             *
  * -------------------------------------------------------------------------- */
 
-#include "InputDataXmlReader.h"
+#include "ceinms/InputDataXmlReader.h"
 #include <string>
 using std::string;
 #include <map>
@@ -37,7 +37,7 @@ using std::endl;
 #include "inputData-schema.hxx"
 
 #include "validation.h"
-#include "FileUtils.h"
+#include "ceinms/FileUtils.h"
 using InputDataXsd::InputDataType;
 
 namespace ceinms {

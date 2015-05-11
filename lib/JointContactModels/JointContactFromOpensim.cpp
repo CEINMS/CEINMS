@@ -1,4 +1,4 @@
-#include "JointContactFromOpensim.h"
+#include "ceinms/JointContactFromOpensim.h"
 #include <vector>
 using std::vector;
 #include <string>
@@ -7,7 +7,7 @@ using std::string;
 using std::cout;
 using std::endl;
 
-#include "ArrayConverter.h"
+#include "ceinms/ArrayConverter.h"
 
 namespace ceinms {
  

@@ -28,10 +28,10 @@
 
 #ifndef ceinms_SimulationManager_h
 #define ceinms_SimulationManager_h
-#include "SetupDataStructure.h"
-#include "CeinmsSetupXmlReader.h"
-#include "InputDataXmlReader.h"
-#include "ExecutionXmlReader.h"
+#include "ceinms/SetupDataStructure.h"
+#include "ceinms/CeinmsSetupXmlReader.h"
+#include "ceinms/InputDataXmlReader.h"
+#include "ceinms/ExecutionXmlReader.h"
 #include <string>
 #include <vector>
 #include <map>

@@ -26,7 +26,7 @@
  * limitations under the License.                                             *
  * -------------------------------------------------------------------------- */
 
-#include "ExponentialActivation.h"
+#include "ceinms/Activation/ExponentialActivation.h"
 #include <cmath>
 
 namespace ceinms {

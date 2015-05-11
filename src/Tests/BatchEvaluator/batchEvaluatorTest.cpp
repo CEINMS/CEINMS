@@ -26,29 +26,30 @@
  * limitations under the License.                                             *
  * -------------------------------------------------------------------------- */
 
-#include "BatchEvaluator.h"
-#include "TrialData.h"
+#include "ceinms/BatchEvaluator.h"
+#include "ceinms/TrialData.h"
+#include "ceinms/MinTorqueError.h"
 using ceinms::TrialData;
-#include "InputConnectors.h"
+#include "ceinms/InputConnectors.h"
 using ceinms::InputConnectors;
-#include "OutputConnectors.h"
+#include "ceinms/OutputConnectors.h"
 using ceinms::OutputConnectors;
-#include "QueuesToTrialData.h"
-#include "EMGFromFile.h"
-#include "LmtMaFromStorageFile.h"
-#include "CeinmsCalibrationSetupXmlReader.h"
-#include "CalibrationXmlReader.h"
-#include "ExternalTorquesFromStorageFile.h"
-#include "InputDataXmlReader.h"
-#include "Curve.h"
-#include "NMSmodel.h"
-#include "Activation/ExponentialActivation.h"
-#include "Activation/PiecewiseActivation.h"
+#include "ceinms/QueuesToTrialData.h"
+#include "ceinms/EMGFromFile.h"
+#include "ceinms/LmtMaFromStorageFile.h"
+#include "ceinms/CeinmsCalibrationSetupXmlReader.h"
+#include "ceinms/CalibrationXmlReader.h"
+#include "ceinms/ExternalTorquesFromStorageFile.h"
+#include "ceinms/InputDataXmlReader.h"
+#include "ceinms/Curve.h"
+#include "ceinms/NMSmodel.h"
+#include "ceinms/Activation/ExponentialActivation.h"
+#include "ceinms/Activation/PiecewiseActivation.h"
 //Tendon Policies
-#include "Tendon/StiffTendon.h"
-#include "Tendon/ElasticTendon.h"
-#include "Tendon/ElasticTendon_BiSec.h"
-#include "SetupDataStructure.h"
+#include "ceinms/Tendon/StiffTendon.h"
+#include "ceinms/Tendon/ElasticTendon.h"
+#include "ceinms/Tendon/ElasticTendon_BiSec.h"
+#include "ceinms/SetupDataStructure.h"
 #include <thread>
 #include <vector>
 using std::vector;
@@ -60,7 +61,7 @@ using std::endl;
 #include <list>
 using std::list;
 #include <algorithm>
-#include "Utilities.h"
+#include "ceinms/Utilities.h"
 using namespace ceinms;
 
 void setLmtMaFilenames(const string& directory, const vector< string > dofNames, string& lmtDataFilename, vector< string >& maDataFilenames)
@@ -247,25 +248,29 @@ int main(int argc, char** argv) {
                         BatchEvaluator batchEvaluator(trials);
                         batchEvaluator.evaluate(mySubject);
                         auto results(batchEvaluator.getResults());
+                        MinTorqueError error;
+                        error.setDofsToCalibrate(mySubject.getDoFNames());
+                        error.setTrials(trials);
+                        error.calculate(results);
+                        std::cout << "error value: " << error.getValue();
+     //                   batchEvaluator.evaluate(mySubject);
+     //                   auto results2(batchEvaluator.getResults());
 
-                        batchEvaluator.evaluate(mySubject);
-                        auto results2(batchEvaluator.getResults());
-
-                        cout << "Results are the same? " << compareVectors(results,results2) << std::endl;
-                        std::ofstream oF1("results1.txt");
-                        oF1 << results.front().activations;
+         //               cout << "Results are the same? " << compareVectors(results,results2) << std::endl;
+                        std::ofstream oF1("results_forces.txt");
+                        oF1 << results.front().forces;
                         oF1.close();
 
-                        std::ofstream oF2("results2.txt");
-                        oF2 << results2.front().activations;
+                        std::ofstream oF2("results_activations.txt");
+                        oF2 << results.front().activations;
                         oF2.close();
 
 
 
-                        batchEvaluator.evaluate(mySubject);
-                        auto results3(batchEvaluator.getResults());
+      //                  batchEvaluator.evaluate(mySubject);
+       //                 auto results3(batchEvaluator.getResults());
 
-                        cout << "Results are the same? " << compareVectors(results2, results3)<< std::endl;
+        //                cout << "Results are the same? " << compareVectors(results2, results3)<< std::endl;
 
 
                     }

@@ -1,6 +1,6 @@
-#include "JointContactFromOpensim.h"
-#include "ArrayConverter.h"
-#include "ContactModelXmlReader.h"
+#include "ceinms/JointContactFromOpensim.h"
+#include "ceinms/ArrayConverter.h"
+#include "ceinms/ContactModelXmlReader.h"
 using namespace ceinms;
 
 

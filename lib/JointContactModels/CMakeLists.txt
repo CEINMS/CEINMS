@@ -3,8 +3,8 @@
 project(JointContactModels)
 
 # List source files
-set(JointContactModels_HEADERS JointContactFromOpensim.h
-							   ExternalForce.h
+set(JointContactModels_HEADERS ceinms/JointContactFromOpensim.h
+							   ceinms/ExternalForce.h
 
                         )
 
@@ -38,15 +38,13 @@ target_link_libraries(JointContactModels optimized ${OPENSIM_LIBRARIES})
 target_link_libraries(JointContactModels debug ${OPENSIM_LIBRARIES_DEBUG})
 
 # Save path to include directory for "internal" usage
-set(JointContactModels_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR} 
-#${CMAKE_CURRENT_SOURCE_DIR}/ObjectiveFunctions ${CMAKE_CURRENT_SOURCE_DIR}/SimAnnealParameters  ${CMAKE_CURRENT_SOURCE_DIR}/TorqueComputationModes 
-CACHE STRING "Include directories for JointContactModels library")
-mark_as_advanced(JointContactModels_INCLUDE_DIRS)
+set(JointContactModels_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}" CACHE INTERNAL "Include directory for JointContactModels library")
+#mark_as_advanced(JointContactModels_INCLUDE_DIRS)
 
-#Install
-#install(FILES ${OptimizationSystems_HEADERS} ${OptimizationSystems_TEMPLATE_IMPLEMENTATION} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}) #should add namespace
-#install(TARGETS OptimizationSystems
-#        EXPORT CEINMSTargets
-#        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-#        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-#        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
+# Install
+install(FILES ${JointContactModels_HEADERS} ${JointContactModels_TEMPLATE_IMPLEMENTATION} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/ceinms)
+install(TARGETS JointContactModels
+        EXPORT CEINMSTargets
+        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})

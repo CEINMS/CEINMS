@@ -32,7 +32,7 @@ using std::string;
 using std::cout;
 using std::endl;
 
-#include "ExcitationGeneratorXmlReader.h"
+#include "ceinms/ExcitationGeneratorXmlReader.h"
 #include "validation.h"
 #include "excitationGenerator-schema.hxx"
 using ExcitationGeneratorXsd::excitationGenerator;

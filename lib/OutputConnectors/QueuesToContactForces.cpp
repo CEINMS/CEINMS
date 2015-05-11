@@ -1,5 +1,5 @@
-#include "QueuesToContactForces.h"
-#include "JointContactFromOpensim.h"
+#include "ceinms/QueuesToContactForces.h"
+#include "ceinms/JointContactFromOpensim.h"
 #include <string>
 #include <thread>
 #include <limits>

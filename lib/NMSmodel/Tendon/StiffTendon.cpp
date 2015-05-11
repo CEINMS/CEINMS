@@ -26,7 +26,7 @@
  * limitations under the License.                                             *
  * -------------------------------------------------------------------------- */
 
-#include "StiffTendon.h"
+#include "ceinms/Tendon/StiffTendon.h"
 #include <string>
 #include <cmath>
 
