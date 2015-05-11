@@ -12,6 +12,7 @@ using ceinms::Concurrency::Latch;
 #include <vector>
 #include <memory>
 #include "ceinms/ArrayConverter.h"
+#include "ceinms/GeneralisedCoordinatesData.h"
 
 
 OpenSim::GCVSplineSet getKinematicsSplines(OpenSim::Model& model, OpenSim::Storage& kinematics, double fc) {
@@ -40,21 +41,16 @@ OpenSim::GCVSplineSet getKinematicsSplines(OpenSim::Model& model, OpenSim::Stora
     if (kinematicsSplines.getSize() > coordinateNamesOS.getSize()){
         kinematicsSplines.setSize(coordinateNamesOS.getSize());
     }
-
     return kinematicsSplines;
 }
 
 int main() {
-    using MuscleForcesData = QueueData < std::vector<double> > ;
-    using ContactForcesData = QueueData < std::vector<SimTK::Vec3> >;
-    using ExternalForcesFrame = QueueData < std::vector<ExternalForceData> > ;
-    using StateData = QueueData < GeneralisedCoordinates > ;
-    Queue<StateData> stateQueue;
-    Queue<ExternalForcesFrame> externalForcesQueue;
-    Queue<MuscleForcesData> muscleForcesQueue;
-    Queue<ContactForcesData> outputContactForcesQueue;
-    std::vector<std::unique_ptr<Latch>> latches;
-    latches.emplace_back(new Latch(4)); // the latch set to 3 is for: stateQueue, externalForcesQueue, contactForcesEstimator, outputContactForcesQueue
+
+    QueuesToContactForces::GeneralisedCoordinatesQueue generalisedCoordinatesQueue;
+    QueuesToContactForces::ExternalForcesQueue externalForcesQueue;
+    QueuesToContactForces::MuscleForcesQueue muscleForcesQueue;
+    QueuesToContactForces::ContactForcesQueue outputContactForcesQueue;
+    Latch latch(4);
     using MyNMSmodel = NMSmodel < ExponentialActivation, ElasticTendon_BiSec, CurveMode::Online > ;
     MyNMSmodel subject;
 
@@ -62,17 +58,12 @@ int main() {
     string externalLoadsFilename(baseDir + "ExtForcesSetup.xml");
     string osimFilename(baseDir + "model.osim");        
   
-    QueuesToContactForces<
-        Queue<StateData>,
-        Queue<ExternalForcesFrame>,
-        Queue<MuscleForcesData>,
-        Queue<ContactForcesData>,
-        Latch> contactForcesEstimator(
-        stateQueue,
+    QueuesToContactForces contactForcesEstimator(
+        generalisedCoordinatesQueue,
         externalForcesQueue,
         muscleForcesQueue,
         outputContactForcesQueue,
-        latches,
+        latch,
         subject,
         osimFilename,
         externalLoadsFilename,
@@ -82,7 +73,7 @@ int main() {
     // init model to get the correct state structure
     OpenSim::Model model(osimFilename);
     model.initSystem();
-    GeneralisedCoordinates generalisedCoordinates(model.getNumCoordinates());
+    GeneralisedCoordinatesData generalisedCoordinates(model.getNumCoordinates());
 
     OpenSim::ExternalLoads externalLoads(model, externalLoadsFilename);
     externalLoads.invokeConnectToModel(model);
@@ -97,10 +88,8 @@ int main() {
     auto kinematicsSplines(getKinematicsSplines(model, kinematics, 8));
 
     auto statesThread(std::async(std::launch::async, [&](){
-
-        for (auto& l : latches)
-            l->wait();
         
+        latch.wait();
         //push states into queue
         for (auto t : timeColumn) {
            
@@ -122,11 +111,11 @@ int main() {
             ArrayConverter::toStdVector(qdd, stdQdd);
             generalisedCoordinates.setQdd(stdQdd);
 
-            StateData state{ t, generalisedCoordinates };
-            stateQueue.push(state);
+            QueuesToContactForces::GeneralisedCoordinatesFrame generalisedCoordinatesFrame{ t, generalisedCoordinates };
+            generalisedCoordinatesQueue.push(generalisedCoordinatesFrame);
         }
-        StateData state{ std::numeric_limits<double>::infinity(), 0 };
-        stateQueue.push(state);
+        QueuesToContactForces::GeneralisedCoordinatesFrame eof{ std::numeric_limits<double>::infinity(), 0 };
+        generalisedCoordinatesQueue.push(eof);
     }));
 
     OpenSim::Storage externalForcesStorage(externalLoads.getDataFileName());
@@ -137,10 +126,9 @@ int main() {
     
     auto forcesThread(std::async(std::launch::async, [&](){
 
-        for (auto& l : latches)
-            l->wait();
+            latch.wait();
         for (auto t : timeColumnExternalLoads) {
-            ExternalForcesFrame externalForcesFrame;
+            QueuesToContactForces::ExternalForcesFrame externalForcesFrame;
             externalForcesFrame.time = t;
             for (unsigned i(0); i < externalLoads.getSize(); ++i) {
                 ExternalForceData currentExtForce;
@@ -151,7 +139,7 @@ int main() {
             }
             externalForcesQueue.push(externalForcesFrame);
         }
-        ExternalForcesFrame eoForces;
+        QueuesToContactForces::ExternalForcesFrame eoForces;
         eoForces.time = std::numeric_limits<double>::infinity();
         externalForcesQueue.push(eoForces); //eof
     }));
@@ -159,8 +147,7 @@ int main() {
     auto logThread(std::async(std::launch::async, [&](){
 
         outputContactForcesQueue.subscribe();
-        for (auto& l : latches)
-            l->wait();
+        latch.wait();
         double time(0);
         bool runCondition(true);
         while (runCondition) {

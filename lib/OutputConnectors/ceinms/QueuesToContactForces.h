@@ -29,32 +29,14 @@
 #ifndef ceinms_QueuesToContactForces_h
 #define ceinms_QueuesToContactForces_h
 
+#include "ceinms/concurrency/Latch.h"
 #include "ceinms/concurrency/Queue.h"
 #include "ceinms/QueueData.h"
 #include "ceinms/ExternalForceData.h"
+#include "ceinms/GeneralisedCoordinatesData.h"
 #include <memory>
 #include <OpenSim/OpenSim.h>
 #include <ostream>
-/*
-namespace ceinms {
-    
-    struct ExternalForceData {
-        unsigned id;
-        SimTK::Vec3 cop;
-        SimTK::Vec3 grf;
-        SimTK::Vec3 moments;
-    };
-    
-
-    std::ostream& operator<< (std::ostream& os, const ExternalForceData& forceData) {
-
-        os << "cop: " << forceData.cop << std::endl;
-        os << "grf: " << forceData.grf << std::endl;
-        os << "moments: " << forceData.moments << std::endl;
-        return os;
-    }
-}
-*/
 
 namespace OpenSim {
 
@@ -91,49 +73,31 @@ namespace OpenSim {
 
 namespace ceinms {
    
-    class GeneralisedCoordinates {
-    private:
-        size_t nCoordinates_;
-        std::vector<double> q_, qd_, qdd_;
-
-    public:
-        GeneralisedCoordinates(size_t nCoordinates) :
-            nCoordinates_(nCoordinates), 
-            q_(nCoordinates, .0),
-            qd_(nCoordinates, .0),
-            qdd_(nCoordinates, .0)
-            {}
-        void setQ(const std::vector<double>& q) {
-            q_ = q;
-        }
-        void setQd(const std::vector<double>& qd) {
-            qd_ = qd;
-        }
-        void setQdd(const std::vector<double>& qdd) {
-            qdd_ = qdd;
-        }
-
-        std::vector<double> getQ() const { return q_; }
-        std::vector<double> getQd() const { return qd_; }
-        std::vector<double> getQdd() const { return qdd_; }
-        
-    };
-
-
-    template<typename Q1, typename Q2, typename Q3, typename Q4, typename L>
     class QueuesToContactForces {
     public:
+        using MuscleForcesFrame = QueueData < std::vector<double> >;
+        using MuscleForcesQueue = Concurrency::Queue < MuscleForcesFrame >;
+
+        using ContactForcesFrame = QueueData < std::vector<SimTK::Vec3> >;
+        using ContactForcesQueue = Concurrency::Queue < ContactForcesFrame > ;
+
+        using ExternalForcesFrame = QueueData < std::vector<ExternalForceData> >;
+        using ExternalForcesQueue = Concurrency::Queue < ExternalForcesFrame > ;
+
+        using GeneralisedCoordinatesFrame = QueueData < GeneralisedCoordinatesData >;
+        using GeneralisedCoordinatesQueue = Concurrency::Queue < GeneralisedCoordinatesFrame > ;
+        
         QueuesToContactForces() = delete;
         QueuesToContactForces(const QueuesToContactForces&) = delete;
         QueuesToContactForces& operator=(const QueuesToContactForces&) = delete;
 
         template <typename NMSmodelT>
         QueuesToContactForces(
-            Q1& inputStateQueue,
-            Q2& inputExternalForcesQueue,
-            Q3& inputMuscleForcesQueue,
-            Q4& outputContactForcesQueue,
-            std::vector<std::unique_ptr<L>>& latches,
+            GeneralisedCoordinatesQueue& inputGeneralisedCoordinatesQueue,
+            ExternalForcesQueue& inputExternalForcesQueue,
+            MuscleForcesQueue& inputMuscleForcesQueue,
+            ContactForcesQueue& outputContactForcesQueue,
+            Concurrency::Latch& latch,
             const NMSmodelT& subject,
             const std::string& osimModelFilename,
             const std::string& externalLoadsXmlFilename,    //this is the same as openSim
@@ -143,17 +107,18 @@ namespace ceinms {
         void operator()();
 
     private:
+        using SingleExternalForceFrame = QueueData < ExternalForceData>;
+        using SingleExternalForceQueue = Concurrency::Queue < SingleExternalForceFrame >;
 
-        Q1& inputStateQueue_;
-        Q2& inputExternalForcesQueue_;
-        Q3& inputMuscleForcesQueue_;
-        Q4& outputContactForcesQueue_;
+        GeneralisedCoordinatesQueue& inputGeneralisedCoordinatesQueue_;
+        ExternalForcesQueue& inputExternalForcesQueue_;
+        MuscleForcesQueue& inputMuscleForcesQueue_;
+        ContactForcesQueue& outputContactForcesQueue_;
         std::string modelFilename_;
-        std::vector<std::unique_ptr<L>>& latches_;
+        Concurrency::Latch& latch_;
         std::vector<std::string> jointsToLog_, dofNames_, musclesNames_;
-        //OpenSim::Model model_;
-        using QueueForce = Concurrency::Queue < QueueData<ExternalForceData> > ;
-        std::vector<std::shared_ptr<QueueForce>> forceQueues_;
+
+        std::vector<std::shared_ptr<SingleExternalForceQueue>> singleExternalForceQueues_;
         std::vector<OpenSim::Force*> extForces_;
         void parseExternalLoadsXml(const std::string& externalLoadsXmlFilename);
     };

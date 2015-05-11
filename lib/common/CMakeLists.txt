@@ -7,7 +7,8 @@ set(Common_HEADERS  ceinms/ArrayConverter.h
                     ceinms/SimulatedAnnealingParameters.h
                     ceinms/QueueData.h
                     ceinms/TimeCompare.h
-                    ceinms/ExternalForceData.h)
+                    ceinms/ExternalForceData.h
+                    ceinms/GeneralisedCoordinatesData.h)
 
 set(Common_SOURCES  Parameter.cpp
                     FileUtils.cpp

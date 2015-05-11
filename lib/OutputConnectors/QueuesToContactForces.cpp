@@ -1,5 +1,6 @@
 #include "ceinms/QueuesToContactForces.h"
 #include "ceinms/JointContactFromOpensim.h"
+#include "ceinms/GeneralisedCoordinatesData.h"
 #include <string>
 #include <thread>
 #include <limits>
@@ -120,23 +121,22 @@ namespace OpenSim {
 
 namespace ceinms {
 
-    template<typename Q1, typename Q2, typename Q3, typename Q4, typename L>
     template<typename NMSmodelT>
-    QueuesToContactForces<Q1, Q2, Q3, Q4, L>::QueuesToContactForces(
-        Q1& inputStateQueue,
-        Q2& inputExternalForcesQueue,
-        Q3& inputMuscleForcesQueue,
-        Q4& outputContactForcesQueue,
-        std::vector<std::unique_ptr<L>>& latches,
+    QueuesToContactForces::QueuesToContactForces(
+        GeneralisedCoordinatesQueue& inputGeneralisedCoordinatesQueue,
+        ExternalForcesQueue& inputExternalForcesQueue,
+        MuscleForcesQueue& inputMuscleForcesQueue,
+        ContactForcesQueue& outputContactForcesQueue,
+        Concurrency::Latch& latch,
         const NMSmodelT& subject,
         const std::string& osimModelFilename,
-        const std::string& externalLoadsXmlFilename,
+        const std::string& externalLoadsXmlFilename,    //this is the same as openSim
         const std::vector< std::string >& jointsToLog) :
-        inputStateQueue_(inputStateQueue),
+        inputGeneralisedCoordinatesQueue_(inputGeneralisedCoordinatesQueue),
         inputExternalForcesQueue_(inputExternalForcesQueue),
         inputMuscleForcesQueue_(inputMuscleForcesQueue),
         outputContactForcesQueue_(outputContactForcesQueue),
-        latches_(latches),
+        latch_(latch),
         modelFilename_(osimModelFilename),
         jointsToLog_(jointsToLog)
 
@@ -148,30 +148,26 @@ namespace ceinms {
     }
 
 
-    template<typename Q1, typename Q2, typename Q3, typename Q4, typename L>
-    void QueuesToContactForces<Q1, Q2, Q3, Q4, L>::parseExternalLoadsXml(const std::string& xmlFilename) {
+    void QueuesToContactForces::parseExternalLoadsXml(const std::string& xmlFilename) {
         OpenSim::XMLDocument document(xmlFilename);
         SimTK::Xml::Element root = document.getRootDataElement();
         SimTK::Xml::element_iterator extForceElementIter = root.element_begin("objects")->element_begin("ExternalForce");
         
         for (extForceElementIter; extForceElementIter != root.element_begin("objects")->element_end(); ++extForceElementIter) {
-            forceQueues_.emplace_back(new QueueForce());
-            extForces_.push_back(new OpenSim::ExternalForceFromQueue(forceQueues_.back(), *extForceElementIter));
+            singleExternalForceQueues_.emplace_back(new SingleExternalForceQueue());
+            extForces_.push_back(new OpenSim::ExternalForceFromQueue(singleExternalForceQueues_.back(), *extForceElementIter));
         }
     }
 
 
-
-    template<typename Q1, typename Q2, typename Q3, typename Q4, typename L>
-    void QueuesToContactForces<Q1, Q2, Q3, Q4, L>::operator()() {
+    void QueuesToContactForces::operator()() {
 
         //0. subscriptions to queues
-        inputStateQueue_.subscribe();
+        inputGeneralisedCoordinatesQueue_.subscribe();
         inputMuscleForcesQueue_.subscribe();
 
         //we create an internal latch, so who is outside doesn't have to bother to increase the count..
-        Latch forceSplitLatch(2);
-
+        Concurrency::Latch forceSplitLatch(2);
 
         //1. Divide external forces in different queues
         auto forceDistributorThr(std::async(std::launch::async, [&](){
@@ -187,48 +183,48 @@ namespace ceinms {
                         QueueData<ExternalForceData> currentForce;
                         currentForce.time = forces.time;
                         currentForce.data = forces.data.at(i);
-                        forceQueues_.at(i)->push(currentForce);
+                        singleExternalForceQueues_.at(i)->push(currentForce);
                     }
                 }
                 else {
                     runCondition = false;
                     QueueData<ExternalForceData> eof;
                     eof.time = std::numeric_limits<double>::infinity();
-                    for (auto& forceQueue : forceQueues_)
+                    for (auto& forceQueue : singleExternalForceQueues_)
                         forceQueue->push(eof);
                 }
             } while (runCondition);
         }));
 
+
         JointContactFromOpensim jointContactModel(modelFilename_, extForces_);
-        vector<string> osimJointNames, existingJointsToLog;
+        std::vector<std::string> osimJointNames, existingJointsToLog;
         jointContactModel.getJointNamesFromOsimModel(osimJointNames);
         for (auto& jointName : jointsToLog_) {
             auto it(std::find(osimJointNames.begin(), osimJointNames.end(), jointName));
             if (it != osimJointNames.end())
                 existingJointsToLog.emplace_back(*it);
             else
-                cout << jointName << " does not exist." << endl;
+                std::cout << jointName << " does not exist." << std::endl;
         }
         //2. call the latch, say that we are done with initialisations
-        for (auto& l : latches_)
-            l->wait();
+        latch_.wait();
         forceSplitLatch.wait();
 
         bool runCondition(true);
         while (runCondition) {
-            QueueData<GeneralisedCoordinates> state(inputStateQueue_.pop());
+            GeneralisedCoordinatesFrame generalisedCoordinatesFrame(inputGeneralisedCoordinatesQueue_.pop());
 
-            if (state.time == std::numeric_limits<double>::infinity())
+            if (generalisedCoordinatesFrame.time == std::numeric_limits<double>::infinity())
                 runCondition = false;
             if (runCondition) {
-                jointContactModel.setTime(state.time);
-                jointContactModel.setQ(state.data.getQ());
-                jointContactModel.setQd(state.data.getQd());
-                jointContactModel.setQdd(state.data.getQdd());
+                jointContactModel.setTime(generalisedCoordinatesFrame.time);
+                jointContactModel.setQ(generalisedCoordinatesFrame.data.getQ());
+                jointContactModel.setQd(generalisedCoordinatesFrame.data.getQd());
+                jointContactModel.setQdd(generalisedCoordinatesFrame.data.getQdd());
                 jointContactModel.calculateReactionForces(true);
-                typename Q4::type contactForces;
-                contactForces.time = state.time;
+                ContactForcesFrame contactForces;
+                contactForces.time = generalisedCoordinatesFrame.time;
                 for (auto& joint : existingJointsToLog) {
                     SimTK::Vec3 reactionForce;
                     jointContactModel.getReactionForceInG(joint, reactionForce);
@@ -243,7 +239,7 @@ namespace ceinms {
              //   oF << std::endl;
             }
         }
-        typename Q4::type contactForces;
+        ContactForcesFrame contactForces;
         contactForces.time = std::numeric_limits<double>::infinity();
         outputContactForcesQueue_.push(contactForces);
 
