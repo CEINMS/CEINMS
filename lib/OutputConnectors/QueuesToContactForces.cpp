@@ -41,9 +41,9 @@ namespace OpenSim {
       
     }
 
-    ceinms::ExternalForceData ExternalForceFromQueue::getForceDataFromPastValues(double time) const {
+    ceinms::ExternalForceData ExternalForceFromQueue::getExternalForceDataFromPastValues(double time) const {
 
-        auto it(std::lower_bound(pastForces_.begin(), pastForces_.end(), time, [](
+        auto it(std::lower_bound(pastExternalForceFrames_.begin(), pastExternalForceFrames_.end(), time, [](
             ceinms::QueueData<ceinms::ExternalForceData>& lhs,
             double t){ return lhs.time < t; }));
         return it->data;
@@ -51,24 +51,23 @@ namespace OpenSim {
     }
 
 
-    ceinms::ExternalForceData ExternalForceFromQueue::getForceDataFromQueue(double time) const {
-
+    ceinms::ExternalForceData ExternalForceFromQueue::getExternalForceDataFromQueue(double time) const {
         
-        ExternalForceQueue::type forceData;
+        ExternalForceFrame forceFrame;
         while (time > lastTime_ && runCondition_){
-            forceData = externalForceQueue_->pop();
-            if (forceData.time == std::numeric_limits<double>::infinity()) {
+            forceFrame = externalForceQueue_->pop();
+            if (forceFrame.time == std::numeric_limits<double>::infinity()) {
                 runCondition_ = false;
-                forceData.data.grf = SimTK::Vec3(0.);
-                forceData.data.cop = SimTK::Vec3(0.);
-                forceData.data.moments = SimTK::Vec3(0.);
+                forceFrame.data.setForceVector(SimTK::Vec3(0.));
+                forceFrame.data.setForceApplicationPoint(SimTK::Vec3(0.));
+                forceFrame.data.setTorque(SimTK::Vec3(0.));
             }
             if (runCondition_) {
-                pastForces_.push_back(forceData);
-                lastTime_ = forceData.time;
+                pastExternalForceFrames_.push_back(forceFrame);
+                lastTime_ = forceFrame.time;
             }
         }
-        return forceData.data;
+        return forceFrame.data;
     }
 
 
@@ -81,16 +80,18 @@ namespace OpenSim {
             double time(state.getTime());
             ceinms::ExternalForceData forceData;
             if (time <= lastTime_)
-                forceData = getForceDataFromPastValues(time);
+                forceData = getExternalForceDataFromPastValues(time);
             else
-                forceData = getForceDataFromQueue(time);
+                forceData = getExternalForceDataFromQueue(time);
 
+            //it could be possible to chenge the application point of the force on the fly, but at the moment we just keep the definitions from the xml
             const SimbodyEngine& engine = getModel().getSimbodyEngine();
-            engine.transform(state, *forceExpressedInBody_, forceData.grf, engine.getGroundBody(), forceData.grf);
-            engine.transformPosition(state, *pointExpressedInBody_, forceData.cop, *appliedToBody_, forceData.cop);
-            ExternalForce::applyForceToPoint(state, *appliedToBody_, forceData.cop, forceData.grf, bodyForces);
-            engine.transform(state, *forceExpressedInBody_, forceData.moments, engine.getGroundBody(), forceData.moments);
-            ExternalForce::applyTorque(state, *appliedToBody_, forceData.moments, bodyForces);
+            SimTK::Vec3 transformedForce, transformedPosition, transformedTorque;
+            engine.transform(state, *forceExpressedInBody_, forceData.getForce(), engine.getGroundBody(), transformedForce);
+            engine.transformPosition(state, *pointExpressedInBody_, forceData.getApplicationPoint(), *appliedToBody_, transformedPosition);
+            ExternalForce::applyForceToPoint(state, *appliedToBody_, transformedPosition, transformedForce, bodyForces);
+            engine.transform(state, *forceExpressedInBody_, forceData.getTorque(), engine.getGroundBody(), transformedTorque);
+            ExternalForce::applyTorque(state, *appliedToBody_, transformedTorque, bodyForces);
         }
     }
  
@@ -193,7 +194,6 @@ namespace ceinms {
                     runCondition = false;
                     QueueData<ExternalForceData> eof;
                     eof.time = std::numeric_limits<double>::infinity();
-                    eof.data.id = 99;
                     for (auto& forceQueue : forceQueues_)
                         forceQueue->push(eof);
                 }
@@ -242,7 +242,6 @@ namespace ceinms {
                 outputContactForcesQueue_.push(contactForces);
              //   oF << std::endl;
             }
-
         }
         typename Q4::type contactForces;
         contactForces.time = std::numeric_limits<double>::infinity();

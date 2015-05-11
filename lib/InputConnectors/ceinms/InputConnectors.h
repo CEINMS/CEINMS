@@ -49,6 +49,9 @@ namespace ceinms {
         Concurrency::Queue< FrameType >  queueExternalTorques;
         Concurrency::Latch doneWithSubscription;
 
+        //queues for joint contact forces
+
+
         double globalTimeLimit;
         bool externalTorquesAvailable;
     };

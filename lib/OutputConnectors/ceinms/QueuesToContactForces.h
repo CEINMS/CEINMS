@@ -31,19 +31,20 @@
 
 #include "ceinms/concurrency/Queue.h"
 #include "ceinms/QueueData.h"
+#include "ceinms/ExternalForceData.h"
 #include <memory>
 #include <OpenSim/OpenSim.h>
 #include <ostream>
-
+/*
 namespace ceinms {
-
+    
     struct ExternalForceData {
         unsigned id;
         SimTK::Vec3 cop;
         SimTK::Vec3 grf;
         SimTK::Vec3 moments;
     };
-
+    
 
     std::ostream& operator<< (std::ostream& os, const ExternalForceData& forceData) {
 
@@ -53,12 +54,14 @@ namespace ceinms {
         return os;
     }
 }
+*/
 
 namespace OpenSim {
 
     class ExternalForceFromQueue : public OpenSim::ExternalForce{
     public:
-        using ExternalForceQueue = ceinms::Concurrency::Queue < ceinms::QueueData<ceinms::ExternalForceData> > ;
+        using ExternalForceFrame = ceinms::QueueData < ceinms::ExternalForceData > ;
+        using ExternalForceQueue = ceinms::Concurrency::Queue < ExternalForceFrame >;
         ExternalForceFromQueue() = delete;
         ExternalForceFromQueue(std::shared_ptr<ExternalForceQueue> externalForceQueue,
             const std::string& appliedToBodyName,
@@ -73,17 +76,15 @@ namespace OpenSim {
         void connectToModel(Model& model) override;
     private:
         bool isSubscribed;
-        ceinms::ExternalForceData getForceDataFromPastValues(double time) const;
-        ceinms::ExternalForceData getForceDataFromQueue(double time) const;
+        ceinms::ExternalForceData getExternalForceDataFromPastValues(double time) const;
+        ceinms::ExternalForceData getExternalForceDataFromQueue(double time) const;
         std::shared_ptr<ExternalForceQueue> externalForceQueue_;
-        mutable std::list<ceinms::QueueData<ceinms::ExternalForceData> > pastForces_;
+        mutable std::list<ceinms::QueueData<ceinms::ExternalForceData> > pastExternalForceFrames_;
         mutable double lastTime_;
         SimTK::ReferencePtr<const Body> appliedToBody_;
         SimTK::ReferencePtr<const Body> forceExpressedInBody_;
         SimTK::ReferencePtr<const Body> pointExpressedInBody_;
         mutable bool runCondition_;
-
-
     };
 
 }

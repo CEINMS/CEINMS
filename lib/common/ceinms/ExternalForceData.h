@@ -1,14 +1,14 @@
-#ifndef Ceinms_ExternalForce_h
-#define Ceinms_ExternalForce_h
+#ifndef Ceinms_ExternalForceData_h
+#define Ceinms_ExternalForceData_h
 #include <ostream>
 #include <utility>
-#include <SimTK/include/SimTKmath.h>
+#include <SimTKcommon.h>
 
 namespace ceinms {
-    class ExternalForce {
+    class ExternalForceData {
     public:
-        ExternalForce();
-        ExternalForce(unsigned targetBodyIndex);
+        ExternalForceData();
+        ExternalForceData(unsigned targetBodyIndex);
         void setTargetBody(unsigned targetBodyIndex);
         void setForceVector(const SimTK::Vec3& force, unsigned expressedInBodyIndex = 0);
         void setForceApplicationPoint(const SimTK::Vec3& point, unsigned expressedInBodyIndex = 0);

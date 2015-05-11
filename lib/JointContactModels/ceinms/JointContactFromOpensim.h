@@ -7,7 +7,7 @@
 #include <memory>
 #include <OpenSim/OpenSim.h>
 #include <OpenSim/Simulation/InverseDynamicsSolver.h>
-#include "ExternalForce.h"
+#include "ceinms/ExternalForceData.h"
 
 namespace ceinms {
 

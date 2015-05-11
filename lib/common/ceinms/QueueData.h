@@ -47,7 +47,6 @@ namespace ceinms {
     struct QueueData {
         double time;
         T data;
-    //    friend bool operator< <>(const QueueData<T>& lhs, const QueueData<T>& rhs);
     };
 
 

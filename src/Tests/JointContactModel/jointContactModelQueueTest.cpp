@@ -47,10 +47,10 @@ OpenSim::GCVSplineSet getKinematicsSplines(OpenSim::Model& model, OpenSim::Stora
 int main() {
     using MuscleForcesData = QueueData < std::vector<double> > ;
     using ContactForcesData = QueueData < std::vector<SimTK::Vec3> >;
-    using ForcesData = QueueData < std::vector<ExternalForceData> > ;
+    using ExternalForcesFrame = QueueData < std::vector<ExternalForceData> > ;
     using StateData = QueueData < GeneralisedCoordinates > ;
     Queue<StateData> stateQueue;
-    Queue<ForcesData> externalForcesQueue;
+    Queue<ExternalForcesFrame> externalForcesQueue;
     Queue<MuscleForcesData> muscleForcesQueue;
     Queue<ContactForcesData> outputContactForcesQueue;
     std::vector<std::unique_ptr<Latch>> latches;
@@ -64,7 +64,7 @@ int main() {
   
     QueuesToContactForces<
         Queue<StateData>,
-        Queue<ForcesData>,
+        Queue<ExternalForcesFrame>,
         Queue<MuscleForcesData>,
         Queue<ContactForcesData>,
         Latch> contactForcesEstimator(
@@ -140,18 +140,18 @@ int main() {
         for (auto& l : latches)
             l->wait();
         for (auto t : timeColumnExternalLoads) {
-            ForcesData forces;
-            forces.time = t;
+            ExternalForcesFrame externalForcesFrame;
+            externalForcesFrame.time = t;
             for (unsigned i(0); i < externalLoads.getSize(); ++i) {
                 ExternalForceData currentExtForce;
-                currentExtForce.grf = externalLoads.get(i).getForceAtTime(t);
-                currentExtForce.cop = externalLoads.get(i).getPointAtTime(t);
-                currentExtForce.moments = externalLoads.get(i).getTorqueAtTime(t);
-                forces.data.push_back(currentExtForce);
+                currentExtForce.setForceVector(externalLoads.get(i).getForceAtTime(t));
+                currentExtForce.setForceApplicationPoint(externalLoads.get(i).getPointAtTime(t));
+                currentExtForce.setTorque(externalLoads.get(i).getTorqueAtTime(t));
+                externalForcesFrame.data.push_back(currentExtForce);
             }
-            externalForcesQueue.push(forces);
+            externalForcesQueue.push(externalForcesFrame);
         }
-        ForcesData eoForces;
+        ExternalForcesFrame eoForces;
         eoForces.time = std::numeric_limits<double>::infinity();
         externalForcesQueue.push(eoForces); //eof
     }));

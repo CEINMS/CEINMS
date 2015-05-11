@@ -1,98 +1,98 @@
-#include "ceinms/ExternalForce.h"
-#include <SimTK/include/SimTKmath.h>
+#include "ceinms/ExternalForceData.h"
+#include <SimTKcommon.h>
 using SimTK::Vec3;
 #include <utility>
 using std::pair;
 
 namespace ceinms {
 
-    ExternalForce::ExternalForce() :
+    ExternalForceData::ExternalForceData() :
         targetBody_(0),
         force_(std::make_pair(0, Vec3(0))),
         point_(std::make_pair(0, Vec3(0))),
         torque_(std::make_pair(0, Vec3(0))) { /*blank*/ }
 
-    ExternalForce::ExternalForce(unsigned targetBody) :
+    ExternalForceData::ExternalForceData(unsigned targetBody) :
         targetBody_(targetBody),
         force_(std::make_pair(0, Vec3(0))),
         point_(std::make_pair(0, Vec3(0))),
         torque_(std::make_pair(0, Vec3(0))) { /*blank*/ }
 
-    void ExternalForce::setTargetBody(unsigned targetBody) {
+    void ExternalForceData::setTargetBody(unsigned targetBody) {
 
         targetBody_ = targetBody;
     }
 
-    void ExternalForce::setForceVector(const Vec3& forceVector, unsigned expressedInBodyIndex) {
+    void ExternalForceData::setForceVector(const Vec3& forceVector, unsigned expressedInBodyIndex) {
 
         force_.first = expressedInBodyIndex;
         force_.second = forceVector;
     }
 
-    void ExternalForce::setForceApplicationPoint(const Vec3& point, unsigned expressedInBodyIndex) {
+    void ExternalForceData::setForceApplicationPoint(const Vec3& point, unsigned expressedInBodyIndex) {
 
         point_.first = expressedInBodyIndex;
         point_.second = point;
     }
 
-    void ExternalForce::setTorque(const Vec3& torque, unsigned expressedInBodyIndex) {
+    void ExternalForceData::setTorque(const Vec3& torque, unsigned expressedInBodyIndex) {
 
         torque_.first = expressedInBodyIndex;
         torque_.second = torque;
     }
 
-    const Vec3& ExternalForce::getForce() const {
+    const Vec3& ExternalForceData::getForce() const {
 
         return force_.second;
     }
 
-    void ExternalForce::getForce(Vec3& force) const {
+    void ExternalForceData::getForce(Vec3& force) const {
 
         force = force_.second;
     }
 
-    unsigned ExternalForce::getForceBodyIndex() const {
+    unsigned ExternalForceData::getForceBodyIndex() const {
         
         return force_.first;
     }
 
-    const Vec3& ExternalForce::getApplicationPoint() const {
+    const Vec3& ExternalForceData::getApplicationPoint() const {
     
         return point_.second;
     }
 
-    void ExternalForce::getApplicationPoint(Vec3& applicationPoint) const {
+    void ExternalForceData::getApplicationPoint(Vec3& applicationPoint) const {
 
         applicationPoint = point_.second;
     }
     
-    unsigned ExternalForce::getApplicationPointBodyIndex() const {
+    unsigned ExternalForceData::getApplicationPointBodyIndex() const {
         
         return point_.first;
     }
 
-    const Vec3& ExternalForce::getTorque() const {
+    const Vec3& ExternalForceData::getTorque() const {
 
         return torque_.second;
     }
 
-    void ExternalForce::getTorque(Vec3& torque) const {
+    void ExternalForceData::getTorque(Vec3& torque) const {
 
         torque = torque_.second;
     }
 
-    unsigned ExternalForce::getTorqueBodyIndex() const {
+    unsigned ExternalForceData::getTorqueBodyIndex() const {
 
         return torque_.first;
     }
 
 
-    unsigned ExternalForce::getTargetBodyIndex() const {
+    unsigned ExternalForceData::getTargetBodyIndex() const {
 
         return targetBody_;
     }
 
-    void ExternalForce::print(std::ostream& os) const {
+    void ExternalForceData::print(std::ostream& os) const {
 
         os << "Target body index " << getTargetBodyIndex() << std::endl;
         os << "Force" << std::endl;
