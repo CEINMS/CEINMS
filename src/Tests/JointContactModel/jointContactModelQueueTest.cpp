@@ -46,7 +46,7 @@ OpenSim::GCVSplineSet getKinematicsSplines(OpenSim::Model& model, OpenSim::Stora
 
 int main() {
     using MuscleForcesData = QueueData < std::vector<double> > ;
-    using ContactForcesData = QueueData < std::vector<double> >;
+    using ContactForcesData = QueueData < std::vector<SimTK::Vec3> >;
     using ForcesData = QueueData < std::vector<ExternalForceData> > ;
     using StateData = QueueData < GeneralisedCoordinates > ;
     Queue<StateData> stateQueue;
@@ -54,7 +54,7 @@ int main() {
     Queue<MuscleForcesData> muscleForcesQueue;
     Queue<ContactForcesData> outputContactForcesQueue;
     std::vector<std::unique_ptr<Latch>> latches;
-    latches.emplace_back(new Latch(3)); // the latch set to 3 is for: stateQueue, externalForcesQueue, contactForcesEstimator
+    latches.emplace_back(new Latch(4)); // the latch set to 3 is for: stateQueue, externalForcesQueue, contactForcesEstimator, outputContactForcesQueue
     using MyNMSmodel = NMSmodel < ExponentialActivation, ElasticTendon_BiSec, CurveMode::Online > ;
     MyNMSmodel subject;
 
@@ -156,6 +156,22 @@ int main() {
         externalForcesQueue.push(eoForces); //eof
     }));
 
+    auto logThread(std::async(std::launch::async, [&](){
+
+        outputContactForcesQueue.subscribe();
+        for (auto& l : latches)
+            l->wait();
+        double time(0);
+        bool runCondition(true);
+        while (runCondition) {
+            auto contactForces(outputContactForcesQueue.pop());
+            time = contactForces.time;
+            if (time == std::numeric_limits<double>::infinity()) runCondition = false;
+            if (runCondition)
+                cout << contactForces.data << endl;
+        }
+    }));
+
     //launch thread for contact forces
     std::thread contactForcesEstimatorThread(std::ref(contactForcesEstimator));
 
@@ -163,6 +179,7 @@ int main() {
     contactForcesEstimatorThread.join();
     forcesThread.wait();
     statesThread.wait();
+    logThread.wait();
     return 0;
 
 

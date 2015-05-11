@@ -187,9 +187,7 @@ namespace ceinms {
                         currentForce.time = forces.time;
                         currentForce.data = forces.data.at(i);
                         forceQueues_.at(i)->push(currentForce);
-         
                     }
-
                 }
                 else {
                     runCondition = false;
@@ -231,20 +229,27 @@ namespace ceinms {
                 jointContactModel.setQ(state.data.getQ());
                 jointContactModel.setQd(state.data.getQd());
                 jointContactModel.setQdd(state.data.getQdd());
-
                 jointContactModel.calculateReactionForces(true);
+                typename Q4::type contactForces;
+                contactForces.time = state.time;
                 for (auto& joint : existingJointsToLog) {
                     SimTK::Vec3 reactionForce;
                     jointContactModel.getReactionForceInG(joint, reactionForce);
-                    oF << state.time << "\t";
-                    oF << reactionForce[0] << "\t" <<
-                        reactionForce[1] << "\t" <<
-                        reactionForce[2] << "\t";
-                }
-                oF << std::endl;
-            }
-        }
+                    contactForces.data.push_back(reactionForce);
 
+              //      oF << state.time << "\t";
+              //      oF << reactionForce[0] << "\t" <<
+              //          reactionForce[1] << "\t" <<
+              //          reactionForce[2] << "\t";
+                }
+                outputContactForcesQueue_.push(contactForces);
+             //   oF << std::endl;
+            }
+
+        }
+        typename Q4::type contactForces;
+        contactForces.time = std::numeric_limits<double>::infinity();
+        outputContactForcesQueue_.push(contactForces);
         fut.wait();
     }
 }
