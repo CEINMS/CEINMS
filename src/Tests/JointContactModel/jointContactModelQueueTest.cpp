@@ -54,7 +54,7 @@ int main() {
     Queue<MuscleForcesData> muscleForcesQueue;
     Queue<ContactForcesData> outputContactForcesQueue;
     std::vector<std::unique_ptr<Latch>> latches;
-    latches.emplace_back(new Latch(4));
+    latches.emplace_back(new Latch(3)); // the latch set to 3 is for: stateQueue, externalForcesQueue, contactForcesEstimator
     using MyNMSmodel = NMSmodel < ExponentialActivation, ElasticTendon_BiSec, CurveMode::Online > ;
     MyNMSmodel subject;
 
@@ -62,15 +62,6 @@ int main() {
     string externalLoadsFilename(baseDir + "ExtForcesSetup.xml");
     string osimFilename(baseDir + "model.osim");        
   
-    
-    //  std::string osimFilename("osimFilename");
- //   std::string externalLoadsXmlFilename("externalLoadsXmlFilename");
-    
-  
-   // std::string kinematicsFilename("kinematics.mot");
-
-
-
     QueuesToContactForces<
         Queue<StateData>,
         Queue<ForcesData>,
@@ -107,7 +98,6 @@ int main() {
 
     auto statesThread(std::async(std::launch::async, [&](){
 
-
         for (auto& l : latches)
             l->wait();
         
@@ -133,32 +123,20 @@ int main() {
             generalisedCoordinates.setQdd(stdQdd);
 
             StateData state{ t, generalisedCoordinates };
-
-      /*      std::cout << "State from producer\n" <<
-                "Time: " << state.getTime() << std::endl <<
-                "Q:   " << state.updQ() << endl <<
-                "Qd:  " << state.updQDot() << endl <<
-                "Qdd: " << state.updQDotDot() << endl <<
-                endl << std::flush;*/
-            //    cout << "Pushing state on queue\n";
             stateQueue.push(state);
         }
         StateData state{ std::numeric_limits<double>::infinity(), 0 };
         stateQueue.push(state);
     }));
 
-//    cout << stateQueue;
-    // push external forces to queue
-  //  OpenSim::ExternalLoads externalLoads(model, externalLoadsXmlFilename);
-
     OpenSim::Storage externalForcesStorage(externalLoads.getDataFileName());
     OpenSim::Array<double> timeColumnExternalLoadsOS;
     vector<double> timeColumnExternalLoads;
     externalForcesStorage.getTimeColumn(timeColumnExternalLoadsOS);
     ceinms::ArrayConverter::toStdVector(timeColumnExternalLoadsOS, timeColumnExternalLoads);
+    
     auto forcesThread(std::async(std::launch::async, [&](){
 
-//        model.initSystem();
         for (auto& l : latches)
             l->wait();
         for (auto t : timeColumnExternalLoads) {
@@ -169,38 +147,18 @@ int main() {
                 currentExtForce.grf = externalLoads.get(i).getForceAtTime(t);
                 currentExtForce.cop = externalLoads.get(i).getPointAtTime(t);
                 currentExtForce.moments = externalLoads.get(i).getTorqueAtTime(t);
-                
-
-              /*  currentExtForce.grf = 0;
-                currentExtForce.cop = 0;
-                currentExtForce.moments = 0;*/
-          //     cout << currentExtForce << endl << std::flush;
-                
                 forces.data.push_back(currentExtForce);
-
-                //     cout << "Pushing external force on queue "<<
-         //           "Time " << t << endl << "values: " 
-          //          << currentExtForce << endl << std::flush;
             }
-           
             externalForcesQueue.push(forces);
-
-       //     cout << "externalForcesQueue " << externalForcesQueue << std::flush;
         }
         ForcesData eoForces;
         eoForces.time = std::numeric_limits<double>::infinity();
         externalForcesQueue.push(eoForces); //eof
     }));
- //   cout << "externalForcesQueue " << externalForcesQueue;
-
 
     //launch thread for contact forces
     std::thread contactForcesEstimatorThread(std::ref(contactForcesEstimator));
-//    auto fut(std::async(std::launch::async, std::ref(contactForcesEstimator)));
 
-    
- //   for (auto& l : latches)
- //       l->wait();
     cout << "Waiting to join\n" << std::flush;
     contactForcesEstimatorThread.join();
     forcesThread.wait();

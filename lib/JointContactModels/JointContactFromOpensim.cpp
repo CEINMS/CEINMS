@@ -25,8 +25,6 @@ namespace ceinms {
         rForcesInG_.resize(nBodies_);
         rTorquesInG_.resize(nBodies_);
 
-
-        //model_.updForceSet().setMemoryOwner(false);
         //1. add extForces to the model, hopefully I won't have problems with queues and opensim
         for (auto &force : externalForces) {
             cout << "models add force\n" << std::flush;
@@ -54,7 +52,6 @@ namespace ceinms {
        
         std::unique_ptr<InverseDynamicsSolver> p(new InverseDynamicsSolver(model_));
         idSolver_ = std::move(p);
-
 
         state_ = model_.initSystem();
         for (auto c : coordinateActuators_)
@@ -177,16 +174,8 @@ namespace ceinms {
        
         for (auto m : muscleActuators_)
             m->setDisabled(state_, disableMuscles);
-
-    //    std::cout << "Num of coordinates " << nCoordinates_ << endl << std::flush;
         for (unsigned i(0); i < nCoordinates_; ++i)
             coordinateActuators_.at(i)->setOverrideForce(state_, residualMobilityForces_.get(i));
-        std::cout << "State: " <<
-            "Time: " << state_.getTime() << std::endl <<
-            "Q:   " << state_.updQ() << endl << 
-            "Qd:  " << state_.updQDot() << endl <<
-            "Qdd: " << state_.updQDotDot() << endl <<
-            endl << std::flush;
         model_.getSimbodyEngine().computeReactions(state_, rForcesInG_, rTorquesInG_);
     }
 
@@ -195,6 +184,4 @@ namespace ceinms {
         reactionForces = rForcesInG_;
         reactionTorques = rTorquesInG_;
     }
-
-
 }
