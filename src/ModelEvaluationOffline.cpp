@@ -154,10 +154,12 @@ namespace ceinms {
 
             // 3. read external Torque
             InputConnectors::FrameType externalTorquesFrameFromQueue;
-            while (TimeCompare::less(externalTorqueTime, lmtMaTime) && !externalTorquesDataFromQueue_.empty()) {
-                externalTorquesFrameFromQueue = externalTorquesDataFromQueue_.front();
-                externalTorquesDataFromQueue_.pop_front();
-                externalTorqueTime = externalTorquesFrameFromQueue.time;
+            if (ModelEvaluationBase<Logger>::externalTorquesAvailable()){
+                while (TimeCompare::less(externalTorqueTime, lmtMaTime) && !externalTorquesDataFromQueue_.empty()) {
+                    externalTorquesFrameFromQueue = externalTorquesDataFromQueue_.front();
+                    externalTorquesDataFromQueue_.pop_front();
+                    externalTorqueTime = externalTorquesFrameFromQueue.time;
+                }
             }
 
             // 4. read emgs
