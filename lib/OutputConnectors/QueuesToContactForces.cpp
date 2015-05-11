@@ -173,7 +173,7 @@ namespace ceinms {
 
 
         //1. Divide external forces in different queues
-        auto fut(std::async(std::launch::async, [&](){
+        auto forceDistributorThr(std::async(std::launch::async, [&](){
             
             inputExternalForcesQueue_.subscribe();
             forceSplitLatch.wait();
@@ -211,9 +211,6 @@ namespace ceinms {
                 cout << jointName << " does not exist." << endl;
         }
         //2. call the latch, say that we are done with initialisations
-
-        std::ofstream oF("jrf.txt");
-
         for (auto& l : latches_)
             l->wait();
         forceSplitLatch.wait();
@@ -250,6 +247,7 @@ namespace ceinms {
         typename Q4::type contactForces;
         contactForces.time = std::numeric_limits<double>::infinity();
         outputContactForcesQueue_.push(contactForces);
-        fut.wait();
+
+        forceDistributorThr.wait();
     }
 }

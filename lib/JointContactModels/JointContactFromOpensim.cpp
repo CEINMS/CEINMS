@@ -96,18 +96,6 @@ namespace ceinms {
     }
 
 
-    void JointContactFromOpensim::setEstimatedMobilityForces(const SimTK::Vector& estimatedMobilityForces) {
-
-        estimatedMobilityForces_  = estimatedMobilityForces;
-    }
-
-
-    void JointContactFromOpensim::setResidualMobilityForces(const SimTK::Vector& residualMobilityForces) {
-
-        residualMobilityForces_ = residualMobilityForces;
-    }
-    
-
     void JointContactFromOpensim::getReactionForce(const std::string& jointName, SimTK::Vec3& forceOnChildInChild) {
 
         const OpenSim::Joint& joint(model_.getJointSet().get(jointName));
@@ -146,22 +134,39 @@ namespace ceinms {
             m->setDisabled(state_, true);        
         //realize the system, so all the forces as gravitational, inertial, and external forces are applied
         model_.getMultibodySystem().realize(state_, SimTK::Stage::Dynamics);
-        
         SimTK::Vector_<SimTK::SpatialVec> appliedBodyForces(model_.getMultibodySystem().getRigidBodyForces(state_, SimTK::Stage::Dynamics));
-       
         residualMobilityForces_ = idSolver_->solve(state_, state_.getUDot(), appliedMobilityForces, appliedBodyForces);
     }
 
-
+    //estimatedMobilityForces is the torque predicted by CEINMS
     //if disableMuscles is true, then intersegmental forces are calculated
-    void JointContactFromOpensim::calculateReactionForcesUsingEstimatedMobilityForces(bool disableMuscles) {
+    void JointContactFromOpensim::calculateReactionForcesWithExternalEstimatedAndResidualMobilityForces(const SimTK::Vector& estimatedMobilityForces, const SimTK::Vector& residualMobilityForces, bool disableMuscles) {
 
         for (auto m : muscleActuators_)
             m->setDisabled(state_, disableMuscles);
-
         for (unsigned i(0); i < nCoordinates_; ++i)
-            coordinateActuators_.at(i)->setOverrideForce(state_, residualMobilityForces_.get(i)-estimatedMobilityForces_.get(i));
+            coordinateActuators_.at(i)->setOverrideForce(state_, residualMobilityForces.get(i) - estimatedMobilityForces.get(i));
         model_.getSimbodyEngine().computeReactions(state_, rForcesInG_, rTorquesInG_);
+    }
+
+    // residualMobilityForces is ID from external file
+    //if disableMuscles is true, then intersegmental forces are calculated
+    void JointContactFromOpensim::calculateReactionForcesWithExternalResidualMobilityForces(const SimTK::Vector& residualMobilityForces, bool disableMuscles) {
+
+        for (auto m : muscleActuators_)
+            m->setDisabled(state_, disableMuscles);
+        for (unsigned i(0); i < nCoordinates_; ++i)
+            coordinateActuators_.at(i)->setOverrideForce(state_, residualMobilityForces.get(i));
+        model_.getSimbodyEngine().computeReactions(state_, rForcesInG_, rTorquesInG_);
+    }
+
+    //estimatedMobilityForces is the torque predicted by CEINMS
+    //if disableMuscles is true, then intersegmental forces are calculated
+    void JointContactFromOpensim::calculateReactionForcesWithExternalEstimatedMobilityForces(const SimTK::Vector& estimatedMobilityForces, bool disableMuscles) {
+
+        SimTK::Vector appliedMobilityForces(nCoordinates_, 0.); //Calculate ID
+        calculateResidualMobilityForces(appliedMobilityForces);
+        calculateReactionForcesWithExternalEstimatedAndResidualMobilityForces(estimatedMobilityForces, residualMobilityForces_, disableMuscles);
     }
 
 

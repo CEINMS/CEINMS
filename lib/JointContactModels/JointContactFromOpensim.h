@@ -26,11 +26,13 @@ namespace ceinms {
 
         void setState(const SimTK::State& state) { state_ = state; }
         
-        void setEstimatedMobilityForces(const SimTK::Vector& estimatedMobilityForces); //this is what CEINMS predicts
-        void setResidualMobilityForces(const SimTK::Vector& residualMobilityForces);  //this is ID from external file
-
         void calculateReactionForces(bool disableMuscles);
-        void calculateReactionForcesUsingEstimatedMobilityForces(bool disableMuscles);
+        // residualMobilityForces is ID from external file
+        void calculateReactionForcesWithExternalResidualMobilityForces(const SimTK::Vector& residualMobilityForces, bool disableMuscles);
+        //estimatedMobilityForces is the torque predicted by CEINMS
+        void calculateReactionForcesWithExternalEstimatedMobilityForces(const SimTK::Vector& estimatedMobilityForces, bool disableMuscles);
+        //estimatedMobilityForces is the torque predicted by CEINMS. residualMobilityForces is ID from external file
+        void calculateReactionForcesWithExternalEstimatedAndResidualMobilityForces(const SimTK::Vector& estimatedMobilityForces, const SimTK::Vector& residualMobilityForces, bool disableMuscles);
 
         void getReactionForce(const std::string& jointName, SimTK::Vec3& forceOnChildInChild);
         void getReactionForceInG(const std::string& jointName, SimTK::Vec3& forceOnChildInG);
@@ -51,7 +53,7 @@ namespace ceinms {
         SimTK::State state_;
         std::size_t nCoordinates_, nBodies_, nMuscles_;
         
-        SimTK::Vector estimatedMobilityForces_;
+ //       SimTK::Vector estimatedMobilityForces_;
         SimTK::Vector residualMobilityForces_;
 
         SimTK::Vector_<SimTK::Vec3> rForcesInG_, rTorquesInG_;

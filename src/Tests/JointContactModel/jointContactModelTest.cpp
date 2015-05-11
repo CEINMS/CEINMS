@@ -81,9 +81,9 @@ void addCoordinateActuators(OpenSim::Model& model, double control, bool removeMu
 
 void calculateIntersegmentaForcesWithCEINMS(const OpenSim::Model& aModel, const OpenSim::GCVSplineSet& kinematicsSplines, const vector<double>& timeColumn) {
     
-    OpenSim::Model model(aModel);
+  /*  OpenSim::Model model(aModel);
 
-    JointContactFromOpensim jointContactModel(model);
+    JointContactFromOpensim jointContactModel(model.getInputFileName(), );
     auto modelSO(model);
     string jointName("ankle_r");
     //  OpenSim::StaticOptimization staticOpt;
@@ -135,7 +135,7 @@ void calculateIntersegmentaForcesWithCEINMS(const OpenSim::Model& aModel, const 
     intForcesSto.setColumnLabels(intForcesLabels);
     intForcesSto.print("ankle_intForces.sto");
     idSto.print("id_fromCeinms.sto");
-
+    */
 }
 
 //copy the model
