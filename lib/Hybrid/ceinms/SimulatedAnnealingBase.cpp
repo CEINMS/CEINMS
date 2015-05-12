@@ -261,6 +261,7 @@ namespace ceinms {
         parameters_.setVectorParameters(xOpt_);
         objectiveFunction_.evalFp();
         cout << "total evaluations:" << noEval << endl;
+        objectiveFunction_.printFs();
     }
 
 

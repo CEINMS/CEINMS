@@ -122,17 +122,19 @@ namespace ceinms {
 
             //5. lmt, ma, emg, extTorques have been read correctly and I can push to the model
             if (runCondition) {
-                subject_.setTime(emgTime);
+                subject_.setTime(lmtMaTime);
                 subject_.setEmgs(emgFrameFromQueue.data);
                 subject_.setMuscleTendonLengths(lmtFrameFromQueue.data);
                 for (unsigned int i = 0; i < noDof_; ++i)
                     subject_.setMomentArms(momentArmsFrameFromQueue.at(i).data, i);
-                subject_.updateState();
+      //          subject_.updateState();
 
                 for (unsigned int i = 0; i < noDof_; ++i)
                     torqueErrorMinimizer_.setSingleExternalTorque(externalTorquesFrameFromQueue.data.at(i), dofNames_.at(i));
                 torqueErrorMinimizer_.setTime(lmtMaTime);
                 torqueErrorMinimizer_.minimize();
+
+                subject_.updateState();
                 subject_.pushState();
 
 #ifdef LOG_FILES
@@ -174,6 +176,7 @@ namespace ceinms {
                 }
 
 
+                cout << "External Torques: ";
                 for (auto& it : externalTorquesFrameFromQueue.data)
                     cout << it << " ";
                 cout << endl;

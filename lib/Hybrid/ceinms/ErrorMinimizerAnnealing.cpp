@@ -108,7 +108,7 @@ namespace ceinms {
 
         template <typename NMSmodelT>
         void ErrorMinimizerAnnealing<NMSmodelT>::minimize() {
-
+            subject_.updateState();
 
             if (currentDofNames_ != subjectDofNames_) {
                 std::cout << "ERROR: the joints names from the external torques are different from the subject ones\n";
@@ -146,6 +146,7 @@ namespace ceinms {
             for (unsigned i = 0; i < xOpt.size(); ++i)
                 cout << xOpt.at(i) << " ";
             cout << endl;
+            subject_.updateState_END_OF_HYBRID_MINIMIZATION();
         }
 
     };

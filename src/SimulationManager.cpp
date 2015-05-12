@@ -142,7 +142,7 @@ namespace ceinms {
         OutputConnectors outputConnectors;
 
         NMSmodelT mySubject;
-        setupSubject(mySubject, subjectFile_);
+        setupSubject(mySubject, subjectFile_, executionCfg_.getTolerance());
 
         // 2. define the thread connecting with the input sources
         string emgFilename(dataLocations_.getExcitationsFile());

@@ -81,6 +81,7 @@ namespace ceinms {
         void   updateFibreLengthAndVelocity_OFFLINE();
         void   updateFibreLengthAndVelocity_HYBRID();
         void   updateFibreLength_OFFLINEPREP();
+        void   updateFibreLengthsAndVelocities_END_OF_HYBRID_MINIMIZATION();
         void   updateMuscleForce();
         void   pushState();
 

@@ -278,7 +278,7 @@ namespace ceinms {
     void NMSmodel<Activation, Tendon, mode>::updateState_HYBRID() {
 
         updateActivations();
-        updateFibreLengthsAndVelocities_OFFLINE();
+        updateFibreLengthsAndVelocities_HYBRID();
         updateMuscleForces();
         updateTorques();
     }
@@ -292,6 +292,16 @@ namespace ceinms {
         updateMuscleForces(selectedmusclesIndex);
         updateTorques();
     }
+
+
+    template <typename Activation, typename Tendon, CurveMode::Mode mode>
+    void NMSmodel<Activation, Tendon, mode>::updateState_END_OF_HYBRID_MINIMIZATION() {
+
+        for (auto& mIt : muscles_)
+            mIt.updateFibreLengthsAndVelocities_END_OF_HYBRID_MINIMIZATION();
+        
+    }
+
 
 
     template <typename Activation, typename Tendon, CurveMode::Mode mode>

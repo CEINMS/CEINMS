@@ -82,6 +82,7 @@ namespace ceinms {
         void updateState_OFFLINE(const std::vector<unsigned>& selectedMusclesIndex);
         void updateState_HYBRID();
         void updateState_HYBRID(const std::vector<unsigned>& selectedMusclesIndex);
+        void updateState_END_OF_HYBRID_MINIMIZATION();
         void updateActivations();
         void updateActivations(const std::vector<unsigned>& selectedMusclesIndex);
         void updateFibreLengthsAndVelocities();

@@ -122,7 +122,7 @@ namespace ceinms {
         CurveOffline forceVelocityCurve_;
         CurveOffline tendonForceStrainCurve_;
 
-        Curve<CurveMode::Online, CurveMode::Cubic, 3>  fibreLengthTrace_;
+        Curve<CurveMode::Online, CurveMode::Cubic, 4>  fibreLengthTrace_;
         double fibreLength_;
         double muscleTendonLength_;
         double activation_;

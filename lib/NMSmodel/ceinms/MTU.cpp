@@ -282,6 +282,12 @@ namespace ceinms {
     }
 
 
+    template<typename Activation, typename Tendon, CurveMode::Mode mode>
+    void MTU<Activation, Tendon, mode>::updateFibreLengthsAndVelocities_END_OF_HYBRID_MINIMIZATION() {
+
+        fibreLengthTrace_.removeLastPointNoUpdate();
+    }
+
 
     template<typename Activation, typename Tendon, CurveMode::Mode mode>
     void MTU<Activation, Tendon, mode>::updateMuscleForce() {
