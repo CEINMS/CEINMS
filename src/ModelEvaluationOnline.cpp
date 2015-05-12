@@ -97,6 +97,20 @@ namespace ceinms {
                 }
             }
 
+            /* Note about firstLmtArrived: all the emgs before the first frame of lmt are 
+            ** read, while after the first frame of lmt just the correspondant emgs are used.
+            ** This is for a few different reasons:
+            ** (i)   in the EMG-assisted mode we can work only with emgs that correspond to a lmt frame.
+            **       Also, different modes should behave in the same way
+            ** (ii)  Since the execution of the model behave in this way, we have to calibrate consistently
+            **       to avoid problems with parameters c1 and c2 in the activation model
+            ** (iii) EMG are supposed to be sampled at a higher frequency than lmt, also undersampling 
+            **       emgs doesn't chenage the information content of the signal, since we are working 
+            **       with linear envelopes. Moreover, we save some time if we undersample emgs
+            ** (iv)  Since the activation model uses a IIR filter, we prefer to 'charge' the filter
+            **       with previous emgs, instead of starting a transient from 0.
+            ** All of the above is subject to change, until we find a smarter way to do things
+             */
             // 4. read emgs
             InputConnectors::FrameType emgFrameFromQueue;
             while (TimeCompare::less(emgTime, lmtMaTime) && runCondition) {
@@ -104,8 +118,8 @@ namespace ceinms {
                 emgTime = emgFrameFromQueue.time + globalEmDelay_;
                 runCondition = runCondition && !emgFrameFromQueue.data.empty();
                 if (!TimeCompare::less(emgTime, lmtMaTime)) firstLmtArrived = true;
-                if (runCondition) {
-//                    subject_.setTime(emgTime);
+                if (runCondition && !firstLmtArrived) {
+                    subject_.setTime(emgTime); //this shouldt affect anything anyway
                     subject_.setEmgs(emgFrameFromQueue.data);
                     subject_.updateActivations();
                     subject_.pushState();
@@ -115,7 +129,7 @@ namespace ceinms {
             //5. lmt, ma, emg, extTorques have been read correctly and I can push to the model
             if (runCondition) {
                 subject_.setTime(lmtMaTime);
-                //subject_.setEmgs(emgFrameFromQueue.data);
+                subject_.setEmgs(emgFrameFromQueue.data);
                 subject_.setMuscleTendonLengths(lmtFrameFromQueue.data);
                 for (unsigned int i = 0; i < noDof_; ++i)
                     subject_.setMomentArms(momentArmsFrameFromQueue.at(i).data, i);

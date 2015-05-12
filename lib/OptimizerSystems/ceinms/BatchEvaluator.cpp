@@ -129,7 +129,7 @@ namespace ceinms {
         for (unsigned emgIndex(0); emgIndex < trialData.emgData.getNRows(); ++emgIndex) {
 
             emgTime = trialData.emgData.getTime(emgIndex) + emDelay;
-            if ( TimeCompare::less(emgTime, lmtTime)) {
+            if (!firstLmtArrived && TimeCompare::less(emgTime, lmtTime)) {
                 subject.setActivations(previousResult.activations.getRow(emgIndex));
                 subject.setEmgsSelective(trialData.emgData.getRow(emgIndex), musclesToUpdate);
                 subject.updateActivations(musclesToUpdate);
@@ -193,7 +193,8 @@ namespace ceinms {
         for (unsigned emgIndex(0); emgIndex < trialData.emgData.getNRows(); ++emgIndex) {
 
             emgTime = trialData.emgData.getTime(emgIndex) + emDelay;
-            if (TimeCompare::less(emgTime, lmtTime)) {
+            if (!firstLmtArrived && TimeCompare::less(emgTime, lmtTime)) {
+                subject.setTime(emgTime);
                 subject.setActivations(previousResult.activations.getRow(emgIndex));
                 subject.setEmgsSelective(trialData.emgData.getRow(emgIndex), musclesToUpdate);
                 subject.updateActivations(musclesToUpdate);;

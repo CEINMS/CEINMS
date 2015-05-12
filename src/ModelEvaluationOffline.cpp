@@ -110,10 +110,11 @@ namespace ceinms {
         auto lmtIt(lmtDataFromQueue_.begin());
         for (auto emgIt : emgDataFromQueue_) {
             double emgTime = emgIt.time + globalEmDelay_;
-//            subject_.setTime(emgTime);
+            subject_.setTime(emgTime);  //this shouldn't affect anything, could be removed
             subject_.setEmgs(emgIt.data);
-            subject_.updateActivations();
+            if (lmtIt == lmtDataFromQueue_.begin()) subject_.updateActivations();
             if (lmtIt != lmtDataFromQueue_.end() && TimeCompare::lessEqual(lmtIt->time, emgTime)) {
+                subject_.updateActivations();
                 subject_.setTime(lmtIt->time);
                 subject_.setMuscleTendonLengths(lmtIt->data);
                 subject_.updateFibreLengths_OFFLINEPREP();
@@ -162,6 +163,8 @@ namespace ceinms {
                 }
             }
 
+            //note: check ModelEvaluationOnline for info about firstLmtArrived
+
             // 4. read emgs
             InputConnectors::FrameType emgFrameFromQueue;
             while (TimeCompare::less(emgTime, lmtMaTime)) {
@@ -170,7 +173,7 @@ namespace ceinms {
                 emgTime = emgFrameFromQueue.time + globalEmDelay_;
                 runCondition = runCondition && !emgFrameFromQueue.data.empty();
                 if (!TimeCompare::less(emgTime, lmtMaTime)) firstLmtArrived = true;
-                if ( runCondition) {
+                if (!firstLmtArrived && runCondition) {
                     subject_.setTime(emgTime);
                     subject_.setEmgs(emgFrameFromQueue.data);
                     subject_.updateActivations();
@@ -179,7 +182,7 @@ namespace ceinms {
             }
 
             subject_.setTime(lmtMaTime);
-            //subject_.setEmgs(emgFrameFromQueue.data);
+            subject_.setEmgs(emgFrameFromQueue.data);
             subject_.setMuscleTendonLengths(lmtFrameFromQueue.data);
             for (unsigned int i = 0; i < noDof_; ++i)
                 subject_.setMomentArms(momentArmsFrameFromQueue.at(i).data, i);
