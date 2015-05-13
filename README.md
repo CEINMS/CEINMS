@@ -1,3 +1,23 @@
+CEINMS
+======
+The Calibrated EMG-Informed NMS Modelling Toolbox (CEINMS) permits to estimate muscle forces inside a human body during static and dynamic tasks. CEINMS implments all the transformations that take place from the onset of muscle excitation to the generation of muscle forces and resulting joint moments.
+
+CEINMS allows automatically identification of a number of parameters that determine the way musculotendon units activate and contract, which vary non-linearly across individuals. This is done via an optimization-based calibration procedure that adjusts the internal parameters to best reflect the anatomy and physiology of an individual.
+
+Read more about CEINMS at the [CEINMS project page](https://simtk.org/home/ceinms)
+
+Quick Start
+===========
+
+Dependencies
+============
+
+Install
+=======
+
+Acknowledgments
+===============
+<!---
 Useful links:
 [OpenSim 3.2 VC12P x86](https://drive.google.com/file/d/0BzMAK5L0QV2PSEkxSUVxSXd3NzA/edit?usp=sharing)
 
@@ -12,3 +32,4 @@ Error	6	error C2146: syntax error : missing ';' before identifier 'LoadOpenSimLi
 ```
 
 If so, be sure that _WIN32 is used instead of WIN32 in the define directives in OpenSim include files DebugUtilities.h, LoadOpenSimLibrary.h, osimCommonDLL.h (i.e. look where the errors are and change WIN32 in _WIN32 everywhere) 
+-->
