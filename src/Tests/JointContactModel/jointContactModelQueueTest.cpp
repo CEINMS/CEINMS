@@ -41,6 +41,9 @@ using ceinms::Concurrency::Latch;
 #include <memory>
 #include "ceinms/ArrayConverter.h"
 #include "ceinms/GeneralisedCoordinatesData.h"
+#include "ceinms/GeneralisedCoordinatesFromStorageFile.h"
+#include "ceinms/ExternalForcesFromStorageFile.h"
+#include "ceinms/InputConnectors.h"
 
 
 OpenSim::GCVSplineSet getKinematicsSplines(OpenSim::Model& model, OpenSim::Storage& kinematics, double fc) {
@@ -73,11 +76,15 @@ OpenSim::GCVSplineSet getKinematicsSplines(OpenSim::Model& model, OpenSim::Stora
 
 int main() {
 
-    QueuesToContactForces::GeneralisedCoordinatesQueue generalisedCoordinatesQueue;
-    QueuesToContactForces::ExternalForcesQueue externalForcesQueue;
+
+    InputConnectors inputConnectors;
+    inputConnectors.doneWithSubscription.setCount(4);
+
+  //  QueuesToContactForces::GeneralisedCoordinatesQueue generalisedCoordinatesQueue;
+  //  QueuesToContactForces::ExternalForcesQueue externalForcesQueue;
     QueuesToContactForces::MuscleForcesQueue muscleForcesQueue;
     QueuesToContactForces::ContactForcesQueue outputContactForcesQueue;
-    Latch latch(4);
+ //   Latch latch(4);
     using MyNMSmodel = NMSmodel < ExponentialActivation, ElasticTendon_BiSec, CurveMode::Online > ;
     MyNMSmodel subject;
 
@@ -86,17 +93,53 @@ int main() {
     string osimFilename(baseDir + "model.osim");        
   
     QueuesToContactForces contactForcesEstimator(
-        generalisedCoordinatesQueue,
-        externalForcesQueue,
+        inputConnectors.queueGeneralisedCoordinates,
+        inputConnectors.queueExternalForces,
         muscleForcesQueue,
         outputContactForcesQueue,
-        latch,
+        inputConnectors.doneWithSubscription,
         subject,
         osimFilename,
         externalLoadsFilename,
         { "ankle_r" });
 
-    //1 run state producer
+    OpenSim::Model model(osimFilename);
+    model.initSystem();
+    OpenSim::ExternalLoads externalLoads(model, externalLoadsFilename);
+    //1 create generalised coordinates producer
+    GeneralisedCoordinatesFromStorageFile generalisedCoordinateFromStorageFile(inputConnectors, osimFilename, externalLoads.getExternalLoadsModelKinematicsFileName());
+    //2 create external forces produces
+    ExternalForcesFromStorageFile externalForcesFromStorageFile(inputConnectors, osimFilename, externalLoadsFilename);
+
+    //3 create and launch log 
+    auto logThread(std::async(std::launch::async, [&](){
+
+        outputContactForcesQueue.subscribe();
+        inputConnectors.doneWithSubscription.wait();
+        double time(0);
+        bool runCondition(true);
+        while (runCondition) {
+            auto contactForces(outputContactForcesQueue.pop());
+            time = contactForces.time;
+            if (time == inputConnectors.TimePlaceholderForEndOfData) runCondition = false;
+            if (runCondition)
+                cout << contactForces.data << endl;
+        }
+    }));
+
+    //launch threads
+    std::thread contactForcesEstimatorThread(std::ref(contactForcesEstimator));
+    std::thread generalisedCoordinateThread(std::ref(generalisedCoordinateFromStorageFile));
+    std::thread externalForcesThread(std::ref(externalForcesFromStorageFile));
+
+
+    contactForcesEstimatorThread.join();
+    generalisedCoordinateThread.join();
+    externalForcesThread.join();
+    logThread.wait();
+
+    /*
+
     // init model to get the correct state structure
     OpenSim::Model model(osimFilename);
     model.initSystem();
@@ -195,6 +238,6 @@ int main() {
     statesThread.wait();
     logThread.wait();
     return 0;
-
+    */
 
 }

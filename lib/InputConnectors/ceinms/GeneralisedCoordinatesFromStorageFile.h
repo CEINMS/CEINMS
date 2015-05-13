@@ -36,8 +36,8 @@ namespace ceinms {
     class GeneralisedCoordinatesFromStorageFile : public GeneralisedCoordinatesFromX {
     public:
         GeneralisedCoordinatesFromStorageFile(InputConnectors& inputConnectors, const std::string& osimModelFilename, const std::string& kinematicsStorageFilename);
-        virtual ~GeneralisedCoordinatesFromStorageFile();
-        virtual void operator()();
+        virtual ~GeneralisedCoordinatesFromStorageFile() override {}
+        virtual void operator()() override;
     private:
         OpenSim::GCVSplineSet getKinematicsSplines(double fc);
         OpenSim::Model model_;

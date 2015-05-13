@@ -39,7 +39,7 @@ namespace ceinms {
     {
     public:
         GeneralisedCoordinatesFromX(InputConnectors& inputConnectors);
-        virtual ~GeneralisedCoordinatesFromX();
+        virtual ~GeneralisedCoordinatesFromX() {};
         virtual void operator()() = 0;
         void updateGeneralisedCoordinates(const GeneralisedCoordinatesData& currentExternalForceData, double currentTime);
         void doneWithSubscriptions();

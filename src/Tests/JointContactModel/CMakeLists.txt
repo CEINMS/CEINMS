@@ -5,6 +5,7 @@ include_directories(
     ${ceinms_common_INCLUDE_DIRS}      
 	${xmlInput_INCLUDE_DIRS}
 	${OutputConnectors_INCLUDE_DIRS}
+	${InputConnectors_INCLUDE_DIRS}
 	${Concurrency_INCLUDE_DIRS}
 	${NMSmodel_INCLUDE_DIRS}
 	${Curve_INCLUDE_DIRS})
@@ -17,5 +18,5 @@ include_directories(
 
 
 add_executable(Test_JointContactModelQueues jointContactModelQueueTest.cpp)
-target_link_libraries(Test_JointContactModelQueues  JointContactModels OutputConnectors xmlInput Concurrency NMSmodel optimized ${OPENSIM_LIBRARIES})
-target_link_libraries(Test_JointContactModelQueues  JointContactModels OutputConnectors xmlInput Concurrency NMSmodel debug ${OPENSIM_LIBRARIES_DEBUG})
+target_link_libraries(Test_JointContactModelQueues  JointContactModels OutputConnectors InputConnectors xmlInput Concurrency NMSmodel optimized ${OPENSIM_LIBRARIES})
+target_link_libraries(Test_JointContactModelQueues  JointContactModels OutputConnectors InputConnectors xmlInput Concurrency NMSmodel debug ${OPENSIM_LIBRARIES_DEBUG})

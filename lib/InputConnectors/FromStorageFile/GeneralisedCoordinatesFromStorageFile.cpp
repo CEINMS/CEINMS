@@ -79,5 +79,35 @@ namespace ceinms {
         GeneralisedCoordinatesFromX::sendEndOfData();
     }
 
+    OpenSim::GCVSplineSet GeneralisedCoordinatesFromStorageFile::getKinematicsSplines(double fc) {
+
+        //reinitialise because I modify the storage with padding and filtering..
+        OpenSim::Storage kinematics(kinematicsStorageFilename_);
+        if (fc > 0) {
+            kinematics.pad(kinematics.getSize() / 2.);
+            kinematics.lowpassIIR(fc);
+        }
+        if (kinematics.isInDegrees()){
+            model_.getSimbodyEngine().convertDegreesToRadians(kinematics);
+        }
+        // Create differentiable splines of the coordinate data
+        OpenSim::GCVSplineSet kinematicsSplines(5, &kinematics);
+        //Functions must correspond to model coordinates and their order for the solver
+        OpenSim::Array<string> coordinateNamesOS;
+        model_.getCoordinateSet().getNames(coordinateNamesOS);
+        for (size_t i(0); i < coordinateNamesOS.getSize(); ++i){
+            if (kinematicsSplines.contains(coordinateNamesOS.get(i))){
+                kinematicsSplines.insert(i, kinematicsSplines.get(coordinateNamesOS.get(i)));
+            }
+            else{
+                kinematicsSplines.insert(i, OpenSim::Constant(model_.getCoordinateSet().get(i).getDefaultValue()));
+            }
+        }
+        if (kinematicsSplines.getSize() > coordinateNamesOS.getSize()){
+            kinematicsSplines.setSize(coordinateNamesOS.getSize());
+        }
+        return kinematicsSplines;
+    }
+
 
 }

@@ -39,7 +39,7 @@ namespace ceinms {
     {
     public:
         ExternalForcesFromX(InputConnectors& inputConnectors);
-        virtual ~ExternalForcesFromX();
+        virtual ~ExternalForcesFromX() {};
         virtual void operator()() = 0;
         void updateExternalForces(const std::vector<ExternalForceData>& currentExternalForceData, double currentTime);
         void sendEndOfData();
