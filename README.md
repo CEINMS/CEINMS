@@ -7,16 +7,22 @@ CEINMS allows automatically identification of a number of parameters that determ
 Read more about CEINMS at the [CEINMS project page](https://simtk.org/home/ceinms)
 
 Quick Start
-===========
+-----------
 
 Dependencies
-============
+------------
+CEINMS depends on the following 
+* cross-platform building: [CMake](http://www.cmake.org/) 2.8.8 or later
+* compiler: [Visual Studio](http://www.visualstudio.com) 2013 or later (Windows only), [gcc](http://gcc.gnu.org/) 4.8.1 or later (typically on Linux), or [Clang](http://clang.llvm.org/) 3.4 or later (typically on Mac, possibly through Xcode)
+* file managment: [Boost libraries](http://www.boost.org/), or [Boost libraries binaries](http://sourceforge.net/projects/boost/files/boost-binaries) (Windows only)
+* XML parsing: [CodeSynthesis XSD 3.3](https://www.codesynthesis.com)
+
 
 Install
-=======
+-------
 
 Acknowledgments
-===============
+---------------
 <!---
 Useful links:
 [OpenSim 3.2 VC12P x86](https://drive.google.com/file/d/0BzMAK5L0QV2PSEkxSUVxSXd3NzA/edit?usp=sharing)
