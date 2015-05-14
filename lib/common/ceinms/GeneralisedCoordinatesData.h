@@ -38,6 +38,10 @@ private:
     std::vector<double> q_, qd_, qdd_;
 
 public:
+
+    GeneralisedCoordinatesData() :
+        nCoordinates_(0) {}
+
     GeneralisedCoordinatesData(size_t nCoordinates) :
         nCoordinates_(nCoordinates),
         q_(nCoordinates, .0),

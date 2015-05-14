@@ -1,3 +1,31 @@
+/* -------------------------------------------------------------------------- *
+* CEINMS is a standalone toolbox for neuromusculoskeletal modelling and      *
+* simulation. CEINMS can also be used as a plugin for OpenSim either         *
+* through the OpenSim GUI or API. See https://simtk.org/home/ceinms and the  *
+* NOTICE file for more information. CEINMS development was coordinated       *
+* through Griffith University and supported by the Australian National       *
+* Health and Medical Research Council (NHMRC), the US National Institutes of *
+* Health (NIH), and the European Union Framework Programme 7 (EU FP7). Also  *
+* see the PROJECTS file for more information about the funding projects.     *
+*                                                                            *
+* Copyright (c) 2010-2015 Griffith University and the Contributors           *
+*                                                                            *
+* CEINMS Contributors: C. Pizzolato, M. Reggiani, M. Sartori,                *
+*                      E. Ceseracciu, and D.G. Lloyd                         *
+*                                                                            *
+* Author(s): C. Pizzolato                                                    *
+*                                                                            *
+* CEINMS is licensed under the Apache License, Version 2.0 (the "License").  *
+* You may not use this file except in compliance with the License. You may   *
+* obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0.*
+*                                                                            *
+* Unless required by applicable law or agreed to in writing, software        *
+* distributed under the License is distributed on an "AS IS" BASIS,          *
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.   *
+* See the License for the specific language governing permissions and        *
+* limitations under the License.                                             *
+* -------------------------------------------------------------------------- */
+
 #include "ceinms/QueuesToContactForces.h"
 #include "ceinms/JointContactFromOpensim.h"
 #include "ceinms/GeneralisedCoordinatesData.h"
@@ -121,12 +149,44 @@ namespace OpenSim {
 
 namespace ceinms {
 
-    template<typename NMSmodelT>
+
+    //this will calculate intersegmental forces
+    template <typename NMSmodelT>
+    QueuesToContactForces::QueuesToContactForces(
+        GeneralisedCoordinatesQueue& inputGeneralisedCoordinatesQueue,
+        ExternalForcesQueue& inputExternalForcesQueue,
+        ContactForcesQueue& outputIntersegmentalForcesQueue,
+        Concurrency::Latch& latch,
+        const NMSmodelT& subject,
+        const std::string& osimModelFilename,
+        const std::string& externalLoadsXmlFilename,    //this is the same as openSim
+        const std::vector< std::string >& jointsToLog):
+        inputGeneralisedCoordinatesQueue_(inputGeneralisedCoordinatesQueue),
+        inputExternalForcesQueue_(inputExternalForcesQueue),
+        outputIntersegmentalForcesQueue_(outputIntersegmentalForcesQueue),
+        latch_(latch),
+        modelFilename_(osimModelFilename),
+        jointsToLog_(jointsToLog),
+        calculateJointReactions_(false),
+        calculateIntersegmentalForces_(true),
+        useEstimatedTorques_(false){
+
+        subject.getDoFNames(dofNames_);
+        subject.getMuscleNames(musclesNames_);
+
+        parseExternalLoadsXml(externalLoadsXmlFilename);
+    }
+
+
+
+    //this will calculate joint reactions
+    template <typename NMSmodelT>
     QueuesToContactForces::QueuesToContactForces(
         GeneralisedCoordinatesQueue& inputGeneralisedCoordinatesQueue,
         ExternalForcesQueue& inputExternalForcesQueue,
         MuscleForcesQueue& inputMuscleForcesQueue,
-        ContactForcesQueue& outputContactForcesQueue,
+        EstimatedTorquesQueue& inputEstimatedTorquesQueue,
+        ContactForcesQueue& outputJointReactionForcesQueue,
         Concurrency::Latch& latch,
         const NMSmodelT& subject,
         const std::string& osimModelFilename,
@@ -134,13 +194,49 @@ namespace ceinms {
         const std::vector< std::string >& jointsToLog) :
         inputGeneralisedCoordinatesQueue_(inputGeneralisedCoordinatesQueue),
         inputExternalForcesQueue_(inputExternalForcesQueue),
-        inputMuscleForcesQueue_(inputMuscleForcesQueue),
-        outputContactForcesQueue_(outputContactForcesQueue),
+        inputEstimatedTorquesQueue_(inputEstimatedTorquesQueue),
+        outputJointReactionForcesQueue_(outputJointReactionForcesQueue),
         latch_(latch),
         modelFilename_(osimModelFilename),
-        jointsToLog_(jointsToLog)
+        jointsToLog_(jointsToLog),
+        calculateJointReactions_(true),
+        calculateIntersegmentalForces_(false),
+        useEstimatedTorques_(true) {
 
-    {
+        subject.getDoFNames(dofNames_);
+        subject.getMuscleNames(musclesNames_);
+
+        parseExternalLoadsXml(externalLoadsXmlFilename);
+    }
+
+
+
+    //this will calculate joint reactions and intersegmental forces
+    template <typename NMSmodelT>
+    QueuesToContactForces::QueuesToContactForces(
+        GeneralisedCoordinatesQueue& inputGeneralisedCoordinatesQueue,
+        ExternalForcesQueue& inputExternalForcesQueue,
+        MuscleForcesQueue& inputMuscleForcesQueue,
+        EstimatedTorquesQueue& inputEstimatedTorquesQueue,
+        ContactForcesQueue& outputJointReactionForcesQueue,
+        ContactForcesQueue& outputIntersegmentalForcesQueue,
+        Concurrency::Latch& latch,
+        const NMSmodelT& subject,
+        const std::string& osimModelFilename,
+        const std::string& externalLoadsXmlFilename,    //this is the same as openSim
+        const std::vector< std::string >& jointsToLog) :
+        inputGeneralisedCoordinatesQueue_(inputGeneralisedCoordinatesQueue),
+        inputExternalForcesQueue_(inputExternalForcesQueue),
+        inputEstimatedTorquesQueue_(inputEstimatedTorquesQueue),
+        outputJointReactionForcesQueue_(outputJointReactionForcesQueue),
+        outputIntersegmentalForcesQueue_(outputIntersegmentalForcesQueue),
+        latch_(latch),
+        modelFilename_(osimModelFilename),
+        jointsToLog_(jointsToLog),
+        calculateJointReactions_(true),
+        calculateIntersegmentalForces_(true),
+        useEstimatedTorques_(true) {
+
         subject.getDoFNames(dofNames_);
         subject.getMuscleNames(musclesNames_);
 
@@ -163,12 +259,13 @@ namespace ceinms {
     void QueuesToContactForces::operator()() {
 
         //0. subscriptions to queues
+        if (useEstimatedTorques_) inputEstimatedTorquesQueue_.subscribe();
+        if (calculateJointReactions_) inputMuscleForcesQueue_.subscribe();
+
         inputGeneralisedCoordinatesQueue_.subscribe();
-        inputMuscleForcesQueue_.subscribe();
 
         //we create an internal latch, so who is outside doesn't have to bother to increase the count..
         Concurrency::Latch forceSplitLatch(2);
-
         //1. Divide external forces in different queues
         auto forceDistributorThr(std::async(std::launch::async, [&](){
             
@@ -193,7 +290,7 @@ namespace ceinms {
                     for (auto& forceQueue : singleExternalForceQueues_)
                         forceQueue->push(eof);
                 }
-            } while (runCondition);
+            } while (runCondition); 
         }));
 
 
@@ -211,6 +308,7 @@ namespace ceinms {
         latch_.wait();
         forceSplitLatch.wait();
 
+        syncFrames(inputGeneralisedCoordinatesQueue_, inputEstimatedTorquesQueue_);
         bool runCondition(true);
         while (runCondition) {
             GeneralisedCoordinatesFrame generalisedCoordinatesFrame(inputGeneralisedCoordinatesQueue_.pop());
@@ -235,13 +333,13 @@ namespace ceinms {
               //          reactionForce[1] << "\t" <<
               //          reactionForce[2] << "\t";
                 }
-                outputContactForcesQueue_.push(contactForces);
+//                outputContactForcesQueue_.push(contactForces);
              //   oF << std::endl;
             }
         }
         ContactForcesFrame contactForces;
         contactForces.time = std::numeric_limits<double>::infinity();
-        outputContactForcesQueue_.push(contactForces);
+     //   outputContactForcesQueue_.push(contactForces);
 
         forceDistributorThr.wait();
     }

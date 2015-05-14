@@ -5,12 +5,20 @@ set(OutputConnectors_SOURCES
     OutputConnectors.cpp
     LoggerOnQueues.cpp
     QueuesToTrialData.cpp
+    QueuesToXForces.cpp
+    QueuesToJointReactionForces.cpp
+    QueuesToIntersegmentalForces.cpp
+    QueuesToIntersegmentalAndJointReactionForces.cpp
 )
 set(OutputConnectors_HEADERS 
     ceinms/OutputConnectors.h
     ceinms/LoggerOnQueues.h
     ceinms/QueuesToTrialData.h
+    ceinms/QueuesToXForces.h
     ceinms/QueuesToContactForces.h
+    ceinms/QueuesToJointReactionForces.h
+    ceinms/QueuesToIntersegmentalForces.h
+    ceinms/QueuesToIntersegmentalAndJointReactionForces.h
 )
 
 set(QueuesToStorageFiles_SOURCES

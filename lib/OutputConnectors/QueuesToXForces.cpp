@@ -1,0 +1,327 @@
+/* -------------------------------------------------------------------------- *
+* CEINMS is a standalone toolbox for neuromusculoskeletal modelling and      *
+* simulation. CEINMS can also be used as a plugin for OpenSim either         *
+* through the OpenSim GUI or API. See https://simtk.org/home/ceinms and the  *
+* NOTICE file for more information. CEINMS development was coordinated       *
+* through Griffith University and supported by the Australian National       *
+* Health and Medical Research Council (NHMRC), the US National Institutes of *
+* Health (NIH), and the European Union Framework Programme 7 (EU FP7). Also  *
+* see the PROJECTS file for more information about the funding projects.     *
+*                                                                            *
+* Copyright (c) 2010-2015 Griffith University and the Contributors           *
+*                                                                            *
+* CEINMS Contributors: C. Pizzolato, M. Reggiani, M. Sartori,                *
+*                      E. Ceseracciu, and D.G. Lloyd                         *
+*                                                                            *
+* Author(s): C. Pizzolato                                                    *
+*                                                                            *
+* CEINMS is licensed under the Apache License, Version 2.0 (the "License").  *
+* You may not use this file except in compliance with the License. You may   *
+* obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0.*
+*                                                                            *
+* Unless required by applicable law or agreed to in writing, software        *
+* distributed under the License is distributed on an "AS IS" BASIS,          *
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.   *
+* See the License for the specific language governing permissions and        *
+* limitations under the License.                                             *
+* -------------------------------------------------------------------------- */
+
+#include "ceinms/QueuesToXForces.h"
+#include <limits>
+#include <vector>
+using std::vector;
+#include <string>
+using std::string;
+#include <SimTK/include/SimTKcommon.h>
+using SimTK::Vec3;
+
+namespace OpenSim {
+
+    ExternalForceFromQueue::ExternalForceFromQueue
+        (std::shared_ptr<ExternalForceQueue> externalForceQueue,
+        const std::string& appliedToBodyName,
+        const std::string& forceExpressedInBodyName,
+        const std::string& pointExpressedInBodyName) :
+        externalForceQueue_(externalForceQueue),
+        appliedToBody_(nullptr),
+        forceExpressedInBody_(nullptr),
+        pointExpressedInBody_(nullptr),
+        lastTime_(std::numeric_limits<double>::lowest()),
+        isSubscribed(false),
+        runCondition_(true)
+    {
+        setAppliedToBodyName(appliedToBodyName);
+        setForceExpressedInBodyName(forceExpressedInBodyName);
+        setPointExpressedInBodyName(pointExpressedInBodyName);
+
+    }
+
+
+    ExternalForceFromQueue::ExternalForceFromQueue(std::shared_ptr<ExternalForceQueue> externalForceQueue, SimTK::Xml::Element& node) :
+        externalForceQueue_(externalForceQueue),
+        appliedToBody_(nullptr),
+        forceExpressedInBody_(nullptr),
+        pointExpressedInBody_(nullptr),
+        lastTime_(std::numeric_limits<double>::lowest()),
+        isSubscribed(false),
+        runCondition_(true)
+    {
+        ExternalForce::updateFromXMLNode(node);
+
+    }
+
+    ceinms::ExternalForceData ExternalForceFromQueue::getExternalForceDataFromPastValues(double time) const {
+
+        auto it(std::lower_bound(pastExternalForceFrames_.begin(), pastExternalForceFrames_.end(), time, [](
+            ceinms::QueueData<ceinms::ExternalForceData>& lhs,
+            double t){ return lhs.time < t; }));
+        return it->data;
+
+    }
+
+
+    ceinms::ExternalForceData ExternalForceFromQueue::getExternalForceDataFromQueue(double time) const {
+
+        ExternalForceFrame forceFrame;
+        while (time > lastTime_ && runCondition_){
+            forceFrame = externalForceQueue_->pop();
+            if (forceFrame.time == std::numeric_limits<double>::infinity()) {
+                runCondition_ = false;
+                forceFrame.data.setForceVector(SimTK::Vec3(0.));
+                forceFrame.data.setForceApplicationPoint(SimTK::Vec3(0.));
+                forceFrame.data.setTorque(SimTK::Vec3(0.));
+            }
+            if (runCondition_) {
+                pastExternalForceFrames_.push_back(forceFrame);
+                lastTime_ = forceFrame.time;
+            }
+        }
+        return forceFrame.data;
+    }
+
+
+    void ExternalForceFromQueue::computeForce(
+        const SimTK::State& state,
+        SimTK::Vector_<SimTK::SpatialVec>& bodyForces,
+        SimTK::Vector& generalizedForces) const
+    {
+        if (runCondition_) {
+            double time(state.getTime());
+            ceinms::ExternalForceData forceData;
+            if (time <= lastTime_)
+                forceData = getExternalForceDataFromPastValues(time);
+            else
+                forceData = getExternalForceDataFromQueue(time);
+
+            //it could be possible to chenge the application point of the force on the fly, but at the moment we just keep the definitions from the xml
+            const SimbodyEngine& engine = getModel().getSimbodyEngine();
+            SimTK::Vec3 transformedForce, transformedPosition, transformedTorque;
+            engine.transform(state, *forceExpressedInBody_, forceData.getForce(), engine.getGroundBody(), transformedForce);
+            engine.transformPosition(state, *pointExpressedInBody_, forceData.getApplicationPoint(), *appliedToBody_, transformedPosition);
+            ExternalForce::applyForceToPoint(state, *appliedToBody_, transformedPosition, transformedForce, bodyForces);
+            engine.transform(state, *forceExpressedInBody_, forceData.getTorque(), engine.getGroundBody(), transformedTorque);
+            ExternalForce::applyTorque(state, *appliedToBody_, transformedTorque, bodyForces);
+        }
+    }
+
+
+    void ExternalForceFromQueue::connectToModel(Model& model) {
+
+        if (!isSubscribed) {
+            externalForceQueue_->subscribe();
+            isSubscribed = true;
+        }
+        Super::connectToModel(model);
+        const std::string& appliedToBodyName = get_applied_to_body();
+        const std::string& forceExpressedInBodyName = get_force_expressed_in_body();
+
+        appliedToBody_ = &_model->updBodySet().get(appliedToBodyName);
+        forceExpressedInBody_ = &_model->updBodySet().get(forceExpressedInBodyName);
+        pointExpressedInBody_ = &_model->updBodySet().get(get_point_expressed_in_body());
+    }
+
+    ExternalForceFromQueue::~ExternalForceFromQueue() {
+
+        //     externalForceQueue_.unsubscribe();
+    }
+}
+
+namespace ceinms {
+
+
+    void QueuesToXForces::initialiseContactModel() {
+
+        //this should just parse, not create stuff.. to fix
+        parseExternalLoadsXml(externalLoadsXmlFilename_);
+        //Using a pointer to delay the initialization
+        jointContactModel_.reset(new JointContactFromOpensim(osimModelFilename_, extForces_));
+        std::vector<std::string> coordinateNamesFromOsim, dofNamesFromSubject, muscleNamesFromOsim, musclesNamesFromSubject, jointNamesFromOsim;
+        jointContactModel_->getCoordinateNamesFromOsimModel(coordinateNamesFromOsim);
+        dofsMapping_.setNames(dofNamesFromSubject_, coordinateNamesFromOsim);
+        jointContactModel_->getMuscleNamesFromOsimModel(muscleNamesFromOsim);
+        musclesMapping_.setNames(musclesNamesFromSubject_, muscleNamesFromOsim);
+
+        jointContactModel_->getJointNamesFromOsimModel(jointNamesFromOsim);
+        for (auto& jointToLog : jointsToLog_) {
+            auto it(std::find(jointNamesFromOsim.cbegin(), jointNamesFromOsim.cend(), jointToLog));
+            if (it == jointNamesFromOsim.end()) {
+                std::cout << jointToLog << " does not exist in the OpenSim model\nExit.";
+                exit(EXIT_FAILURE);
+            }
+        }
+
+    }
+
+    void QueuesToXForces::parseExternalLoadsXml(const std::string& xmlFilename) {
+        OpenSim::XMLDocument document(xmlFilename);
+        SimTK::Xml::Element root = document.getRootDataElement();
+        SimTK::Xml::element_iterator extForceElementIter = root.element_begin("objects")->element_begin("ExternalForce");
+
+        for (extForceElementIter; extForceElementIter != root.element_begin("objects")->element_end(); ++extForceElementIter) {
+            singleExternalForceQueues_.emplace_back(new SingleExternalForceQueue());
+            extForces_.push_back(new OpenSim::ExternalForceFromQueue(singleExternalForceQueues_.back(), *extForceElementIter));
+        }
+    }
+
+
+
+    void QueuesToXForces::distributeExternalForces() {
+
+        //launch the thread, and let it go.. wait iws in the distructor
+        splitForcesThread_ = (std::async(std::launch::async, [&](){
+
+            inputExternalForcesQueue_.subscribe();
+            splitForcesLatch_.wait();
+
+            bool runCondition(true);
+            do {
+                QueueData<std::vector<ExternalForceData>> forces(inputExternalForcesQueue_.pop());
+                if (forces.time < std::numeric_limits<double>::infinity()) {
+                    for (size_t i(0); i < forces.data.size(); ++i) {
+                        QueueData<ExternalForceData> currentForce;
+                        currentForce.time = forces.time;
+                        currentForce.data = forces.data.at(i);
+                        singleExternalForceQueues_.at(i)->push(currentForce);
+                    }
+                }
+                else {
+                    runCondition = false;
+                    QueueData<ExternalForceData> eof;
+                    eof.time = std::numeric_limits<double>::infinity();
+                    for (auto& forceQueue : singleExternalForceQueues_)
+                        forceQueue->push(eof);
+                }
+            } while (runCondition);
+        }));
+    }
+
+    void QueuesToXForces::doneWithSubscriptions() {
+        
+        //from a queue with a vector of N forces we distribute the external forces in N queues.. 
+        //each of them connected internally to an OpenSim model
+        distributeExternalForces();
+        splitForcesLatch_.wait();
+        externalLatch_.wait();
+
+    }
+
+
+    void QueuesToXForces::setState(double time, const vector<double>& q, const vector<double>& qd, const vector<double>& qdd) {
+
+        jointContactModel_->setTime(time);
+        jointContactModel_->setQ(q);
+        jointContactModel_->setQd(qd);
+        jointContactModel_->setQdd(qdd);
+    }
+
+
+    SimTK::Vector&& QueuesToXForces::toSimTKVector(const std::vector<double>& v) {
+
+        SimTK::Vector ansV(v.size(), .0);
+        for (size_t i(0); i < v.size(); ++i)
+            ansV.set(i, v.at(i));
+        return std::move(ansV);
+    }
+
+
+    void QueuesToXForces::calculateIntersegmentalForces() {
+
+        jointContactModel_->calculateIntersegmentalForces();
+    }
+
+
+
+    void QueuesToXForces::calculateIntersegmentalForces(const vector<double>& realMobilityForces) {
+    
+        //todo put forces and torques in the right place in the vector
+        jointContactModel_->calculateIntersegmentalForcesUsingExternalMobilityForces(toSimTKVector(realMobilityForces));
+    }
+
+
+    void QueuesToXForces::calculateJointReactionForces(const vector<double>& muscleForces, const vector<double>& estimatedMobilityForces) {
+    
+        //todo put forces and torques in the right place in the vector
+        jointContactModel_->calculateJointReactionForces(toSimTKVector(musclesMapping_.map(muscleForces)), toSimTKVector(dofsMapping_.map(estimatedMobilityForces)));
+    }
+
+
+    void QueuesToXForces::calculateJointReactionForces(const vector<double>& muscleForces, const vector<double>& estimatedMobilityForces, const vector<double>& realMobilityForces) {
+    
+        jointContactModel_->calculateJointReactionForcesUsingExternalMobilityForces(
+            toSimTKVector(musclesMapping_.map(muscleForces)), 
+            toSimTKVector(dofsMapping_.map(estimatedMobilityForces)), 
+            toSimTKVector(realMobilityForces));
+    }
+
+
+    void QueuesToXForces::getJointReactionForcesInG(vector<Vec3>& jointReactionsInG) const {
+    
+        jointReactionsInG.clear();
+        for (auto& jointName : jointsToLog_) {
+            Vec3 force;
+            jointContactModel_->getJointReactionForceInG(jointName, force);
+            jointReactionsInG.emplace_back(force);
+        }
+
+    }
+
+
+    void QueuesToXForces::getIntersegmentalForcesInG(vector<Vec3>& intersegmentalForcesInG) const {
+    
+        intersegmentalForcesInG.clear();
+        for (auto& jointName : jointsToLog_) {
+            Vec3 force;
+            jointContactModel_->getIntersegmentalForceInG(jointName, force);
+            intersegmentalForcesInG.emplace_back(force);
+        }
+
+    }
+
+
+    void QueuesToXForces::getJointReactionForcesInChild(vector<Vec3>& jointReactionsInChild) const {
+    
+        jointReactionsInChild.clear();
+        for (auto& jointName : jointsToLog_) {
+            Vec3 force;
+            jointContactModel_->getJointReactionForceInChild(jointName, force);
+            jointReactionsInChild.emplace_back(force);
+        }
+    }
+
+
+    void QueuesToXForces::getIntersegmentalForcesInChild(vector<Vec3>& intersegmentalForcesInChild) const {
+       
+        intersegmentalForcesInChild.clear();
+        for (auto& jointName : jointsToLog_) {
+            Vec3 force;
+            jointContactModel_->getIntersegmentalForceInChild(jointName, force);
+            intersegmentalForcesInChild.emplace_back(force);
+        }
+    }
+
+
+    QueuesToXForces::~QueuesToXForces() {
+        splitForcesThread_.wait();
+    }
+
+}
