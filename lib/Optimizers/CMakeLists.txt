@@ -23,7 +23,4 @@ target_include_directories( Optimizers
 # Save path to include directory for "internal" usage
 set(Optimizers_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}" ${ceinms_common_INCLUDE_DIRS} CACHE INTERNAL "Include directories for Optimizers library")
 
-install(FILES ${Optimizers_HEADERS} ${Optimizers_TEMPLATE_IMPLEMENTATION} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/ceinms)
-
-
-
+install(FILES ${Optimizers_HEADERS} ${Optimizers_TEMPLATE_IMPLEMENTATION} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/ceinms COMPONENT Development)

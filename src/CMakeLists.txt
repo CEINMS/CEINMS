@@ -77,10 +77,6 @@ target_link_libraries( CEINMScalibrate
       ${Boost_PROGRAM_OPTIONS_LIBRARY}
 )
 
-if (NOT CMAKE_VERSION VERSION_LESS 3.0.0)
-    #target_link_libraries(CEINMScalibrate Calibration)
-endif()
-
 install(TARGETS CEINMS CEINMScalibrate
-        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT Applications)
 
