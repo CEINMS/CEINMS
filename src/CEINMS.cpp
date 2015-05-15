@@ -1,259 +1,150 @@
-//__________________________________________________________________________
-// Author(s): Claudio Pizzolato, Monica Reggiani - September 2013
-// email:  claudio.pizzolato@griffithuni.edu.au
-//
-// DO NOT REDISTRIBUTE WITHOUT PERMISSION
-//__________________________________________________________________________
-//
+/* -------------------------------------------------------------------------- *
+ * CEINMS is a standalone toolbox for neuromusculoskeletal modelling and      *
+ * simulation. CEINMS can also be used as a plugin for OpenSim either         *
+ * through the OpenSim GUI or API. See https://simtk.org/home/ceinms and the  *
+ * NOTICE file for more information. CEINMS development was coordinated       *
+ * through Griffith University and supported by the Australian National       *
+ * Health and Medical Research Council (NHMRC), the US National Institutes of *
+ * Health (NIH), and the European Union Framework Programme 7 (EU FP7). Also  *
+ * see the PROJECTS file for more information about the funding projects.     *
+ *                                                                            *
+ * Copyright (c) 2010-2015 Griffith University and the Contributors           *
+ *                                                                            *
+ * CEINMS Contributors: C. Pizzolato, M. Reggiani, M. Sartori,                *
+ *                      E. Ceseracciu, and D.G. Lloyd                         *
+ *                                                                            *
+ * Author(s): C. Pizzolato, M. Reggiani, E. Ceseracciu                        *
+ *                                                                            *
+ * CEINMS is licensed under the Apache License, Version 2.0 (the "License").  *
+ * You may not use this file except in compliance with the License. You may   *
+ * obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0.*
+ *                                                                            *
+ * Unless required by applicable law or agreed to in writing, software        *
+ * distributed under the License is distributed on an "AS IS" BASIS,          *
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.   *
+ * See the License for the specific language governing permissions and        *
+ * limitations under the License.                                             *
+ * -------------------------------------------------------------------------- */
 
-
-#include "EMGFromFile.h"
-#include "LmtMaFromFile.h"
-#include "ExternalTorqueFromFile.h"
-#include "ModelEvaluationOnline.h"
-#include "ModelEvaluationOffline.h"
-#include "ModelEvaluationHybrid.h"
-#include "SetupDataStructure.h"
-#include "Activation/ExponentialActivation.h"
-#include "Tendon/StiffTendon.h"
-#include "Tendon/ElasticTendon.h"
-#include "Tendon/ElasticTendon_BiSec.h"
-#include "ErrorMinimizerAnnealing.h"
-#include "HybridWeightings.h"
-#include "Curve.h"
-#include "ExecutionXmlReader.h"
-
+#include "ceinms/Utilities.h"
+#include "ceinms/FileUtils.h"
+#include "ceinms/CeinmsSetupXmlReader.h"
+#include "SimulationManager.h"
 #include <ctime>
 
-#include <boost/thread.hpp>
+#include <iomanip>
+
 #include <string>
 using std::string;
 #include <iostream>
 using std::cout;
+using std::endl;
 #include <vector>
 using std::vector;
+#include <map>
+using std::map;
 #include <stdlib.h>
 
-#include <boost/program_options.hpp>
-namespace po = boost::program_options;
-
-template<typename T1, typename T2, typename T3, typename T4>
-void runThreads(T1& t1, T2& t2, T3& t3, T4& t4) {
- 
-    boost::thread thread1(t1);
-    boost::thread thread2(t2);  
-    boost::thread thread3(t3);  
-    boost::thread thread4(t4);
-    thread1.join();
-    thread2.join();
-    thread3.join();
-    thread4.join();
-}
-
-template <typename T>
-void setupSubject(T& mySubject, string configurationFile) {
-    
-    SetupDataStructure<T> setupData(configurationFile);
-    setupData.createCurves();
-    setupData.createMuscles(mySubject);
-    setupData.createDoFs(mySubject);
-    
-}
-    
 
 void printHeader() {
 
     cout << endl;
-    cout << "+-+-+-+-+-+-+\n"                            
+    cout << "+-+-+-+-+-+-+\n"
          << "|C|E|I|N|M|S|\n"
-         << "+-+-+-+-+-+-+-+-+-+-+\n"                    
-         << "|C|a|l|i|b|r|a|t|e|d|\n"                    
-         << "+-+-+-+-+-+-+-+-+-+-+-+-+\n"                
-         << "|E|M|G|-|I|n|f|o|r|m|e|d|\n"                
+         << "+-+-+-+-+-+-+-+-+-+-+\n"
+         << "|C|a|l|i|b|r|a|t|e|d|\n"
+         << "+-+-+-+-+-+-+-+-+-+-+-+-+\n"
+         << "|E|M|G|-|I|n|f|o|r|m|e|d|\n"
          << "+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+\n"
          << "|N|e|u|r|o|m|u|s|c|u|l|o|s|k|e|l|e|t|a|l|\n"
          << "+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+\n"
-         << "|T|o|o|l|b|o|x|\n"                          
-         << "+-+-+-+-+-+-+-+\n\n";                   
-        
+         << "|T|o|o|l|b|o|x|\n"
+         << "+-+-+-+-+-+-+-+\n\n";
+
     }
-    
+
 void printAuthors() {
-    
+
     time_t now = std::time(0);
     tm *gmtm = std::gmtime(&now);
     cout << "Copyright (C) " << gmtm->tm_year+1900 << endl;
-    cout << "Claudio Pizzolato, Monica Reggiani, David Lloyd, Massimo Sartori\n\n";
-    
-    cout << "Software developers: Claudio Pizzolato, Monica Reggiani\n";
+    cout << "Claudio Pizzolato, Monica Reggiani, David Lloyd\n\n";
+
+    cout << "Software developers: Claudio Pizzolato, Elena Ceseracciu, Monica Reggiani\n";
 }
-    
+
+void PrintUsage()
+{
+    string progName= "CEINMS";
+    cout << "\n\n" << progName << ":\n";// << GetVersionAndDate() << "\n\n";
+    cout << "Option            Argument          Action / Notes\n";
+    cout << "------            --------          --------------\n";
+    cout << "-Help, -H                           Print the command-line options for " << progName << ".\n";
+    cout << "-PrintSetup, -PS                    Generates a template Setup file\n";
+    cout << "-Setup, -S        SetupFileName     Specify an xml setup file.\n";
+
+}
+
 
 int main(int argc, char** argv) {
- 
+
     printHeader();
     printAuthors();
-    
-#ifdef LOG  
+
+#ifdef LOG
   cout << "Check configuration data...\n";
 #endif
-  
-    string subjectFile;
-    string executionFile;
-    string inputDirectory;
-    string outputDirectory;
-    string emgGeneratorFile;
 
-    int opt;
-    po::options_description desc("Allowed options");
-    desc.add_options()
-    ("help", "produce help message")
-    ("subject,s", po::value<string>(&subjectFile), "subject xml file")
-    ("execution,x", po::value<string>(&executionFile),  "execution xml file")
-    ("input-dir,i", po::value<string>(&inputDirectory), "trial directory path")
-    ("output-dir,o", po::value<string>(&outputDirectory)->default_value("./Output"), "output directory")
-    ("emg-generator,g", po::value<string>(&emgGeneratorFile)->default_value("cfg/xml/emgGenerator.xml"), "EMG mapping");
-    
-    po::variables_map vm;
-    po::store(po::parse_command_line(argc, argv, desc), vm);
-    po::notify(vm);    
-
-    if (vm.count("help") || argc < 7) {
-        cout << desc << "\n";
-        return 1;
+    string option="";
+    string setupFileName;
+    if (argc < 2) {
+        PrintUsage();
+        return 0;
     }
-    // check command line arguments... 
-  
+    else{
+        int i;
+        for (i = 1; i <= (argc - 1); i++) {
+            option = argv[i];
 
+            // PRINT THE USAGE OPTIONS
+            if ((option == "-help") || (option == "-h") || (option == "-Help") || (option == "-H") ||
+                (option == "-usage") || (option == "-u") || (option == "-Usage") || (option == "-U")) {
+                PrintUsage();
+                return 0;
+            }
+            else if ((option == "-S") || (option == "-Setup")) {
+                if (argv[i + 1] == 0){
+                    cout << "No setup file specified!" << endl;
+                    PrintUsage();
+                    return -1;
+                }
+                setupFileName = argv[i + 1];
+                break;
 
-    EMGFromFile emgProducer(inputDirectory);
-    LmtMaFromFile lmtMaProducer(inputDirectory);
-    ExternalTorqueFromFile externalTorqueProducer(inputDirectory);
-
-    ExecutionXmlReader executionCfg(executionFile);             
-    
-   NMSModelCfg::RunMode runMode = executionCfg.getRunMode();
-   
-//    NMSModelCfg::RunMode runMode = NMSModelCfg::HybridPiecewiseActivationElasticTendonOnline;
-    switch(runMode) {
-               
-        case NMSModelCfg::OpenLoopExponentialActivationStiffTendonOnline: {
-            typedef NMSmodel<ExponentialActivation, StiffTendon, CurveMode::Online> MyNMSmodel;
-            MyNMSmodel mySubject;
-            setupSubject(mySubject, subjectFile);
-            ModelEvaluationOnline<MyNMSmodel> consumer(mySubject, outputDirectory);
-            runThreads(consumer, emgProducer, lmtMaProducer, externalTorqueProducer);
-            break;
+                // Print a default setup file
+            }
+            else if ((option == "-PrintSetup") || (option == "-PS")) {
+                if (ceinms::CeinmsSetupXmlReader::writeTemplateCeinmsSetupFile("defaultCeinmsSetupFile.xml"))
+                {
+                    std::cout << "Wrote template setup file to defaultCeinmsSetupFile.xml" << std::endl;
+                    return 0;
+                }
+                else
+                {
+                    std::cout << "An error occurred while writing template setup file to defaultCeinmsSetupFile.xml" << std::endl;
+                    return -1;
+                }
+            }
+            else {
+                cout << "Unrecognized option " << option << " on command line... Ignored" << endl;
+                PrintUsage();
+                return -1;
+            }
         }
-       
-        case NMSModelCfg::OpenLoopExponentialActivationStiffTendonOffline: {
-            typedef NMSmodel<ExponentialActivation, StiffTendon, CurveMode::Offline> MyNMSmodel;
-            MyNMSmodel mySubject;
-            setupSubject(mySubject, subjectFile);
-            ModelEvaluationOffline<MyNMSmodel> consumer(mySubject, outputDirectory);
-            runThreads(consumer, emgProducer, lmtMaProducer, externalTorqueProducer);
-            break;
-        }
-        /*
-        case NMSModelCfg::OpenLoopExponentialActivationElasticTendonOnline: {
-            typedef NMSmodel<ExponentialActivation, ElasticTendon<CurveMode::Online>, CurveMode::Online> MyNMSmodel;
-            MyNMSmodel mySubject;
-            setupSubject(mySubject, subjectFile);
-            ModelEvaluationOnline<MyNMSmodel> consumer(mySubject);
-            runThreads(consumer, emgProducer, lmtMaProducer, externalTorqueProducer);
-            break;
-        }
-        
-        case NMSModelCfg::OpenLoopExponentialActivationElasticTendonOffline: {
-            typedef NMSmodel<ExponentialActivation, ElasticTendon<CurveMode::Offline>, CurveMode::Offline> MyNMSmodel;
-            MyNMSmodel mySubject;
-            setupSubject(mySubject, subjectFile);
-            ModelEvaluationOffline<MyNMSmodel> consumer(mySubject);
-            runThreads(consumer, emgProducer, lmtMaProducer, externalTorqueProducer);
-            break;
-        }
-        */
-        case NMSModelCfg::OpenLoopExponentialActivationElasticTendonBiSecOnline: {
-            typedef NMSmodel<ExponentialActivation, ElasticTendon_BiSec, CurveMode::Online> MyNMSmodel;
-            MyNMSmodel mySubject;
-            setupSubject(mySubject, subjectFile);
-            ModelEvaluationOnline<MyNMSmodel> consumer(mySubject, outputDirectory);
-            runThreads(consumer, emgProducer, lmtMaProducer, externalTorqueProducer);
-            break;
-        }
-        
-        case NMSModelCfg::OpenLoopExponentialActivationElasticTendonBiSecOffline: {
-            typedef NMSmodel<ExponentialActivation, ElasticTendon_BiSec, CurveMode::Offline> MyNMSmodel;
-            MyNMSmodel mySubject;
-            setupSubject(mySubject, subjectFile);
-            ModelEvaluationOffline<MyNMSmodel> consumer(mySubject, outputDirectory);
-            runThreads(consumer, emgProducer, lmtMaProducer, externalTorqueProducer);
-            break;
-        }
-        
-        
-        case NMSModelCfg::HybridExponentialActivationStiffTendonOnline: { 
-            typedef NMSmodel<ExponentialActivation, StiffTendon, CurveMode::Online> MyNMSmodel;
-            typedef Hybrid::ErrorMinimizerAnnealing<MyNMSmodel> MyErrorMinimizer;
-            SetupDataStructure<MyNMSmodel> setupData(subjectFile);
-            MyNMSmodel mySubject;
-            setupData.createCurves();
-            setupData.createMuscles(mySubject);
-            setupData.createDoFs(mySubject);
-            MyErrorMinimizer errorMinimizer(mySubject);
-            HybridWeightings weightings;
-            executionCfg.getHybridWeightings(weightings.alpha, weightings.beta, weightings.gamma);
-            errorMinimizer.setWeightings(weightings);
-            vector<string> toPredict, toTrack;
-            executionCfg.getMusclesToPredict(toPredict);
-            executionCfg.getMusclesToTrack(toTrack);
-            errorMinimizer.setMusclesNamesWithEmgToPredict(toPredict);
-            errorMinimizer.setMusclesNamesWithEmgToTrack(toTrack);
-            double rt, t, epsilon;
-            unsigned noEpsilon, ns, nt, maxNoEval;
-            executionCfg.getAnnealingParameters(nt, ns, rt, t, maxNoEval, epsilon, noEpsilon);
-            errorMinimizer.setAnnealingParameters(nt, ns, rt, t, maxNoEval, epsilon, noEpsilon);
-            ModelEvaluationHybrid<MyNMSmodel, MyErrorMinimizer> consumer(mySubject, errorMinimizer, outputDirectory);
-            runThreads(consumer, emgProducer, lmtMaProducer, externalTorqueProducer);
-            break;
-        } 
-        
-          case NMSModelCfg::HybridExponentialActivationElasticTendonBiSecOnline: { 
-            typedef NMSmodel<ExponentialActivation, ElasticTendon_BiSec, CurveMode::Online> MyNMSmodel;
-            typedef Hybrid::ErrorMinimizerAnnealing<MyNMSmodel> MyErrorMinimizer;
-            SetupDataStructure<MyNMSmodel> setupData(subjectFile);
-            MyNMSmodel mySubject;
-            setupData.createCurves();
-            setupData.createMuscles(mySubject);
-            setupData.createDoFs(mySubject);
-            MyErrorMinimizer errorMinimizer(mySubject);
-            HybridWeightings weightings;
-            executionCfg.getHybridWeightings(weightings.alpha, weightings.beta, weightings.gamma);
-            errorMinimizer.setWeightings(weightings);
-            vector<string> toPredict, toTrack;
-            executionCfg.getMusclesToPredict(toPredict);
-            executionCfg.getMusclesToTrack(toTrack);
-            errorMinimizer.setMusclesNamesWithEmgToPredict(toPredict);
-            errorMinimizer.setMusclesNamesWithEmgToTrack(toTrack);
-            double rt, t, epsilon;
-            unsigned noEpsilon, ns, nt, maxNoEval;
-            executionCfg.getAnnealingParameters(nt, ns, rt, t, maxNoEval, epsilon, noEpsilon);
-            errorMinimizer.setAnnealingParameters(nt, ns, rt, t, maxNoEval, epsilon, noEpsilon);
-            ModelEvaluationHybrid<MyNMSmodel, MyErrorMinimizer> consumer(mySubject, errorMinimizer, outputDirectory);
-            runThreads(consumer, emgProducer, lmtMaProducer, externalTorqueProducer);
-            break;
-        } 
-
-
-        default:
-            std::cout << "Implementation not available yet. Verify you XML configuration file\n";
-            break;
-            
-                
-            
-            
     }
-    
-  
-  return 0;
+
+    ceinms::SimulationManager simulation(setupFileName);
+    bool flag = simulation.run();
+
+    return flag;
 }

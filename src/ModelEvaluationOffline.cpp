@@ -1,15 +1,34 @@
-//__________________________________________________________________________
-// Author(s): Claudio Pizzolato, Monica Reggiani - September 2013
-// email:  claudio.pizzolato@griffithuni.edu.au
-//
-// DO NOT REDISTRIBUTE WITHOUT PERMISSION
-//__________________________________________________________________________
-//
+/* -------------------------------------------------------------------------- *
+ * CEINMS is a standalone toolbox for neuromusculoskeletal modelling and      *
+ * simulation. CEINMS can also be used as a plugin for OpenSim either         *
+ * through the OpenSim GUI or API. See https://simtk.org/home/ceinms and the  *
+ * NOTICE file for more information. CEINMS development was coordinated       *
+ * through Griffith University and supported by the Australian National       *
+ * Health and Medical Research Council (NHMRC), the US National Institutes of *
+ * Health (NIH), and the European Union Framework Programme 7 (EU FP7). Also  *
+ * see the PROJECTS file for more information about the funding projects.     *
+ *                                                                            *
+ * Copyright (c) 2010-2015 Griffith University and the Contributors           *
+ *                                                                            *
+ * CEINMS Contributors: C. Pizzolato, M. Reggiani, M. Sartori,                *
+ *                      E. Ceseracciu, and D.G. Lloyd                         *
+ *                                                                            *
+ * Author(s): C. Pizzolato, M. Reggiani                                       *
+ *                                                                            *
+ * CEINMS is licensed under the Apache License, Version 2.0 (the "License").  *
+ * You may not use this file except in compliance with the License. You may   *
+ * obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0.*
+ *                                                                            *
+ * Unless required by applicable law or agreed to in writing, software        *
+ * distributed under the License is distributed on an "AS IS" BASIS,          *
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.   *
+ * See the License for the specific language governing permissions and        *
+ * limitations under the License.                                             *
+ * -------------------------------------------------------------------------- */
 
-
-//#include "ModelEvaluationOffline.h"
-#include "SyncTools.h"
 #include "SimpleFileLogger.h"
+#include "StorageLogger.h"
+#include "ceinms/TimeCompare.h"
 
 #include <iostream>
 using std::cout;
@@ -19,277 +38,248 @@ using std::vector;
 #include <string>
 using std::string;
 
+#include "ModelEvaluationOffline.h"
+#include "ModelEvaluationBase.h"
+#include "ceinms/InputConnectors.h"
+#include "ceinms/OutputConnectors.h"
 #define LOG_FILES
 #define LOG
 
-
-
-template <typename NMSmodelT>
-ModelEvaluationOffline<NMSmodelT>::ModelEvaluationOffline(NMSmodelT& subject, const std::string& outputDir) 
-:subject_(subject), outputDir_(outputDir)
-{ }
-
-
-template <typename NMSmodelT>
-void ModelEvaluationOffline<NMSmodelT>::initOfflineCurve() {
-
-    SyncTools::Shared::lmtProducingDone.wait();
-    cout << "fiber velocity CURVE \n";
-    vector< vector<double> > allLmt;
-    
-    SyncTools::Shared::queueLmtMutex.lock();
-    std::list< vector<double> >::iterator lmtIt;
-    for(lmtIt = SyncTools::Shared::queueLmt.begin(); lmtIt != SyncTools::Shared::queueLmt.end(); lmtIt++)
-        allLmt.push_back(*lmtIt);
-    SyncTools::Shared::queueLmtMutex.unlock();
-
-    SyncTools::Shared::emgProducingDone.wait();
-    vector< vector<double> > allEmg;
-    
-    SyncTools::Shared::queueEmgMutex.lock();
-    std::list< vector<double> >::iterator emgIt;
-    for(emgIt = SyncTools::Shared::queueEmg.begin(); emgIt != SyncTools::Shared::queueEmg.end(); emgIt++)
-        allEmg.push_back(*emgIt);
-
-    SyncTools::Shared::queueEmgMutex.unlock();
-    
-    double globalEmDelay = subject_.getGlobalEmDelay(); 
-    unsigned lmtCt = 0;
-    double lmtTime = (allLmt.at(0)).back();
-    double emgTime; 
-    
-    for(int emgCt = 0; emgCt < allEmg.size() - 1; ++emgCt) {
-        emgTime = (allEmg.at(emgCt)).back() + globalEmDelay;
-        allEmg.at(emgCt).pop_back();
-        subject_.setTime(emgTime);
-        subject_.setEmgs(allEmg.at(emgCt));
-        subject_.updateActivations();
-        if ((lmtTime <= emgTime) && (lmtCt < allLmt.size() - 1)) {
-            allLmt.at(lmtCt).pop_back();
-            subject_.setMuscleTendonLengths(allLmt.at(lmtCt));
-            subject_.updateFibreLengths_OFFLINEPREP();
-            ++lmtCt;
-            lmtTime = allLmt.at(lmtCt).back();
-        }
-        subject_.pushState();
+namespace ceinms {
+    template <typename NMSmodelT, typename Logger>
+    ModelEvaluationOffline<NMSmodelT, Logger>::ModelEvaluationOffline(InputConnectors& inputConnectors, OutputConnectors& outputConnectors, NMSmodelT& subject, const vector<string>& valuesToLog)
+        :ModelEvaluationBase<Logger>::ModelEvaluationBase(inputConnectors, outputConnectors, valuesToLog), subject_(subject)
+    {
+        subject_.getDoFNames(dofNames_);
+        noDof_ = dofNames_.size();
+        globalEmDelay_ = subject.getGlobalEmDelay();
     }
-    subject_.updateFibreLengthTraces();
-}
 
 
-template <typename NMSmodelT>
-void ModelEvaluationOffline<NMSmodelT>::setSubject(NMSmodelT& subject) {
-    
-    subject_ = subject;
-}
+    template <typename NMSmodelT, typename Logger>
+    void ModelEvaluationOffline<NMSmodelT, Logger>::readDataFromQueues() {
+
+        bool runCondition = true;
+        //read EMG data
+        do{
+            auto frame(ModelEvaluationBase<Logger>::getEmgFromInputQueue());
+            if (!frame.data.empty())
+                emgDataFromQueue_.push_back(frame);
+            else runCondition = false;
+        } while (runCondition);
+
+        runCondition = true;
+        //read LMT data
+        do{
+            auto frame(ModelEvaluationBase<Logger>::getLmtFromInputQueue());
+            if (!frame.data.empty())
+                lmtDataFromQueue_.push_back(frame);
+            else runCondition = false;
+        } while (runCondition);
 
 
+        runCondition = ModelEvaluationBase<Logger>::externalTorquesAvailable();
+        //read external torques
+        do{
+            auto frame(ModelEvaluationBase<Logger>::getExternalTorquesFromInputQueue());
+            if (!frame.data.empty())
+                externalTorquesDataFromQueue_.push_back(frame);
+            else runCondition = false;
+        } while (runCondition);
 
-template <typename NMSmodelT>
-void ModelEvaluationOffline<NMSmodelT>::operator()() {
- 
-    vector<double> emgFromQueue;
-    vector<double> lmtFromQueue;
-    vector< vector<double> > momentArmsFromQueue;
-    vector< vector<double> > externalTorqueFromQueue;  
-    double emgTime, lmtMaTime;
-    vector<double> externalTorqueTime;
-    bool runCondition = true;
-    
-    //read dofs names from XML file and set dofNames global variable
-    subject_.getDoFNames(dofNames_);
-    setDofNamesToShared(dofNames_);  //set dof names on global variable, needed to lmtMaFromFile class
-    noDof_ = dofNames_.size();
-    momentArmsFromQueue.resize(noDof_);
-    
-    // all initialization stuff MUST be placed before this line
-    // be sure to call getMusclesNames() just after readyToStart.wait() if you want to
-    SyncTools::Shared::readyToStart.wait(); //barrier
 
-    vector<string> muscleNamesFromShared;
-    getMusclesNamesFromShared(muscleNamesFromShared);
-    vector< vector<string> > muscleNamesOnDofFromShared;
-    getMusclesNamesOnDofsFromShared(muscleNamesOnDofFromShared);
- 
-//CHECK MUSCLES NAMES between XML model and input files 
+        runCondition = true;
+        //read moment arms data
+        do{
+            vector< InputConnectors::FrameType > maFrame;
+            for (unsigned i = 0; i < noDof_; ++i) {
+                auto currentMomentArms(ModelEvaluationBase<Logger>::getMomentArmsFromInputQueue(i));
+                if (!currentMomentArms.data.empty())
+                    maFrame.push_back(currentMomentArms);
+                else runCondition = false;
+            }
+            if (runCondition)
+                maDataFromQueue_.push_back(maFrame);
+        } while (runCondition);
 
-    getDofNamesAssociatedToExternalTorque(dofNamesWithExtTorque_);
-    externalTorqueTime.resize(dofNamesWithExtTorque_.size());
-    externalTorqueFromQueue.resize(dofNamesWithExtTorque_.size());
+    }
+
+    template <typename NMSmodelT, typename Logger>
+    void ModelEvaluationOffline<NMSmodelT, Logger>::initOfflineCurve() {
+
+        auto lmtIt(lmtDataFromQueue_.begin());
+        for (auto emgIt : emgDataFromQueue_) {
+            double emgTime = emgIt.time + globalEmDelay_;
+            subject_.setTime(emgTime);  //this shouldn't affect anything, could be removed
+            subject_.setEmgs(emgIt.data);
+            if (lmtIt == lmtDataFromQueue_.begin()) subject_.updateActivations();
+            if (lmtIt != lmtDataFromQueue_.end() && TimeCompare::lessEqual(lmtIt->time, emgTime)) {
+                subject_.updateActivations();
+                subject_.setTime(lmtIt->time);
+                subject_.setMuscleTendonLengths(lmtIt->data);
+                subject_.updateFibreLengths_OFFLINEPREP();
+                ++lmtIt;
+            }
+            subject_.pushState();
+        }
+        subject_.updateFibreLengthTraces();
+    }
+
+
+    template <typename NMSmodelT, typename Logger>
+    void ModelEvaluationOffline<NMSmodelT, Logger>::operator()() {
+
+        ModelEvaluationBase<Logger>::subscribeToInputConnectors();
 
 #ifdef LOG
-    cout << "Deegres of Freedom with an external torque data:\n";
-    for(unsigned int i = 0; i < dofNamesWithExtTorque_.size(); ++i)
-        cout << dofNamesWithExtTorque_.at(i) << endl;
-    if (dofNamesWithExtTorque_.size() == 0)
-        cout << "no external torque data found!\n";
+        cout << "starting consume" << endl;
 #endif
+        readDataFromQueues();
+        initOfflineCurve();
 
-  //external torques provided as input may refer to a subset of dof, 
-  //ie. we may have less external torques then the number of dofs 
-  //private class variable dofNamesWithExtTorque_ stores the dof names list with external torque data
-  
-    if(!subject_.compareMusclesNames(muscleNamesFromShared)) {
-        cout << "ERROR: muscles names from emg or lmt files don't match with XML model ones\n";
-        exit(EXIT_FAILURE);
-    }
-    
-    for(unsigned int i = 0; i < noDof_; ++i) {
-        if(!subject_.compareMusclesNamesOnDoF(muscleNamesOnDofFromShared.at(i), i)) {
-        cout << "ERROR: muscles names from " << dofNames_.at(i) << "Ma.txt file don't match with XML model ones\n";
-        exit(EXIT_FAILURE);
-        }      
-    }
+        double externalTorqueTime = std::numeric_limits<double>::lowest();
+        double emgTime = std::numeric_limits<double>::lowest();
+        bool runCondition = !(emgDataFromQueue_.empty() || maDataFromQueue_.empty() || lmtDataFromQueue_.empty());
+        bool firstLmtArrived(false);
 
-//END CHECK MUSCLES
+        while (runCondition) {  // while(runCondition)
 
-    double globalEmDelay = subject_.getGlobalEmDelay(); 
+            // 1. read lmt Data
+            InputConnectors::FrameType lmtFrameFromQueue(lmtDataFromQueue_.front());
+            lmtDataFromQueue_.pop_front();
+            double lmtMaTime = lmtFrameFromQueue.time;
 
-#ifdef LOG
-  cout << "starting consume" << endl;
-#endif
-  
-#ifdef LOG_FILES
-    Logger::SimpleFileLogger<NMSmodelT> logger(subject_, outputDir_);
-    logger.addLog(Logger::Activations);
-    logger.addLog(Logger::FibreLengths);
-    logger.addLog(Logger::FibreVelocities);
-    logger.addLog(Logger::MuscleForces);
-    logger.addLog(Logger::Torques);
-#endif
-    initOfflineCurve();
+            // 2. read moment arms data
+            vector< InputConnectors::FrameType > momentArmsFrameFromQueue(maDataFromQueue_.front());
+            maDataFromQueue_.pop_front();
 
-    vector<bool> stillExtTorqueDataOnDof;
-    for (unsigned int i = 0; i < dofNamesWithExtTorque_.size(); ++i)
-        stillExtTorqueDataOnDof.push_back(true);
-	
-    do {  
-        getLmtFromShared(lmtFromQueue);
-        lmtMaTime = lmtFromQueue.back();
-        lmtFromQueue.pop_back();         //removes time value from the end of vector
-        for(unsigned int i = 0; i < noDof_; ++i) {
-            getMomentArmsFromShared((momentArmsFromQueue.at(i)), i);    
-            momentArmsFromQueue.at(i).pop_back();  //removes time value from the end of vector
-        }
-        for(unsigned int i = 0; i < dofNamesWithExtTorque_.size(); ++i) {  
-            do {
-//poiché i dati delle torque esterne provenienti dal produttore possono avere frequenze di campionamento diverse
-//è allo stesso modo possibile avere un numero di dati differente a seconda del dof considerato
-//stillExtTorqueDataOnDof è un vettore che tiene conto di questo, in modo da evitare problemi di lunghezza sui vettori
-                if(stillExtTorqueDataOnDof.at(i)) {   
-                    getExternalTorqueFromShared(externalTorqueFromQueue.at(i), i);
-                    externalTorqueTime.at(i) = externalTorqueFromQueue.at(i).back();
-                    externalTorqueFromQueue.at(i).pop_back();
-                    if(externalTorqueFromQueue.at(i).empty())
-                        stillExtTorqueDataOnDof.at(i) = false;
-                }
-      
-            } while( (externalTorqueTime.at(i) < lmtMaTime) && stillExtTorqueDataOnDof.at(i));     
-        }
-
-
-//dopo il for la variabile externalTorqueFromQueue conterrà i valori delle torque esterne sincronizzati con i tempi
-//forniti dal produttore di lmt e ma. Si ricorda che per questioni di ortogonalità la variabile externalTorqueFromQueue
-//è un vettore di vettori di double. tuttavia, poiché è presente un unico valore di torque esterna per un dato istante di tempo
-//è possibile estrarre i dati e porli in un semplice vettore di double.
-//externalTorqueTime contiene i valori temporali di ogni torque esterna. la forma è generalizzata poiché si ipotizza una diversa frequenza
-//di campionamento per ogni torque esterna.
-//nel caso attuale externalTorqueTime contine lo stesso valore temporale per ogni torque esterna.
-//nella variabile privata dofNamesWithExtTorque_ sono contenuti i nomi dei gradi di libertà ai quali è associata una torque esterna
-//tale variabile può essere utilizzata come controllo, poiché la torque esterna è misurata solo su alcuni dof.
-
-        do {
-            getEmgFromShared(emgFromQueue);
-            emgTime = emgFromQueue.back() + globalEmDelay;
-            emgFromQueue.pop_back();
-            if(!emgFromQueue.empty()) {
-                //ROBA CHE DEVE FARE EMG
-                subject_.setTime(emgTime);
-                subject_.setEmgs(emgFromQueue);
-                if(emgTime < lmtMaTime) {
-                    subject_.updateActivations();
-                    subject_.pushState();
-        
-#ifdef LOG_FILES  
-                    logger.log(emgTime, Logger::Activations);
-#endif  
+            // 3. read external Torque
+            InputConnectors::FrameType externalTorquesFrameFromQueue;
+            if (ModelEvaluationBase<Logger>::externalTorquesAvailable()){
+                while (TimeCompare::less(externalTorqueTime, lmtMaTime) && !externalTorquesDataFromQueue_.empty()) {
+                    externalTorquesFrameFromQueue = externalTorquesDataFromQueue_.front();
+                    externalTorquesDataFromQueue_.pop_front();
+                    externalTorqueTime = externalTorquesFrameFromQueue.time;
                 }
             }
-            else runCondition = false;
-        } while( (emgTime < lmtMaTime) && runCondition);
-   
- //ROBA VARIA lmt ma
-        if (!lmtFromQueue.empty() && !momentArmsFromQueue.empty() && runCondition) {
-            subject_.setMuscleTendonLengths(lmtFromQueue);
-            for(unsigned int i = 0; i < noDof_; ++i)     
-                subject_.setMomentArms(momentArmsFromQueue.at(i), i); 
+
+            //note: check ModelEvaluationOnline for info about firstLmtArrived
+
+            // 4. read emgs
+            InputConnectors::FrameType emgFrameFromQueue;
+            while (TimeCompare::less(emgTime, lmtMaTime)) {
+                emgFrameFromQueue = emgDataFromQueue_.front();
+                emgDataFromQueue_.pop_front();
+                emgTime = emgFrameFromQueue.time + globalEmDelay_;
+                runCondition = runCondition && !emgFrameFromQueue.data.empty();
+                if (!TimeCompare::less(emgTime, lmtMaTime)) firstLmtArrived = true;
+                if (!firstLmtArrived && runCondition) {
+                    subject_.setTime(emgTime);
+                    subject_.setEmgs(emgFrameFromQueue.data);
+                    subject_.updateActivations();
+                    subject_.pushState();
+                }
+            }
+
+            subject_.setTime(lmtMaTime);
+            subject_.setEmgs(emgFrameFromQueue.data);
+            subject_.setMuscleTendonLengths(lmtFrameFromQueue.data);
+            for (unsigned int i = 0; i < noDof_; ++i)
+                subject_.setMomentArms(momentArmsFrameFromQueue.at(i).data, i);
             subject_.updateState_OFFLINE();
             subject_.pushState();
-    
+#ifdef LOG_FILES
+            //:TODO: Improve as now you are defining two times what you want to log
+            vector<double> data;
+            subject_.getActivations(data);
+            ModelEvaluationBase<Logger>::logger.log(lmtMaTime, data, "Activations");
+            subject_.getFiberLengths(data);
+            ModelEvaluationBase<Logger>::logger.log(lmtMaTime, data, "FiberLenghts");
+            subject_.getNormFiberLengths(data);
+            ModelEvaluationBase<Logger>::logger.log(lmtMaTime, data, "NormFiberLengths");
+            subject_.getFiberVelocities(data);
+            ModelEvaluationBase<Logger>::logger.log(lmtMaTime, data, "FiberVelocities");
+            subject_.getNormFiberVelocities(data);
+            ModelEvaluationBase<Logger>::logger.log(lmtMaTime, data, "NormFiberVelocities");
+            subject_.getPennationAnglesAtT(data);
+            ModelEvaluationBase<Logger>::logger.log(lmtMaTime, data, "PennationAngles");
+            subject_.getMuscleForces(data);
+            ModelEvaluationBase<Logger>::logger.log(lmtMaTime, data, "MuscleForces");
+            subject_.getTorques(data);
+            ModelEvaluationBase<Logger>::logger.log(lmtMaTime, data, "Torques");
+#endif
+
+#ifdef LOG
+            cout << endl << endl << "EmgTime: " << emgTime << endl << "EMG" << endl;
+            for (auto& it : emgFrameFromQueue.data)
+                cout << it << "\t";
+
+            cout << endl << "Activations: " << endl;
+            vector<double> cActivations;
+            subject_.getActivations(cActivations);
+            for (auto& it : cActivations)
+                cout << it << "\t";
+
+            cout << endl << "LmtTime: " << lmtMaTime << endl << "Lmt" << endl;
+            for (auto& it : lmtFrameFromQueue.data)
+                cout << it << "\t";
+
+            vector<double> cMuscleForces;
+            subject_.getMuscleForces(cMuscleForces);
+            cout << endl << "Muscle forces: " << endl;
+            for (auto& it : cMuscleForces)
+                cout << it << "\t";
+
+            for (unsigned int j = 0; j < dofNames_.size(); ++j) {
+                cout << endl << "MomentArms on: " << dofNames_.at(j) << endl;
+                for (auto& it : momentArmsFrameFromQueue.at(j).data)
+                    cout << it << "\t";
+            }
+
+            cout << endl << "External Torques: ";
+            for (auto& it : externalTorquesFrameFromQueue.data)
+                cout << it << " ";
+
+            vector<double> cTorques;
+            subject_.getTorques(cTorques);
+            for (unsigned int i = 0; i < cTorques.size(); ++i) {
+                cout << "\nCurrent Torque on " << dofNames_.at(i) << " ";
+                cout << cTorques.at(i);
+            }
+            cout << endl << "----------------------------------------" << endl;
+#endif
+            runCondition = runCondition = !(emgDataFromQueue_.empty() || maDataFromQueue_.empty() || lmtDataFromQueue_.empty());
+        } //end while(runCondition)
+
 
 
 #ifdef LOG_FILES
-        logger.log(emgTime, Logger::Activations);
-        logger.log(emgTime, Logger::FibreLengths);
-        logger.log(emgTime, Logger::FibreVelocities);
-        logger.log(emgTime, Logger::MuscleForces);
-        logger.log(emgTime, Logger::Torques);
-#endif    
+        //:TODO: improve this... This is the end... so I'm just writing on the queue a time equal to 0
+        vector<double> endData;
+        double endTime = std::numeric_limits<double>::infinity();
+        ModelEvaluationBase<Logger>::logger.log(endTime, endData, "Activations");
+        ModelEvaluationBase<Logger>::logger.log(endTime, endData, "FiberLenghts");
+        ModelEvaluationBase<Logger>::logger.log(endTime, endData, "NormFiberLengths");
+        ModelEvaluationBase<Logger>::logger.log(endTime, endData, "FiberVelocities");
+        ModelEvaluationBase<Logger>::logger.log(endTime, endData, "NormFiberVelocities");
+        ModelEvaluationBase<Logger>::logger.log(endTime, endData, "PennationAngles");
+        ModelEvaluationBase<Logger>::logger.log(endTime, endData, "MuscleForces");
+        ModelEvaluationBase<Logger>::logger.log(endTime, endData, "Torques");
+#endif
+
+        this->doneWithExecution();
 #ifdef LOG
-        cout << endl << endl << "Time: " << emgTime << endl << "EMG" << endl;
-        for(unsigned int i=0; i < emgFromQueue.size(); ++i)
-            cout << emgFromQueue.at(i) << "\t" ;
-        cout << endl << "Lmt" << endl;
-        for(unsigned int i=0; i < lmtFromQueue.size(); ++i)
-            cout << lmtFromQueue.at(i) << "\t";
-
-        for(unsigned int j = 0; j < dofNames_.size(); ++j) {
-            cout << endl << "MomentArms on " << dofNames_.at(j) << endl;
-            for(unsigned int i=0; i < (momentArmsFromQueue.at(j)).size(); ++i)
-                cout << (momentArmsFromQueue.at(j)).at(i) << "\t";
-        }
-      
-        for(unsigned int i = 0; i < dofNamesWithExtTorque_.size(); ++i) {
-            if(!externalTorqueFromQueue.at(i).empty()) {
-                cout << "\nExternal Torque on " << dofNamesWithExtTorque_.at(i) << " ";
-                cout << externalTorqueFromQueue.at(i).at(0); 
-            }        
-        }   
-        vector<double> cTorques;
-        subject_.getTorques(cTorques);
-        for(unsigned int i = 0; i < cTorques.size(); ++i) {
-            cout << "\nCurrent Torque on " << dofNames_.at(i) << " ";
-            cout << cTorques.at(i); 
-        }   
-        cout << endl << "----------------------------------------" << endl;
+        cout << "Estimation completed. " << endl;
 #endif
-        }
-        else runCondition = false;
 
-/*    when time value from input data is greater then globalTimeLimit (which value is set in ExternalVariables.cpp)
-   OR when an empty vector is acqured from one of the queues the thread stop consuming 
-NOTE: when one a producer push an empty vector in a queue means that ther are no more data to be produced, it's like an end frame. 
-*/
-        runCondition = (emgTime < SyncTools::Shared::globalTimeLimit) && (lmtMaTime < SyncTools::Shared::globalTimeLimit) && runCondition;
-    } while (runCondition);
-
-#ifdef LOG  
-  cout << "Estimation completed. Output file printed in "+outputDir_ << endl;;
-#endif
-}
+    }
 
 
-template <typename NMSmodelT>
-ModelEvaluationOffline<NMSmodelT>::~ModelEvaluationOffline()
-{
+    template <typename NMSmodelT, typename Logger>
+    ModelEvaluationOffline<NMSmodelT, Logger>::~ModelEvaluationOffline()
+    {
+
+    }
+
 
 }
-
-
-
-
-
-
-
-
-

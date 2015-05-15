@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!--Authors: Elena Ceseracciu, Claudio Pizzolato, Monica Reggiani -->
+
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+    <xs:annotation>
+        <xs:documentation xml:lang="en"/>
+    </xs:annotation>
+
+    <xs:complexType name="momentArmsFileType">
+        <xs:simpleContent>
+            <xs:extension base="xs:string">
+                <xs:attribute name="dofName" use="required" type="xs:string" />
+            </xs:extension>
+        </xs:simpleContent>
+    </xs:complexType>
+    <xs:complexType name="momentArmsListType">
+        <xs:sequence>
+             <xs:element maxOccurs="unbounded" name="momentArmsFile" type="momentArmsFileType"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="InputDataType">
+        <xs:sequence>
+            <xs:choice maxOccurs="unbounded">
+                <xs:element minOccurs="1" maxOccurs="1" name="muscleTendonLengthFile" type="xs:string"/>
+                <xs:element minOccurs="1" maxOccurs="1" name="momentArmsFiles" type="momentArmsListType"/>
+                <xs:element minOccurs="1" maxOccurs="1" name="excitationsFile" type="xs:string"/>
+                <xs:element maxOccurs="1" name="externalTorquesFile" type="xs:string"/>
+            </xs:choice>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:element name="inputData" type="InputDataType"/>
+</xs:schema>

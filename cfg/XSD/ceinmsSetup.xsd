@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!--Authors: Elena Ceseracciu, Claudio Pizzolato, Monica Reggiani -->
+
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:annotation>
+    <xs:documentation xml:lang="en"/>
+  </xs:annotation>
+  <xs:complexType name="CeinmsType">
+    <xs:sequence>
+      <xs:choice maxOccurs="unbounded">
+        <xs:element maxOccurs="1" name="subjectFile" type="xs:string"/>
+        <xs:element maxOccurs="1" name="inputDataFile" type="xs:string"/>
+        <xs:element maxOccurs="1" name="executionFile" type="xs:string"/>
+        <xs:element maxOccurs="1" name="excitationGeneratorFile" type="xs:string"/>
+        <xs:element maxOccurs="1" name="outputDirectory" type="xs:string"/>
+      </xs:choice>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ceinms" type="CeinmsType"/>
+</xs:schema>

@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!--Authors: Elena Ceseracciu, Claudio Pizzolato, Monica Reggiani -->
+
+<xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:annotation>
+    <xs:documentation xml:lang="en"/>
+  </xs:annotation>
+
+  <xs:simpleType name="StringListType">
+    <xs:list itemType="xs:token"/>
+  </xs:simpleType>
+
+  <xs:complexType name="InputSignalsType">
+    <xs:simpleContent>
+        <xs:extension base="StringListType">
+          <xs:attribute type="xs:token" name="type"/>
+        </xs:extension>
+     </xs:simpleContent>
+  </xs:complexType>
+
+  <xs:complexType name="InputType">
+    <xs:simpleContent>
+        <xs:extension base="xs:token">
+          <xs:attribute type="xs:double" name="weight" use="required"/>
+        </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+
+  <xs:complexType name="InputListType">
+
+  </xs:complexType>
+
+  <xs:complexType name="ExcitationType">
+    <xs:sequence>
+      <xs:element name="input" maxOccurs="unbounded" minOccurs="0" type="InputType"/>
+    </xs:sequence>
+    <xs:attribute type="xs:token" name="id" use="required"/>
+  </xs:complexType>
+
+  <xs:complexType name="ExcitationListType">
+    <xs:sequence>
+      <xs:element name="excitation" maxOccurs="unbounded" minOccurs="1" type="ExcitationType"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:element name="excitationGenerator">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="inputSignals" maxOccurs="1" type="InputSignalsType"/>
+        <xs:element name="mapping" minOccurs="1" type="ExcitationListType"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+</xs:schema>

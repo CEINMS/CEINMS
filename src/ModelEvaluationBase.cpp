@@ -1,106 +1,126 @@
-//__________________________________________________________________________
-// Author(s): Claudio Pizzolato, Monica Reggiani - October 2013
-// email:  claudio.pizzolato@griffithuni.edu.au
-//         monica.reggiani@gmail.com
-//
-// DO NOT REDISTRIBUTE WITHOUT PERMISSION
-//__________________________________________________________________________
-//
+/* -------------------------------------------------------------------------- *
+ * CEINMS is a standalone toolbox for neuromusculoskeletal modelling and      *
+ * simulation. CEINMS can also be used as a plugin for OpenSim either         *
+ * through the OpenSim GUI or API. See https://simtk.org/home/ceinms and the  *
+ * NOTICE file for more information. CEINMS development was coordinated       *
+ * through Griffith University and supported by the Australian National       *
+ * Health and Medical Research Council (NHMRC), the US National Institutes of *
+ * Health (NIH), and the European Union Framework Programme 7 (EU FP7). Also  *
+ * see the PROJECTS file for more information about the funding projects.     *
+ *                                                                            *
+ * Copyright (c) 2010-2015 Griffith University and the Contributors           *
+ *                                                                            *
+ * CEINMS Contributors: C. Pizzolato, M. Reggiani, M. Sartori,                *
+ *                      E. Ceseracciu, and D.G. Lloyd                         *
+ *                                                                            *
+ * Author(s): C. Pizzolato, M. Reggiani                                       *
+ *                                                                            *
+ * CEINMS is licensed under the Apache License, Version 2.0 (the "License").  *
+ * You may not use this file except in compliance with the License. You may   *
+ * obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0.*
+ *                                                                            *
+ * Unless required by applicable law or agreed to in writing, software        *
+ * distributed under the License is distributed on an "AS IS" BASIS,          *
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.   *
+ * See the License for the specific language governing permissions and        *
+ * limitations under the License.                                             *
+ * -------------------------------------------------------------------------- */
 
-#include "ModelEvaluationBase.h"
-#include "SyncTools.h"
+#include "ceinms/InputConnectors.h"
+#include "ceinms/OutputConnectors.h"
 
 #include <vector>
 using std::vector;
 #include <string>
 using std::string;
 
-void ModelEvaluationBase::getEmgFromShared(vector<double>& emgs) {
 
-    SyncTools::Shared::queueEmgSemFull.wait(); //waits if there is no item in queueEmg
-    SyncTools::Shared::queueEmgMutex.lock();   
+namespace ceinms {
+    template <typename Logger>
+    ModelEvaluationBase<Logger>::ModelEvaluationBase(InputConnectors& inputConnectors, OutputConnectors& outputConnectors, const vector<string>& valuesToLog)
+        :inputConnectors_(inputConnectors), outputConnectors_(outputConnectors), logger(outputConnectors, valuesToLog)
+    { }
 
-    emgs = SyncTools::Shared::queueEmg.front(); 
-    SyncTools::Shared::queueEmg.pop_front(); 
-    
-    SyncTools::Shared::queueEmgMutex.unlock();
-    SyncTools::Shared::queueEmgSemEmpty.notify();  //notify that an item has been removed from queueEmg
+
+    template <typename Logger>
+    void ModelEvaluationBase<Logger>::subscribeToInputConnectors() {
+
+        inputConnectors_.queueLmt.subscribe();
+        inputConnectors_.queueEmg.subscribe();
+        for (auto& it : inputConnectors_.queueMomentArms)
+            (*it).subscribe();
+        inputConnectors_.queueExternalTorques.subscribe();
+
+        inputConnectors_.doneWithSubscription.wait();
+    }
+
+
+    template <typename Logger>
+    bool ModelEvaluationBase<Logger>::externalTorquesAvailable() const {
+        return inputConnectors_.externalTorquesAvailable;
+    }
+
+    template <typename Logger>
+    float ModelEvaluationBase<Logger>::getGlobalTimeLimit() const {
+        return inputConnectors_.globalTimeLimit;
+    }
+
+    template <typename Logger>
+    void ModelEvaluationBase<Logger>::getEmgFromInputQueue(InputConnectors::FrameType& emgs) {
+        emgs = inputConnectors_.queueEmg.pop();
+    }
+
+
+    template <typename Logger>
+    void ModelEvaluationBase<Logger>::getLmtFromInputQueue(InputConnectors::FrameType& lmts) {
+        lmts = inputConnectors_.queueLmt.pop();
+    }
+
+
+    template <typename Logger>
+    void ModelEvaluationBase<Logger>::getMomentArmsFromInputQueue(InputConnectors::FrameType& momentArms, unsigned int whichDof) {
+        momentArms = (*inputConnectors_.queueMomentArms.at(whichDof)).pop();
+    }
+
+
+    template <typename Logger>
+    void ModelEvaluationBase<Logger>::getExternalTorquesFromInputQueue(InputConnectors::FrameType& externalTorques) {
+        externalTorques = inputConnectors_.queueExternalTorques.pop();
+    }
+
+
+    template <typename Logger>
+    InputConnectors::FrameType ModelEvaluationBase<Logger>::getEmgFromInputQueue() {
+        return inputConnectors_.queueEmg.pop();
+    }
+
+
+    template <typename Logger>
+    InputConnectors::FrameType ModelEvaluationBase<Logger>::getLmtFromInputQueue() {
+        return inputConnectors_.queueLmt.pop();
+    }
+
+
+    template <typename Logger>
+    InputConnectors::FrameType ModelEvaluationBase<Logger>::getMomentArmsFromInputQueue(unsigned int whichDof) {
+        return (*inputConnectors_.queueMomentArms.at(whichDof)).pop();
+    }
+
+
+    template <typename Logger>
+    InputConnectors::FrameType ModelEvaluationBase<Logger>::getExternalTorquesFromInputQueue(){
+        return inputConnectors_.queueExternalTorques.pop();
+    }
+
+    template <typename Logger>
+    void ModelEvaluationBase<Logger>::doneWithExecution(){
+        outputConnectors_.doneWithExecution.wait();
+    }
+
+
+
+    template <typename Logger>
+    ModelEvaluationBase<Logger>::~ModelEvaluationBase() { }
+
+
 }
-
-void ModelEvaluationBase::getLmtFromShared(vector<double>& lmts) {
-
-    SyncTools::Shared::queueLmtSemFull.wait();
-    SyncTools::Shared::queueLmtMutex.lock(); 
-    
-    lmts = SyncTools::Shared::queueLmt.front(); 
-    SyncTools::Shared::queueLmt.pop_front();  
-    
-    SyncTools::Shared::queueLmtMutex.unlock();
-    SyncTools::Shared::queueLmtSemEmpty.notify();
-}
-
-
-void ModelEvaluationBase::getMomentArmsFromShared(vector<double>& momentArms, unsigned int whichDof) {
-    
-    SyncTools::Shared::queueMomentArmsSemFull.wait();
-    SyncTools::Shared::queueMomentArmsMutex.lock();   
-
-    momentArms = SyncTools::Shared::queueMomentArms.at(whichDof).front(); 
-    SyncTools::Shared::queueMomentArms.at(whichDof).pop_front();  
-
-    SyncTools::Shared::queueMomentArmsMutex.unlock();
-    SyncTools::Shared::queueMomentArmsSemEmpty.notify();
-}
-
-
-void ModelEvaluationBase::getExternalTorqueFromShared(vector<double>& externalTorque, unsigned int whichDof) {
-
-    SyncTools::Shared::queueExternalTorqueSemFull.wait(); //waits if there is no item in queue
-    SyncTools::Shared::queueExternalTorqueMutex.lock();   
-
-    externalTorque = SyncTools::Shared::queueExternalTorque.at(whichDof).front(); 
-    SyncTools::Shared::queueExternalTorque.at(whichDof).pop_front(); 
-    
-    SyncTools::Shared::queueExternalTorqueMutex.unlock();
-    SyncTools::Shared::queueExternalTorqueSemEmpty.notify();  //notify that an item has been removed from queue
-}
-
-
-void ModelEvaluationBase::getDofNamesAssociatedToExternalTorque(vector<string>& dofNames) {
-
-    SyncTools::Shared::dofNamesWithExtTorqueMutex.lock();
-    dofNames = SyncTools::Shared::dofNamesWithExtTorque; //make a local copy of global variable dofNamesWithExtTorque
-    SyncTools::Shared::dofNamesWithExtTorqueMutex.unlock();
-}
-
-
-void ModelEvaluationBase::getMusclesNamesFromShared(vector<string>& muscleNames) {
-    
-    SyncTools::Shared::musclesNamesMutex.lock();
-    muscleNames = SyncTools::Shared::musclesNames; //make a local copy of global variable musclesNames
-    SyncTools::Shared::musclesNamesMutex.unlock();
-}
-
-
-void ModelEvaluationBase::getMusclesNamesOnDofsFromShared(vector< vector<string> >& muscleNamesOnDofs){
-    
-    SyncTools::Shared::musclesNamesOnDofMutex.lock();
-    muscleNamesOnDofs = SyncTools::Shared::musclesNamesOnDof; //make a local copy of global variable musclesNamesOnDof
-    SyncTools::Shared::musclesNamesOnDofMutex.unlock();
-}
-
-
-//controllare se viene usata
-void ModelEvaluationBase::setDofNamesToShared(const vector<string>& dofNames) {
-
-    SyncTools::Shared::dofNames = dofNames; //dofNames is a global variable, it's needed for LmtMaFromFile class
-    SyncTools::Shared::dofNamesSem.notify();
-}
-
-
-
-ModelEvaluationBase::~ModelEvaluationBase() { }
-
-
-
-

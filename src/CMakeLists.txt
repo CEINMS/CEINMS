@@ -1,14 +1,22 @@
 ## Authors: Monica Reggiani, Claudio Pizzolato
 
+add_subdirectory(Tests)
+
 include_directories(
-  ${Producers_INCLUDE_DIRS}
+  #${Producers_INCLUDE_DIRS}
+  ${InputConnectors_INCLUDE_DIRS}
+  ${OutputConnectors_INCLUDE_DIRS}
   ${NMSmodel_INCLUDE_DIRS}
-  ${CMAKE_SOURCE_DIR}/lib/Curve
+  ${Curve_INCLUDE_DIRS}
+  ${Concurrency_INCLUDE_DIRS}
   ${xmlInput_INCLUDE_DIRS}
   ${FileIO_INCLUDE_DIRS}
-  ${Calibration_INCLUDE_DIRS}
+ # ${Calibration_INCLUDE_DIRS}
   ${CMAKE_SOURCE_DIR}/lib/Hybrid
   ${ceinms_common_INCLUDE_DIRS}
+  ${Optimizers_INCLUDE_DIRS}
+  ${OptimizationSystems_INCLUDE_DIRS}
+  ${TrialData_INCLUDE_DIRS}
 )
 include_directories(${Boost_INCLUDE_DIRS})
 
@@ -21,84 +29,54 @@ include_directories(${Boost_INCLUDE_DIRS})
 #  ${CMAKE_SOURCE_DIR}/lib/Hybrid
 #)
 
-set(CEINMS_COMMON_SOURCES ModelEvaluationBase.cpp ModelEvaluationHybrid.cpp ModelEvaluationOnline.cpp ModelEvaluationOffline.cpp)
+set(CEINMS_COMMON_SOURCES  ModelEvaluationHybrid.cpp ModelEvaluationOnline.cpp ModelEvaluationOffline.cpp ModelEvaluationBase.cpp SimulationManager.cpp)
 set_source_files_properties(ModelEvaluationHybrid.cpp
                             ModelEvaluationOnline.cpp
                             ModelEvaluationOffline.cpp
+                            ModelEvaluationBase.cpp
+							SimulationManager.cpp
                             PROPERTIES HEADER_FILE_ONLY TRUE)
-set(CEINMS_HEADERS ModelEvaluationBase.h ModelEvaluationHybrid.h ModelEvaluationOnline.h ModelEvaluationOffline.h SimpleFileLogger.h)
+set(CEINMS_HEADERS ModelEvaluationBase.h 
+                   ModelEvaluationHybrid.h 
+                   ModelEvaluationOnline.h 
+                   ModelEvaluationOffline.h 
+                   Logger.h 
+                   SimpleFileLogger.h 
+                   StorageLogger.h 
+                   SimulationManager.h)
+                   
 set(CEINMS_SOURCES CEINMS.cpp ${CEINMS_COMMON_SOURCES})
 ADD_EXECUTABLE( CEINMS ${CEINMS_SOURCES} ${CEINMS_HEADERS} )
 TARGET_LINK_LIBRARIES( CEINMS
       FileIO
       xmlInput
       NMSmodel
-      Producers
-      ${CMAKE_THREAD_LIBS_INIT}
-      ${Boost_LIBRARIES}
+      InputConnectors
+      OutputConnectors
+      #${CMAKE_THREAD_LIBS_INIT}
+      ${Boost_PROGRAM_OPTIONS_LIBRARY}
+      ${Boost_FILESYSTEM_LIBRARY}
 )
 
-#enable_language(Fortran)
-#if(UNIX)
-#find_package(LAPACK)
-#set(lapack_unix ${LAPACK_LIBRARIES} ${BLAS_LIBRARIES})
-#endif(UNIX)
-
-if(OPENSIM_FOUND)
-  include_directories(${OPENSIM_INCLUDE_DIRS} ${SIMTK_INCLUDE_DIRS})
-  set(CEINMS-osim_SOURCES CEINMS-osim.cpp ProducersFromOpenSim.cpp ${CEINMS_COMMON_SOURCES})
-  set(CEINMS-osim_HEADERS ProducersFromOpenSim.h ${CEINMS_HEADERS})
-  add_executable(CEINMS-osim  ${CEINMS-osim_SOURCES} ${CEINMS-osim_HEADERS})
-
-  target_link_libraries( CEINMS-osim
-      FileIO
-      xmlInput
-      NMSmodel
-      ProducersOSim
-      ${CMAKE_THREAD_LIBS_INIT}
-      ${Boost_LIBRARIES}
-      ${OPENSIM_LIBRARIES}
-  )
-
-  if(UNIX)
-  target_link_libraries( CEINMS-osim
-	${lapack_unix} )
-  endif(UNIX)
-
-endif()
-
-set(CEINMScalibrate_HEADERS XmlWriter.h)
-set(CEINMScalibrate_COMMON_SOURCES XmlWriter.cpp)
+set(CEINMScalibrate_HEADERS XmlWriter.h CalibrationManager.h)
+set(CEINMScalibrate_COMMON_SOURCES XmlWriter.cpp CalibrationManager.cpp)
 set(CEINMScalibrate_SOURCES CEINMScalibration.cpp ${CEINMScalibrate_COMMON_SOURCES})
 
-set_source_files_properties(XmlWriter.cpp PROPERTIES HEADER_FILE_ONLY TRUE)
+set_source_files_properties(XmlWriter.cpp CalibrationManager.cpp PROPERTIES HEADER_FILE_ONLY TRUE)
 
 add_executable( CEINMScalibrate ${CEINMScalibrate_SOURCES} ${CEINMScalibrate_HEADERS})
 target_link_libraries( CEINMScalibrate
       xmlInput
-      Calibration
       NMSmodel
       FileIO
-      ${Boost_LIBRARIES}
+      InputConnectors
+      OutputConnectors
+      OptimizationSystems
+	#  Optimizers
+	#  TrialData
+      ${Boost_PROGRAM_OPTIONS_LIBRARY}
 )
 
-if(OPENSIM_FOUND)
-  set(CEINMScalibrate-osim_SOURCES
-    CEINMScalibration-osim.cpp  )
-    
-  add_executable( CEINMScalibrate-osim ${CEINMScalibrate-osim_SOURCES} )
-  target_link_libraries( CEINMScalibrate-osim
-      xmlInput
-      Calibration
-      NMSmodel
-      FileIO
-      ${Boost_LIBRARIES}
-      ${XERCES_LIBRARY}
-      ${OPENSIM_LIBRARIES}
-  )
+install(TARGETS CEINMS CEINMScalibrate
+        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT Applications)
 
-  if(UNIX)
-  target_link_libraries( CEINMScalibrate-osim
-	${lapack_unix} )
-  endif(UNIX)
-endif()

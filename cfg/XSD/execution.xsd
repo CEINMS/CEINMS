@@ -1,14 +1,20 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!--Authors: Elena Ceseracciu, Claudio Pizzolato, Monica Reggiani -->
+
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
   <xs:annotation>
     <xs:documentation xml:lang="en"/>
   </xs:annotation>
-  <xs:complexType name="TendonElementType"/>
+  <xs:complexType name="TendonElementType">
+    <xs:sequence>
+      <xs:element name="tolerance" minOccurs="0" maxOccurs="1" type="xs:double"/>
+    </xs:sequence>
+  </xs:complexType>
   <xs:complexType name="TendonType">
     <xs:choice>
       <xs:element name="stiff" type="TendonElementType"/>
-      <xs:element name="elastic" type="TendonElementType"/>
-      <xs:element name="elasticBiSec" type="TendonElementType"/>
+      <xs:element name="integrationElastic" type="TendonElementType"/>
+      <xs:element name="equilibriumElastic" type="TendonElementType"/>
     </xs:choice>
   </xs:complexType>
   <xs:complexType name="ActivationElementType"/>
@@ -36,15 +42,15 @@
   </xs:complexType>
   <xs:complexType name="OpenLoopType"/>
   <xs:simpleType name="MuscleListType">
-    <xs:list itemType="xs:string"/>
+    <xs:list itemType="xs:token"/>
   </xs:simpleType>
   <xs:complexType name="HybridType">
     <xs:sequence>
       <xs:element name="alpha" type="xs:double"/>
       <xs:element name="beta" type="xs:double"/>
       <xs:element name="gamma" type="xs:double"/>
-      <xs:element name="trackedMuscles" type="MuscleListType"/>
-      <xs:element name="predictedMuscles" type="MuscleListType"/>
+      <xs:element name="synthMTUs" type="MuscleListType"/>
+      <xs:element name="adjustMTUs" type="MuscleListType"/>
       <xs:element name="algorithm" type="HybridAlgorithmType"/>
     </xs:sequence>
   </xs:complexType>
@@ -62,7 +68,7 @@
     </xs:sequence>
   </xs:complexType>
   <xs:simpleType name="ElaboratedDoFsType">
-    <xs:list itemType="xs:string"/>
+    <xs:list itemType="xs:token"/>
   </xs:simpleType>
   <xs:complexType name="ExecutionElementType"/>
   <xs:complexType name="FileType"/>
@@ -80,9 +86,7 @@
         <xs:element name="online" type="ExecutionElementType"/>
         <xs:element name="offline" type="ExecutionElementType"/>
       </xs:choice>
-      <xs:element minOccurs="0" name="samplingFrequency" type="xs:int"/>
       <xs:element minOccurs="0" name="elaboratedDoFs" type="ElaboratedDoFsType"/>
-      <xs:element minOccurs="0" name="logging" type="LoggingType"/>
     </xs:sequence>
   </xs:complexType>
   <xs:element name="execution" type="ExecutionType"/>
