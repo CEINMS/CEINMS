@@ -30,7 +30,7 @@
 #define ceinms_ContactModelXmlReader_h
 #include "contactModel.hxx"
 #include <string>
-#include <list>
+#include <vector>
 
 namespace ceinms {
     //in future we could have different sources..
@@ -41,21 +41,26 @@ namespace ceinms {
         std::string osimModel;
         std::string motion;
         std::string externalLoads;
-        std::list<std::string> joints;
+        std::vector<std::string> joints;
     };
 
     class ContactModelXmlReader {
 
     public:
+        ContactModelXmlReader();
         ContactModelXmlReader(const std::string& filename);
+        void setXmlInputFile(const std::string& filename);
         ContactModelType getContactModelType() const;
         ContactModelFromOpenSimSetup getContactModelSetupOsim() const;
     private:
+        void init();
         void readXml();
+        void checkFile(const std::string& filename) const;
         std::string getCompleteFilename(std::string filename) const;
         ContactModelFromOpenSimSetup setup_;
         std::auto_ptr<ContactModelXsd::ContactModelType> contactModelPointer_;
         std::string filepath_;
+        std::string filename_;
     };
 
 }

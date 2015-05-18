@@ -27,13 +27,14 @@
 * -------------------------------------------------------------------------- */
 
 #include "ceinms/QueuesToJointReactionForces.h"
+#include <thread>
+#include <chrono>
 
 namespace ceinms {
 
-
-
     void QueuesToJointReactionForces::operator()() {
 
+        QueuesToXForces::initialiseContactModel();
 
         inputGeneralisedCoordinatesQueue_.subscribe();
         inputMuscleForcesQueue_.subscribe();
@@ -43,7 +44,7 @@ namespace ceinms {
         bool runCondition(true);
         while (runCondition) {
 
-
+ //           std::this_thread::sleep_for(std::chrono::seconds(10));
             auto frames(QueuesToXForces::syncFrames(inputGeneralisedCoordinatesQueue_, inputMuscleForcesQueue_, inputEstimatedTorquesQueue_));
             GeneralisedCoordinatesFrame generalisedCoordinatesFrame;
             MuscleForcesFrame muscleForcesFrame;
@@ -69,9 +70,10 @@ namespace ceinms {
                 outputJointReactionForcesQueue_.push(contactForces);
 
             }
-            ContactForcesFrame contactForces;
-            contactForces.time = std::numeric_limits<double>::infinity();
-            outputJointReactionForcesQueue_.push(contactForces);
         }
+        ContactForcesFrame contactForces;
+        contactForces.time = std::numeric_limits<double>::infinity();
+        outputJointReactionForcesQueue_.push(contactForces);
+
     }
 }

@@ -45,7 +45,10 @@ add_library(InputConnectors STATIC
   ${InputConnectors_HEADERS}
   ${FromStorageFile_HEADERS}
 )
-target_link_libraries(InputConnectors FileIO Concurrency ${Boost_FILESYSTEM_LIBRARY} ${OPENSIM_LIBRARIES})
+target_link_libraries(InputConnectors FileIO Concurrency ${Boost_FILESYSTEM_LIBRARY} optimized ${OPENSIM_LIBRARIES})
+target_link_libraries(InputConnectors FileIO Concurrency ${Boost_FILESYSTEM_LIBRARY} debug ${OPENSIM_LIBRARIES_DEBUG})
+
+
 target_include_directories(InputConnectors
                                 PRIVATE     ${CMAKE_CURRENT_SOURCE_DIR}
                                             ${ceinms_common_INCLUDE_DIRS}

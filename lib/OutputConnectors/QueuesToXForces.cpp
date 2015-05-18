@@ -173,6 +173,7 @@ namespace ceinms {
     }
 
     void QueuesToXForces::parseExternalLoadsXml(const std::string& xmlFilename) {
+        std::cout << "External loads xml: " << xmlFilename << std::endl << std::flush;
         OpenSim::XMLDocument document(xmlFilename);
         SimTK::Xml::Element root = document.getRootDataElement();
         SimTK::Xml::element_iterator extForceElementIter = root.element_begin("objects")->element_begin("ExternalForce");
@@ -234,13 +235,13 @@ namespace ceinms {
         jointContactModel_->setQdd(qdd);
     }
 
-
-    SimTK::Vector&& QueuesToXForces::toSimTKVector(const std::vector<double>& v) {
+    
+    SimTK::Vector QueuesToXForces::toSimTKVector(std::vector<double> v) {
 
         SimTK::Vector ansV(v.size(), .0);
         for (size_t i(0); i < v.size(); ++i)
             ansV.set(i, v.at(i));
-        return std::move(ansV);
+        return ansV;
     }
 
 
@@ -261,7 +262,9 @@ namespace ceinms {
     void QueuesToXForces::calculateJointReactionForces(const vector<double>& muscleForces, const vector<double>& estimatedMobilityForces) {
     
         //todo put forces and torques in the right place in the vector
-        jointContactModel_->calculateJointReactionForces(toSimTKVector(musclesMapping_.map(muscleForces)), toSimTKVector(dofsMapping_.map(estimatedMobilityForces)));
+        auto forces(toSimTKVector(musclesMapping_.map(muscleForces)));
+        auto torques(toSimTKVector(dofsMapping_.map(estimatedMobilityForces)));
+        jointContactModel_->calculateJointReactionForces(forces, torques);
     }
 
 

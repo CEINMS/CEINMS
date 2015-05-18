@@ -17,6 +17,9 @@ include_directories(
   ${Optimizers_INCLUDE_DIRS}
   ${OptimizationSystems_INCLUDE_DIRS}
   ${TrialData_INCLUDE_DIRS}
+  ${JointContactModels_INCLUDE_DIRS}
+ # ${OPENSIM_INCLUDE_DIRS}       
+ # ${SIMTK_INCLUDE_DIRS}
 )
 include_directories(${Boost_INCLUDE_DIRS})
 
@@ -53,6 +56,7 @@ TARGET_LINK_LIBRARIES( CEINMS
       NMSmodel
       InputConnectors
       OutputConnectors
+	  JointContactModels
       #${CMAKE_THREAD_LIBS_INIT}
       ${Boost_PROGRAM_OPTIONS_LIBRARY}
       ${Boost_FILESYSTEM_LIBRARY}

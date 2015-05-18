@@ -38,7 +38,7 @@
 #include "ceinms/ExcitationGeneratorFromXml.h"
 #include "ceinms/InputConnectors.h"
 
-#define LOG
+#define LOG_EMGFromFile
 
 namespace ceinms {
     class EMGFromFile :public EMGFromX
@@ -59,7 +59,7 @@ namespace ceinms {
         :EMGFromX(inputConnectors, subject), emgData_(emgFilename, emgGeneratorFilename)
     {
 
-#ifdef LOG
+#ifdef LOG_EMGFromFile
         std::cout << "\nEMG: Reading emg file..." << emgFilename << std::endl;
 #endif
 

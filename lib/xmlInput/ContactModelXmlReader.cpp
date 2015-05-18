@@ -41,10 +41,18 @@ using std::list;
 
 namespace ceinms {
 
-    ContactModelXmlReader::ContactModelXmlReader(const string& filename) {
+    ContactModelXmlReader::ContactModelXmlReader() {}
+
+    ContactModelXmlReader::ContactModelXmlReader(const string& filename) :
+    filename_(filename) {
+
+        init();
+    }
+
+    void  ContactModelXmlReader::init() {
 
         try {
-            std::auto_ptr<ContactModelXsd::ContactModelType> contactModelPointer(parseAndValidate<ContactModelXsd::ContactModelType>(filename, contactModel_schema, sizeof(contactModel_schema)));
+            std::auto_ptr<ContactModelXsd::ContactModelType> contactModelPointer(parseAndValidate<ContactModelXsd::ContactModelType>(filename_, contactModel_schema, sizeof(contactModel_schema)));
             contactModelPointer_ = contactModelPointer;
         }
         catch (const xml_schema::exception& e) {
@@ -53,29 +61,52 @@ namespace ceinms {
         }
 
         // save the location of input filename
-        string::size_type dirSep = filename.rfind('/'); // Unix/Mac dir separator
+        string::size_type dirSep = filename_.rfind('/'); // Unix/Mac dir separator
 
         if (dirSep == string::npos)
-            dirSep = filename.rfind('\\'); // DOS dir separator
+            dirSep = filename_.rfind('\\'); // DOS dir separator
 
         if (dirSep != string::npos) // if '_fileName' contains path information...
-            filepath_ = filename.substr(0, dirSep + 1); // include trailing slashes
+            filepath_ = filename_.substr(0, dirSep + 1); // include trailing slashes
 
         readXml();
     }
+
+
+    void ContactModelXmlReader::setXmlInputFile(const std::string& filename) {
+
+        filename_ = filename;
+        init();
+    }
+
 
     ContactModelType ContactModelXmlReader::getContactModelType() const {
 
         return ContactModelType::OpenSim;
     }
 
+
+    void ContactModelXmlReader::checkFile(const std::string& filename) const {
+
+        if (!FileUtils::fileExists(filename)) {
+            cout << "File: " << filename << " does not exist.\nExit.";
+            std::exit(EXIT_FAILURE);
+        }
+    }
+
     void ContactModelXmlReader::readXml() {
         contactModelPointer_->fromOpenSim();
         ContactModelXsd::FromOpenSimType& fromOsim(*(contactModelPointer_->fromOpenSim().begin()));
         setup_.osimModel = getCompleteFilename(*(fromOsim.osimModel().begin()));
+        checkFile(setup_.osimModel); 
+        setup_.osimModel = FileUtils::simplify(setup_.osimModel);
         setup_.motion = getCompleteFilename(*(fromOsim.motion().begin()));
+        checkFile(setup_.motion);
+        setup_.motion = FileUtils::simplify(setup_.motion);
         setup_.externalLoads = getCompleteFilename(*(fromOsim.externalLoads().begin()));
-        
+        checkFile(setup_.externalLoads);
+        setup_.externalLoads = FileUtils::simplify(setup_.externalLoads);
+
         ContactModelXsd::JointsType& jointXsd(*fromOsim.joints().begin());
         for (ContactModelXsd::JointsType::iterator it = jointXsd.begin(); it != jointXsd.end(); ++it)
             setup_.joints.push_back(*it);

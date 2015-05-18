@@ -30,6 +30,8 @@
 #include "StorageLogger.h"
 #include "ceinms/TimeCompare.h"
 
+#include <thread>
+#include <chrono>
 #include <iostream>
 using std::cout;
 using std::endl;
@@ -43,7 +45,7 @@ using std::string;
 #include "ceinms/InputConnectors.h"
 #include "ceinms/OutputConnectors.h"
 #define LOG_FILES
-#define LOG
+#define Evaluation_LOG
 
 namespace ceinms {
     template <typename NMSmodelT, typename Logger>
@@ -107,19 +109,28 @@ namespace ceinms {
     template <typename NMSmodelT, typename Logger>
     void ModelEvaluationOffline<NMSmodelT, Logger>::initOfflineCurve() {
 
+        bool runCondition(true);
         auto lmtIt(lmtDataFromQueue_.begin());
         for (auto emgIt : emgDataFromQueue_) {
             double emgTime = emgIt.time + globalEmDelay_;
             subject_.setTime(emgTime);
             subject_.setEmgs(emgIt.data);
-            if (lmtIt == lmtDataFromQueue_.begin()) subject_.updateActivations();
-            if (TimeCompare::lessEqual(lmtIt->time, emgTime) && lmtIt != lmtDataFromQueue_.end()) {
+            if (lmtIt == lmtDataFromQueue_.begin()) {
                 subject_.updateActivations();
-                subject_.setMuscleTendonLengths(lmtIt->data);
-                subject_.updateFibreLengths_OFFLINEPREP();
-                ++lmtIt;
+                subject_.pushState();
             }
-            subject_.pushState();
+            //we need to guard runCondition.. we cannot deferencing lmtIt->time if lmtIt == lmtDataFromQueue_.end(), so we have to split the check
+            if (lmtIt == lmtDataFromQueue_.end()) runCondition = false;
+            if (runCondition) {
+                if (TimeCompare::lessEqual(lmtIt->time, emgTime)) {
+                    subject_.updateActivations();
+                    subject_.setMuscleTendonLengths(lmtIt->data);
+                    subject_.updateFibreLengths_OFFLINEPREP();
+                    subject_.pushState();
+                    ++lmtIt;
+                }
+            }
+            
         }
         subject_.updateFibreLengthTraces();
     }
@@ -203,36 +214,41 @@ namespace ceinms {
             subject_.getTorques(data);
             ModelEvaluationBase<Logger>::logger.log(emgTime, data, "Torques");
 #endif
+            cout << "modelEval time: " << lmtMaTime;
+            for (unsigned i(0); i < 100; ++i) cout << ".";
+            cout << endl;
 
-#ifdef LOG
+            
+
+#ifdef Evaluation_LOG
             cout << endl << endl << "EmgTime: " << emgTime << endl << "EMG" << endl;
-            for (auto& it : emgFrameFromQueue.data)
+            for (auto it : emgFrameFromQueue.data)
                 cout << it << "\t";
 
             cout << endl << "Activations: " << endl;
             vector<double> cActivations;
             subject_.getActivations(cActivations);
-            for (auto& it : cActivations)
+            for (auto it : cActivations)
                 cout << it << "\t";
 
             cout << endl << "LmtTime: " << lmtMaTime << endl << "Lmt" << endl;
-            for (auto& it : lmtFrameFromQueue.data)
+            for (auto it : lmtFrameFromQueue.data)
                 cout << it << "\t";
 
             vector<double> cMuscleForces;
             subject_.getMuscleForces(cMuscleForces);
             cout << endl << "Muscle forces: " << endl;
-            for (auto& it : cMuscleForces)
+            for (auto it : cMuscleForces)
                 cout << it << "\t";
 
             for (unsigned int j = 0; j < dofNames_.size(); ++j) {
                 cout << endl << "MomentArms on: " << dofNames_.at(j) << endl;
-                for (auto& it : momentArmsFrameFromQueue.at(j).data)
+                for (auto it : momentArmsFrameFromQueue.at(j).data)
                     cout << it << "\t";
             }
 
             cout << endl << "External Torques: ";
-            for (auto& it : externalTorquesFrameFromQueue.data)
+            for (auto it : externalTorquesFrameFromQueue.data)
                 cout << it << " ";
 
             vector<double> cTorques;

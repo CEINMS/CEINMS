@@ -132,6 +132,22 @@ namespace ceinms {
             return filepath_ + fileName;
     }
 
+
+    std::string CeinmsSetupXmlReader::getContactModelFile() {
+
+        std::string fileName(*(ceinmsSetupPointer_->contactModelFile().begin()));
+        FileUtils::trim(fileName);
+        if (FileUtils::isAbsolute(fileName.c_str()))
+            return fileName;
+        else
+            return filepath_ + fileName;
+    }
+
+    bool CeinmsSetupXmlReader::hasContactModel() {
+        
+        return !(ceinmsSetupPointer_->contactModelFile().empty());
+    }
+
     bool CeinmsSetupXmlReader::writeTemplateCeinmsSetupFile(const string& templateFile)
     {
         std::ofstream templateFileStream(templateFile);

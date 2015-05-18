@@ -44,7 +44,8 @@ namespace ceinms {
         {
         using namespace OpenSim;
 
-        
+        auto open = idResults_.is_open();
+
         Model modelCopy(modelFilename);
         modelCopy.initSystem();
         nCoordinates_ = modelCopy.getNumCoordinates();
@@ -53,9 +54,10 @@ namespace ceinms {
         rForcesInG_.resize(nBodies_);
         rTorquesInG_.resize(nBodies_);
 
+        qdd_.resize(nCoordinates_);
+
         //1. add extForces to the model, hopefully I won't have problems with queues and opensim
         for (auto &force : externalForces) {
-            cout << "models add force\n" << std::flush;
             model_.addForce(force);
         }
 
@@ -63,7 +65,7 @@ namespace ceinms {
         OpenSim::Array<string> muscleNames;
         model_.getMuscles().getNames(muscleNames);
         for (unsigned i(0); i < nMuscles_; ++i) 
-            muscleActuators_.push_back(dynamic_cast<Actuator_*>(&model_.updForceSet().get(muscleNames.get(i))));
+            muscleActuators_.push_back((const_cast<OpenSim::Muscle*>(&model_.updForceSet().getMuscles().get(muscleNames.get(i)))));
 
         const CoordinateSet& cs = model_.getCoordinateSet();
         for (unsigned i(0); i < nCoordinates_; ++i) {
@@ -85,10 +87,9 @@ namespace ceinms {
         for (auto c : coordinateActuators_)
             c->overrideForce(state_, true);
 
-        for (auto m : muscleActuators_) {
-            m->setDisabled(state_, true);
-            m->set_isDisabled(true);
-        }
+
+        for (auto m : muscleActuators_) 
+            m->overrideForce(state_, true);        
     }
 
 
@@ -223,8 +224,14 @@ namespace ceinms {
 
     void JointContactFromOpensim::calculateInverseDynamics() {
         //this updates residualMobilityForces_
+        disableMuscleActuators();
         SimTK::Vector appliedMobilityForces(nCoordinates_, 0.); //Calculate ID
         calculateResidualMobilityForces(appliedMobilityForces);
+
+        idResults_ << state_.getTime() << "\t";
+        for (auto f : residualMobilityForces_)
+            idResults_ << std::fixed << f << "\t";
+        idResults_ << std::endl;
 
     }
 
@@ -245,8 +252,8 @@ namespace ceinms {
     
     void JointContactFromOpensim::setMuscleForcesToActuators(const SimTK::Vector& muscleForces) {
 
-        for (size_t i(0); i < muscleActuators_.size(); ++i)
-            dynamic_cast<OpenSim::Muscle*>(muscleActuators_.at(i))->setOverrideForce(state_, muscleForces[i]);
+        for (size_t i(0); i < muscleActuators_.size(); ++i) 
+            muscleActuators_.at(i)->setOverrideForce(state_, muscleForces[i]);
     }
 
 
@@ -260,6 +267,7 @@ namespace ceinms {
 
         for (unsigned i(0); i < nCoordinates_; ++i)
             coordinateActuators_.at(i)->setOverrideForce(state_, residualMobilityForces.get(i));
+        model_.getMultibodySystem().realize(state_, SimTK::Stage::Acceleration);
         model_.getSimbodyEngine().computeReactions(state_, rForcesInG_, rTorquesInG_);
     }
 
@@ -268,12 +276,10 @@ namespace ceinms {
     //if appliedMobilityForces is 0 then it is the ID
     void JointContactFromOpensim::calculateResidualMobilityForces(const SimTK::Vector& appliedMobilityForces) {
 
-        for (auto m : muscleActuators_)
-            m->setDisabled(state_, true);        
         //realize the system, so all the forces as gravitational, inertial, and external forces are applied
         model_.getMultibodySystem().realize(state_, SimTK::Stage::Dynamics);
         SimTK::Vector_<SimTK::SpatialVec> appliedBodyForces(model_.getMultibodySystem().getRigidBodyForces(state_, SimTK::Stage::Dynamics));
-        residualMobilityForces_ = idSolver_->solve(state_, state_.getUDot(), appliedMobilityForces, appliedBodyForces);
+        residualMobilityForces_ = idSolver_->solve(state_, qdd_, appliedMobilityForces, appliedBodyForces);
     }
 
 

@@ -37,6 +37,8 @@
 #include <OpenSim/Simulation/InverseDynamicsSolver.h>
 #include "ceinms/ExternalForceData.h"
 
+#include <ostream> //
+
 namespace ceinms {
 
     class JointContactFromOpensim {
@@ -88,8 +90,9 @@ namespace ceinms {
         SimTK::Vector residualMobilityForces_;
         SimTK::Vector_<SimTK::Vec3> rForcesInG_, rTorquesInG_;
         SimTK::Vector_<SimTK::Vec3> intForcesInG_, jrForcesInG_;;
+        SimTK::Vector_<SimTK::Real> qdd_;
 
-        std::vector<OpenSim::Actuator_*> muscleActuators_;
+        std::vector<OpenSim::Muscle*> muscleActuators_;
         std::vector<OpenSim::CoordinateActuator*> coordinateActuators_;
         std::unique_ptr<OpenSim::InverseDynamicsSolver> idSolver_;
     };
@@ -111,7 +114,7 @@ namespace ceinms {
     template<typename T>
     void JointContactFromOpensim::setQdd(const T& qdd) {
         for (size_t i(0); i < nCoordinates_; ++i) {
-            state_.updUDot()[i] = qdd[i];
+            qdd_[i] = qdd[i];
         }
     }
 

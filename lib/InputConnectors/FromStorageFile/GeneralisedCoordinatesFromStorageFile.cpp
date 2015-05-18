@@ -40,46 +40,45 @@ namespace ceinms {
     GeneralisedCoordinatesFromStorageFile::GeneralisedCoordinatesFromStorageFile(InputConnectors& inputConnectors, const string& osimModelFilename, const string& kinematicsStorageFilename) :
         GeneralisedCoordinatesFromX(inputConnectors), model_(osimModelFilename), kinematicsStorageFilename_(kinematicsStorageFilename) {
 
+        //for some mysterious reason, if I don't use c_str it doesn't work..
+        OpenSim::Storage kinematics(kinematicsStorageFilename_.c_str());
+        OpenSim::Array<double> timeColumnOS;
+        kinematics.getTimeColumn(timeColumnOS);
+        ceinms::ArrayConverter::toStdVector(timeColumnOS, timeColumn_);
+        updateKinematicsSplines(8);
     }
 
     void GeneralisedCoordinatesFromStorageFile::operator()() {
-
-        OpenSim::Storage kinematics(kinematicsStorageFilename_);
-        double firstTime(kinematics.getFirstTime());
-        double lastTime(kinematics.getLastTime());
-        OpenSim::Array<double> timeColumnOS;
-        kinematics.getTimeColumn(timeColumnOS);
-        vector<double> timeColumn;
-        ceinms::ArrayConverter::toStdVector(timeColumnOS, timeColumn);
-        auto kinematicsSplines(getKinematicsSplines(8));
+        std::cout << "Kinematics storage filename " << kinematicsStorageFilename_ << std::endl << std::flush;
 
         GeneralisedCoordinatesFromX::doneWithSubscriptions();
-        for (auto t : timeColumn) {
+        for (auto t : timeColumn_) {
 
             GeneralisedCoordinatesData generalisedCoordinates(model_.getNumCoordinates());
             OpenSim::Array<double> q;
             vector<double> stdQ;
-            kinematicsSplines.evaluate(q, 0, t);
+            splines_.evaluate(q, 0, t);
             ArrayConverter::toStdVector(q, stdQ);
             generalisedCoordinates.setQ(stdQ);
 
             OpenSim::Array<double> qd;
             vector<double> stdQd;
-            kinematicsSplines.evaluate(qd, 1, t);
+            splines_.evaluate(qd, 1, t);
             ArrayConverter::toStdVector(qd, stdQd);
             generalisedCoordinates.setQd(stdQd);
 
             OpenSim::Array<double> qdd;
             vector<double> stdQdd;
-            kinematicsSplines.evaluate(qdd, 2, t);
+            splines_.evaluate(qdd, 2, t);
             ArrayConverter::toStdVector(qdd, stdQdd);
             generalisedCoordinates.setQdd(stdQdd);
             GeneralisedCoordinatesFromX::updateGeneralisedCoordinates(generalisedCoordinates, t);
         }
         GeneralisedCoordinatesFromX::sendEndOfData();
+
     }
 
-    OpenSim::GCVSplineSet GeneralisedCoordinatesFromStorageFile::getKinematicsSplines(double fc) {
+    void GeneralisedCoordinatesFromStorageFile::updateKinematicsSplines(double fc) {
 
         //reinitialise because I modify the storage with padding and filtering..
         OpenSim::Storage kinematics(kinematicsStorageFilename_);
@@ -106,7 +105,7 @@ namespace ceinms {
         if (kinematicsSplines.getSize() > coordinateNamesOS.getSize()){
             kinematicsSplines.setSize(coordinateNamesOS.getSize());
         }
-        return kinematicsSplines;
+        splines_ = kinematicsSplines;
     }
 
 

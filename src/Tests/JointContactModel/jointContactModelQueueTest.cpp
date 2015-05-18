@@ -27,6 +27,7 @@
 * -------------------------------------------------------------------------- */
 
 #include "ceinms/QueuesToIntersegmentalForces.h"
+#include "ceinms/QueuesToJointReactionForces.h"
 #include "ceinms/concurrency/Queue.h"
 #include "ceinms/concurrency/Latch.h"
 using namespace ceinms;
@@ -48,7 +49,9 @@ using ceinms::Concurrency::Latch;
 
 int main() {
 
-
+    string kinematicsStorageFilename_ = "C:/Users\\S2849511\\Dropbox\\Ricerca\\Data\\CEINMS_test_data\\ElaboratedData\\R24\\inverseKinematics\\IK03_SC02DN03\\RWalk2\\ik.mot";
+    OpenSim::Storage kinematics(kinematicsStorageFilename_);
+    /*
     InputConnectors inputConnectors;
     inputConnectors.doneWithSubscription.setCount(4);
 
@@ -59,10 +62,25 @@ int main() {
     string baseDir("C:/Users/S2849511/coding/versioning/ceinms/src/Tests/JointContactModel/Data/");
     string externalLoadsFilename(baseDir + "ExtForcesSetup.xml");
     string osimFilename(baseDir + "model.osim");        
-  
-    QueuesToIntersegmentalForces contactForcesEstimator(
-        inputConnectors.queueGeneralisedCoordinates,
+    //
+    //QueuesToIntersegmentalForces contactForcesEstimator(
+    //    inputConnectors.queueGeneralisedCoordinates,
+    //    inputConnectors.queueExternalForces,
+    //    outputContactForcesQueue,
+    //    inputConnectors.doneWithSubscription,
+    //    subject,
+    //    osimFilename,
+    //    externalLoadsFilename,
+    //    { "ankle_r" });
+    //    
+
+    QueuesToJointReactionForces::MuscleForcesQueue queueMuscleForces;
+    QueuesToJointReactionForces::EstimatedTorquesQueue queueTorques;
+
+    QueuesToJointReactionForces contactForcesEstimator(inputConnectors.queueGeneralisedCoordinates,
         inputConnectors.queueExternalForces,
+        queueMuscleForces,
+        queueTorques,
         outputContactForcesQueue,
         inputConnectors.doneWithSubscription,
         subject,
@@ -70,6 +88,7 @@ int main() {
         externalLoadsFilename,
         { "ankle_r" });
 
+    
     OpenSim::Model model(osimFilename);
     model.initSystem();
     OpenSim::ExternalLoads externalLoads(model, externalLoadsFilename);
@@ -104,5 +123,6 @@ int main() {
     generalisedCoordinateThread.join();
     externalForcesThread.join();
     logThread.wait();
+    */
 
 }

@@ -94,9 +94,9 @@ namespace ceinms {
             inSize_ = inNames.size();
             outSize_ = outNames.size();
 
-            for (auto& in : inNames) {
+            for (const auto& in : inNames) {
                 auto it(std::find(outNames.cbegin(), outNames.cend(), in));
-                if (it != outNames.end())
+                if (it != outNames.cend())
                     inToOutMapping_.push_back(std::distance(outNames.cbegin(), it));
                 else inToOutMapping_.push_back(-1);
             }
@@ -104,13 +104,14 @@ namespace ceinms {
 
 
         template<typename T>
-        T&& map(const T& in) {
-            T out(outSize_);
-            for (auto i : inToOutMapping_) {
-                if (i >= 0)
-                    out[inToOutMapping_[i]] = in[i];
+        std::vector<T> map(std::vector<T> in) {
+            std::vector<T> out(outSize_, 0.);
+            for (unsigned i(0); i < inToOutMapping_.size(); ++i) {
+                int mapIdx(inToOutMapping_.at(i));
+                if (mapIdx >= 0)
+                    out.at(mapIdx) = in.at(i);
             }
-            return std::move(out);
+            return out;
         }
     };
 
@@ -145,7 +146,7 @@ namespace ceinms {
             return frame;
         };
 
-        
+        /*
         template<typename T1, typename T2>
         static std::tuple<typename T1::type, typename T2::type> syncFrames(T1& queue1, T2& queue2){
 
@@ -165,19 +166,19 @@ namespace ceinms {
 
             return std::make_tuple(frame1, frame2, frame3);
         };
-        
-    /*    template<typename A1, typename... Args>
-        static std::tuple<typename A1::type, typename... Args::type> syncFrames(A1& queue1, Args&... queues){
+        */
+        template<typename A1, typename... Args>
+        static auto syncFrames(A1& queue1, Args&... queues) -> decltype(std::make_tuple(queue1.pop(), queues.pop()...)) {
 
             auto frame1(queue1.pop());
-            return std::make_tuple(frame1, syncFrameToTime(frame1.time, queues...)...);
+            return std::make_tuple(frame1, syncFrameToTime(frame1.time, queues)...);
         };
-*/
+
     private:
 
         using SingleExternalForceFrame = QueueData < ExternalForceData>;
         using SingleExternalForceQueue = Concurrency::Queue < SingleExternalForceFrame >;
-        static SimTK::Vector&& toSimTKVector(const std::vector<double>& v);
+        static SimTK::Vector toSimTKVector(std::vector<double> v);
         void parseExternalLoadsXml(const std::string& externalLoadsXmlFilename);
        
         void distributeExternalForces();

@@ -26,6 +26,7 @@
  * limitations under the License.                                             *
  * -------------------------------------------------------------------------- */
 
+
 #include "ceinms/CeinmsSetupXmlReader.h"
 #include "ceinms/NMSmodel.h"
 
@@ -37,9 +38,12 @@
 #include "ceinms/Activation/PiecewiseActivation.h"
 #include "ceinms/Curve.h"
 
+
 #include "ceinms/EMGFromFile.h"
 #include "ceinms/LmtMaFromStorageFile.h"
 #include "ceinms/ExternalTorquesFromStorageFile.h"
+#include "ceinms/GeneralisedCoordinatesFromStorageFile.h"
+#include "ceinms/ExternalForcesFromStorageFile.h"
 
 #include "ModelEvaluationOnline.h"
 #include "ModelEvaluationOffline.h"
@@ -54,6 +58,8 @@
 
 #include "ceinms/LoggerOnQueues.h"
 #include "ceinms/QueuesToStorageFiles.h"
+#include "ceinms/QueuesToJointReactionForces.h"
+
 #include <string>
 using std::string;
 
@@ -70,14 +76,142 @@ namespace ceinms {
         executionCfg_(ceinmsSetup_.getExecutionFile()),
         subjectFile_(ceinmsSetup_.getSubjectFile()),
         outputDirectory_(ceinmsSetup_.getOutputDirectory()),
-        emgGeneratorFile_(ceinmsSetup_.getExcitationGeneratorFile())
+        emgGeneratorFile_(ceinmsSetup_.getExcitationGeneratorFile()),
+        hasContactModel_(ceinmsSetup_.hasContactModel())
     {
-
+        cout << "Contact model ";
+        if (hasContactModel_) {
+            cout << "found" << endl;
+            contactModelCfg_.setXmlInputFile(ceinmsSetup_.getContactModelFile());
+        }
+        else
+            cout << " not found" << endl;
     }
 
 
     template <typename NMSmodelT, template <typename, typename> class ModelEvaluatorT, typename LoggerT>
-    bool SimulationManager::runOpenLoop() {
+    bool SimulationManager::runOpenLoop(bool useContactForces) {
+        
+        if (useContactForces)
+            runOpenLoopWithJointReactionForces < NMSmodelT, ModelEvaluatorT, LoggerT >();
+        else 
+            runOpenLoopNoContactForces < NMSmodelT, ModelEvaluatorT, LoggerT >();
+        return true;
+    }
+
+
+    template <typename NMSmodelT, template <typename, typename> class ModelEvaluatorT, typename LoggerT>
+    bool SimulationManager::runOpenLoopWithJointReactionForces() {
+        
+        InputConnectors inputConnectors;
+        OutputConnectors outputConnectors;
+
+        NMSmodelT mySubject;
+        setupSubject(mySubject, subjectFile_, executionCfg_.getTolerance());
+
+        // 2. define the thread connecting with the input sources
+        string emgFilename(dataLocations_.getExcitationsFile());
+        EMGFromFile emgProducer(inputConnectors, mySubject, emgFilename, emgGeneratorFile_);
+
+        vector< string > dofNames;
+        mySubject.getDoFNames(dofNames);
+        vector< string > maFilename;
+        sortMaFilenames(dataLocations_.getMaFiles(), dofNames, maFilename);
+        LmtMaFromStorageFile lmtMaProducer(inputConnectors, mySubject, dataLocations_.getLmtFile(), maFilename);
+
+        string externalTorqueFilename(dataLocations_.getExternalTorqueFile());
+        ExternalTorquesFromStorageFile externalTorquesProducer(inputConnectors, mySubject, externalTorqueFilename);
+
+        vector<string> dataToLog = { "Activations",
+            "FiberLenghts",
+            "NormFiberLengths",
+            "FiberVelocities",
+            "NormFiberVelocities",
+            "PennationAngles",
+            "MuscleForces",
+            "Torques" };
+        // 2b. define the thread consuming the output sources
+        vector<string> valuesToWrite = dataToLog;
+        QueuesToStorageFiles queuesToStorageFiles(inputConnectors, outputConnectors, mySubject, valuesToWrite, outputDirectory_);
+
+        // 3. define the model simulator
+        vector<string> valuesToLog = dataToLog;
+        ModelEvaluatorT<NMSmodelT, LoggerT>  simulator(inputConnectors, outputConnectors, mySubject, valuesToLog);
+
+        QueuesToJointReactionForces::ContactForcesQueue outputJointReactionForcesQueue;
+
+        // 4. start contact model stuff
+        auto contactModelSetup(contactModelCfg_.getContactModelSetupOsim());
+        QueuesToJointReactionForces jointReactionForcesEstimator(inputConnectors.queueGeneralisedCoordinates,
+            inputConnectors.queueExternalForces,
+            *outputConnectors.logQueues["MuscleForces"],
+            *outputConnectors.logQueues["Torques"],
+            outputJointReactionForcesQueue,
+            inputConnectors.doneWithSubscription,
+            mySubject,
+            contactModelSetup.osimModel,
+            contactModelSetup.externalLoads,
+            contactModelSetup.joints);
+            
+        GeneralisedCoordinatesFromStorageFile generalisedCoordinateFromStorageFile(inputConnectors, contactModelSetup.osimModel, contactModelSetup.motion);
+        //2 create external forces produces
+        ExternalForcesFromStorageFile externalForcesFromStorageFile(inputConnectors, contactModelSetup.osimModel, contactModelSetup.externalLoads);
+
+
+        inputConnectors.doneWithSubscription.setCount(9);
+        outputConnectors.doneWithExecution.setCount(2);
+
+
+        //3 create and launch log 
+        auto logThread(std::async(std::launch::async, [&](){
+            std::ofstream outF("outForces.csv");
+            outputJointReactionForcesQueue.subscribe();
+            inputConnectors.doneWithSubscription.wait();
+            double time(0);
+            bool runCondition(true);
+            while (runCondition) {
+                auto contactForces(outputJointReactionForcesQueue.pop());
+                time = contactForces.time;
+                if (time == inputConnectors.TimePlaceholderForEndOfData) runCondition = false;
+                if (runCondition) {
+                    outF << time;
+                    for (auto& cf : contactForces.data)
+                        outF << ", " << cf[0] << ", " << cf[1] << ", " << cf[2];
+                    outF << endl;
+                }
+            }
+            outF.close();
+        }));
+
+
+        //launch threads
+        std::thread contactForcesEstimatorThread(std::ref(jointReactionForcesEstimator));
+        std::thread generalisedCoordinateThread(std::ref(generalisedCoordinateFromStorageFile));
+        std::thread externalForcesThread(std::ref(externalForcesFromStorageFile));
+
+        // 4. start the threads
+        std::thread emgProdThread(std::ref(emgProducer));
+        std::thread externalTorquesProdThread(std::ref(externalTorquesProducer));
+        std::thread lmtMaProdThread(std::ref(lmtMaProducer));
+        std::thread simulatorThread(std::ref(simulator));
+        std::thread queuesToStorageFilesThread(std::ref(queuesToStorageFiles));
+
+        emgProdThread.join();
+        lmtMaProdThread.join();
+        externalTorquesProdThread.join();
+        simulatorThread.join();
+        queuesToStorageFilesThread.join();
+        contactForcesEstimatorThread.join();
+        generalisedCoordinateThread.join();
+        externalForcesThread.join();
+        logThread.wait();
+        
+        return 0;
+    }
+
+
+    template <typename NMSmodelT, template <typename, typename> class ModelEvaluatorT, typename LoggerT>
+    bool SimulationManager::runOpenLoopNoContactForces() {
 
         //Monica probably won't like this
         InputConnectors inputConnectors;
@@ -219,35 +353,35 @@ namespace ceinms {
         switch (runMode) {
 
         case NMSModelCfg::OpenLoopExponentialActivationStiffTendonOnline:
-            exitFlag = runOpenLoop < NMSmodel<ExponentialActivation, StiffTendon, CurveMode::Online>, ModelEvaluationOnline, LoggerOnQueues > ();
+            exitFlag = runOpenLoop < NMSmodel<ExponentialActivation, StiffTendon, CurveMode::Online>, ModelEvaluationOnline, LoggerOnQueues > (hasContactModel_);
             break;
 
         case NMSModelCfg::OpenLoopExponentialActivationStiffTendonOffline:
-            exitFlag = runOpenLoop < NMSmodel<ExponentialActivation, StiffTendon, CurveMode::Offline>, ModelEvaluationOffline, LoggerOnQueues >();
+            exitFlag = runOpenLoop < NMSmodel<ExponentialActivation, StiffTendon, CurveMode::Offline>, ModelEvaluationOffline, LoggerOnQueues >(hasContactModel_);
             break;
 
         case NMSModelCfg::OpenLoopExponentialActivationElasticTendonBiSecOnline:
-            exitFlag = runOpenLoop<NMSmodel<ExponentialActivation, ElasticTendon_BiSec, CurveMode::Online>, ModelEvaluationOnline, LoggerOnQueues>();
+            exitFlag = runOpenLoop<NMSmodel<ExponentialActivation, ElasticTendon_BiSec, CurveMode::Online>, ModelEvaluationOnline, LoggerOnQueues>(hasContactModel_);
             break;
 
         case NMSModelCfg::OpenLoopExponentialActivationElasticTendonBiSecOffline:
-            exitFlag = runOpenLoop<NMSmodel<ExponentialActivation, ElasticTendon_BiSec, CurveMode::Offline>, ModelEvaluationOffline, LoggerOnQueues >();
+            exitFlag = runOpenLoop<NMSmodel<ExponentialActivation, ElasticTendon_BiSec, CurveMode::Offline>, ModelEvaluationOffline, LoggerOnQueues >(hasContactModel_);
             break;
 
         case NMSModelCfg::OpenLoopPiecewiseActivationStiffTendonOnline:
-            exitFlag = runOpenLoop<NMSmodel<PiecewiseActivation, StiffTendon, CurveMode::Online>, ModelEvaluationOnline, LoggerOnQueues>();
+            exitFlag = runOpenLoop<NMSmodel<PiecewiseActivation, StiffTendon, CurveMode::Online>, ModelEvaluationOnline, LoggerOnQueues>(hasContactModel_);
             break;
 
         case NMSModelCfg::OpenLoopPiecewiseActivationStiffTendonOffline:
-            exitFlag = runOpenLoop<NMSmodel<PiecewiseActivation, StiffTendon, CurveMode::Offline>, ModelEvaluationOffline, LoggerOnQueues >();
+            exitFlag = runOpenLoop<NMSmodel<PiecewiseActivation, StiffTendon, CurveMode::Offline>, ModelEvaluationOffline, LoggerOnQueues >(hasContactModel_);
             break;
 
         case NMSModelCfg::OpenLoopPiecewiseActivationElasticTendonBiSecOnline:
-            exitFlag = runOpenLoop<NMSmodel<PiecewiseActivation, ElasticTendon_BiSec, CurveMode::Online>, ModelEvaluationOnline, LoggerOnQueues>();
+            exitFlag = runOpenLoop<NMSmodel<PiecewiseActivation, ElasticTendon_BiSec, CurveMode::Online>, ModelEvaluationOnline, LoggerOnQueues>(hasContactModel_);
             break;
 
         case NMSModelCfg::OpenLoopPiecewiseActivationElasticTendonBiSecOffline:
-            exitFlag = runOpenLoop<NMSmodel<PiecewiseActivation, ElasticTendon_BiSec, CurveMode::Offline>, ModelEvaluationOffline, LoggerOnQueues >();
+            exitFlag = runOpenLoop<NMSmodel<PiecewiseActivation, ElasticTendon_BiSec, CurveMode::Offline>, ModelEvaluationOffline, LoggerOnQueues >(hasContactModel_);
             break;
 
         case NMSModelCfg::HybridExponentialActivationStiffTendonOnline:

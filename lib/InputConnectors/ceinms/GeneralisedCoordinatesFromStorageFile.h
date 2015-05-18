@@ -39,9 +39,11 @@ namespace ceinms {
         virtual ~GeneralisedCoordinatesFromStorageFile() override {}
         virtual void operator()() override;
     private:
-        OpenSim::GCVSplineSet getKinematicsSplines(double fc);
+        void updateKinematicsSplines(double fc);
+        OpenSim::GCVSplineSet splines_;
         OpenSim::Model model_;
         std::string kinematicsStorageFilename_;
+        std::vector<double> timeColumn_;
     };
 
 }
