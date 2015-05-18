@@ -95,21 +95,36 @@ namespace ceinms {
     }
 
     void ContactModelXmlReader::readXml() {
-        contactModelPointer_->fromOpenSim();
-        ContactModelXsd::FromOpenSimType& fromOsim(*(contactModelPointer_->fromOpenSim().begin()));
-        setup_.osimModel = getCompleteFilename(*(fromOsim.osimModel().begin()));
-        checkFile(setup_.osimModel); 
-        setup_.osimModel = FileUtils::simplify(setup_.osimModel);
-        setup_.motion = getCompleteFilename(*(fromOsim.motion().begin()));
-        checkFile(setup_.motion);
-        setup_.motion = FileUtils::simplify(setup_.motion);
-        setup_.externalLoads = getCompleteFilename(*(fromOsim.externalLoads().begin()));
-        checkFile(setup_.externalLoads);
-        setup_.externalLoads = FileUtils::simplify(setup_.externalLoads);
+        if (contactModelPointer_->fromOpenSim().size() > 0) {
+            contactModelType_ = ContactModelType::OpenSim;
+            ContactModelXsd::FromOpenSimType& fromOsim(*(contactModelPointer_->fromOpenSim().begin()));
+            setupOsim_.osimModel = getCompleteFilename(*(fromOsim.osimModel().begin()));
+            checkFile(setupOsim_.osimModel);
+            setupOsim_.osimModel = FileUtils::simplify(setupOsim_.osimModel);
+            setupOsim_.motion = getCompleteFilename(*(fromOsim.motion().begin()));
+            checkFile(setupOsim_.motion);
+            setupOsim_.motion = FileUtils::simplify(setupOsim_.motion);
+            setupOsim_.externalLoads = getCompleteFilename(*(fromOsim.externalLoads().begin()));
+            checkFile(setupOsim_.externalLoads);
+            setupOsim_.externalLoads = FileUtils::simplify(setupOsim_.externalLoads);
 
-        ContactModelXsd::JointsType& jointXsd(*fromOsim.joints().begin());
-        for (ContactModelXsd::JointsType::iterator it = jointXsd.begin(); it != jointXsd.end(); ++it)
-            setup_.joints.push_back(*it);
+            ContactModelXsd::JointsType& jointXsd(*fromOsim.joints().begin());
+            for (ContactModelXsd::JointsType::iterator it = jointXsd.begin(); it != jointXsd.end(); ++it)
+                setupOsim_.joints.push_back(*it);
+        }
+        if (contactModelPointer_->kneeBalance().size() > 0) {
+            contactModelType_ = ContactModelType::KneeBalance;
+
+            ContactModelXsd::KneeBalanceType& kneeBalance(*(contactModelPointer_->kneeBalance().begin()));
+            setupKneeBalance_.intercondyleDistance = kneeBalance.intercondyleDistance();
+
+            setupKneeBalance_.condyle1.dof = kneeBalance.condyle().front().dof().front();
+            setupKneeBalance_.condyle2.dof = kneeBalance.condyle().back().dof().front();
+
+            setupKneeBalance_.condyle1.name = kneeBalance.condyle().front().name().front();
+            setupKneeBalance_.condyle2.name = kneeBalance.condyle().back().name().front();
+        }
+
     }
 
     string ContactModelXmlReader::getCompleteFilename(string filename) const {
@@ -124,9 +139,14 @@ namespace ceinms {
 
     ContactModelFromOpenSimSetup ContactModelXmlReader::getContactModelSetupOsim() const {
         
-        return setup_;
+        return setupOsim_;
 
     }
 
+
+    ContactModelKneeBalanceSetup ContactModelXmlReader::getContactModelSetupKneeBalance() const {
+
+        return setupKneeBalance_;
+    }
 
 }

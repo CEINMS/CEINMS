@@ -34,7 +34,7 @@
 
 namespace ceinms {
     //in future we could have different sources..
-    enum class ContactModelType { OpenSim };
+    enum class ContactModelType { OpenSim, KneeBalance };
 
     struct ContactModelFromOpenSimSetup{
 
@@ -44,6 +44,19 @@ namespace ceinms {
         std::vector<std::string> joints;
     };
 
+
+
+    struct ContactModelKneeBalanceSetup {
+        struct Condyle {
+            std::string name;
+            std::string dof;
+        };
+
+        double intercondyleDistance;
+        Condyle condyle1, condyle2;
+    };
+
+
     class ContactModelXmlReader {
 
     public:
@@ -52,13 +65,17 @@ namespace ceinms {
         void setXmlInputFile(const std::string& filename);
         ContactModelType getContactModelType() const;
         ContactModelFromOpenSimSetup getContactModelSetupOsim() const;
+        ContactModelKneeBalanceSetup getContactModelSetupKneeBalance() const;
+
     private:
         void init();
         void readXml();
         void checkFile(const std::string& filename) const;
         std::string getCompleteFilename(std::string filename) const;
-        ContactModelFromOpenSimSetup setup_;
+        ContactModelFromOpenSimSetup setupOsim_;
+        ContactModelKneeBalanceSetup setupKneeBalance_;
         std::auto_ptr<ContactModelXsd::ContactModelType> contactModelPointer_;
+        ContactModelType contactModelType_;
         std::string filepath_;
         std::string filename_;
     };
