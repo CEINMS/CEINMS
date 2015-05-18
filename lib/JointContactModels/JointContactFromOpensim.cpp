@@ -42,11 +42,8 @@ namespace ceinms {
     JointContactFromOpensim::JointContactFromOpensim(const std::string& modelFilename, std::vector<OpenSim::Force*> externalForces) :
         model_(modelFilename)
         {
-        using namespace OpenSim;
 
-        auto open = idResults_.is_open();
-
-        Model modelCopy(modelFilename);
+        OpenSim::Model modelCopy(modelFilename);
         modelCopy.initSystem();
         nCoordinates_ = modelCopy.getNumCoordinates();
         nBodies_ = modelCopy.getNumBodies();
@@ -67,9 +64,9 @@ namespace ceinms {
         for (unsigned i(0); i < nMuscles_; ++i) 
             muscleActuators_.push_back((const_cast<OpenSim::Muscle*>(&model_.updForceSet().getMuscles().get(muscleNames.get(i)))));
 
-        const CoordinateSet& cs = model_.getCoordinateSet();
+        const OpenSim::CoordinateSet& cs = model_.getCoordinateSet();
         for (unsigned i(0); i < nCoordinates_; ++i) {
-            CoordinateActuator *actuator = new CoordinateActuator();
+            OpenSim::CoordinateActuator *actuator = new OpenSim::CoordinateActuator();
             actuator->setCoordinate(&cs.get(i));
             string actuatorName(cs.get(i).getName() + "_actuator");
             actuator->setName(actuatorName);
@@ -77,17 +74,14 @@ namespace ceinms {
             actuator->setMaxControl(100000);
             actuator->setMinControl(-100000);
             model_.addForce(actuator);
-            coordinateActuators_.push_back(dynamic_cast<CoordinateActuator*>(&(model_.updForceSet().get(actuatorName))));
+            coordinateActuators_.push_back(dynamic_cast<OpenSim::CoordinateActuator*>(&(model_.updForceSet().get(actuatorName))));
         }
        
-        std::unique_ptr<InverseDynamicsSolver> p(new InverseDynamicsSolver(model_));
-        idSolver_ = std::move(p);
+        idSolver_.reset(new OpenSim::InverseDynamicsSolver(model_));
 
         state_ = model_.initSystem();
         for (auto c : coordinateActuators_)
             c->overrideForce(state_, true);
-
-
         for (auto m : muscleActuators_) 
             m->overrideForce(state_, true);        
     }
@@ -227,12 +221,6 @@ namespace ceinms {
         disableMuscleActuators();
         SimTK::Vector appliedMobilityForces(nCoordinates_, 0.); //Calculate ID
         calculateResidualMobilityForces(appliedMobilityForces);
-
-        idResults_ << state_.getTime() << "\t";
-        for (auto f : residualMobilityForces_)
-            idResults_ << std::fixed << f << "\t";
-        idResults_ << std::endl;
-
     }
 
 

@@ -74,10 +74,11 @@ namespace ceinms {
                 outputIntersegmentalForcesQueue_.push(intForces);
 
             }
-            ContactForcesFrame endOfData;
-            endOfData.time = std::numeric_limits<double>::infinity();
-            outputJointReactionForcesQueue_.push(endOfData);
-            outputIntersegmentalForcesQueue_.push(endOfData);
         }
+
+        ContactForcesFrame endOfData;
+        endOfData.time = std::numeric_limits<double>::infinity();
+        outputJointReactionForcesQueue_.push(endOfData);
+        outputIntersegmentalForcesQueue_.push(endOfData);
     }
 }

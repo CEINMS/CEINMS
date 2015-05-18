@@ -37,7 +37,6 @@
 #include <OpenSim/Simulation/InverseDynamicsSolver.h>
 #include "ceinms/ExternalForceData.h"
 
-#include <ostream> //
 
 namespace ceinms {
 

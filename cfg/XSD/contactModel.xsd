@@ -21,9 +21,29 @@
     </xs:choice>
   </xs:complexType>
 
+
+  <xs:complexType name="CondyleType">
+    <xs:choice maxOccurs="unbounded">
+      <xs:sequence>
+        <xs:element maxOccurs="1" minOccurs="1" name="name" type="xs:token"/>
+        <xs:element maxOccurs="1" minOccurs="1" name="dof" type="xs:token"/>
+      </xs:sequence>
+    </xs:choice>
+  </xs:complexType>
+
+  <xs:complexType name="KneeBalanceType">
+    <xs:choice maxOccurs="unbounded">
+      <xs:sequence>
+        <xs:element maxOccurs="1" minOccurs="1" name="intercondyleDistance" type="xs:double"/>
+        <xs:element maxOccurs="2" minOccurs="2" name="condyle" type="CondyleType"/>
+      </xs:sequence>
+    </xs:choice>
+  </xs:complexType>
+
   <xs:complexType name="ContactModelType">
     <xs:choice maxOccurs="unbounded">
         <xs:element maxOccurs="1" name="fromOpenSim" type="FromOpenSimType"/>
+        <xs:element maxOccurs="1" name="kneeBalance" type="KneeBalanceType"/>
     </xs:choice>
   </xs:complexType>
 
