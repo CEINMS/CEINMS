@@ -27,6 +27,7 @@
 * -------------------------------------------------------------------------- */
 
 #include "ceinms/ExternalForcesFromStorageFile.h"
+#include "ceinms/queues/MultipleExternalForcesQueue.h"
 #include "ceinms/ArrayConverter.h"
 #include <OpenSim/OpenSim.h>
 using OpenSim::Model;
@@ -56,7 +57,7 @@ namespace ceinms {
 
         ExternalForcesFromX::doneWithSubscriptions();
         for (auto t : timeColumnExternalLoads) {
-            InputConnectors::ExternalForcesFrame externalForcesFrame;
+            MultipleExternalForcesFrame externalForcesFrame;
             externalForcesFrame.time = t;
             for (unsigned i(0); i < externalLoads.getSize(); ++i) {
                 ExternalForceData currentExtForce;

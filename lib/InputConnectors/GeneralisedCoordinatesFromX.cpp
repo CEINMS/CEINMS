@@ -28,6 +28,7 @@
 
 #include "ceinms/GeneralisedCoordinatesFromX.h"
 #include "ceinms/InputConnectors.h"
+#include "ceinms/GeneralisedCoordinatesData.h"
 #include <vector>
 using std::vector;
 
@@ -39,7 +40,7 @@ namespace ceinms {
 
     void GeneralisedCoordinatesFromX::updateGeneralisedCoordinates(const GeneralisedCoordinatesData& currentGeneralisedCoordinatesData, double currentTime) {
 
-        InputConnectors::GeneralisedCoordinatesFrame frame{ currentTime, currentGeneralisedCoordinatesData };
+        GeneralisedCoordinatesFrame frame{ currentTime, currentGeneralisedCoordinatesData };
         inputConnectors_.queueGeneralisedCoordinates.push(frame);
     }
 

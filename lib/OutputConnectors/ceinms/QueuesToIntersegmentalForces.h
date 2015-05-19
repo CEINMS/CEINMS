@@ -30,27 +30,19 @@
 #define ceinms_QueuesToIntersegmentalForces_h
 
 #include "ceinms/QueuesToXForces.h"
-#include "ceinms/GeneralisedCoordinatesData.h"
+#include "ceinms/queues/ContactForcesQueue.h"
+#include "ceinms/queues/MultipleExternalForcesQueue.h"
+#include "ceinms/queues/GeneralisedCoordinatesQueue.h"
 
 namespace ceinms {
 
     class QueuesToIntersegmentalForces : public QueuesToXForces {
     public:
 
-        using ContactForcesFrame = QueueData < std::vector<SimTK::Vec3> >;
-        using ContactForcesQueue = Concurrency::Queue < ContactForcesFrame >;
-
-        using ExternalForcesFrame = QueuesToXForces::ExternalForcesFrame;
-        using ExternalForcesQueue = QueuesToXForces::ExternalForcesQueue;
-
-        using GeneralisedCoordinatesFrame = QueueData < GeneralisedCoordinatesData >;
-        using GeneralisedCoordinatesQueue = Concurrency::Queue < GeneralisedCoordinatesFrame >;
-
-
         template <typename NMSmodelT>
         QueuesToIntersegmentalForces(
         GeneralisedCoordinatesQueue& inputGeneralisedCoordinatesQueue,
-        ExternalForcesQueue& inputExternalForcesQueue,
+        MultipleExternalForcesQueue& inputExternalForcesQueue,
         ContactForcesQueue& outputIntersegmentalForcesQueue,
         Concurrency::Latch& latch,
         const NMSmodelT& subject,
@@ -71,7 +63,7 @@ namespace ceinms {
     template <typename NMSmodelT>
     QueuesToIntersegmentalForces::QueuesToIntersegmentalForces(
         GeneralisedCoordinatesQueue& inputGeneralisedCoordinatesQueue,
-        ExternalForcesQueue& inputExternalForcesQueue,
+        MultipleExternalForcesQueue& inputExternalForcesQueue,
         ContactForcesQueue& outputIntersegmentalForcesQueue,
         Concurrency::Latch& latch,
         const NMSmodelT& subject,

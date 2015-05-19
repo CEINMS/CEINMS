@@ -34,6 +34,9 @@
 #include "ceinms/QueueData.h"
 #include "ceinms/ExternalForceData.h"
 #include "ceinms/GeneralisedCoordinatesData.h"
+#include "ceinms/queues/MultipleExternalForcesQueue.h"
+#include "ceinms/queues/GeneralisedCoordinatesQueue.h"
+
 
 #include <list>
 #include <vector>
@@ -53,13 +56,7 @@ namespace ceinms {
         Concurrency::Latch doneWithSubscription;
 
         //queues for joint contact forces
-        using ExternalForcesFrame = QueueData < std::vector<ExternalForceData> >;
-        using ExternalForcesQueue = Concurrency::Queue < ExternalForcesFrame >;
-        ExternalForcesQueue queueExternalForces;
-
-
-        using GeneralisedCoordinatesFrame = QueueData < GeneralisedCoordinatesData >;
-        using GeneralisedCoordinatesQueue = Concurrency::Queue < GeneralisedCoordinatesFrame >;
+        MultipleExternalForcesQueue queueExternalForces;
         GeneralisedCoordinatesQueue queueGeneralisedCoordinates;
 
         double globalTimeLimit;

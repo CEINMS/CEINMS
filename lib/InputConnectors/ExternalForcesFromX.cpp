@@ -38,7 +38,7 @@ namespace ceinms {
 
     void ExternalForcesFromX::updateExternalForces(const vector<ExternalForceData>& currentExternalForceData, double currentTime) {
 
-        InputConnectors::ExternalForcesFrame frame{ currentTime, currentExternalForceData };
+        MultipleExternalForcesFrame frame{ currentTime, currentExternalForceData };
         inputConnectors_.queueExternalForces.push(frame);
     }
 

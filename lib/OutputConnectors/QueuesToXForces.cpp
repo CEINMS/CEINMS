@@ -34,11 +34,13 @@ using std::vector;
 using std::string;
 #include <SimTK/include/SimTKcommon.h>
 using SimTK::Vec3;
+using ceinms::SingleExternalForceFrame;
+using ceinms::SingleExternalForceQueue;
 
 namespace OpenSim {
 
     ExternalForceFromQueue::ExternalForceFromQueue
-        (std::shared_ptr<ExternalForceQueue> externalForceQueue,
+        (std::shared_ptr<ceinms::SingleExternalForceQueue> externalForceQueue,
         const std::string& appliedToBodyName,
         const std::string& forceExpressedInBodyName,
         const std::string& pointExpressedInBodyName) :
@@ -57,7 +59,7 @@ namespace OpenSim {
     }
 
 
-    ExternalForceFromQueue::ExternalForceFromQueue(std::shared_ptr<ExternalForceQueue> externalForceQueue, SimTK::Xml::Element& node) :
+    ExternalForceFromQueue::ExternalForceFromQueue(std::shared_ptr<ceinms::SingleExternalForceQueue> externalForceQueue, SimTK::Xml::Element& node) :
         externalForceQueue_(externalForceQueue),
         appliedToBody_(nullptr),
         forceExpressedInBody_(nullptr),
@@ -82,7 +84,7 @@ namespace OpenSim {
 
     ceinms::ExternalForceData ExternalForceFromQueue::getExternalForceDataFromQueue(double time) const {
 
-        ExternalForceFrame forceFrame;
+        SingleExternalForceFrame forceFrame;
         while (time > lastTime_ && runCondition_){
             forceFrame = externalForceQueue_->pop();
             if (forceFrame.time == std::numeric_limits<double>::infinity()) {

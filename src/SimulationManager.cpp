@@ -60,6 +60,8 @@
 #include "ceinms/QueuesToStorageFiles.h"
 #include "ceinms/QueuesToJointReactionForces.h"
 
+#include "ceinms/queues/ContactForcesQueue.h"
+
 #include <string>
 using std::string;
 
@@ -138,7 +140,7 @@ namespace ceinms {
         vector<string> valuesToLog = dataToLog;
         ModelEvaluatorT<NMSmodelT, LoggerT>  simulator(inputConnectors, outputConnectors, mySubject, valuesToLog);
 
-        QueuesToJointReactionForces::ContactForcesQueue outputJointReactionForcesQueue;
+        ContactForcesQueue outputJointReactionForcesQueue;
 
         // 4. start contact model stuff
         auto contactModelSetup(contactModelCfg_.getContactModelSetupOsim());

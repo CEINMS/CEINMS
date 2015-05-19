@@ -9,6 +9,7 @@ set(OutputConnectors_SOURCES
     QueuesToJointReactionForces.cpp
     QueuesToIntersegmentalForces.cpp
     QueuesToIntersegmentalAndJointReactionForces.cpp
+	QueuesToKneeBalanceContactForces.cpp
 )
 set(OutputConnectors_HEADERS 
     ceinms/OutputConnectors.h
@@ -19,6 +20,7 @@ set(OutputConnectors_HEADERS
     ceinms/QueuesToJointReactionForces.h
     ceinms/QueuesToIntersegmentalForces.h
     ceinms/QueuesToIntersegmentalAndJointReactionForces.h
+	ceinms/QueuesToKneeBalanceContactForces.h
 )
 
 set(QueuesToStorageFiles_SOURCES

@@ -39,19 +39,20 @@
 #include "ceinms/concurrency/Latch.h"
 #include "ceinms/QueueData.h"
 #include "ceinms/ExternalForceData.h"
+#include "ceinms/queues/MultipleExternalForcesQueue.h"
+#include "ceinms/queues/SingleExternalForceQueue.h"
+
 
 namespace OpenSim {
 
     class ExternalForceFromQueue : public OpenSim::ExternalForce{
     public:
-        using ExternalForceFrame = ceinms::QueueData < ceinms::ExternalForceData >;
-        using ExternalForceQueue = ceinms::Concurrency::Queue < ExternalForceFrame >;
         ExternalForceFromQueue() = delete;
-        ExternalForceFromQueue(std::shared_ptr<ExternalForceQueue> externalForceQueue,
+        ExternalForceFromQueue(std::shared_ptr<ceinms::SingleExternalForceQueue> externalForceQueue,
             const std::string& appliedToBodyName,
             const std::string& forceExpressedInBodyName,
             const std::string& pointExpressedInBodyName);
-        ExternalForceFromQueue(std::shared_ptr<ExternalForceQueue> externalForceQueue, SimTK::Xml::Element& aNode);
+        ExternalForceFromQueue(std::shared_ptr<ceinms::SingleExternalForceQueue> externalForceQueue, SimTK::Xml::Element& aNode);
         virtual ~ExternalForceFromQueue();
     protected:
         virtual void computeForce(const SimTK::State& state,
@@ -62,7 +63,7 @@ namespace OpenSim {
         bool isSubscribed;
         ceinms::ExternalForceData getExternalForceDataFromPastValues(double time) const;
         ceinms::ExternalForceData getExternalForceDataFromQueue(double time) const;
-        std::shared_ptr<ExternalForceQueue> externalForceQueue_;
+        std::shared_ptr<ceinms::SingleExternalForceQueue> externalForceQueue_;
         mutable std::list<ceinms::QueueData<ceinms::ExternalForceData> > pastExternalForceFrames_;
         mutable double lastTime_;
         SimTK::ReferencePtr<const Body> appliedToBody_;
@@ -117,11 +118,9 @@ namespace ceinms {
 
     class QueuesToXForces {
     public:
-        using ExternalForcesFrame = QueueData < std::vector<ExternalForceData> >;
-        using ExternalForcesQueue = Concurrency::Queue < ExternalForcesFrame >;
 
         template<typename NMSmodelT>
-        QueuesToXForces(ExternalForcesQueue& externalForcesQueue, Concurrency::Latch& latch, const NMSmodelT& subject, const std::string& osimModelFilename, const std::string& externalLoadsXmlFilename, const std::vector< std::string >& jointsToLog);
+        QueuesToXForces(MultipleExternalForcesQueue& externalForcesQueue, Concurrency::Latch& latch, const NMSmodelT& subject, const std::string& osimModelFilename, const std::string& externalLoadsXmlFilename, const std::vector< std::string >& jointsToLog);
         virtual ~QueuesToXForces();
         virtual void operator()() {};
         void setState(double time, const std::vector<double>& q, const std::vector<double>& qd, const std::vector<double>& qdd);
@@ -136,6 +135,7 @@ namespace ceinms {
         void getIntersegmentalForcesInChild(std::vector<SimTK::Vec3>& intersegmentalForcesInChild) const;
         void doneWithSubscriptions();
         void initialiseContactModel();
+
         template<typename T>
         static typename T::type syncFrameToTime(double t, T& queue) {
 
@@ -146,27 +146,6 @@ namespace ceinms {
             return frame;
         };
 
-        /*
-        template<typename T1, typename T2>
-        static std::tuple<typename T1::type, typename T2::type> syncFrames(T1& queue1, T2& queue2){
-
-
-            auto frame1(queue1.pop());
-            auto frame2(syncFrameToTime(frame1.time, queue2));
-            return std::make_tuple(frame1, frame2);
-        };
-
-        template<typename T1, typename T2, typename T3>
-        static std::tuple<typename T1::type, typename T2::type, typename T3::type> syncFrames(T1& queue1, T2& queue2, T3& queue3){
-
-
-            auto frame1(queue1.pop());
-            auto frame2(syncFrameToTime(frame1.time, queue2));
-            auto frame3(syncFrameToTime(frame1.time, queue3));
-
-            return std::make_tuple(frame1, frame2, frame3);
-        };
-        */
         template<typename A1, typename... Args>
         static auto syncFrames(A1& queue1, Args&... queues) -> decltype(std::make_tuple(queue1.pop(), queues.pop()...)) {
 
@@ -176,18 +155,14 @@ namespace ceinms {
 
     private:
 
-        using SingleExternalForceFrame = QueueData < ExternalForceData>;
-        using SingleExternalForceQueue = Concurrency::Queue < SingleExternalForceFrame >;
         static SimTK::Vector toSimTKVector(std::vector<double> v);
         void parseExternalLoadsXml(const std::string& externalLoadsXmlFilename);
-       
         void distributeExternalForces();
-
         void updateCeinmsToOpenSimDofMapping();
         void updateCeinmsToOpenSimMuscleMapping();
         void checkJointsToLogsExistInOpenSim();
 
-        ExternalForcesQueue& inputExternalForcesQueue_;
+        MultipleExternalForcesQueue& inputExternalForcesQueue_;
         Concurrency::Latch splitForcesLatch_;
         Concurrency::Latch& externalLatch_;
         std::future<void> splitForcesThread_;
@@ -204,7 +179,7 @@ namespace ceinms {
 
     template<typename NMSmodelT>
     QueuesToXForces::QueuesToXForces(
-        ExternalForcesQueue& inputExternalForcesQueue,
+        MultipleExternalForcesQueue& inputExternalForcesQueue,
         Concurrency::Latch& latch,
         const NMSmodelT& subject,
         const std::string& osimModelFilename,

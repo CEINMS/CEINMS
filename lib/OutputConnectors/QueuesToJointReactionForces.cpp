@@ -27,6 +27,7 @@
 * -------------------------------------------------------------------------- */
 
 #include "ceinms/QueuesToJointReactionForces.h"
+#include "ceinms/GeneralisedCoordinatesData.h"
 #include <thread>
 #include <chrono>
 

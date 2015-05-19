@@ -30,6 +30,11 @@
 #define ceinms_QueuesToJointReactionForces_h
 #include "ceinms/QueuesToXForces.h"
 #include "ceinms/GeneralisedCoordinatesData.h"
+#include "ceinms/queues/ContactForcesQueue.h"
+#include "ceinms/queues/EstimatedTorquesQueue.h"
+#include "ceinms/queues/GeneralisedCoordinatesQueue.h"
+#include "ceinms/queues/MuscleForcesQueue.h"
+#include "ceinms/queues/MultipleExternalForcesQueue.h"
 
 namespace ceinms {
 
@@ -37,25 +42,10 @@ namespace ceinms {
 
     public:
 
-        using ContactForcesFrame = QueueData < std::vector<SimTK::Vec3> >;
-        using ContactForcesQueue = Concurrency::Queue < ContactForcesFrame >;
-
-        using ExternalForcesFrame = QueuesToXForces::ExternalForcesFrame;
-        using ExternalForcesQueue = QueuesToXForces::ExternalForcesQueue;
-
-        using GeneralisedCoordinatesFrame = QueueData < GeneralisedCoordinatesData >;
-        using GeneralisedCoordinatesQueue = Concurrency::Queue < GeneralisedCoordinatesFrame >;
-
-        using MuscleForcesFrame = QueueData < std::vector<double> >;
-        using MuscleForcesQueue = Concurrency::Queue < MuscleForcesFrame >;
-
-        using EstimatedTorquesFrame = QueueData < std::vector<double> >;
-        using EstimatedTorquesQueue = Concurrency::Queue < EstimatedTorquesFrame >;
-
         template <typename NMSmodelT>
         QueuesToJointReactionForces(
             GeneralisedCoordinatesQueue& inputGeneralisedCoordinatesQueue,
-            ExternalForcesQueue& inputExternalForcesQueue,
+            MultipleExternalForcesQueue& inputExternalForcesQueue,
             MuscleForcesQueue& inputMuscleForcesQueue,
             EstimatedTorquesQueue& inputEstimatedTorquesQueue,
             ContactForcesQueue& outputJointReactionForcesQueue,
@@ -80,7 +70,7 @@ namespace ceinms {
     template <typename NMSmodelT>
     QueuesToJointReactionForces::QueuesToJointReactionForces(
         GeneralisedCoordinatesQueue& inputGeneralisedCoordinatesQueue,
-        ExternalForcesQueue& inputExternalForcesQueue,
+        MultipleExternalForcesQueue& inputExternalForcesQueue,
         MuscleForcesQueue& inputMuscleForcesQueue,
         EstimatedTorquesQueue& inputEstimatedTorquesQueue,
         ContactForcesQueue& outputJointReactionForcesQueue,

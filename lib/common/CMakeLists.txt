@@ -8,7 +8,16 @@ set(Common_HEADERS  ceinms/ArrayConverter.h
                     ceinms/QueueData.h
                     ceinms/TimeCompare.h
                     ceinms/ExternalForceData.h
-                    ceinms/GeneralisedCoordinatesData.h)
+                    ceinms/GeneralisedCoordinatesData.h
+                    ceinms/ContactModelFromOpenSimSetup.h
+                    ceinms/ContactModelKneeBalanceSetup.h
+                    ceinms/queues/ContactForcesQueue.h
+                    ceinms/queues/EstimatedTorquesQueue.h
+                    ceinms/queues/MultipleExternalForcesQueue.h
+                    ceinms/queues/ExternalTorquesQueues.h
+                    ceinms/queues/GeneralisedCoordinatesQueue.h
+                    ceinms/queues/MuscleForcesQueue.h
+					ceinms/queues/SingleExternalForceQueue.h)
 
 set(Common_SOURCES  Parameter.cpp
                     FileUtils.cpp

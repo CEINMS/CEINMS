@@ -31,31 +31,12 @@
 #include "contactModel.hxx"
 #include <string>
 #include <vector>
+#include "ceinms/ContactModelFromOpenSimSetup.h"
+#include "ceinms/ContactModelKneeBalanceSetup.h"
 
 namespace ceinms {
     //in future we could have different sources..
     enum class ContactModelType { OpenSim, KneeBalance };
-
-    struct ContactModelFromOpenSimSetup{
-
-        std::string osimModel;
-        std::string motion;
-        std::string externalLoads;
-        std::vector<std::string> joints;
-    };
-
-
-
-    struct ContactModelKneeBalanceSetup {
-        struct Condyle {
-            std::string name;
-            std::string dof;
-        };
-
-        double intercondyleDistance;
-        Condyle condyle1, condyle2;
-    };
-
 
     class ContactModelXmlReader {
 
