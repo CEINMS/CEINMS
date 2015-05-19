@@ -78,8 +78,6 @@ namespace OpenSim {
 
 namespace ceinms {
 
-
-
     class QueuesToXForces {
     public:
 
@@ -100,22 +98,6 @@ namespace ceinms {
         void doneWithSubscriptions();
         void initialiseContactModel();
 
-        template<typename T>
-        static typename T::type syncFrameToTime(double t, T& queue) {
-
-            typename T::type frame;
-            do {
-                frame = queue.pop();
-            } while (frame.time < t);
-            return frame;
-        };
-
-        template<typename A1, typename... Args>
-        static auto syncFrames(A1& queue1, Args&... queues) -> decltype(std::make_tuple(queue1.pop(), queues.pop()...)) {
-
-            auto frame1(queue1.pop());
-            return std::make_tuple(frame1, syncFrameToTime(frame1.time, queues)...);
-        };
 
     private:
         static SimTK::Vector toSimTKVector(std::vector<double> v);

@@ -28,6 +28,7 @@
 
 
 #include "ceinms/QueuesToIntersegmentalAndJointReactionForces.h"
+#include "ceinms/QueuesSync.h"
 
 namespace ceinms {
 
@@ -43,7 +44,7 @@ namespace ceinms {
 
         bool runCondition(true);
         while (runCondition) {
-            auto frames(QueuesToXForces::syncFrames(inputGeneralisedCoordinatesQueue_, inputMuscleForcesQueue_, inputEstimatedTorquesQueue_));
+            auto frames(QueuesSync::sync(inputGeneralisedCoordinatesQueue_, inputMuscleForcesQueue_, inputEstimatedTorquesQueue_));
             GeneralisedCoordinatesFrame generalisedCoordinatesFrame;
             MuscleForcesFrame muscleForcesFrame;
             EstimatedTorquesFrame estimatedTorquesFrame;

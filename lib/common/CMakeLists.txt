@@ -12,6 +12,7 @@ set(Common_HEADERS  ceinms/ArrayConverter.h
                     ceinms/ContactModelFromOpenSimSetup.h
                     ceinms/ContactModelKneeBalanceSetup.h
                     ceinms/Mapper.h
+                    ceinms/QueuesSync.h
                     ceinms/queues/VecContactForcesQueue.h
 					ceinms/queues/ScalarContactForcesQueue.h                    
 					ceinms/queues/EstimatedTorquesQueue.h
