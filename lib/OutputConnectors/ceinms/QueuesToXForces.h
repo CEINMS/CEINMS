@@ -41,6 +41,7 @@
 #include "ceinms/ExternalForceData.h"
 #include "ceinms/queues/MultipleExternalForcesQueue.h"
 #include "ceinms/queues/SingleExternalForceQueue.h"
+#include "ceinms/Mapper.h"
 
 
 namespace OpenSim {
@@ -78,43 +79,6 @@ namespace OpenSim {
 namespace ceinms {
 
 
-    class PutInTheRightPlace {
-    private:
-        size_t inSize_, outSize_;
-        std::vector<int> inToOutMapping_; //using int because in case in > out, we can use -1 as not-map token
-        void updateMapping();
-    public:
-        PutInTheRightPlace() :
-            inSize_(0), outSize_(0) {}
-        PutInTheRightPlace(const std::vector<std::string>& inNames, const std::vector<std::string>& outNames) {
-            setNames(inNames, outNames);
-        }
-
-        void setNames(const std::vector<std::string>& inNames, const std::vector<std::string>& outNames) {
-
-            inSize_ = inNames.size();
-            outSize_ = outNames.size();
-
-            for (const auto& in : inNames) {
-                auto it(std::find(outNames.cbegin(), outNames.cend(), in));
-                if (it != outNames.cend())
-                    inToOutMapping_.push_back(std::distance(outNames.cbegin(), it));
-                else inToOutMapping_.push_back(-1);
-            }
-        }
-
-
-        template<typename T>
-        std::vector<T> map(std::vector<T> in) {
-            std::vector<T> out(outSize_, 0.);
-            for (unsigned i(0); i < inToOutMapping_.size(); ++i) {
-                int mapIdx(inToOutMapping_.at(i));
-                if (mapIdx >= 0)
-                    out.at(mapIdx) = in.at(i);
-            }
-            return out;
-        }
-    };
 
     class QueuesToXForces {
     public:
@@ -154,7 +118,6 @@ namespace ceinms {
         };
 
     private:
-
         static SimTK::Vector toSimTKVector(std::vector<double> v);
         void parseExternalLoadsXml(const std::string& externalLoadsXmlFilename);
         void distributeExternalForces();
@@ -170,7 +133,7 @@ namespace ceinms {
         std::vector<std::shared_ptr<SingleExternalForceQueue>> singleExternalForceQueues_;
         std::vector<std::string> jointsToLog_, dofNamesFromSubject_, musclesNamesFromSubject_;
         std::unique_ptr<JointContactFromOpensim> jointContactModel_;
-        PutInTheRightPlace dofsMapping_, musclesMapping_;
+        Mapper  dofsMapping_, musclesMapping_;
         std::string osimModelFilename_, externalLoadsXmlFilename_;
 
     };

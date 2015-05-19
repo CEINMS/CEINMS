@@ -32,7 +32,7 @@
 #include "ceinms/QueuesToXForces.h"
 #include "ceinms/GeneralisedCoordinatesData.h"
 
-#include "ceinms/queues/ContactForcesQueue.h"
+#include "ceinms/queues/VecContactForcesQueue.h"
 #include "ceinms/queues/MultipleExternalForcesQueue.h"
 #include "ceinms/queues/GeneralisedCoordinatesQueue.h"
 #include "ceinms/queues/MuscleForcesQueue.h"
@@ -49,8 +49,8 @@ namespace ceinms {
             MultipleExternalForcesQueue& inputExternalForcesQueue,
             MuscleForcesQueue& inputMuscleForcesQueue,
             EstimatedTorquesQueue& inputEstimatedTorquesQueue,
-            ContactForcesQueue& outputJointReactionForcesQueue,
-            ContactForcesQueue& outputIntersegmentalForcesQueue,
+            VecContactForcesQueue& outputJointReactionForcesQueue,
+            VecContactForcesQueue& outputIntersegmentalForcesQueue,
             Concurrency::Latch& latch,
             const NMSmodelT& subject,
             const std::string& osimModelFilename,
@@ -64,8 +64,8 @@ namespace ceinms {
         GeneralisedCoordinatesQueue& inputGeneralisedCoordinatesQueue_;
         MuscleForcesQueue& inputMuscleForcesQueue_;
         EstimatedTorquesQueue& inputEstimatedTorquesQueue_;
-        ContactForcesQueue& outputJointReactionForcesQueue_;
-        ContactForcesQueue& outputIntersegmentalForcesQueue_;
+        VecContactForcesQueue& outputJointReactionForcesQueue_;
+        VecContactForcesQueue& outputIntersegmentalForcesQueue_;
 
     };
 
@@ -76,8 +76,8 @@ namespace ceinms {
         MultipleExternalForcesQueue& inputExternalForcesQueue,
         MuscleForcesQueue& inputMuscleForcesQueue,
         EstimatedTorquesQueue& inputEstimatedTorquesQueue,
-        ContactForcesQueue& outputJointReactionForcesQueue,
-        ContactForcesQueue& outputIntersegmentalForcesQueue,
+        VecContactForcesQueue& outputJointReactionForcesQueue,
+        VecContactForcesQueue& outputIntersegmentalForcesQueue,
         Concurrency::Latch& latch,
         const NMSmodelT& subject,
         const std::string& osimModelFilename,

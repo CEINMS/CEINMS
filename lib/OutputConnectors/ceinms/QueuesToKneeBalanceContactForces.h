@@ -28,11 +28,15 @@
 
 #ifndef ceinms_QueuesToKneeBalanceContactForces_h
 #define ceinms_QueuesToKneeBalanceContactForces_h
+
 #include "ceinms/ContactModelKneeBalanceSetup.h"
+#include "ceinms/queues/EstimatedTorquesQueue.h"
+#include "ceinms/queues/ExternalTorquesQueues.h"
+#include "ceinms/queues/ScalarContactForcesQueue.h"
+
 #include <vector>
 #include <string>
-class EstimatedTorquesQueue;
-class ExternalTorquesQueues;
+
 
 namespace ceinms {
 
@@ -41,16 +45,42 @@ namespace ceinms {
         template<typename NMSmodelT>
         QueuesToKneeBalanceContactForces(
             EstimatedTorquesQueue& inputEstimatedTorquesQueue,
-            ExternalTorquesQueues& inputExternalTOrquesQueue,
+            ExternalTorquesQueue& inputExternalTorquesQueue,
+            ScalarContactForcesQueue& outputContactForcesQueue,
             const ContactModelKneeBalanceSetup& contactModelSetup,
             const NMSmodelT& subject);
+        void operator()();
 
     private:
+        double getContactForce(double externalTorque, double estimatedTorque) const;
         double intercondyleDistance_;
-
-
-
+        Condyle condyle1_, condyle2_;
+        EstimatedTorquesQueue& inputEstimatedTorquesQueue_;
+        ExternalTorquesQueue& inputExternalTorquesQueue_;
+        ScalarContactForcesQueue& outputContactForcesQueue_;
+        std::vector<std::string> dofNamesFromSubject_;
     };
+
+    template<typename NMSmodelT>
+    QueuesToKneeBalanceContactForces::QueuesToKneeBalanceContactForces(
+        EstimatedTorquesQueue& inputEstimatedTorquesQueue,
+        ExternalTorquesQueue& inputExternalTorquesQueue,
+        ScalarContactForcesQueue& outputContactForcesQueue,
+        const ContactModelKneeBalanceSetup& contactModelSetup,
+        const NMSmodelT& subject) :
+        inputEstimatedTorquesQueue_(inputEstimatedTorquesQueue),
+        inputExternalTorquesQueue_(inputExternalTorquesQueue),
+        outputContactForcesQueue_(outputContactForcesQueue),
+        condyle1_(contactModelSetup.condyle1),
+        condyle2_(contactModelSetup.condyle2),
+        intercondyleDistance_(contactModelSetup.intercondyleDistance) {
+
+        subject.getDoFNames(dofNamesFromSubject_);
+
+    }
+
+
+
 
 }
 

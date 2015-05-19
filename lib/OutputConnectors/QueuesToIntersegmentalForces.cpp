@@ -53,14 +53,14 @@ namespace ceinms {
                     );
 
                 QueuesToXForces::calculateIntersegmentalForces();
-                ContactForcesFrame contactForces;
+                VecContactForcesFrame contactForces;
                 contactForces.time = generalisedCoordinatesFrame.time;
                 QueuesToXForces::getIntersegmentalForcesInG(contactForces.data);
                 outputIntersegmentalForcesQueue_.push(contactForces);
 
             }
         }
-        ContactForcesFrame contactForces;
+        VecContactForcesFrame contactForces;
         contactForces.time = std::numeric_limits<double>::infinity();
         outputIntersegmentalForcesQueue_.push(contactForces);
     }

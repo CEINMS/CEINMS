@@ -28,9 +28,10 @@
 
 #ifndef ceinms_QueuesToJointReactionForces_h
 #define ceinms_QueuesToJointReactionForces_h
+
 #include "ceinms/QueuesToXForces.h"
 #include "ceinms/GeneralisedCoordinatesData.h"
-#include "ceinms/queues/ContactForcesQueue.h"
+#include "ceinms/queues/VecContactForcesQueue.h"
 #include "ceinms/queues/EstimatedTorquesQueue.h"
 #include "ceinms/queues/GeneralisedCoordinatesQueue.h"
 #include "ceinms/queues/MuscleForcesQueue.h"
@@ -48,7 +49,7 @@ namespace ceinms {
             MultipleExternalForcesQueue& inputExternalForcesQueue,
             MuscleForcesQueue& inputMuscleForcesQueue,
             EstimatedTorquesQueue& inputEstimatedTorquesQueue,
-            ContactForcesQueue& outputJointReactionForcesQueue,
+            VecContactForcesQueue& outputJointReactionForcesQueue,
             Concurrency::Latch& latch,
             const NMSmodelT& subject,
             const std::string& osimModelFilename,
@@ -62,7 +63,7 @@ namespace ceinms {
         GeneralisedCoordinatesQueue& inputGeneralisedCoordinatesQueue_;
         MuscleForcesQueue& inputMuscleForcesQueue_;
         EstimatedTorquesQueue& inputEstimatedTorquesQueue_;
-        ContactForcesQueue& outputJointReactionForcesQueue_;
+        VecContactForcesQueue& outputJointReactionForcesQueue_;
     
     };
 
@@ -73,7 +74,7 @@ namespace ceinms {
         MultipleExternalForcesQueue& inputExternalForcesQueue,
         MuscleForcesQueue& inputMuscleForcesQueue,
         EstimatedTorquesQueue& inputEstimatedTorquesQueue,
-        ContactForcesQueue& outputJointReactionForcesQueue,
+        VecContactForcesQueue& outputJointReactionForcesQueue,
         Concurrency::Latch& latch,
         const NMSmodelT& subject,
         const std::string& osimModelFilename,

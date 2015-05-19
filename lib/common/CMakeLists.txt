@@ -11,8 +11,10 @@ set(Common_HEADERS  ceinms/ArrayConverter.h
                     ceinms/GeneralisedCoordinatesData.h
                     ceinms/ContactModelFromOpenSimSetup.h
                     ceinms/ContactModelKneeBalanceSetup.h
-                    ceinms/queues/ContactForcesQueue.h
-                    ceinms/queues/EstimatedTorquesQueue.h
+                    ceinms/Mapper.h
+                    ceinms/queues/VecContactForcesQueue.h
+					ceinms/queues/ScalarContactForcesQueue.h                    
+					ceinms/queues/EstimatedTorquesQueue.h
                     ceinms/queues/MultipleExternalForcesQueue.h
                     ceinms/queues/ExternalTorquesQueues.h
                     ceinms/queues/GeneralisedCoordinatesQueue.h
@@ -21,13 +23,18 @@ set(Common_HEADERS  ceinms/ArrayConverter.h
 
 set(Common_SOURCES  Parameter.cpp
                     FileUtils.cpp
-                    ExternalForceData.cpp)
+                    ExternalForceData.cpp
+					Mapper.cpp)
 
+set(Common_TEMPLATE_IMPLEMENTATION		)
+
+
+set_source_files_properties( ${Common_TEMPLATE_IMPLEMENTATION} PROPERTIES HEADER_FILE_ONLY TRUE)
 source_group("Headers" FILES ${Common_HEADERS})
-source_group("Sources" FILES ${Common_SOURCES})
+source_group("Sources" FILES ${Common_SOURCES} ${Common_TEMPLATE_IMPLEMENTATION} )
 
 # Define target
-add_library(ceinms_common STATIC ${Common_SOURCES} ${Common_HEADERS})
+add_library(ceinms_common STATIC ${Common_SOURCES} ${Common_HEADERS}  ${Common_TEMPLATE_IMPLEMENTATION})
 target_link_libraries(ceinms_common LINK_PRIVATE ${Boost_FILESYSTEM_LIBRARY} ${Boost_SYSTEM_LIBRARY} ${OPENSIM_LIBRARIES})
 target_include_directories(ceinms_common PUBLIC ${Boost_INCLUDE_DIRS} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR} ${SIMTK_INCLUDE_DIRS})
 

@@ -30,7 +30,7 @@
 #define ceinms_QueuesToIntersegmentalForces_h
 
 #include "ceinms/QueuesToXForces.h"
-#include "ceinms/queues/ContactForcesQueue.h"
+#include "ceinms/queues/VecContactForcesQueue.h"
 #include "ceinms/queues/MultipleExternalForcesQueue.h"
 #include "ceinms/queues/GeneralisedCoordinatesQueue.h"
 
@@ -43,7 +43,7 @@ namespace ceinms {
         QueuesToIntersegmentalForces(
         GeneralisedCoordinatesQueue& inputGeneralisedCoordinatesQueue,
         MultipleExternalForcesQueue& inputExternalForcesQueue,
-        ContactForcesQueue& outputIntersegmentalForcesQueue,
+        VecContactForcesQueue& outputIntersegmentalForcesQueue,
         Concurrency::Latch& latch,
         const NMSmodelT& subject,
         const std::string& osimModelFilename,
@@ -55,7 +55,7 @@ namespace ceinms {
 
     private:
         GeneralisedCoordinatesQueue& inputGeneralisedCoordinatesQueue_;
-        ContactForcesQueue& outputIntersegmentalForcesQueue_;
+        VecContactForcesQueue& outputIntersegmentalForcesQueue_;
 
     };
 
@@ -64,7 +64,7 @@ namespace ceinms {
     QueuesToIntersegmentalForces::QueuesToIntersegmentalForces(
         GeneralisedCoordinatesQueue& inputGeneralisedCoordinatesQueue,
         MultipleExternalForcesQueue& inputExternalForcesQueue,
-        ContactForcesQueue& outputIntersegmentalForcesQueue,
+        VecContactForcesQueue& outputIntersegmentalForcesQueue,
         Concurrency::Latch& latch,
         const NMSmodelT& subject,
         const std::string& osimModelFilename,

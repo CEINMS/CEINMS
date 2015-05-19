@@ -30,13 +30,15 @@
 #define ceinms_ContactModelKneeBalanceSetup_h
 #include <string>
 
-namespace ceinms {
-    struct ContactModelKneeBalanceSetup {
-        struct Condyle {
-            std::string name;
-            std::string dof;
-        };
 
+namespace ceinms {
+    
+    struct Condyle {
+        std::string name;
+        std::string dof;
+    };
+
+    struct ContactModelKneeBalanceSetup {
         double intercondyleDistance;
         Condyle condyle1, condyle2;
     };

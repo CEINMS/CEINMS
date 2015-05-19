@@ -62,13 +62,13 @@ namespace ceinms {
                     );
 
                 QueuesToXForces::calculateJointReactionForces(muscleForcesFrame.data, estimatedTorquesFrame.data);
-                ContactForcesFrame jrForces;
+                VecContactForcesFrame jrForces;
                 jrForces.time = generalisedCoordinatesFrame.time;
                 QueuesToXForces::getJointReactionForcesInG(jrForces.data);
                 outputJointReactionForcesQueue_.push(jrForces);
 
                 QueuesToXForces::calculateIntersegmentalForces();
-                ContactForcesFrame intForces;
+                VecContactForcesFrame intForces;
                 intForces.time = generalisedCoordinatesFrame.time;
                 QueuesToXForces::getIntersegmentalForcesInG(intForces.data);
                 outputIntersegmentalForcesQueue_.push(intForces);
@@ -76,7 +76,7 @@ namespace ceinms {
             }
         }
 
-        ContactForcesFrame endOfData;
+        VecContactForcesFrame endOfData;
         endOfData.time = std::numeric_limits<double>::infinity();
         outputJointReactionForcesQueue_.push(endOfData);
         outputIntersegmentalForcesQueue_.push(endOfData);

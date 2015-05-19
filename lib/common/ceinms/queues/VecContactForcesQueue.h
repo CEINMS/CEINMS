@@ -26,8 +26,8 @@
 * limitations under the License.                                             *
 * -------------------------------------------------------------------------- */
 
-#ifndef ceinms_ContactForcesQueue_h
-#define ceinms_ContactForcesQueue_h
+#ifndef ceinms_VecContactForcesQueue_h
+#define ceinms_VecContactForcesQueue_h
 
 #include <vector>
 #include <SimTKcommon.h>
@@ -40,8 +40,8 @@ namespace Concurrency {
 
 namespace ceinms {
 
-    using ContactForcesFrame = QueueData < std::vector<SimTK::Vec3> >;
-    using ContactForcesQueue = Concurrency::Queue < ContactForcesFrame >;
+    using VecContactForcesFrame = QueueData < std::vector<SimTK::Vec3> >;
+    using VecContactForcesQueue = Concurrency::Queue < VecContactForcesFrame >;
 
 }
 
