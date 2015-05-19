@@ -8,6 +8,7 @@ Read more about CEINMS at the [CEINMS project page](https://simtk.org/home/ceinm
 
 Quick Start
 -----------
+[Test data and examples](https://simtk.org/frs/download.php?file_id=4495)
 
 Dependencies
 ------------
@@ -20,9 +21,16 @@ CEINMS depends on the following
 
 Install
 -------
+[CEINMS 0.9 Win32 installer](https://simtk.org/frs/download.php?file_id=4494) (does not require any external library).
 
 Acknowledgments
 ---------------
+* Australian National Health and Medical Research Council (628850)
+* Royal Society of NZ Marsden Fund (12-UOA-1221)
+* US National Institutes of Health Grant (R01EB009351)
+* Commission of the European Union Grant (IFP7-ICT-2013-10-611695)
+* European Research Council (ERC) Advanced Grant DEMOVE (267888)
+
 <!---
 Useful links:
 [OpenSim 3.2 VC12P x86](https://drive.google.com/file/d/0BzMAK5L0QV2PSEkxSUVxSXd3NzA/edit?usp=sharing)
