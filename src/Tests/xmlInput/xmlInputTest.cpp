@@ -35,30 +35,12 @@ using std::string;
 #include "boost/filesystem.hpp"
 using boost::filesystem::absolute;
 using boost::filesystem::canonical;
-
-/*
-constexpr const char * const strend(const char * const str) {
-return *str ? strend(str + 1) : str;
-}
-
-constexpr const char * const fromlastslash(const char * const start, const char * const end) {
-    return (end >= start && *end != '/') ? fromlastslash(start, end - 1) : (end + 1);
-}
-
-constexpr const char * const pathlast(const char * const path) {
-    return fromlastslash(path, strend(path));
-}
-*/
-
+using boost::filesystem::path;
 int main() {
-    //    cout << pathlast(__FILE__) << endl;
-    //    boost::filesystem::path p(__FILE__);
-    //    boost::filesystem::path dir = p.parent_path() /= "TestData";
-    //    string filename(absolute(dir /= "contactModelKnee.xml").string());
-    //    cout << filename << endl;
 
-    //to fix when constexpr works on visual studio
-    string filename("C:/Users/S2849511/coding/versioning/ceinms/src/Tests/xmlInput/TestData/contactModelKnee.xml");
+    boost::filesystem::path dir = path(BASE_DIR) /= "TestData";
+    string filename((dir /= "contactModelKnee.xml").string());
+
     ceinms::ContactModelXmlReader contactModelReader(filename);
     switch (contactModelReader.getContactModelType()) {
     case ceinms::ContactModelType::OpenSim:
