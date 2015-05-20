@@ -49,7 +49,7 @@ namespace ceinms {
             const ContactModelKneeBalanceSetup& setup,
             const NMSmodelT& subject);
 
-        void initialize(const ContactModelKneeBalanceSetup& setup, const std::vector<std::string>& names);
+        void initialize(const ContactModelKneeBalanceSetup& setup, const std::vector<std::string>& dofNamesFromSubject);
         // externalTorques and estimatedTorques should have length of dofNamesFromSubject,
         // the mapping is done internally
         void setTorques(const std::vector<double>& externalTorques, const std::vector<double>& estimatedTorques);

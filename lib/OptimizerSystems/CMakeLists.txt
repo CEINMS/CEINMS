@@ -9,6 +9,9 @@ set(OptimizationSystems_HEADERS ceinms/NMSmodelSystem.h
                                 ceinms/AbstractOptimizerSystem.h
                                 ceinms/MinTorqueError.h
 								ceinms/Result.h
+                                ceinms/MinTorqueErrorAndContactForces.h
+                                ceinms/Barrier.h
+                                ceinms/SumKneeContactForces.h
                         )
 
 set(OptimizationSystems_TEMPLATE_IMPLEMENTATION
@@ -17,7 +20,7 @@ set(OptimizationSystems_TEMPLATE_IMPLEMENTATION
 							ceinms/BatchEvaluator.cpp
 							)
                             
-set(OptimizationSystems_SOURCES MinTorqueError.cpp Result.cpp
+set(OptimizationSystems_SOURCES MinTorqueError.cpp Result.cpp SumKneeContactForces.cpp
 )
 
 set_source_files_properties( ${OptimizationSystems_TEMPLATE_IMPLEMENTATION} PROPERTIES HEADER_FILE_ONLY TRUE)
@@ -33,7 +36,8 @@ target_include_directories( OptimizationSystems
                                     ${FileIO_INCLUDE_DIRS}
                                     ${ceinms_common_INCLUDE_DIRS}
 									${Optimizers_INCLUDE_DIRS}
-									${TrialData_INCLUDE_DIRS})
+									${TrialData_INCLUDE_DIRS}
+                                    ${JointContactModels_INCLUDE_DIRS})
 
 
 # Save path to include directory for "internal" usage
