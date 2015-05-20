@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<contactModel xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="contactModel.xsd">
+<kneeBalance>
+<intercondyleDistance>0.03</intercondyleDistance>
+<condyle>
+<name>medial_condyle_l</name>
+<dof>medial_tibia_l</dof>
+</condyle>
+<condyle>
+<name>lateral_condyle_l</name>
+<dof>lateral_tibia_l</dof>
+</condyle>
+</kneeBalance>
+</contactModel>

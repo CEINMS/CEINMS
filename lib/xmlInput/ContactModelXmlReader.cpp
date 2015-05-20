@@ -82,7 +82,7 @@ namespace ceinms {
 
     ContactModelType ContactModelXmlReader::getContactModelType() const {
 
-        return ContactModelType::OpenSim;
+        return contactModelType_;
     }
 
 
@@ -118,11 +118,11 @@ namespace ceinms {
             ContactModelXsd::KneeBalanceType& kneeBalance(*(contactModelPointer_->kneeBalance().begin()));
             setupKneeBalance_.intercondyleDistance = kneeBalance.intercondyleDistance();
 
-            setupKneeBalance_.condyle1.dof = kneeBalance.condyle().front().dof().front();
-            setupKneeBalance_.condyle2.dof = kneeBalance.condyle().back().dof().front();
+            setupKneeBalance_.condyle1.dof = kneeBalance.condyle().front().dof();
+            setupKneeBalance_.condyle2.dof = kneeBalance.condyle().back().dof();
 
-            setupKneeBalance_.condyle1.name = kneeBalance.condyle().front().name().front();
-            setupKneeBalance_.condyle2.name = kneeBalance.condyle().back().name().front();
+            setupKneeBalance_.condyle1.name = kneeBalance.condyle().front().name();
+            setupKneeBalance_.condyle2.name = kneeBalance.condyle().back().name();
         }
 
     }
