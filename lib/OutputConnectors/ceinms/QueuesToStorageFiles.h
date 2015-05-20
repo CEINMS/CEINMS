@@ -34,6 +34,7 @@
 #include <boost/filesystem.hpp>
 #include "OutputConnectors.h"
 #include "ceinms/InputConnectors.h"
+#include "ceinms/concurrency/Latch.h"
 
 namespace ceinms {
     class QueuesToStorageFiles {

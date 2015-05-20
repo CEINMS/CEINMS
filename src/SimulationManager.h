@@ -49,9 +49,11 @@ namespace ceinms {
         template <typename NMSmodelT, template <typename, typename> class ModelEvaluatorT, typename LoggerT>
         bool runOpenLoop(bool useContactForces);
         template <typename NMSmodelT, template <typename, typename> class ModelEvaluatorT, typename LoggerT>
-        bool runOpenLoopWithJointReactionForces();
+        bool runOpenLoopWithGenericContactModel();
         template <typename NMSmodelT, template <typename, typename> class ModelEvaluatorT, typename LoggerT>
-        bool runOpenLoopNoContactForces();
+        bool runOpenLoopWithKneeBalanceContactModel();
+        template <typename NMSmodelT, template <typename, typename> class ModelEvaluatorT, typename LoggerT>
+        bool runOpenLoop();
         template <typename T>
         bool runHybrid();
 

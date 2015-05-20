@@ -27,12 +27,41 @@
 * -------------------------------------------------------------------------- */
 
 #include "ceinms/QueuesToKneeBalanceContactForces.h"
+#include "ceinms/QueuesSync.h"
+#include <tuple>
+#include <limits>
 
 namespace ceinms {
 
     void QueuesToKneeBalanceContactForces::operator()(){
 
+        inputExternalTorquesQueue_.subscribe();
+        inputEstimatedTorquesQueue_.subscribe();
 
+        subscriptionLatch_.wait();
 
+        bool runCondition(true);
+        while (runCondition) {
+
+            auto frames(QueuesSync::sync(inputExternalTorquesQueue_, inputEstimatedTorquesQueue_));
+            ExternalTorquesFrame externalTorquesFrame;
+            EstimatedTorquesFrame estimatedTorquesFrame;
+            std::tie(externalTorquesFrame, estimatedTorquesFrame) = frames;
+            if (externalTorquesFrame.time == std::numeric_limits<double>::infinity() ||
+                estimatedTorquesFrame.time == std::numeric_limits<double>::infinity())
+                runCondition = false;
+            if (runCondition) {
+                kneeContactModel_.setTorques(externalTorquesFrame.data, estimatedTorquesFrame.data);
+                ScalarContactForcesFrame contactForcesFrame;
+                contactForcesFrame.time = estimatedTorquesFrame.time;
+                kneeContactModel_.getContactForces(contactForcesFrame.data);
+                outputContactForcesQueue_.push(contactForcesFrame);
+            }
+        }
+
+        ScalarContactForcesFrame eod;
+        eod.time = std::numeric_limits<double>::infinity();
+        outputContactForcesQueue_.push(eod);
     }
+
 }

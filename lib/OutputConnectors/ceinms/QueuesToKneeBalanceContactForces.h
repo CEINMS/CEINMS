@@ -29,10 +29,14 @@
 #ifndef ceinms_QueuesToKneeBalanceContactForces_h
 #define ceinms_QueuesToKneeBalanceContactForces_h
 
+#include "ceinms/concurrency/Latch.h"
+#include "ceinms/concurrency/Queue.h"
 #include "ceinms/ContactModelKneeBalanceSetup.h"
 #include "ceinms/queues/EstimatedTorquesQueue.h"
 #include "ceinms/queues/ExternalTorquesQueues.h"
 #include "ceinms/queues/ScalarContactForcesQueue.h"
+#include "ceinms/Mapper.h"
+#include "ceinms/KneeBalanceContactModel.h"
 
 #include <vector>
 #include <string>
@@ -47,18 +51,17 @@ namespace ceinms {
             EstimatedTorquesQueue& inputEstimatedTorquesQueue,
             ExternalTorquesQueue& inputExternalTorquesQueue,
             ScalarContactForcesQueue& outputContactForcesQueue,
+            Concurrency::Latch& subscriptionLatch,
             const ContactModelKneeBalanceSetup& contactModelSetup,
             const NMSmodelT& subject);
         void operator()();
 
     private:
-        double getContactForce(double externalTorque, double estimatedTorque) const;
-        double intercondyleDistance_;
-        Condyle condyle1_, condyle2_;
         EstimatedTorquesQueue& inputEstimatedTorquesQueue_;
         ExternalTorquesQueue& inputExternalTorquesQueue_;
         ScalarContactForcesQueue& outputContactForcesQueue_;
-        std::vector<std::string> dofNamesFromSubject_;
+        Concurrency::Latch& subscriptionLatch_;
+        KneeBalanceContactModel kneeContactModel_;
     };
 
     template<typename NMSmodelT>
@@ -66,22 +69,15 @@ namespace ceinms {
         EstimatedTorquesQueue& inputEstimatedTorquesQueue,
         ExternalTorquesQueue& inputExternalTorquesQueue,
         ScalarContactForcesQueue& outputContactForcesQueue,
+        Concurrency::Latch& subscriptionLatch,
         const ContactModelKneeBalanceSetup& contactModelSetup,
         const NMSmodelT& subject) :
         inputEstimatedTorquesQueue_(inputEstimatedTorquesQueue),
         inputExternalTorquesQueue_(inputExternalTorquesQueue),
         outputContactForcesQueue_(outputContactForcesQueue),
-        condyle1_(contactModelSetup.condyle1),
-        condyle2_(contactModelSetup.condyle2),
-        intercondyleDistance_(contactModelSetup.intercondyleDistance) {
-
-        subject.getDoFNames(dofNamesFromSubject_);
-
-    }
-
-
-
-
+        subscriptionLatch_(subscriptionLatch),
+        kneeContactModel_(contactModelSetup, subject)
+         {   }
 }
 
 #endif

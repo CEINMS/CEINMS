@@ -24,17 +24,20 @@ set(OutputConnectors_HEADERS
 )
 
 set(QueuesToStorageFiles_SOURCES
-  QueuesToStorageFiles/QueuesToStorageFiles.cpp
+    QueuesToStorageFiles/QueuesToStorageFiles.cpp
+    QueuesToStorageFiles/QueueToStorageFile.cpp
+  
 )
 
 set(QueuesToStorageFiles_HEADERS
     ceinms/QueuesToStorageFiles.h
+    ceinms/QueueToStorageFile.h
 )
 
 
 set(OutputConnectors_TEMPLATE_IMPLEMENTATION
 	QueuesToContactForces.cpp
-							)
+	)
   
 set_source_files_properties( ${OutputConnectors_TEMPLATE_IMPLEMENTATION} PROPERTIES HEADER_FILE_ONLY TRUE)
 

@@ -29,6 +29,7 @@
 #ifndef ceinms_QueuesSync_h
 #define ceinms_QueuesSync_h
 #include <tuple>
+#include <limits>
 
 namespace ceinms {
     namespace QueuesSync {
@@ -49,6 +50,12 @@ namespace ceinms {
             auto frame1(queue1.pop());
             return std::make_tuple(frame1, syncToTime(frame1.time, queues)...);
         }
+
+        template<typename T>
+        bool isEndOfData(const T& frame) {
+            return frame.time == std::numeric_limits<double>::infinity();
+        }
+
     }
 
 }

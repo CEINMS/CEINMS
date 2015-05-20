@@ -59,8 +59,11 @@
 #include "ceinms/LoggerOnQueues.h"
 #include "ceinms/QueuesToStorageFiles.h"
 #include "ceinms/QueuesToJointReactionForces.h"
+#include "ceinms/QueuesToKneeBalanceContactForces.h"
 
 #include "ceinms/queues/VecContactForcesQueue.h"
+#include "ceinms/queues/ScalarContactForcesQueue.h"
+#include "ceinms/QueueToStorageFile.h"
 
 #include <string>
 using std::string;
@@ -94,16 +97,114 @@ namespace ceinms {
     template <typename NMSmodelT, template <typename, typename> class ModelEvaluatorT, typename LoggerT>
     bool SimulationManager::runOpenLoop(bool useContactForces) {
         
-        if (useContactForces)
-            runOpenLoopWithJointReactionForces < NMSmodelT, ModelEvaluatorT, LoggerT >();
+        if (useContactForces) {
+            switch (contactModelCfg_.getContactModelType()) {
+            case ContactModelType::OpenSim: 
+                runOpenLoopWithGenericContactModel < NMSmodelT, ModelEvaluatorT, LoggerT >();
+                break;
+            case ContactModelType::KneeBalance: 
+                runOpenLoopWithKneeBalanceContactModel < NMSmodelT, ModelEvaluatorT, LoggerT >();
+                break;
+            }
+        }
         else 
-            runOpenLoopNoContactForces < NMSmodelT, ModelEvaluatorT, LoggerT >();
+            runOpenLoop< NMSmodelT, ModelEvaluatorT, LoggerT >();
         return true;
     }
 
 
     template <typename NMSmodelT, template <typename, typename> class ModelEvaluatorT, typename LoggerT>
-    bool SimulationManager::runOpenLoopWithJointReactionForces() {
+    bool SimulationManager::runOpenLoopWithKneeBalanceContactModel() {
+
+        InputConnectors inputConnectors;
+        OutputConnectors outputConnectors;
+
+        NMSmodelT mySubject;
+        setupSubject(mySubject, subjectFile_, executionCfg_.getTolerance());
+
+        // 2. define the thread connecting with the input sources
+        string emgFilename(dataLocations_.getExcitationsFile());
+        EMGFromFile emgProducer(inputConnectors, mySubject, emgFilename, emgGeneratorFile_);
+
+        vector< string > dofNames;
+        mySubject.getDoFNames(dofNames);
+        vector< string > maFilename;
+        sortMaFilenames(dataLocations_.getMaFiles(), dofNames, maFilename);
+        LmtMaFromStorageFile lmtMaProducer(inputConnectors, mySubject, dataLocations_.getLmtFile(), maFilename);
+
+        string externalTorqueFilename(dataLocations_.getExternalTorqueFile());
+        ExternalTorquesFromStorageFile externalTorquesProducer(inputConnectors, mySubject, externalTorqueFilename);
+
+        vector<string> dataToLog = { "Activations",
+            "FiberLenghts",
+            "NormFiberLengths",
+            "FiberVelocities",
+            "NormFiberVelocities",
+            "PennationAngles",
+            "MuscleForces",
+            "Torques" };
+
+
+        vector<string> valuesToWrite = dataToLog;
+        QueuesToStorageFiles queuesToStorageFiles(inputConnectors, outputConnectors, mySubject, valuesToWrite, outputDirectory_);
+
+        // 3. define the model simulator
+        vector<string> valuesToLog = dataToLog;
+        ModelEvaluatorT<NMSmodelT, LoggerT>  simulator(inputConnectors, outputConnectors, mySubject, valuesToLog);
+
+        //4. define contact forces queue
+        ScalarContactForcesQueue outputContactForcesQueue;
+        //5. define contact forces estimator
+        QueuesToKneeBalanceContactForces queuesToKneeBalanceContactForces(
+            *outputConnectors.logQueues["Torques"],
+            inputConnectors.queueExternalTorques,
+            outputContactForcesQueue,
+            inputConnectors.doneWithSubscription,
+            contactModelCfg_.getContactModelSetupKneeBalance(),
+            mySubject);
+
+        const vector<string> contactForcesNames{
+            contactModelCfg_.getContactModelSetupKneeBalance().condyle1.name+"_force",
+            contactModelCfg_.getContactModelSetupKneeBalance().condyle2.name+ "_force",
+        };
+
+        //6. define logging for contact forces
+        QueueToStorageFile contactForcesLogger(
+            outputContactForcesQueue,
+            inputConnectors.doneWithSubscription,
+            outputConnectors.doneWithExecution,
+            contactForcesNames,
+            "ContactForces",
+            outputDirectory_);
+                
+        inputConnectors.doneWithSubscription.setCount(7);
+        outputConnectors.doneWithExecution.setCount(3);
+
+        // 4. start the threads
+        std::thread emgProdThread(std::ref(emgProducer));
+        std::thread externalTorquesProdThread(std::ref(externalTorquesProducer));
+        std::thread lmtMaProdThread(std::ref(lmtMaProducer));
+        std::thread simulatorThread(std::ref(simulator));
+        std::thread queuesToStorageFilesThread(std::ref(queuesToStorageFiles));
+        std::thread kneeContactModelThread(std::ref(queuesToKneeBalanceContactForces));
+        std::thread kneeContactModelLoggerThread(std::ref(contactForcesLogger));
+
+        emgProdThread.join();
+        lmtMaProdThread.join();
+        externalTorquesProdThread.join();
+        simulatorThread.join();
+        queuesToStorageFilesThread.join();
+        kneeContactModelThread.join();
+        kneeContactModelLoggerThread.join();
+
+        return 0;
+
+    }
+
+
+
+    template <typename NMSmodelT, template <typename, typename> class ModelEvaluatorT, typename LoggerT>
+    bool SimulationManager::runOpenLoopWithGenericContactModel() {
         
         InputConnectors inputConnectors;
         OutputConnectors outputConnectors;
@@ -213,7 +314,7 @@ namespace ceinms {
 
 
     template <typename NMSmodelT, template <typename, typename> class ModelEvaluatorT, typename LoggerT>
-    bool SimulationManager::runOpenLoopNoContactForces() {
+    bool SimulationManager::runOpenLoop() {
 
         //Monica probably won't like this
         InputConnectors inputConnectors;
