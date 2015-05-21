@@ -74,9 +74,17 @@ namespace ceinms {
         calibrationFile_(ceinmsCalibrationSetup_.getCalibrationFile()),
         calibrationXmlReader_(ceinmsCalibrationSetup_.getCalibrationFile()),
         calibratedSubjectFile_(ceinmsCalibrationSetup_.getOutputSubjectFile()),
-        emgGeneratorFile_(ceinmsCalibrationSetup_.getExcitationGeneratorFile()) {
+        emgGeneratorFile_(ceinmsCalibrationSetup_.getExcitationGeneratorFile()),
+        hasContactModel_(ceinmsCalibrationSetup_.hasContactModel()){
 
         calibrationXmlReader_.getCalibrationTrials(calibrationTrialIDs_);
+        cout << "Contact model ";
+        if (hasContactModel_) {
+            cout << "found" << endl;
+            contactModelCfg_.setXmlInputFile(ceinmsCalibrationSetup_.getContactModelFile());
+        }
+        else
+            cout << " not found" << endl;
     }
 
     template <typename NMSmodelT>
@@ -119,7 +127,7 @@ namespace ceinms {
                     ObjectiveFunctionSetup objectiveFunctionSetup = currentCalibrationStep.getObjectiveFunctionSetup();
 
                     SumKneeContactForces sumKneeContacts(objectiveFunctionSetup);
-                    //sumKneeContacts.setContactModelSetup();
+                    sumKneeContacts.setContactModelSetup(contactModelCfg_.getContactModelSetupKneeBalance());
                     MinTorqueError minTorqueError;
                     MinTorqueErrorAndContactForces minTorqueErrorAndContactForces(minTorqueError, sumKneeContacts);
 

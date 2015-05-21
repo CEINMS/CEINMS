@@ -121,6 +121,23 @@ namespace ceinms {
             return filepath_ + fileName;
     }
 
+
+    std::string CeinmsCalibrationSetupXmlReader::getContactModelFile() {
+
+        std::string fileName(*(ceinmsCalibrationSetupPointer_->contactModelFile().begin()));
+        FileUtils::trim(fileName);
+        if (FileUtils::isAbsolute(fileName.c_str()))
+            return fileName;
+        else
+            return filepath_ + fileName;
+    }
+
+    bool CeinmsCalibrationSetupXmlReader::hasContactModel() {
+
+        return !(ceinmsCalibrationSetupPointer_->contactModelFile().empty());
+    }
+
+
     bool CeinmsCalibrationSetupXmlReader::writeTemplateCeinmsCalibrationSetupFile(const std::string& templateFile)
     {
         std::ofstream templateFileStream(templateFile);
