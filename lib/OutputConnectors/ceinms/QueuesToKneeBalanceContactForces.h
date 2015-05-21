@@ -36,7 +36,7 @@
 #include "ceinms/queues/ExternalTorquesQueues.h"
 #include "ceinms/queues/ScalarContactForcesQueue.h"
 #include "ceinms/Mapper.h"
-#include "ceinms/KneeBalanceContactModel.h"
+#include "ceinms/ContactModelKneeBalance.h"
 
 #include <vector>
 #include <string>
@@ -61,7 +61,7 @@ namespace ceinms {
         ExternalTorquesQueue& inputExternalTorquesQueue_;
         ScalarContactForcesQueue& outputContactForcesQueue_;
         Concurrency::Latch& subscriptionLatch_;
-        KneeBalanceContactModel kneeContactModel_;
+        ContactModelKneeBalance kneeContactModel_;
     };
 
     template<typename NMSmodelT>

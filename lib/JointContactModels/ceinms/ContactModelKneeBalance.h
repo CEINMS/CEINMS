@@ -26,8 +26,8 @@
 * limitations under the License.                                             *
 * -------------------------------------------------------------------------- */
 
-#ifndef ceinms_KneeBalanceContactModel_h
-#define ceinms_KneeBalanceContactModel_h
+#ifndef ceinms_ContactModelKneeBalance_h
+#define ceinms_ContactModelKneeBalance_h
 #include "ceinms/ContactModelKneeBalanceSetup.h"
 #include "ceinms/Mapper.h"
 #include <vector>
@@ -35,17 +35,17 @@
 
 namespace ceinms {
 
-    class KneeBalanceContactModel {
+    class ContactModelKneeBalance {
 
     public:
-        KneeBalanceContactModel();
+        ContactModelKneeBalance();
 
-        KneeBalanceContactModel(
+        ContactModelKneeBalance(
             const ContactModelKneeBalanceSetup& setup,
             const std::vector<std::string>& dofNamesFromSubject);
 
         template<typename NMSmodelT>
-        KneeBalanceContactModel(
+        ContactModelKneeBalance(
             const ContactModelKneeBalanceSetup& setup,
             const NMSmodelT& subject);
 
@@ -63,17 +63,18 @@ namespace ceinms {
         double calculateSingleForce(double externalTorque, double estimatedTorque) const;
         double intercondyleDistance_;
         std::vector<double> contactForces_;
-        std::vector<std::string> condyleNames_, dofNamesFromSubject_;
+        std::vector<std::string> condyleNames_, condyleDofs_;
         std::vector<Mapper> fromSubjectTorquesToCondyleOppositeTorque_;
     };
 
     template<typename NMSmodelT>
-    KneeBalanceContactModel::KneeBalanceContactModel(
+    ContactModelKneeBalance::ContactModelKneeBalance(
         const ContactModelKneeBalanceSetup& setup,
         const NMSmodelT& subject) :
         fromSubjectTorquesToCondyleOppositeTorque_(2),
         condyleNames_(2),
-        contactForces_(2){
+        contactForces_(2),
+        condyleDofs_(2){
 
         std::vector<std::string> dofNamesFromSubject;
         subject.getDoFNames(dofNamesFromSubject);

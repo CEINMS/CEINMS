@@ -31,6 +31,7 @@
 
 #include <vector>
 #include <string>
+#include <iostream>
 
 namespace ceinms {
 
@@ -52,6 +53,10 @@ namespace ceinms {
     template<typename T>
     std::vector<T> Mapper::map(const std::vector<T>& in, T defaultValue) const {
 
+        if (in.size() != inSize_) {
+            std::cout << "Mapper: provided " << in.size() << " values, espected " << inSize_ << std::endl;
+            std::exit(EXIT_FAILURE);
+        }
         //this is flawed, since it works with double, but may have problems with other types..
         //maybe add a second parameter that is the default value
         std::vector<T> out(outSize_, defaultValue); 

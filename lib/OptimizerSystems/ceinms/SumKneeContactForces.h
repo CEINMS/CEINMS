@@ -33,7 +33,7 @@
 #include "ceinms/TrialData.h"
 #include "Result.h"
 #include "ceinms/ContactModelKneeBalanceSetup.h"
-#include "ceinms/KneeBalanceContactModel.h"
+#include "ceinms/ContactModelKneeBalance.h"
 #include "Barrier.h"
 #include "ceinms/Mapper.h"
 #include "ceinms/ObjectiveFunctionSetup.h"
@@ -66,7 +66,7 @@ namespace ceinms {
     private:
         double f_, weight_, exponent_;
         std::vector<TrialData> trials_;
-        KneeBalanceContactModel kneeContactModel_;
+        ContactModelKneeBalance kneeContactModel_;
         ContactModelKneeBalanceSetup kneeContactModelSetup_;
         BarrierFunction barrierFunc_;
     };

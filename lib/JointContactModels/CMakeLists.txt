@@ -5,7 +5,7 @@ project(JointContactModels)
 # List source files
 set(JointContactModels_HEADERS 
     ceinms/JointContactFromOpensim.h                            
-    ceinms/KneeBalanceContactModel.h
+    ceinms/ContactModelKneeBalance.h
     )
 
 set(JointContactModels_TEMPLATE_IMPLEMENTATION
@@ -14,7 +14,7 @@ set(JointContactModels_TEMPLATE_IMPLEMENTATION
                             
 set(JointContactModels_SOURCES 
     JointContactFromOpensim.cpp
-    KneeBalanceContactModel.cpp
+    ContactModelKneeBalance.cpp
 )
 
 set_source_files_properties( ${JointContactModels_TEMPLATE_IMPLEMENTATION} PROPERTIES HEADER_FILE_ONLY TRUE)
