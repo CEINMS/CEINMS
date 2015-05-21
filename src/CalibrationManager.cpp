@@ -119,6 +119,7 @@ namespace ceinms {
                     ObjectiveFunctionSetup objectiveFunctionSetup = currentCalibrationStep.getObjectiveFunctionSetup();
 
                     SumKneeContactForces sumKneeContacts(objectiveFunctionSetup);
+                    //sumKneeContacts.setContactModelSetup();
                     MinTorqueError minTorqueError;
                     MinTorqueErrorAndContactForces minTorqueErrorAndContactForces(minTorqueError, sumKneeContacts);
 
