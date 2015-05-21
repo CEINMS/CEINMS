@@ -45,6 +45,10 @@ using std::vector;
 #include "ceinms/Activation/ExponentialActivation.h"
 #include "ceinms/Activation/PiecewiseActivation.h"
 #include "ceinms/MinTorqueError.h"
+#include "ceinms/SumKneeContactForces.h"
+#include "ceinms/MinTorqueErrorAndContactForces.h"
+
+
 #include "ceinms/SimulatedAnnealing.h"
 #include "ceinms/NMSmodelSystem.h"
 #include "ceinms/Curve.h"
@@ -53,6 +57,7 @@ using std::vector;
 #include "ceinms/ExternalTorquesFromStorageFile.h"
 #include "ceinms/LmtMaFromStorageFile.h"
 
+#include "ceinms/ObjectiveFunctionSetup.h"
 #include "ceinms/QueuesToTrialData.h"
 #include "ceinms/InputConnectors.h"
 #include "ceinms/OutputConnectors.h"
@@ -94,9 +99,32 @@ namespace ceinms {
                     currentCalibrationStep.getDofNames(dofsToCalibrate);
                     ParameterSet parameterSet;
                     currentCalibrationStep.getParameterSet(parameterSet);
+                    ObjectiveFunctionSetup objectiveFunctionSetup = currentCalibrationStep.getObjectiveFunctionSetup();
 
                     using MySystem = NMSmodelSystem < NMSmodelT, MinTorqueError>;
                     MySystem system(mySubject, trials, MinTorqueError(), parameterSet, dofsToCalibrate);
+
+                    SimulatedAnnealingParameters simanParameters;
+                    calibrationXmlReader_.getOptimizationAlgorithmParameters(simanParameters);
+                    Optimizers::SimulatedAnnealing<MySystem> optimizer(system, simanParameters);
+                    exitflag = optimizer.optimize();
+                }   break;
+
+                case CalibrationCfg::TorqueErrorAndSumKneeContactForcesParameterSetDefault: {
+
+                    vector<string> dofsToCalibrate;
+                    currentCalibrationStep.getDofNames(dofsToCalibrate);
+                    ParameterSet parameterSet;
+                    currentCalibrationStep.getParameterSet(parameterSet);
+                    ObjectiveFunctionSetup objectiveFunctionSetup = currentCalibrationStep.getObjectiveFunctionSetup();
+
+                    SumKneeContactForces sumKneeContacts(objectiveFunctionSetup);
+                    MinTorqueError minTorqueError;
+                    MinTorqueErrorAndContactForces minTorqueErrorAndContactForces(minTorqueError, sumKneeContacts);
+
+
+                    using MySystem = NMSmodelSystem < NMSmodelT, MinTorqueErrorAndContactForces>;
+                    MySystem system(mySubject, trials, minTorqueErrorAndContactForces, parameterSet, dofsToCalibrate);
 
                     SimulatedAnnealingParameters simanParameters;
                     calibrationXmlReader_.getOptimizationAlgorithmParameters(simanParameters);

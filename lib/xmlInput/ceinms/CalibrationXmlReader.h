@@ -39,6 +39,7 @@
 #include "calibration.hxx"
 #include "ceinms/SimulatedAnnealingParameters.h"
 #include "ceinms/Parameter.h"
+#include "ceinms/ObjectiveFunctionSetup.h"
 
 namespace ceinms {
 
@@ -47,21 +48,22 @@ namespace ceinms {
     class CalibrationStep {
 
     public:
-        void setObjectiveFunction(unsigned objectiveFunction);
+        void setObjectiveFunction(unsigned objectiveFunction, double weight, double exponent);
         void setParametersPolicy(unsigned parametersPolicy);
         CalibrationCfg::Step getStepCfg() const;
-
+        ObjectiveFunctionSetup getObjectiveFunctionSetup() const;
         void pushDofName(std::string& dofName);
         void getDofNames(std::list<std::string>& dofNames) const;
         void getDofNames(std::vector<std::string>& dofNames) const;
 
         void pushParameter(const Parameter& parameter);
         void getParameterSet(ParameterSet& parameterSet) const;
+        void setBarrierList(const BarrierListSetup& barrierListSetup);
 
         friend std::ostream& operator<< (std::ostream& output, const CalibrationStep& b);
 
     private:
-        unsigned objectiveFunction_;
+        ObjectiveFunctionSetup objectiveFunctionSetup_;
         std::list<std::string> dofNames_;
         ParameterSet parameterSet_;
     };
@@ -88,6 +90,7 @@ namespace ceinms {
         void readStep(CalibrationXsd::StepType& stepType, CalibrationStep& calibrationStep);
         void readParameter(CalibrationXsd::ParameterType& parameterType, Parameter& parameter);
         void readCalibrationTrialList();
+        BarrierListSetup readBarrierList(CalibrationXsd::ObjectiveFunctionElementType& objectiveFunctionType);
         unsigned runMode_;
         unsigned optimizationAlgorithm_;
         std::string trialsDirectory_;

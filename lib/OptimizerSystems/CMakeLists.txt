@@ -20,7 +20,7 @@ set(OptimizationSystems_TEMPLATE_IMPLEMENTATION
 							ceinms/BatchEvaluator.cpp
 							)
                             
-set(OptimizationSystems_SOURCES MinTorqueError.cpp Result.cpp SumKneeContactForces.cpp
+set(OptimizationSystems_SOURCES MinTorqueError.cpp Result.cpp SumKneeContactForces.cpp MinTorqueErrorAndContactForces.cpp
 )
 
 set_source_files_properties( ${OptimizationSystems_TEMPLATE_IMPLEMENTATION} PROPERTIES HEADER_FILE_ONLY TRUE)

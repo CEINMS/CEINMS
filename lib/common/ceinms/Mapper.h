@@ -41,7 +41,7 @@ namespace ceinms {
         Mapper(const std::vector<std::string>& inNames, const std::vector<std::string>& outNames);
         void setNames(const std::vector<std::string>& inNames, const std::vector<std::string>& outNames);
         template<typename T>
-        std::vector<T> map(const std::vector<T>& in, T defaultValue = T{}); //the return object will be copy elided
+        std::vector<T> map(const std::vector<T>& in, T defaultValue = T{}) const; //the return object will be copy elided
     private:
         size_t inSize_, outSize_;
         std::vector<int> inToOutMapping_; //using int because in case in > out, we can use -1 as not-map token
@@ -50,7 +50,7 @@ namespace ceinms {
 
 
     template<typename T>
-    std::vector<T> Mapper::map(const std::vector<T>& in, T defaultValue) {
+    std::vector<T> Mapper::map(const std::vector<T>& in, T defaultValue) const {
 
         //this is flawed, since it works with double, but may have problems with other types..
         //maybe add a second parameter that is the default value

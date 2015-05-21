@@ -56,7 +56,25 @@
   <xs:simpleType name="TrialSetType">
     <xs:list itemType="xs:string"/>
   </xs:simpleType>
-  <xs:complexType name="ObjectiveFunctionElementType"/>
+  
+  
+  <xs:complexType name="BarrierType" >
+    <xs:sequence>
+      <xs:element name="targetName" minOccurs="1" maxOccurs="1" type="xs:token"/>
+      <xs:element name="range"  minOccurs="1" maxOccurs="1" type="TwoDoublesType"/>
+    </xs:sequence>
+  <xs:attribute type="xs:double" name="weight" use="optional" default="1"/>
+  <xs:attribute type="xs:double" name="exponent" use="optional" default="2" />
+  </xs:complexType>
+    
+  <xs:complexType name="ObjectiveFunctionElementType">
+   <xs:sequence>
+      <xs:element name="barrier" minOccurs="0" maxOccurs="unbounded" type="BarrierType"/>
+   </xs:sequence>
+    <xs:attribute type="xs:double" name="weight" use="optional" default="1"/>
+    <xs:attribute type="xs:double" name="exponent" use="optional" default="2" />
+  </xs:complexType>
+  
   <xs:complexType name="GlobalParameterType"/>
 
   <xs:simpleType name="SingleParameterType">
@@ -66,6 +84,8 @@
   <xs:complexType name="ObjectiveFunctionType">
     <xs:choice>
       <xs:element name="minimizeTorqueError" type="ObjectiveFunctionElementType"/>
+      <xs:element name="sumKneeContactForces" type="ObjectiveFunctionElementType"/>
+      <xs:element name="torqueErrorAndSumKneeContactForces" type="ObjectiveFunctionElementType"/>
     </xs:choice>
   </xs:complexType>
   <xs:simpleType name="DoFsType">

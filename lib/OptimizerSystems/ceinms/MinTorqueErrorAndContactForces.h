@@ -33,28 +33,24 @@
 #include "ceinms/TrialData.h"
 #include "Result.h"
 #include "MinTorqueError.h"
+#include "SumKneeContactForces.h"
 #include "Barrier.h"
 #include <cmath>
 
 namespace ceinms {
 
-
-    struct PenaltyFunctionSetup {
-    };
-
-    struct ContactForceCalibrationSetup {
-
-    };
-
+    //this is going to become a composition of objective functions.. sooner or later..
     class MinTorqueErrorAndContactForces {
     public:
-        MinTorqueErrorAndContactForces() : f_(std::numeric_limits<double>::max()) {}
+        MinTorqueErrorAndContactForces(const MinTorqueError& torqueErrorFun, const SumKneeContactForces& sumKneeContactFun);
+   //     MinTorqueErrorAndContactForces();
         void setDofsToCalibrate(const std::vector<std::string>& dofsToCalibrate);
         void setTrials(const std::vector<TrialData>& trials);
         void calculate(const std::vector<Result>& results);
         double getValue() const { return f_; }
     private:
         MinTorqueError minTorqueError_;
+        SumKneeContactForces sumKneeContactForces_;
         double f_;
         std::vector<TrialData> trials_;
         std::vector<std::string> dofsToCalibrate_;

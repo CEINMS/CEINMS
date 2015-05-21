@@ -35,26 +35,40 @@
 #include "ceinms/ContactModelKneeBalanceSetup.h"
 #include "ceinms/KneeBalanceContactModel.h"
 #include "Barrier.h"
+#include "ceinms/Mapper.h"
+#include "ceinms/ObjectiveFunctionSetup.h"
 
 namespace ceinms {
-    class SumKneeContactForcesSetup;
+
+    class BarrierFunction {
+    public:
+        BarrierFunction();
+        void initialize(const BarrierListSetup& setup, const std::vector<std::string>& namesFromInput);
+        double getValue(const std::vector<double>& x) const;
+    private:
+        std::vector<Barrier> barriers_;
+        std::vector<std::string> barrierTargetNames_;
+        Mapper barrierMapper_;
+        double f_;
+    };
+
     class SumKneeContactForces {
     public:
+        SumKneeContactForces(const ObjectiveFunctionSetup& setup);
         SumKneeContactForces() : f_(std::numeric_limits<double>::max()) {}
         void setDofsToCalibrate(const std::vector<std::string>& dofsToCalibrate) {};
         void setTrials(const std::vector<TrialData>& trials);
         void calculate(const std::vector<Result>& results);
         double getValue() const { return f_; }
-        void setSumKneeContactForcesSetup(const SumKneeContactForcesSetup& setup); //this has to have weightings and exponents for the obj functions
+        void setSetup(const ObjectiveFunctionSetup& setup);
         void setContactModelSetup(const ContactModelKneeBalanceSetup& setup);
         void setBarrierParameters(double xL, double xR, double weight, double exponent);
     private:
-        double f_;
+        double f_, weight_, exponent_;
         std::vector<TrialData> trials_;
         KneeBalanceContactModel kneeContactModel_;
         ContactModelKneeBalanceSetup kneeContactModelSetup_;
-        Barrier barrier_;
-
+        BarrierFunction barrierFunc_;
     };
 
 }

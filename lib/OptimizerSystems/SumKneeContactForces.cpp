@@ -34,6 +34,36 @@ using std::vector;
 namespace ceinms {
 
 
+    BarrierFunction::BarrierFunction() : f_(std::numeric_limits<double>::max()) {}
+
+    void BarrierFunction::initialize(const BarrierListSetup& setup, const std::vector<std::string>& namesFromInput) {
+
+
+        for (auto it : setup.barrierSetup) {
+            barriers_.push_back(Barrier(it.xL, it.xR, it.weight, it.exponent));
+            barrierTargetNames_.push_back(it.targetName);
+        }
+        barrierMapper_.setNames(namesFromInput, barrierTargetNames_);
+    }
+
+
+    double BarrierFunction::getValue(const std::vector<double>& x) const {
+
+        double f = 0;
+        auto orderedX = barrierMapper_.map(x);
+        for (unsigned i(0); i < barriers_.size(); ++i)
+            f += barriers_.at(i).getPenalty(orderedX.at(i));
+        return f;
+    }
+
+
+    SumKneeContactForces::SumKneeContactForces(const ObjectiveFunctionSetup& setup) : f_(std::numeric_limits<double>::max()) 
+    {
+        setSetup(setup);
+        barrierFunc_.initialize(setup.barrierListSetup, kneeContactModel_.getCondyleNames());
+    
+    }
+
     void SumKneeContactForces::setTrials(const vector<TrialData>& trials) {
 
         trials_ = trials;
@@ -45,19 +75,22 @@ namespace ceinms {
         kneeContactModelSetup_ = setup;
         if (!trials_.empty())
             kneeContactModel_.initialize(kneeContactModelSetup_, trials_.front().dofNames);
+
     }
 
 
-    void SumKneeContactForces::setBarrierParameters(double xL, double xR, double weight, double exponent) {
+    void SumKneeContactForces::setSetup(const ObjectiveFunctionSetup& setup) {
 
-        barrier_.setParameters(xL, xR, weight, exponent);
+        
+        weight_ = setup.weight;
+        exponent_ = setup.exponent;
+
     }
 
 
     void SumKneeContactForces::calculate(const vector<Result>& results) {
 
         f_ = 0;
-        double weight1, weight2, exponent1, exponent2;
         vector<double> contactForces;
         auto tIt(trials_.cbegin());
         auto rIt(results.cbegin());
@@ -65,10 +98,9 @@ namespace ceinms {
             for (size_t rowIdx(0); rowIdx < tIt->torqueData.getNRows(); rowIdx) {
                 kneeContactModel_.setTorques(tIt->torqueData.getRow(rowIdx), rIt->torques.getRow(rowIdx));
                 kneeContactModel_.getContactForces(contactForces);
-                f_ += weight1*std::pow(contactForces.at(0), exponent1) +
-                    weight2*std::pow(contactForces.at(1), exponent2) +
-                    barrier_.getPenalty(contactForces.at(0)) + barrier_.getPenalty(contactForces.at(1));
-
+                for (auto& cf : contactForces)
+                    f_ += weight_*std::pow(cf, exponent_);
+                f_ += barrierFunc_.getValue(contactForces);
             }
 
         }

@@ -34,7 +34,8 @@ namespace ceinms {
 
         //Objective Function
         const unsigned MinimizeTorqueError = 100;
-
+        const unsigned SumKneeContactForces = 200;
+        const unsigned TorqueErrorAndSumKneeContactForces = 300;
         //Algorithm
         const unsigned Siman = 1;
         const unsigned Nop = 0;
@@ -45,6 +46,9 @@ namespace ceinms {
 
         enum Step{
             MinimizeTorqueErrorParameterSetDefault = 100,
+            SumKneeContactForcesParameterSetDefault = 200,
+            TorqueErrorAndSumKneeContactForcesParameterSetDefault = 300,
+
             Empty = -1
 
         };

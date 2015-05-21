@@ -28,7 +28,6 @@
 #ifndef ceinms_Barrier_h
 #define ceinms_Barrier_h
 #include <cmath>
-
 namespace ceinms{
 
     class Barrier {
