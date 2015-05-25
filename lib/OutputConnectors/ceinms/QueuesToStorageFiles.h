@@ -70,7 +70,7 @@ namespace ceinms {
         outputDir_ += "/";
         boost::filesystem::path dir(outputDir_);
         if (!boost::filesystem::exists(dir)) {
-            if (!boost::filesystem::create_directory(dir)) {
+            if (!boost::filesystem::create_directories(dir)) {
                 std::cout << "Error: Cannot create the output directory " + outputDir_ << std::endl;
                 exit(EXIT_FAILURE);
             }
