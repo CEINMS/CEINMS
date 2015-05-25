@@ -95,7 +95,8 @@ namespace ceinms {
         auto tIt(trials_.cbegin());
         auto rIt(results.cbegin());
         for (tIt; tIt != trials_.cend(); ++tIt, ++rIt) {
-            for (size_t rowIdx(0); rowIdx < tIt->torqueData.getNRows(); ++rowIdx) {
+            size_t nRows(std::min(tIt->torqueData.getNRows(), rIt->torques.getNRows()));
+            for (size_t rowIdx(0); rowIdx < nRows; ++rowIdx) {
                 kneeContactModel_.setTorques(tIt->torqueData.getRow(rowIdx), rIt->torques.getRow(rowIdx));
                 kneeContactModel_.getContactForces(contactForces);
                 for (auto& cf : contactForces)
