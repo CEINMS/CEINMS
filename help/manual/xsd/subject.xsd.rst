@@ -76,8 +76,8 @@ XML example
                 <name>hip_flexion_r</name>
                 <mtuNameSet>add_brev_r add_long_r add_mag1_r add_mag2_r add_mag3_r
                             bifemlh_r glut_max1_r glut_max2_r glut_max3_r glut_med1_r
-                            glut_med2_r glut_med3_r glut_min1_r glut_min2_r 
-                            glut_min3_r grac_r iliacus_r psoas_r rect_fem_r 
+                            glut_med2_r glut_med3_r glut_min1_r glut_min2_r
+                            glut_min3_r grac_r iliacus_r psoas_r rect_fem_r
                             sar_r semimem_r semiten_r tfl_r</mtuNameSet>
             </dof>
             <dof>
@@ -132,6 +132,7 @@ The parameters common to all muscles are:
 - ``emDelay`` the electromechanical delay (:math:`d` in :ref:`introActivationDynamics`)
 - ``percentageChange`` the percentage change in optimal fibre length depending on activation (:math:`\gamma` in :ref:`introContractionDynamics`)
 - ``damping`` the muscle damping coefficient (:math:`d_m` in :ref:`introContractionDynamics`)
+- ``maxContractionVelocity`` the normalised maximum contraction velocity of the fibre
 - four ``curve`` elements, describing the normalized force/length (active and passive), normalized force/velocity, normalized tendon force/strain curves shown in the :ref:`active and passive force curves <forcelengthcurves>`) figure in section :ref:`introContractionDynamics`. Each ``curve`` has a name, a list of y-coordinates, and the corresponding x-coordinates that can be interpolated to provide the complete curves.
 
 mtu
@@ -145,8 +146,9 @@ Each muscle tendon unit is further described by the following, muscle-specific p
 - ``optimalFibreLength`` is the optimal fibre length at maximum activation, (:math:`L_m^0` in :ref:`introContractionDynamics`)
 - ``pennationAngle`` is the pennation angle of the fibre at its optimal length (:math:`\varphi_0` in :ref:`introContractionDynamics`)
 - ``tendonSlackLength`` is the tendon slack length (:math:`l_{ts}` in :ref:`introContractionDynamics`)
+- ``maxContractionVelocity`` the normalised maximum contraction velocity of the fibre
 - ``maxIsometricForce`` is the maximum isometric muscle force (:math:`F^{max}` in :ref:`introContractionDynamics`)
-- ``strengthCoefficient`` is a multiplicative factor for ``maxIsometricForce``; the rationale for its inclusion is that, instead of calibrating the ``maxIsometricForce`` parameter for each muscle, you may want to keep it fixed and calibrate a reduced number of ``strength coefficient`` parameters instead, that can be shared by multiple muscles (e.g., belonging to the same muscle group - this is under the assumption that muscles in the same group develop in the same way). 
+- ``strengthCoefficient`` is a multiplicative factor for ``maxIsometricForce``; the rationale for its inclusion is that, instead of calibrating the ``maxIsometricForce`` parameter for each muscle, you may want to keep it fixed and calibrate a reduced number of ``strength coefficient`` parameters instead, that can be shared by multiple muscles (e.g., belonging to the same muscle group - this is under the assumption that muscles in the same group develop in the same way).
 
 
 .. _subjectDof:

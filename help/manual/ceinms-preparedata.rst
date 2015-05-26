@@ -86,7 +86,7 @@ Key outputs of MOtoNMS are:
 Data organization
 ~~~~~~~~~~~~~~~~~
 
-MOtoNMS requires that input C3D files are located inside an ``InputData`` directory, or any of its subdirectory; processed data will be saved into an ``ElaboratedData`` directory, keeping the same folder organization, as explained in the MOtoNMS manual :ref:`motonms:DataOrganization` page. 
+MOtoNMS requires that input C3D files are located inside an ``InputData`` directory, or any of its subdirectory; processed data will be saved into an ``ElaboratedData`` directory, keeping the same folder organization, as explained in the MOtoNMS manual :ref:`motonms:DataOrganization` page.
 
 We suggest to enforce the same data organization for dealing with OpenSim and CEINMS processing: inside the ``ElaboratedData``, along with ``sessionData``, ``staticElaborations``, and ``dynamicElaborations``, we suggest you create a folder for each of the processing steps involved (e.g., Inverse Kinematics, CEINMS). This allows to automatize the most time-consuming tasks (i.e., preparing configuration files and pre-processing data) as will be discussed in `Batch processing scripts`_.
 
@@ -226,4 +226,3 @@ You may also want to automatize the creation of :ref:`trial (input) data descrip
 
 .. bibliography:: litManuals.bib
     :cited:
-

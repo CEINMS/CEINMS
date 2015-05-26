@@ -25,7 +25,7 @@ Once you have installed the software (see :ref:`installCeinms`) and prepared the
 
     ``CEINMScalibrate -S <path to main XML setup file>``
 
-If setup and data files can be correctly found, calibration will start after the number of total parameters is printed to screen. Calibration time may vary depending on the number of parameters you are calibrating and the computing power of your computer, so it may take several minutes before any information is printed to screen. 
+If setup and data files can be correctly found, calibration will start after the number of total parameters is printed to screen. Calibration time may vary depending on the number of parameters you are calibrating and the computing power of your computer, so it may take several minutes before any information is printed to screen.
 
 .. important:: Please make sure that the output subject file specified in the :ref:`main setup XML file <ceinmscalibrateConfigurationFile>` is to be written into a folder that already exists.
 
@@ -34,4 +34,3 @@ Output
 ======
 
 When software execution finishes, an XML description of the calibrated subject will be written to the file that was specified as ``outputSubjectFile`` in the :ref:`main setup XML file <ceinmscalibrateConfigurationFile>`. We encourage you to check that calibrated parameters are still consistent with any information you have on the subject's physiology. In particular, we suggest that you check if any parameter hit the boundary of the calibration range, which may suggest that either the boundaries are incorrect, or that the experimental data you provided was not consistent with the model.
-

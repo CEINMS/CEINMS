@@ -16,7 +16,7 @@ CEINMS was designed and written to be flexible and generic software, that is, gi
 #. *Full-predictive open-loop mode.* The experimentally recorded EMG signals and 3D joint angles are used as input to a neuromusculoskeletal model to directly drive the computations of the musculotendon forces :cite:`gerus2013subject,lloyd2003emg,lloyd1996model,lloyd2001strategies,lloyd2008neuromusculoskeletal,sartori2012emg,winby2013correlation,winby2009muscle` (:num:`Fig. #figoverview`).
 #. *Hybrid mode.* The excitation patterns of muscles from which it is not practical or possible to routinely collect EMG signals (e.g. deep muscles) are constructed using optimization algorithms. Then, the constructed excitations, experimental EMGs, and 3D joint angles are used as input for the neuromusculoskeletal model :cite:`sartori2013hybrid`.
 #. *EMG-assisted mode.* This mode is a more generalizable form of the Hybrid mode. It uses optimization to adjust both the excitations determined from experimentally recorded EMG signals and to determine the excitations of muscles without experimental EMG. Then the muscle excitations, coupled with 3D joint angles, are used as input to the neuromusculoskeletal model.
-#. *Full optimization-driven closed-loop mode.* In this mode, without the aid of experimental EMG data, an optimization algorithm is used to construct all the muscle excitations to drive the neuromusculoskeletal model :cite:`erdemir2007model,tsirakos1997inverse`.
+#. *Static optimisation mode.* In this mode, without the aid of experimental EMG data, an optimization algorithm is used to construct all the muscle excitations to drive the neuromusculoskeletal model :cite:`erdemir2007model,tsirakos1997inverse`.
 
 Importantly, the different operation modes can be executed on the same neuromusculoskeletal model, allowing a consistent comparison among the different neural solutions. Fundamental to the current EMG-informed methods and the above modes of operation, CEINMS can be calibrated to the individual subject (:num:`Fig. #figcalibration`) :cite:`lloyd2003emg`. This is an optional operation procedure in CEINMS, which can therefore run in un-calibrated or calibrated state.
 
@@ -266,9 +266,9 @@ is computed and compared to ``p'``, a uniformly distributed random number from `
 Otherwise, ``X'`` is rejected. Two factors decrease the probability of an uphill move: lower temperature
 and larger differences in the function values.
 
-Every ``NS`` steps through all the elements of ``X``, the step length vector ``V`` is 
+Every ``NS`` steps through all the elements of ``X``, the step length vector ``V`` is
 adjusted so that half of all moves are accepted (line 24).
-The goal is to sample the function widely. If a greater percentage of points are accepted for ``x_k``, then the 
+The goal is to sample the function widely. If a greater percentage of points are accepted for ``x_k``, then the
 relevant element of ``V`` is enlarged. For a given temperature, this increases the number of rejections and
 decreases the percentage of acceptances. Every ``NT`` times through the above loops, the temperature ``T``
 is reduced (line 32). The new temperature is given by
@@ -279,10 +279,10 @@ is reduced (line 32). The new temperature is given by
 where ``rT`` ranges in ``[0,1)``. A lower temperature makes a given uphill move less likely, so the number of rejections increases and the step lengths decline. After a change in the temperature, the ``X`` vector is reset to the current ``X_opt`` (line 33).
 This selection of the starting point together with a smaller step focuses search efforts on the most promising area.
 
-After the temperature reduction, we define ``X*_h=X`` where ``X`` is the vector used 
+After the temperature reduction, we define ``X*_h=X`` where ``X`` is the vector used
 in the last function evaluation and ``h`` is increased every ``N_T`` times (lines 26 - 27).
-The algorithm ends by comparing ``f(X*_l)`` with ``f_opt``, where ``l=h, h-1, ... , h-N_eps``. 
-If all the ``N_eps`` differences are less then ``epsilon``, the algorithm terminates (lines 28 - 30). 
+The algorithm ends by comparing ``f(X*_l)`` with ``f_opt``, where ``l=h, h-1, ... , h-N_eps``.
+If all the ``N_eps`` differences are less then ``epsilon``, the algorithm terminates (lines 28 - 30).
 This criterion helps to ensure that global minimum is reached.
 
 

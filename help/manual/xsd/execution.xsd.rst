@@ -21,15 +21,15 @@ XML example
                 <alpha> 1 </alpha>
                 <beta> 2 </beta>
                 <gamma> 3 </gamma>
-                <trackedMuscles>
+                <synthMTUs>psoas_r illiacus_r</synthMTUs>
+                <adjustMTUs>
                                    recfem_r vasmed_r vaslat_r vasint_r bicfemsh_r
                                    gmin1_r gmin2_r gmin3_r gmed1_r gmed2_r gmed3_r
                                    tfl_r addbrev_r addlong_r addmag1_r addmag2_r
                                    addmag3_r gra_r sar_r semiten_r semimem_r bicfemlh_r
                                    gmax1_r gmax2_r gmax3_r gaslat_r gasmed_r sol_r perlong_r
                                    tibant_r perter_r perbrev_r
-                </trackedMuscles>
-                <predictedMuscles> psoas_r illiacus_r</predictedMuscles>
+                </adjustMTUs>
                 <algorithm>
                     <simulatedAnnealing>
                         <noEpsilon>4</noEpsilon>
@@ -93,12 +93,11 @@ hybrid
 The hybrid execution modality (see :ref:`introHybrid`) configuration is provided here:
 
 - ``alpha`` weight for the sum of the squared difference between experimental joint moments provided as :ref:`input data <prepareDataInputData>` and the joint moments estimated by CEINMS
-- ``beta`` weight for the sum of the squared difference between experimental and predicted muscle excitations
-- ``gamma`` weight for the sum of squared muscle excitations
+- ``beta`` weight for the sum of squared muscle excitations
+- ``gamma`` weight for the sum of the squared difference between experimental and predicted muscle excitations
 - ``trackedMuscles`` list of muscles for which an EMG reference signal to "track" is provided
 - ``predictedMuscles`` list of muscles for which no EMG signal is available, therefore activation is only predicted using static optimization techniques
 - ``algorithm`` the optimization algorithm that solves the hybrid static optimization problem, see :ref:`optimizationalgorithm`
-
 
 
 XSD grammar
