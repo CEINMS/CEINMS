@@ -169,7 +169,7 @@ namespace ceinms {
         };
 
         //6. define logging for contact forces
-        QueueToStorageFile contactForcesLogger(
+        QueueToStorageFile<std::vector<double>> contactForcesLogger(
             outputContactForcesQueue,
             inputConnectors.doneWithSubscription,
             outputConnectors.doneWithExecution,
@@ -260,44 +260,29 @@ namespace ceinms {
         //2 create external forces produces
         ExternalForcesFromStorageFile externalForcesFromStorageFile(inputConnectors, contactModelSetup.osimModel, contactModelSetup.externalLoads);
 
+        //3 create and launch log 
+        QueueToStorageFile<std::vector<SimTK::Vec3>> contactForcesLogger(
+            outputJointReactionForcesQueue,
+            inputConnectors.doneWithSubscription,
+            outputConnectors.doneWithExecution,
+            contactModelSetup.joints,
+            "ContactForces",
+            outputDirectory_);
 
         inputConnectors.doneWithSubscription.setCount(9);
-        outputConnectors.doneWithExecution.setCount(2);
-
-
-        //3 create and launch log 
-        auto logThread(std::async(std::launch::async, [&](){
-            std::ofstream outF("outForces.csv");
-            outputJointReactionForcesQueue.subscribe();
-            inputConnectors.doneWithSubscription.wait();
-            double time(0);
-            bool runCondition(true);
-            while (runCondition) {
-                auto contactForces(outputJointReactionForcesQueue.pop());
-                time = contactForces.time;
-                if (time == inputConnectors.TimePlaceholderForEndOfData) runCondition = false;
-                if (runCondition) {
-                    outF << time;
-                    for (auto& cf : contactForces.data)
-                        outF << ", " << cf[0] << ", " << cf[1] << ", " << cf[2];
-                    outF << endl;
-                }
-            }
-            outF.close();
-        }));
-
+        outputConnectors.doneWithExecution.setCount(3);
 
         //launch threads
         std::thread contactForcesEstimatorThread(std::ref(jointReactionForcesEstimator));
         std::thread generalisedCoordinateThread(std::ref(generalisedCoordinateFromStorageFile));
         std::thread externalForcesThread(std::ref(externalForcesFromStorageFile));
 
-        // 4. start the threads
         std::thread emgProdThread(std::ref(emgProducer));
         std::thread externalTorquesProdThread(std::ref(externalTorquesProducer));
         std::thread lmtMaProdThread(std::ref(lmtMaProducer));
         std::thread simulatorThread(std::ref(simulator));
         std::thread queuesToStorageFilesThread(std::ref(queuesToStorageFiles));
+        std::thread contactForcesLoggerThread(std::ref(contactForcesLogger));
 
         emgProdThread.join();
         lmtMaProdThread.join();
@@ -307,7 +292,7 @@ namespace ceinms {
         contactForcesEstimatorThread.join();
         generalisedCoordinateThread.join();
         externalForcesThread.join();
-        logThread.wait();
+        contactForcesLoggerThread.join();
         
         return 0;
     }

@@ -39,9 +39,10 @@
 
 namespace ceinms {
 
+    template<typename DataType>
     class QueueToStorageFile {
     public:
-        using DataType = std::vector < double >;
+    //    using DataType = std::vector < double >;
         using FrameType = QueueData < DataType >;
         using QueueType = Concurrency::Queue < FrameType > ;
 
@@ -61,6 +62,7 @@ namespace ceinms {
 
     private:
         void initFile();
+        void writeToFile();
         QueueType& inputQueue_;
         Concurrency::Latch& subscriptionLatch_;
         Concurrency::Latch& readyToWriteLatch_;
@@ -74,4 +76,5 @@ namespace ceinms {
 
 }
 
+#include "QueuesToStorageFiles/QueueToStorageFile.cpp"
 #endif

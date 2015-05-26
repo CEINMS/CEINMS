@@ -25,12 +25,16 @@
 * See the License for the specific language governing permissions and        *
 * limitations under the License.                                             *
 * -------------------------------------------------------------------------- */
-#include "ceinms/QueueToStorageFile.h"
+//#include "ceinms/QueueToStorageFile.h"
 #include "ceinms/QueuesSync.h"
 #include <iostream>
+#include <vector>
+#include <SimTK/include/SimTKcommon.h>
+
 namespace ceinms{
 
-    QueueToStorageFile::QueueToStorageFile(
+    template<typename DataType>
+    QueueToStorageFile<DataType>::QueueToStorageFile(
         QueueType& inputQueue,
         Concurrency::Latch& subscriptionLatch,
         Concurrency::Latch& readyToWriteLatch,
@@ -44,7 +48,6 @@ namespace ceinms{
         valueName_(valueName),
         outputDir_(outputDir),
         separator_("\t") {
-
 
         outputDir_ += "/";
         boost::filesystem::path dir(outputDir_);
@@ -68,7 +71,8 @@ namespace ceinms{
         }
     }
 
-    void QueueToStorageFile::initFile()
+    template<typename DataType>
+    void QueueToStorageFile<DataType>::initFile()
     {
         if (dataToWrite_.size() < 1)
         {
@@ -86,7 +90,27 @@ namespace ceinms{
         *outFile_ << std::endl;
     }
 
-    void QueueToStorageFile::operator()() {
+    template<>
+    void QueueToStorageFile<std::vector<SimTK::Vec3>>::initFile()
+    {
+        if (dataToWrite_.size() < 1)
+        {
+            std::cout << "No " << valueName_ << "data to write!" << std::endl;
+            return;
+        }
+
+        *outFile_ << "CEINMS output" << std::endl;
+        *outFile_ << "datacolumns " << dataToWrite_.back().data.size()*3 + 1 << std::endl;
+        *outFile_ << "datarows " << dataToWrite_.size() << std::endl;
+        *outFile_ << "endheader" << std::endl;
+        *outFile_ << "time" + separator_;
+        for (auto& it : columnLabels_)
+            *outFile_ << it << "_x" << separator_ << it << "_y" << separator_ << it << "_z" << separator_;
+        *outFile_ << std::endl;
+    }
+
+    template<typename DataType>
+    void QueueToStorageFile<DataType>::operator()() {
 
         inputQueue_.subscribe();
         subscriptionLatch_.wait();
@@ -102,12 +126,34 @@ namespace ceinms{
         }
 
         initFile();
+        writeToFile();
+        
+        
+    }
+
+    template<typename DataType>
+    void QueueToStorageFile<DataType>::writeToFile() {
+
         for (auto& dataIt : dataToWrite_) {
             *outFile_ << dataIt.time << separator_;
             for (auto& sampleIt : dataIt.data)
                 *outFile_ << sampleIt << separator_;
             *outFile_ << std::endl;
         }
-        
     }
+
+    template<>
+    void QueueToStorageFile<std::vector<SimTK::Vec3>>::writeToFile() {
+
+        for (auto& dataIt : dataToWrite_) {
+            *outFile_ << dataIt.time << separator_;
+            for (auto& sampleIt : dataIt.data)
+                *outFile_ << sampleIt[0] << separator_
+                          << sampleIt[1] << separator_
+                          << sampleIt[2] << separator_;
+            *outFile_ << std::endl;
+        }
+    }
+
+
 }
