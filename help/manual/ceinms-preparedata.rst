@@ -141,7 +141,8 @@ Most important fields within the ``MuscleAnalysis`` block are:
         <AnalyzeTool name="MuscleAnalysisTool">
             <!--Name of the .osim file used to construct a model.-->
             <model_file> ** MODEL FILE **</model_file>
-            <!--Replace the model's force set with sets specified in <force_set_files>? If false, the force set is appended to.-->
+            <!--Replace the model's force set with sets specified in <force_set_files>?
+                If false, the force set is appended to.-->
             <replace_force_set>false</replace_force_set>
             <!--List of xml files used to construct an force set for the model.-->
             <force_set_files />
@@ -153,33 +154,45 @@ Most important fields within the ``MuscleAnalysis`` block are:
             <initial_time> ** INITIAL TIME ** </initial_time>
             <!--Final time for the simulation.-->
             <final_time> ** FINAL TIME ** </final_time>
-            <!--Flag indicating whether or not to compute equilibrium values for states other than the coordinates or speeds.  For example, equilibrium muscle fiber lengths or muscle forces.-->
-            <solve_for_equilibrium_for_auxiliary_states>false</solve_for_equilibrium_for_auxiliary_states>
+            <!--Flag indicating whether or not to compute equilibrium values for states
+                other than the coordinates or speeds.  For example, equilibrium muscle
+                fiber lengths or muscle forces.-->
+            <solve_for_equilibrium_for_auxiliary_states>
+                false
+            </solve_for_equilibrium_for_auxiliary_states>
             <!--Maximum number of integrator steps.-->
             <maximum_number_of_integrator_steps>20000</maximum_number_of_integrator_steps>
             <!--Maximum integration step size.-->
             <maximum_integrator_step_size>1</maximum_integrator_step_size>
             <!--Minimum integration step size.-->
             <minimum_integrator_step_size>1e-008</minimum_integrator_step_size>
-            <!--Integrator error tolerance. When the error is greater, the integrator step size is decreased.-->
+            <!--Integrator error tolerance. When the error is greater,
+                the integrator step size is decreased.-->
             <integrator_error_tolerance>1e-005</integrator_error_tolerance>
             <!--Set of analyses to be run during the investigation.-->
             <AnalysisSet name="Analyses">
                 <objects>
                     <MuscleAnalysis name="MuscleAnalysis">
-                        <!--Flag (true or false) specifying whether whether on. True by default.-->
+                        <!--Flag (true or false) specifying whether whether on.
+                            True by default.-->
                         <on>true</on>
                         <!--Start time.-->
                         <start_time> ** INITIAL TIME, AS ABOVE ** </start_time>
                         <!--End time.-->
                         <end_time> ** FINAL TIME, AS ABOVE ** </end_time>
-                        <!--Specifies how often to store results during a simulation. More specifically, the interval (a positive integer) specifies how many successful integration steps should be taken before results are recorded again.-->
+                        <!--Specifies how often to store results during a simulation.
+                            More specifically, the interval (a positive integer) specifies
+                            how many successful integration steps should be taken before
+                            results are recorded again.-->
                         <step_interval>1</step_interval>
-                        <!--Flag (true or false) indicating whether the results are in degrees or not.-->
+                        <!--Flag (true or false) indicating whether the results are
+                            in degrees or not.-->
                         <in_degrees>true</in_degrees>
-                        <!--List of muscles for which to perform the analysis. Use 'all' to perform the analysis for all muscles.-->
+                        <!--List of muscles for which to perform the analysis. Use 'all' to
+                            perform the analysis for all muscles.-->
                         <muscle_list> all</muscle_list>
-                        <!--List of generalized coordinates for which to compute moment arms. Use 'all' to compute for all coordinates.-->
+                        <!--List of generalized coordinates for which to compute moment arms.
+                            Use 'all' to compute for all coordinates.-->
                         <moment_arm_coordinate_list> all</moment_arm_coordinate_list>
                         <!--Flag indicating whether moments should be computed.-->
                         <compute_moments>true</compute_moments>
@@ -194,14 +207,23 @@ Most important fields within the ``MuscleAnalysis`` block are:
             </ControllerSet>
             <!--XML file (.xml) containing the forces applied to the model as ExternalLoads.-->
             <external_loads_file> ** EXTERNAL LOADS FILE (optional) ** </external_loads_file>
-            <!--Storage file (.sto) containing the time history of states for the model. This file often contains multiple rows of data, each row being a time-stamped array of states. The first column contains the time.  The rest of the columns contain the states in the order appropriate for the model. In a storage file, unlike a motion file (.mot), non-uniform time spacing is allowed.  If the user-specified initial time for a simulation does not correspond exactly to one of the time stamps in this file, inerpolation is NOT used because it is sometimes necessary to an exact set of states for analyses.  Instead, the closest earlier set of states is used.-->
+            <!--Storage file (.sto) containing the time history of states for the model.-->
             <states_file />
-            <!--Motion file (.mot) or storage file (.sto) containing the time history of the generalized coordinates for the model. These can be specified in place of the states file.-->
+            <!--Motion file (.mot) or storage file (.sto) containing the time history of the
+                generalized coordinates for the model. These can be specified in place of
+                the states file.-->
             <coordinates_file> ** OUTPUT FILE FROM INVERSE KINEMATICS** </coordinates_file>
-            <!--Storage file (.sto) containing the time history of the generalized speeds for the model. If coordinates_file is used in place of states_file, these can be optionally set as well to give the speeds. If not specified, speeds will be computed from coordinates by differentiation.-->
+            <!--Storage file (.sto) containing the time history of the generalized speeds
+                for the model. If coordinates_file is used in place of states_file, these can be
+                optionally set as well to give the speeds. If not specified, speeds will be
+                computed from coordinates by differentiation.-->
             <speeds_file />
-            <!--Low-pass cut-off frequency for filtering the coordinates_file data (currently does not apply to states_file or speeds_file). A negative value results in no filtering. The default value is -1.0, so no filtering.-->
-            <lowpass_cutoff_frequency_for_coordinates>-1</lowpass_cutoff_frequency_for_coordinates>
+            <!--Low-pass cut-off frequency for filtering the coordinates_file data
+                (currently does not apply to states_file or speeds_file). A negative value
+                results in no filtering. The default value is -1.0, so no filtering.-->
+            <lowpass_cutoff_frequency_for_coordinates>
+                -1
+            </lowpass_cutoff_frequency_for_coordinates>
         </AnalyzeTool>
     </OpenSimDocument>
 
