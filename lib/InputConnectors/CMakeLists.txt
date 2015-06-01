@@ -25,6 +25,8 @@ set(InputConnectors_SOURCES
   ExternalForcesFromX.cpp
   GeneralisedCoordinatesFromX.cpp
   InputConnectors.cpp
+  LmtMaFromMcbs.cpp
+  
 )
 set(InputConnectors_HEADERS
   ceinms/EMGFromX.h
@@ -33,6 +35,7 @@ set(InputConnectors_HEADERS
   ceinms/ExternalForcesFromX.h
   ceinms/GeneralisedCoordinatesFromX.h
   ceinms/InputConnectors.h
+  ceinms/LmtMaFromMcbs.h
 )
 
 source_group("Headers" FILES ${InputConnectors_HEADERS} ${FromStorageFile_HEADERS} )
@@ -57,7 +60,9 @@ target_include_directories(InputConnectors
                                             ${Boost_INCLUDE_DIRS}
 								PUBLIC
 											${OPENSIM_INCLUDE_DIRS}
-											${SIMTK_INCLUDE_DIRS})
+											${SIMTK_INCLUDE_DIRS}
+											${mcbs_INCLUDE_DIRS}
+											${osimSpliner_INCLUDE_DIRS})
 
 # Save path to include directory for "internal" usage
 set(InputConnectors_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}"  CACHE INTERNAL "Include directories for InputConnectors library")

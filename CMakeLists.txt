@@ -34,6 +34,12 @@ find_package(XERCES REQUIRED)
 
 find_package(OpenSim REQUIRED)
 
+find_package(mcbs REQUIRED)
+
+find_package(osimSpliner REQUIRED)
+
+
+
 # Choose common build locations for executables and libraries
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
