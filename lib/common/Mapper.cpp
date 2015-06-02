@@ -44,7 +44,8 @@ namespace ceinms {
 
 
     void Mapper::setNames(const std::vector<std::string>& inNames, const std::vector<std::string>& outNames) {
-
+        
+        inToOutMapping_.clear();
         inSize_ = inNames.size();
         outSize_ = outNames.size();
 

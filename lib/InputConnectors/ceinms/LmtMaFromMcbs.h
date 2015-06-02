@@ -35,13 +35,18 @@
 #include <iostream>
 #include <vector>
 #include <string>
-
+#include "ceinms/LmtMaFromX.h"
+#include "ceinms/concurrency/Queue.h"
+#include "ceinms/queues/GeneralisedCoordinatesQueue.h"
+#include "ceinms/concurrency/Latch.h"
+#include <map>
+#include "ceinms/Mapper.h"
 
 namespace ceinms {
 
     class SplineSetBase {
     public:
-        virtual std::vector<std::string> getDofNames() { return std::vector<std::string>(); }
+        virtual std::vector<std::string> getDofNames() = 0;
         virtual void getLmt(
             std::vector<double>& lmtValues,
             const std::vector<double>& dofValues) = 0;
@@ -74,6 +79,7 @@ namespace ceinms {
             const std::vector<std::vector<double> >& y);
         SplineSetAdapter(const std::string& coeffDir, const std::vector<std::string>& muscleNames);
         SplineSetAdapter(const SplineSetAdapter& orig) = delete;
+        virtual std::vector<std::string> getDofNames() override { return splineSet_.getDofNames(); }
         virtual void getLmt(
             std::vector<double>& lmtValues,
             const std::vector<double>& dofValues) override {
@@ -199,6 +205,64 @@ namespace ceinms {
             const std::vector<double>&,
             const std::vector<int>&,
             const std::vector<std::vector<double> >& > (dofNames, musclesNames, a, b, n, y);
+    }
+
+
+    class LmtMaFromMcbs : public LmtMaFromX {
+    public:
+
+        //coeffDir contains dofAngles.cfg
+        template <typename NMSModelT>
+        LmtMaFromMcbs(
+            InputConnectors& inputConnectors, 
+            GeneralisedCoordinatesQueue& inputCoordinateQueue, 
+            Concurrency::Latch& doneWithSubscription, 
+            Concurrency::Latch& doneWithExecution,
+            const NMSModelT& subject, 
+            const string& coeffDir);
+        void operator()() override;
+
+    private:
+        std::shared_ptr<SplineSetBase> splineSet_;
+        GeneralisedCoordinatesQueue& inputCoordinateQueue_;
+        Concurrency::Latch& doneWithSubscriptions_;
+        Concurrency::Latch& doneWithExecution_;
+        std::map<std::string, std::vector<std::string>> muscleNamesOnDofsMap_;
+        Mapper dofMapper_;
+
+    };
+
+    template <typename NMSModelT>
+    LmtMaFromMcbs::LmtMaFromMcbs(
+        InputConnectors& inputConnectors, 
+        GeneralisedCoordinatesQueue& inputCoordinateQueue, 
+        Concurrency::Latch& doneWithSubscriptions, 
+        Concurrency::Latch& doneWithExecution,
+        const NMSModelT& subject, 
+        const string& coeffDir) :
+        LmtMaFromX(inputConnectors, subject), 
+        splineSet_(makeSplineSet(dofNames_.size(), coeffDir, musclesNames_)), 
+        inputCoordinateQueue_(inputCoordinateQueue),
+        doneWithSubscriptions_(doneWithSubscriptions), doneWithExecution_(doneWithExecution) {
+
+
+        subject.getMuscleNamesOnDofs(muscleNamesOnDofsMap_);
+
+        inputConnectors_.queueMomentArms.clear();
+        for (int i = 0; i < dofNames_.size(); ++i)
+            inputConnectors_.queueMomentArms.push_back(new Concurrency::Queue< InputConnectors::FrameType >);
+
+        vector<string> dofNamesFromSpline(splineSet_->getDofNames());
+        cout << "dof names from spline ";
+        for (auto dof : dofNamesFromSpline)
+            cout << dof << " ";
+        cout << endl;
+
+        dofMapper_.setNames(dofNames_, dofNamesFromSpline);
+        
+// inputCoordinateQueue_should receive data already formatted correctly because 
+// this object doesn't know opensim
+        
     }
 
 }

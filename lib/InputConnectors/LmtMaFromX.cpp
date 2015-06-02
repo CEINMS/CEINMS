@@ -36,8 +36,12 @@ using std::string;
 #include <vector>
 using std::vector;
 #include <cstdlib>
+#include <limits>
 
 namespace ceinms {
+
+    const double LmtMaFromX::EndOfDataTimePlaceholder = std::numeric_limits<double>::infinity();
+
     void LmtMaFromX::updateLmt(const vector<double>& currentLmtData, double currentTime)
     {
         QueueData< vector<double> > lmtDataToPush;
@@ -52,6 +56,17 @@ namespace ceinms {
         momentArmsDataToPush.data = currentMomentArmsData;
         momentArmsDataToPush.time = currentTime;
         (*inputConnectors_.queueMomentArms.at(whichDof)).push(momentArmsDataToPush);
+    }
+
+    void LmtMaFromX::sendLmtEndOfData() {
+        
+        updateLmt(vector<double>(), EndOfDataTimePlaceholder);
+    }
+
+    void LmtMaFromX::sendMaEndOfData() {
+
+        for (unsigned i(0); i < dofNames_.size(); ++i)
+            updateMomentArms(vector<double>(), EndOfDataTimePlaceholder, i);
     }
 
     LmtMaFromX::~LmtMaFromX() { }

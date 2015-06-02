@@ -46,6 +46,21 @@ namespace ceinms {
         kinematics.getTimeColumn(timeColumnOS);
         ceinms::ArrayConverter::toStdVector(timeColumnOS, timeColumn_);
         updateKinematicsSplines(8);
+        OpenSim::Array<string> coordinateNamesOS;
+        model_.getCoordinateSet().getNames(coordinateNamesOS);
+        ceinms::ArrayConverter::toStdVector(coordinateNamesOS, coordinateNamesFromOsimModel_);
+        mapper_.setNames(coordinateNamesFromOsimModel_, coordinateNamesFromOsimModel_);
+    }
+
+
+    GeneralisedCoordinatesFromStorageFile::GeneralisedCoordinatesFromStorageFile(
+        InputConnectors& inputConnectors, 
+        const string& osimModelFilename, 
+        const string& kinematicsStorageFilename, 
+        const std::vector<std::string>& coordinatesToLog) :
+        GeneralisedCoordinatesFromStorageFile(inputConnectors, osimModelFilename, kinematicsStorageFilename)  {
+
+        mapper_.setNames(coordinateNamesFromOsimModel_, coordinatesToLog);
     }
 
     void GeneralisedCoordinatesFromStorageFile::operator()() {
@@ -54,24 +69,24 @@ namespace ceinms {
         GeneralisedCoordinatesFromX::doneWithSubscriptions();
         for (auto t : timeColumn_) {
 
-            GeneralisedCoordinatesData generalisedCoordinates(model_.getNumCoordinates());
+            GeneralisedCoordinatesData generalisedCoordinates(mapper_.getOutSize());
             OpenSim::Array<double> q;
             vector<double> stdQ;
             splines_.evaluate(q, 0, t);
             ArrayConverter::toStdVector(q, stdQ);
-            generalisedCoordinates.setQ(stdQ);
+            generalisedCoordinates.setQ(mapper_.map(stdQ));
 
             OpenSim::Array<double> qd;
             vector<double> stdQd;
             splines_.evaluate(qd, 1, t);
             ArrayConverter::toStdVector(qd, stdQd);
-            generalisedCoordinates.setQd(stdQd);
+            generalisedCoordinates.setQd(mapper_.map(stdQd));
 
             OpenSim::Array<double> qdd;
             vector<double> stdQdd;
             splines_.evaluate(qdd, 2, t);
             ArrayConverter::toStdVector(qdd, stdQdd);
-            generalisedCoordinates.setQdd(stdQdd);
+            generalisedCoordinates.setQdd(mapper_.map(stdQdd));
             GeneralisedCoordinatesFromX::updateGeneralisedCoordinates(generalisedCoordinates, t);
         }
         GeneralisedCoordinatesFromX::sendEndOfData();

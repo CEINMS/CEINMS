@@ -30,6 +30,7 @@
 #include <iostream>
 #include <vector>
 #include <SimTK/include/SimTKcommon.h>
+#include "ceinms/GeneralisedCoordinatesData.h"
 
 namespace ceinms{
 
@@ -109,6 +110,27 @@ namespace ceinms{
         *outFile_ << std::endl;
     }
 
+
+    template<>
+    void QueueToStorageFile<GeneralisedCoordinatesData>::initFile()
+    {
+        if (dataToWrite_.size() < 1)
+        {
+            std::cout << "No " << valueName_ << "data to write!" << std::endl;
+            return;
+        }
+
+        *outFile_ << "CEINMS output" << std::endl;
+        *outFile_ << "datacolumns " << dataToWrite_.back().data.getNCoordinates() * 3 + 1 << std::endl;
+        *outFile_ << "datarows " << dataToWrite_.size() << std::endl;
+        *outFile_ << "endheader" << std::endl;
+        *outFile_ << "time" + separator_;
+        for (auto& it : columnLabels_)
+            *outFile_ << it << "_pos" << separator_ << it << "_vel" << separator_ << it << "_acc" << separator_;
+        *outFile_ << std::endl;
+    }
+
+
     template<typename DataType>
     void QueueToStorageFile<DataType>::operator()() {
 
@@ -151,6 +173,25 @@ namespace ceinms{
                 *outFile_ << sampleIt[0] << separator_
                           << sampleIt[1] << separator_
                           << sampleIt[2] << separator_;
+            *outFile_ << std::endl;
+        }
+    }
+
+
+    template<>
+    void QueueToStorageFile<GeneralisedCoordinatesData>::writeToFile() {
+
+        for (auto& dataIt : dataToWrite_) {
+            *outFile_ << dataIt.time << separator_;
+            auto q(dataIt.data.getQ());
+            auto qd(dataIt.data.getQd());
+            auto qdd(dataIt.data.getQdd());
+
+            for (unsigned i(0); i < dataIt.data.getNCoordinates(); ++i) {
+                *outFile_ << q[i] << separator_
+                    << qd[i] << separator_
+                    << qdd[i] << separator_;
+            }
             *outFile_ << std::endl;
         }
     }

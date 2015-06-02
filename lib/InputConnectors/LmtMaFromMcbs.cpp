@@ -33,26 +33,24 @@ using std::string;
 #include "ceinms/LmtMaFromMcbs.h"
 #include <vector>
 using std::vector;
+#include <algorithm>
 
 namespace ceinms {
     
     shared_ptr<SplineSetBase> makeSplineSet(int degree, const string& inputDataFilename) {
    
         std::function<shared_ptr<SplineSetBase>(const string&)> ftable[] = {
-            &wrap<1, string>,
-            &wrap<1, string>,
+            nullptr,
+            nullptr,
             &wrap<2, string>,
             &wrap<3, string>,
             &wrap<4, string>,
             &wrap<5, string>,
             &wrap<6, string>,
             &wrap<7, string>,
-            &wrap<8, string>,
-            &wrap<9, string>,
-            &wrap<10, string>
         };
 
-        if (degree > 11) {
+        if (degree > 7) {
             std::cout << "Degree of mcbs too high.\nExit.\n";
             std::exit(EXIT_FAILURE);
         }
@@ -76,21 +74,17 @@ namespace ceinms {
             const vector<int>&,
             const vector<vector<double> >&)> ftable[] = {
             
-            &wrapAlias<1>,
-            &wrapAlias<1>,
+            nullptr,
+            nullptr,
             &wrapAlias<2>,
             &wrapAlias<3>,
             &wrapAlias<4>,
             &wrapAlias<5>,
             &wrapAlias<6>,
             &wrapAlias<7>,
-            &wrapAlias<8>,
-            &wrapAlias<9>,
-            &wrapAlias<10>
-
         };
 
-        if (degree > 11) {
+        if (degree > 7) {
             std::cout << "Degree of mcbs too high.\nExit.\n";
             std::exit(EXIT_FAILURE);
         }
@@ -106,20 +100,17 @@ namespace ceinms {
         std::function<shared_ptr<SplineSetBase>(
             const string&, 
             const vector<string>&)> ftable[] = {
-            &wrap<1, const string&, const vector<string>&>,
+            nullptr,
+            nullptr,
             &wrap<2, const string&, const vector<string>&>,
             &wrap<3, const string&, const vector<string>&>,
             &wrap<4, const string&, const vector<string>&>,
             &wrap<5, const string&, const vector<string>&>,
             &wrap<6, const string&, const vector<string>&>,
             &wrap<7, const string&, const vector<string>&>,
-            &wrap<8, const string&, const vector<string>&>,
-            &wrap<9, const string&, const vector<string>&>,
-            &wrap<10, const string&, const vector<string>&>,
-            &wrap<11, const string&, const vector<string>&>,
         };
 
-        if (degree > 11) {
+        if (degree > 7) {
             std::cout << "Degree of mcbs too high.\nExit.\n";
             std::exit(EXIT_FAILURE);
         }
@@ -127,6 +118,39 @@ namespace ceinms {
     }
     
  
+    void LmtMaFromMcbs::operator()() {
+
+        inputCoordinateQueue_.subscribe();
+        doneWithSubscriptions_.wait();
+
+        bool runCondition(true);
+
+        do {
+            GeneralisedCoordinatesFrame coordinates(inputCoordinateQueue_.pop());
+            double currentTime(coordinates.time);
+            if (currentTime < std::numeric_limits<double>::infinity()) {
+                vector<double> lmts;
+                vector<double> dofsValues(dofMapper_.map(coordinates.data.getQ()));
+
+                splineSet_->getLmt(lmts, dofsValues);
+                LmtMaFromX::updateLmt(lmts, currentTime);
+                for (auto dofIt(dofNames_.cbegin()); dofIt != dofNames_.cend(); ++dofIt) {
+                    vector<double> maValues;
+                    splineSet_->getMa(*dofIt, muscleNamesOnDofsMap_[*dofIt], dofsValues, maValues);
+                    unsigned dofIdx(std::distance(dofNames_.cbegin(), dofIt));
+                    LmtMaFromX::updateMomentArms(maValues, currentTime, dofIdx);
+                }
+            }
+            else {
+                runCondition = false;
+                LmtMaFromX::sendLmtEndOfData();
+                LmtMaFromX::sendMaEndOfData();
+            }
+
+        } while (runCondition);
+        doneWithExecution_.wait();
+
+    }
 
 
 }

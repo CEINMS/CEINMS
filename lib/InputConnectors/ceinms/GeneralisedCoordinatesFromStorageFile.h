@@ -31,11 +31,13 @@
 #include "ceinms/GeneralisedCoordinatesFromX.h"
 #include "InputConnectors.h"
 #include <OpenSim/OpenSim.h>
+#include "ceinms/Mapper.h"
 
 namespace ceinms {
     class GeneralisedCoordinatesFromStorageFile : public GeneralisedCoordinatesFromX {
     public:
         GeneralisedCoordinatesFromStorageFile(InputConnectors& inputConnectors, const std::string& osimModelFilename, const std::string& kinematicsStorageFilename);
+        GeneralisedCoordinatesFromStorageFile(InputConnectors& inputConnectors, const std::string& osimModelFilename, const std::string& kinematicsStorageFilename, const std::vector<std::string>& coordinatesToLog);
         virtual ~GeneralisedCoordinatesFromStorageFile() override {}
         virtual void operator()() override;
     private:
@@ -44,6 +46,9 @@ namespace ceinms {
         OpenSim::Model model_;
         std::string kinematicsStorageFilename_;
         std::vector<double> timeColumn_;
+        std::vector<std::string> coordinateNamesFromOsimModel_;
+        Mapper mapper_;
+
     };
 
 }

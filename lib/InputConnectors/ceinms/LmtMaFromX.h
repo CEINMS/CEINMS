@@ -43,12 +43,15 @@ namespace ceinms {
         virtual void operator()() {};
         void updateLmt(const std::vector<double>& currentLmtData, double currentTime);
         void updateMomentArms(const std::vector<double>& currentMomentArmsData, double currentTime, unsigned int whichDof);
-
+        void sendLmtEndOfData();
+        void sendMaEndOfData();
+        
     protected:
         std::vector< std::string > musclesNames_;
         std::vector< std::string > dofNames_;
         std::vector< std::vector< std::string > > muscleNamesOnDofs_;
         InputConnectors& inputConnectors_;
+        static const double EndOfDataTimePlaceholder;
     };
 
 
