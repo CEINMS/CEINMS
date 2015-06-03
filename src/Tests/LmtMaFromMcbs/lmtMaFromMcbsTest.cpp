@@ -33,6 +33,10 @@ using std::vector;
 #include <thread>
 #include <string>
 using std::string;
+#include <iostream>
+using std::cout;
+using std::endl;
+#include <sstream>
 #include "boost/filesystem.hpp"
 using boost::filesystem::path;
 #include "ceinms/LmtMaFromMcbs.h"
@@ -46,6 +50,56 @@ using boost::filesystem::path;
 #include "ceinms/GeneralisedCoordinatesFromStorageFile.h"
 #include "ceinms/QueueToStorageFile.h"
 using namespace ceinms;
+#include <OpenSim/OpenSim.h>
+using namespace OpenSim;
+
+
+
+double calculateRMSE(Array<double> arr1, Array<double> arr2) {
+
+    double sum(0);
+    size_t sizeArr(std::min(arr1.size(), arr2.size()));
+    for (unsigned i(0); i < sizeArr; ++i) 
+        sum += (arr1[i] - arr2[i])*(arr1[i] - arr2[i]);
+    return std::sqrt(sum / static_cast<double>(sizeArr));
+}
+
+
+void printTable(vector<string> names, vector<double> errors) {
+
+    cout << endl;
+    cout << std::setw(20) << "Muscle" << std::setw(20) << "RMSE" << endl;
+    cout << "          " << std::setfill('-') << std::setw(30) << '-' << endl;
+    for (unsigned i(0); i < names.size(); ++i)
+        cout << std::setfill(' ') << std::setw(20) << names[i] << std::setw(20) << errors[i] << endl;
+    cout << endl;
+}
+
+void compareSto(const string& f1, const string& f2) {
+
+    Storage sto1(f1.c_str());
+    Storage sto2(f2.c_str());
+    vector<double> errors;
+    vector<string> names;
+    Array<string> names1(sto1.getColumnLabels());
+    Array<string> names2(sto2.getColumnLabels());
+    for (unsigned i(0); i < names1.size(); ++i) {
+        string currentName(names1.get(i));
+        int idx2(names2.findIndex(currentName));
+        //time column should be 0, and -1 is not found
+        if (idx2 > 0) {
+            Array<double> column1, column2;
+            sto1.getDataColumn(currentName, column1);
+            sto2.getDataColumn(currentName, column2);
+            errors.emplace_back(calculateRMSE(column1, column2));
+            names.emplace_back(currentName);
+        }
+    }
+
+    cout << "Comparing " << f1 << " and " << f2 << endl;
+    printTable(names, errors);
+
+}
 
 int main(){
 
@@ -54,7 +108,9 @@ int main(){
     string osimModelFilename((testDataDir / "Subject" / "scaled.osim").string());
     string subjectFilename((testDataDir / "Subject" / "uncalibrated.xml").string());
     string splineCoeffDir((testDataDir / "GeneratedSplines").string());
-
+    string outputDir((testDataDir / "MotionData" / "McbsResults").string());
+    boost::filesystem::create_directories(outputDir);
+    string maDir((testDataDir / "MotionData" / "MuscleAnalysis").string());
 
     NMSmodel<ExponentialActivation, ElasticTendon_BiSec, CurveMode::Offline> subject;
     setupSubject(subject, subjectFilename);
@@ -62,10 +118,9 @@ int main(){
     inputConnectors.doneWithSubscription.setCount(7);
     ceinms::Concurrency::Latch doneWithExecution(6);
 
-//    GeneralisedCoordinatesQueue inputCoordinateQueue;
     GeneralisedCoordinatesFromStorageFile generalisedCoordinatesFromStorage(inputConnectors, osimModelFilename, ikFilename, subject.getDoFNames());
     LmtMaFromMcbs lmtMaFromMcbs(inputConnectors, inputConnectors.queueGeneralisedCoordinates, inputConnectors.doneWithSubscription, doneWithExecution, subject, splineCoeffDir);
-    QueueToStorageFile<vector<double>> lmtLogger(inputConnectors.queueLmt, inputConnectors.doneWithSubscription, doneWithExecution, subject.getMuscleNames(), "lmt");
+    QueueToStorageFile<vector<double>> lmtLogger(inputConnectors.queueLmt, inputConnectors.doneWithSubscription, doneWithExecution, subject.getMuscleNames(), "_Mcbs_Length", outputDir);
     
     std::map<string, vector<string>> musclesOnDof;
     subject.getMuscleNamesOnDofs(musclesOnDof);
@@ -79,9 +134,9 @@ int main(){
             inputConnectors.doneWithSubscription, 
             doneWithExecution, 
             musclesOnDof[*dofIt], 
-            *dofIt + "_moment_arm"));
+            "_Mcbs_MomentArm_" + *dofIt, outputDir));
     }
-   
+    
     std::thread ikReaderThr(std::ref(generalisedCoordinatesFromStorage));
     std::thread lmtMaFromMcbsThr(std::ref(lmtMaFromMcbs));
     std::thread lmtLoggerThr(std::ref(lmtLogger));
@@ -97,5 +152,14 @@ int main(){
     for (auto& it : maLoggersThrs)
         it->join();
         
+    //now compare results with muscle analysis data
+    
+    
+    compareSto(outputDir + "/_Mcbs_Length.sto", maDir + "/_MuscleAnalysis_Length.sto");
+    for (auto& dof : dofNames)
+        compareSto(
+        outputDir + "/_Mcbs_MomentArm_" + dof + ".sto", 
+        maDir + "/_MuscleAnalysis_MomentArm_" + dof + ".sto");
+
     return 0;
 }
