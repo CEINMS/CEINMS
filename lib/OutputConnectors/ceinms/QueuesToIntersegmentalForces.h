@@ -41,41 +41,46 @@ namespace ceinms {
 
         template <typename NMSmodelT>
         QueuesToIntersegmentalForces(
-        GeneralisedCoordinatesQueue& inputGeneralisedCoordinatesQueue,
-        MultipleExternalForcesQueue& inputExternalForcesQueue,
-        VecContactForcesQueue& outputIntersegmentalForcesQueue,
-        Concurrency::Latch& latch,
-        const NMSmodelT& subject,
-        const std::string& osimModelFilename,
-        const std::string& externalLoadsXmlFilename,    //this is the same as openSim
-        const std::vector< std::string >& jointsToLog);
+            GeneralisedCoordinatesQueue& inputGeneralisedCoordinatesQueue,
+            MultipleExternalForcesQueue& inputExternalForcesQueue,
+            VecContactForcesQueue& outputIntersegmentalForcesQueue,
+            Concurrency::Latch& doneWithSubscriptions,
+            Concurrency::Latch& doneWithExecution,
+            const NMSmodelT& subject,
+            const std::string& osimModelFilename,
+            const std::string& externalLoadsXmlFilename,    //this is the same as openSim
+            const std::vector< std::string >& jointsToLog);
 
         virtual void operator()() override;
         virtual ~QueuesToIntersegmentalForces() override {}
 
     private:
+        void sendEndOfData();
         GeneralisedCoordinatesQueue& inputGeneralisedCoordinatesQueue_;
         VecContactForcesQueue& outputIntersegmentalForcesQueue_;
-
     };
-
 
     template <typename NMSmodelT>
     QueuesToIntersegmentalForces::QueuesToIntersegmentalForces(
         GeneralisedCoordinatesQueue& inputGeneralisedCoordinatesQueue,
         MultipleExternalForcesQueue& inputExternalForcesQueue,
         VecContactForcesQueue& outputIntersegmentalForcesQueue,
-        Concurrency::Latch& latch,
+        Concurrency::Latch& doneWithSubscriptions,
+        Concurrency::Latch& doneWithExecution,
         const NMSmodelT& subject,
         const std::string& osimModelFilename,
         const std::string& externalLoadsXmlFilename,    //this is the same as openSim
         const std::vector< std::string >& jointsToLog) :
-        QueuesToXForces(inputExternalForcesQueue, latch, subject, osimModelFilename, externalLoadsXmlFilename, jointsToLog),
+        QueuesToXForces(
+        inputExternalForcesQueue,
+        doneWithSubscriptions,
+        doneWithExecution,
+        subject,
+        osimModelFilename,
+        externalLoadsXmlFilename,
+        jointsToLog),
         inputGeneralisedCoordinatesQueue_(inputGeneralisedCoordinatesQueue),
         outputIntersegmentalForcesQueue_(outputIntersegmentalForcesQueue) {  }
-
-
 }
-
 
 #endif

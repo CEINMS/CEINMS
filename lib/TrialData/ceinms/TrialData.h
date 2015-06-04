@@ -43,26 +43,31 @@ namespace ceinms {
         DataTable<double> emgData;
         DataTable<double> lmtData;
         DataTable<double> torqueData;
-
+        bool isConsistent() {
+            bool consistent =
+                emgData.getNRows() > 0 &&
+                lmtData.getNRows() > 0 &&
+                torqueData.getNRows() > 0;
+            return consistent;
+        }
         size_t noDoF;
         std::vector<std::string> dofNames;
         std::vector<DataTable<double>> maData;
-
     };
 }
 
 /*
 std::ostream& operator<< (std::ostream& output, const TrialData& rhs) {
 
-	output << "ID " << rhs.id_ << std::endl;
-	output << "noMuscles " << rhs.noMuscles_ << std::endl;
-    output << "noEMGsteps " << rhs.noEmgSteps_ << std::endl;
-    output << "noLmtsteps " << rhs.noLmtSteps_ << std::endl;
-	output << "noDofs " << rhs.noDoF_ << std::endl;
-	output << "noTorqueSteps " << rhs.noTorqueSteps_ << std::endl;
+output << "ID " << rhs.id_ << std::endl;
+output << "noMuscles " << rhs.noMuscles_ << std::endl;
+output << "noEMGsteps " << rhs.noEmgSteps_ << std::endl;
+output << "noLmtsteps " << rhs.noLmtSteps_ << std::endl;
+output << "noDofs " << rhs.noDoF_ << std::endl;
+output << "noTorqueSteps " << rhs.noTorqueSteps_ << std::endl;
 
-	return output;
-	}*/
+return output;
+}*/
 //#include "TrialData.cpp"
 
 #endif

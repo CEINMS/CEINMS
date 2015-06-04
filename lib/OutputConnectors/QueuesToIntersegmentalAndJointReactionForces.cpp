@@ -29,6 +29,7 @@
 
 #include "ceinms/QueuesToIntersegmentalAndJointReactionForces.h"
 #include "ceinms/QueuesSync.h"
+#include "ceinms/EndOfData.h"
 
 namespace ceinms {
 
@@ -36,7 +37,7 @@ namespace ceinms {
 
     void QueuesToIntersegmentalAndJointReactionForces::operator()() {
 
-
+        QueuesToXForces::initialiseContactModel();
         inputGeneralisedCoordinatesQueue_.subscribe();
         inputMuscleForcesQueue_.subscribe();
         inputEstimatedTorquesQueue_.subscribe();
@@ -77,8 +78,14 @@ namespace ceinms {
             }
         }
 
+        sendEndOfData();
         VecContactForcesFrame endOfData;
-        endOfData.time = std::numeric_limits<double>::infinity();
+        QueuesToXForces::doneWithExecution();
+    }
+
+    void QueuesToIntersegmentalAndJointReactionForces::sendEndOfData() {
+
+        VecContactForcesFrame endOfData(EndOfData::get<VecContactForcesFrame>());
         outputJointReactionForcesQueue_.push(endOfData);
         outputIntersegmentalForcesQueue_.push(endOfData);
     }

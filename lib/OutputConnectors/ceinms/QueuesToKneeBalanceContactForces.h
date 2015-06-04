@@ -41,7 +41,6 @@
 #include <vector>
 #include <string>
 
-
 namespace ceinms {
 
     class QueuesToKneeBalanceContactForces {
@@ -51,16 +50,19 @@ namespace ceinms {
             EstimatedTorquesQueue& inputEstimatedTorquesQueue,
             ExternalTorquesQueue& inputExternalTorquesQueue,
             ScalarContactForcesQueue& outputContactForcesQueue,
-            Concurrency::Latch& subscriptionLatch,
+            Concurrency::Latch& doneWithSubscription,
+            Concurrency::Latch& doneWithExecution,
             const ContactModelKneeBalanceSetup& contactModelSetup,
             const NMSmodelT& subject);
         void operator()();
 
     private:
+        void sendEndOfData();
         EstimatedTorquesQueue& inputEstimatedTorquesQueue_;
         ExternalTorquesQueue& inputExternalTorquesQueue_;
         ScalarContactForcesQueue& outputContactForcesQueue_;
-        Concurrency::Latch& subscriptionLatch_;
+        Concurrency::Latch& doneWithSubscription_;
+        Concurrency::Latch& doneWithExecution_;
         ContactModelKneeBalance kneeContactModel_;
     };
 
@@ -69,15 +71,17 @@ namespace ceinms {
         EstimatedTorquesQueue& inputEstimatedTorquesQueue,
         ExternalTorquesQueue& inputExternalTorquesQueue,
         ScalarContactForcesQueue& outputContactForcesQueue,
-        Concurrency::Latch& subscriptionLatch,
+        Concurrency::Latch& doneWithSubscription,
+        Concurrency::Latch& doneWithExecution,
         const ContactModelKneeBalanceSetup& contactModelSetup,
         const NMSmodelT& subject) :
         inputEstimatedTorquesQueue_(inputEstimatedTorquesQueue),
         inputExternalTorquesQueue_(inputExternalTorquesQueue),
         outputContactForcesQueue_(outputContactForcesQueue),
-        subscriptionLatch_(subscriptionLatch),
+        doneWithSubscription_(doneWithSubscription),
+        doneWithExecution_(doneWithExecution),
         kneeContactModel_(contactModelSetup, subject)
-         {   }
+    {   }
 }
 
 #endif

@@ -48,7 +48,6 @@ using std::vector;
 #include "ceinms/SumKneeContactForces.h"
 #include "ceinms/MinTorqueErrorAndContactForces.h"
 
-
 #include "ceinms/SimulatedAnnealing.h"
 #include "ceinms/NMSmodelSystem.h"
 #include "ceinms/Curve.h"
@@ -66,7 +65,6 @@ using std::vector;
 #include "ceinms/FileUtils.h"
 
 namespace ceinms {
-
 
     CalibrationManager::CalibrationManager(const string& setupFilename) :
         ceinmsCalibrationSetup_(setupFilename),
@@ -101,59 +99,55 @@ namespace ceinms {
         while (calibrationXmlReader_.popNextCalibrationStep(currentCalibrationStep)) {
             std::cout << "CalibrationStepCfg " << currentCalibrationStep.getStepCfg() << std::endl;
             switch (currentCalibrationStep.getStepCfg()) {
-                case CalibrationCfg::MinimizeTorqueErrorParameterSetDefault: {
+            case CalibrationCfg::MinimizeTorqueErrorParameterSetDefault: {
 
-                    vector<string> dofsToCalibrate;
-                    currentCalibrationStep.getDofNames(dofsToCalibrate);
-                    ParameterSet parameterSet;
-                    currentCalibrationStep.getParameterSet(parameterSet);
-                    ObjectiveFunctionSetup objectiveFunctionSetup = currentCalibrationStep.getObjectiveFunctionSetup();
+                vector<string> dofsToCalibrate;
+                currentCalibrationStep.getDofNames(dofsToCalibrate);
+                ParameterSet parameterSet;
+                currentCalibrationStep.getParameterSet(parameterSet);
+                ObjectiveFunctionSetup objectiveFunctionSetup = currentCalibrationStep.getObjectiveFunctionSetup();
 
-                    using MySystem = NMSmodelSystem < NMSmodelT, MinTorqueError>;
-                    MySystem system(mySubject, trials, MinTorqueError(), parameterSet, dofsToCalibrate);
+                using MySystem = NMSmodelSystem < NMSmodelT, MinTorqueError > ;
+                MySystem system(mySubject, trials, MinTorqueError(), parameterSet, dofsToCalibrate);
 
-                    SimulatedAnnealingParameters simanParameters;
-                    calibrationXmlReader_.getOptimizationAlgorithmParameters(simanParameters);
-                    Optimizers::SimulatedAnnealing<MySystem> optimizer(system, simanParameters);
-                    exitflag = optimizer.optimize();
-                }   break;
+                SimulatedAnnealingParameters simanParameters;
+                calibrationXmlReader_.getOptimizationAlgorithmParameters(simanParameters);
+                Optimizers::SimulatedAnnealing<MySystem> optimizer(system, simanParameters);
+                exitflag = optimizer.optimize();
+            }   break;
 
-                case CalibrationCfg::TorqueErrorAndSumKneeContactForcesParameterSetDefault: {
+            case CalibrationCfg::TorqueErrorAndSumKneeContactForcesParameterSetDefault: {
 
-                    vector<string> dofsToCalibrate;
-                    currentCalibrationStep.getDofNames(dofsToCalibrate);
-                    ParameterSet parameterSet;
-                    currentCalibrationStep.getParameterSet(parameterSet);
-                    ObjectiveFunctionSetup objectiveFunctionSetup = currentCalibrationStep.getObjectiveFunctionSetup();
+                vector<string> dofsToCalibrate;
+                currentCalibrationStep.getDofNames(dofsToCalibrate);
+                ParameterSet parameterSet;
+                currentCalibrationStep.getParameterSet(parameterSet);
+                ObjectiveFunctionSetup objectiveFunctionSetup = currentCalibrationStep.getObjectiveFunctionSetup();
 
-                    SumKneeContactForces sumKneeContacts(objectiveFunctionSetup);
-                    sumKneeContacts.setContactModelSetup(contactModelCfg_.getContactModelSetupKneeBalance());
-                    MinTorqueError minTorqueError;
-                    MinTorqueErrorAndContactForces minTorqueErrorAndContactForces(minTorqueError, sumKneeContacts);
+                SumKneeContactForces sumKneeContacts(objectiveFunctionSetup);
+                sumKneeContacts.setContactModelSetup(contactModelCfg_.getContactModelSetupKneeBalance());
+                MinTorqueError minTorqueError;
+                MinTorqueErrorAndContactForces minTorqueErrorAndContactForces(minTorqueError, sumKneeContacts);
 
+                using MySystem = NMSmodelSystem < NMSmodelT, MinTorqueErrorAndContactForces > ;
+                MySystem system(mySubject, trials, minTorqueErrorAndContactForces, parameterSet, dofsToCalibrate);
 
-                    using MySystem = NMSmodelSystem < NMSmodelT, MinTorqueErrorAndContactForces>;
-                    MySystem system(mySubject, trials, minTorqueErrorAndContactForces, parameterSet, dofsToCalibrate);
-
-                    SimulatedAnnealingParameters simanParameters;
-                    calibrationXmlReader_.getOptimizationAlgorithmParameters(simanParameters);
-                    Optimizers::SimulatedAnnealing<MySystem> optimizer(system, simanParameters);
-                    exitflag = optimizer.optimize();
-                }   break;
-
+                SimulatedAnnealingParameters simanParameters;
+                calibrationXmlReader_.getOptimizationAlgorithmParameters(simanParameters);
+                Optimizers::SimulatedAnnealing<MySystem> optimizer(system, simanParameters);
+                exitflag = optimizer.optimize();
+            }   break;
             } //end switch
         }//end while
         writeXml(mySubject, uncalibratedSubjectFile_, calibrationFile_, calibratedSubjectFile_);
         return exitflag;
     }
 
-
     template <typename NMSmodelT>
     bool  CalibrationManager::runHybrid() {
         cout << "Implementation not available in calibration yet. Verify you XML configuration file" << endl;
         return 1;
     }
-
 
     bool CalibrationManager::run() {
 
@@ -205,21 +199,17 @@ namespace ceinms {
             exitFlag = runHybrid<NMSmodel<PiecewiseActivation, StiffTendon, CurveMode::Online>>();
             break;
 
-
         case NMSModelCfg::HybridPiecewiseActivationElasticTendonBiSecOnline:
             exitFlag = runHybrid<NMSmodel<PiecewiseActivation, ElasticTendon_BiSec, CurveMode::Online>>();
             break;
-
 
         default:
             cout << "Implementation not available yet. Verify you XML configuration file" << endl;
             exitFlag = 1;
             break;
-
         }
         return exitFlag;
     }
-
 
     template<typename NMSmodelT>
     TrialData CalibrationManager::readTrialData(const string& inputDataFilename, NMSmodelT& mySubject, const string& trialId, const string& emgGeneratorFile) {
@@ -257,7 +247,7 @@ namespace ceinms {
         externalTorquesProdThread.join();
         queuesToTrialDataThread.join();
 
-        if (queuesToTrialData.getTrialData().lmtData.getNRows() < 1)
+        if (!queuesToTrialData.getTrialData().isConsistent())
         {
             std::cout << "ERROR: No data was read for trial " << trialId << std::endl;
             exit(EXIT_FAILURE);
@@ -267,9 +257,9 @@ namespace ceinms {
 
     template<typename NMSmodelT>
     void CalibrationManager::writeXml(NMSmodelT& mySubject,
-                                      const string& uncalibratedSubjectXmlFile,
-                                      const string& calibrationXmlFile,
-                                      const string& newCalibratedSubjectXmlFile) {
+        const string& uncalibratedSubjectXmlFile,
+        const string& calibrationXmlFile,
+        const string& newCalibratedSubjectXmlFile) {
         XmlWriter xmlWriter(uncalibratedSubjectXmlFile);
         xmlWriter.setParameters(mySubject);
         xmlWriter.addCalibrationInfo(calibrationXmlFile);
@@ -278,9 +268,9 @@ namespace ceinms {
     }
 
     void CalibrationManager::sortMaFilenames(const std::map<std::string,
-                                             std::string>& maMap,
-                                             const std::vector< std::string >& dofNames,
-                                             std::vector< std::string >& maDataFilenames) {
+        std::string>& maMap,
+        const std::vector< std::string >& dofNames,
+        std::vector< std::string >& maDataFilenames) {
 
         int currentDof = 0;
         for (auto& it : dofNames)

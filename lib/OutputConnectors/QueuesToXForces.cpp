@@ -224,7 +224,7 @@ namespace ceinms {
         //each of them connected internally to an OpenSim model
         distributeExternalForces();
         splitForcesLatch_.wait();
-        externalLatch_.wait();
+        externalDoneWithSubscriptionsLatch_.wait();
 
     }
 
@@ -322,6 +322,12 @@ namespace ceinms {
             jointContactModel_->getIntersegmentalForceInChild(jointName, force);
             intersegmentalForcesInChild.emplace_back(force);
         }
+    }
+
+
+    void QueuesToXForces::doneWithExecution() {
+
+        externalDoneWithExecutionLatch_.wait();
     }
 
 

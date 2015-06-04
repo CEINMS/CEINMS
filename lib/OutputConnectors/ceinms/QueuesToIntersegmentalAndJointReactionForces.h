@@ -26,7 +26,6 @@
 * limitations under the License.                                             *
 * -------------------------------------------------------------------------- */
 
-
 #ifndef ceinms_QueuesToIntersegmentalAndJointReactionForces_h
 #define ceinms_QueuesToIntersegmentalAndJointReactionForces_h
 #include "ceinms/QueuesToXForces.h"
@@ -51,7 +50,8 @@ namespace ceinms {
             EstimatedTorquesQueue& inputEstimatedTorquesQueue,
             VecContactForcesQueue& outputJointReactionForcesQueue,
             VecContactForcesQueue& outputIntersegmentalForcesQueue,
-            Concurrency::Latch& latch,
+            Concurrency::Latch& doneWithSubscriptions,
+            Concurrency::Latch& doneWithExecution,
             const NMSmodelT& subject,
             const std::string& osimModelFilename,
             const std::string& externalLoadsXmlFilename,
@@ -61,14 +61,13 @@ namespace ceinms {
         virtual ~QueuesToIntersegmentalAndJointReactionForces() override {}
 
     private:
+        void sendEndOfData();
         GeneralisedCoordinatesQueue& inputGeneralisedCoordinatesQueue_;
         MuscleForcesQueue& inputMuscleForcesQueue_;
         EstimatedTorquesQueue& inputEstimatedTorquesQueue_;
         VecContactForcesQueue& outputJointReactionForcesQueue_;
         VecContactForcesQueue& outputIntersegmentalForcesQueue_;
-
     };
-
 
     template <typename NMSmodelT>
     QueuesToIntersegmentalAndJointReactionForces::QueuesToIntersegmentalAndJointReactionForces(
@@ -78,20 +77,26 @@ namespace ceinms {
         EstimatedTorquesQueue& inputEstimatedTorquesQueue,
         VecContactForcesQueue& outputJointReactionForcesQueue,
         VecContactForcesQueue& outputIntersegmentalForcesQueue,
-        Concurrency::Latch& latch,
+        Concurrency::Latch& doneWithSubscriptions,
+        Concurrency::Latch& doneWithExecution,
         const NMSmodelT& subject,
         const std::string& osimModelFilename,
         const std::string& externalLoadsXmlFilename,
         const std::vector< std::string >& jointsToLog) :
-        QueuesToXForces(inputExternalForcesQueue, latch, subject, osimModelFilename, externalLoadsXmlFilename, jointsToLog),
+        QueuesToXForces(
+        inputExternalForcesQueue,
+        doneWithSubscriptions,
+        doneWithExecution,
+        subject,
+        osimModelFilename,
+        externalLoadsXmlFilename,
+        jointsToLog),
         inputGeneralisedCoordinatesQueue_(inputGeneralisedCoordinatesQueue),
         inputMuscleForcesQueue_(inputMuscleForcesQueue),
         inputEstimatedTorquesQueue_(inputEstimatedTorquesQueue),
         outputJointReactionForcesQueue_(outputJointReactionForcesQueue),
         outputIntersegmentalForcesQueue_(outputIntersegmentalForcesQueue)
     {}
-
 }
-
 
 #endif 

@@ -29,6 +29,7 @@
 #include "ceinms/QueuesToJointReactionForces.h"
 #include "ceinms/GeneralisedCoordinatesData.h"
 #include "ceinms/QueuesSync.h"
+#include "ceinms/EndOfData.h"
 #include <thread>
 #include <chrono>
 
@@ -46,16 +47,15 @@ namespace ceinms {
         bool runCondition(true);
         while (runCondition) {
 
- //           std::this_thread::sleep_for(std::chrono::seconds(10));
             auto frames(QueuesSync::sync(inputGeneralisedCoordinatesQueue_, inputMuscleForcesQueue_, inputEstimatedTorquesQueue_));
             GeneralisedCoordinatesFrame generalisedCoordinatesFrame;
             MuscleForcesFrame muscleForcesFrame;
             EstimatedTorquesFrame estimatedTorquesFrame;
             std::tie(generalisedCoordinatesFrame, muscleForcesFrame, estimatedTorquesFrame) = frames;
 
-            if ((generalisedCoordinatesFrame.time == std::numeric_limits<double>::infinity()) ||
-                (muscleForcesFrame.time == std::numeric_limits<double>::infinity()) ||
-                (estimatedTorquesFrame.time == std::numeric_limits<double>::infinity()))
+            if (EndOfData::isEod(generalisedCoordinatesFrame) ||
+                EndOfData::isEod(muscleForcesFrame) ||
+                EndOfData::isEod(estimatedTorquesFrame))
                 runCondition = false;
             if (runCondition) {
                 QueuesToXForces::setState(
@@ -73,9 +73,13 @@ namespace ceinms {
 
             }
         }
-        VecContactForcesFrame contactForces;
-        contactForces.time = std::numeric_limits<double>::infinity();
-        outputJointReactionForcesQueue_.push(contactForces);
+        sendEndOfData();
+        QueuesToXForces::doneWithExecution();
+    }
 
+
+    void QueuesToJointReactionForces::sendEndOfData() {
+
+        outputJointReactionForcesQueue_.push(EndOfData::get<VecContactForcesFrame>());
     }
 }

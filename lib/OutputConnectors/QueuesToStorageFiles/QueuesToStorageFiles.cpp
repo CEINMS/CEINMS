@@ -28,6 +28,7 @@
 
 #include "ceinms/QueuesToStorageFiles.h"
 #include "ceinms/InputConnectors.h"
+#include "ceinms/EndOfData.h"
 
 namespace ceinms {
     void QueuesToStorageFiles::addLog(std::string valueName)
@@ -42,15 +43,14 @@ namespace ceinms {
         }
 
         outFiles_.insert(std::make_pair(valueName, file_ptr));
-
     }
 
     void QueuesToStorageFiles::operator()() {
 
         for (auto& it : valuesToWrite_) {
 
-            auto q = outputConnectors_.logQueues.find(it);
-            if (q == outputConnectors_.logQueues.end()) {
+            auto q = inputLogQueue_.find(it);
+            if (q == inputLogQueue_.end()) {
                 std::cout << it << " queue was not found\n";
                 exit(EXIT_FAILURE);
             }
@@ -60,23 +60,22 @@ namespace ceinms {
             }
         }
 
-        inputConnectors_.doneWithSubscription.wait();
+        doneWithSubscriptions_.wait();
 
-        outputConnectors_.doneWithExecution.wait();
-
+        readyToWrite_.wait();
 
         for (auto& currentValue : valuesToWrite_) {
 
-            auto currentQueue = outputConnectors_.logQueues.find(currentValue);
-            if (currentQueue == outputConnectors_.logQueues.end()) {
+            auto currentQueue = inputLogQueue_.find(currentValue);
+            if (currentQueue == inputLogQueue_.end()) {
                 std::cout << currentValue << " queue was not found\n";
                 exit(EXIT_FAILURE);
             }
 
-            OutputConnectors::FrameType currentFrame;
-            std::vector< OutputConnectors::FrameType > dataToWrite;
+            ScalarVectorFrame currentFrame;
+            std::vector< ScalarVectorFrame > dataToWrite;
             currentFrame = currentQueue->second->pop();
-            while (currentFrame.time != outputConnectors_.TimePlaceholderForEndOfData) {
+            while (!EndOfData::isEod(currentFrame)) {
                 dataToWrite.push_back(currentFrame);
                 currentFrame = currentQueue->second->pop();
             }
@@ -93,8 +92,7 @@ namespace ceinms {
         }
     }
 
-
-    void QueuesToStorageFiles::initFile(const std::string& valueName, const std::vector< OutputConnectors::FrameType >& dataToWrite)
+    void QueuesToStorageFiles::initFile(const std::string& valueName, const std::vector<ScalarVectorFrame>& dataToWrite)
     {
         if (dataToWrite.size() < 1)
         {

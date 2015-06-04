@@ -32,9 +32,12 @@
 #include <iostream>
 #include <fstream>
 #include <boost/filesystem.hpp>
-#include "OutputConnectors.h"
 #include "ceinms/InputConnectors.h"
 #include "ceinms/TrialData.h"
+#include "ceinms/concurrency/Queue.h"
+#include "ceinms/concurrency/Latch.h"
+#include "ceinms/queues/ScalarVectorQueue.h"
+#include "ceinms/queues/MultipleMomentArmsQueues.h"
 
 namespace ceinms {
     class QueuesToTrialData {
@@ -43,7 +46,22 @@ namespace ceinms {
         QueuesToTrialData(const QueuesToTrialData&) = delete;
         QueuesToTrialData& operator=(const QueuesToTrialData&) = delete;
 
-        template<typename NMSmodel> QueuesToTrialData(InputConnectors& inputConnectors, OutputConnectors& outputConnectors, NMSmodel& subject, std::string id) : inputConnectors_(inputConnectors), outputConnectors_(outputConnectors)
+        template<typename NMSmodel>
+        QueuesToTrialData(
+            ScalarVectorQueue& inputEmgQueue,
+            ScalarVectorQueue& inputLmtQueue,
+            ScalarVectorQueue& inputExternalTorqueQueue,
+            MultipleMomentArmsQueues& inputMomentArmsQueues,
+            Concurrency::Latch& doneWithSubscriptions,
+            Concurrency::Latch& doneWithExecution,
+            NMSmodel& subject,
+            std::string id) :
+            inputEmgQueue_(inputEmgQueue),
+            inputLmtQueue_(inputLmtQueue),
+            inputExternalTorqueQueue_(inputExternalTorqueQueue),
+            inputMomentArmsQueues_(inputMomentArmsQueues),
+            doneWithSubscriptions_(doneWithSubscriptions),
+            doneWithExecution_(doneWithExecution)
         {
             data_.id = id;
             std::vector<std::string> muscleNames;
@@ -59,7 +77,6 @@ namespace ceinms {
             for (auto i(0); i < data_.noDoF; ++i)
                 data_.maData.at(i).setLabels(maMuscleNames.at(i));
             data_.torqueData.setLabels(data_.dofNames);
-
         };
         ~QueuesToTrialData() = default;
         void operator()();
@@ -67,11 +84,13 @@ namespace ceinms {
 
     private:
         TrialData data_;
-        InputConnectors& inputConnectors_;
-        OutputConnectors& outputConnectors_;
-        //std::vector<std::string> valuesToWrite_;
-        //std::vector<std::string> torqueNames_;
-        //std::vector<std::string> muscleNames_;
+        ScalarVectorQueue& inputEmgQueue_;
+        ScalarVectorQueue& inputLmtQueue_;
+        ScalarVectorQueue& inputExternalTorqueQueue_;
+        MultipleMomentArmsQueues& inputMomentArmsQueues_;
+        Concurrency::Latch& doneWithSubscriptions_;
+        Concurrency::Latch& doneWithExecution_;
     };
 }
+
 #endif

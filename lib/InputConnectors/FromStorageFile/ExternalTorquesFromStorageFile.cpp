@@ -31,7 +31,6 @@
 #include "ceinms/DataFromStorageFile.h"
 #include "ceinms/InputConnectors.h"
 
-
 #include <iostream>
 using std::cout;
 using std::endl;
@@ -76,9 +75,9 @@ namespace ceinms  {
             }
 
             ExternalTorquesFromX::sendEndOfData();
-
         }
         else {
+            ExternalTorquesFromX::sendEndOfData();
 #ifdef LOG
             cout << "\n ExtTorque: external Torques not available " << endl;
 #endif

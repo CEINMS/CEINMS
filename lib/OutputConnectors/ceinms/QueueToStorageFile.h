@@ -42,8 +42,8 @@ namespace ceinms {
     template<typename DataType>
     class QueueToStorageFile {
     public:
-    //    using DataType = std::vector < double >;
-        using FrameType = QueueData < DataType >;
+        //    using DataType = std::vector < double >;
+        using FrameType = QueueData < DataType > ;
         using QueueType = Concurrency::Queue < FrameType > ;
 
         QueueToStorageFile() = delete;
@@ -52,10 +52,10 @@ namespace ceinms {
 
         QueueToStorageFile(
             QueueType& inputQueue,
-            Concurrency::Latch& subscriptionLatch, 
-            Concurrency::Latch& readyToWriteLatch, 
-            const std::vector<std::string>& columnLabels, 
-            const std::string& filename, 
+            Concurrency::Latch& subscriptionLatch,
+            Concurrency::Latch& readyToWriteLatch,
+            const std::vector<std::string>& columnLabels,
+            const std::string& filename,
             const std::string& outputDir = "./Output/");
         ~QueueToStorageFile() = default;
         void operator()();
@@ -73,7 +73,6 @@ namespace ceinms {
         std::shared_ptr<std::ofstream> outFile_;
         std::vector< FrameType > dataToWrite_;
     };
-
 }
 
 #include "QueuesToStorageFiles/QueueToStorageFile.cpp"

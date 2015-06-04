@@ -50,23 +50,23 @@ namespace ceinms {
             MuscleForcesQueue& inputMuscleForcesQueue,
             EstimatedTorquesQueue& inputEstimatedTorquesQueue,
             VecContactForcesQueue& outputJointReactionForcesQueue,
-            Concurrency::Latch& latch,
+            Concurrency::Latch& doneWithSubscriptions,
+            Concurrency::Latch& doneWithExecution,
             const NMSmodelT& subject,
             const std::string& osimModelFilename,
             const std::string& externalLoadsXmlFilename,
             const std::vector< std::string >& jointsToLog);
- 
+
         virtual void operator()() override;
         virtual ~QueuesToJointReactionForces() override {}
 
     private:
+        void sendEndOfData();
         GeneralisedCoordinatesQueue& inputGeneralisedCoordinatesQueue_;
         MuscleForcesQueue& inputMuscleForcesQueue_;
         EstimatedTorquesQueue& inputEstimatedTorquesQueue_;
         VecContactForcesQueue& outputJointReactionForcesQueue_;
-    
     };
-
 
     template <typename NMSmodelT>
     QueuesToJointReactionForces::QueuesToJointReactionForces(
@@ -75,19 +75,25 @@ namespace ceinms {
         MuscleForcesQueue& inputMuscleForcesQueue,
         EstimatedTorquesQueue& inputEstimatedTorquesQueue,
         VecContactForcesQueue& outputJointReactionForcesQueue,
-        Concurrency::Latch& latch,
+        Concurrency::Latch& doneWithSubscriptions,
+        Concurrency::Latch& doneWithExecution,
         const NMSmodelT& subject,
         const std::string& osimModelFilename,
         const std::string& externalLoadsXmlFilename,
         const std::vector< std::string >& jointsToLog) :
-        QueuesToXForces(inputExternalForcesQueue, latch, subject, osimModelFilename, externalLoadsXmlFilename, jointsToLog),
+        QueuesToXForces(
+        inputExternalForcesQueue,
+        doneWithSubscriptions,
+        doneWithExecution,
+        subject,
+        osimModelFilename,
+        externalLoadsXmlFilename,
+        jointsToLog),
         inputGeneralisedCoordinatesQueue_(inputGeneralisedCoordinatesQueue),
         inputMuscleForcesQueue_(inputMuscleForcesQueue),
         inputEstimatedTorquesQueue_(inputEstimatedTorquesQueue),
         outputJointReactionForcesQueue_(outputJointReactionForcesQueue)
-        {}
-
+    {}
 }
-
 
 #endif 

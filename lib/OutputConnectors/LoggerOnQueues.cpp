@@ -27,33 +27,32 @@
  * -------------------------------------------------------------------------- */
 
 #include "ceinms/LoggerOnQueues.h"
-#include "ceinms/OutputConnectors.h"
 #include <vector>
 #include <string>
 #include <iostream>
+#include <map>
 
 namespace ceinms{
-    LoggerOnQueues::LoggerOnQueues(OutputConnectors& outputConnector, const std::vector< std::string >& valuesToLog) :
-        outputConnectors_(outputConnector) {
+    LoggerOnQueues::LoggerOnQueues(ScalarLogQueue& outputLogQueue, const std::vector< std::string >& valuesToLog) :
+        outputLogQueue_(outputLogQueue) {
 
         for (auto& it : valuesToLog)
-            outputConnectors_.logQueues.insert(std::make_pair(it, new Concurrency::Queue< OutputConnectors::FrameType>));
+            outputLogQueue_.insert(std::make_pair(it, std::make_shared<ScalarVectorQueue>()));
     }
 
+    void LoggerOnQueues::log(double time, const ScalarVectorData& dataToLog, const std::string& valueToLog) {
 
-    void LoggerOnQueues::log(double time, const OutputConnectors::DataType& dataToLog, const std::string& valueToLog) {
+        ScalarVectorFrame frameToPush;
+        frameToPush.data = dataToLog;
+        frameToPush.time = time;
 
-        OutputConnectors::FrameType dataToPush;
-        dataToPush.data = dataToLog;
-        dataToPush.time = time;
+        auto currentQueue = outputLogQueue_.find(valueToLog);
 
-        auto currentQueue = outputConnectors_.logQueues.find(valueToLog);
-
-        if (currentQueue == outputConnectors_.logQueues.end()) {
+        if (currentQueue == outputLogQueue_.end()) {
             std::cout << "queue for " << valueToLog << " was not found\n";
             exit(EXIT_FAILURE);
         }
         else
-            currentQueue->second->push(dataToPush);
+            currentQueue->second->push(frameToPush);
     }
 }

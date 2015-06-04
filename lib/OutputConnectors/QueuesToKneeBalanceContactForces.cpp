@@ -28,6 +28,7 @@
 
 #include "ceinms/QueuesToKneeBalanceContactForces.h"
 #include "ceinms/QueuesSync.h"
+#include "ceinms/EndOfData.h"
 #include <tuple>
 #include <limits>
 
@@ -38,7 +39,7 @@ namespace ceinms {
         inputExternalTorquesQueue_.subscribe();
         inputEstimatedTorquesQueue_.subscribe();
 
-        subscriptionLatch_.wait();
+        doneWithSubscription_.wait();
 
         bool runCondition(true);
         while (runCondition) {
@@ -47,8 +48,8 @@ namespace ceinms {
             ExternalTorquesFrame externalTorquesFrame;
             EstimatedTorquesFrame estimatedTorquesFrame;
             std::tie(externalTorquesFrame, estimatedTorquesFrame) = frames;
-            if (externalTorquesFrame.time == std::numeric_limits<double>::infinity() ||
-                estimatedTorquesFrame.time == std::numeric_limits<double>::infinity())
+            if (EndOfData::isEod(externalTorquesFrame) ||
+                EndOfData::isEod(estimatedTorquesFrame))
                 runCondition = false;
             if (runCondition) {
                 kneeContactModel_.setTorques(externalTorquesFrame.data, estimatedTorquesFrame.data);
@@ -59,9 +60,13 @@ namespace ceinms {
             }
         }
 
-        ScalarContactForcesFrame eod;
-        eod.time = std::numeric_limits<double>::infinity();
-        outputContactForcesQueue_.push(eod);
+        sendEndOfData();
+        doneWithExecution_.wait();
     }
 
+
+    void QueuesToKneeBalanceContactForces::sendEndOfData() {
+
+        outputContactForcesQueue_.push(EndOfData::get<ScalarContactForcesFrame>());
+    }
 }

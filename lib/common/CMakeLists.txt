@@ -24,7 +24,8 @@ set(Common_HEADERS  ceinms/ArrayConverter.h
                     ceinms/queues/MuscleForcesQueue.h
 					ceinms/queues/SingleExternalForceQueue.h
                     ceinms/queues/ScalarVectorQueue.h
-                    ceinms/queues/MultipleMomentArmsQueues.h)
+                    ceinms/queues/MultipleMomentArmsQueues.h
+					ceinms/queues/LogQueue.h)
 
 set(Common_SOURCES  Parameter.cpp
                     FileUtils.cpp

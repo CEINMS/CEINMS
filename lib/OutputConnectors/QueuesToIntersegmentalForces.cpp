@@ -27,7 +27,7 @@
 * -------------------------------------------------------------------------- */
 
 #include "ceinms/QueuesToIntersegmentalForces.h"
-
+#include "ceinms/EndOfData.h"
 namespace ceinms {
 
 
@@ -42,7 +42,7 @@ namespace ceinms {
         while (runCondition) {
             GeneralisedCoordinatesFrame generalisedCoordinatesFrame(inputGeneralisedCoordinatesQueue_.pop());
 
-            if (generalisedCoordinatesFrame.time == std::numeric_limits<double>::infinity())
+            if (EndOfData::isEod(generalisedCoordinatesFrame))
                 runCondition = false;
             if (runCondition) {
                 QueuesToXForces::setState(
@@ -57,12 +57,17 @@ namespace ceinms {
                 contactForces.time = generalisedCoordinatesFrame.time;
                 QueuesToXForces::getIntersegmentalForcesInG(contactForces.data);
                 outputIntersegmentalForcesQueue_.push(contactForces);
-
             }
         }
-        VecContactForcesFrame contactForces;
-        contactForces.time = std::numeric_limits<double>::infinity();
-        outputIntersegmentalForcesQueue_.push(contactForces);
+      
+        sendEndOfData();
+        QueuesToXForces::doneWithExecution();
+
     }
 
+
+    void QueuesToIntersegmentalForces::sendEndOfData() {
+
+        outputIntersegmentalForcesQueue_.push(EndOfData::get<VecContactForcesFrame>());
+    }
 }

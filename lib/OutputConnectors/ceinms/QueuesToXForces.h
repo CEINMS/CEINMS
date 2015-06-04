@@ -49,11 +49,13 @@ namespace OpenSim {
     class ExternalForceFromQueue : public OpenSim::ExternalForce{
     public:
         ExternalForceFromQueue() = delete;
-        ExternalForceFromQueue(std::shared_ptr<ceinms::SingleExternalForceQueue> externalForceQueue,
+        ExternalForceFromQueue(
+            std::shared_ptr<ceinms::SingleExternalForceQueue> externalForceQueue,
             const std::string& appliedToBodyName,
             const std::string& forceExpressedInBodyName,
             const std::string& pointExpressedInBodyName);
-        ExternalForceFromQueue(std::shared_ptr<ceinms::SingleExternalForceQueue> externalForceQueue, SimTK::Xml::Element& aNode);
+        ExternalForceFromQueue(
+            std::shared_ptr<ceinms::SingleExternalForceQueue> externalForceQueue, SimTK::Xml::Element& aNode);
         virtual ~ExternalForceFromQueue();
     protected:
         virtual void computeForce(const SimTK::State& state,
@@ -82,9 +84,16 @@ namespace ceinms {
     public:
 
         template<typename NMSmodelT>
-        QueuesToXForces(MultipleExternalForcesQueue& externalForcesQueue, Concurrency::Latch& latch, const NMSmodelT& subject, const std::string& osimModelFilename, const std::string& externalLoadsXmlFilename, const std::vector< std::string >& jointsToLog);
+        QueuesToXForces(
+            MultipleExternalForcesQueue& inputExternalForcesQueue, 
+            Concurrency::Latch& doneWithSubscriptions, 
+            Concurrency::Latch& doneWithExecution,
+            const NMSmodelT& subject, 
+            const std::string& osimModelFilename, 
+            const std::string& externalLoadsXmlFilename, 
+            const std::vector< std::string >& jointsToLog);
         virtual ~QueuesToXForces();
-        virtual void operator()() {};
+        virtual void operator()() = 0;
         void setState(double time, const std::vector<double>& q, const std::vector<double>& qd, const std::vector<double>& qdd);
         void calculateIntersegmentalForces();
         //Instead of calculating the ID internally, I can provide the mobility forces (e.g. I've done the calculation before.. and I want to save time)
@@ -96,8 +105,8 @@ namespace ceinms {
         void getJointReactionForcesInChild(std::vector<SimTK::Vec3>& jointReactionsInChild) const;
         void getIntersegmentalForcesInChild(std::vector<SimTK::Vec3>& intersegmentalForcesInChild) const;
         void doneWithSubscriptions();
+        void doneWithExecution();
         void initialiseContactModel();
-
 
     private:
         static SimTK::Vector toSimTKVector(std::vector<double> v);
@@ -109,7 +118,8 @@ namespace ceinms {
 
         MultipleExternalForcesQueue& inputExternalForcesQueue_;
         Concurrency::Latch splitForcesLatch_;
-        Concurrency::Latch& externalLatch_;
+        Concurrency::Latch& externalDoneWithSubscriptionsLatch_;
+        Concurrency::Latch& externalDoneWithExecutionLatch_;
         std::future<void> splitForcesThread_;
         std::vector<OpenSim::Force*> extForces_;
         std::vector<std::shared_ptr<SingleExternalForceQueue>> singleExternalForceQueues_;
@@ -125,13 +135,15 @@ namespace ceinms {
     template<typename NMSmodelT>
     QueuesToXForces::QueuesToXForces(
         MultipleExternalForcesQueue& inputExternalForcesQueue,
-        Concurrency::Latch& latch,
+        Concurrency::Latch& doneWithSubscriptions,
+        Concurrency::Latch& doneWithExecution,
         const NMSmodelT& subject,
         const std::string& osimModelFilename,
         const std::string& externalLoadsXmlFilename,
         const std::vector< std::string >& jointsToLog) :
         inputExternalForcesQueue_(inputExternalForcesQueue),
-        externalLatch_(latch),
+        externalDoneWithSubscriptionsLatch_(doneWithSubscriptions),
+        externalDoneWithExecutionLatch_(doneWithExecution),
         jointContactModel_(nullptr),
         splitForcesLatch_(2), osimModelFilename_(osimModelFilename),
         externalLoadsXmlFilename_(externalLoadsXmlFilename),
