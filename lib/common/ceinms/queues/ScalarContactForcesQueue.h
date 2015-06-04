@@ -31,6 +31,7 @@
 
 #include <vector>
 #include "ceinms/QueueData.h"
+#include "ceinms/queues/ScalarVectorQueue.h"
 
 namespace Concurrency {
     template<typename>
@@ -39,7 +40,7 @@ namespace Concurrency {
 
 namespace ceinms {
 
-    using ScalarContactForcesFrame = QueueData < std::vector<double> >;
+    using ScalarContactForcesFrame = ScalarContactForcesFrame;
     using ScalarContactForcesQueue = Concurrency::Queue < ScalarContactForcesFrame >;
 
 }

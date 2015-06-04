@@ -26,30 +26,44 @@
  * limitations under the License.                                             *
  * -------------------------------------------------------------------------- */
 
-#ifndef ceinms_EMGFromX_h
-#define ceinms_EMGFromX_h
+#ifndef ceinms_EmgFromX_h
+#define ceinms_EmgFromX_h
 
 #include <string>
 #include <vector>
-#include "InputConnectors.h"
+
+#include "ceinms/concurrency/Latch.h"
+#include "ceinms/concurrency/Queue.h"
+#include "ceinms/queues/ScalarVectorQueue.h"
 
 namespace ceinms {
-    class EMGFromX
+    class EmgFromX
     {
     public:
+        using EmgData = ScalarVectorFrame::type;
         template <typename NMSModelT>
-        EMGFromX(InputConnectors& inputConnectors, const NMSModelT& subject);
-        virtual ~EMGFromX();
+        EmgFromX(ScalarVectorQueue& outputEmgQueue, Concurrency::Latch& doneWithSubcriptions, Concurrency::Latch& doneWithExecution, const NMSModelT& subject);
+        virtual ~EmgFromX();
         virtual void operator()() {};
-        void updateEmg(const std::vector<double>& currentEmgData, double currentTime);
+        void updateEmg(const EmgData& currentEmgData, double currentTime);
+        void doneWithSubscriptions();
+        void doneWithExecution();
+        void sendEndOfData();
     protected:
         std::vector< std::string > musclesNames_;
-        InputConnectors& inputConnectors_;
+    private:
+        ScalarVectorQueue& outputEmgQueue_;
+        Concurrency::Latch& doneWithSubcriptions_;
+        Concurrency::Latch& doneWithExecution_;
+
     };
 
 
     template <typename NMSModelT>
-    EMGFromX::EMGFromX(InputConnectors& inputConnectors, const NMSModelT& subject) : inputConnectors_(inputConnectors)
+    EmgFromX::EmgFromX(ScalarVectorQueue& outputEmgQueue, Concurrency::Latch& doneWithSubcriptions, Concurrency::Latch& doneWithExecution, const NMSModelT& subject) :
+        outputEmgQueue_(outputEmgQueue),
+        doneWithSubcriptions_(doneWithSubcriptions),
+        doneWithExecution_(doneWithExecution)
     {
         subject.getMuscleNames(musclesNames_);
     }

@@ -27,25 +27,42 @@
  * -------------------------------------------------------------------------- */
 
 #include "ceinms/EMGFromX.h"
-#include "ceinms/InputConnectors.h"
-
 #include <string>
 using std::string;
 #include <vector>
 using std::vector;
 #include "ceinms/QueueData.h"
 #include <cstdlib>
+#include "ceinms/EndOfData.h"
 
 namespace ceinms {
-    void EMGFromX::updateEmg(const vector<double>& currentEmgData, double currentTime)
+    void EmgFromX::updateEmg(const EmgData& currentEmgData, double currentTime)
     {
-        QueueData< vector<double> > emgDataToPush;
+        QueueData< EmgData > emgDataToPush;
         emgDataToPush.data = currentEmgData;
         emgDataToPush.time = currentTime;
-        inputConnectors_.queueEmg.push(emgDataToPush);
+        outputEmgQueue_.push(emgDataToPush);
     }
 
 
-    EMGFromX::~EMGFromX() { }
+    void EmgFromX::doneWithSubscriptions() {
+
+        doneWithSubcriptions_.wait();
+    }
+
+
+    void EmgFromX::doneWithExecution() {
+        
+        doneWithExecution_.wait();
+    }
+
+
+    void EmgFromX::sendEndOfData() {
+
+        outputEmgQueue_.push(EndOfData::get<ScalarVectorFrame>());
+    }
+
+
+    EmgFromX::~EmgFromX() { }
 
 }

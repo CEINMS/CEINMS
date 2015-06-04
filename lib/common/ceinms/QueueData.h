@@ -45,6 +45,7 @@ namespace ceinms {
 
     template <typename T>
     struct QueueData {
+        using type = T;
         double time;
         T data;
     };

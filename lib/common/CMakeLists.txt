@@ -14,6 +14,7 @@ set(Common_HEADERS  ceinms/ArrayConverter.h
                     ceinms/Mapper.h
                     ceinms/QueuesSync.h
 					ceinms/ObjectiveFunctionSetup.h
+                    ceinms/EndOfData.h
                     ceinms/queues/VecContactForcesQueue.h
 					ceinms/queues/ScalarContactForcesQueue.h                    
 					ceinms/queues/EstimatedTorquesQueue.h
@@ -21,7 +22,8 @@ set(Common_HEADERS  ceinms/ArrayConverter.h
                     ceinms/queues/ExternalTorquesQueues.h
                     ceinms/queues/GeneralisedCoordinatesQueue.h
                     ceinms/queues/MuscleForcesQueue.h
-					ceinms/queues/SingleExternalForceQueue.h)
+					ceinms/queues/SingleExternalForceQueue.h
+                    ceinms/queues/ScalarVectorQueue.h)
 
 set(Common_SOURCES  Parameter.cpp
                     FileUtils.cpp
