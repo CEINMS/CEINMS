@@ -27,7 +27,6 @@
  * -------------------------------------------------------------------------- */
 
 #include "ceinms/ExternalTorquesFromX.h"
-#include "ceinms/InputConnectors.h"
 #include "ceinms/EndOfData.h"
 #include <iostream>
 using std::cout;
@@ -47,24 +46,20 @@ namespace ceinms {
         outputExternalTorquesQueue_.push(externalTorquesFrameToPush);
     }
 
-
     void ExternalTorquesFromX::doneWithSubscriptions() {
 
         doneWithSubscriptions_.wait();
     }
-
 
     void ExternalTorquesFromX::doneWithExecution() {
 
         doneWithExecution_.wait();
     }
 
-
     void ExternalTorquesFromX::sendEndOfData() {
 
         outputExternalTorquesQueue_.push(EndOfData::get<TorqueFrame>());
     }
 
-    
     ExternalTorquesFromX::~ExternalTorquesFromX() { }
 }

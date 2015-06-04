@@ -28,7 +28,6 @@
 #ifndef ceinms_ExternalForcesFromStorageFile_h
 #define ceinms_ExternalForcesFromStorageFile_h
 #include "ceinms/ExternalForcesFromX.h"
-#include "ceinms/InputConnectors.h"
 #include <string>
 
 namespace ceinms {
@@ -39,15 +38,14 @@ namespace ceinms {
         ExternalForcesFromStorageFile(
             MultipleExternalForcesQueue& outputMultipleExternalForcesQueue,
             Concurrency::Latch& doneWithSubscriptions,
-            Concurrency::Latch& doneWithExecution, 
-            const std::string& osimModelFilename, 
+            Concurrency::Latch& doneWithExecution,
+            const std::string& osimModelFilename,
             const std::string& externalLoadsXmlFilename);
         void operator()() override;
         virtual ~ExternalForcesFromStorageFile() override {}
     private:
         std::string osimModelFilename_, externalLoadsXmlFilename_;
     };
-
 }
 
 #endif

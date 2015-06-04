@@ -29,7 +29,6 @@
 #ifndef ceinms_GeneralisedCoordinatesFromStorageFile_h
 #define ceinms_GeneralisedCoordinatesFromStorageFile_h
 #include "ceinms/GeneralisedCoordinatesFromX.h"
-#include "InputConnectors.h"
 #include <OpenSim/OpenSim.h>
 #include "ceinms/Mapper.h"
 
@@ -46,8 +45,8 @@ namespace ceinms {
             GeneralisedCoordinatesQueue& outputGeneralisedCoordinatesQueue_,
             Concurrency::Latch& doneWithSubscriptions,
             Concurrency::Latch& doneWithExecution,
-            const std::string& osimModelFilename, 
-            const std::string& kinematicsStorageFilename, 
+            const std::string& osimModelFilename,
+            const std::string& kinematicsStorageFilename,
             const std::vector<std::string>& coordinatesToLog);
         virtual ~GeneralisedCoordinatesFromStorageFile() override {}
         virtual void operator()() override;
@@ -59,9 +58,7 @@ namespace ceinms {
         std::vector<double> timeColumn_;
         std::vector<std::string> coordinateNamesFromOsimModel_;
         Mapper mapper_;
-
     };
-
 }
 
 #endif

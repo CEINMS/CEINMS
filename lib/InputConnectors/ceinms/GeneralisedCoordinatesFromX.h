@@ -31,7 +31,6 @@
 
 #include <string>
 #include <vector>
-#include "InputConnectors.h"
 #include "ceinms/concurrency/Queue.h"
 #include "ceinms/concurrency/Latch.h"
 #include "ceinms/GeneralisedCoordinatesData.h"
@@ -56,6 +55,5 @@ namespace ceinms {
         Concurrency::Latch& doneWithSubscriptions_;
         Concurrency::Latch& doneWithExecution_;
     };
-
 }
 #endif

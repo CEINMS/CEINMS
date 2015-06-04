@@ -27,7 +27,6 @@
 * -------------------------------------------------------------------------- */
 
 #include "ceinms/GeneralisedCoordinatesFromX.h"
-#include "ceinms/InputConnectors.h"
 #include "ceinms/GeneralisedCoordinatesData.h"
 #include "ceinms/EndOfData.h"
 #include <vector>
@@ -42,9 +41,8 @@ namespace ceinms {
         outputGeneralisedCoordinatesQueue_(outputGeneralisedCoordinatesQueue),
         doneWithSubscriptions_(doneWithSubscriptions),
         doneWithExecution_(doneWithExecution)
-        
-        { }
 
+    { }
 
     void GeneralisedCoordinatesFromX::updateGeneralisedCoordinates(const GeneralisedCoordinatesData& currentGeneralisedCoordinatesData, double currentTime) {
 
@@ -52,23 +50,18 @@ namespace ceinms {
         outputGeneralisedCoordinatesQueue_.push(frame);
     }
 
-
     void GeneralisedCoordinatesFromX::doneWithSubscriptions() {
 
         doneWithSubscriptions_.wait();
     }
-
 
     void GeneralisedCoordinatesFromX::doneWithExecution() {
 
         doneWithExecution_.wait();
     }
 
-
     void GeneralisedCoordinatesFromX::sendEndOfData() {
 
         outputGeneralisedCoordinatesQueue_.push(EndOfData::get<GeneralisedCoordinatesFrame>());
-
     }
-
 }

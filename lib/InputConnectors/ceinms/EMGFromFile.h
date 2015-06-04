@@ -36,7 +36,6 @@
 #include "ceinms/EmgFromX.h"
 #include "ceinms/EMGDataFromFile.h"
 #include "ceinms/ExcitationGeneratorFromXml.h"
-#include "ceinms/InputConnectors.h"
 
 #define LOG_EMGFromFile
 
@@ -46,11 +45,11 @@ namespace ceinms {
     public:
         template <typename NMSModelT>
         EmgFromFile(
-            ScalarVectorQueue& outputEmgQueue, 
-            Concurrency::Latch& doneWithSubscriptions, 
-            Concurrency::Latch& doneWithExecution, 
-            const NMSModelT& subject, 
-            const std::string& emgFilename, 
+            ScalarVectorQueue& outputEmgQueue,
+            Concurrency::Latch& doneWithSubscriptions,
+            Concurrency::Latch& doneWithExecution,
+            const NMSModelT& subject,
+            const std::string& emgFilename,
             const std::string& emgGeneratorFilename);
         void operator()();
         virtual ~EmgFromFile();
@@ -58,7 +57,6 @@ namespace ceinms {
         std::string inputDir_;
         EMGDataFromFile<ExcitationGeneratorFromXml> emgData_;
     };
-
 
     template <typename NMSModelT>
     EmgFromFile::EmgFromFile(

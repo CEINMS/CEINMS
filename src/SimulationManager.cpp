@@ -26,7 +26,6 @@
  * limitations under the License.                                             *
  * -------------------------------------------------------------------------- */
 
-
 #include "ceinms/CeinmsSetupXmlReader.h"
 #include "ceinms/NMSmodel.h"
 
@@ -37,7 +36,6 @@
 #include "ceinms/Activation/ExponentialActivation.h"
 #include "ceinms/Activation/PiecewiseActivation.h"
 #include "ceinms/Curve.h"
-
 
 #include "ceinms/EMGFromFile.h"
 #include "ceinms/LmtMaFromStorageFile.h"
@@ -52,9 +50,6 @@
 //Hybrid optimiser
 #include "ceinms/ErrorMinimizerAnnealing.h"
 #include "ceinms/HybridWeightings.h"
-
-#include "ceinms/InputConnectors.h"
-#include "ceinms/OutputConnectors.h"
 
 #include "ceinms/LoggerOnQueues.h"
 #include "ceinms/QueuesToStorageFiles.h"
@@ -74,8 +69,7 @@ using std::endl;
 
 namespace ceinms {
 
-
-    SimulationManager::SimulationManager(const string& setupFilename):
+    SimulationManager::SimulationManager(const string& setupFilename) :
         ceinmsSetup_(setupFilename),
         dataLocations_(ceinmsSetup_.getInputDataFile()),
         executionCfg_(ceinmsSetup_.getExecutionFile()),
@@ -93,25 +87,23 @@ namespace ceinms {
             cout << " not found" << endl;
     }
 
-
     template <typename NMSmodelT, template <typename, typename> class ModelEvaluatorT, typename LoggerT>
     bool SimulationManager::runOpenLoop(bool useContactForces) {
-        
+
         if (useContactForces) {
             switch (contactModelCfg_.getContactModelType()) {
-            case ContactModelType::OpenSim: 
+            case ContactModelType::OpenSim:
                 runOpenLoopWithGenericContactModel < NMSmodelT, ModelEvaluatorT, LoggerT >();
                 break;
-            case ContactModelType::KneeBalance: 
+            case ContactModelType::KneeBalance:
                 runOpenLoopWithKneeBalanceContactModel < NMSmodelT, ModelEvaluatorT, LoggerT >();
                 break;
             }
         }
-        else 
+        else
             runOpenLoop< NMSmodelT, ModelEvaluatorT, LoggerT >();
         return true;
     }
-
 
     template <typename NMSmodelT, template <typename, typename> class ModelEvaluatorT, typename LoggerT>
     bool SimulationManager::runOpenLoopWithKneeBalanceContactModel() {
@@ -144,7 +136,6 @@ namespace ceinms {
             "MuscleForces",
             "Torques" };
 
-
         vector<string> valuesToWrite = dataToLog;
         QueuesToStorageFiles queuesToStorageFiles(inputConnectors, outputConnectors, mySubject, valuesToWrite, outputDirectory_);
 
@@ -164,8 +155,8 @@ namespace ceinms {
             mySubject);
 
         const vector<string> contactForcesNames{
-            contactModelCfg_.getContactModelSetupKneeBalance().condyle1.name+"_force",
-            contactModelCfg_.getContactModelSetupKneeBalance().condyle2.name+ "_force",
+            contactModelCfg_.getContactModelSetupKneeBalance().condyle1.name + "_force",
+            contactModelCfg_.getContactModelSetupKneeBalance().condyle2.name + "_force",
         };
 
         //6. define logging for contact forces
@@ -176,7 +167,7 @@ namespace ceinms {
             contactForcesNames,
             "ContactForces",
             outputDirectory_);
-                
+
         inputConnectors.doneWithSubscription.setCount(7);
         outputConnectors.doneWithExecution.setCount(3);
 
@@ -198,14 +189,11 @@ namespace ceinms {
         kneeContactModelLoggerThread.join();
 
         return 0;
-
     }
-
-
 
     template <typename NMSmodelT, template <typename, typename> class ModelEvaluatorT, typename LoggerT>
     bool SimulationManager::runOpenLoopWithGenericContactModel() {
-        
+
         InputConnectors inputConnectors;
         OutputConnectors outputConnectors;
 
@@ -255,12 +243,12 @@ namespace ceinms {
             contactModelSetup.osimModel,
             contactModelSetup.externalLoads,
             contactModelSetup.joints);
-            
+
         GeneralisedCoordinatesFromStorageFile generalisedCoordinateFromStorageFile(inputConnectors, contactModelSetup.osimModel, contactModelSetup.motion);
         //2 create external forces produces
         ExternalForcesFromStorageFile externalForcesFromStorageFile(inputConnectors, contactModelSetup.osimModel, contactModelSetup.externalLoads);
 
-        //3 create and launch log 
+        //3 create and launch log
         QueueToStorageFile<std::vector<SimTK::Vec3>> contactForcesLogger(
             outputJointReactionForcesQueue,
             inputConnectors.doneWithSubscription,
@@ -293,10 +281,9 @@ namespace ceinms {
         generalisedCoordinateThread.join();
         externalForcesThread.join();
         contactForcesLoggerThread.join();
-        
+
         return 0;
     }
-
 
     template <typename NMSmodelT, template <typename, typename> class ModelEvaluatorT, typename LoggerT>
     bool SimulationManager::runOpenLoop() {
@@ -322,13 +309,13 @@ namespace ceinms {
         ExternalTorquesFromStorageFile externalTorquesProducer(inputConnectors, mySubject, externalTorqueFilename);
 
         vector<string> dataToLog = { "Activations",
-                                     "FiberLenghts",
-                                     "NormFiberLengths",
-                                     "FiberVelocities",
-                                     "NormFiberVelocities",
-                                     "PennationAngles",
-                                     "MuscleForces",
-                                     "Torques" };
+            "FiberLenghts",
+            "NormFiberLengths",
+            "FiberVelocities",
+            "NormFiberVelocities",
+            "PennationAngles",
+            "MuscleForces",
+            "Torques" };
         // 2b. define the thread consuming the output sources
         vector<string> valuesToWrite = dataToLog;
         QueuesToStorageFiles queuesToStorageFiles(inputConnectors, outputConnectors, mySubject, valuesToWrite, outputDirectory_);
@@ -355,7 +342,6 @@ namespace ceinms {
 
         return 0;
     }
-
 
     template <typename NMSmodelT>
     bool SimulationManager::runHybrid() {
@@ -429,9 +415,7 @@ namespace ceinms {
         queuesToStorageFilesThread.join();
 
         return 0;
-
     }
-
 
     bool SimulationManager::run() {
 
@@ -441,7 +425,7 @@ namespace ceinms {
         switch (runMode) {
 
         case NMSModelCfg::OpenLoopExponentialActivationStiffTendonOnline:
-            exitFlag = runOpenLoop < NMSmodel<ExponentialActivation, StiffTendon, CurveMode::Online>, ModelEvaluationOnline, LoggerOnQueues > (hasContactModel_);
+            exitFlag = runOpenLoop < NMSmodel<ExponentialActivation, StiffTendon, CurveMode::Online>, ModelEvaluationOnline, LoggerOnQueues >(hasContactModel_);
             break;
 
         case NMSModelCfg::OpenLoopExponentialActivationStiffTendonOffline:
@@ -484,22 +468,18 @@ namespace ceinms {
             exitFlag = runHybrid<NMSmodel<PiecewiseActivation, StiffTendon, CurveMode::Online>>();
             break;
 
-
         case NMSModelCfg::HybridPiecewiseActivationElasticTendonBiSecOnline:
             exitFlag = runHybrid<NMSmodel<PiecewiseActivation, ElasticTendon_BiSec, CurveMode::Online>>();
             break;
-
 
         default:
             cout << "Implementation not available yet. Verify you XML configuration file" << endl;
             exitFlag = 1;
             break;
-
         } //end switch
 
         return exitFlag;
     }
-
 
     void SimulationManager::sortMaFilenames(const std::map<std::string, std::string>& maMap, const std::vector< std::string >& dofNames, std::vector< std::string >& maDataFilenames)
     {
@@ -517,6 +497,4 @@ namespace ceinms {
             }
         }
     }
-
-
 }

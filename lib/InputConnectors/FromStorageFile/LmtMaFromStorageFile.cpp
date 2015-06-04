@@ -28,7 +28,6 @@
 
 #include "ceinms/LmtMaFromStorageFile.h"
 #include "ceinms/DataFromStorageFile.h"
-#include "ceinms/InputConnectors.h"
 #include "ceinms/Utilities.h"
 
 #include <iostream>
@@ -82,6 +81,5 @@ namespace ceinms {
 #ifdef LOG
         cout << "\nLmtMa: lmtMa DONE\n";
 #endif
-
     }
 }

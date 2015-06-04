@@ -29,7 +29,6 @@
 #include "ceinms/ExternalTorquesFromStorageFile.h"
 #include "ceinms/ExternalTorquesFromX.h"
 #include "ceinms/DataFromStorageFile.h"
-#include "ceinms/InputConnectors.h"
 
 #include <iostream>
 using std::cout;

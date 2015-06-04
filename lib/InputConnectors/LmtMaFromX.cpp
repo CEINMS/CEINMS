@@ -27,7 +27,6 @@
  * -------------------------------------------------------------------------- */
 
 #include "ceinms/LmtMaFromX.h"
-#include "ceinms/InputConnectors.h"
 #include "ceinms/EndOfData.h"
 using std::cout;
 using std::endl;
@@ -48,7 +47,6 @@ namespace ceinms {
         outputLmtQueue_.push(lmtFrameToPush);
     }
 
-
     void LmtMaFromX::updateMomentArms(const MomentArmsData& currentMomentArmsData, double currentTime, unsigned int whichDof) {
 
         MomentArmsFrame momentArmsFrameToPush;
@@ -57,31 +55,26 @@ namespace ceinms {
         outputMomentArmsQueue_.at(whichDof)->push(momentArmsFrameToPush);
     }
 
-
     void LmtMaFromX::doneWithSubscriptions() {
 
         doneWithSubscriptions_.wait();
     }
-
 
     void LmtMaFromX::doneWithExecution() {
 
         doneWithExecution_.wait();
     }
 
-
     void LmtMaFromX::sendLmtEndOfData() {
- 
+
         outputLmtQueue_.push(EndOfData::get<LmtFrame>());
     }
-
 
     void LmtMaFromX::sendMaEndOfData() {
 
         for (unsigned i(0); i < dofNames_.size(); ++i)
             outputLmtQueue_.push(EndOfData::get<MomentArmsFrame>());
     }
-
 
     void LmtMaFromX::initialiseMomentArmsQueue() {
 
