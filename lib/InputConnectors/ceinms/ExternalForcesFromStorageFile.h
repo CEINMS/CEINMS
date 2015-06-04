@@ -36,8 +36,13 @@ namespace ceinms {
     class ExternalForcesFromStorageFile : public ExternalForcesFromX {
     public:
         //to parse the external forces easily, I need an opensim model.. otherwise I have to read manually from the storage
-        ExternalForcesFromStorageFile(ceinms::InputConnectors& inputConnectors, const std::string& osimModelFilename, const std::string& externalLoadsXmlFilename);
-        void operator()();
+        ExternalForcesFromStorageFile(
+            MultipleExternalForcesQueue& outputMultipleExternalForcesQueue,
+            Concurrency::Latch& doneWithSubscriptions,
+            Concurrency::Latch& doneWithExecution, 
+            const std::string& osimModelFilename, 
+            const std::string& externalLoadsXmlFilename);
+        void operator()() override;
         virtual ~ExternalForcesFromStorageFile() override {}
     private:
         std::string osimModelFilename_, externalLoadsXmlFilename_;

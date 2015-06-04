@@ -29,26 +29,40 @@
 #include "ceinms/ExternalForcesFromX.h"
 #include <vector>
 using std::vector;
+#include "ceinms/EndOfData.h"
 
 namespace ceinms {
 
-    ExternalForcesFromX::ExternalForcesFromX(InputConnectors& inputConnectors) :
-        inputConnectors_(inputConnectors) 
+    ExternalForcesFromX::ExternalForcesFromX(
+        MultipleExternalForcesQueue& outputMultipleExternalForcesQueue,
+        Concurrency::Latch& doneWithSubscriptions,
+        Concurrency::Latch& doneWithExecution) :
+        outputMultipleExternalForcesQueue_(outputMultipleExternalForcesQueue),
+        doneWithSubscriptions_(doneWithSubscriptions),
+        doneWithExecution_(doneWithExecution)
     { }
 
-    void ExternalForcesFromX::updateExternalForces(const vector<ExternalForceData>& currentExternalForceData, double currentTime) {
+    void ExternalForcesFromX::updateExternalForces(const MultipleExternalForcesData& currentExternalForceData, double currentTime) {
 
         MultipleExternalForcesFrame frame{ currentTime, currentExternalForceData };
-        inputConnectors_.queueExternalForces.push(frame);
+        outputMultipleExternalForcesQueue_.push(frame);
     }
 
     void ExternalForcesFromX::sendEndOfData() {
 
-        updateExternalForces(vector<ExternalForceData>(), inputConnectors_.TimePlaceholderForEndOfData);
+        outputMultipleExternalForcesQueue_.push(EndOfData::get<MultipleExternalForcesFrame>());
     }
 
     void ExternalForcesFromX::doneWithSubscriptions() {
 
-        inputConnectors_.doneWithSubscription.wait();
+        doneWithSubscriptions_.wait();
     }
+
+
+    void ExternalForcesFromX::doneWithExecution() {
+
+        doneWithExecution_.wait();
+    }
+
+
 }

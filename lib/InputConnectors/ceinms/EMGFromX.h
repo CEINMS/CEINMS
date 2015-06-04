@@ -42,7 +42,7 @@ namespace ceinms {
     public:
         using EmgData = ScalarVectorFrame::type;
         template <typename NMSModelT>
-        EmgFromX(ScalarVectorQueue& outputEmgQueue, Concurrency::Latch& doneWithSubcriptions, Concurrency::Latch& doneWithExecution, const NMSModelT& subject);
+        EmgFromX(ScalarVectorQueue& outputEmgQueue, Concurrency::Latch& doneWithSubscriptions, Concurrency::Latch& doneWithExecution, const NMSModelT& subject);
         virtual ~EmgFromX();
         virtual void operator()() {};
         void updateEmg(const EmgData& currentEmgData, double currentTime);
@@ -53,16 +53,16 @@ namespace ceinms {
         std::vector< std::string > musclesNames_;
     private:
         ScalarVectorQueue& outputEmgQueue_;
-        Concurrency::Latch& doneWithSubcriptions_;
+        Concurrency::Latch& doneWithSubscriptions_;
         Concurrency::Latch& doneWithExecution_;
 
     };
 
 
     template <typename NMSModelT>
-    EmgFromX::EmgFromX(ScalarVectorQueue& outputEmgQueue, Concurrency::Latch& doneWithSubcriptions, Concurrency::Latch& doneWithExecution, const NMSModelT& subject) :
+    EmgFromX::EmgFromX(ScalarVectorQueue& outputEmgQueue, Concurrency::Latch& doneWithSubscriptions, Concurrency::Latch& doneWithExecution, const NMSModelT& subject) :
         outputEmgQueue_(outputEmgQueue),
-        doneWithSubcriptions_(doneWithSubcriptions),
+        doneWithSubscriptions_(doneWithSubscriptions),
         doneWithExecution_(doneWithExecution)
     {
         subject.getMuscleNames(musclesNames_);

@@ -39,8 +39,15 @@ using std::vector;
 
 namespace ceinms {
 
-    ExternalForcesFromStorageFile::ExternalForcesFromStorageFile(InputConnectors& inputConnectors, const string& osimModelFilename, const string& externalLoadsXmlFilename) :
-        ExternalForcesFromX(inputConnectors), osimModelFilename_(osimModelFilename), externalLoadsXmlFilename_(externalLoadsXmlFilename)
+    ExternalForcesFromStorageFile::ExternalForcesFromStorageFile(
+        MultipleExternalForcesQueue& outputMultipleExternalForcesQueue,
+        Concurrency::Latch& doneWithSubscriptions,
+        Concurrency::Latch& doneWithExecution,
+        const std::string& osimModelFilename,
+        const std::string& externalLoadsXmlFilename) :
+        ExternalForcesFromX(outputMultipleExternalForcesQueue, doneWithSubscriptions, doneWithExecution), 
+        osimModelFilename_(osimModelFilename), 
+        externalLoadsXmlFilename_(externalLoadsXmlFilename)
     {}
 
     void ExternalForcesFromStorageFile::operator()() {
@@ -69,6 +76,7 @@ namespace ceinms {
             ExternalForcesFromX::updateExternalForces(externalForcesFrame.data, externalForcesFrame.time);
         }
         ExternalForcesFromX::sendEndOfData();
+        ExternalForcesFromX::doneWithExecution();
 
 
     }

@@ -2,7 +2,7 @@
 
 # List source files
 set(FromStorageFile_SOURCES
-  FromStorageFile/EMGFromFile.cpp
+  FromStorageFile/EmgFromFile.cpp
   FromStorageFile/ExternalTorquesFromStorageFile.cpp
   FromStorageFile/LmtMaFromStorageFile.cpp
   FromStorageFile/Utilities.cpp
@@ -10,7 +10,7 @@ set(FromStorageFile_SOURCES
   FromStorageFile/GeneralisedCoordinatesFromStorageFile.cpp
 )
 set(FromStorageFile_HEADERS
-  ceinms/EMGFromFile.h
+  ceinms/EmgFromFile.h
   ceinms/ExternalTorquesFromStorageFile.h
   ceinms/LmtMaFromStorageFile.h
   ceinms/Utilities.h
@@ -19,22 +19,20 @@ set(FromStorageFile_HEADERS
 )
 
 set(InputConnectors_SOURCES
-  EMGFromX.cpp
+  EmgFromX.cpp
   ExternalTorquesFromX.cpp
   LmtMaFromX.cpp
   ExternalForcesFromX.cpp
   GeneralisedCoordinatesFromX.cpp
-  InputConnectors.cpp
   LmtMaFromMcbs.cpp
   
 )
 set(InputConnectors_HEADERS
-  ceinms/EMGFromX.h
+  ceinms/EmgFromX.h
   ceinms/ExternalTorquesFromX.h
   ceinms/LmtMaFromX.h
   ceinms/ExternalForcesFromX.h
   ceinms/GeneralisedCoordinatesFromX.h
-  ceinms/InputConnectors.h
   ceinms/LmtMaFromMcbs.h
 )
 

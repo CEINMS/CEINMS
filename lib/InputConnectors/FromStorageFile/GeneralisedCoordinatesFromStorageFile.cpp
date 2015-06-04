@@ -37,8 +37,15 @@ using std::vector;
 
 namespace ceinms {
 
-    GeneralisedCoordinatesFromStorageFile::GeneralisedCoordinatesFromStorageFile(InputConnectors& inputConnectors, const string& osimModelFilename, const string& kinematicsStorageFilename) :
-        GeneralisedCoordinatesFromX(inputConnectors), model_(osimModelFilename), kinematicsStorageFilename_(kinematicsStorageFilename) {
+    GeneralisedCoordinatesFromStorageFile::GeneralisedCoordinatesFromStorageFile(
+        GeneralisedCoordinatesQueue& outputGeneralisedCoordinatesQueue,
+        Concurrency::Latch& doneWithSubscriptions,
+        Concurrency::Latch& doneWithExecution,
+        const std::string& osimModelFilename,
+        const std::string& kinematicsStorageFilename) :
+        GeneralisedCoordinatesFromX(outputGeneralisedCoordinatesQueue, doneWithSubscriptions, doneWithExecution),
+        model_(osimModelFilename), 
+        kinematicsStorageFilename_(kinematicsStorageFilename) {
 
         //for some mysterious reason, if I don't use c_str it doesn't work..
         OpenSim::Storage kinematics(kinematicsStorageFilename_.c_str());
@@ -54,11 +61,18 @@ namespace ceinms {
 
 
     GeneralisedCoordinatesFromStorageFile::GeneralisedCoordinatesFromStorageFile(
-        InputConnectors& inputConnectors, 
-        const string& osimModelFilename, 
-        const string& kinematicsStorageFilename, 
+        GeneralisedCoordinatesQueue& outputGeneralisedCoordinatesQueue,
+        Concurrency::Latch& doneWithSubscriptions,
+        Concurrency::Latch& doneWithExecution,
+        const std::string& osimModelFilename,
+        const std::string& kinematicsStorageFilename,
         const std::vector<std::string>& coordinatesToLog) :
-        GeneralisedCoordinatesFromStorageFile(inputConnectors, osimModelFilename, kinematicsStorageFilename)  {
+        GeneralisedCoordinatesFromStorageFile(
+        outputGeneralisedCoordinatesQueue, 
+        doneWithSubscriptions, 
+        doneWithExecution, 
+        osimModelFilename, 
+        kinematicsStorageFilename)  {
 
         mapper_.setNames(coordinateNamesFromOsimModel_, coordinatesToLog);
     }
@@ -90,6 +104,7 @@ namespace ceinms {
             GeneralisedCoordinatesFromX::updateGeneralisedCoordinates(generalisedCoordinates, t);
         }
         GeneralisedCoordinatesFromX::sendEndOfData();
+        GeneralisedCoordinatesFromX::doneWithExecution();
 
     }
 

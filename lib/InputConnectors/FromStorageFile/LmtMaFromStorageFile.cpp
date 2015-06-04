@@ -46,7 +46,7 @@ namespace ceinms {
     void LmtMaFromStorageFile::operator()()
     {
         // 1. wait - if required - for the required subscriptions to happen
-        inputConnectors_.doneWithSubscription.wait();
+        LmtMaFromX::doneWithSubscriptions();
 
         double time;
         while (lmtData_.areStillData())
@@ -59,7 +59,7 @@ namespace ceinms {
             for (int i = 0; i < musclesNames_.size(); ++i)
                 selectedLmtData.at(i) = newLmtData.at(musclePositionInLmtStorage_.at(i));
 
-            updateLmt(selectedLmtData, time);
+            LmtMaFromX::updateLmt(selectedLmtData, time);
 
             for (unsigned int currentDof = 0; currentDof < dofNames_.size(); ++currentDof)
             {
@@ -71,17 +71,13 @@ namespace ceinms {
                 for (int i = 0; i < selectedMaData.size(); ++i)
                     selectedMaData.at(i) = newMaData.at(musclePositionsInMaStorages_.at(currentDof).at(i));
 
-                updateMomentArms(selectedMaData, time, currentDof);
+                LmtMaFromX::updateMomentArms(selectedMaData, time, currentDof);
             }
         }
 
-        vector<double> endOfData;
-        updateLmt(endOfData, std::numeric_limits<double>::infinity());
-        for (unsigned int i = 0; i < dofNames_.size(); ++i)
-            updateMomentArms(endOfData, std::numeric_limits<double>::infinity(), i);
-
-        //SyncTools::Shared::lmtProducingDone.notify(); //used for validate curve only
-
+        LmtMaFromX::sendLmtEndOfData();
+        LmtMaFromX::sendMaEndOfData();
+        LmtMaFromX::doneWithExecution();
 
 #ifdef LOG
         cout << "\nLmtMa: lmtMa DONE\n";

@@ -41,6 +41,12 @@ namespace ceinms{
             f.time = std::numeric_limits<double>::infinity();
             return f;
         }
+
+        template<typename Frame>
+        bool isEod(const Frame& f) {
+
+            return (f.time == std::numeric_limits<double>::infinity());
+        }
     }
 
 }

@@ -36,8 +36,19 @@
 namespace ceinms {
     class GeneralisedCoordinatesFromStorageFile : public GeneralisedCoordinatesFromX {
     public:
-        GeneralisedCoordinatesFromStorageFile(InputConnectors& inputConnectors, const std::string& osimModelFilename, const std::string& kinematicsStorageFilename);
-        GeneralisedCoordinatesFromStorageFile(InputConnectors& inputConnectors, const std::string& osimModelFilename, const std::string& kinematicsStorageFilename, const std::vector<std::string>& coordinatesToLog);
+        GeneralisedCoordinatesFromStorageFile(
+            GeneralisedCoordinatesQueue& outputGeneralisedCoordinatesQueue_,
+            Concurrency::Latch& doneWithSubscriptions,
+            Concurrency::Latch& doneWithExecution,
+            const std::string& osimModelFilename,
+            const std::string& kinematicsStorageFilename);
+        GeneralisedCoordinatesFromStorageFile(
+            GeneralisedCoordinatesQueue& outputGeneralisedCoordinatesQueue_,
+            Concurrency::Latch& doneWithSubscriptions,
+            Concurrency::Latch& doneWithExecution,
+            const std::string& osimModelFilename, 
+            const std::string& kinematicsStorageFilename, 
+            const std::vector<std::string>& coordinatesToLog);
         virtual ~GeneralisedCoordinatesFromStorageFile() override {}
         virtual void operator()() override;
     private:

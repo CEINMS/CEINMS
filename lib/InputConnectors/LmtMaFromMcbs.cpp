@@ -34,6 +34,7 @@ using std::string;
 #include <vector>
 using std::vector;
 #include <algorithm>
+#include "ceinms/EndOfData.h"
 
 namespace ceinms {
     
@@ -121,21 +122,21 @@ namespace ceinms {
     void LmtMaFromMcbs::operator()() {
 
         inputCoordinateQueue_.subscribe();
-        doneWithSubscriptions_.wait();
+        LmtMaFromX::doneWithSubscriptions();
 
         bool runCondition(true);
 
         do {
             GeneralisedCoordinatesFrame coordinates(inputCoordinateQueue_.pop());
             double currentTime(coordinates.time);
-            if (currentTime < std::numeric_limits<double>::infinity()) {
-                vector<double> lmts;
+            if (EndOfData::isEod(coordinates)) {
+                LmtData lmts;
                 vector<double> dofsValues(dofMapper_.map(coordinates.data.getQ()));
 
                 splineSet_->getLmt(lmts, dofsValues);
                 LmtMaFromX::updateLmt(lmts, currentTime);
                 for (auto dofIt(dofNames_.cbegin()); dofIt != dofNames_.cend(); ++dofIt) {
-                    vector<double> maValues;
+                    MomentArmsData maValues;
                     splineSet_->getMa(*dofIt, muscleNamesOnDofsMap_[*dofIt], dofsValues, maValues);
                     unsigned dofIdx(std::distance(dofNames_.cbegin(), dofIt));
                     LmtMaFromX::updateMomentArms(maValues, currentTime, dofIdx);
@@ -148,7 +149,7 @@ namespace ceinms {
             }
 
         } while (runCondition);
-        doneWithExecution_.wait();
+        LmtMaFromX::doneWithExecution();
 
     }
 

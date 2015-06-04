@@ -42,7 +42,8 @@ namespace ceinms {
 
     class ExternalForceData;
 
-    using MultipleExternalForcesFrame = QueueData < std::vector<ExternalForceData> >;
+    using MultipleExternalForcesData = std::vector < ExternalForceData > ;
+    using MultipleExternalForcesFrame = QueueData < MultipleExternalForcesData >;
     using MultipleExternalForcesQueue = Concurrency::Queue < MultipleExternalForcesFrame >;
 
 }

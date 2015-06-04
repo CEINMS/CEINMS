@@ -26,7 +26,7 @@
  * limitations under the License.                                             *
  * -------------------------------------------------------------------------- */
 
-#include "ceinms/EMGFromFile.h"
+#include "ceinms/EmgFromFile.h"
 
 #include <string>
 using std::string;
@@ -40,26 +40,23 @@ using std::endl;
 #define LOG
 
 namespace ceinms {
-    void EMGFromFile::operator()()
+    void EmgFromFile::operator()()
     {
-        inputConnectors_.doneWithSubscription.wait();
+        EmgFromX::doneWithSubscriptions();
 
         while (emgData_.areStillData())
         {
             emgData_.readNextEmgData();
-            updateEmg(emgData_.getCurrentData(), emgData_.getCurrentTime());
+            EmgFromX::updateEmg(emgData_.getCurrentData(), emgData_.getCurrentTime());
         }
-
-        vector<double> endOfEmg;
-        updateEmg(endOfEmg, std::numeric_limits<double>::infinity());
-
-        // SyncTools::Shared::emgProducingDone.notify();
+        EmgFromX::sendEndOfData();
 
 #ifdef LOG
         cout << "\nEMG: EMG DONE\n";
 #endif
 
+        EmgFromX::doneWithExecution();
     }
 
-    EMGFromFile::~EMGFromFile(){}
+    EmgFromFile::~EmgFromFile(){}
 }

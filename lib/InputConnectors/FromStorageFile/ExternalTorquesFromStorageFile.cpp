@@ -47,8 +47,6 @@ using std::vector;
 namespace ceinms  {
     ExternalTorquesFromStorageFile::~ExternalTorquesFromStorageFile()
     {
-        if (externalTorquesDataFromFile_ != nullptr)
-            delete externalTorquesDataFromFile_;
     }
 
     bool ExternalTorquesFromStorageFile::externalTorquesFileExist(const string& fileName)
@@ -62,9 +60,9 @@ namespace ceinms  {
     void ExternalTorquesFromStorageFile::operator()()
     {
 
-        inputConnectors_.doneWithSubscription.wait();
+        ExternalTorquesFromX::doneWithSubscriptions();
 
-        if (inputConnectors_.externalTorquesAvailable)
+        if (externalTorquesAvailable_)
         {
             while (externalTorquesDataFromFile_->areStillData())
             {
@@ -77,8 +75,7 @@ namespace ceinms  {
                 updateExternalTorques(selectedTorquesData, externalTorquesDataFromFile_->getCurrentTime());
             }
 
-            vector<double> endOfTorques;
-            updateExternalTorques(endOfTorques, std::numeric_limits<double>::infinity());
+            ExternalTorquesFromX::sendEndOfData();
 
         }
         else {
@@ -91,5 +88,6 @@ namespace ceinms  {
         cout << "\nexternalTorque DONE\n";
 #endif
 
+        ExternalTorquesFromX::doneWithExecution();
     }
 }

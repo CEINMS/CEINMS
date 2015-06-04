@@ -32,20 +32,29 @@
 #include <string>
 #include <vector>
 #include "InputConnectors.h"
+#include "ceinms/concurrency/Queue.h"
+#include "ceinms/concurrency/Latch.h"
 #include "ceinms/GeneralisedCoordinatesData.h"
+#include "ceinms/queues/GeneralisedCoordinatesQueue.h"
 
 namespace ceinms {
-    class GeneralisedCoordinatesFromX
-    {
+    class GeneralisedCoordinatesFromX {
+
     public:
-        GeneralisedCoordinatesFromX(InputConnectors& inputConnectors);
+        GeneralisedCoordinatesFromX(
+            GeneralisedCoordinatesQueue& outputGeneralisedCoordinatesQueue,
+            Concurrency::Latch& doneWithSubscriptions,
+            Concurrency::Latch& doneWithExecution);
         virtual ~GeneralisedCoordinatesFromX() {};
         virtual void operator()() = 0;
         void updateGeneralisedCoordinates(const GeneralisedCoordinatesData& currentExternalForceData, double currentTime);
         void doneWithSubscriptions();
+        void doneWithExecution();
         void sendEndOfData();
     private:
-        InputConnectors& inputConnectors_;
+        GeneralisedCoordinatesQueue& outputGeneralisedCoordinatesQueue_;
+        Concurrency::Latch& doneWithSubscriptions_;
+        Concurrency::Latch& doneWithExecution_;
     };
 
 }

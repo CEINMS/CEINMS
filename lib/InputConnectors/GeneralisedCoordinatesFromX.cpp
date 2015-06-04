@@ -29,28 +29,46 @@
 #include "ceinms/GeneralisedCoordinatesFromX.h"
 #include "ceinms/InputConnectors.h"
 #include "ceinms/GeneralisedCoordinatesData.h"
+#include "ceinms/EndOfData.h"
 #include <vector>
 using std::vector;
 
 namespace ceinms {
 
-    GeneralisedCoordinatesFromX::GeneralisedCoordinatesFromX(InputConnectors& inputConnectors) :
-        inputConnectors_(inputConnectors)
-    { }
+    GeneralisedCoordinatesFromX::GeneralisedCoordinatesFromX(
+        GeneralisedCoordinatesQueue& outputGeneralisedCoordinatesQueue,
+        Concurrency::Latch& doneWithSubscriptions,
+        Concurrency::Latch& doneWithExecution) :
+        outputGeneralisedCoordinatesQueue_(outputGeneralisedCoordinatesQueue),
+        doneWithSubscriptions_(doneWithSubscriptions),
+        doneWithExecution_(doneWithExecution)
+        
+        { }
+
 
     void GeneralisedCoordinatesFromX::updateGeneralisedCoordinates(const GeneralisedCoordinatesData& currentGeneralisedCoordinatesData, double currentTime) {
 
         GeneralisedCoordinatesFrame frame{ currentTime, currentGeneralisedCoordinatesData };
-        inputConnectors_.queueGeneralisedCoordinates.push(frame);
+        outputGeneralisedCoordinatesQueue_.push(frame);
     }
 
-    void GeneralisedCoordinatesFromX::sendEndOfData() {
-
-        updateGeneralisedCoordinates(GeneralisedCoordinatesData(0), inputConnectors_.TimePlaceholderForEndOfData);
-    }
 
     void GeneralisedCoordinatesFromX::doneWithSubscriptions() {
 
-        inputConnectors_.doneWithSubscription.wait();
+        doneWithSubscriptions_.wait();
     }
+
+
+    void GeneralisedCoordinatesFromX::doneWithExecution() {
+
+        doneWithExecution_.wait();
+    }
+
+
+    void GeneralisedCoordinatesFromX::sendEndOfData() {
+
+        outputGeneralisedCoordinatesQueue_.push(EndOfData::get<GeneralisedCoordinatesFrame>());
+
+    }
+
 }

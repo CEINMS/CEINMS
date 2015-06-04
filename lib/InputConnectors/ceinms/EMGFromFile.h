@@ -26,14 +26,14 @@
  * limitations under the License.                                             *
  * -------------------------------------------------------------------------- */
 
-#ifndef ceinms_EMGFromFile_h
-#define ceinms_EMGFromFile_h
+#ifndef ceinms_EmgFromFile_h
+#define ceinms_EmgFromFile_h
 
 #include <string>
 #include <vector>
 #include <iostream>
 
-#include "ceinms/EMGFromX.h"
+#include "ceinms/EmgFromX.h"
 #include "ceinms/EMGDataFromFile.h"
 #include "ceinms/ExcitationGeneratorFromXml.h"
 #include "ceinms/InputConnectors.h"
@@ -41,13 +41,19 @@
 #define LOG_EMGFromFile
 
 namespace ceinms {
-    class EMGFromFile :public EMGFromX
+    class EmgFromFile :public EmgFromX
     {
     public:
         template <typename NMSModelT>
-        EMGFromFile(InputConnectors& inputConnectors, const NMSModelT& subject, const std::string& emgFilename, const std::string& emgGeneratorFilename);
+        EmgFromFile(
+            ScalarVectorQueue& outputEmgQueue, 
+            Concurrency::Latch& doneWithSubscriptions, 
+            Concurrency::Latch& doneWithExecution, 
+            const NMSModelT& subject, 
+            const std::string& emgFilename, 
+            const std::string& emgGeneratorFilename);
         void operator()();
-        virtual ~EMGFromFile();
+        virtual ~EmgFromFile();
     private:
         std::string inputDir_;
         EMGDataFromFile<ExcitationGeneratorFromXml> emgData_;
@@ -55,8 +61,14 @@ namespace ceinms {
 
 
     template <typename NMSModelT>
-    EMGFromFile::EMGFromFile(InputConnectors& inputConnectors, const NMSModelT& subject, const std::string& emgFilename, const std::string& emgGeneratorFilename)
-        :EMGFromX(inputConnectors, subject), emgData_(emgFilename, emgGeneratorFilename)
+    EmgFromFile::EmgFromFile(
+        ScalarVectorQueue& outputEmgQueue,
+        Concurrency::Latch& doneWithSubscriptions,
+        Concurrency::Latch& doneWithExecution,
+        const NMSModelT& subject,
+        const std::string& emgFilename,
+        const std::string& emgGeneratorFilename) :
+        EmgFromX(outputEmgQueue, doneWithSubscriptions, doneWithExecution, subject), emgData_(emgFilename, emgGeneratorFilename)
     {
 
 #ifdef LOG_EMGFromFile

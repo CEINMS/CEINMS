@@ -214,9 +214,10 @@ namespace ceinms {
         //coeffDir contains dofAngles.cfg
         template <typename NMSModelT>
         LmtMaFromMcbs(
-            InputConnectors& inputConnectors, 
-            GeneralisedCoordinatesQueue& inputCoordinateQueue, 
-            Concurrency::Latch& doneWithSubscription, 
+            GeneralisedCoordinatesQueue& inputCoordinateQueue,
+            ScalarVectorQueue& outputLmtQueue,
+            MultipleMomentArmsQueues outputMomentArmsQueue,
+            Concurrency::Latch& doneWithSubscriptions,
             Concurrency::Latch& doneWithExecution,
             const NMSModelT& subject, 
             const string& coeffDir);
@@ -225,32 +226,26 @@ namespace ceinms {
     private:
         std::shared_ptr<SplineSetBase> splineSet_;
         GeneralisedCoordinatesQueue& inputCoordinateQueue_;
-        Concurrency::Latch& doneWithSubscriptions_;
-        Concurrency::Latch& doneWithExecution_;
         std::map<std::string, std::vector<std::string>> muscleNamesOnDofsMap_;
         Mapper dofMapper_;
-
     };
 
     template <typename NMSModelT>
     LmtMaFromMcbs::LmtMaFromMcbs(
-        InputConnectors& inputConnectors, 
-        GeneralisedCoordinatesQueue& inputCoordinateQueue, 
-        Concurrency::Latch& doneWithSubscriptions, 
+        GeneralisedCoordinatesQueue& inputCoordinateQueue,
+        ScalarVectorQueue& outputLmtQueue,
+        MultipleMomentArmsQueues outputMomentArmsQueue,
+        Concurrency::Latch& doneWithSubscriptions,
         Concurrency::Latch& doneWithExecution,
-        const NMSModelT& subject, 
+        const NMSModelT& subject,
         const string& coeffDir) :
-        LmtMaFromX(inputConnectors, subject), 
+        LmtMaFromX(outputLmtQueue, outputMomentArmsQueue, doneWithSubscriptions, doneWithExecution, subject),
         splineSet_(makeSplineSet(dofNames_.size(), coeffDir, musclesNames_)), 
         inputCoordinateQueue_(inputCoordinateQueue),
         doneWithSubscriptions_(doneWithSubscriptions), doneWithExecution_(doneWithExecution) {
 
 
         subject.getMuscleNamesOnDofs(muscleNamesOnDofsMap_);
-
-        inputConnectors_.queueMomentArms.clear();
-        for (int i = 0; i < dofNames_.size(); ++i)
-            inputConnectors_.queueMomentArms.push_back(new Concurrency::Queue< InputConnectors::FrameType >);
 
         vector<string> dofNamesFromSpline(splineSet_->getDofNames());
         cout << "dof names from spline ";

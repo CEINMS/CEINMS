@@ -34,12 +34,20 @@
 #include "ceinms/DataFromStorageFile.h"
 #include <string>
 #include <vector>
+#include <memory>
 
 namespace ceinms {
     class LmtMaFromStorageFile :public LmtMaFromX {
     public:
         template <typename NMSModelT>
-        LmtMaFromStorageFile(InputConnectors& inputConnectors, const NMSModelT& subject, const std::string& lmtDataFilename, const std::vector< std::string>& maDataFileName);
+        LmtMaFromStorageFile(
+            ScalarVectorQueue& outputLmtQueue,
+            MultipleMomentArmsQueues outputMomentArmsQueue,
+            Concurrency::Latch& doneWithSubscriptions,
+            Concurrency::Latch& doneWithExecution,
+            const NMSModelT& subject, 
+            const std::string& lmtDataFilename, 
+            const std::vector< std::string>& maDataFileName);
         void operator()();
 
     private:
@@ -47,18 +55,24 @@ namespace ceinms {
         std::vector<size_t> musclePositionInLmtStorage_;
         std::vector< std::vector<size_t> > musclePositionsInMaStorages_;
         DataFromStorageFile lmtData_;
-        std::vector< DataFromStorageFile* > maDataStorageFiles_;
+        std::vector< std::unique_ptr<DataFromStorageFile> > maDataStorageFiles_;
     };
 
     template <typename NMSModelT>
-    LmtMaFromStorageFile::LmtMaFromStorageFile(InputConnectors& inputConnectors, const NMSModelT& subject, const std::string& lmtDataFilename, const std::vector< std::string>& maDataFileName)
-        :LmtMaFromX(inputConnectors, subject), lmtData_(lmtDataFilename)
-    {  // 1. Open the input files
+    LmtMaFromStorageFile::LmtMaFromStorageFile(
+        ScalarVectorQueue& outputLmtQueue,
+        MultipleMomentArmsQueues outputMomentArmsQueue,
+        Concurrency::Latch& doneWithSubscriptions,
+        Concurrency::Latch& doneWithExecution,
+        const NMSModelT& subject,
+        const std::string& lmtDataFilename,
+        const std::vector< std::string>& maDataFileName) :
+        LmtMaFromX(outputLmtQueue, outputMomentArmsQueue, doneWithSubscriptions, doneWithExecution, subject), 
+        lmtData_(lmtDataFilename) {  
+        
+        // 1. Open the input files
         for (std::string it : maDataFileName)
-        {
-            DataFromStorageFile* nextMaDataPtr = new DataFromStorageFile(it);
-            maDataStorageFiles_.push_back(nextMaDataPtr);
-        }
+            maDataStorageFiles_.emplace_back(new DataFromStorageFile(it));
 
         // 2. setup the conversion matrixes
         std::vector<std::string> musclesNamesFromStorageFile = lmtData_.getColumnNames();

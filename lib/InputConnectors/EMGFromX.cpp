@@ -26,7 +26,7 @@
  * limitations under the License.                                             *
  * -------------------------------------------------------------------------- */
 
-#include "ceinms/EMGFromX.h"
+#include "ceinms/EmgFromX.h"
 #include <string>
 using std::string;
 #include <vector>
@@ -47,7 +47,7 @@ namespace ceinms {
 
     void EmgFromX::doneWithSubscriptions() {
 
-        doneWithSubcriptions_.wait();
+        doneWithSubscriptions_.wait();
     }
 
 

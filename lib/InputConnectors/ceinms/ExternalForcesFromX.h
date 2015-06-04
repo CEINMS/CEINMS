@@ -31,21 +31,30 @@
 
 #include <string>
 #include <vector>
-#include "InputConnectors.h"
 #include "ceinms/ExternalForceData.h"
+#include "ceinms/concurrency/Queue.h"
+#include "ceinms/concurrency/Latch.h"
+#include "ceinms/queues/MultipleExternalForcesQueue.h"
 
 namespace ceinms {
     class ExternalForcesFromX
     {
     public:
-        ExternalForcesFromX(InputConnectors& inputConnectors);
+
+        ExternalForcesFromX(
+            MultipleExternalForcesQueue& outputMultipleExternalForcesQueue,
+            Concurrency::Latch& doneWithSubscriptions,
+            Concurrency::Latch& doneWithExecution);
         virtual ~ExternalForcesFromX() {};
         virtual void operator()() = 0;
-        void updateExternalForces(const std::vector<ExternalForceData>& currentExternalForceData, double currentTime);
+        void updateExternalForces(const MultipleExternalForcesData& currentExternalForceData, double currentTime);
         void sendEndOfData();
         void doneWithSubscriptions();
+        void doneWithExecution();
     private:
-        InputConnectors& inputConnectors_;
+        MultipleExternalForcesQueue& outputMultipleExternalForcesQueue_;
+        Concurrency::Latch& doneWithSubscriptions_;
+        Concurrency::Latch& doneWithExecution_;
     };
 
 }
