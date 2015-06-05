@@ -30,19 +30,13 @@
 #define ceinms_EstimatedTorquesQueue_h
 
 #include <vector>
-#include "ceinms/QueueData.h"
-
-namespace Concurrency {
-    template<typename>
-    class Queue;
-}
+#include "ceinms/queues/ScalarVectorQueue.h"
 
 namespace ceinms {
 
-    using EstimatedTorquesFrame = QueueData < std::vector<double> >;
-    using EstimatedTorquesQueue = Concurrency::Queue < EstimatedTorquesFrame >;
-
+    using EstimatedTorquesData = ScalarVectorData;
+    using EstimatedTorquesFrame = ScalarVectorFrame;
+    using EstimatedTorquesQueue = ScalarVectorQueue;
 }
-
 
 #endif

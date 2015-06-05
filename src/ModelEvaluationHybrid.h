@@ -38,7 +38,17 @@ namespace ceinms {
     class ModelEvaluationHybrid : public ModelEvaluationBase < Logger > {
 
     public:
-        ModelEvaluationHybrid(InputConnectors& inputConnectors, OutputConnectors& outputConnectors, NMSmodelT& subject, ErrorMinimizerT& torqueErrorMinimizer, const vector<string>& valuesToLog);
+        ModelEvaluationHybrid(
+            EmgQueue& inputEmgQueue,
+            LmtQueue& inputLmtQueue,
+            ExternalTorquesQueue& inputExternalTorqueQueue,
+            MultipleMomentArmsQueues& inputMomentArmsQueues,
+            ScalarLogQueue& outputLogQueue,
+            Concurrency::Latch& doneWithSubscriptions,
+            Concurrency::Latch& doneWithExecution,
+            NMSmodelT& subject,
+            ErrorMinimizerT& torqueErrorMinimizer,
+            const vector<string>& valuesToLog);
         void setOutputDirectory(const std::string& outputDir);
         void operator()();
 
@@ -50,7 +60,6 @@ namespace ceinms {
         std::vector< std::string > dofNamesWithExtTorque_;
         unsigned noDof_;
         double globalEmDelay_;
-
     };
 }
 

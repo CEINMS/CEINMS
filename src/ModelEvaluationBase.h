@@ -31,9 +31,13 @@
 
 #include <vector>
 #include <string>
-
-#include "ceinms/InputConnectors.h"
-#include "ceinms/OutputConnectors.h"
+#include "ceinms/concurrency/Queue.h"
+#include "ceinms/concurrency/Latch.h"
+#include "ceinms/queues/EmgQueue.h"
+#include "ceinms/queues/LmtQueue.h"
+#include "ceinms/queues/MultipleMomentArmsQueues.h"
+#include "ceinms/queues/ExternalTorquesQueues.h"
+#include "ceinms/queues/LogQueue.h"
 
 namespace ceinms {
     template <typename Logger>
@@ -41,31 +45,42 @@ namespace ceinms {
 
     public:
         ModelEvaluationBase() = delete;
-        ModelEvaluationBase(InputConnectors& inputConnectors, OutputConnectors& outputConnectors, const std::vector<std::string>& valuesToLog);
+        ModelEvaluationBase(
+            EmgQueue& inputEmgQueue,
+            LmtQueue& inputLmtQueue,
+            ExternalTorquesQueue& inputExternalTorqueQueue,
+            MultipleMomentArmsQueues& inputMomentArmsQueues,
+            ScalarLogQueue& outputLogQueue,
+            Concurrency::Latch& doneWithSubscriptions,
+            Concurrency::Latch& doneWithExecution,
+            const std::vector<std::string>& valuesToLog);
         virtual ~ModelEvaluationBase();
         virtual void operator()() = 0;
-
     protected:
-        void getEmgFromInputQueue(InputConnectors::FrameType& emgFromQueue);
-        void getLmtFromInputQueue(InputConnectors::FrameType& lmtFromQueue);
-        void getMomentArmsFromInputQueue(InputConnectors::FrameType& momentArmsFromQueue, unsigned int whichDof);
-        void getExternalTorquesFromInputQueue(InputConnectors::FrameType& externalTorquesFromQueue);
-        void doneWithExecution();
 
-        InputConnectors::FrameType getEmgFromInputQueue();
-        InputConnectors::FrameType getLmtFromInputQueue();
-        InputConnectors::FrameType getMomentArmsFromInputQueue(unsigned int whichDof);
-        InputConnectors::FrameType getExternalTorquesFromInputQueue();
+        void getEmgFromInputQueue(EmgFrame& emgFromQueue);
+        void getLmtFromInputQueue(LmtFrame& lmtFromQueue);
+        void getMomentArmsFromInputQueue(MomentArmsFrame& momentArmsFromQueue, unsigned int whichDof);
+        void getExternalTorquesFromInputQueue(ExternalTorquesFrame& externalTorquesFromQueue);
 
-        void subscribeToInputConnectors();
+        EmgFrame getEmgFromInputQueue();
+        LmtFrame getLmtFromInputQueue();
+        MomentArmsFrame getMomentArmsFromInputQueue(unsigned int whichDof);
+        ExternalTorquesFrame getExternalTorquesFromInputQueue();
+
+        void doneWithSubscriptions();
         bool externalTorquesAvailable() const;
-        float getGlobalTimeLimit() const;
-
+        void doneWithExecution();
         Logger logger;
 
     private:
-        InputConnectors& inputConnectors_;
-        OutputConnectors& outputConnectors_;
+        void subscribeToQueues();
+        EmgQueue& inputEmgQueue_;
+        LmtQueue& inputLmtQueue_;
+        ExternalTorquesQueue& inputExternalTorqueQueue_;
+        MultipleMomentArmsQueues& inputMomentArmsQueues_;
+        Concurrency::Latch& doneWithSubscriptions_;
+        Concurrency::Latch& doneWithExecution_;
     };
 }
 

@@ -26,101 +26,94 @@
  * limitations under the License.                                             *
  * -------------------------------------------------------------------------- */
 
-#include "ceinms/InputConnectors.h"
-#include "ceinms/OutputConnectors.h"
-
 #include <vector>
 using std::vector;
 #include <string>
 using std::string;
 
-
 namespace ceinms {
     template <typename Logger>
-    ModelEvaluationBase<Logger>::ModelEvaluationBase(InputConnectors& inputConnectors, OutputConnectors& outputConnectors, const vector<string>& valuesToLog)
-        :inputConnectors_(inputConnectors), outputConnectors_(outputConnectors), logger(outputConnectors, valuesToLog)
+    ModelEvaluationBase<Logger>::ModelEvaluationBase(
+        EmgQueue& inputEmgQueue,
+        LmtQueue& inputLmtQueue,
+        ExternalTorquesQueue& inputExternalTorqueQueue,
+        MultipleMomentArmsQueues& inputMomentArmsQueues,
+        ScalarLogQueue& outputLogQueue,
+        Concurrency::Latch& doneWithSubscriptions,
+        Concurrency::Latch& doneWithExecution,
+        const std::vector<std::string>& valuesToLog) :
+
+        inputEmgQueue_(inputEmgQueue),
+        inputLmtQueue_(inputLmtQueue),
+        inputExternalTorqueQueue_(inputExternalTorqueQueue),
+        inputMomentArmsQueues_(inputMomentArmsQueues),
+        doneWithSubscriptions_(doneWithSubscriptions),
+        doneWithExecution_(doneWithExecution),
+        logger(outputLogQueue, valuesToLog)
     { }
 
-
     template <typename Logger>
-    void ModelEvaluationBase<Logger>::subscribeToInputConnectors() {
+    void ModelEvaluationBase<Logger>::subscribeToQueues() {
 
-        inputConnectors_.queueLmt.subscribe();
-        inputConnectors_.queueEmg.subscribe();
-        for (auto& it : inputConnectors_.queueMomentArms)
+        inputEmgQueue_.subscribe();
+        inputLmtQueue_.subscribe();
+        inputExternalTorqueQueue_.subscribe();
+        for (auto& it : inputMomentArmsQueues_)
             (*it).subscribe();
-        inputConnectors_.queueExternalTorques.subscribe();
-
-        inputConnectors_.doneWithSubscription.wait();
-    }
-
-
-    template <typename Logger>
-    bool ModelEvaluationBase<Logger>::externalTorquesAvailable() const {
-        return inputConnectors_.externalTorquesAvailable;
     }
 
     template <typename Logger>
-    float ModelEvaluationBase<Logger>::getGlobalTimeLimit() const {
-        return inputConnectors_.globalTimeLimit;
+    void ModelEvaluationBase<Logger>::doneWithSubscriptions() {
+
+        subscribeToQueues();
+        doneWithSubscriptions_.wait();
     }
 
     template <typename Logger>
-    void ModelEvaluationBase<Logger>::getEmgFromInputQueue(InputConnectors::FrameType& emgs) {
-        emgs = inputConnectors_.queueEmg.pop();
+    void ModelEvaluationBase<Logger>::getEmgFromInputQueue(EmgFrame& emgs) {
+        emgs = inputEmgQueue_.pop();
     }
 
-
     template <typename Logger>
-    void ModelEvaluationBase<Logger>::getLmtFromInputQueue(InputConnectors::FrameType& lmts) {
-        lmts = inputConnectors_.queueLmt.pop();
+    void ModelEvaluationBase<Logger>::getLmtFromInputQueue(LmtFrame& lmts) {
+        lmts = inputLmtQueue_.pop();
     }
 
-
     template <typename Logger>
-    void ModelEvaluationBase<Logger>::getMomentArmsFromInputQueue(InputConnectors::FrameType& momentArms, unsigned int whichDof) {
-        momentArms = (*inputConnectors_.queueMomentArms.at(whichDof)).pop();
+    void ModelEvaluationBase<Logger>::getMomentArmsFromInputQueue(MomentArmsFrame& momentArms, unsigned int whichDof) {
+        momentArms = (*inputMomentArmsQueues_.at(whichDof)).pop();
     }
 
-
     template <typename Logger>
-    void ModelEvaluationBase<Logger>::getExternalTorquesFromInputQueue(InputConnectors::FrameType& externalTorques) {
-        externalTorques = inputConnectors_.queueExternalTorques.pop();
+    void ModelEvaluationBase<Logger>::getExternalTorquesFromInputQueue(ExternalTorquesFrame& externalTorques) {
+        externalTorques = inputExternalTorqueQueue_.pop();
     }
 
-
     template <typename Logger>
-    InputConnectors::FrameType ModelEvaluationBase<Logger>::getEmgFromInputQueue() {
-        return inputConnectors_.queueEmg.pop();
+    EmgFrame ModelEvaluationBase<Logger>::getEmgFromInputQueue() {
+        return inputEmgQueue_.pop();
     }
 
-
     template <typename Logger>
-    InputConnectors::FrameType ModelEvaluationBase<Logger>::getLmtFromInputQueue() {
-        return inputConnectors_.queueLmt.pop();
+    LmtFrame ModelEvaluationBase<Logger>::getLmtFromInputQueue() {
+        return inputLmtQueue_.pop();
     }
 
-
     template <typename Logger>
-    InputConnectors::FrameType ModelEvaluationBase<Logger>::getMomentArmsFromInputQueue(unsigned int whichDof) {
-        return (*inputConnectors_.queueMomentArms.at(whichDof)).pop();
+    MomentArmsFrame ModelEvaluationBase<Logger>::getMomentArmsFromInputQueue(unsigned int whichDof) {
+        return (*inputMomentArmsQueues_.at(whichDof)).pop();
     }
 
-
     template <typename Logger>
-    InputConnectors::FrameType ModelEvaluationBase<Logger>::getExternalTorquesFromInputQueue(){
-        return inputConnectors_.queueExternalTorques.pop();
+    ExternalTorquesFrame ModelEvaluationBase<Logger>::getExternalTorquesFromInputQueue(){
+        return inputExternalTorqueQueue_.pop();
     }
 
     template <typename Logger>
     void ModelEvaluationBase<Logger>::doneWithExecution(){
-        outputConnectors_.doneWithExecution.wait();
+        doneWithExecution_.wait();
     }
-
-
 
     template <typename Logger>
     ModelEvaluationBase<Logger>::~ModelEvaluationBase() { }
-
-
 }

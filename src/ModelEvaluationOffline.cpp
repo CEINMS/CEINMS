@@ -42,21 +42,36 @@ using std::string;
 
 #include "ModelEvaluationOffline.h"
 #include "ModelEvaluationBase.h"
-#include "ceinms/InputConnectors.h"
-#include "ceinms/OutputConnectors.h"
 #define LOG_FILES
 #define Evaluation_LOG
 
 namespace ceinms {
     template <typename NMSmodelT, typename Logger>
-    ModelEvaluationOffline<NMSmodelT, Logger>::ModelEvaluationOffline(InputConnectors& inputConnectors, OutputConnectors& outputConnectors, NMSmodelT& subject, const vector<string>& valuesToLog)
-        :ModelEvaluationBase<Logger>::ModelEvaluationBase(inputConnectors, outputConnectors, valuesToLog), subject_(subject)
+    ModelEvaluationOffline<NMSmodelT, Logger>::ModelEvaluationOffline(
+        EmgQueue& inputEmgQueue,
+        LmtQueue& inputLmtQueue,
+        ExternalTorquesQueue& inputExternalTorqueQueue,
+        MultipleMomentArmsQueues& inputMomentArmsQueues,
+        ScalarLogQueue& outputLogQueue,
+        Concurrency::Latch& doneWithSubscriptions,
+        Concurrency::Latch& doneWithExecution,
+        NMSmodelT& subject,
+        const vector<string>& valuesToLog) :
+        ModelEvaluationBase<Logger>(
+        inputEmgQueue,
+        inputLmtQueue,
+        inputExternalTorqueQueue,
+        inputMomentArmsQueues,
+        outputLogQueue,
+        doneWithSubscriptions,
+        doneWithExecution,
+        valuesToLog),
+        subject_(subject)
     {
         subject_.getDoFNames(dofNames_);
         noDof_ = dofNames_.size();
         globalEmDelay_ = subject.getGlobalEmDelay();
     }
-
 
     template <typename NMSmodelT, typename Logger>
     void ModelEvaluationOffline<NMSmodelT, Logger>::readDataFromQueues() {
@@ -66,7 +81,7 @@ namespace ceinms {
         do{
             auto frame(ModelEvaluationBase<Logger>::getEmgFromInputQueue());
             if (!frame.data.empty())
-                emgDataFromQueue_.push_back(frame);
+                emgFramesFromQueue_.push_back(frame);
             else runCondition = false;
         } while (runCondition);
 
@@ -75,25 +90,23 @@ namespace ceinms {
         do{
             auto frame(ModelEvaluationBase<Logger>::getLmtFromInputQueue());
             if (!frame.data.empty())
-                lmtDataFromQueue_.push_back(frame);
+                lmtFramesFromQueue_.push_back(frame);
             else runCondition = false;
         } while (runCondition);
 
-
-        runCondition = ModelEvaluationBase<Logger>::externalTorquesAvailable();
+        runCondition = true;
         //read external torques
         do{
             auto frame(ModelEvaluationBase<Logger>::getExternalTorquesFromInputQueue());
             if (!frame.data.empty())
-                externalTorquesDataFromQueue_.push_back(frame);
+                externalTorquesFramesFromQueue_.push_back(frame);
             else runCondition = false;
         } while (runCondition);
-
 
         runCondition = true;
         //read moment arms data
         do{
-            vector< InputConnectors::FrameType > maFrame;
+            vector< MomentArmsFrame > maFrame;
             for (unsigned i = 0; i < noDof_; ++i) {
                 auto currentMomentArms(ModelEvaluationBase<Logger>::getMomentArmsFromInputQueue(i));
                 if (!currentMomentArms.data.empty())
@@ -101,26 +114,25 @@ namespace ceinms {
                 else runCondition = false;
             }
             if (runCondition)
-                maDataFromQueue_.push_back(maFrame);
+                maFramesFromQueue_.push_back(maFrame);
         } while (runCondition);
-
     }
 
     template <typename NMSmodelT, typename Logger>
     void ModelEvaluationOffline<NMSmodelT, Logger>::initOfflineCurve() {
 
         bool runCondition(true);
-        auto lmtIt(lmtDataFromQueue_.begin());
-        for (auto emgIt : emgDataFromQueue_) {
+        auto lmtIt(lmtFramesFromQueue_.begin());
+        for (auto emgIt : emgFramesFromQueue_) {
             double emgTime = emgIt.time + globalEmDelay_;
             subject_.setTime(emgTime);
             subject_.setEmgs(emgIt.data);
-            if (lmtIt == lmtDataFromQueue_.begin()) {
+            if (lmtIt == lmtFramesFromQueue_.begin()) {
                 subject_.updateActivations();
                 subject_.pushState();
             }
             //we need to guard runCondition.. we cannot deferencing lmtIt->time if lmtIt == lmtDataFromQueue_.end(), so we have to split the check
-            if (lmtIt == lmtDataFromQueue_.end()) runCondition = false;
+            if (lmtIt == lmtFramesFromQueue_.end()) runCondition = false;
             if (runCondition) {
                 if (TimeCompare::lessEqual(lmtIt->time, emgTime)) {
                     subject_.updateActivations();
@@ -130,16 +142,14 @@ namespace ceinms {
                     ++lmtIt;
                 }
             }
-            
         }
         subject_.updateFibreLengthTraces();
     }
 
-
     template <typename NMSmodelT, typename Logger>
     void ModelEvaluationOffline<NMSmodelT, Logger>::operator()() {
 
-        ModelEvaluationBase<Logger>::subscribeToInputConnectors();
+        ModelEvaluationBase<Logger>::doneWithSubscriptions();
 
 #ifdef LOG
         cout << "starting consume" << endl;
@@ -149,49 +159,49 @@ namespace ceinms {
 
         double externalTorqueTime = std::numeric_limits<double>::lowest();
         double emgTime = std::numeric_limits<double>::lowest();
-        bool runCondition = !(emgDataFromQueue_.empty() || maDataFromQueue_.empty() || lmtDataFromQueue_.empty());
+        bool runCondition = !(emgFramesFromQueue_.empty() || maFramesFromQueue_.empty() || lmtFramesFromQueue_.empty());
         bool firstLmtArrived(false);
 
         while (runCondition) {  // while(runCondition)
 
             // 1. read lmt Data
-            InputConnectors::FrameType lmtFrameFromQueue(lmtDataFromQueue_.front());
-            lmtDataFromQueue_.pop_front();
-            double lmtMaTime = lmtFrameFromQueue.time;
+            LmtFrame lmtFrame(lmtFramesFromQueue_.front());
+            lmtFramesFromQueue_.pop_front();
+            double lmtMaTime = lmtFrame.time;
 
             // 2. read moment arms data
-            vector< InputConnectors::FrameType > momentArmsFrameFromQueue(maDataFromQueue_.front());
-            maDataFromQueue_.pop_front();
+            vector< MomentArmsFrame > momentArmsFrames(maFramesFromQueue_.front());
+            maFramesFromQueue_.pop_front();
 
             // 3. read external Torque
-            InputConnectors::FrameType externalTorquesFrameFromQueue;
-            while (TimeCompare::less(externalTorqueTime, lmtMaTime) && !externalTorquesDataFromQueue_.empty()) {
-                externalTorquesFrameFromQueue = externalTorquesDataFromQueue_.front();
-                externalTorquesDataFromQueue_.pop_front();
-                externalTorqueTime = externalTorquesFrameFromQueue.time;
+            ExternalTorquesFrame externalTorquesFrame;
+            while (TimeCompare::less(externalTorqueTime, lmtMaTime) && !externalTorquesFramesFromQueue_.empty()) {
+                externalTorquesFrame = externalTorquesFramesFromQueue_.front();
+                externalTorquesFramesFromQueue_.pop_front();
+                externalTorqueTime = externalTorquesFrame.time;
             }
 
             // 4. read emgs
-            InputConnectors::FrameType emgFrameFromQueue;
+            EmgFrame emgFrame;
             while (TimeCompare::less(emgTime, lmtMaTime)) {
-                emgFrameFromQueue = emgDataFromQueue_.front();
-                emgDataFromQueue_.pop_front();
-                emgTime = emgFrameFromQueue.time + globalEmDelay_;
-                runCondition = runCondition && !emgFrameFromQueue.data.empty();
+                emgFrame = emgFramesFromQueue_.front();
+                emgFramesFromQueue_.pop_front();
+                emgTime = emgFrame.time + globalEmDelay_;
+                runCondition = runCondition && !emgFrame.data.empty();
                 if (!TimeCompare::less(emgTime, lmtMaTime)) firstLmtArrived = true;
                 if (!firstLmtArrived && runCondition) {
                     subject_.setTime(emgTime);
-                    subject_.setEmgs(emgFrameFromQueue.data);
+                    subject_.setEmgs(emgFrame.data);
                     subject_.updateActivations();
                     subject_.pushState();
                 }
             }
 
             subject_.setTime(emgTime);
-            subject_.setEmgs(emgFrameFromQueue.data);
-            subject_.setMuscleTendonLengths(lmtFrameFromQueue.data);
+            subject_.setEmgs(emgFrame.data);
+            subject_.setMuscleTendonLengths(lmtFrame.data);
             for (unsigned int i = 0; i < noDof_; ++i)
-                subject_.setMomentArms(momentArmsFrameFromQueue.at(i).data, i);
+                subject_.setMomentArms(momentArmsFrames.at(i).data, i);
             subject_.updateState_OFFLINE();
             subject_.pushState();
 #ifdef LOG_FILES
@@ -218,11 +228,9 @@ namespace ceinms {
             for (unsigned i(0); i < 100; ++i) cout << ".";
             cout << endl;
 
-            
-
 #ifdef Evaluation_LOG
             cout << endl << endl << "EmgTime: " << emgTime << endl << "EMG" << endl;
-            for (auto it : emgFrameFromQueue.data)
+            for (auto it : emgFrame.data)
                 cout << it << "\t";
 
             cout << endl << "Activations: " << endl;
@@ -232,7 +240,7 @@ namespace ceinms {
                 cout << it << "\t";
 
             cout << endl << "LmtTime: " << lmtMaTime << endl << "Lmt" << endl;
-            for (auto it : lmtFrameFromQueue.data)
+            for (auto it : lmtFrame.data)
                 cout << it << "\t";
 
             vector<double> cMuscleForces;
@@ -243,12 +251,12 @@ namespace ceinms {
 
             for (unsigned int j = 0; j < dofNames_.size(); ++j) {
                 cout << endl << "MomentArms on: " << dofNames_.at(j) << endl;
-                for (auto it : momentArmsFrameFromQueue.at(j).data)
+                for (auto it : momentArmsFrames.at(j).data)
                     cout << it << "\t";
             }
 
             cout << endl << "External Torques: ";
-            for (auto it : externalTorquesFrameFromQueue.data)
+            for (auto it : externalTorquesFrame.data)
                 cout << it << " ";
 
             vector<double> cTorques;
@@ -259,10 +267,8 @@ namespace ceinms {
             }
             cout << endl << "----------------------------------------" << endl;
 #endif
-            runCondition = runCondition = !(emgDataFromQueue_.empty() || maDataFromQueue_.empty() || lmtDataFromQueue_.empty());
+            runCondition = runCondition = !(emgFramesFromQueue_.empty() || maFramesFromQueue_.empty() || lmtFramesFromQueue_.empty());
         } //end while(runCondition)
-
-
 
 #ifdef LOG_FILES
         //:TODO: improve this... This is the end... so I'm just writing on the queue a time equal to 0
@@ -278,19 +284,14 @@ namespace ceinms {
         ModelEvaluationBase<Logger>::logger.log(endTime, endData, "Torques");
 #endif
 
-        this->doneWithExecution();
+        ModelEvaluationBase<Logger>::doneWithExecution();
 #ifdef LOG
         cout << "Estimation completed. " << endl;
 #endif
-
     }
-
 
     template <typename NMSmodelT, typename Logger>
     ModelEvaluationOffline<NMSmodelT, Logger>::~ModelEvaluationOffline()
     {
-
     }
-
-
 }

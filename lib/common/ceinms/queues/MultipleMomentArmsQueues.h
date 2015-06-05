@@ -1,4 +1,3 @@
-
 /* -------------------------------------------------------------------------- *
 * CEINMS is a standalone toolbox for neuromusculoskeletal modelling and      *
 * simulation. CEINMS can also be used as a plugin for OpenSim either         *
@@ -41,9 +40,10 @@ namespace Concurrency {
 
 namespace ceinms {
 
+    using MomentArmsData = ScalarVectorData;
     using MomentArmsFrame = ScalarVectorFrame;
     using MomentArmsQueue = ScalarVectorQueue;
-    using MultipleMomentArmsQueues = std::vector < std::shared_ptr<MomentArmsQueue> >;
+    using MultipleMomentArmsQueues = std::vector < std::shared_ptr<MomentArmsQueue> > ;
 }
 
 #endif

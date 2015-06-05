@@ -40,10 +40,9 @@ namespace Concurrency {
 
 namespace ceinms {
 
-    using VecContactForcesFrame = QueueData < std::vector<SimTK::Vec3> >;
-    using VecContactForcesQueue = Concurrency::Queue < VecContactForcesFrame >;
-
+    using VecContactForcesData = std::vector < SimTK::Vec3 > ;
+    using VecContactForcesFrame = QueueData < VecContactForcesData > ;
+    using VecContactForcesQueue = Concurrency::Queue < VecContactForcesFrame > ;
 }
-
 
 #endif

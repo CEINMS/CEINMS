@@ -43,9 +43,9 @@ namespace ceinms {
         using TorqueData = TorqueFrame::type;
         template <typename NMSModelT>
         ExternalTorquesFromX(
-            ScalarVectorQueue& outputExternalTorques, 
+            ScalarVectorQueue& outputExternalTorquesQueue,
             Concurrency::Latch& doneWithSubscriptions,
-            Concurrency::Latch& doneWithExecution, 
+            Concurrency::Latch& doneWithExecution,
             const NMSModelT& subject);
 
         virtual ~ExternalTorquesFromX();
@@ -63,10 +63,9 @@ namespace ceinms {
         Concurrency::Latch& doneWithExecution_;
     };
 
-
     template <typename NMSModelT>
     ExternalTorquesFromX::ExternalTorquesFromX(
-        ScalarVectorQueue& outputExternalTorques,
+        ScalarVectorQueue& outputExternalTorquesQueue,
         Concurrency::Latch& doneWithSubscriptions,
         Concurrency::Latch& doneWithExecution,
         const NMSModelT& subject) :

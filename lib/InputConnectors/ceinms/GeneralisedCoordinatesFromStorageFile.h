@@ -36,13 +36,13 @@ namespace ceinms {
     class GeneralisedCoordinatesFromStorageFile : public GeneralisedCoordinatesFromX {
     public:
         GeneralisedCoordinatesFromStorageFile(
-            GeneralisedCoordinatesQueue& outputGeneralisedCoordinatesQueue_,
+            GeneralisedCoordinatesQueue& outputGeneralisedCoordinatesQueue,
             Concurrency::Latch& doneWithSubscriptions,
             Concurrency::Latch& doneWithExecution,
             const std::string& osimModelFilename,
             const std::string& kinematicsStorageFilename);
         GeneralisedCoordinatesFromStorageFile(
-            GeneralisedCoordinatesQueue& outputGeneralisedCoordinatesQueue_,
+            GeneralisedCoordinatesQueue& outputGeneralisedCoordinatesQueue,
             Concurrency::Latch& doneWithSubscriptions,
             Concurrency::Latch& doneWithExecution,
             const std::string& osimModelFilename,

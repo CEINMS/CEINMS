@@ -82,21 +82,21 @@ namespace ceinms {
         readyToWrite_(readyToWrite),
         valuesToWrite_(valuesToWrite),
         outputDir_(outputDir),
-        separator_("\t"), {
+        separator_("\t") {
 
-            outputDir_ += "/";
-            boost::filesystem::path dir(outputDir_);
-            if (!boost::filesystem::exists(dir)) {
-                if (!boost::filesystem::create_directories(dir)) {
-                    std::cout << "Error: Cannot create the output directory " + outputDir_ << std::endl;
-                    exit(EXIT_FAILURE);
-                }
-                std::cout << "Created output directory " + dir.string() << std::endl;
+        outputDir_ += "/";
+        boost::filesystem::path dir(outputDir_);
+        if (!boost::filesystem::exists(dir)) {
+            if (!boost::filesystem::create_directories(dir)) {
+                std::cout << "Error: Cannot create the output directory " + outputDir_ << std::endl;
+                exit(EXIT_FAILURE);
             }
-            else std::cout << "Using " + dir.string() + " as output directory\n";
-
-            subject.getDoFNames(torqueNames_);
-            subject.getMuscleNames(muscleNames_);
+            std::cout << "Created output directory " + dir.string() << std::endl;
         }
+        else std::cout << "Using " + dir.string() + " as output directory\n";
+
+        subject.getDoFNames(torqueNames_);
+        subject.getMuscleNames(muscleNames_);
+    }
 }
 #endif

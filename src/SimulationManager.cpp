@@ -37,7 +37,7 @@
 #include "ceinms/Activation/PiecewiseActivation.h"
 #include "ceinms/Curve.h"
 
-#include "ceinms/EMGFromFile.h"
+#include "ceinms/EmgFromFile.h"
 #include "ceinms/LmtMaFromStorageFile.h"
 #include "ceinms/ExternalTorquesFromStorageFile.h"
 #include "ceinms/GeneralisedCoordinatesFromStorageFile.h"
@@ -56,8 +56,15 @@
 #include "ceinms/QueuesToJointReactionForces.h"
 #include "ceinms/QueuesToKneeBalanceContactForces.h"
 
+#include "ceinms/concurrency/Latch.h"
+#include "ceinms/concurrency/Queue.h"
 #include "ceinms/queues/VecContactForcesQueue.h"
 #include "ceinms/queues/ScalarContactForcesQueue.h"
+#include "ceinms/queues/EmgQueue.h"
+#include "ceinms/queues/LmtQueue.h"
+#include "ceinms/queues/ExternalTorquesQueues.h"
+#include "ceinms/queues/MultipleMomentArmsQueues.h"
+#include "ceinms/queues/LogQueue.h"
 #include "ceinms/QueueToStorageFile.h"
 
 #include <string>
@@ -78,6 +85,7 @@ namespace ceinms {
         emgGeneratorFile_(ceinmsSetup_.getExcitationGeneratorFile()),
         hasContactModel_(ceinmsSetup_.hasContactModel())
     {
+
         cout << "Contact model ";
         if (hasContactModel_) {
             cout << "found" << endl;
@@ -108,24 +116,35 @@ namespace ceinms {
     template <typename NMSmodelT, template <typename, typename> class ModelEvaluatorT, typename LoggerT>
     bool SimulationManager::runOpenLoopWithKneeBalanceContactModel() {
 
-        InputConnectors inputConnectors;
-        OutputConnectors outputConnectors;
+        //Create queues for input data
+        EmgQueue emgQueue;
+        LmtQueue lmtQueue;
+        ExternalTorquesQueue externalTorqueQueue;
+        MultipleMomentArmsQueues momentArmsQueues;
+
+        //Creates queues for output data
+        ScalarLogQueue logQueue;
+        ScalarContactForcesQueue contactForcesQueue;
+
+        //Creates latches to sync threads
+        Concurrency::Latch doneWithSubscriptionsLatch;
+        Concurrency::Latch doneWithExecutionLatch;
 
         NMSmodelT mySubject;
         setupSubject(mySubject, subjectFile_, executionCfg_.getTolerance());
 
         // 2. define the thread connecting with the input sources
         string emgFilename(dataLocations_.getExcitationsFile());
-        EMGFromFile emgProducer(inputConnectors, mySubject, emgFilename, emgGeneratorFile_);
+        EmgFromFile emgProducer(emgQueue, doneWithSubscriptionsLatch, doneWithExecutionLatch, mySubject, emgFilename, emgGeneratorFile_);
 
         vector< string > dofNames;
         mySubject.getDoFNames(dofNames);
         vector< string > maFilename;
         sortMaFilenames(dataLocations_.getMaFiles(), dofNames, maFilename);
-        LmtMaFromStorageFile lmtMaProducer(inputConnectors, mySubject, dataLocations_.getLmtFile(), maFilename);
+        LmtMaFromStorageFile lmtMaProducer(lmtQueue, momentArmsQueues, doneWithSubscriptionsLatch, doneWithExecutionLatch, mySubject, dataLocations_.getLmtFile(), maFilename);
 
         string externalTorqueFilename(dataLocations_.getExternalTorqueFile());
-        ExternalTorquesFromStorageFile externalTorquesProducer(inputConnectors, mySubject, externalTorqueFilename);
+        ExternalTorquesFromStorageFile externalTorquesProducer(externalTorqueQueue, doneWithSubscriptionsLatch, doneWithExecutionLatch, mySubject, externalTorqueFilename);
 
         vector<string> dataToLog = { "Activations",
             "FiberLenghts",
@@ -137,20 +156,30 @@ namespace ceinms {
             "Torques" };
 
         vector<string> valuesToWrite = dataToLog;
-        QueuesToStorageFiles queuesToStorageFiles(inputConnectors, outputConnectors, mySubject, valuesToWrite, outputDirectory_);
+        QueuesToStorageFiles queuesToStorageFiles(logQueue, doneWithSubscriptionsLatch, doneWithExecutionLatch, mySubject, valuesToWrite, outputDirectory_);
 
         // 3. define the model simulator
         vector<string> valuesToLog = dataToLog;
-        ModelEvaluatorT<NMSmodelT, LoggerT>  simulator(inputConnectors, outputConnectors, mySubject, valuesToLog);
+        ModelEvaluatorT<NMSmodelT, LoggerT>  simulator(
+            emgQueue,
+            lmtQueue,
+            externalTorqueQueue,
+            momentArmsQueues,
+            logQueue,
+            doneWithSubscriptionsLatch,
+            doneWithExecutionLatch,
+            mySubject,
+            valuesToLog);
 
         //4. define contact forces queue
         ScalarContactForcesQueue outputContactForcesQueue;
         //5. define contact forces estimator
         QueuesToKneeBalanceContactForces queuesToKneeBalanceContactForces(
-            *outputConnectors.logQueues["Torques"],
-            inputConnectors.queueExternalTorques,
-            outputContactForcesQueue,
-            inputConnectors.doneWithSubscription,
+            *logQueue["Torques"],
+            externalTorqueQueue,
+            contactForcesQueue,
+            doneWithSubscriptionsLatch,
+            doneWithExecutionLatch,
             contactModelCfg_.getContactModelSetupKneeBalance(),
             mySubject);
 
@@ -160,16 +189,16 @@ namespace ceinms {
         };
 
         //6. define logging for contact forces
-        QueueToStorageFile<std::vector<double>> contactForcesLogger(
-            outputContactForcesQueue,
-            inputConnectors.doneWithSubscription,
-            outputConnectors.doneWithExecution,
+        QueueToStorageFile<ScalarVectorData> contactForcesLogger(
+            contactForcesQueue,
+            doneWithSubscriptionsLatch,
+            doneWithExecutionLatch,
             contactForcesNames,
             "ContactForces",
             outputDirectory_);
 
-        inputConnectors.doneWithSubscription.setCount(7);
-        outputConnectors.doneWithExecution.setCount(3);
+        doneWithSubscriptionsLatch.setCount(7);
+        doneWithExecutionLatch.setCount(7);
 
         // 4. start the threads
         std::thread emgProdThread(std::ref(emgProducer));
@@ -194,24 +223,37 @@ namespace ceinms {
     template <typename NMSmodelT, template <typename, typename> class ModelEvaluatorT, typename LoggerT>
     bool SimulationManager::runOpenLoopWithGenericContactModel() {
 
-        InputConnectors inputConnectors;
-        OutputConnectors outputConnectors;
+        //Create queues for input data
+        EmgQueue emgQueue;
+        LmtQueue lmtQueue;
+        ExternalTorquesQueue externalTorqueQueue;
+        MultipleMomentArmsQueues momentArmsQueues;
+        GeneralisedCoordinatesQueue generalisedCoordinatesQueue;
+        MultipleExternalForcesQueue externalForcesQueue;
+
+        //Creates queues for output data
+        ScalarLogQueue logQueue;
+        VecContactForcesQueue contactForcesQueue;
+
+        //Creates latches to sync threads
+        Concurrency::Latch doneWithSubscriptionsLatch;
+        Concurrency::Latch doneWithExecutionLatch;
 
         NMSmodelT mySubject;
         setupSubject(mySubject, subjectFile_, executionCfg_.getTolerance());
 
         // 2. define the thread connecting with the input sources
         string emgFilename(dataLocations_.getExcitationsFile());
-        EMGFromFile emgProducer(inputConnectors, mySubject, emgFilename, emgGeneratorFile_);
+        EmgFromFile emgProducer(emgQueue, doneWithSubscriptionsLatch, doneWithExecutionLatch, mySubject, emgFilename, emgGeneratorFile_);
 
         vector< string > dofNames;
         mySubject.getDoFNames(dofNames);
         vector< string > maFilename;
         sortMaFilenames(dataLocations_.getMaFiles(), dofNames, maFilename);
-        LmtMaFromStorageFile lmtMaProducer(inputConnectors, mySubject, dataLocations_.getLmtFile(), maFilename);
+        LmtMaFromStorageFile lmtMaProducer(lmtQueue, momentArmsQueues, doneWithSubscriptionsLatch, doneWithExecutionLatch, mySubject, dataLocations_.getLmtFile(), maFilename);
 
         string externalTorqueFilename(dataLocations_.getExternalTorqueFile());
-        ExternalTorquesFromStorageFile externalTorquesProducer(inputConnectors, mySubject, externalTorqueFilename);
+        ExternalTorquesFromStorageFile externalTorquesProducer(externalTorqueQueue, doneWithSubscriptionsLatch, doneWithExecutionLatch, mySubject, externalTorqueFilename);
 
         vector<string> dataToLog = { "Activations",
             "FiberLenghts",
@@ -221,44 +263,64 @@ namespace ceinms {
             "PennationAngles",
             "MuscleForces",
             "Torques" };
+
         // 2b. define the thread consuming the output sources
         vector<string> valuesToWrite = dataToLog;
-        QueuesToStorageFiles queuesToStorageFiles(inputConnectors, outputConnectors, mySubject, valuesToWrite, outputDirectory_);
+        QueuesToStorageFiles queuesToStorageFiles(logQueue, doneWithSubscriptionsLatch, doneWithExecutionLatch, mySubject, valuesToWrite, outputDirectory_);
 
         // 3. define the model simulator
         vector<string> valuesToLog = dataToLog;
-        ModelEvaluatorT<NMSmodelT, LoggerT>  simulator(inputConnectors, outputConnectors, mySubject, valuesToLog);
-
-        VecContactForcesQueue outputJointReactionForcesQueue;
+        ModelEvaluatorT<NMSmodelT, LoggerT>  simulator(
+            emgQueue,
+            lmtQueue,
+            externalTorqueQueue,
+            momentArmsQueues,
+            logQueue,
+            doneWithSubscriptionsLatch,
+            doneWithExecutionLatch,
+            mySubject,
+            valuesToLog);
 
         // 4. start contact model stuff
         auto contactModelSetup(contactModelCfg_.getContactModelSetupOsim());
-        QueuesToJointReactionForces jointReactionForcesEstimator(inputConnectors.queueGeneralisedCoordinates,
-            inputConnectors.queueExternalForces,
-            *outputConnectors.logQueues["MuscleForces"],
-            *outputConnectors.logQueues["Torques"],
-            outputJointReactionForcesQueue,
-            inputConnectors.doneWithSubscription,
+        QueuesToJointReactionForces jointReactionForcesEstimator(
+            generalisedCoordinatesQueue,
+            externalForcesQueue,
+            *logQueue["MuscleForces"],
+            *logQueue["Torques"],
+            contactForcesQueue,
+            doneWithSubscriptionsLatch,
+            doneWithExecutionLatch,
             mySubject,
             contactModelSetup.osimModel,
             contactModelSetup.externalLoads,
             contactModelSetup.joints);
 
-        GeneralisedCoordinatesFromStorageFile generalisedCoordinateFromStorageFile(inputConnectors, contactModelSetup.osimModel, contactModelSetup.motion);
+        GeneralisedCoordinatesFromStorageFile generalisedCoordinateFromStorageFile(
+            generalisedCoordinatesQueue,
+            doneWithSubscriptionsLatch,
+            doneWithExecutionLatch,
+            contactModelSetup.osimModel,
+            contactModelSetup.motion);
         //2 create external forces produces
-        ExternalForcesFromStorageFile externalForcesFromStorageFile(inputConnectors, contactModelSetup.osimModel, contactModelSetup.externalLoads);
+        ExternalForcesFromStorageFile externalForcesFromStorageFile(
+            externalForcesQueue,
+            doneWithSubscriptionsLatch,
+            doneWithExecutionLatch,
+            contactModelSetup.osimModel,
+            contactModelSetup.externalLoads);
 
         //3 create and launch log
-        QueueToStorageFile<std::vector<SimTK::Vec3>> contactForcesLogger(
-            outputJointReactionForcesQueue,
-            inputConnectors.doneWithSubscription,
-            outputConnectors.doneWithExecution,
+        QueueToStorageFile<VecContactForcesData> contactForcesLogger(
+            contactForcesQueue,
+            doneWithSubscriptionsLatch,
+            doneWithExecutionLatch,
             contactModelSetup.joints,
             "ContactForces",
             outputDirectory_);
 
-        inputConnectors.doneWithSubscription.setCount(9);
-        outputConnectors.doneWithExecution.setCount(3);
+        doneWithSubscriptionsLatch.setCount(9);
+        doneWithExecutionLatch.setCount(9);
 
         //launch threads
         std::thread contactForcesEstimatorThread(std::ref(jointReactionForcesEstimator));
@@ -288,25 +350,34 @@ namespace ceinms {
     template <typename NMSmodelT, template <typename, typename> class ModelEvaluatorT, typename LoggerT>
     bool SimulationManager::runOpenLoop() {
 
-        //Monica probably won't like this
-        InputConnectors inputConnectors;
-        OutputConnectors outputConnectors;
+        //Create queues for input data
+        EmgQueue emgQueue;
+        LmtQueue lmtQueue;
+        ExternalTorquesQueue externalTorqueQueue;
+        MultipleMomentArmsQueues momentArmsQueues;
+
+        //Creates queues for output data
+        ScalarLogQueue logQueue;
+
+        //Creates latches to sync threads
+        Concurrency::Latch doneWithSubscriptionsLatch;
+        Concurrency::Latch doneWithExecutionLatch;
 
         NMSmodelT mySubject;
         setupSubject(mySubject, subjectFile_, executionCfg_.getTolerance());
 
         // 2. define the thread connecting with the input sources
         string emgFilename(dataLocations_.getExcitationsFile());
-        EMGFromFile emgProducer(inputConnectors, mySubject, emgFilename, emgGeneratorFile_);
+        EmgFromFile emgProducer(emgQueue, doneWithSubscriptionsLatch, doneWithExecutionLatch, mySubject, emgFilename, emgGeneratorFile_);
 
         vector< string > dofNames;
         mySubject.getDoFNames(dofNames);
         vector< string > maFilename;
         sortMaFilenames(dataLocations_.getMaFiles(), dofNames, maFilename);
-        LmtMaFromStorageFile lmtMaProducer(inputConnectors, mySubject, dataLocations_.getLmtFile(), maFilename);
+        LmtMaFromStorageFile lmtMaProducer(lmtQueue, momentArmsQueues, doneWithSubscriptionsLatch, doneWithExecutionLatch, mySubject, dataLocations_.getLmtFile(), maFilename);
 
         string externalTorqueFilename(dataLocations_.getExternalTorqueFile());
-        ExternalTorquesFromStorageFile externalTorquesProducer(inputConnectors, mySubject, externalTorqueFilename);
+        ExternalTorquesFromStorageFile externalTorquesProducer(externalTorqueQueue, doneWithSubscriptionsLatch, doneWithExecutionLatch, mySubject, externalTorqueFilename);
 
         vector<string> dataToLog = { "Activations",
             "FiberLenghts",
@@ -318,14 +389,23 @@ namespace ceinms {
             "Torques" };
         // 2b. define the thread consuming the output sources
         vector<string> valuesToWrite = dataToLog;
-        QueuesToStorageFiles queuesToStorageFiles(inputConnectors, outputConnectors, mySubject, valuesToWrite, outputDirectory_);
+        QueuesToStorageFiles queuesToStorageFiles(logQueue, doneWithSubscriptionsLatch, doneWithExecutionLatch, mySubject, valuesToWrite, outputDirectory_);
 
         // 3. define the model simulator
         vector<string> valuesToLog = dataToLog;
-        ModelEvaluatorT<NMSmodelT, LoggerT>  simulator(inputConnectors, outputConnectors, mySubject, valuesToLog);
+        ModelEvaluatorT<NMSmodelT, LoggerT>  simulator(
+            emgQueue,
+            lmtQueue,
+            externalTorqueQueue,
+            momentArmsQueues,
+            logQueue,
+            doneWithSubscriptionsLatch,
+            doneWithExecutionLatch,
+            mySubject,
+            valuesToLog);
 
-        inputConnectors.doneWithSubscription.setCount(5);
-        outputConnectors.doneWithExecution.setCount(2);
+        doneWithSubscriptionsLatch.setCount(5);
+        doneWithExecutionLatch.setCount(5);
 
         // 4. start the threads
         std::thread emgProdThread(std::ref(emgProducer));
@@ -345,25 +425,35 @@ namespace ceinms {
 
     template <typename NMSmodelT>
     bool SimulationManager::runHybrid() {
-        // 1. define the model
-        InputConnectors inputConnectors;
-        OutputConnectors outputConnectors;
+
+        //Create queues for input data
+        EmgQueue emgQueue;
+        LmtQueue lmtQueue;
+        ExternalTorquesQueue externalTorqueQueue;
+        MultipleMomentArmsQueues momentArmsQueues;
+
+        //Creates queues for output data
+        ScalarLogQueue logQueue;
+
+        //Creates latches to sync threads
+        Concurrency::Latch doneWithSubscriptionsLatch;
+        Concurrency::Latch doneWithExecutionLatch;
 
         NMSmodelT mySubject;
         setupSubject(mySubject, subjectFile_);
 
         // 2. define the thread connecting with the input sources
         string emgFilename(dataLocations_.getExcitationsFile());
-        EMGFromFile emgProducer(inputConnectors, mySubject, emgFilename, emgGeneratorFile_);
+        EmgFromFile emgProducer(emgQueue, doneWithSubscriptionsLatch, doneWithExecutionLatch, mySubject, emgFilename, emgGeneratorFile_);
 
         vector< string > dofNames;
         mySubject.getDoFNames(dofNames);
         vector< string > maFilename;
         sortMaFilenames(dataLocations_.getMaFiles(), dofNames, maFilename);
-        LmtMaFromStorageFile lmtMaProducer(inputConnectors, mySubject, dataLocations_.getLmtFile(), maFilename);
+        LmtMaFromStorageFile lmtMaProducer(lmtQueue, momentArmsQueues, doneWithSubscriptionsLatch, doneWithExecutionLatch, mySubject, dataLocations_.getLmtFile(), maFilename);
 
         string externalTorqueFilename(dataLocations_.getExternalTorqueFile());
-        ExternalTorquesFromStorageFile externalTorquesProducer(inputConnectors, mySubject, externalTorqueFilename);
+        ExternalTorquesFromStorageFile externalTorquesProducer(externalTorqueQueue, doneWithSubscriptionsLatch, doneWithExecutionLatch, mySubject, externalTorqueFilename);
         vector<string> dataToLog = { "Activations",
             "FiberLenghts",
             "NormFiberLengths",
@@ -375,13 +465,13 @@ namespace ceinms {
             "AdjustedEmgs" };
         // 2b. define the thread consuming the output sources
         vector<string> valuesToWrite = dataToLog;
-        QueuesToStorageFiles queuesToStorageFiles(inputConnectors, outputConnectors, mySubject, valuesToWrite, outputDirectory_);
+        QueuesToStorageFiles queuesToStorageFiles(logQueue, doneWithSubscriptionsLatch, doneWithExecutionLatch, mySubject, valuesToWrite, outputDirectory_);
 
         // 3. define the model simulator
         vector<string> valuesToLog = dataToLog;
 
-        inputConnectors.doneWithSubscription.setCount(5);
-        outputConnectors.doneWithExecution.setCount(2);
+        doneWithSubscriptionsLatch.setCount(5);
+        doneWithExecutionLatch.setCount(5);
 
         // 4. define the optimiser
         typedef Hybrid::ErrorMinimizerAnnealing<NMSmodelT> MyErrorMinimizer;
@@ -399,7 +489,17 @@ namespace ceinms {
         executionCfg_.getAnnealingParameters(nt, ns, rt, t, maxNoEval, epsilon, noEpsilon);
         errorMinimizer.setAnnealingParameters(nt, ns, rt, t, maxNoEval, epsilon, noEpsilon);
 
-        ModelEvaluationHybrid<NMSmodelT, MyErrorMinimizer, LoggerOnQueues> simulator(inputConnectors, outputConnectors, mySubject, errorMinimizer, valuesToLog);
+        ModelEvaluationHybrid<NMSmodelT, MyErrorMinimizer, LoggerOnQueues> simulator(
+            emgQueue,
+            lmtQueue,
+            externalTorqueQueue,
+            momentArmsQueues,
+            logQueue,
+            doneWithSubscriptionsLatch,
+            doneWithExecutionLatch,
+            mySubject,
+            errorMinimizer,
+            valuesToLog);
 
         // 5. start the threads
         std::thread emgProdThread(std::ref(emgProducer));

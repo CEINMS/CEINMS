@@ -29,7 +29,7 @@
 #include "SimpleFileLogger.h"
 #include "StorageLogger.h"
 #include "ceinms/TimeCompare.h"
-
+#include "ceinms/EndOfData.h"
 #include <iostream>
 using std::cout;
 using std::endl;
@@ -41,16 +41,29 @@ using std::string;
 #define LOG_FILES
 #define LOG
 
-
 namespace ceinms {
     template <typename NMSmodelT, typename ErrorMinimizerT, typename Logger>
-    ModelEvaluationHybrid<NMSmodelT, ErrorMinimizerT, Logger>::ModelEvaluationHybrid(InputConnectors& inputConnectors,
-        OutputConnectors& outputConnectors,
+    ModelEvaluationHybrid<NMSmodelT, ErrorMinimizerT, Logger>::ModelEvaluationHybrid(
+        EmgQueue& inputEmgQueue,
+        LmtQueue& inputLmtQueue,
+        ExternalTorquesQueue& inputExternalTorqueQueue,
+        MultipleMomentArmsQueues& inputMomentArmsQueues,
+        ScalarLogQueue& outputLogQueue,
+        Concurrency::Latch& doneWithSubscriptions,
+        Concurrency::Latch& doneWithExecution,
         NMSmodelT& subject,
         ErrorMinimizerT& torqueErrorMinimizer,
         const vector<string>& valuesToLog
-        )
-        :ModelEvaluationBase<Logger>::ModelEvaluationBase(inputConnectors, outputConnectors, valuesToLog),
+        ) :
+        ModelEvaluationBase<Logger>(
+        inputEmgQueue,
+        inputLmtQueue,
+        inputExternalTorqueQueue,
+        inputMomentArmsQueues,
+        outputLogQueue,
+        doneWithSubscriptions,
+        doneWithExecution,
+        valuesToLog),
         subject_(subject),
         torqueErrorMinimizer_(torqueErrorMinimizer) {
 
@@ -59,11 +72,10 @@ namespace ceinms {
         globalEmDelay_ = subject.getGlobalEmDelay();
     }
 
-
     template <typename NMSmodelT, typename ErrorMinimizerT, typename Logger>
     void ModelEvaluationHybrid<NMSmodelT, ErrorMinimizerT, Logger>::operator()() {
 
-        ModelEvaluationBase<Logger>::subscribeToInputConnectors();
+        ModelEvaluationBase<Logger>::doneWithSubscriptions();
 
 #ifdef LOG
         cout << "starting consume" << endl;
@@ -76,7 +88,7 @@ namespace ceinms {
         do {  // while(runCondition)
 
             // 1. read lmt Data
-            InputConnectors::FrameType lmtFrameFromQueue;
+            LmtFrame lmtFrameFromQueue;
             ModelEvaluationBase<Logger>::getLmtFromInputQueue(lmtFrameFromQueue);
             double lmtMaTime = lmtFrameFromQueue.time;
 
@@ -84,7 +96,7 @@ namespace ceinms {
             runCondition = runCondition && !lmtFrameFromQueue.data.empty();
 
             // 2. read moment arms data
-            vector< InputConnectors::FrameType > momentArmsFrameFromQueue;
+            vector< MomentArmsFrame > momentArmsFrameFromQueue;
             momentArmsFrameFromQueue.resize(noDof_);
             for (unsigned int i = 0; i < noDof_; ++i) {
                 ModelEvaluationBase<Logger>::getMomentArmsFromInputQueue((momentArmsFrameFromQueue.at(i)), i);
@@ -92,21 +104,15 @@ namespace ceinms {
             }
 
             // 3. read external Torque
-            InputConnectors::FrameType externalTorquesFrameFromQueue;
-            if (ModelEvaluationBase<Logger>::externalTorquesAvailable()) {
-                while (TimeCompare::less(externalTorqueTime, lmtMaTime)) {
-                    ModelEvaluationBase<Logger>::getExternalTorquesFromInputQueue(externalTorquesFrameFromQueue);
-                    externalTorqueTime = externalTorquesFrameFromQueue.time;
-                }
-            }
-            else
-            {
-                std::cout << "External torque data is needed in Hybrid Mode but it is not available!" << std::endl;
-                break;
+            ExternalTorquesFrame externalTorquesFrameFromQueue;
+            while (TimeCompare::less(externalTorqueTime, lmtMaTime) && runCondition) {
+                ModelEvaluationBase<Logger>::getExternalTorquesFromInputQueue(externalTorquesFrameFromQueue);
+                if (EndOfData::isEod(externalTorquesFrameFromQueue)) runCondition = false;
+                externalTorqueTime = externalTorquesFrameFromQueue.time;
             }
 
             // 4. read emgs
-            InputConnectors::FrameType emgFrameFromQueue;
+            EmgFrame emgFrameFromQueue;
             while (TimeCompare::less(emgTime, lmtMaTime) && runCondition) {
                 ModelEvaluationBase<Logger>::getEmgFromInputQueue(emgFrameFromQueue);
                 emgTime = emgFrameFromQueue.time + globalEmDelay_;
@@ -173,7 +179,6 @@ namespace ceinms {
                         cout << it << "\t";
                 }
 
-
                 for (auto& it : externalTorquesFrameFromQueue.data)
                     cout << it << " ";
                 cout << endl;
@@ -190,10 +195,7 @@ namespace ceinms {
 
             //   float globalTimeLimit = ModelEvaluationBase<Logger>::getGlobalTimeLimit();
             //   runCondition = TimeCompare::less(emgTime,  globalTimeLimit) && TimeCompare::less(lmtMaTime, globalTimeLimit) && runCondition;
-
         } while (runCondition);
-
-
 
 #ifdef LOG_FILES
         //:TODO: improve this... This is the end... so I'm just writing on the queue a time equal to 0
@@ -210,11 +212,9 @@ namespace ceinms {
         ModelEvaluationBase<Logger>::logger.log(endTime, endData, "AdjustedEmgs");
 #endif
 
-        this->doneWithExecution();
+        ModelEvaluationBase<Logger>::doneWithExecution();
 #ifdef LOG
         cout << "Estimation completed." << endl;
 #endif
-
-
     }
 }

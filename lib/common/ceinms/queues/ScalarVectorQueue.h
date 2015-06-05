@@ -40,10 +40,8 @@ namespace Concurrency {
 namespace ceinms {
 
     using ScalarVectorData = std::vector < double > ;
-    using ScalarVectorFrame = QueueData < ScalarVectorData >;
-    using ScalarVectorQueue = Concurrency::Queue < ScalarVectorFrame >;
-
+    using ScalarVectorFrame = QueueData < ScalarVectorData > ;
+    using ScalarVectorQueue = Concurrency::Queue < ScalarVectorFrame > ;
 }
-
 
 #endif

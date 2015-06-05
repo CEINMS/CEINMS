@@ -45,8 +45,8 @@ namespace ceinms {
             MultipleMomentArmsQueues outputMomentArmsQueue,
             Concurrency::Latch& doneWithSubscriptions,
             Concurrency::Latch& doneWithExecution,
-            const NMSModelT& subject, 
-            const std::string& lmtDataFilename, 
+            const NMSModelT& subject,
+            const std::string& lmtDataFilename,
             const std::vector< std::string>& maDataFileName);
         void operator()();
 
@@ -67,9 +67,9 @@ namespace ceinms {
         const NMSModelT& subject,
         const std::string& lmtDataFilename,
         const std::vector< std::string>& maDataFileName) :
-        LmtMaFromX(outputLmtQueue, outputMomentArmsQueue, doneWithSubscriptions, doneWithExecution, subject), 
-        lmtData_(lmtDataFilename) {  
-        
+        LmtMaFromX(outputLmtQueue, outputMomentArmsQueue, doneWithSubscriptions, doneWithExecution, subject),
+        lmtData_(lmtDataFilename) {
+
         // 1. Open the input files
         for (std::string it : maDataFileName)
             maDataStorageFiles_.emplace_back(new DataFromStorageFile(it));
@@ -86,11 +86,6 @@ namespace ceinms {
             musclePositionsInMaStorages_.at(currentDof) = findMapping(muscleNamesOnDofs_.at(currentDof), muscleNamesFromStorageFile);
             currentDof++;
         }
-
-        inputConnectors_.queueMomentArms.clear();
-        for (int i = 0; i < dofNames_.size(); ++i)
-            inputConnectors_.queueMomentArms.push_back(new Concurrency::Queue< InputConnectors::FrameType >);
-
     }
 }
 

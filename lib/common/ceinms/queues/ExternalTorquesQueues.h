@@ -30,19 +30,13 @@
 #define ceinms_ExternalTorquesQueue_h
 
 #include <vector>
-#include "ceinms/QueueData.h"
-
-namespace Concurrency {
-    template<typename>
-    class Queue;
-}
+#include "ceinms/queues/ScalarVectorQueue.h"
 
 namespace ceinms {
 
-    using ExternalTorquesFrame = QueueData < std::vector<double> >;
-    using ExternalTorquesQueue = Concurrency::Queue < ExternalTorquesFrame >;
-
+    using ExternalTorquesData = ScalarVectorData;
+    using ExternalTorquesFrame = ScalarVectorFrame;
+    using ExternalTorquesQueue = ScalarVectorQueue;
 }
-
 
 #endif

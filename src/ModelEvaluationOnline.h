@@ -39,10 +39,19 @@ namespace ceinms {
 
     public:
         ModelEvaluationOnline() = delete;
-        ModelEvaluationOnline(InputConnectors& inputConnectors, OutputConnectors& outputConnectors, NMSmodelT& subject, const std::vector< std::string >& valuesToLog); // const std::string& outputDir = "./Output");
+        ModelEvaluationOnline(
+            EmgQueue& inputEmgQueue,
+            LmtQueue& inputLmtQueue,
+            ExternalTorquesQueue& inputExternalTorqueQueue,
+            MultipleMomentArmsQueues& inputMomentArmsQueues,
+            ScalarLogQueue& outputLogQueue,
+            Concurrency::Latch& doneWithSubscriptions,
+            Concurrency::Latch& doneWithExecution,
+            NMSmodelT& subject,
+            const std::vector< std::string >& valuesToLog); // const std::string& outputDir = "./Output");
         void setOutputDirectory(const std::string& outputDir);
         //    void setSubject(NMSmodelT& subject);
-        void operator()();
+        void operator()() override;
 
     private:
         NMSmodelT& subject_;

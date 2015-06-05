@@ -27,7 +27,6 @@
  * -------------------------------------------------------------------------- */
 
 #include "ceinms/QueuesToTrialData.h"
-#include "ceinms/InputConnectors.h"
 #include "ceinms/EndOfData.h"
 
 namespace ceinms {

@@ -41,11 +41,20 @@ namespace ceinms {
 
     public:
         ModelEvaluationOffline() = delete;
-        ModelEvaluationOffline(InputConnectors& inputConnectors, OutputConnectors& outputConnectors, NMSmodelT& subject, const std::vector< std::string >& valuesToLog);
+        ModelEvaluationOffline(
+            EmgQueue& inputEmgQueue,
+            LmtQueue& inputLmtQueue,
+            ExternalTorquesQueue& inputExternalTorqueQueue,
+            MultipleMomentArmsQueues& inputMomentArmsQueues,
+            ScalarLogQueue& outputLogQueue,
+            Concurrency::Latch& doneWithSubscriptions,
+            Concurrency::Latch& doneWithExecution,
+            NMSmodelT& subject,
+            const std::vector< std::string >& valuesToLog);
         ~ModelEvaluationOffline();
 
         void setOutputDirectory(const std::string& outputDir);
-        void operator()();
+        void operator()() override;
 
     private:
         void readDataFromQueues();
@@ -55,8 +64,10 @@ namespace ceinms {
         std::vector< std::string > dofNames_;
         std::vector< std::string > dofNamesWithExtTorque_;
 
-        std::list< InputConnectors::FrameType > lmtDataFromQueue_, emgDataFromQueue_, externalTorquesDataFromQueue_;
-        std::list< std::vector < InputConnectors::FrameType > > maDataFromQueue_;
+        std::list<LmtFrame> lmtFramesFromQueue_;
+        std::list<EmgFrame> emgFramesFromQueue_;
+        std::list<ExternalTorquesFrame> externalTorquesFramesFromQueue_;
+        std::list < std::vector < MomentArmsFrame >> maFramesFromQueue_;
         unsigned noDof_;
         double globalEmDelay_;
     };

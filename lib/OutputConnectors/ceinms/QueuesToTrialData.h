@@ -32,7 +32,6 @@
 #include <iostream>
 #include <fstream>
 #include <boost/filesystem.hpp>
-#include "ceinms/InputConnectors.h"
 #include "ceinms/TrialData.h"
 #include "ceinms/concurrency/Queue.h"
 #include "ceinms/concurrency/Latch.h"
