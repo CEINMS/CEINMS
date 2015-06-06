@@ -41,8 +41,8 @@ namespace ceinms {
     public:
         template <typename NMSModelT>
         LmtMaFromStorageFile(
-            ScalarVectorQueue& outputLmtQueue,
-            MultipleMomentArmsQueues outputMomentArmsQueue,
+            LmtQueue& outputLmtQueue,
+            MultipleMomentArmsQueues& outputMomentArmsQueue,
             Concurrency::Latch& doneWithSubscriptions,
             Concurrency::Latch& doneWithExecution,
             const NMSModelT& subject,
@@ -60,8 +60,8 @@ namespace ceinms {
 
     template <typename NMSModelT>
     LmtMaFromStorageFile::LmtMaFromStorageFile(
-        ScalarVectorQueue& outputLmtQueue,
-        MultipleMomentArmsQueues outputMomentArmsQueue,
+        LmtQueue& outputLmtQueue,
+        MultipleMomentArmsQueues& outputMomentArmsQueue,
         Concurrency::Latch& doneWithSubscriptions,
         Concurrency::Latch& doneWithExecution,
         const NMSModelT& subject,

@@ -73,7 +73,7 @@ namespace ceinms {
     void LmtMaFromX::sendMaEndOfData() {
 
         for (unsigned i(0); i < dofNames_.size(); ++i)
-            outputLmtQueue_.push(EndOfData::get<MomentArmsFrame>());
+            outputMomentArmsQueue_.at(i)->push(EndOfData::get<MomentArmsFrame>());
     }
 
     void LmtMaFromX::initialiseMomentArmsQueue() {

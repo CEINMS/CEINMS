@@ -44,8 +44,6 @@ using ceinms::Concurrency::Latch;
 #include "ceinms/GeneralisedCoordinatesData.h"
 #include "ceinms/GeneralisedCoordinatesFromStorageFile.h"
 #include "ceinms/ExternalForcesFromStorageFile.h"
-#include "ceinms/InputConnectors.h"
-
 
 int main() {
 
@@ -61,7 +59,7 @@ int main() {
 
     string baseDir("C:/Users/S2849511/coding/versioning/ceinms/src/Tests/JointContactModel/Data/");
     string externalLoadsFilename(baseDir + "ExtForcesSetup.xml");
-    string osimFilename(baseDir + "model.osim");        
+    string osimFilename(baseDir + "model.osim");
     //
     //QueuesToIntersegmentalForces contactForcesEstimator(
     //    inputConnectors.queueGeneralisedCoordinates,
@@ -72,23 +70,22 @@ int main() {
     //    osimFilename,
     //    externalLoadsFilename,
     //    { "ankle_r" });
-    //    
+    //
 
     QueuesToJointReactionForces::MuscleForcesQueue queueMuscleForces;
     QueuesToJointReactionForces::EstimatedTorquesQueue queueTorques;
 
     QueuesToJointReactionForces contactForcesEstimator(inputConnectors.queueGeneralisedCoordinates,
-        inputConnectors.queueExternalForces,
-        queueMuscleForces,
-        queueTorques,
-        outputContactForcesQueue,
-        inputConnectors.doneWithSubscription,
-        subject,
-        osimFilename,
-        externalLoadsFilename,
-        { "ankle_r" });
+    inputConnectors.queueExternalForces,
+    queueMuscleForces,
+    queueTorques,
+    outputContactForcesQueue,
+    inputConnectors.doneWithSubscription,
+    subject,
+    osimFilename,
+    externalLoadsFilename,
+    { "ankle_r" });
 
-    
     OpenSim::Model model(osimFilename);
     model.initSystem();
     OpenSim::ExternalLoads externalLoads(model, externalLoadsFilename);
@@ -97,20 +94,20 @@ int main() {
     //2 create external forces produces
     ExternalForcesFromStorageFile externalForcesFromStorageFile(inputConnectors, osimFilename, externalLoadsFilename);
 
-    //3 create and launch log 
+    //3 create and launch log
     auto logThread(std::async(std::launch::async, [&](){
-        cout << "Logging\n";
-        outputContactForcesQueue.subscribe();
-        inputConnectors.doneWithSubscription.wait();
-        double time(0);
-        bool runCondition(true);
-        while (runCondition) {
-            auto contactForces(outputContactForcesQueue.pop());
-            time = contactForces.time;
-            if (time == inputConnectors.TimePlaceholderForEndOfData) runCondition = false;
-            if (runCondition)
-                cout << contactForces << endl;
-        }
+    cout << "Logging\n";
+    outputContactForcesQueue.subscribe();
+    inputConnectors.doneWithSubscription.wait();
+    double time(0);
+    bool runCondition(true);
+    while (runCondition) {
+    auto contactForces(outputContactForcesQueue.pop());
+    time = contactForces.time;
+    if (time == inputConnectors.TimePlaceholderForEndOfData) runCondition = false;
+    if (runCondition)
+    cout << contactForces << endl;
+    }
     }));
 
     //launch threads
@@ -118,11 +115,9 @@ int main() {
     std::thread generalisedCoordinateThread(std::ref(generalisedCoordinateFromStorageFile));
     std::thread externalForcesThread(std::ref(externalForcesFromStorageFile));
 
-
     contactForcesEstimatorThread.join();
     generalisedCoordinateThread.join();
     externalForcesThread.join();
     logThread.wait();
     */
-
 }

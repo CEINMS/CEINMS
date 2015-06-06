@@ -33,24 +33,22 @@
 #include <string>
 #include "ceinms/concurrency/Queue.h"
 #include "ceinms/concurrency/Latch.h"
-#include "ceinms/queues/ScalarVectorQueue.h"
+#include "ceinms/queues/ExternalTorquesQueue.h"
 
 namespace ceinms {
     class ExternalTorquesFromX
     {
     public:
-        using TorqueFrame = ScalarVectorFrame;
-        using TorqueData = TorqueFrame::type;
         template <typename NMSModelT>
         ExternalTorquesFromX(
-            ScalarVectorQueue& outputExternalTorquesQueue,
+            ExternalTorquesQueue& outputExternalTorquesQueue,
             Concurrency::Latch& doneWithSubscriptions,
             Concurrency::Latch& doneWithExecution,
             const NMSModelT& subject);
 
         virtual ~ExternalTorquesFromX();
         virtual void operator()() = 0;
-        void updateExternalTorques(const TorqueData& currentExternalTorquesData, double currentTime);
+        void updateExternalTorques(const ExternalTorquesData& currentExternalTorquesData, double currentTime);
         void doneWithSubscriptions();
         void doneWithExecution();
         void sendEndOfData();
@@ -58,14 +56,14 @@ namespace ceinms {
     protected:
         std::vector< std::string > dofNames_;
     private:
-        ScalarVectorQueue& outputExternalTorquesQueue_;
+        ExternalTorquesQueue& outputExternalTorquesQueue_;
         Concurrency::Latch& doneWithSubscriptions_;
         Concurrency::Latch& doneWithExecution_;
     };
 
     template <typename NMSModelT>
     ExternalTorquesFromX::ExternalTorquesFromX(
-        ScalarVectorQueue& outputExternalTorquesQueue,
+        ExternalTorquesQueue& outputExternalTorquesQueue,
         Concurrency::Latch& doneWithSubscriptions,
         Concurrency::Latch& doneWithExecution,
         const NMSModelT& subject) :

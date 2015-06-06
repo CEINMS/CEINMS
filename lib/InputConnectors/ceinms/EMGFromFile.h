@@ -45,7 +45,7 @@ namespace ceinms {
     public:
         template <typename NMSModelT>
         EmgFromFile(
-            ScalarVectorQueue& outputEmgQueue,
+            EmgQueue& outputEmgQueue,
             Concurrency::Latch& doneWithSubscriptions,
             Concurrency::Latch& doneWithExecution,
             const NMSModelT& subject,
@@ -60,7 +60,7 @@ namespace ceinms {
 
     template <typename NMSModelT>
     EmgFromFile::EmgFromFile(
-        ScalarVectorQueue& outputEmgQueue,
+        EmgQueue& outputEmgQueue,
         Concurrency::Latch& doneWithSubscriptions,
         Concurrency::Latch& doneWithExecution,
         const NMSModelT& subject,

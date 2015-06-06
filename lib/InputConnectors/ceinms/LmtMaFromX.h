@@ -34,22 +34,18 @@
 #include <memory>
 #include "ceinms/concurrency/Queue.h"
 #include "ceinms/concurrency/Latch.h"
-#include "ceinms/queues/ScalarVectorQueue.h"
+#include "ceinms/queues/LmtQueue.h"
 #include "ceinms/queues/MultipleMomentArmsQueues.h"
 
 namespace ceinms {
     class LmtMaFromX
     {
     public:
-        using LmtData = ScalarVectorFrame::type;
-        using LmtFrame = ScalarVectorFrame;
-        using MomentArmsData = MomentArmsFrame::type;
-
         template <typename NMSModelT>
         LmtMaFromX(
-            ScalarVectorQueue& outputLmtQueue, 
-            MultipleMomentArmsQueues outputMomentArmsQueue,
-            Concurrency::Latch& doneWithSubscriptions, 
+            LmtQueue& outputLmtQueue,
+            MultipleMomentArmsQueues& outputMomentArmsQueue,
+            Concurrency::Latch& doneWithSubscriptions,
             Concurrency::Latch& doneWithExecution,
             const NMSModelT& subject);
         virtual ~LmtMaFromX();
@@ -67,17 +63,16 @@ namespace ceinms {
         std::vector< std::vector< std::string > > muscleNamesOnDofs_;
     private:
         void initialiseMomentArmsQueue();
-        ScalarVectorQueue& outputLmtQueue_;
-        MultipleMomentArmsQueues outputMomentArmsQueue_;
+        LmtQueue& outputLmtQueue_;
+        MultipleMomentArmsQueues& outputMomentArmsQueue_;
         Concurrency::Latch& doneWithSubscriptions_;
         Concurrency::Latch& doneWithExecution_;
     };
 
-
     template <typename NMSModelT>
     LmtMaFromX::LmtMaFromX(
-        ScalarVectorQueue& outputLmtQueue,
-        MultipleMomentArmsQueues outputMomentArmsQueue,
+        LmtQueue& outputLmtQueue,
+        MultipleMomentArmsQueues& outputMomentArmsQueue,
         Concurrency::Latch& doneWithSubscriptions,
         Concurrency::Latch& doneWithExecution,
         const NMSModelT& subject) :
@@ -91,7 +86,6 @@ namespace ceinms {
         subject.getDoFNames(dofNames_);
         subject.getMuscleNamesOnDofs(muscleNamesOnDofs_);
         initialiseMomentArmsQueue();
-
     }
 }
 #endif

@@ -76,7 +76,7 @@ namespace ceinms {
 
             if (emgRunning) {
                 ScalarVectorFrame emgFrameFromQueue = inputEmgQueue_.pop();
-                if (EndOfData::isEod(emgFrameFromQueue)) {
+                if (!EndOfData::isEod(emgFrameFromQueue)) {
                     data_.emgData.pushRow(emgFrameFromQueue.time, emgFrameFromQueue.data);
                 }
                 else

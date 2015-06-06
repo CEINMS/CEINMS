@@ -37,9 +37,9 @@ using std::vector;
 #include "ceinms/EndOfData.h"
 
 namespace ceinms {
-    
+
     shared_ptr<SplineSetBase> makeSplineSet(int degree, const string& inputDataFilename) {
-   
+
         std::function<shared_ptr<SplineSetBase>(const string&)> ftable[] = {
             nullptr,
             nullptr,
@@ -57,8 +57,7 @@ namespace ceinms {
         }
         return ftable[degree](inputDataFilename);
     }
-    
-    
+
     shared_ptr<SplineSetBase> makeSplineSet(int degree,
         const vector<string > dofNames,
         const vector<string > musclesNames,
@@ -67,14 +66,14 @@ namespace ceinms {
         const vector<int>& n,
         const vector<vector<double>>& y) {
 
-        std::function<shared_ptr<SplineSetBase>(
+        std::function < shared_ptr<SplineSetBase>(
             const vector<string >,
             const vector<string >,
             const vector<double>&,
             const vector<double>&,
             const vector<int>&,
-            const vector<vector<double> >&)> ftable[] = {
-            
+            const vector<vector<double> >&) > ftable[] = {
+
             nullptr,
             nullptr,
             &wrapAlias<2>,
@@ -91,16 +90,15 @@ namespace ceinms {
         }
         return ftable[degree](dofNames, musclesNames, a, b, n, y);
     }
-    
 
     shared_ptr<SplineSetBase> makeSplineSet(
         int degree,
         const string& coeffDir,
         const vector<string>& muscleNames) {
 
-        std::function<shared_ptr<SplineSetBase>(
-            const string&, 
-            const vector<string>&)> ftable[] = {
+        std::function < shared_ptr<SplineSetBase>(
+            const string&,
+            const vector<string>&) > ftable[] = {
             nullptr,
             nullptr,
             &wrap<2, const string&, const vector<string>&>,
@@ -117,8 +115,7 @@ namespace ceinms {
         }
         return ftable[degree](coeffDir, muscleNames);
     }
-    
- 
+
     void LmtMaFromMcbs::operator()() {
 
         inputCoordinateQueue_.subscribe();
@@ -129,7 +126,7 @@ namespace ceinms {
         do {
             GeneralisedCoordinatesFrame coordinates(inputCoordinateQueue_.pop());
             double currentTime(coordinates.time);
-            if (EndOfData::isEod(coordinates)) {
+            if (!EndOfData::isEod(coordinates)) {
                 LmtData lmts;
                 vector<double> dofsValues(dofMapper_.map(coordinates.data.getQ()));
 
@@ -147,11 +144,7 @@ namespace ceinms {
                 LmtMaFromX::sendLmtEndOfData();
                 LmtMaFromX::sendMaEndOfData();
             }
-
         } while (runCondition);
         LmtMaFromX::doneWithExecution();
-
     }
-
-
 }

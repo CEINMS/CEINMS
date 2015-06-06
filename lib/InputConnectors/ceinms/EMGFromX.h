@@ -34,15 +34,14 @@
 
 #include "ceinms/concurrency/Latch.h"
 #include "ceinms/concurrency/Queue.h"
-#include "ceinms/queues/ScalarVectorQueue.h"
+#include "ceinms/queues/EmgQueue.h"
 
 namespace ceinms {
     class EmgFromX
     {
     public:
-        using EmgData = ScalarVectorFrame::type;
         template <typename NMSModelT>
-        EmgFromX(ScalarVectorQueue& outputEmgQueue, Concurrency::Latch& doneWithSubscriptions, Concurrency::Latch& doneWithExecution, const NMSModelT& subject);
+        EmgFromX(EmgQueue& outputEmgQueue, Concurrency::Latch& doneWithSubscriptions, Concurrency::Latch& doneWithExecution, const NMSModelT& subject);
         virtual ~EmgFromX();
         virtual void operator()() {};
         void updateEmg(const EmgData& currentEmgData, double currentTime);
@@ -52,15 +51,13 @@ namespace ceinms {
     protected:
         std::vector< std::string > musclesNames_;
     private:
-        ScalarVectorQueue& outputEmgQueue_;
+        EmgQueue& outputEmgQueue_;
         Concurrency::Latch& doneWithSubscriptions_;
         Concurrency::Latch& doneWithExecution_;
-
     };
 
-
     template <typename NMSModelT>
-    EmgFromX::EmgFromX(ScalarVectorQueue& outputEmgQueue, Concurrency::Latch& doneWithSubscriptions, Concurrency::Latch& doneWithExecution, const NMSModelT& subject) :
+    EmgFromX::EmgFromX(EmgQueue& outputEmgQueue, Concurrency::Latch& doneWithSubscriptions, Concurrency::Latch& doneWithExecution, const NMSModelT& subject) :
         outputEmgQueue_(outputEmgQueue),
         doneWithSubscriptions_(doneWithSubscriptions),
         doneWithExecution_(doneWithExecution)

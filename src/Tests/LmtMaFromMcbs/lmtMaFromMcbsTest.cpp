@@ -40,30 +40,29 @@ using std::endl;
 #include "boost/filesystem.hpp"
 using boost::filesystem::path;
 #include "ceinms/LmtMaFromMcbs.h"
-#include "ceinms/concurrency/Latch.h"
-#include "ceinms/concurrency/Queue.h"
 #include "ceinms/NMSmodel.h"
 #include "ceinms/Activation/ExponentialActivation.h"
 #include "ceinms/Tendon/ElasticTendon_BiSec.h"
 #include "ceinms/Curve.h"
-#include "ceinms/InputConnectors.h"
 #include "ceinms/GeneralisedCoordinatesFromStorageFile.h"
 #include "ceinms/QueueToStorageFile.h"
+#include "ceinms/concurrency/Queue.h"
+#include "ceinms/concurrency/Latch.h"
+#include "ceinms/queues/LmtQueue.h"
+#include "ceinms/queues/MultipleMomentArmsQueues.h"
+#include "ceinms/queues/GeneralisedCoordinatesQueue.h"
 using namespace ceinms;
 #include <OpenSim/OpenSim.h>
 using namespace OpenSim;
-
-
 
 double calculateRMSE(Array<double> arr1, Array<double> arr2) {
 
     double sum(0);
     size_t sizeArr(std::min(arr1.size(), arr2.size()));
-    for (unsigned i(0); i < sizeArr; ++i) 
+    for (unsigned i(0); i < sizeArr; ++i)
         sum += (arr1[i] - arr2[i])*(arr1[i] - arr2[i]);
     return std::sqrt(sum / static_cast<double>(sizeArr));
 }
-
 
 void printTable(vector<string> names, vector<double> errors) {
 
@@ -98,7 +97,6 @@ void compareSto(const string& f1, const string& f2) {
 
     cout << "Comparing " << f1 << " and " << f2 << endl;
     printTable(names, errors);
-
 }
 
 int main(){
@@ -112,53 +110,71 @@ int main(){
     boost::filesystem::create_directories(outputDir);
     string maDir((testDataDir / "MotionData" / "MuscleAnalysis").string());
 
+    GeneralisedCoordinatesQueue generalisedCoordinatesQueue;
+    LmtQueue lmtQueue;
+    MultipleMomentArmsQueues momentArmsQueue;
+
+    ceinms::Concurrency::Latch doneWithSubscriptions;
+    ceinms::Concurrency::Latch doneWithExecution;
+
     NMSmodel<ExponentialActivation, ElasticTendon_BiSec, CurveMode::Offline> subject;
     setupSubject(subject, subjectFilename);
-    InputConnectors inputConnectors;
-    inputConnectors.doneWithSubscription.setCount(7);
-    ceinms::Concurrency::Latch doneWithExecution(6);
+    doneWithSubscriptions.setCount(7);
+    doneWithExecution.setCount(7);
 
-    GeneralisedCoordinatesFromStorageFile generalisedCoordinatesFromStorage(inputConnectors, osimModelFilename, ikFilename, subject.getDoFNames());
-    LmtMaFromMcbs lmtMaFromMcbs(inputConnectors, inputConnectors.queueGeneralisedCoordinates, inputConnectors.doneWithSubscription, doneWithExecution, subject, splineCoeffDir);
-    QueueToStorageFile<vector<double>> lmtLogger(inputConnectors.queueLmt, inputConnectors.doneWithSubscription, doneWithExecution, subject.getMuscleNames(), "_Mcbs_Length", outputDir);
-    
+    GeneralisedCoordinatesFromStorageFile generalisedCoordinatesFromStorage(
+        generalisedCoordinatesQueue,
+        doneWithSubscriptions,
+        doneWithExecution,
+        osimModelFilename,
+        ikFilename,
+        subject.getDoFNames());
+    LmtMaFromMcbs lmtMaFromMcbs(generalisedCoordinatesQueue,
+        lmtQueue,
+        momentArmsQueue,
+        doneWithSubscriptions,
+        doneWithExecution,
+        subject,
+        splineCoeffDir);
+
+    QueueToStorageFile<LmtData> lmtLogger(lmtQueue, doneWithSubscriptions, doneWithExecution, subject.getMuscleNames(), "_Mcbs_Length", outputDir);
+
     std::map<string, vector<string>> musclesOnDof;
     subject.getMuscleNamesOnDofs(musclesOnDof);
     using QueueToSto = QueueToStorageFile < vector<double> > ;
     vector< std::unique_ptr< QueueToSto>> queueToSto;
     auto dofNames(subject.getDoFNames());
-    for (auto dofIt(dofNames.cbegin()); dofIt != dofNames.cend(); ++ dofIt) {
+    for (auto dofIt(dofNames.cbegin()); dofIt != dofNames.cend(); ++dofIt) {
         size_t dofIdx(std::distance(dofNames.cbegin(), dofIt));
         queueToSto.emplace_back(new QueueToSto(
-            *inputConnectors.queueMomentArms.at(dofIdx), 
-            inputConnectors.doneWithSubscription, 
-            doneWithExecution, 
-            musclesOnDof[*dofIt], 
+            *momentArmsQueue.at(dofIdx),
+            doneWithSubscriptions,
+            doneWithExecution,
+            musclesOnDof[*dofIt],
             "_Mcbs_MomentArm_" + *dofIt, outputDir));
     }
-    
+
     std::thread ikReaderThr(std::ref(generalisedCoordinatesFromStorage));
     std::thread lmtMaFromMcbsThr(std::ref(lmtMaFromMcbs));
     std::thread lmtLoggerThr(std::ref(lmtLogger));
 
     vector<std::unique_ptr<std::thread>> maLoggersThrs;
-    for (auto it(queueToSto.begin()); it != queueToSto.end(); ++ it) {
+    for (auto it(queueToSto.begin()); it != queueToSto.end(); ++it) {
         maLoggersThrs.emplace_back(new std::thread(std::ref(**it)));
     }
-    
+
     ikReaderThr.join();
     lmtMaFromMcbsThr.join();
     lmtLoggerThr.join();
     for (auto& it : maLoggersThrs)
         it->join();
-        
+
     //now compare results with muscle analysis data
-    
-    
+
     compareSto(outputDir + "/_Mcbs_Length.sto", maDir + "/_MuscleAnalysis_Length.sto");
     for (auto& dof : dofNames)
         compareSto(
-        outputDir + "/_Mcbs_MomentArm_" + dof + ".sto", 
+        outputDir + "/_Mcbs_MomentArm_" + dof + ".sto",
         maDir + "/_MuscleAnalysis_MomentArm_" + dof + ".sto");
 
     return 0;

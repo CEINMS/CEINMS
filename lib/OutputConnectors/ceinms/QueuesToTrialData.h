@@ -35,7 +35,9 @@
 #include "ceinms/TrialData.h"
 #include "ceinms/concurrency/Queue.h"
 #include "ceinms/concurrency/Latch.h"
-#include "ceinms/queues/ScalarVectorQueue.h"
+#include "ceinms/queues/EmgQueue.h"
+#include "ceinms/queues/LmtQueue.h"
+#include "ceinms/queues/ExternalTorquesQueue.h"
 #include "ceinms/queues/MultipleMomentArmsQueues.h"
 
 namespace ceinms {
@@ -47,9 +49,9 @@ namespace ceinms {
 
         template<typename NMSmodel>
         QueuesToTrialData(
-            ScalarVectorQueue& inputEmgQueue,
-            ScalarVectorQueue& inputLmtQueue,
-            ScalarVectorQueue& inputExternalTorqueQueue,
+            EmgQueue& inputEmgQueue,
+            LmtQueue& inputLmtQueue,
+            ExternalTorquesQueue& inputExternalTorqueQueue,
             MultipleMomentArmsQueues& inputMomentArmsQueues,
             Concurrency::Latch& doneWithSubscriptions,
             Concurrency::Latch& doneWithExecution,
@@ -83,9 +85,9 @@ namespace ceinms {
 
     private:
         TrialData data_;
-        ScalarVectorQueue& inputEmgQueue_;
-        ScalarVectorQueue& inputLmtQueue_;
-        ScalarVectorQueue& inputExternalTorqueQueue_;
+        EmgQueue& inputEmgQueue_;
+        LmtQueue& inputLmtQueue_;
+        ExternalTorquesQueue& inputExternalTorqueQueue_;
         MultipleMomentArmsQueues& inputMomentArmsQueues_;
         Concurrency::Latch& doneWithSubscriptions_;
         Concurrency::Latch& doneWithExecution_;

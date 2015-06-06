@@ -36,7 +36,7 @@
 #include "ceinms/queues/EmgQueue.h"
 #include "ceinms/queues/LmtQueue.h"
 #include "ceinms/queues/MultipleMomentArmsQueues.h"
-#include "ceinms/queues/ExternalTorquesQueues.h"
+#include "ceinms/queues/ExternalTorquesQueue.h"
 #include "ceinms/queues/LogQueue.h"
 
 namespace ceinms {

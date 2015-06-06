@@ -33,7 +33,7 @@
 #include "ceinms/concurrency/Queue.h"
 #include "ceinms/ContactModelKneeBalanceSetup.h"
 #include "ceinms/queues/EstimatedTorquesQueue.h"
-#include "ceinms/queues/ExternalTorquesQueues.h"
+#include "ceinms/queues/ExternalTorquesQueue.h"
 #include "ceinms/queues/ScalarContactForcesQueue.h"
 #include "ceinms/Mapper.h"
 #include "ceinms/ContactModelKneeBalance.h"

@@ -38,9 +38,9 @@ using std::vector;
 #include <cstdlib>
 
 namespace ceinms {
-    void ExternalTorquesFromX::updateExternalTorques(const TorqueData& currentExternalTorquesData, double currentTime)
+    void ExternalTorquesFromX::updateExternalTorques(const ExternalTorquesData& currentExternalTorquesData, double currentTime)
     {
-        TorqueFrame externalTorquesFrameToPush;
+        ExternalTorquesFrame externalTorquesFrameToPush;
         externalTorquesFrameToPush.data = currentExternalTorquesData;
         externalTorquesFrameToPush.time = currentTime;
         outputExternalTorquesQueue_.push(externalTorquesFrameToPush);
@@ -58,7 +58,7 @@ namespace ceinms {
 
     void ExternalTorquesFromX::sendEndOfData() {
 
-        outputExternalTorquesQueue_.push(EndOfData::get<TorqueFrame>());
+        outputExternalTorquesQueue_.push(EndOfData::get<ExternalTorquesFrame>());
     }
 
     ExternalTorquesFromX::~ExternalTorquesFromX() { }

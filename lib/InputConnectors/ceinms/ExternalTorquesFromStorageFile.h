@@ -42,10 +42,10 @@ namespace ceinms {
     public:
         template <typename NMSModelT>
         ExternalTorquesFromStorageFile(
-            ScalarVectorQueue& outputExternalTorques,
+            ExternalTorquesQueue& outputExternalTorques,
             Concurrency::Latch& doneWithSubscriptions,
             Concurrency::Latch& doneWithExecution,
-            const NMSModelT& subject, 
+            const NMSModelT& subject,
             const std::string& dataDirectory);
         void operator()();
         ~ExternalTorquesFromStorageFile();
@@ -57,15 +57,14 @@ namespace ceinms {
         bool externalTorquesAvailable_;
     };
 
-
     template <typename NMSModelT>
     ExternalTorquesFromStorageFile::ExternalTorquesFromStorageFile(
-        ScalarVectorQueue& outputExternalTorques,
+        ExternalTorquesQueue& outputExternalTorques,
         Concurrency::Latch& doneWithSubscriptions,
         Concurrency::Latch& doneWithExecution,
         const NMSModelT& subject,
         const std::string& externalTorqueFilename)
-        :ExternalTorquesFromX(outputExternalTorques, doneWithSubscriptions, doneWithExecution, subject), 
+        :ExternalTorquesFromX(outputExternalTorques, doneWithSubscriptions, doneWithExecution, subject),
         externalTorquesDataFromFile_(nullptr),
         externalTorquesAvailable_(false)
     {
@@ -92,7 +91,6 @@ namespace ceinms {
                 torqueNamesToFind.push_back(it + "_moment");
 
             dofPosInStorage_ = findMapping(torqueNamesToFind, columnNamesInStorageFile);
-
         }
     }
 }

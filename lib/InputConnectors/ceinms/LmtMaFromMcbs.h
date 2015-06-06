@@ -38,6 +38,8 @@
 #include "ceinms/LmtMaFromX.h"
 #include "ceinms/concurrency/Queue.h"
 #include "ceinms/queues/GeneralisedCoordinatesQueue.h"
+#include "ceinms/queues/LmtQueue.h"
+#include "ceinms/queues/MultipleMomentArmsQueues.h"
 #include "ceinms/concurrency/Latch.h"
 #include <map>
 #include "ceinms/Mapper.h"
@@ -132,14 +134,12 @@ namespace ceinms {
         const std::vector<std::vector<double> >& y);
     std::shared_ptr<SplineSetBase> makeSplineSet(int degree, const std::string& coeffDir, const std::vector<std::string>& muscleNames);
 
-   
     template<int N>
     std::shared_ptr<SplineSetAdapter<N>> SplineSetAdapter<N>::make(const string& inputDataFilename) {
 
         return shared_ptr<SplineSetAdapter<N>>(new SplineSetAdapter<N>(inputDataFilename));
     }
-    
-    
+
     template<int N>
     std::shared_ptr<SplineSetAdapter<N>> SplineSetAdapter<N>::make(
         const std::vector< std::string > dofNames,
@@ -152,14 +152,12 @@ namespace ceinms {
         return shared_ptr<SplineSetAdapter<N>>(new SplineSetAdapter<N>(dofNames, musclesNames, a, b, n, y));
     }
 
-
     template<int N>
     std::shared_ptr<SplineSetAdapter<N>> SplineSetAdapter<N>::make(const std::string& coeffDir, const std::vector<std::string>& muscleNames) {
 
         return shared_ptr<SplineSetAdapter<N>>(new SplineSetAdapter<N>(coeffDir, muscleNames));
     }
-    
-    
+
     template<int N>
     SplineSetAdapter<N>::SplineSetAdapter(const std::string& inputDataFilename) :
         splineSet_(inputDataFilename)
@@ -175,18 +173,14 @@ namespace ceinms {
         const std::vector<std::vector<double> >& y) :
         splineSet_(dofNames, musclesNames, a, b, n, y) {}
 
-
-
     template<int N>
     SplineSetAdapter<N>::SplineSetAdapter(const std::string& coeffDir, const std::vector<std::string>& muscleNames) :
         splineSet_(coeffDir, muscleNames) {}
-
 
     template<int N, typename... Args>
     auto wrap(Args... args) -> decltype(SplineSetAdapter<N>::make(args...)){
         return SplineSetAdapter<N>::make(args...);
     }
-
 
     //we use this because the second constructor has plenty of arguments
     template<int N>
@@ -207,7 +201,6 @@ namespace ceinms {
             const std::vector<std::vector<double> >& > (dofNames, musclesNames, a, b, n, y);
     }
 
-
     class LmtMaFromMcbs : public LmtMaFromX {
     public:
 
@@ -215,11 +208,11 @@ namespace ceinms {
         template <typename NMSModelT>
         LmtMaFromMcbs(
             GeneralisedCoordinatesQueue& inputCoordinateQueue,
-            ScalarVectorQueue& outputLmtQueue,
-            MultipleMomentArmsQueues outputMomentArmsQueue,
+            LmtQueue& outputLmtQueue,
+            MultipleMomentArmsQueues& outputMomentArmsQueue,
             Concurrency::Latch& doneWithSubscriptions,
             Concurrency::Latch& doneWithExecution,
-            const NMSModelT& subject, 
+            const NMSModelT& subject,
             const string& coeffDir);
         void operator()() override;
 
@@ -234,16 +227,14 @@ namespace ceinms {
     LmtMaFromMcbs::LmtMaFromMcbs(
         GeneralisedCoordinatesQueue& inputCoordinateQueue,
         ScalarVectorQueue& outputLmtQueue,
-        MultipleMomentArmsQueues outputMomentArmsQueue,
+        MultipleMomentArmsQueues& outputMomentArmsQueue,
         Concurrency::Latch& doneWithSubscriptions,
         Concurrency::Latch& doneWithExecution,
         const NMSModelT& subject,
         const string& coeffDir) :
         LmtMaFromX(outputLmtQueue, outputMomentArmsQueue, doneWithSubscriptions, doneWithExecution, subject),
-        splineSet_(makeSplineSet(dofNames_.size(), coeffDir, musclesNames_)), 
-        inputCoordinateQueue_(inputCoordinateQueue),
-        doneWithSubscriptions_(doneWithSubscriptions), doneWithExecution_(doneWithExecution) {
-
+        splineSet_(makeSplineSet(dofNames_.size(), coeffDir, musclesNames_)),
+        inputCoordinateQueue_(inputCoordinateQueue) {
 
         subject.getMuscleNamesOnDofs(muscleNamesOnDofsMap_);
 
@@ -254,13 +245,10 @@ namespace ceinms {
         cout << endl;
 
         dofMapper_.setNames(dofNames_, dofNamesFromSpline);
-        
-// inputCoordinateQueue_should receive data already formatted correctly because 
-// this object doesn't know opensim
-        
+
+        // inputCoordinateQueue_should receive data already formatted correctly because
+        // this object doesn't know opensim
     }
-
 }
-
 
 #endif

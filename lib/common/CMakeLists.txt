@@ -19,7 +19,7 @@ set(Common_HEADERS  ceinms/ArrayConverter.h
 					ceinms/queues/ScalarContactForcesQueue.h                    
 					ceinms/queues/EstimatedTorquesQueue.h
                     ceinms/queues/MultipleExternalForcesQueue.h
-                    ceinms/queues/ExternalTorquesQueues.h
+                    ceinms/queues/ExternalTorquesQueue.h
                     ceinms/queues/GeneralisedCoordinatesQueue.h
                     ceinms/queues/MuscleForcesQueue.h
 					ceinms/queues/SingleExternalForceQueue.h

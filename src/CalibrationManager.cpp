@@ -55,11 +55,15 @@ using std::vector;
 #include "ceinms/EMGFromFile.h"
 #include "ceinms/ExternalTorquesFromStorageFile.h"
 #include "ceinms/LmtMaFromStorageFile.h"
-
 #include "ceinms/ObjectiveFunctionSetup.h"
+
+#include "ceinms/concurrency/Queue.h"
+#include "ceinms/concurrency/Latch.h"
+#include "ceinms/queues/EmgQueue.h"
+#include "ceinms/queues/LmtQueue.h"
+#include "ceinms/queues/ExternalTorquesQueue.h"
+#include "ceinms/queues/MultipleMomentArmsQueues.h"
 #include "ceinms/QueuesToTrialData.h"
-#include "ceinms/InputConnectors.h"
-#include "ceinms/OutputConnectors.h"
 
 #include "XmlWriter.h"
 #include "ceinms/FileUtils.h"
@@ -216,25 +220,30 @@ namespace ceinms {
 
         InputDataXmlReader dataLocations(inputDataFilename);
 
-        std::unique_ptr<InputConnectors> inputConnectors(new InputConnectors);
-        std::unique_ptr<OutputConnectors> outputConnectors(new OutputConnectors);
+        EmgQueue emgQueue;
+        LmtQueue lmtQueue;
+        ExternalTorquesQueue externalTorqueQueue;
+        MultipleMomentArmsQueues momentArmsQueues;
+
+        Concurrency::Latch doneWithSubscription;
+        Concurrency::Latch doneWithExecution;
 
         string emgFilename(dataLocations.getExcitationsFile());
-        EMGFromFile emgProducer(*inputConnectors, mySubject, emgFilename, emgGeneratorFile);
+        EmgFromFile emgProducer(emgQueue, doneWithSubscription, doneWithExecution, mySubject, emgFilename, emgGeneratorFile);
 
         vector< string > dofNames;
         mySubject.getDoFNames(dofNames);
         vector< string > maFilename;
         sortMaFilenames(dataLocations.getMaFiles(), dofNames, maFilename);
-        LmtMaFromStorageFile lmtMaProducer(*inputConnectors, mySubject, dataLocations.getLmtFile(), maFilename);
+        LmtMaFromStorageFile lmtMaProducer(lmtQueue, momentArmsQueues, doneWithSubscription, doneWithExecution, mySubject, dataLocations.getLmtFile(), maFilename);
 
         string externalTorqueFilename(dataLocations.getExternalTorqueFile());
-        ExternalTorquesFromStorageFile externalTorquesProducer(*inputConnectors, mySubject, externalTorqueFilename);
+        ExternalTorquesFromStorageFile externalTorquesProducer(externalTorqueQueue, doneWithSubscription, doneWithExecution, mySubject, externalTorqueFilename);
 
-        QueuesToTrialData queuesToTrialData(*inputConnectors, *outputConnectors, mySubject, trialId);
+        QueuesToTrialData queuesToTrialData(emgQueue, lmtQueue, externalTorqueQueue, momentArmsQueues, doneWithSubscription, doneWithExecution, mySubject, trialId);
 
-        inputConnectors->doneWithSubscription.setCount(4);
-        outputConnectors->doneWithExecution.setCount(1);
+        doneWithSubscription.setCount(4);
+        doneWithExecution.setCount(4);
 
         // 4. start the threads
         std::thread emgProdThread(std::ref(emgProducer));
