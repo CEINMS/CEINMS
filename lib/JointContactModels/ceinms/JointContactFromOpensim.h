@@ -37,7 +37,6 @@
 #include <OpenSim/Simulation/InverseDynamicsSolver.h>
 #include "ceinms/ExternalForceData.h"
 
-
 namespace ceinms {
 
     class JointContactFromOpensim {
@@ -52,12 +51,14 @@ namespace ceinms {
         template<typename T>
         void setQdd(const T& qdd);
         void setTime(double time);
-        
+
+        void calculateInverseDynamics();
         void calculateIntersegmentalForces();
         void calculateIntersegmentalForcesUsingExternalMobilityForces(const SimTK::Vector& realMobilityForces);
         void calculateJointReactionForces(const SimTK::Vector& muscleForces, const SimTK::Vector& estimatedMobilityForces);
         void calculateJointReactionForcesUsingExternalMobilityForces(const SimTK::Vector& muscleForces, const SimTK::Vector& estimatedMobilityForces, const SimTK::Vector& realMobilityForces);
-       
+
+        void getResidualMobilityForces(SimTK::Vector& residualMobilityForces) const;
         void getJointReactionForceInG(const std::string& jointName, SimTK::Vec3& forceOnChildInG) const;
         void getJointReactionForceInChild(const std::string& jointName, SimTK::Vec3& forceOnChildInChild) const;
         void getIntersegmentalForceInG(const std::string& jointName, SimTK::Vec3& forceOnChildInG) const;
@@ -70,10 +71,9 @@ namespace ceinms {
 
         std::string getJointNameOnDof(const std::string& dofName);
         void getAllReactionForces(SimTK::Vector_<SimTK::Vec3>& reactionForces, SimTK::Vector_<SimTK::Vec3>& reactionTorques) const;
-        SimTK::Vector getMobilityForces() const {   return residualMobilityForces_; }
+        SimTK::Vector getMobilityForces() const { return residualMobilityForces_; }
 
     private:
-        void calculateInverseDynamics();
         void disableMuscleActuators();
         void enableMuscleActuators();
         void calculateReactions();
@@ -116,7 +116,6 @@ namespace ceinms {
             qdd_[i] = qdd[i];
         }
     }
-
 }
 
 #endif

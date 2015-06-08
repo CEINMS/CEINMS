@@ -38,10 +38,10 @@ using std::endl;
 #include "ceinms/ArrayConverter.h"
 
 namespace ceinms {
- 
+
     JointContactFromOpensim::JointContactFromOpensim(const std::string& modelFilename, std::vector<OpenSim::Force*> externalForces) :
         model_(modelFilename)
-        {
+    {
 
         OpenSim::Model modelCopy(modelFilename);
         modelCopy.initSystem();
@@ -58,10 +58,9 @@ namespace ceinms {
             model_.addForce(force);
         }
 
-
         OpenSim::Array<string> muscleNames;
         model_.getMuscles().getNames(muscleNames);
-        for (unsigned i(0); i < nMuscles_; ++i) 
+        for (unsigned i(0); i < nMuscles_; ++i)
             muscleActuators_.push_back((const_cast<OpenSim::Muscle*>(&model_.updForceSet().getMuscles().get(muscleNames.get(i)))));
 
         const OpenSim::CoordinateSet& cs = model_.getCoordinateSet();
@@ -76,29 +75,32 @@ namespace ceinms {
             model_.addForce(actuator);
             coordinateActuators_.push_back(dynamic_cast<OpenSim::CoordinateActuator*>(&(model_.updForceSet().get(actuatorName))));
         }
-       
+
         idSolver_.reset(new OpenSim::InverseDynamicsSolver(model_));
 
         state_ = model_.initSystem();
         for (auto c : coordinateActuators_)
             c->overrideForce(state_, true);
-        for (auto m : muscleActuators_) 
-            m->overrideForce(state_, true);        
+        for (auto m : muscleActuators_)
+            m->overrideForce(state_, true);
     }
 
+    void JointContactFromOpensim::setTime(double time) {
 
-    void JointContactFromOpensim::setTime(double time) { 
-    
-        state_.updTime() = time; 
+        state_.updTime() = time;
+    }
+
+    void JointContactFromOpensim::getResidualMobilityForces(SimTK::Vector& residualMobilityForces) const {
+
+        residualMobilityForces = residualMobilityForces_;
     }
 
     void JointContactFromOpensim::getMuscleNamesFromOsimModel(vector<string>& names) const {
 
         OpenSim::Array<string> namesOsim;
         model_.getMuscles().getNames(namesOsim);
-        ArrayConverter::toStdVector(namesOsim, names);     
+        ArrayConverter::toStdVector(namesOsim, names);
     }
-
 
     void JointContactFromOpensim::getCoordinateNamesFromOsimModel(vector<string>& names) const {
 
@@ -107,14 +109,12 @@ namespace ceinms {
         ArrayConverter::toStdVector(namesOsim, names);
     }
 
-
     void JointContactFromOpensim::getBodyNamesFromOsimModel(vector<string>& names) const {
 
         OpenSim::Array<string> namesOsim;
         model_.getBodySet().getNames(namesOsim);
         ArrayConverter::toStdVector(namesOsim, names);
     }
-
 
     void JointContactFromOpensim::getJointNamesFromOsimModel(vector<string>& names) const {
 
@@ -123,50 +123,43 @@ namespace ceinms {
         ArrayConverter::toStdVector(namesOsim, names);
     }
 
-
     void JointContactFromOpensim::getJointReactionForceInG(const string& jointName, SimTK::Vec3& forceOnChildInG) const {
-    
+
         getReactionForceInG(jrForcesInG_, jointName, forceOnChildInG);
     }
 
-
     void JointContactFromOpensim::getJointReactionForceInChild(const string& jointName, SimTK::Vec3& forceOnChildInChild) const {
-    
+
         getReactionForceInChild(jrForcesInG_, jointName, forceOnChildInChild);
     }
 
-
     void JointContactFromOpensim::getIntersegmentalForceInG(const string& jointName, SimTK::Vec3& forceOnChildInG) const {
-    
+
         getReactionForceInG(intForcesInG_, jointName, forceOnChildInG);
     }
 
-
     void JointContactFromOpensim::getIntersegmentalForceInChild(const string& jointName, SimTK::Vec3& forceOnChildInChild) const {
-    
+
         getReactionForceInChild(intForcesInG_, jointName, forceOnChildInChild);
     }
-
 
     void JointContactFromOpensim::getReactionForceInChild(const SimTK::Vector_<SimTK::Vec3>& rForcesInG, const std::string& jointName, SimTK::Vec3& forceOnChildInChild) const {
 
         const OpenSim::Joint& joint(model_.getJointSet().get(jointName));
         unsigned idx(model_.getJointSet().getIndex(joint.getName()));
         model_.getSimbodyEngine().transform(state_,
-                                            model_.getGroundBody(),
-                                            rForcesInG.get(idx),
-                                            joint.getBody(),
-                                            forceOnChildInChild);
+            model_.getGroundBody(),
+            rForcesInG.get(idx),
+            joint.getBody(),
+            forceOnChildInChild);
     }
-
 
     void JointContactFromOpensim::getReactionForceInG(const SimTK::Vector_<SimTK::Vec3>& rForcesInG, const std::string& jointName, SimTK::Vec3& forceOnChildInG)  const {
 
-       const OpenSim::Joint& joint(model_.getJointSet().get(jointName));
-       unsigned idx(model_.getJointSet().getIndex(joint.getName()));
-       forceOnChildInG = rForcesInG.get(idx);
+        const OpenSim::Joint& joint(model_.getJointSet().get(jointName));
+        unsigned idx(model_.getJointSet().getIndex(joint.getName()));
+        forceOnChildInG = rForcesInG.get(idx);
     }
-
 
     string JointContactFromOpensim::getJointNameOnDof(const string& dofName) {
 
@@ -175,18 +168,15 @@ namespace ceinms {
             std::exit(EXIT_FAILURE);
         }
         return model_.getCoordinateSet().get(dofName).getJoint().getName();
-
     }
 
-
     void JointContactFromOpensim::calculateIntersegmentalForces() {
-    
+
         calculateInverseDynamics();
         disableMuscleActuators();
         calculateReactions();
         intForcesInG_ = rForcesInG_;
     }
-
 
     void JointContactFromOpensim::calculateIntersegmentalForcesUsingExternalMobilityForces(const SimTK::Vector& realMobilityForces) {
 
@@ -195,7 +185,6 @@ namespace ceinms {
         calculateReactions();
         intForcesInG_ = rForcesInG_;
     }
-
 
     void JointContactFromOpensim::calculateJointReactionForces(const SimTK::Vector& muscleForces, const SimTK::Vector& estimatedMobilityForces) {
 
@@ -206,7 +195,6 @@ namespace ceinms {
         jrForcesInG_ = rForcesInG_;
     }
 
-
     void JointContactFromOpensim::calculateJointReactionForcesUsingExternalMobilityForces(const SimTK::Vector& muscleForces, const SimTK::Vector& estimatedMobilityForces, const SimTK::Vector& realMobilityForces) {
 
         enableMuscleActuators();
@@ -215,7 +203,6 @@ namespace ceinms {
         jrForcesInG_ = rForcesInG_;
     }
 
-
     void JointContactFromOpensim::calculateInverseDynamics() {
         //this updates residualMobilityForces_
         disableMuscleActuators();
@@ -223,13 +210,11 @@ namespace ceinms {
         calculateResidualMobilityForces(appliedMobilityForces);
     }
 
-
     void JointContactFromOpensim::disableMuscleActuators() {
 
         for (auto m : muscleActuators_)
             m->setDisabled(state_, true);
     }
-
 
     void JointContactFromOpensim::enableMuscleActuators() {
 
@@ -237,19 +222,16 @@ namespace ceinms {
             m->setDisabled(state_, false);
     }
 
-    
     void JointContactFromOpensim::setMuscleForcesToActuators(const SimTK::Vector& muscleForces) {
 
-        for (size_t i(0); i < muscleActuators_.size(); ++i) 
+        for (size_t i(0); i < muscleActuators_.size(); ++i)
             muscleActuators_.at(i)->setOverrideForce(state_, muscleForces[i]);
     }
-
 
     void JointContactFromOpensim::calculateReactions() {
 
         calculateReactions(residualMobilityForces_);
     }
-
 
     void JointContactFromOpensim::calculateReactions(const SimTK::Vector& residualMobilityForces) {
 
@@ -259,8 +241,6 @@ namespace ceinms {
         model_.getSimbodyEngine().computeReactions(state_, rForcesInG_, rTorquesInG_);
     }
 
-
-
     //if appliedMobilityForces is 0 then it is the ID
     void JointContactFromOpensim::calculateResidualMobilityForces(const SimTK::Vector& appliedMobilityForces) {
 
@@ -269,7 +249,6 @@ namespace ceinms {
         SimTK::Vector_<SimTK::SpatialVec> appliedBodyForces(model_.getMultibodySystem().getRigidBodyForces(state_, SimTK::Stage::Dynamics));
         residualMobilityForces_ = idSolver_->solve(state_, qdd_, appliedMobilityForces, appliedBodyForces);
     }
-
 
     void JointContactFromOpensim::getAllReactionForces(SimTK::Vector_<SimTK::Vec3>& reactionForces, SimTK::Vector_<SimTK::Vec3>& reactionTorques) const {
         reactionForces = rForcesInG_;
