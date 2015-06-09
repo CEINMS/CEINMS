@@ -42,7 +42,7 @@
 #include "ceinms/queues/MultipleExternalForcesQueue.h"
 #include "ceinms/queues/SingleExternalForceQueue.h"
 #include "ceinms/Mapper.h"
-
+#include "ceinms/ExternalForceDataSetup.h"
 
 namespace OpenSim {
 
@@ -51,6 +51,9 @@ namespace OpenSim {
         ExternalForceFromQueue() = delete;
         ExternalForceFromQueue(
             std::shared_ptr<ceinms::SingleExternalForceQueue> externalForceQueue,
+            const std::string& forceIdentifier,
+            const std::string& pointIdentifier,
+            const std::string& torqueIdentifier,
             const std::string& appliedToBodyName,
             const std::string& forceExpressedInBodyName,
             const std::string& pointExpressedInBodyName);
@@ -76,8 +79,6 @@ namespace OpenSim {
     };
 }
 
-
-
 namespace ceinms {
 
     class QueuesToXForces {
@@ -85,37 +86,51 @@ namespace ceinms {
 
         template<typename NMSmodelT>
         QueuesToXForces(
-            MultipleExternalForcesQueue& inputExternalForcesQueue, 
-            Concurrency::Latch& doneWithSubscriptions, 
+            MultipleExternalForcesQueue& inputExternalForcesQueue,
+            Concurrency::Latch& doneWithSubscriptions,
             Concurrency::Latch& doneWithExecution,
-            const NMSmodelT& subject, 
-            const std::string& osimModelFilename, 
-            const std::string& externalLoadsXmlFilename, 
+            const NMSmodelT& subject,
+            const std::string& osimModelFilename,
+            const std::string& externalLoadsXmlFilename,
             const std::vector< std::string >& jointsToLog);
+
+        template<typename NMSmodelT>
+        QueuesToXForces(
+            MultipleExternalForcesQueue& inputExternalForcesQueue,
+            Concurrency::Latch& doneWithSubscriptions,
+            Concurrency::Latch& doneWithExecution,
+            const NMSmodelT& subject,
+            const std::string& osimModelFilename,
+            const std::vector<ExternalForceDataSetup>& externalForceDataSetups,
+            const std::vector< std::string >& jointsToLog);
+
         virtual ~QueuesToXForces();
         virtual void operator()() = 0;
         void setState(double time, const std::vector<double>& q, const std::vector<double>& qd, const std::vector<double>& qdd);
         void calculateIntersegmentalForces();
         //Instead of calculating the ID internally, I can provide the mobility forces (e.g. I've done the calculation before.. and I want to save time)
-        void calculateIntersegmentalForces(const std::vector<double>& realMobilityForces); 
+        void calculateIntersegmentalForces(const std::vector<double>& realMobilityForces);
         void calculateJointReactionForces(const std::vector<double>& muscleForces, const std::vector<double>& estimatedMobilityForces);
         void calculateJointReactionForces(const std::vector<double>& muscleForces, const std::vector<double>& estimatedMobilityForces, const std::vector<double>& realMobilityForces);
+        void calculateInverseDynamics();
         void getJointReactionForcesInG(std::vector<SimTK::Vec3>& jointReactionsInG) const;
         void getIntersegmentalForcesInG(std::vector<SimTK::Vec3>& intersegmentalForcesInG) const;
         void getJointReactionForcesInChild(std::vector<SimTK::Vec3>& jointReactionsInChild) const;
         void getIntersegmentalForcesInChild(std::vector<SimTK::Vec3>& intersegmentalForcesInChild) const;
+        void getResidualMobilityForces(std::vector<double>& residualMobilityForces, bool limitToSubjectDofs) const; //i.e. result of ID
         void doneWithSubscriptions();
         void doneWithExecution();
         void initialiseContactModel();
 
     private:
         static SimTK::Vector toSimTKVector(std::vector<double> v);
-        void parseExternalLoadsXml(const std::string& externalLoadsXmlFilename);
+        static std::vector<double> fromSimTKVector(SimTK::Vector v);
+        std::vector<ExternalForceDataSetup> parseExternalLoadsXml(const std::string& externalLoadsXmlFilename) const;
         void distributeExternalForces();
         void updateCeinmsToOpenSimDofMapping();
         void updateCeinmsToOpenSimMuscleMapping();
         void checkJointsToLogsExistInOpenSim();
-
+        void initialiseExternalForces();
         MultipleExternalForcesQueue& inputExternalForcesQueue_;
         Concurrency::Latch splitForcesLatch_;
         Concurrency::Latch& externalDoneWithSubscriptionsLatch_;
@@ -126,11 +141,9 @@ namespace ceinms {
         std::vector<std::string> jointsToLog_, dofNamesFromSubject_, musclesNamesFromSubject_;
         std::unique_ptr<JointContactFromOpensim> jointContactModel_;
         Mapper  dofsMapping_, musclesMapping_;
-        std::string osimModelFilename_, externalLoadsXmlFilename_;
-
+        std::string osimModelFilename_;
+        std::vector<ExternalForceDataSetup> externalForcesDataSetups_;
     };
-
-
 
     template<typename NMSmodelT>
     QueuesToXForces::QueuesToXForces(
@@ -146,17 +159,35 @@ namespace ceinms {
         externalDoneWithExecutionLatch_(doneWithExecution),
         jointContactModel_(nullptr),
         splitForcesLatch_(2), osimModelFilename_(osimModelFilename),
-        externalLoadsXmlFilename_(externalLoadsXmlFilename),
         jointsToLog_(jointsToLog)
 
     {
         subject.getDoFNames(dofNamesFromSubject_);
         subject.getMuscleNames(musclesNamesFromSubject_);
-
+        externalForcesDataSetups_ = parseExternalLoadsXml(externalLoadsXmlFilename);
     }
 
+    template<typename NMSmodelT>
+    QueuesToXForces::QueuesToXForces(
+        MultipleExternalForcesQueue& inputExternalForcesQueue,
+        Concurrency::Latch& doneWithSubscriptions,
+        Concurrency::Latch& doneWithExecution,
+        const NMSmodelT& subject,
+        const std::string& osimModelFilename,
+        const std::vector<ExternalForceDataSetup>& externalForceDataSetups,
+        const std::vector< std::string >& jointsToLog) :
+        inputExternalForcesQueue_(inputExternalForcesQueue),
+        externalDoneWithSubscriptionsLatch_(doneWithSubscriptions),
+        externalDoneWithExecutionLatch_(doneWithExecution),
+        jointContactModel_(nullptr),
+        splitForcesLatch_(2), osimModelFilename_(osimModelFilename),
+        externalForcesDataSetups_(externalForceDataSetups),
+        jointsToLog_(jointsToLog)
 
-
+    {
+        subject.getDoFNames(dofNamesFromSubject_);
+        subject.getMuscleNames(musclesNamesFromSubject_);
+    }
 }
 
 #endif

@@ -29,13 +29,15 @@
 #include "ceinms/ExternalForcesFromStorageFile.h"
 #include "ceinms/queues/MultipleExternalForcesQueue.h"
 #include "ceinms/ArrayConverter.h"
+#include "ceinms/FileUtils.h"
+#include <boost/filesystem.hpp>
+using boost::filesystem::path;
 #include <OpenSim/OpenSim.h>
 using OpenSim::Model;
 #include <string>
 using std::string;
 #include <vector>
 using std::vector;
-
 
 namespace ceinms {
 
@@ -45,8 +47,8 @@ namespace ceinms {
         Concurrency::Latch& doneWithExecution,
         const std::string& osimModelFilename,
         const std::string& externalLoadsXmlFilename) :
-        ExternalForcesFromX(outputMultipleExternalForcesQueue, doneWithSubscriptions, doneWithExecution), 
-        osimModelFilename_(osimModelFilename), 
+        ExternalForcesFromX(outputMultipleExternalForcesQueue, doneWithSubscriptions, doneWithExecution),
+        osimModelFilename_(osimModelFilename),
         externalLoadsXmlFilename_(externalLoadsXmlFilename)
     {}
 
@@ -54,6 +56,21 @@ namespace ceinms {
 
         Model model(osimModelFilename_);
         OpenSim::ExternalLoads externalLoads(model, externalLoadsXmlFilename_);
+
+        path p(externalLoadsXmlFilename_);
+        path baseDir(p.parent_path());
+
+        //correct file path so it works relatively to the xml itself
+        auto forcesFilename = externalLoads.getDataFileName();
+        if (!FileUtils::isAbsolute(forcesFilename.c_str()))
+            forcesFilename = (baseDir / forcesFilename).string();
+        externalLoads.setDataFileName(forcesFilename);
+
+        auto kinematicsFilename = externalLoads.getExternalLoadsModelKinematicsFileName();
+        if (!FileUtils::isAbsolute(kinematicsFilename.c_str()))
+            kinematicsFilename = (baseDir / kinematicsFilename).string();
+        externalLoads.setExternalLoadsModelKinematicsFileName(kinematicsFilename);
+
         externalLoads.invokeConnectToModel(model);
 
         OpenSim::Storage externalForcesStorage(externalLoads.getDataFileName());
@@ -77,8 +94,5 @@ namespace ceinms {
         }
         ExternalForcesFromX::sendEndOfData();
         ExternalForcesFromX::doneWithExecution();
-
-
     }
-
 }

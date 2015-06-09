@@ -8,6 +8,7 @@ set(Common_HEADERS  ceinms/ArrayConverter.h
                     ceinms/QueueData.h
                     ceinms/TimeCompare.h
                     ceinms/ExternalForceData.h
+                    ceinms/ExternalForceDataSetup.h
                     ceinms/GeneralisedCoordinatesData.h
                     ceinms/ContactModelFromOpenSimSetup.h
                     ceinms/ContactModelKneeBalanceSetup.h
