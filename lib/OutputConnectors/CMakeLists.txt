@@ -10,6 +10,7 @@ set(OutputConnectors_SOURCES
     QueuesToIntersegmentalAndJointReactionForces.cpp
 	QueuesToKneeBalanceContactForces.cpp
     QueuesToInverseDynamics.cpp
+    QueuesToStorageFiles.cpp
 )
 set(OutputConnectors_HEADERS 
     ceinms/LoggerOnQueues.h
@@ -20,24 +21,13 @@ set(OutputConnectors_HEADERS
     ceinms/QueuesToIntersegmentalAndJointReactionForces.h
 	ceinms/QueuesToKneeBalanceContactForces.h
     ceinms/QueuesToInverseDynamics.h
-)
-
-set(QueuesToStorageFiles_SOURCES
-    QueuesToStorageFiles/QueuesToStorageFiles.cpp
-    
-  
-)
-
-set(QueuesToStorageFiles_HEADERS
     ceinms/QueuesToStorageFiles.h
     ceinms/QueueToStorageFile.h
 )
 
-set(QueuesToStorageFiles_TEMPLATE_IMPLEMENTATION
-	QueuesToStorageFiles/QueueToStorageFile.cpp
-	)
 
 set(OutputConnectors_TEMPLATE_IMPLEMENTATION
+    ceinms/QueueToStorageFile.cpp
 
 	)
   
@@ -76,7 +66,7 @@ target_include_directories(OutputConnectors
 set(OutputConnectors_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}" CACHE INTERNAL "Include directories for OutputConnectors library")
 
 # Install
-install(FILES ${OutputConnectors_HEADERS} ${QueuesToStorageFiles_HEADERS} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/ceinms)
+install(FILES ${OutputConnectors_HEADERS} ${OutputConnectors_TEMPLATE_IMPLEMENTATION} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/ceinms)
 install(TARGETS OutputConnectors
         EXPORT CEINMSTargets
         RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
