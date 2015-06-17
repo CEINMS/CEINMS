@@ -38,13 +38,15 @@ namespace ceinms {
         targetBody_(0),
         force_(std::make_pair(0, Vec3(0))),
         point_(std::make_pair(0, Vec3(0))),
-        torque_(std::make_pair(0, Vec3(0))) { /*blank*/ }
+        torque_(std::make_pair(0, Vec3(0))) { /*blank*/
+    }
 
     ExternalForceData::ExternalForceData(unsigned targetBody) :
         targetBody_(targetBody),
         force_(std::make_pair(0, Vec3(0))),
         point_(std::make_pair(0, Vec3(0))),
-        torque_(std::make_pair(0, Vec3(0))) { /*blank*/ }
+        torque_(std::make_pair(0, Vec3(0))) { /*blank*/
+    }
 
     void ExternalForceData::setTargetBody(unsigned targetBody) {
 
@@ -57,7 +59,7 @@ namespace ceinms {
         force_.second = forceVector;
     }
 
-    void ExternalForceData::setForceApplicationPoint(const Vec3& point, unsigned expressedInBodyIndex) {
+    void ExternalForceData::setApplicationPoint(const Vec3& point, unsigned expressedInBodyIndex) {
 
         point_.first = expressedInBodyIndex;
         point_.second = point;
@@ -80,12 +82,12 @@ namespace ceinms {
     }
 
     unsigned ExternalForceData::getForceBodyIndex() const {
-        
+
         return force_.first;
     }
 
     const Vec3& ExternalForceData::getApplicationPoint() const {
-    
+
         return point_.second;
     }
 
@@ -93,9 +95,9 @@ namespace ceinms {
 
         applicationPoint = point_.second;
     }
-    
+
     unsigned ExternalForceData::getApplicationPointBodyIndex() const {
-        
+
         return point_.first;
     }
 
@@ -113,7 +115,6 @@ namespace ceinms {
 
         return torque_.first;
     }
-
 
     unsigned ExternalForceData::getTargetBodyIndex() const {
 
@@ -133,5 +134,4 @@ namespace ceinms {
         os << "--Reference System Index " << getTorqueBodyIndex() << std::endl;
         os << "--Value                  " << getTorque() << std::endl;
     }
-
 }

@@ -39,7 +39,7 @@ namespace ceinms {
         ExternalForceData(unsigned targetBodyIndex);
         void setTargetBody(unsigned targetBodyIndex);
         void setForceVector(const SimTK::Vec3& force, unsigned expressedInBodyIndex = 0);
-        void setForceApplicationPoint(const SimTK::Vec3& point, unsigned expressedInBodyIndex = 0);
+        void setApplicationPoint(const SimTK::Vec3& point, unsigned expressedInBodyIndex = 0);
         void setTorque(const SimTK::Vec3& torque, unsigned expressedInBodyIndex = 0);
 
         unsigned getTargetBodyIndex() const;
@@ -62,7 +62,6 @@ namespace ceinms {
         std::pair<unsigned, SimTK::Vec3> point_;  //reference system index and point vector
         std::pair<unsigned, SimTK::Vec3> force_;  //reference system index and force vector
         std::pair<unsigned, SimTK::Vec3> torque_;  //reference system index and force vector
-
     };
 }
 

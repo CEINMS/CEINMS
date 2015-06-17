@@ -91,7 +91,7 @@ namespace OpenSim {
             if (forceFrame.time == std::numeric_limits<double>::infinity()) {
                 runCondition_ = false;
                 forceFrame.data.setForceVector(SimTK::Vec3(0.));
-                forceFrame.data.setForceApplicationPoint(SimTK::Vec3(0.));
+                forceFrame.data.setApplicationPoint(SimTK::Vec3(0.));
                 forceFrame.data.setTorque(SimTK::Vec3(0.));
             }
             if (runCondition_) {

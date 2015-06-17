@@ -19,15 +19,14 @@ target_link_libraries(Test_LmtMaFromMcbs InputConnectors ceinms_common NMSmodel 
 
 
 set(N_DOFS 4)
-FIND_PROGRAM(osimSpliner_BIN NAMES "osimSpliner${N_DOFS}" PATHS ${osimSpliner_DIR}/../../bin NO_DEFAULT_PATH NO_CMAKE_SYSTEM_PATH NO_SYSTEM_ENVIRONMENT_PATH NO_CMAKE_FIND_ROOT_PATH)
-#SET(osimSpliner_BIN ${osimSpliner_DIR}/../../bin/osimSpliner${N_DOFS}.exe )
-execute_process(COMMAND ${osimSpliner_BIN} 
-                TestData/Subject/scaled.osim 
-                TestData/SplinesSetup/dofAngles.cfg
-                TestData/SplinesSetup/muscles.in
-                TestData/GeneratedSplines/
-				RESULT_VARIABLE rv      
-				OUTPUT_VARIABLE ov    
-				WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}
-)
-message("${ov}")
+#FIND_PROGRAM(osimSpliner_BIN NAMES "osimSpliner${N_DOFS}" PATHS ${osimSpliner_DIR}/../../bin NO_DEFAULT_PATH NO_CMAKE_SYSTEM_PATH NO_SYSTEM_ENVIRONMENT_PATH NO_CMAKE_FIND_ROOT_PATH)
+#execute_process(COMMAND ${osimSpliner_BIN} 
+#                TestData/Subject/scaled.osim 
+#                TestData/SplinesSetup/dofAngles.cfg
+#                TestData/SplinesSetup/muscles.in
+#                TestData/GeneratedSplines/
+#				RESULT_VARIABLE rv      
+#				OUTPUT_VARIABLE ov    
+#				WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}
+#)
+#message("${ov}")

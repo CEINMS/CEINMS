@@ -86,7 +86,7 @@ namespace ceinms {
             for (unsigned i(0); i < externalLoads.getSize(); ++i) {
                 ExternalForceData currentExtForce;
                 currentExtForce.setForceVector(externalLoads.get(i).getForceAtTime(t));
-                currentExtForce.setForceApplicationPoint(externalLoads.get(i).getPointAtTime(t));
+                currentExtForce.setApplicationPoint(externalLoads.get(i).getPointAtTime(t));
                 currentExtForce.setTorque(externalLoads.get(i).getTorqueAtTime(t));
                 externalForcesFrame.data.push_back(currentExtForce);
             }
