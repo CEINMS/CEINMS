@@ -40,13 +40,15 @@ namespace ceinms {
             Concurrency::Latch& doneWithSubscriptions,
             Concurrency::Latch& doneWithExecution,
             const std::string& osimModelFilename,
-            const std::string& kinematicsStorageFilename);
+            const std::string& kinematicsStorageFilename,
+            double fc);
         GeneralisedCoordinatesFromStorageFile(
             GeneralisedCoordinatesQueue& outputGeneralisedCoordinatesQueue,
             Concurrency::Latch& doneWithSubscriptions,
             Concurrency::Latch& doneWithExecution,
             const std::string& osimModelFilename,
             const std::string& kinematicsStorageFilename,
+            double fc,
             const std::vector<std::string>& coordinatesToLog);
         virtual ~GeneralisedCoordinatesFromStorageFile() override {}
         virtual void operator()() override;

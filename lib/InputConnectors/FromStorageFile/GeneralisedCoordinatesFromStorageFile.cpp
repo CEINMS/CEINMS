@@ -42,9 +42,10 @@ namespace ceinms {
         Concurrency::Latch& doneWithSubscriptions,
         Concurrency::Latch& doneWithExecution,
         const std::string& osimModelFilename,
-        const std::string& kinematicsStorageFilename) :
+        const std::string& kinematicsStorageFilename,
+        double fc) :
         GeneralisedCoordinatesFromX(outputGeneralisedCoordinatesQueue, doneWithSubscriptions, doneWithExecution),
-        model_(osimModelFilename), 
+        model_(osimModelFilename),
         kinematicsStorageFilename_(kinematicsStorageFilename) {
 
         //for some mysterious reason, if I don't use c_str it doesn't work..
@@ -52,13 +53,12 @@ namespace ceinms {
         OpenSim::Array<double> timeColumnOS;
         kinematics.getTimeColumn(timeColumnOS);
         ceinms::ArrayConverter::toStdVector(timeColumnOS, timeColumn_);
-        updateKinematicsSplines(8);
+        updateKinematicsSplines(fc);
         OpenSim::Array<string> coordinateNamesOS;
         model_.getCoordinateSet().getNames(coordinateNamesOS);
         ceinms::ArrayConverter::toStdVector(coordinateNamesOS, coordinateNamesFromOsimModel_);
         mapper_.setNames(coordinateNamesFromOsimModel_, coordinateNamesFromOsimModel_);
     }
-
 
     GeneralisedCoordinatesFromStorageFile::GeneralisedCoordinatesFromStorageFile(
         GeneralisedCoordinatesQueue& outputGeneralisedCoordinatesQueue,
@@ -66,13 +66,15 @@ namespace ceinms {
         Concurrency::Latch& doneWithExecution,
         const std::string& osimModelFilename,
         const std::string& kinematicsStorageFilename,
+        double fc,
         const std::vector<std::string>& coordinatesToLog) :
         GeneralisedCoordinatesFromStorageFile(
-        outputGeneralisedCoordinatesQueue, 
-        doneWithSubscriptions, 
-        doneWithExecution, 
-        osimModelFilename, 
-        kinematicsStorageFilename)  {
+        outputGeneralisedCoordinatesQueue,
+        doneWithSubscriptions,
+        doneWithExecution,
+        osimModelFilename,
+        kinematicsStorageFilename,
+        fc)  {
 
         mapper_.setNames(coordinateNamesFromOsimModel_, coordinatesToLog);
     }
@@ -105,7 +107,6 @@ namespace ceinms {
         }
         GeneralisedCoordinatesFromX::sendEndOfData();
         GeneralisedCoordinatesFromX::doneWithExecution();
-
     }
 
     void GeneralisedCoordinatesFromStorageFile::updateKinematicsSplines(double fc) {
@@ -137,6 +138,4 @@ namespace ceinms {
         }
         splines_ = kinematicsSplines;
     }
-
-
 }

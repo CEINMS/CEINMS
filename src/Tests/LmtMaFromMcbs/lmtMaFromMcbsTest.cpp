@@ -128,6 +128,7 @@ int main(){
         doneWithExecution,
         osimModelFilename,
         ikFilename,
+        8,
         subject.getDoFNames());
     LmtMaFromMcbs lmtMaFromMcbs(generalisedCoordinatesQueue,
         lmtQueue,

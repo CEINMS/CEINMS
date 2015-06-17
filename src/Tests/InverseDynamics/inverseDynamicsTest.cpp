@@ -131,7 +131,8 @@ int main() {
         doneWithSubscriptions,
         doneWithExecution,
         osimModelFilename,
-        kinematicsStorageFilename);
+        kinematicsStorageFilename,
+        8);
 
     QueuesToInverseDynamics queuesToInverseDynamics(
         generalisedCoordinateQueue,

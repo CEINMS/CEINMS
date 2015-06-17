@@ -301,7 +301,8 @@ namespace ceinms {
             doneWithSubscriptionsLatch,
             doneWithExecutionLatch,
             contactModelSetup.osimModel,
-            contactModelSetup.motion);
+            contactModelSetup.motion,
+            8);
         //2 create external forces produces
         ExternalForcesFromStorageFile externalForcesFromStorageFile(
             externalForcesQueue,
