@@ -37,6 +37,7 @@
 #include "ceinms/queues/GeneralisedCoordinatesQueue.h"
 #include "ceinms/queues/MultipleExternalForcesQueue.h"
 #include "ceinms/queues/ExternalTorquesQueue.h"
+#include "ceinms/ExternalForceDataSetup.h"
 
 namespace ceinms{
 
@@ -53,6 +54,18 @@ namespace ceinms{
             const NMSmodelT& subject,
             const std::string& osimModelFilename,
             const std::string& externalLoadsXmlFilename,
+            bool onlyLogSubjectDofs);
+
+        template <typename NMSmodelT>
+        QueuesToInverseDynamics(
+            GeneralisedCoordinatesQueue& inputGeneralisedCoordinatesQueue,
+            MultipleExternalForcesQueue& inputExternalForcesQueue,
+            ExternalTorquesQueue& outputExternalTorquesQueue,
+            Concurrency::Latch& doneWithSubscriptions,
+            Concurrency::Latch& doneWithExecution,
+            const NMSmodelT& subject,
+            const std::string& osimModelFilename,
+            const std::vector<ExternalForceDataSetup>& externalForceDataSetups,
             bool onlyLogSubjectDofs);
 
         virtual void operator()() override;
@@ -82,6 +95,28 @@ namespace ceinms{
         subject,
         osimModelFilename,
         externalLoadsXmlFilename, {}),
+        inputGeneralisedCoordinatesQueue_(inputGeneralisedCoordinatesQueue),
+        outputExternalTorquesQueue_(outputExternalTorquesQueue),
+        onlyLogSubjectDofs_(onlyLogSubjectDofs) {
+    }
+
+    template <typename NMSmodelT>
+    QueuesToInverseDynamics::QueuesToInverseDynamics(
+        GeneralisedCoordinatesQueue& inputGeneralisedCoordinatesQueue,
+        MultipleExternalForcesQueue& inputExternalForcesQueue,
+        ExternalTorquesQueue& outputExternalTorquesQueue,
+        Concurrency::Latch& doneWithSubscriptions,
+        Concurrency::Latch& doneWithExecution,
+        const NMSmodelT& subject,
+        const std::string& osimModelFilename,
+        const std::vector<ExternalForceDataSetup>& externalForceDataSetups,
+        bool onlyLogSubjectDofs) :
+        QueuesToXForces(inputExternalForcesQueue,
+        doneWithSubscriptions,
+        doneWithExecution,
+        subject,
+        osimModelFilename,
+        externalForceDataSetups, {}),
         inputGeneralisedCoordinatesQueue_(inputGeneralisedCoordinatesQueue),
         outputExternalTorquesQueue_(outputExternalTorquesQueue),
         onlyLogSubjectDofs_(onlyLogSubjectDofs) {
