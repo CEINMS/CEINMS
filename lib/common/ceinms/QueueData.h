@@ -40,7 +40,6 @@ namespace ceinms {
     template<typename T>
     bool operator<(const QueueData<T>& lhs, const QueueData<T>& rhs) {
         return lhs.time < rhs.time;
-
     }
 
     template <typename T>
@@ -48,11 +47,17 @@ namespace ceinms {
         using type = T;
         double time;
         T data;
+
+        template<typename Archive>
+        inline void serialize(Archive& ar, const unsigned int version){
+
+            ar & this->time;
+            ar & this->data;
+        }
     };
 
-
     //REMOVE AFTER DEBUG
-     
+
     template<typename T>
     std::ostream& operator<< (std::ostream& os, const QueueData<T>& queueData) {
         os << "Time: " << queueData.time << std::endl;
@@ -68,7 +73,5 @@ namespace ceinms {
         os << std::endl;
         return os;
     }
-
-    
 }
 #endif
