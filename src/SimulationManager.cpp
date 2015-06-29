@@ -54,6 +54,8 @@
 #include "ceinms/LoggerOnQueues.h"
 #include "ceinms/QueuesToStorageFiles.h"
 #include "ceinms/QueuesToJointReactionForces.h"
+#include "ceinms/QueuesToIntersegmentalAndJointReactionForces.h"
+#include "ceinms/QueuesToInverseDynamics.h"
 #include "ceinms/QueuesToKneeBalanceContactForces.h"
 
 #include "ceinms/concurrency/Latch.h"
@@ -66,7 +68,7 @@
 #include "ceinms/queues/MultipleMomentArmsQueues.h"
 #include "ceinms/queues/LogQueue.h"
 #include "ceinms/QueueToStorageFile.h"
-
+#include "ceinms/ArrayConverter.h"
 #include <string>
 using std::string;
 
@@ -230,11 +232,12 @@ namespace ceinms {
         MultipleMomentArmsQueues momentArmsQueues;
         GeneralisedCoordinatesQueue generalisedCoordinatesQueue;
         MultipleExternalForcesQueue externalForcesQueue;
+        ExternalTorquesQueue torquesFromIDQueue;
 
         //Creates queues for output data
         ScalarLogQueue logQueue;
         VecContactForcesQueue contactForcesQueue;
-
+        VecContactForcesQueue intersegmentalForcesQueue;
         //Creates latches to sync threads
         Concurrency::Latch doneWithSubscriptionsLatch;
         Concurrency::Latch doneWithExecutionLatch;
@@ -282,13 +285,15 @@ namespace ceinms {
             valuesToLog);
 
         // 4. start contact model stuff
+
         auto contactModelSetup(contactModelCfg_.getContactModelSetupOsim());
-        QueuesToJointReactionForces jointReactionForcesEstimator(
+        QueuesToIntersegmentalAndJointReactionForces jointReactionForcesEstimator(
             generalisedCoordinatesQueue,
             externalForcesQueue,
             *logQueue["MuscleForces"],
             *logQueue["Torques"],
             contactForcesQueue,
+            intersegmentalForcesQueue,
             doneWithSubscriptionsLatch,
             doneWithExecutionLatch,
             mySubject,
@@ -320,8 +325,40 @@ namespace ceinms {
             "ContactForces",
             outputDirectory_);
 
-        doneWithSubscriptionsLatch.setCount(9);
-        doneWithExecutionLatch.setCount(9);
+        QueueToStorageFile<VecContactForcesData> intersegmentalForcesLogger(
+            intersegmentalForcesQueue,
+            doneWithSubscriptionsLatch,
+            doneWithExecutionLatch,
+            contactModelSetup.joints,
+            "IntersegmentalForces",
+            outputDirectory_);
+
+        OpenSim::Model osimModel(contactModelSetup.osimModel);
+        OpenSim::Array<std::string> osimCoordNames;
+        osimModel.getCoordinateSet().getNames(osimCoordNames);
+        std::vector<std::string> coordNames;
+        ArrayConverter::toStdVector(osimCoordNames, coordNames);
+        QueueToStorageFile<ExternalTorquesData> externalTorquesLogger(
+            torquesFromIDQueue,
+            doneWithSubscriptionsLatch,
+            doneWithExecutionLatch,
+            coordNames,
+            "ExternalTorques",
+            outputDirectory_);
+
+        QueuesToInverseDynamics inverseDynamicsSolver(
+            generalisedCoordinatesQueue,
+            externalForcesQueue,
+            torquesFromIDQueue,
+            doneWithSubscriptionsLatch,
+            doneWithExecutionLatch,
+            mySubject,
+            contactModelSetup.osimModel,
+            contactModelSetup.externalLoads,
+            false);
+
+        doneWithSubscriptionsLatch.setCount(12);
+        doneWithExecutionLatch.setCount(12);
 
         //launch threads
         std::thread contactForcesEstimatorThread(std::ref(jointReactionForcesEstimator));
@@ -334,6 +371,9 @@ namespace ceinms {
         std::thread simulatorThread(std::ref(simulator));
         std::thread queuesToStorageFilesThread(std::ref(queuesToStorageFiles));
         std::thread contactForcesLoggerThread(std::ref(contactForcesLogger));
+        std::thread intersegmentalForcesLoggerThread(std::ref(intersegmentalForcesLogger));
+        std::thread inverseDynamicsSolverThread(std::ref(inverseDynamicsSolver));
+        std::thread externalTorquesLoggerThread(std::ref(externalTorquesLogger));
 
         emgProdThread.join();
         lmtMaProdThread.join();
@@ -344,6 +384,9 @@ namespace ceinms {
         generalisedCoordinateThread.join();
         externalForcesThread.join();
         contactForcesLoggerThread.join();
+        intersegmentalForcesLoggerThread.join();
+        inverseDynamicsSolverThread.join();
+        externalTorquesLoggerThread.join();
 
         return 0;
     }
