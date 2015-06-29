@@ -31,6 +31,8 @@
 #include <vector>
 #include <SimTK/include/SimTKcommon.h>
 #include "ceinms/GeneralisedCoordinatesData.h"
+#include "ceinms/ExternalForceData.h"
+#include "ceinms/queues/MultipleExternalForcesQueue.h"
 
 namespace ceinms{
 
@@ -41,14 +43,17 @@ namespace ceinms{
         Concurrency::Latch& readyToWriteLatch,
         const std::vector<std::string>& columnLabels,
         const std::string& valueName,
-        const std::string& outputDir) :
+        const std::string& outputDir,
+        const std::string& extension) :
         inputQueue_(inputQueue),
         subscriptionLatch_(subscriptionLatch),
         readyToWriteLatch_(readyToWriteLatch),
         columnLabels_(columnLabels),
         valueName_(valueName),
         outputDir_(outputDir),
-        separator_("\t") {
+        separator_("\t"),
+        extension_(extension)
+    {
 
         outputDir_ += "/";
         boost::filesystem::path dir(outputDir_);
@@ -61,7 +66,7 @@ namespace ceinms{
         }
         else std::cout << "Using " + dir.string() + " as output directory\n";
 
-        std::string filename = valueName + ".sto";
+        std::string filename = valueName + "." + extension_;
         std::string outFilename = outputDir_ + filename;
 
         outFile_.reset(new std::ofstream(outFilename.c_str()));
@@ -80,14 +85,14 @@ namespace ceinms{
             std::cout << "No " << valueName_ << "data to write!" << std::endl;
             return;
         }
-  
+
         *outFile_ << "CEINMS output" << std::endl;
         *outFile_ << "datacolumns " << dataToWrite_.back().data.size() + 1 << std::endl;
         *outFile_ << "datarows " << dataToWrite_.size() << std::endl;
         *outFile_ << "endheader" << std::endl;
         *outFile_ << "time" + separator_;
         for (auto& it : columnLabels_)
-                *outFile_ << it << separator_;
+            *outFile_ << it << separator_;
         *outFile_ << std::endl;
     }
 
@@ -101,7 +106,7 @@ namespace ceinms{
         }
 
         *outFile_ << "CEINMS output" << std::endl;
-        *outFile_ << "datacolumns " << dataToWrite_.back().data.size()*3 + 1 << std::endl;
+        *outFile_ << "datacolumns " << dataToWrite_.back().data.size() * 3 + 1 << std::endl;
         *outFile_ << "datarows " << dataToWrite_.size() << std::endl;
         *outFile_ << "endheader" << std::endl;
         *outFile_ << "time" + separator_;
@@ -109,7 +114,6 @@ namespace ceinms{
             *outFile_ << it << "_x" << separator_ << it << "_y" << separator_ << it << "_z" << separator_;
         *outFile_ << std::endl;
     }
-
 
     template<>
     void QueueToStorageFile<GeneralisedCoordinatesData>::initFile()
@@ -130,6 +134,33 @@ namespace ceinms{
         *outFile_ << std::endl;
     }
 
+    template<>
+    void QueueToStorageFile<MultipleExternalForcesData>::initFile()
+    {
+        if (dataToWrite_.size() < 1)
+        {
+            std::cout << "No " << valueName_ << "data to write!" << std::endl;
+            return;
+        }
+
+        *outFile_ << "CEINMS output" << std::endl;
+        *outFile_ << "datacolumns " << dataToWrite_.back().data.size() * 9 + 1 << std::endl;
+        *outFile_ << "datarows " << dataToWrite_.size() << std::endl;
+        *outFile_ << "endheader" << std::endl;
+        *outFile_ << "time" + separator_;
+        for (auto& it : columnLabels_)
+            *outFile_ <<
+            it << "_vx" << separator_ <<
+            it << "_vy" << separator_ <<
+            it << "_vz" << separator_ <<
+            it << "_px" << separator_ <<
+            it << "_py" << separator_ <<
+            it << "_pz" << separator_ <<
+            it << "_mx" << separator_ <<
+            it << "_my" << separator_ <<
+            it << "_mz" << separator_;
+        *outFile_ << std::endl;
+    }
 
     template<typename DataType>
     void QueueToStorageFile<DataType>::operator()() {
@@ -149,8 +180,6 @@ namespace ceinms{
 
         initFile();
         writeToFile();
-        
-        
     }
 
     template<typename DataType>
@@ -171,12 +200,11 @@ namespace ceinms{
             *outFile_ << dataIt.time << separator_;
             for (auto& sampleIt : dataIt.data)
                 *outFile_ << sampleIt[0] << separator_
-                          << sampleIt[1] << separator_
-                          << sampleIt[2] << separator_;
+                << sampleIt[1] << separator_
+                << sampleIt[2] << separator_;
             *outFile_ << std::endl;
         }
     }
-
 
     template<>
     void QueueToStorageFile<GeneralisedCoordinatesData>::writeToFile() {
@@ -196,5 +224,27 @@ namespace ceinms{
         }
     }
 
+    template<>
+    void QueueToStorageFile<MultipleExternalForcesData>::writeToFile() {
 
+        for (auto& dataIt : dataToWrite_) {
+            *outFile_ << dataIt.time << separator_;
+            for (auto& v : dataIt.data) {
+                auto f(v.getForce());
+                auto p(v.getApplicationPoint());
+                auto m(v.getTorque());
+                *outFile_
+                    << f[0] << separator_
+                    << f[1] << separator_
+                    << f[2] << separator_
+                    << p[0] << separator_
+                    << p[1] << separator_
+                    << p[2] << separator_
+                    << m[0] << separator_
+                    << m[1] << separator_
+                    << m[2] << separator_;
+            }
+            *outFile_ << std::endl;
+        }
+    }
 }

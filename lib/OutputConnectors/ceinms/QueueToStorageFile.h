@@ -54,7 +54,8 @@ namespace ceinms {
             Concurrency::Latch& readyToWriteLatch,
             const std::vector<std::string>& columnLabels,
             const std::string& filename,
-            const std::string& outputDir = "./Output/");
+            const std::string& outputDir = "./Output/",
+            const std::string& extension = "sto");
         ~QueueToStorageFile() = default;
         void operator()();
 
@@ -68,6 +69,7 @@ namespace ceinms {
         std::string outputDir_;
         std::string separator_;
         std::string valueName_;
+        std::string extension_;
         std::shared_ptr<std::ofstream> outFile_;
         std::vector< FrameType > dataToWrite_;
     };
