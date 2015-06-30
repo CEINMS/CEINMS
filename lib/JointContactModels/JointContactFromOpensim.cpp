@@ -40,7 +40,8 @@ using std::endl;
 namespace ceinms {
 
     JointContactFromOpensim::JointContactFromOpensim(const std::string& modelFilename, std::vector<OpenSim::Force*> externalForces) :
-        model_(modelFilename)
+        model_(modelFilename),
+        idSolver_(nullptr)
     {
 
         OpenSim::Model modelCopy(modelFilename);
@@ -76,7 +77,7 @@ namespace ceinms {
             coordinateActuators_.push_back(dynamic_cast<OpenSim::CoordinateActuator*>(&(model_.updForceSet().get(actuatorName))));
         }
 
-        idSolver_.reset(new OpenSim::InverseDynamicsSolver(model_));
+        idSolver_ = new OpenSim::InverseDynamicsSolver(model_);
 
         state_ = model_.initSystem();
         for (auto c : coordinateActuators_)
@@ -259,5 +260,11 @@ namespace ceinms {
     void JointContactFromOpensim::getAllReactionForces(SimTK::Vector_<SimTK::Vec3>& reactionForces, SimTK::Vector_<SimTK::Vec3>& reactionTorques) const {
         reactionForces = rForcesInG_;
         reactionTorques = rTorquesInG_;
+    }
+
+    JointContactFromOpensim::~JointContactFromOpensim() {
+
+        //     if (idSolver_ != nullptr)
+        //         delete idSolver_;
     }
 }

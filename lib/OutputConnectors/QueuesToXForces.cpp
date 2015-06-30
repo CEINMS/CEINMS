@@ -40,7 +40,7 @@ using ceinms::SingleExternalForceQueue;
 namespace OpenSim {
 
     ExternalForceFromQueue::ExternalForceFromQueue
-        (std::shared_ptr<ceinms::SingleExternalForceQueue> externalForceQueue,
+        (ceinms::SingleExternalForceQueue* externalForceQueue,
         const std::string& forceIdentifier,
         const std::string& pointIdentifier,
         const std::string& torqueIdentifier,
@@ -63,7 +63,7 @@ namespace OpenSim {
         setPointExpressedInBodyName(pointExpressedInBodyName);
     }
 
-    ExternalForceFromQueue::ExternalForceFromQueue(std::shared_ptr<ceinms::SingleExternalForceQueue> externalForceQueue, SimTK::Xml::Element& node) :
+    ExternalForceFromQueue::ExternalForceFromQueue(ceinms::SingleExternalForceQueue* externalForceQueue, SimTK::Xml::Element& node) :
         externalForceQueue_(externalForceQueue),
         appliedToBody_(nullptr),
         forceExpressedInBody_(nullptr),
@@ -142,6 +142,9 @@ namespace OpenSim {
     }
 
     ExternalForceFromQueue::~ExternalForceFromQueue() {
+
+        if (externalForceQueue_ != nullptr)
+            delete externalForceQueue_;
 
         //     externalForceQueue_.unsubscribe();
     }
@@ -361,5 +364,9 @@ namespace ceinms {
 
     QueuesToXForces::~QueuesToXForces() {
         splitForcesThread_.wait();
+
+        //     for (OpenSim::Force* it : extForces_)
+        //        if (it != nullptr)
+        //           delete it;
     }
 }

@@ -42,7 +42,7 @@ namespace ceinms {
     class JointContactFromOpensim {
     public:
         JointContactFromOpensim(const std::string& modelFilename, std::vector<OpenSim::Force*> externalForces);
-
+        virtual ~JointContactFromOpensim();
         void setMuscleForces(const std::vector<double>& forces);
         template<typename T>
         void setQ(const T& q);
@@ -93,7 +93,8 @@ namespace ceinms {
 
         std::vector<OpenSim::Muscle*> muscleActuators_;
         std::vector<OpenSim::CoordinateActuator*> coordinateActuators_;
-        std::unique_ptr<OpenSim::InverseDynamicsSolver> idSolver_;
+        //need to use raw ptr because OpenSim
+        OpenSim::InverseDynamicsSolver* idSolver_;
     };
 
     template<typename T>

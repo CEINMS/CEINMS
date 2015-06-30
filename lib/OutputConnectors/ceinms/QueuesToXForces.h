@@ -49,8 +49,9 @@ namespace OpenSim {
     class ExternalForceFromQueue : public OpenSim::ExternalForce{
     public:
         ExternalForceFromQueue() = delete;
+        ExternalForceFromQueue(ExternalForceFromQueue&) = delete;
         ExternalForceFromQueue(
-            std::shared_ptr<ceinms::SingleExternalForceQueue> externalForceQueue,
+            ceinms::SingleExternalForceQueue* externalForceQueue,
             const std::string& forceIdentifier,
             const std::string& pointIdentifier,
             const std::string& torqueIdentifier,
@@ -58,7 +59,7 @@ namespace OpenSim {
             const std::string& forceExpressedInBodyName,
             const std::string& pointExpressedInBodyName);
         ExternalForceFromQueue(
-            std::shared_ptr<ceinms::SingleExternalForceQueue> externalForceQueue, SimTK::Xml::Element& aNode);
+            ceinms::SingleExternalForceQueue* externalForceQueue, SimTK::Xml::Element& aNode);
         virtual ~ExternalForceFromQueue();
     protected:
         virtual void computeForce(const SimTK::State& state,
@@ -69,7 +70,8 @@ namespace OpenSim {
         bool isSubscribed;
         ceinms::ExternalForceData getExternalForceDataFromPastValues(double time) const;
         ceinms::ExternalForceData getExternalForceDataFromQueue(double time) const;
-        std::shared_ptr<ceinms::SingleExternalForceQueue> externalForceQueue_;
+        //need to use raw pointers because opensim deletes stuff for me.. and it's a mess
+        ceinms::SingleExternalForceQueue* externalForceQueue_;
         mutable std::list<ceinms::QueueData<ceinms::ExternalForceData> > pastExternalForceFrames_;
         mutable double lastTime_;
         SimTK::ReferencePtr<const Body> appliedToBody_;
@@ -137,7 +139,7 @@ namespace ceinms {
         Concurrency::Latch& externalDoneWithExecutionLatch_;
         std::future<void> splitForcesThread_;
         std::vector<OpenSim::Force*> extForces_;
-        std::vector<std::shared_ptr<SingleExternalForceQueue>> singleExternalForceQueues_;
+        std::vector<SingleExternalForceQueue*> singleExternalForceQueues_;
         std::vector<std::string> jointsToLog_, dofNamesFromSubject_, musclesNamesFromSubject_;
         std::unique_ptr<JointContactFromOpensim> jointContactModel_;
         Mapper  dofsMapping_, musclesMapping_;
