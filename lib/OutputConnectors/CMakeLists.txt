@@ -58,6 +58,7 @@ target_include_directories(OutputConnectors
                                         ${Concurrency_INCLUDE_DIRS}
                                         ${TrialData_INCLUDE_DIRS}
 										${JointContactModels_INCLUDE_DIRS}
+										${FileIO_INCLUDE_DIRS}
                                 PUBLIC  ${Boost_INCLUDE_DIRS}
 								        ${OPENSIM_INCLUDE_DIRS}
                                         ${SIMTK_INCLUDE_DIRS})

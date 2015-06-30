@@ -32,31 +32,28 @@
 #include "ceinms/concurrency/Latch.h"
 #include "ceinms/concurrency/Queue.h"
 #include "ceinms/QueueData.h"
-#include "boost/filesystem.hpp"
-#include <vector>
-#include <memory>
-#include <ostream>
+#include "ceinms/FileLogger.h"
 
 namespace ceinms {
-
+    //we should change ne name of the file, to be QueueToFileLogger..
     template<typename DataType>
-    class QueueToStorageFile {
+    class QueueToFileLogger {
     public:
         using FrameType = QueueData < DataType > ;
         using QueueType = Concurrency::Queue < FrameType > ;
-        QueueToStorageFile() = delete;
-        QueueToStorageFile(const QueueToStorageFile&) = delete;
-        QueueToStorageFile& operator=(const QueueToStorageFile&) = delete;
+        QueueToFileLogger() = delete;
+        QueueToFileLogger(const QueueToFileLogger&) = delete;
+        QueueToFileLogger& operator=(const QueueToFileLogger&) = delete;
 
-        QueueToStorageFile(
+        QueueToFileLogger(
             QueueType& inputQueue,
             Concurrency::Latch& subscriptionLatch,
             Concurrency::Latch& readyToWriteLatch,
             const std::vector<std::string>& columnLabels,
-            const std::string& filename,
+            const std::string& valueName,
             const std::string& outputDir = "./Output/",
             const std::string& extension = "sto");
-        ~QueueToStorageFile() = default;
+        ~QueueToFileLogger() = default;
         void operator()();
 
     private:
@@ -65,14 +62,11 @@ namespace ceinms {
         QueueType& inputQueue_;
         Concurrency::Latch& subscriptionLatch_;
         Concurrency::Latch& readyToWriteLatch_;
-        std::vector<std::string> columnLabels_;
-        std::string outputDir_;
-        std::string separator_;
-        std::string valueName_;
-        std::string extension_;
-        std::shared_ptr<std::ofstream> outFile_;
-        std::vector< FrameType > dataToWrite_;
+        FileLogger<DataType> logger_;
     };
+
+    template <typename U>
+    using QueueToStorageFile = QueueToFileLogger < U > ;
 }
 
 #include "QueueToStorageFile.cpp"

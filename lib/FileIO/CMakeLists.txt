@@ -14,6 +14,7 @@ set(FileIO_HEADERS
   ceinms/DataFromStorageFile.h
   ceinms/EMGDataFromFile.h
   ceinms/policyTemplates.h
+  ceinms/FileLogger.h
 )
 
 source_group("Headers" FILES ${FileIO_HEADERS})
