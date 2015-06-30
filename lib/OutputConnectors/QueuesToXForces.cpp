@@ -363,8 +363,9 @@ namespace ceinms {
     }
 
     QueuesToXForces::~QueuesToXForces() {
-        splitForcesThread_.wait();
 
+        if (splitForcesThread_.valid())
+            splitForcesThread_.wait();
         //     for (OpenSim::Force* it : extForces_)
         //        if (it != nullptr)
         //           delete it;

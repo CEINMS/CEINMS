@@ -122,6 +122,8 @@ namespace ceinms {
             return false;
         initFile();
         writeToFile();
+        outFile_->flush();
+        outFile_->close();
         return true;
     }
 
@@ -139,7 +141,6 @@ namespace ceinms {
     bool FileLogger<DataType>::createFile() {
 
         bool success(true);
-        outputDir_ += "/";
         boost::filesystem::path dir(outputDir_);
         if (!boost::filesystem::exists(dir)) {
             if (!boost::filesystem::create_directories(dir)) {
@@ -148,9 +149,9 @@ namespace ceinms {
             }
             std::cout << "Created output directory " + dir.string() << std::endl;
         }
-        else std::cout << "Using " + dir.string() + " as output directory\n";
+        else std::cout << "Using " + boost::filesystem::canonical(dir).string() + " as output directory\n";
 
-        std::string outFilename = outputDir_ + filename_;
+        std::string outFilename = (dir / filename_).string();
 
         outFile_.reset(new std::ofstream(outFilename.c_str()));
 
