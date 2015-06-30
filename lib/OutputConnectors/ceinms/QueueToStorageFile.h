@@ -57,8 +57,6 @@ namespace ceinms {
         void operator()();
 
     private:
-        void initFile();
-        void writeToFile();
         QueueType& inputQueue_;
         Concurrency::Latch& subscriptionLatch_;
         Concurrency::Latch& readyToWriteLatch_;
