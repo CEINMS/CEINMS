@@ -45,6 +45,8 @@ using boost::filesystem::path;
 #include "ceinms/Tendon/ElasticTendon_BiSec.h"
 #include "ceinms/Curve.h"
 #include "ceinms/GeneralisedCoordinatesFromStorageFile.h"
+#include "ceinms/ExternalForceData.h"
+#include "ceinms/queues/MultipleExternalForcesQueue.h"
 #include "ceinms/QueueToStorageFile.h"
 #include "ceinms/concurrency/Queue.h"
 #include "ceinms/concurrency/Latch.h"

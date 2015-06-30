@@ -8,7 +8,8 @@ include_directories(
 	${InputConnectors_INCLUDE_DIRS}
 	${Concurrency_INCLUDE_DIRS}
 	${NMSmodel_INCLUDE_DIRS}
-	${Curve_INCLUDE_DIRS})
+	${Curve_INCLUDE_DIRS}
+	${FileIO_INCLUDE_DIRS})
 add_definitions(/DBASE_DIR="${CMAKE_CURRENT_LIST_DIR}")
 
 #add_executable(Test_JointContactModel jointContactModelTest.cpp)

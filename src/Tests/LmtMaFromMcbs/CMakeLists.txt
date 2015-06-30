@@ -10,6 +10,7 @@ include_directories(
 	${OutputConnectors_INCLUDE_DIRS}
 	${osimSpliner_INCLUDE_DIRS}
 	${mbcs_INCLUDE_DIRS}
+	${FileIO_INCLUDE_DIRS}
 					 )
 
 add_definitions(/DBASE_DIR="${CMAKE_CURRENT_LIST_DIR}")

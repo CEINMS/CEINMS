@@ -85,7 +85,6 @@ namespace ceinms {
             muscleNames_.push_back(nextColumnName);
         } while (!myStream.eof() && ++noReadColumns < noMuscles_);
 
-
         if (noMuscles_ != muscleNames_.size()) {
             cout << "Something is wrong. " << noMuscles_ << " muscles should be in the file "
                 << "and we have : " << muscleNames_.size();
@@ -147,7 +146,6 @@ namespace ceinms {
           EMGgenerator_.convert(currentReadEMG_, currentEMGData_);
           */
         ++currentTimeStep_;
-
     }
 
     template <typename EMGgenerator>
@@ -156,4 +154,4 @@ namespace ceinms {
     }
 }
 
-#include "policyTemplates.h"
+#include "ceinms/policyTemplates.h"
