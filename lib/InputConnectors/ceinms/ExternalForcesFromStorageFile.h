@@ -42,8 +42,10 @@ namespace ceinms {
             const std::string& osimModelFilename,
             const std::string& externalLoadsXmlFilename);
         void operator()() override;
+        void setPushFrequency(double f) { pushFrequency_ = f; }
         virtual ~ExternalForcesFromStorageFile() override {}
     private:
+        double pushFrequency_;
         std::string osimModelFilename_, externalLoadsXmlFilename_;
     };
 }

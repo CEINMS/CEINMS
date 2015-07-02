@@ -79,8 +79,14 @@ namespace ceinms {
         externalForcesStorage.getTimeColumn(timeColumnExternalLoadsOS);
         ArrayConverter::toStdVector(timeColumnExternalLoadsOS, timeColumnExternalLoads);
 
+        unsigned sleepTimeMilliseconds;
+        if (pushFrequency_ > 0)
+            sleepTimeMilliseconds = static_cast<unsigned>(std::floor(1000. / (pushFrequency_)));
+
         ExternalForcesFromX::doneWithSubscriptions();
         for (auto t : timeColumnExternalLoads) {
+            if (pushFrequency_ > 0)
+                std::this_thread::sleep_for(std::chrono::milliseconds(sleepTimeMilliseconds));
             MultipleExternalForcesFrame externalForcesFrame;
             externalForcesFrame.time = t;
             for (unsigned i(0); i < externalLoads.getSize(); ++i) {
