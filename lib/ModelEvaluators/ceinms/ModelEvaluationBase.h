@@ -26,20 +26,26 @@
  * limitations under the License.                                             *
  * -------------------------------------------------------------------------- */
 
-#ifndef ceinms_ModelEvaluationOnline_h
-#define ceinms_ModelEvaluationOnline_h
+#ifndef ceinms_ModelEvaluationBase_h
+#define ceinms_ModelEvaluationBase_h
 
 #include <vector>
 #include <string>
-#include "ModelEvaluationBase.h"
+#include "ceinms/concurrency/Queue.h"
+#include "ceinms/concurrency/Latch.h"
+#include "ceinms/queues/EmgQueue.h"
+#include "ceinms/queues/LmtQueue.h"
+#include "ceinms/queues/MultipleMomentArmsQueues.h"
+#include "ceinms/queues/ExternalTorquesQueue.h"
+#include "ceinms/queues/LogQueue.h"
 
 namespace ceinms {
-    template <typename NMSmodelT, typename Logger>
-    class ModelEvaluationOnline : public ModelEvaluationBase < Logger > {
+    template <typename Logger>
+    class ModelEvaluationBase {
 
     public:
-        ModelEvaluationOnline() = delete;
-        ModelEvaluationOnline(
+        ModelEvaluationBase() = delete;
+        ModelEvaluationBase(
             EmgQueue& inputEmgQueue,
             LmtQueue& inputLmtQueue,
             ExternalTorquesQueue& inputExternalTorqueQueue,
@@ -47,21 +53,38 @@ namespace ceinms {
             ScalarLogQueue& outputLogQueue,
             Concurrency::Latch& doneWithSubscriptions,
             Concurrency::Latch& doneWithExecution,
-            NMSmodelT& subject,
-            const std::vector< std::string >& valuesToLog); // const std::string& outputDir = "./Output");
-        void setOutputDirectory(const std::string& outputDir);
-        //    void setSubject(NMSmodelT& subject);
-        void operator()() override;
+            const std::vector<std::string>& valuesToLog,
+            bool showLog = true);
+        virtual ~ModelEvaluationBase();
+        virtual void operator()() = 0;
+    protected:
+
+        void getEmgFromInputQueue(EmgFrame& emgFromQueue);
+        void getLmtFromInputQueue(LmtFrame& lmtFromQueue);
+        void getMomentArmsFromInputQueue(MomentArmsFrame& momentArmsFromQueue, unsigned int whichDof);
+        void getExternalTorquesFromInputQueue(ExternalTorquesFrame& externalTorquesFromQueue);
+
+        EmgFrame getEmgFromInputQueue();
+        LmtFrame getLmtFromInputQueue();
+        MomentArmsFrame getMomentArmsFromInputQueue(unsigned int whichDof);
+        ExternalTorquesFrame getExternalTorquesFromInputQueue();
+
+        void doneWithSubscriptions();
+        bool externalTorquesAvailable() const;
+        void doneWithExecution();
+        Logger logger;
+        bool showLog_;
 
     private:
-        NMSmodelT& subject_;
-        std::string outputDir_;
-        std::vector< std::string > dofNames_;
-        std::vector< std::string > dofNamesWithExtTorque_;
-        unsigned noDof_;
-        double globalEmDelay_;
+        void subscribeToQueues();
+        EmgQueue& inputEmgQueue_;
+        LmtQueue& inputLmtQueue_;
+        ExternalTorquesQueue& inputExternalTorqueQueue_;
+        MultipleMomentArmsQueues& inputMomentArmsQueues_;
+        Concurrency::Latch& doneWithSubscriptions_;
+        Concurrency::Latch& doneWithExecution_;
     };
 }
 
-#include "ModelEvaluationOnline.cpp"
+#include "ModelEvaluationBase.cpp"
 #endif

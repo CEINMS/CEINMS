@@ -80,7 +80,8 @@ namespace ceinms {
 
     double ContactModelKneeBalance::calculateSingleForce(double externalTorque, double estimatedTorque) const {
 
-        return (estimatedTorque - externalTorque) / intercondyleDistance_;
+        //to remove abs after isb and proberly fix the problem with the reference system
+        return abs((estimatedTorque - externalTorque) / intercondyleDistance_);
     }
 
     

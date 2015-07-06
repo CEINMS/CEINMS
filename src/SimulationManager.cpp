@@ -43,9 +43,9 @@
 #include "ceinms/GeneralisedCoordinatesFromStorageFile.h"
 #include "ceinms/ExternalForcesFromStorageFile.h"
 
-#include "ModelEvaluationOnline.h"
-#include "ModelEvaluationOffline.h"
-#include "ModelEvaluationHybrid.h"
+#include "ceinms/ModelEvaluationOnline.h"
+#include "ceinms/ModelEvaluationOffline.h"
+#include "ceinms/ModelEvaluationHybrid.h"
 
 //Hybrid optimiser
 #include "ceinms/ErrorMinimizerAnnealing.h"

@@ -41,7 +41,8 @@ namespace ceinms {
         ScalarLogQueue& outputLogQueue,
         Concurrency::Latch& doneWithSubscriptions,
         Concurrency::Latch& doneWithExecution,
-        const std::vector<std::string>& valuesToLog) :
+        const std::vector<std::string>& valuesToLog,
+        bool showLog) :
 
         inputEmgQueue_(inputEmgQueue),
         inputLmtQueue_(inputLmtQueue),
@@ -49,7 +50,8 @@ namespace ceinms {
         inputMomentArmsQueues_(inputMomentArmsQueues),
         doneWithSubscriptions_(doneWithSubscriptions),
         doneWithExecution_(doneWithExecution),
-        logger(outputLogQueue, valuesToLog)
+        logger(outputLogQueue, valuesToLog),
+        showLog_(showLog)
     { }
 
     template <typename Logger>

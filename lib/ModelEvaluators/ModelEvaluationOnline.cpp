@@ -26,9 +26,6 @@
  * limitations under the License.                                             *
  * -------------------------------------------------------------------------- */
 
-#include "SimpleFileLogger.h"
-#include "StorageLogger.h"
-
 #include <iostream>
 using std::cout;
 using std::endl;
@@ -39,8 +36,6 @@ using std::vector;
 using std::string;
 
 #include "ceinms/TimeCompare.h"
-#include "ModelEvaluationOnline.h"
-#include "ModelEvaluationBase.h"
 #include "ceinms/EndOfData.h"
 
 #define LOG_FILES
@@ -57,7 +52,8 @@ namespace ceinms {
         Concurrency::Latch& doneWithSubscriptions,
         Concurrency::Latch& doneWithExecution,
         NMSmodelT& subject,
-        const vector<string>& valuesToLog)
+        const vector<string>& valuesToLog,
+        bool showLog)
         :ModelEvaluationBase<Logger>(
         inputEmgQueue,
         inputLmtQueue,
@@ -66,7 +62,8 @@ namespace ceinms {
         outputLogQueue,
         doneWithSubscriptions,
         doneWithExecution,
-        valuesToLog),
+        valuesToLog,
+        showLog),
         subject_(subject)
     {
         subject_.getDoFNames(dofNames_);
@@ -109,6 +106,7 @@ namespace ceinms {
             //if no external torques are available, the producer will send an EndOfData frame
             // 3. read external Torque
             ExternalTorquesFrame externalTorquesFrameFromQueue;
+            externalTorquesFrameFromQueue.data.resize(noDof_);
             if (externalTorquesRunCondition) {
                 while (TimeCompare::less(externalTorqueTime, lmtMaTime)) {
                     ModelEvaluationBase<Logger>::getExternalTorquesFromInputQueue(externalTorquesFrameFromQueue);
@@ -120,6 +118,7 @@ namespace ceinms {
 
             // 4. read emgs
             EmgFrame emgFrameFromQueue;
+            emgFrameFromQueue.data.resize(subject_.getNoMuscles());
             while (TimeCompare::less(emgTime, lmtMaTime) && runCondition) {
                 ModelEvaluationBase<Logger>::getEmgFromInputQueue(emgFrameFromQueue);
                 emgTime = emgFrameFromQueue.time + globalEmDelay_;
@@ -164,32 +163,34 @@ namespace ceinms {
 #endif
 
 #ifdef LOG
-                cout << endl << endl << "EmgTime: " << emgTime << endl << "EMG" << endl;
-                for (auto& it : emgFrameFromQueue.data)
-                    cout << it << "\t";
-
-                cout << endl << "LmtTime: " << lmtMaTime << endl << "Lmt" << endl;
-                for (auto& it : lmtFrameFromQueue.data)
-                    cout << it << "\t";
-
-                for (unsigned int j = 0; j < dofNames_.size(); ++j) {
-                    cout << endl << "MomentArms on: " << dofNames_.at(j) << endl;
-                    for (auto& it : momentArmsFramesFromQueue.at(j).data)
+                if (showLog_) {
+                    cout << endl << endl << "EmgTime: " << emgTime << endl << "EMG" << endl;
+                    for (auto& it : emgFrameFromQueue.data)
                         cout << it << "\t";
-                }
 
-                if (externalTorquesRunCondition) {
-                    for (auto& it : externalTorquesFrameFromQueue.data)
-                        cout << it << " ";
-                }
+                    cout << endl << "LmtTime: " << lmtMaTime << endl << "Lmt" << endl;
+                    for (auto& it : lmtFrameFromQueue.data)
+                        cout << it << "\t";
 
-                vector<double> cTorques;
-                subject_.getTorques(cTorques);
-                for (unsigned int i = 0; i < cTorques.size(); ++i) {
-                    cout << "\nCurrent Torque on " << dofNames_.at(i) << " ";
-                    cout << cTorques.at(i);
+                    for (unsigned int j = 0; j < dofNames_.size(); ++j) {
+                        cout << endl << "MomentArms on: " << dofNames_.at(j) << endl;
+                        for (auto& it : momentArmsFramesFromQueue.at(j).data)
+                            cout << it << "\t";
+                    }
+
+                    if (externalTorquesRunCondition) {
+                        for (auto& it : externalTorquesFrameFromQueue.data)
+                            cout << it << " ";
+                    }
+
+                    vector<double> cTorques;
+                    subject_.getTorques(cTorques);
+                    for (unsigned int i = 0; i < cTorques.size(); ++i) {
+                        cout << "\nCurrent Torque on " << dofNames_.at(i) << " ";
+                        cout << cTorques.at(i);
+                    }
+                    cout << endl << "----------------------------------------" << endl;
                 }
-                cout << endl << "----------------------------------------" << endl;
 #endif
             }
 
