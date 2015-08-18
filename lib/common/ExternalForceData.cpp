@@ -38,14 +38,16 @@ namespace ceinms {
         targetBody_(0),
         force_(std::make_pair(0, Vec3(0))),
         point_(std::make_pair(0, Vec3(0))),
-        torque_(std::make_pair(0, Vec3(0))) { /*blank*/
+        torque_(std::make_pair(0, Vec3(0))),
+        useApplicationPoint_(true) { /*blank*/
     }
 
     ExternalForceData::ExternalForceData(unsigned targetBody) :
         targetBody_(targetBody),
         force_(std::make_pair(0, Vec3(0))),
         point_(std::make_pair(0, Vec3(0))),
-        torque_(std::make_pair(0, Vec3(0))) { /*blank*/
+        torque_(std::make_pair(0, Vec3(0))),
+        useApplicationPoint_(true) { /*blank*/
     }
 
     void ExternalForceData::setTargetBody(unsigned targetBody) {
@@ -63,6 +65,11 @@ namespace ceinms {
 
         point_.first = expressedInBodyIndex;
         point_.second = point;
+    }
+
+    void ExternalForceData::setMoments(const SimTK::Vec3& moments, unsigned expressedInBodyIndex) {
+        moments_.first = expressedInBodyIndex;
+        moments_.second = moments;
     }
 
     void ExternalForceData::setTorque(const Vec3& torque, unsigned expressedInBodyIndex) {
@@ -99,6 +106,31 @@ namespace ceinms {
     unsigned ExternalForceData::getApplicationPointBodyIndex() const {
 
         return point_.first;
+    }
+
+    void ExternalForceData::setUseApplicationPoint(bool useApplicationPoint) {
+
+        useApplicationPoint_ = useApplicationPoint;
+    }
+
+    bool ExternalForceData::getUseApplicationPoint() const {
+
+        return useApplicationPoint_;
+    }
+
+    const Vec3& ExternalForceData::getMoments() const {
+
+        return moments_.second;
+    }
+
+    void ExternalForceData::getMoments(Vec3& moments) const {
+
+        moments = moments_.second;
+    }
+
+    unsigned ExternalForceData::getMomentsBodyIndex() const {
+
+        return moments_.first;
     }
 
     const Vec3& ExternalForceData::getTorque() const {

@@ -115,13 +115,25 @@ namespace OpenSim {
             else
                 forceData = getExternalForceDataFromQueue(time);
 
-            //it could be possible to chenge the application point of the force on the fly, but at the moment we just keep the definitions from the xml
+            SimTK::Vec3 torquesToApply(0.);
+
             const SimbodyEngine& engine = getModel().getSimbodyEngine();
             SimTK::Vec3 transformedForce, transformedPosition, transformedTorque;
             engine.transform(state, *forceExpressedInBody_, forceData.getForce(), engine.getGroundBody(), transformedForce);
-            engine.transformPosition(state, *pointExpressedInBody_, forceData.getApplicationPoint(), *appliedToBody_, transformedPosition);
+
+            if (forceData.getUseApplicationPoint()) {
+                //use COP + GRF + fre torque
+                torquesToApply = forceData.getTorque();
+                engine.transformPosition(state, *pointExpressedInBody_, forceData.getApplicationPoint(), *appliedToBody_, transformedPosition);
+            }
+            else {
+                //apply the grf and moments from the force plate directly to the body
+                pointExpressedInBody_->getMassCenter(transformedPosition);
+                torquesToApply = forceData.getMoments();
+            }
+
             ExternalForce::applyForceToPoint(state, *appliedToBody_, transformedPosition, transformedForce, bodyForces);
-            engine.transform(state, *forceExpressedInBody_, forceData.getTorque(), engine.getGroundBody(), transformedTorque);
+            engine.transform(state, *forceExpressedInBody_, torquesToApply, engine.getGroundBody(), transformedTorque);
             ExternalForce::applyTorque(state, *appliedToBody_, transformedTorque, bodyForces);
         }
     }

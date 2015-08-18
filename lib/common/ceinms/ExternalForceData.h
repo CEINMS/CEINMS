@@ -41,6 +41,7 @@ namespace ceinms {
         void setForceVector(const SimTK::Vec3& force, unsigned expressedInBodyIndex = 0);
         void setApplicationPoint(const SimTK::Vec3& point, unsigned expressedInBodyIndex = 0);
         void setTorque(const SimTK::Vec3& torque, unsigned expressedInBodyIndex = 0);
+        void setMoments(const SimTK::Vec3& moments, unsigned expressedInBodyIndex = 0);
 
         unsigned getTargetBodyIndex() const;
 
@@ -48,10 +49,17 @@ namespace ceinms {
         void getForce(SimTK::Vec3& force) const;
         unsigned getForceBodyIndex() const;
 
+        void setUseApplicationPoint(bool useApplicationPoint); //if false applies grf to centre of mass
+        bool getUseApplicationPoint() const;
         const SimTK::Vec3& getApplicationPoint() const;
         void getApplicationPoint(SimTK::Vec3& applicationPoint) const;
         unsigned getApplicationPointBodyIndex() const;
 
+        const SimTK::Vec3& getMoments() const;
+        void getMoments(SimTK::Vec3& moments) const;
+        unsigned getMomentsBodyIndex() const;
+
+        //torques should be updated based on moments, grf, and cop
         const SimTK::Vec3& getTorque() const;
         void getTorque(SimTK::Vec3& torque) const;
         unsigned getTorqueBodyIndex() const;
@@ -62,6 +70,8 @@ namespace ceinms {
         std::pair<unsigned, SimTK::Vec3> point_;  //reference system index and point vector
         std::pair<unsigned, SimTK::Vec3> force_;  //reference system index and force vector
         std::pair<unsigned, SimTK::Vec3> torque_;  //reference system index and force vector
+        std::pair<unsigned, SimTK::Vec3> moments_;  //reference system index and moments
+        bool useApplicationPoint_;
     };
 }
 
