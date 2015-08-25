@@ -48,7 +48,6 @@ namespace ceinms {
             void subscribe();
             void unsubscribe();
             T pop();
-            T front();
             void push(const T& item);
             template <typename B>
             friend std::ostream& operator<< (std::ostream& os, const Queue<B>& queue);

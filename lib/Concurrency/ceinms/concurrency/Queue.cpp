@@ -53,19 +53,6 @@ namespace ceinms{
             return val;
         }
 
-        template <typename T>
-        T Queue<T>::front() {
-
-            std::unique_lock<std::mutex> mlock(mutex_);
-            while (subscribersMissingRead_[std::this_thread::get_id()] == 0) {
-                cond_.wait(mlock);
-            }
-
-            T val = *subscribersNextRead_[std::this_thread::get_id()];
-            mlock.unlock();
-            return val;
-        }
-
         // push data only when the queue has subscribers
         template <typename T>
         void Queue<T>::push(const T& item) {
