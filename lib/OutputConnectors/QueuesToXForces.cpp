@@ -133,6 +133,7 @@ namespace OpenSim {
             }
 
             ExternalForce::applyForceToPoint(state, *appliedToBody_, transformedPosition, transformedForce, bodyForces);
+
             engine.transform(state, *forceExpressedInBody_, torquesToApply, engine.getGroundBody(), transformedTorque);
             ExternalForce::applyTorque(state, *appliedToBody_, transformedTorque, bodyForces);
         }

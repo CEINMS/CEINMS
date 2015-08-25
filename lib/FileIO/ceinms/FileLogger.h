@@ -198,7 +198,7 @@ namespace ceinms {
         *outFile_ << "endheader" << std::endl;
         *outFile_ << "time" + sp_;
         for (auto& it : columnLabels_)
-            *outFile_ << it << "_pos" << sp_ << it << "_vel" << sp_ << it << "_acc" << sp_;
+            *outFile_ << it << sp_ << it << "_vel" << sp_ << it << "_acc" << sp_;
         *outFile_ << std::endl;
     }
 
@@ -206,7 +206,7 @@ namespace ceinms {
     void FileLogger<MultipleExternalForcesData>::initFile()
     {
         *outFile_ << "CEINMS output" << std::endl;
-        *outFile_ << "datacolumns " << dataToWrite_.back().data.size() * 9 + 1 << std::endl;
+        *outFile_ << "datacolumns " << dataToWrite_.back().data.size() * 12 + 1 << std::endl;
         *outFile_ << "datarows " << dataToWrite_.size() << std::endl;
         *outFile_ << "endheader" << std::endl;
         *outFile_ << "time" + sp_;
@@ -220,7 +220,11 @@ namespace ceinms {
             it << "_pz" << sp_ <<
             it << "_mx" << sp_ <<
             it << "_my" << sp_ <<
-            it << "_mz" << sp_;
+            it << "_mz" << sp_ <<
+            it << "_tx" << sp_ <<
+            it << "_ty" << sp_ <<
+            it << "_tz" << sp_;
+        ;
         *outFile_ << std::endl;
     }
 
@@ -274,7 +278,8 @@ namespace ceinms {
             for (auto& v : dataIt.data) {
                 auto f(v.getForce());
                 auto p(v.getApplicationPoint());
-                auto m(v.getTorque());
+                auto m(v.getMoments());
+                auto t(v.getTorque());
                 *outFile_
                     << f[0] << sp_
                     << f[1] << sp_
@@ -284,7 +289,10 @@ namespace ceinms {
                     << p[2] << sp_
                     << m[0] << sp_
                     << m[1] << sp_
-                    << m[2] << sp_;
+                    << m[2] << sp_
+                    << t[0] << sp_
+                    << t[1] << sp_
+                    << t[2] << sp_;
             }
             *outFile_ << std::endl;
         }

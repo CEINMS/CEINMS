@@ -29,7 +29,6 @@
 #ifndef ceinms_Queue_h
 #define ceinms_Queue_h
 
-
 #include <list>
 #include <map>
 #include <thread>
@@ -49,6 +48,7 @@ namespace ceinms {
             void subscribe();
             void unsubscribe();
             T pop();
+            T front();
             void push(const T& item);
             template <typename B>
             friend std::ostream& operator<< (std::ostream& os, const Queue<B>& queue);
