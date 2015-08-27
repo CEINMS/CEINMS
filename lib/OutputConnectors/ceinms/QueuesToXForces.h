@@ -73,6 +73,7 @@ namespace OpenSim {
         //need to use raw pointers because opensim deletes stuff for me.. and it's a mess
         ceinms::SingleExternalForceQueue* externalForceQueue_;
         mutable std::list<ceinms::QueueData<ceinms::ExternalForceData> > pastExternalForceFrames_;
+        static const unsigned MaxStorageLength_ = 1000;
         mutable double lastTime_;
         SimTK::ReferencePtr<const Body> appliedToBody_;
         SimTK::ReferencePtr<const Body> forceExpressedInBody_;

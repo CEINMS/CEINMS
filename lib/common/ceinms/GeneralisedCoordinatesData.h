@@ -53,6 +53,7 @@ namespace ceinms {
         size_t getNCoordinates() const { return nCoordinates_; }
 
         void setQ(const std::vector<double>& q) {
+            nCoordinates_ = q.size();
             q_ = q;
         }
         void setQd(const std::vector<double>& qd) {
@@ -68,8 +69,6 @@ namespace ceinms {
         void getQ(std::vector<double>& q) const { q = q_; }
         void getQd(std::vector<double>& qd) const { qd = qd_; }
         void getQdd(std::vector<double>& qdd) const { qdd = qdd_; }
-
-
     };
 }
 #endif

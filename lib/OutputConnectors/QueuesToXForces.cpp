@@ -97,6 +97,8 @@ namespace OpenSim {
             if (runCondition_) {
                 pastExternalForceFrames_.push_back(forceFrame);
                 lastTime_ = forceFrame.time;
+                if (pastExternalForceFrames_.size() > MaxStorageLength_)
+                    pastExternalForceFrames_.pop_front();
             }
         }
         return forceFrame.data;
