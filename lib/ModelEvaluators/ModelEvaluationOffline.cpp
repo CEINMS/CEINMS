@@ -26,8 +26,8 @@
  * limitations under the License.                                             *
  * -------------------------------------------------------------------------- */
 
-#include "SimpleFileLogger.h"
-#include "StorageLogger.h"
+//#include "SimpleFileLogger.h"
+//#include "StorageLogger.h"
 #include "ceinms/TimeCompare.h"
 
 #include <thread>
@@ -40,8 +40,8 @@ using std::vector;
 #include <string>
 using std::string;
 
-#include "ModelEvaluationOffline.h"
-#include "ModelEvaluationBase.h"
+#include "ceinms/ModelEvaluationOffline.h"
+#include "ceinms/ModelEvaluationBase.h"
 #define LOG_FILES
 #define Evaluation_LOG
 

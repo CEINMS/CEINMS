@@ -39,6 +39,7 @@ target_include_directories( OptimizationSystems
 									${TrialData_INCLUDE_DIRS}
                                     ${JointContactModels_INCLUDE_DIRS})
 
+target_link_libraries(OptimizationSystems ceinms_common JointContactModels)
 
 # Save path to include directory for "internal" usage
 set(OptimizationSystems_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}"

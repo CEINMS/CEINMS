@@ -163,7 +163,7 @@ namespace ceinms {
 #endif
 
 #ifdef LOG
-                if (showLog_) {
+                if (this->showLog_) {
                     cout << endl << endl << "EmgTime: " << emgTime << endl << "EMG" << endl;
                     for (auto& it : emgFrameFromQueue.data)
                         cout << it << "\t";

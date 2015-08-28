@@ -26,8 +26,8 @@
  * limitations under the License.                                             *
  * -------------------------------------------------------------------------- */
 
-#include "SimpleFileLogger.h"
-#include "StorageLogger.h"
+//#include "SimpleFileLogger.h"
+//#include "StorageLogger.h"
 #include "ceinms/TimeCompare.h"
 #include "ceinms/EndOfData.h"
 #include <iostream>

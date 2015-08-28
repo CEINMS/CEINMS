@@ -137,7 +137,7 @@ namespace ceinms {
     template<int N>
     std::shared_ptr<SplineSetAdapter<N>> SplineSetAdapter<N>::make(const string& inputDataFilename) {
 
-        return shared_ptr<SplineSetAdapter<N>>(new SplineSetAdapter<N>(inputDataFilename));
+        return std::shared_ptr<SplineSetAdapter<N>>(new SplineSetAdapter<N>(inputDataFilename));
     }
 
     template<int N>
@@ -149,13 +149,13 @@ namespace ceinms {
         const std::vector<int>& n,
         const std::vector<std::vector<double> >& y) {
 
-        return shared_ptr<SplineSetAdapter<N>>(new SplineSetAdapter<N>(dofNames, musclesNames, a, b, n, y));
+        return std::shared_ptr<SplineSetAdapter<N>>(new SplineSetAdapter<N>(dofNames, musclesNames, a, b, n, y));
     }
 
     template<int N>
     std::shared_ptr<SplineSetAdapter<N>> SplineSetAdapter<N>::make(const std::string& coeffDir, const std::vector<std::string>& muscleNames) {
 
-        return shared_ptr<SplineSetAdapter<N>>(new SplineSetAdapter<N>(coeffDir, muscleNames));
+        return std::shared_ptr<SplineSetAdapter<N>>(new SplineSetAdapter<N>(coeffDir, muscleNames));
     }
 
     template<int N>
@@ -238,11 +238,11 @@ namespace ceinms {
 
         subject.getMuscleNamesOnDofs(muscleNamesOnDofsMap_);
 
-        vector<string> dofNamesFromSpline(splineSet_->getDofNames());
-        cout << "dof names from spline ";
+        std::vector<string> dofNamesFromSpline(splineSet_->getDofNames());
+        std::cout << "dof names from spline ";
         for (auto dof : dofNamesFromSpline)
-            cout << dof << " ";
-        cout << endl;
+            std::cout << dof << " ";
+        std::cout << std::endl;
 
         dofMapper_.setNames(dofNames_, dofNamesFromSpline);
 

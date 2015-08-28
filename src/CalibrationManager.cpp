@@ -52,7 +52,7 @@ using std::vector;
 #include "ceinms/NMSmodelSystem.h"
 #include "ceinms/Curve.h"
 #include "ceinms/InputDataXmlReader.h"
-#include "ceinms/EMGFromFile.h"
+#include "ceinms/EmgFromFile.h"
 #include "ceinms/ExternalTorquesFromStorageFile.h"
 #include "ceinms/LmtMaFromStorageFile.h"
 #include "ceinms/ObjectiveFunctionSetup.h"

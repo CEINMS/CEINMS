@@ -34,7 +34,7 @@
 
 using ceinms::TrialData;
 #include "ceinms/QueuesToTrialData.h"
-#include "ceinms/EMGFromFile.h"
+#include "ceinms/EmgFromFile.h"
 #include "ceinms/LmtMaFromStorageFile.h"
 #include "ceinms/CeinmsCalibrationSetupXmlReader.h"
 #include "ceinms/CalibrationXmlReader.h"

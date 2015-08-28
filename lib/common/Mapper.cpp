@@ -29,6 +29,7 @@
 #include <vector>
 #include <string>
 #include "ceinms/Mapper.h"
+#include <algorithm>
 
 namespace ceinms {
 
