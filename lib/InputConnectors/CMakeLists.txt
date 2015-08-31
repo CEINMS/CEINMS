@@ -47,7 +47,7 @@ add_library(InputConnectors STATIC
   ${FromStorageFile_HEADERS}
 )
 target_link_libraries(InputConnectors FileIO Concurrency ${Boost_FILESYSTEM_LIBRARY} optimized ${OPENSIM_LIBRARIES})
-target_link_libraries(InputConnectors FileIO Concurrency ${Boost_FILESYSTEM_LIBRARY} debug ${OPENSIM_LIBRARIES_DEBUG})
+#target_link_libraries(InputConnectors FileIO Concurrency ${Boost_FILESYSTEM_LIBRARY} debug ${OPENSIM_LIBRARIES_DEBUG})
 
 
 target_include_directories(InputConnectors

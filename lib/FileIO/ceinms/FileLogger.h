@@ -32,7 +32,14 @@
 #include <vector>
 #include <list>
 #include <memory>
-#include <ostream>
+#include <string>
+#include <fstream>
+#include <iostream>
+#include <SimTKcommon.h>
+#include "ceinms/ExternalForceData.h"
+#include "ceinms/queues/MultipleExternalForcesQueue.h"
+#include "ceinms/GeneralisedCoordinatesData.h"
+
 
 namespace ceinms {
     template<typename DataType>

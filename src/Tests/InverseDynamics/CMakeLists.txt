@@ -19,5 +19,6 @@ include_directories(
 add_definitions(/DBASE_DIR="${CMAKE_CURRENT_LIST_DIR}")
 
 add_executable(Test_InverseDynamics inverseDynamicsTest.cpp)
+
 target_link_libraries(Test_InverseDynamics  JointContactModels OutputConnectors InputConnectors xmlInput Concurrency NMSmodel optimized ${OPENSIM_LIBRARIES})
-target_link_libraries(Test_InverseDynamics  JointContactModels OutputConnectors InputConnectors xmlInput Concurrency NMSmodel debug ${OPENSIM_LIBRARIES_DEBUG})
+#target_link_libraries(Test_InverseDynamics  JointContactModels OutputConnectors InputConnectors xmlInput Concurrency NMSmodel debug ${OPENSIM_LIBRARIES_DEBUG})

@@ -17,7 +17,7 @@ if(UNIX AND NOT CMAKE_BUILD_TYPE)
 endif()
 
 if(UNIX)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread -std=c++11 -Wno-deprecated-declarations ")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread -std=c++1y -Wno-deprecated-declarations --verbose ")
 endif(UNIX)
 
 set(CMAKE_VERBOSE_MAKEFILE OFF)

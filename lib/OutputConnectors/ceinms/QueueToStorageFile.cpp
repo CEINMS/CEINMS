@@ -49,7 +49,7 @@ namespace ceinms{
     {
 
         if (!logger_.printable()) {
-            cout << endl << std::fflush;
+           std:: cout << std::endl;
             exit(EXIT_FAILURE);
         }
     }

@@ -49,7 +49,7 @@ add_library(OutputConnectors STATIC
   ${QueuesToStorageFiles_HEADERS}
 )
 target_link_libraries(OutputConnectors JointContactModels ceinms_common ${Boost_FILESYSTEM_LIBRARY} optimized ${OPENSIM_LIBRARIES})
-target_link_libraries(OutputConnectors JointContactModels ceinms_common ${Boost_FILESYSTEM_LIBRARY} debug ${OPENSIM_LIBRARIES_DEBUG})
+#target_link_libraries(OutputConnectors JointContactModels ceinms_common ${Boost_FILESYSTEM_LIBRARY} debug ${OPENSIM_LIBRARIES_DEBUG})
 
 target_include_directories(OutputConnectors
                                 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}

@@ -36,7 +36,7 @@ target_include_directories( JointContactModels
                                     )
 
 target_link_libraries(JointContactModels optimized ${OPENSIM_LIBRARIES})
-target_link_libraries(JointContactModels debug ${OPENSIM_LIBRARIES_DEBUG})
+#target_link_libraries(JointContactModels debug ${OPENSIM_LIBRARIES_DEBUG})
 
 # Save path to include directory for "internal" usage
 set(JointContactModels_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}" CACHE INTERNAL "Include directory for JointContactModels library")

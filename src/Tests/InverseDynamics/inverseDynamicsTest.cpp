@@ -171,5 +171,6 @@ int main() {
     loggerThr.join();
 
     compareSto((outputDir / "id.sto").string(), (outputReferenceDir / "id.sto").string());
+    getchar(); 
     return 0;
 }
