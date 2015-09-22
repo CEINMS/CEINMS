@@ -32,7 +32,7 @@
 using std::vector;
 #include <string>
 using std::string;
-#include <SimTK/include/SimTKcommon.h>
+#include <SimTKcommon.h>
 using SimTK::Vec3;
 using ceinms::SingleExternalForceFrame;
 using ceinms::SingleExternalForceQueue;
