@@ -55,10 +55,10 @@ find_library(osimSimulation
              PATHS ${OPENSIM_POSSIBLE_DIRECTORIES}
              PATH_SUFFIXES sdk/lib lib)
 
-find_library(osimSimulation_d
-             NAMES osimSimulation_d
-             PATHS ${OPENSIM_POSSIBLE_DIRECTORIES}
-             PATH_SUFFIXES sdk/lib lib)
+#find_library(osimSimulation_d
+#             NAMES osimSimulation_d
+#             PATHS ${OPENSIM_POSSIBLE_DIRECTORIES}
+#             PATH_SUFFIXES sdk/lib lib)
              
              
 find_library(osimCommon
@@ -66,20 +66,20 @@ find_library(osimCommon
              PATHS ${OPENSIM_POSSIBLE_DIRECTORIES}
              PATH_SUFFIXES sdk/lib lib)
 
- find_library(osimCommon_d
-             NAMES osimCommon_d
-             PATHS ${OPENSIM_POSSIBLE_DIRECTORIES}
-             PATH_SUFFIXES sdk/lib lib)
+#find_library(osimCommon_d
+#             NAMES osimCommon_d
+#             PATHS ${OPENSIM_POSSIBLE_DIRECTORIES}
+#             PATH_SUFFIXES sdk/lib lib)
              
 find_library(osimActuators
              NAMES osimActuators
              PATHS ${OPENSIM_POSSIBLE_DIRECTORIES}
              PATH_SUFFIXES sdk/lib lib)
 
- find_library(osimActuators_d
-             NAMES osimActuators_d
-             PATHS ${OPENSIM_POSSIBLE_DIRECTORIES}
-             PATH_SUFFIXES sdk/lib lib)
+#find_library(osimActuators_d
+#             NAMES osimActuators_d
+#             PATHS ${OPENSIM_POSSIBLE_DIRECTORIES}
+#             PATH_SUFFIXES sdk/lib lib)
 
              
 find_library(osimAnalyses
@@ -87,10 +87,10 @@ find_library(osimAnalyses
              PATHS ${OPENSIM_POSSIBLE_DIRECTORIES}
              PATH_SUFFIXES sdk/lib lib)
 
- find_library(osimAnalyses_d
-             NAMES osimAnalyses_d
-             PATHS ${OPENSIM_POSSIBLE_DIRECTORIES}
-             PATH_SUFFIXES sdk/lib lib)
+#find_library(osimAnalyses_d
+#             NAMES osimAnalyses_d
+#             PATHS ${OPENSIM_POSSIBLE_DIRECTORIES}
+#             PATH_SUFFIXES sdk/lib lib)
 
              
 find_library(osimTools
@@ -98,10 +98,10 @@ find_library(osimTools
              PATHS ${OPENSIM_POSSIBLE_DIRECTORIES}
              PATH_SUFFIXES sdk/lib lib)
 
- find_library(osimTools_d
-             NAMES osimTools_d
-             PATHS ${OPENSIM_POSSIBLE_DIRECTORIES}
-             PATH_SUFFIXES sdk/lib lib)
+#find_library(osimTools_d
+#             NAMES osimTools_d
+#             PATHS ${OPENSIM_POSSIBLE_DIRECTORIES}
+#             PATH_SUFFIXES sdk/lib lib)
 
              
 find_library(${NameSpace}SimTKcommon
@@ -109,10 +109,10 @@ find_library(${NameSpace}SimTKcommon
              PATHS ${OPENSIM_POSSIBLE_DIRECTORIES}
              PATH_SUFFIXES sdk/lib lib)
 
- find_library(${NameSpace}SimTKcommon_d
-             NAMES ${NameSpace}SimTKcommon_d SimTKcommon_d
-             PATHS ${OPENSIM_POSSIBLE_DIRECTORIES}
-             PATH_SUFFIXES sdk/lib lib)
+#find_library(${NameSpace}SimTKcommon_d
+#            NAMES ${NameSpace}SimTKcommon_d SimTKcommon_d
+#            PATHS ${OPENSIM_POSSIBLE_DIRECTORIES}
+#            PATH_SUFFIXES sdk/lib lib)
 
              
 find_library(${NameSpace}SimTKmath
@@ -120,10 +120,10 @@ find_library(${NameSpace}SimTKmath
              PATHS ${OPENSIM_POSSIBLE_DIRECTORIES}
              PATH_SUFFIXES sdk/lib lib)
 
- find_library(${NameSpace}SimTKmath_d
-             NAMES ${NameSpace}SimTKmath_d SimTKmath_d
-             PATHS ${OPENSIM_POSSIBLE_DIRECTORIES}
-             PATH_SUFFIXES sdk/lib lib)
+#find_library(${NameSpace}SimTKmath_d
+#             NAMES ${NameSpace}SimTKmath_d SimTKmath_d
+#             PATHS ${OPENSIM_POSSIBLE_DIRECTORIES}
+#             PATH_SUFFIXES sdk/lib lib)
 
              
 find_library(${NameSpace}SimTKsimbody SimTKsimbody
@@ -131,14 +131,14 @@ find_library(${NameSpace}SimTKsimbody SimTKsimbody
              PATHS ${OPENSIM_POSSIBLE_DIRECTORIES}
              PATH_SUFFIXES sdk/lib lib)
 
- find_library(${NameSpace}SimTKsimbody_d SimTKsimbody_d
-             NAMES ${NameSpace}SimTKsimbody_d
-             PATHS ${OPENSIM_POSSIBLE_DIRECTORIES}
-             PATH_SUFFIXES sdk/lib lib)
+#find_library(${NameSpace}SimTKsimbody_d SimTKsimbody_d
+#             NAMES ${NameSpace}SimTKsimbody_d
+#             PATHS ${OPENSIM_POSSIBLE_DIRECTORIES}
+#             PATH_SUFFIXES sdk/lib lib)
 
              #does this exist?
 find_library(SimTKlapack
-             NAMES SimTKlapack lapack
+             NAMES SimTKlapack lapack liblapack
              PATHS ${OPENSIM_POSSIBLE_DIRECTORIES}
              PATH_SUFFIXES sdk/lib lib)
 
