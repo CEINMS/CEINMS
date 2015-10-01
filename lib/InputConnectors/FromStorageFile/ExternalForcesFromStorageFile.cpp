@@ -39,6 +39,8 @@ using std::string;
 #include <vector>
 using std::vector;
 
+#include <iostream>
+
 namespace ceinms {
 
     ExternalForcesFromStorageFile::ExternalForcesFromStorageFile(
@@ -72,14 +74,13 @@ namespace ceinms {
         externalLoads.setExternalLoadsModelKinematicsFileName(kinematicsFilename);
 
         externalLoads.invokeConnectToModel(model);
-
         OpenSim::Storage externalForcesStorage(externalLoads.getDataFileName());
         OpenSim::Array<double> timeColumnExternalLoadsOS;
         vector<double> timeColumnExternalLoads;
         externalForcesStorage.getTimeColumn(timeColumnExternalLoadsOS);
         ArrayConverter::toStdVector(timeColumnExternalLoadsOS, timeColumnExternalLoads);
 
-        unsigned sleepTimeMilliseconds;
+        unsigned sleepTimeMilliseconds(0);
         if (pushFrequency_ > 0)
             sleepTimeMilliseconds = static_cast<unsigned>(std::floor(1000. / (pushFrequency_)));
 
@@ -94,6 +95,7 @@ namespace ceinms {
                 currentExtForce.setForceVector(externalLoads.get(i).getForceAtTime(t));
                 currentExtForce.setApplicationPoint(externalLoads.get(i).getPointAtTime(t));
                 currentExtForce.setTorque(externalLoads.get(i).getTorqueAtTime(t));
+                currentExtForce.setSourceName(externalLoads.get(i).getName());
                 externalForcesFrame.data.push_back(currentExtForce);
             }
             ExternalForcesFromX::updateExternalForces(externalForcesFrame.data, externalForcesFrame.time);
