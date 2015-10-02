@@ -29,6 +29,9 @@
 #ifndef ceinms_ExternalForceDataSetup_h
 #define ceinms_ExternalForceDataSetup_h
 #include <string>
+#include <vector>
+#include <OpenSim/OpenSim.h>
+
 namespace ceinms {
 
     struct ExternalForceDataSetup {
@@ -41,6 +44,8 @@ namespace ceinms {
         std::string forceExpressedInBodyName;
         std::string pointExpressedInBodyName;
     };
+
+    std::vector<ExternalForceDataSetup> parseExternalLoadsXml(const std::string& xmlFilename);
 }
 
 #endif

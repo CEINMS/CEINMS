@@ -128,7 +128,6 @@ namespace ceinms {
     private:
         static SimTK::Vector toSimTKVector(std::vector<double> v);
         static std::vector<double> fromSimTKVector(SimTK::Vector v);
-        std::vector<ExternalForceDataSetup> parseExternalLoadsXml(const std::string& externalLoadsXmlFilename) const;
         void distributeExternalForces();
         void updateCeinmsToOpenSimDofMapping();
         void updateCeinmsToOpenSimMuscleMapping();
