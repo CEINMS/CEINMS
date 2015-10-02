@@ -40,7 +40,7 @@ namespace ceinms {
             typename T::type frame;
             do {
                 frame = queue.pop();
-            } while (frame.time < t);
+            } while (frame.time < t && !isEndOfData(frame));
             return frame;
         }
 
@@ -55,8 +55,6 @@ namespace ceinms {
         bool isEndOfData(const T& frame) {
             return frame.time == std::numeric_limits<double>::infinity();
         }
-
     }
-
 }
 #endif

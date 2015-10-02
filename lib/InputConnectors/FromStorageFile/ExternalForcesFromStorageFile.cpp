@@ -56,6 +56,7 @@ namespace ceinms {
 
     void ExternalForcesFromStorageFile::operator()() {
 
+        path cwd(boost::filesystem::current_path());
         Model model(osimModelFilename_);
         OpenSim::ExternalLoads externalLoads(model, externalLoadsXmlFilename_);
 
@@ -72,8 +73,8 @@ namespace ceinms {
         if (!FileUtils::isAbsolute(kinematicsFilename.c_str()))
             kinematicsFilename = (baseDir / kinematicsFilename).string();
         externalLoads.setExternalLoadsModelKinematicsFileName(kinematicsFilename);
-
         externalLoads.invokeConnectToModel(model);
+
         OpenSim::Storage externalForcesStorage(externalLoads.getDataFileName());
         OpenSim::Array<double> timeColumnExternalLoadsOS;
         vector<double> timeColumnExternalLoads;
@@ -83,6 +84,8 @@ namespace ceinms {
         unsigned sleepTimeMilliseconds(0);
         if (pushFrequency_ > 0)
             sleepTimeMilliseconds = static_cast<unsigned>(std::floor(1000. / (pushFrequency_)));
+
+        boost::filesystem::current_path(cwd);
 
         ExternalForcesFromX::doneWithSubscriptions();
         for (auto t : timeColumnExternalLoads) {
