@@ -39,6 +39,7 @@ namespace ceinms {
         force_(std::make_pair(0, Vec3(0))),
         point_(std::make_pair(0, Vec3(0))),
         torque_(std::make_pair(0, Vec3(0))),
+        sourceName_(""),
         useApplicationPoint_(true) { /*blank*/
     }
 
@@ -47,6 +48,7 @@ namespace ceinms {
         force_(std::make_pair(0, Vec3(0))),
         point_(std::make_pair(0, Vec3(0))),
         torque_(std::make_pair(0, Vec3(0))),
+        sourceName_(""),
         useApplicationPoint_(true) { /*blank*/
     }
 
@@ -76,6 +78,16 @@ namespace ceinms {
 
         torque_.first = expressedInBodyIndex;
         torque_.second = torque;
+    }
+
+    void  ExternalForceData::setSourceName(const std::string& name) {
+
+        sourceName_ = name;
+    }
+
+    std::string  ExternalForceData::getSourceName() const {
+
+        return sourceName_;
     }
 
     const Vec3& ExternalForceData::getForce() const {

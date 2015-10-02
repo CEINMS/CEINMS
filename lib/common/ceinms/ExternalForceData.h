@@ -42,6 +42,8 @@ namespace ceinms {
         void setApplicationPoint(const SimTK::Vec3& point, unsigned expressedInBodyIndex = 0);
         void setTorque(const SimTK::Vec3& torque, unsigned expressedInBodyIndex = 0);
         void setMoments(const SimTK::Vec3& moments, unsigned expressedInBodyIndex = 0);
+        void setSourceName(const std::string& name);
+        std::string getSourceName() const;
 
         unsigned getTargetBodyIndex() const;
 
@@ -72,6 +74,7 @@ namespace ceinms {
         std::pair<unsigned, SimTK::Vec3> torque_;  //reference system index and force vector
         std::pair<unsigned, SimTK::Vec3> moments_;  //reference system index and moments
         bool useApplicationPoint_;
+        std::string sourceName_; //e.g. name of the force plates
     };
 }
 

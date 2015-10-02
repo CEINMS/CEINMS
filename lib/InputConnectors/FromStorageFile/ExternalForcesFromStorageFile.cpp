@@ -39,6 +39,8 @@ using std::string;
 #include <vector>
 using std::vector;
 
+#include <iostream>
+
 namespace ceinms {
 
     ExternalForcesFromStorageFile::ExternalForcesFromStorageFile(
@@ -54,6 +56,7 @@ namespace ceinms {
 
     void ExternalForcesFromStorageFile::operator()() {
 
+        path cwd(boost::filesystem::current_path());
         Model model(osimModelFilename_);
         OpenSim::ExternalLoads externalLoads(model, externalLoadsXmlFilename_);
 
@@ -70,7 +73,6 @@ namespace ceinms {
         if (!FileUtils::isAbsolute(kinematicsFilename.c_str()))
             kinematicsFilename = (baseDir / kinematicsFilename).string();
         externalLoads.setExternalLoadsModelKinematicsFileName(kinematicsFilename);
-
         externalLoads.invokeConnectToModel(model);
 
         OpenSim::Storage externalForcesStorage(externalLoads.getDataFileName());
@@ -79,9 +81,11 @@ namespace ceinms {
         externalForcesStorage.getTimeColumn(timeColumnExternalLoadsOS);
         ArrayConverter::toStdVector(timeColumnExternalLoadsOS, timeColumnExternalLoads);
 
-        unsigned sleepTimeMilliseconds;
+        unsigned sleepTimeMilliseconds(0);
         if (pushFrequency_ > 0)
             sleepTimeMilliseconds = static_cast<unsigned>(std::floor(1000. / (pushFrequency_)));
+
+        boost::filesystem::current_path(cwd);
 
         ExternalForcesFromX::doneWithSubscriptions();
         for (auto t : timeColumnExternalLoads) {
@@ -94,6 +98,7 @@ namespace ceinms {
                 currentExtForce.setForceVector(externalLoads.get(i).getForceAtTime(t));
                 currentExtForce.setApplicationPoint(externalLoads.get(i).getPointAtTime(t));
                 currentExtForce.setTorque(externalLoads.get(i).getTorqueAtTime(t));
+                currentExtForce.setSourceName(externalLoads.get(i).getName());
                 externalForcesFrame.data.push_back(currentExtForce);
             }
             ExternalForcesFromX::updateExternalForces(externalForcesFrame.data, externalForcesFrame.time);
