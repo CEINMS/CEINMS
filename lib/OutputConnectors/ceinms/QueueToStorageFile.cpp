@@ -29,7 +29,7 @@
 #include "ceinms/QueuesSync.h"
 #include <iostream>
 #include <vector>
-#include <SimTK/include/SimTKcommon.h>
+#include <SimTKcommon.h>
 
 namespace ceinms{
 

@@ -34,6 +34,13 @@
 namespace ceinms {
     namespace QueuesSync {
 
+
+        template<typename T>
+        bool isEndOfData(const T& frame) {
+            return frame.time == std::numeric_limits<double>::infinity();
+        }
+
+
         template<typename T>
         typename T::type syncToTime(double t, T& queue) {
 
@@ -49,11 +56,6 @@ namespace ceinms {
 
             auto frame1(queue1.pop());
             return std::make_tuple(frame1, syncToTime(frame1.time, queues)...);
-        }
-
-        template<typename T>
-        bool isEndOfData(const T& frame) {
-            return frame.time == std::numeric_limits<double>::infinity();
         }
     }
 }
