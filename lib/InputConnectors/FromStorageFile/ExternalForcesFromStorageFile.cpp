@@ -51,7 +51,23 @@ namespace ceinms {
         const std::string& externalLoadsXmlFilename) :
         ExternalForcesFromX(outputMultipleExternalForcesQueue, doneWithSubscriptions, doneWithExecution),
         osimModelFilename_(osimModelFilename),
-        externalLoadsXmlFilename_(externalLoadsXmlFilename)
+        externalLoadsXmlFilename_(externalLoadsXmlFilename),
+        useCustomForceFile_(false)
+    {}
+
+    ExternalForcesFromStorageFile::ExternalForcesFromStorageFile(
+        MultipleExternalForcesQueue& outputMultipleExternalForcesQueue,
+        Concurrency::Latch& doneWithSubscriptions,
+        Concurrency::Latch& doneWithExecution,
+        const std::string& osimModelFilename,
+        const std::string& externalLoadsXmlFilename,
+        const std::string& grfFilename) :
+        ExternalForcesFromX(outputMultipleExternalForcesQueue, doneWithSubscriptions, doneWithExecution),
+        osimModelFilename_(osimModelFilename),
+        externalLoadsXmlFilename_(externalLoadsXmlFilename),
+        grfFilename_(grfFilename),
+        useCustomForceFile_(true)
+
     {}
 
     void ExternalForcesFromStorageFile::operator()() {
@@ -75,7 +91,10 @@ namespace ceinms {
         externalLoads.setExternalLoadsModelKinematicsFileName(kinematicsFilename);
         externalLoads.invokeConnectToModel(model);
 
-        OpenSim::Storage externalForcesStorage(externalLoads.getDataFileName());
+        if (!useCustomForceFile_)
+            grfFilename_ = externalLoads.getDataFileName();
+
+        OpenSim::Storage externalForcesStorage(grfFilename_);
         OpenSim::Array<double> timeColumnExternalLoadsOS;
         vector<double> timeColumnExternalLoads;
         externalForcesStorage.getTimeColumn(timeColumnExternalLoadsOS);

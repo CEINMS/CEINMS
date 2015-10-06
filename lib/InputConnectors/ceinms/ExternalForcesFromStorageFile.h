@@ -41,12 +41,23 @@ namespace ceinms {
             Concurrency::Latch& doneWithExecution,
             const std::string& osimModelFilename,
             const std::string& externalLoadsXmlFilename);
+
+        //using this constructor, grfFilename replace the grf in externalLoadsXml
+        ExternalForcesFromStorageFile(
+            MultipleExternalForcesQueue& outputMultipleExternalForcesQueue,
+            Concurrency::Latch& doneWithSubscriptions,
+            Concurrency::Latch& doneWithExecution,
+            const std::string& osimModelFilename,
+            const std::string& externalLoadsXmlFilename,
+            const std::string& grfFilename);
+
         void operator()() override;
         void setPushFrequency(double f) { pushFrequency_ = f; }
         virtual ~ExternalForcesFromStorageFile() override {}
     private:
         double pushFrequency_;
-        std::string osimModelFilename_, externalLoadsXmlFilename_;
+        std::string osimModelFilename_, externalLoadsXmlFilename_, grfFilename_;
+        bool useCustomForceFile_;
     };
 }
 
