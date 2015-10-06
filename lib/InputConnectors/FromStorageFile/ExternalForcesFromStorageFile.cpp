@@ -80,19 +80,18 @@ namespace ceinms {
         path baseDir(p.parent_path());
 
         //correct file path so it works relatively to the xml itself
-        auto forcesFilename = externalLoads.getDataFileName();
-        if (!FileUtils::isAbsolute(forcesFilename.c_str()))
-            forcesFilename = (baseDir / forcesFilename).string();
-        externalLoads.setDataFileName(forcesFilename);
+        if (!useCustomForceFile_)
+            grfFilename_ = externalLoads.getDataFileName();
+
+        if (!FileUtils::isAbsolute(grfFilename_.c_str()))
+            grfFilename_ = (baseDir / grfFilename_).string();
+        externalLoads.setDataFileName(grfFilename_);
 
         auto kinematicsFilename = externalLoads.getExternalLoadsModelKinematicsFileName();
         if (!FileUtils::isAbsolute(kinematicsFilename.c_str()))
             kinematicsFilename = (baseDir / kinematicsFilename).string();
         externalLoads.setExternalLoadsModelKinematicsFileName(kinematicsFilename);
         externalLoads.invokeConnectToModel(model);
-
-        if (!useCustomForceFile_)
-            grfFilename_ = externalLoads.getDataFileName();
 
         OpenSim::Storage externalForcesStorage(grfFilename_);
         OpenSim::Array<double> timeColumnExternalLoadsOS;
