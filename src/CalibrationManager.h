@@ -33,6 +33,7 @@
 #include "ceinms/CeinmsCalibrationSetupXmlReader.h"
 #include "ceinms/CalibrationXmlReader.h"
 #include "ceinms/InputDataXmlReader.h"
+#include "ceinms/ContactModelXmlReader.h"
 #include "ceinms/TrialData.h"
 
 
@@ -70,10 +71,12 @@ namespace ceinms {
 
         CeinmsCalibrationSetupXmlReader ceinmsCalibrationSetup_;
         CalibrationXmlReader calibrationXmlReader_;
+        ContactModelXmlReader contactModelCfg_;
         std::string uncalibratedSubjectFile_;
         std::string calibratedSubjectFile_;
         std::string calibrationFile_;
         std::string emgGeneratorFile_;
+        bool hasContactModel_;
         std::list<std::string> calibrationTrialIDs_;
 
     };

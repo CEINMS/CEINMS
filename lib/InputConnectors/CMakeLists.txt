@@ -2,29 +2,38 @@
 
 # List source files
 set(FromStorageFile_SOURCES
-  FromStorageFile/EMGFromFile.cpp
+  FromStorageFile/EmgFromFile.cpp
   FromStorageFile/ExternalTorquesFromStorageFile.cpp
   FromStorageFile/LmtMaFromStorageFile.cpp
   FromStorageFile/Utilities.cpp
+  FromStorageFile/ExternalForcesFromStorageFile.cpp
+  FromStorageFile/GeneralisedCoordinatesFromStorageFile.cpp
 )
 set(FromStorageFile_HEADERS
-  ceinms/EMGFromFile.h
+  ceinms/EmgFromFile.h
   ceinms/ExternalTorquesFromStorageFile.h
   ceinms/LmtMaFromStorageFile.h
   ceinms/Utilities.h
+  ceinms/ExternalForcesFromStorageFile.h
+  ceinms/GeneralisedCoordinatesFromStorageFile.h
 )
 
 set(InputConnectors_SOURCES
-  EMGFromX.cpp
+  EmgFromX.cpp
   ExternalTorquesFromX.cpp
   LmtMaFromX.cpp
-  InputConnectors.cpp
+  ExternalForcesFromX.cpp
+  GeneralisedCoordinatesFromX.cpp
+  LmtMaFromMcbs.cpp
+  
 )
 set(InputConnectors_HEADERS
-  ceinms/EMGFromX.h
+  ceinms/EmgFromX.h
   ceinms/ExternalTorquesFromX.h
   ceinms/LmtMaFromX.h
-  ceinms/InputConnectors.h
+  ceinms/ExternalForcesFromX.h
+  ceinms/GeneralisedCoordinatesFromX.h
+  ceinms/LmtMaFromMcbs.h
 )
 
 source_group("Headers" FILES ${InputConnectors_HEADERS} ${FromStorageFile_HEADERS} )
@@ -37,13 +46,21 @@ add_library(InputConnectors STATIC
   ${InputConnectors_HEADERS}
   ${FromStorageFile_HEADERS}
 )
-target_link_libraries(InputConnectors FileIO Concurrency ${Boost_FILESYSTEM_LIBRARY})
+target_link_libraries(InputConnectors FileIO Concurrency ${Boost_FILESYSTEM_LIBRARY} optimized ${OPENSIM_LIBRARIES})
+#target_link_libraries(InputConnectors FileIO Concurrency ${Boost_FILESYSTEM_LIBRARY} debug ${OPENSIM_LIBRARIES_DEBUG})
+
+
 target_include_directories(InputConnectors
                                 PRIVATE     ${CMAKE_CURRENT_SOURCE_DIR}
                                             ${ceinms_common_INCLUDE_DIRS}
                                             ${FileIO_INCLUDE_DIRS}
                                             ${Concurrency_INCLUDE_DIRS}
-                                            ${Boost_INCLUDE_DIRS})
+                                            ${Boost_INCLUDE_DIRS}
+								PUBLIC
+											${OPENSIM_INCLUDE_DIRS}
+											${SIMTK_INCLUDE_DIRS}
+											${mcbs_INCLUDE_DIRS}
+											${osimSpliner_INCLUDE_DIRS})
 
 # Save path to include directory for "internal" usage
 set(InputConnectors_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}"  CACHE INTERNAL "Include directories for InputConnectors library")

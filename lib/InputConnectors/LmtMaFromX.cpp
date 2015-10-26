@@ -27,8 +27,7 @@
  * -------------------------------------------------------------------------- */
 
 #include "ceinms/LmtMaFromX.h"
-#include "ceinms/InputConnectors.h"
-
+#include "ceinms/EndOfData.h"
 using std::cout;
 using std::endl;
 #include <string>
@@ -36,22 +35,52 @@ using std::string;
 #include <vector>
 using std::vector;
 #include <cstdlib>
+#include <limits>
 
 namespace ceinms {
-    void LmtMaFromX::updateLmt(const vector<double>& currentLmtData, double currentTime)
-    {
-        QueueData< vector<double> > lmtDataToPush;
-        lmtDataToPush.data = currentLmtData;
-        lmtDataToPush.time = currentTime;
-        inputConnectors_.queueLmt.push(lmtDataToPush);
+
+    void LmtMaFromX::updateLmt(const LmtData& currentLmtData, double currentTime) {
+
+        LmtFrame lmtFrameToPush;
+        lmtFrameToPush.data = currentLmtData;
+        lmtFrameToPush.time = currentTime;
+        outputLmtQueue_.push(lmtFrameToPush);
     }
 
-    void LmtMaFromX::updateMomentArms(const vector<double>& currentMomentArmsData, double currentTime, unsigned int whichDof)
-    {
-        QueueData< vector<double> > momentArmsDataToPush;
-        momentArmsDataToPush.data = currentMomentArmsData;
-        momentArmsDataToPush.time = currentTime;
-        (*inputConnectors_.queueMomentArms.at(whichDof)).push(momentArmsDataToPush);
+    void LmtMaFromX::updateMomentArms(const MomentArmsData& currentMomentArmsData, double currentTime, unsigned int whichDof) {
+
+        MomentArmsFrame momentArmsFrameToPush;
+        momentArmsFrameToPush.data = currentMomentArmsData;
+        momentArmsFrameToPush.time = currentTime;
+        outputMomentArmsQueue_.at(whichDof)->push(momentArmsFrameToPush);
+    }
+
+    void LmtMaFromX::doneWithSubscriptions() {
+
+        doneWithSubscriptions_.wait();
+    }
+
+    void LmtMaFromX::doneWithExecution() {
+
+        doneWithExecution_.wait();
+    }
+
+    void LmtMaFromX::sendLmtEndOfData() {
+
+        outputLmtQueue_.push(EndOfData::get<LmtFrame>());
+    }
+
+    void LmtMaFromX::sendMaEndOfData() {
+
+        for (unsigned i(0); i < dofNames_.size(); ++i)
+            outputMomentArmsQueue_.at(i)->push(EndOfData::get<MomentArmsFrame>());
+    }
+
+    void LmtMaFromX::initialiseMomentArmsQueue() {
+
+        outputMomentArmsQueue_.clear();
+        for (size_t i(0); i < dofNames_.size(); ++i)
+            outputMomentArmsQueue_.emplace_back(new MomentArmsQueue());
     }
 
     LmtMaFromX::~LmtMaFromX() { }

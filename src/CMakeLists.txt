@@ -17,6 +17,10 @@ include_directories(
   ${Optimizers_INCLUDE_DIRS}
   ${OptimizationSystems_INCLUDE_DIRS}
   ${TrialData_INCLUDE_DIRS}
+  ${JointContactModels_INCLUDE_DIRS}
+  ${ModelEvaluators_INCLUDE_DIRS}
+ # ${OPENSIM_INCLUDE_DIRS}       
+ # ${SIMTK_INCLUDE_DIRS}
 )
 include_directories(${Boost_INCLUDE_DIRS})
 
@@ -29,17 +33,10 @@ include_directories(${Boost_INCLUDE_DIRS})
 #  ${CMAKE_SOURCE_DIR}/lib/Hybrid
 #)
 
-set(CEINMS_COMMON_SOURCES  ModelEvaluationHybrid.cpp ModelEvaluationOnline.cpp ModelEvaluationOffline.cpp ModelEvaluationBase.cpp SimulationManager.cpp)
-set_source_files_properties(ModelEvaluationHybrid.cpp
-                            ModelEvaluationOnline.cpp
-                            ModelEvaluationOffline.cpp
-                            ModelEvaluationBase.cpp
-							SimulationManager.cpp
+set(CEINMS_COMMON_SOURCES  SimulationManager.cpp)
+set_source_files_properties(SimulationManager.cpp
                             PROPERTIES HEADER_FILE_ONLY TRUE)
-set(CEINMS_HEADERS ModelEvaluationBase.h 
-                   ModelEvaluationHybrid.h 
-                   ModelEvaluationOnline.h 
-                   ModelEvaluationOffline.h 
+set(CEINMS_HEADERS 
                    Logger.h 
                    SimpleFileLogger.h 
                    StorageLogger.h 
@@ -53,6 +50,7 @@ TARGET_LINK_LIBRARIES( CEINMS
       NMSmodel
       InputConnectors
       OutputConnectors
+	  JointContactModels
       #${CMAKE_THREAD_LIBS_INIT}
       ${Boost_PROGRAM_OPTIONS_LIBRARY}
       ${Boost_FILESYSTEM_LIBRARY}

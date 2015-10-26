@@ -27,21 +27,20 @@
  * -------------------------------------------------------------------------- */
 
 #include "ceinms/QueuesToTrialData.h"
-#include "ceinms/InputConnectors.h"
+#include "ceinms/EndOfData.h"
 
 namespace ceinms {
     void QueuesToTrialData::operator()() {
 
-        inputConnectors_.queueLmt.subscribe();
-        inputConnectors_.queueEmg.subscribe();
-        for (auto& it : inputConnectors_.queueMomentArms)
+        inputEmgQueue_.subscribe();
+        inputLmtQueue_.subscribe();
+        inputExternalTorqueQueue_.subscribe();
+        for (auto& it : inputMomentArmsQueues_)
             (*it).subscribe();
-        inputConnectors_.queueExternalTorques.subscribe();
-        inputConnectors_.doneWithSubscription.wait();
-        outputConnectors_.doneWithExecution.wait();
 
-        if (!inputConnectors_.externalTorquesAvailable)
-            return;
+        doneWithSubscriptions_.wait();
+        doneWithExecution_.wait(); //wait until all the data has been produced and put in the queues
+
         double externalTorqueTime = std::numeric_limits<double>::lowest();
         bool lmtRunning = true;
         bool torqueRunning = true;
@@ -50,12 +49,12 @@ namespace ceinms {
 
             // 1. read lmt Data
             if (lmtRunning) {
-                InputConnectors::FrameType lmtFrameFromQueue = inputConnectors_.queueLmt.pop();
-                if (lmtFrameFromQueue.time < std::numeric_limits<double>::infinity()) {
+                ScalarVectorFrame lmtFrameFromQueue = inputLmtQueue_.pop();
+                if (!EndOfData::isEod(lmtFrameFromQueue)) {
                     data_.lmtData.pushRow(lmtFrameFromQueue.time, lmtFrameFromQueue.data);
                     // 2. read moment arms data
-                    for (unsigned int i = 0; i < inputConnectors_.queueMomentArms.size(); ++i) {
-                        InputConnectors::FrameType momentArmsFrameFromQueue = (*inputConnectors_.queueMomentArms.at(i)).pop();
+                    for (unsigned int i = 0; i < inputMomentArmsQueues_.size(); ++i) {
+                        MomentArmsFrame momentArmsFrameFromQueue = (*inputMomentArmsQueues_.at(i)).pop();
                         data_.maData.at(i).pushRow(momentArmsFrameFromQueue.time, momentArmsFrameFromQueue.data);
                     }
                 }
@@ -63,10 +62,12 @@ namespace ceinms {
                     lmtRunning = false;
             }
 
+            //if there is no external torque, ExternalTorqueFromX is configured to just send an EOD frame
+            //in that case, we'll get the EOD here.. the result will be a
             // 3. read external Torque
             if (torqueRunning) {
-                InputConnectors::FrameType externalTorquesFrameFromQueue = inputConnectors_.queueExternalTorques.pop();
-                if (externalTorquesFrameFromQueue.time < std::numeric_limits<double>::infinity()) {
+                ScalarVectorFrame externalTorquesFrameFromQueue = inputExternalTorqueQueue_.pop();
+                if (!EndOfData::isEod(externalTorquesFrameFromQueue)) {
                     data_.torqueData.pushRow(externalTorquesFrameFromQueue.time, externalTorquesFrameFromQueue.data);
                 }
                 else
@@ -74,14 +75,13 @@ namespace ceinms {
             }
 
             if (emgRunning) {
-                InputConnectors::FrameType emgFrameFromQueue = inputConnectors_.queueEmg.pop();
-                if (emgFrameFromQueue.time < std::numeric_limits<double>::infinity()) {
+                ScalarVectorFrame emgFrameFromQueue = inputEmgQueue_.pop();
+                if (!EndOfData::isEod(emgFrameFromQueue)) {
                     data_.emgData.pushRow(emgFrameFromQueue.time, emgFrameFromQueue.data);
                 }
                 else
                     emgRunning = false;
             }
-
         } while (lmtRunning || emgRunning || torqueRunning);
     }
 

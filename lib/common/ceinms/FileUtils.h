@@ -36,6 +36,8 @@ namespace ceinms {
 
         std::string getFile(const std::string& aPath, const std::string& mask);
         bool isAbsolute(const char *path);
+        bool fileExists(const std::string& filename);
+        std::string simplify(const std::string& filename);
         void trim(std::string& fileName);
 
     }

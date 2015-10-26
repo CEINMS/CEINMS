@@ -30,12 +30,8 @@
 #include "ceinms/TrialData.h"
 #include "ceinms/MinTorqueError.h"
 using ceinms::TrialData;
-#include "ceinms/InputConnectors.h"
-using ceinms::InputConnectors;
-#include "ceinms/OutputConnectors.h"
-using ceinms::OutputConnectors;
 #include "ceinms/QueuesToTrialData.h"
-#include "ceinms/EMGFromFile.h"
+#include "ceinms/EmgFromFile.h"
 #include "ceinms/LmtMaFromStorageFile.h"
 #include "ceinms/CeinmsCalibrationSetupXmlReader.h"
 #include "ceinms/CalibrationXmlReader.h"
@@ -50,6 +46,14 @@ using ceinms::OutputConnectors;
 #include "ceinms/Tendon/ElasticTendon.h"
 #include "ceinms/Tendon/ElasticTendon_BiSec.h"
 #include "ceinms/SetupDataStructure.h"
+#include "ceinms/concurrency/Latch.h"
+#include "ceinms/concurrency/Queue.h"
+#include "ceinms/queues/EmgQueue.h"
+#include "ceinms/queues/LmtQueue.h"
+#include "ceinms/queues/ExternalTorquesQueue.h"
+#include "ceinms/queues/MultipleMomentArmsQueues.h"
+#include "ceinms/QueuesToTrialData.h"
+
 #include <thread>
 #include <vector>
 using std::vector;
@@ -95,34 +99,35 @@ void sortMaFilenames(const std::map<string, string>& maMap, const vector< string
     }
 }
 
-
 template<typename NMSmodelT>
 ceinms::TrialData readTrialData(std::string inputDataFilename, NMSmodelT& mySubject, std::string trialId, std::string emgGeneratorFile)
 {
     InputDataXmlReader dataLocations(inputDataFilename);
-    // CEINMS::InputConnectors* inputConnectors= new CEINMS::InputConnectors();
-    //CEINMS::OutputConnectors* outputConnectors = new CEINMS::OutputConnectors();
 
-    std::unique_ptr<InputConnectors> inputConnectors(new InputConnectors);
-    std::unique_ptr<OutputConnectors> outputConnectors(new OutputConnectors);
+    EmgQueue emgQueue;
+    LmtQueue lmtQueue;
+    ExternalTorquesQueue externalTorqueQueue;
+    MultipleMomentArmsQueues momentArmsQueues;
+
+    ceinms::Concurrency::Latch doneWithSubscription;
+    ceinms::Concurrency::Latch doneWithExecution;
 
     string emgFilename(dataLocations.getExcitationsFile());
-    EMGFromFile emgProducer(*inputConnectors, mySubject, emgFilename, emgGeneratorFile);
+    EmgFromFile emgProducer(emgQueue, doneWithSubscription, doneWithExecution, mySubject, emgFilename, emgGeneratorFile);
 
     vector< string > dofNames;
     mySubject.getDoFNames(dofNames);
     vector< string > maFilename;
     sortMaFilenames(dataLocations.getMaFiles(), dofNames, maFilename);
-    LmtMaFromStorageFile lmtMaProducer(*inputConnectors, mySubject, dataLocations.getLmtFile(), maFilename);
+    LmtMaFromStorageFile lmtMaProducer(lmtQueue, momentArmsQueues, doneWithSubscription, doneWithExecution, mySubject, dataLocations.getLmtFile(), maFilename);
 
     string externalTorqueFilename(dataLocations.getExternalTorqueFile());
-    ExternalTorquesFromStorageFile externalTorquesProducer(*inputConnectors, mySubject, externalTorqueFilename);
+    ExternalTorquesFromStorageFile externalTorquesProducer(externalTorqueQueue, doneWithSubscription, doneWithExecution, mySubject, externalTorqueFilename);
 
-    QueuesToTrialData queuesToTrialData(*inputConnectors, *outputConnectors, mySubject, trialId);
+    QueuesToTrialData queuesToTrialData(emgQueue, lmtQueue, externalTorqueQueue, momentArmsQueues, doneWithSubscription, doneWithExecution, mySubject, trialId);
 
-
-    inputConnectors->doneWithSubscription.setCount(4);
-    outputConnectors->doneWithExecution.setCount(1);
+    doneWithSubscription.setCount(4);
+    doneWithExecution.setCount(4);
 
     // 4. start the threads
     std::thread emgProdThread(std::ref(emgProducer));
@@ -135,7 +140,7 @@ ceinms::TrialData readTrialData(std::string inputDataFilename, NMSmodelT& mySubj
     externalTorquesProdThread.join();
     queuesToTrialDataThread.join();
 
-    if (queuesToTrialData.getTrialData().lmtData.getNRows() < 1)
+    if (!queuesToTrialData.getTrialData().isConsistent())
     {
         std::cout << "ERROR: No data was read for trial " << trialId << std::endl;
         exit(EXIT_FAILURE);
@@ -152,7 +157,6 @@ void PrintUsage()
     cout << "-Help, -H                           Print the command-line options for " << progName << ".\n";
     cout << "-PrintSetup, -PS                    Generates a template Setup file\n";
     cout << "-Setup, -S        SetupFileName     Specify an xml setup file.\n";
-
 }
 
 template <typename T>
@@ -162,9 +166,7 @@ bool compareVectors(const std::vector<T>& v1, const std::vector<T>& v2) {
         return a.equals(b); });
 }
 
-
 int main(int argc, char** argv) {
-
 
     string option = "";
     string setupFileName;
@@ -233,56 +235,50 @@ int main(int argc, char** argv) {
     std::cout << "NMSModelCfg " << runMode << std::endl;
     switch (runMode) {
 
-        case NMSModelCfg::OpenLoopExponentialActivationElasticTendonBiSecOffline: {
+    case NMSModelCfg::OpenLoopExponentialActivationElasticTendonBiSecOffline: {
 
-            using  MyNMSmodel = NMSmodel < ExponentialActivation, ElasticTendon_BiSec, CurveMode::Offline > ;
-            MyNMSmodel mySubject;
-            setupSubject(mySubject, uncalibratedSubjectXmlFile);
-            for (list<string>::iterator trialIt = calibrationTrialIDs.begin(); trialIt != calibrationTrialIDs.end(); ++trialIt)
-                trials.push_back(readTrialData(*trialIt, mySubject, *trialIt, emgGeneratorFile));
-            CalibrationStep currentCalibrationStep;
-            while (calibrationXmlReader.popNextCalibrationStep(currentCalibrationStep)) {
-                std::cout << "CalibrationStepCfg " << currentCalibrationStep.getStepCfg() << std::endl;
-                switch (currentCalibrationStep.getStepCfg()) {
-                    case CalibrationCfg::MinimizeTorqueErrorParameterSetDefault: {
-                        BatchEvaluator batchEvaluator(trials);
-                        batchEvaluator.evaluate(mySubject);
-                        auto results(batchEvaluator.getResults());
-                        MinTorqueError error;
-                        error.setDofsToCalibrate(mySubject.getDoFNames());
-                        error.setTrials(trials);
-                        error.calculate(results);
-                        std::cout << "error value: " << error.getValue();
-     //                   batchEvaluator.evaluate(mySubject);
-     //                   auto results2(batchEvaluator.getResults());
+        using  MyNMSmodel = NMSmodel < ExponentialActivation, ElasticTendon_BiSec, CurveMode::Offline > ;
+        MyNMSmodel mySubject;
+        setupSubject(mySubject, uncalibratedSubjectXmlFile);
+        for (list<string>::iterator trialIt = calibrationTrialIDs.begin(); trialIt != calibrationTrialIDs.end(); ++trialIt)
+            trials.push_back(readTrialData(*trialIt, mySubject, *trialIt, emgGeneratorFile));
+        CalibrationStep currentCalibrationStep;
+        while (calibrationXmlReader.popNextCalibrationStep(currentCalibrationStep)) {
+            std::cout << "CalibrationStepCfg " << currentCalibrationStep.getStepCfg() << std::endl;
+            switch (currentCalibrationStep.getStepCfg()) {
+            case CalibrationCfg::MinimizeTorqueErrorParameterSetDefault: {
+                BatchEvaluator batchEvaluator(trials);
+                batchEvaluator.evaluate(mySubject);
+                auto results(batchEvaluator.getResults());
+                MinTorqueError error;
+                error.setDofsToCalibrate(mySubject.getDoFNames());
+                error.setTrials(trials);
+                error.calculate(results);
+                std::cout << "error value: " << error.getValue();
+                //                   batchEvaluator.evaluate(mySubject);
+                //                   auto results2(batchEvaluator.getResults());
 
-         //               cout << "Results are the same? " << compareVectors(results,results2) << std::endl;
-                        std::ofstream oF1("results_forces.txt");
-                        oF1 << results.front().forces;
-                        oF1.close();
+                //               cout << "Results are the same? " << compareVectors(results,results2) << std::endl;
+                std::ofstream oF1("results_forces.txt");
+                oF1 << results.front().forces;
+                oF1.close();
 
-                        std::ofstream oF2("results_activations.txt");
-                        oF2 << results.front().activations;
-                        oF2.close();
+                std::ofstream oF2("results_activations.txt");
+                oF2 << results.front().activations;
+                oF2.close();
 
+                //                  batchEvaluator.evaluate(mySubject);
+                //                 auto results3(batchEvaluator.getResults());
 
-
-      //                  batchEvaluator.evaluate(mySubject);
-       //                 auto results3(batchEvaluator.getResults());
-
-        //                cout << "Results are the same? " << compareVectors(results2, results3)<< std::endl;
-
-
-                    }
-                        break;
-                    default:
-                        std::cerr << "Calibration Step not valid\n";
-                }
-            } //end while
-
-
-        } //end case
-    break;
+                //                cout << "Results are the same? " << compareVectors(results2, results3)<< std::endl;
+            }
+                                                                         break;
+            default:
+                std::cerr << "Calibration Step not valid\n";
+            }
+        } //end while
+    } //end case
+                                                                              break;
     }
     return 0;
 }

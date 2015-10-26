@@ -32,6 +32,7 @@
 #include "ceinms/CeinmsSetupXmlReader.h"
 #include "ceinms/InputDataXmlReader.h"
 #include "ceinms/ExecutionXmlReader.h"
+#include "ceinms/ContactModelXmlReader.h"
 #include <string>
 #include <vector>
 #include <map>
@@ -46,8 +47,13 @@ namespace ceinms {
 
     private:
         template <typename NMSmodelT, template <typename, typename> class ModelEvaluatorT, typename LoggerT>
+        bool runOpenLoop(bool useContactForces);
+        template <typename NMSmodelT, template <typename, typename> class ModelEvaluatorT, typename LoggerT>
+        bool runOpenLoopWithGenericContactModel();
+        template <typename NMSmodelT, template <typename, typename> class ModelEvaluatorT, typename LoggerT>
+        bool runOpenLoopWithKneeBalanceContactModel();
+        template <typename NMSmodelT, template <typename, typename> class ModelEvaluatorT, typename LoggerT>
         bool runOpenLoop();
-
         template <typename T>
         bool runHybrid();
 
@@ -56,11 +62,13 @@ namespace ceinms {
         CeinmsSetupXmlReader ceinmsSetup_;
         InputDataXmlReader dataLocations_;
         ExecutionXmlReader executionCfg_;
+        ContactModelXmlReader contactModelCfg_;
         std::string subjectFile_;
         std::string executionFile_;
         std::string inputData_;
         std::string outputDirectory_;
         std::string emgGeneratorFile_;
+        bool hasContactModel_;
     };
 }
 

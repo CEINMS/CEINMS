@@ -31,6 +31,8 @@ schema_to_bin(${CMAKE_SOURCE_DIR}/cfg/XSD/excitationGenerator.xsd)
 schema_to_bin(${CMAKE_SOURCE_DIR}/cfg/XSD/inputData.xsd)
 schema_to_bin(${CMAKE_SOURCE_DIR}/cfg/XSD/ceinmsSetup.xsd)
 schema_to_bin(${CMAKE_SOURCE_DIR}/cfg/XSD/ceinmsCalibrationSetup.xsd)
+schema_to_bin(${CMAKE_SOURCE_DIR}/cfg/XSD/contactModel.xsd)
+
 
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
@@ -42,6 +44,7 @@ xsd_schema(execution_GENERATED ${CMAKE_SOURCE_DIR}/cfg/XSD/execution.xsd --gener
 xsd_schema(inputData_GENERATED ${CMAKE_SOURCE_DIR}/cfg/XSD/inputData.xsd --generate-serialization --namespace-map =InputDataXsd)
 xsd_schema(ceinmsSetup_GENERATED ${CMAKE_SOURCE_DIR}/cfg/XSD/ceinmsSetup.xsd --generate-serialization --namespace-map =CeinmsSetupXsd)
 xsd_schema(ceinmsCalibrationSetup_GENERATED ${CMAKE_SOURCE_DIR}/cfg/XSD/ceinmsCalibrationSetup.xsd --generate-serialization --namespace-map =CeinmsCalibrationSetupXsd)
+xsd_schema(contactModel_GENERATED ${CMAKE_SOURCE_DIR}/cfg/XSD/contactModel.xsd --generate-serialization --namespace-map =ContactModelXsd)
 
 set(xmlInput_SOURCES    ExecutionXmlReader.cpp
                         CalibrationXmlReader.cpp
@@ -51,6 +54,7 @@ set(xmlInput_SOURCES    ExecutionXmlReader.cpp
                         InputDataXmlReader.cpp
                         CeinmsSetupXmlReader.cpp
                         CeinmsCalibrationSetupXmlReader.cpp
+						ContactModelXmlReader.cpp
                         )
 
 set(schemas_GENERATED_SOURCES  ${CMAKE_CURRENT_BINARY_DIR}/execution-schema.cxx
@@ -59,7 +63,10 @@ set(schemas_GENERATED_SOURCES  ${CMAKE_CURRENT_BINARY_DIR}/execution-schema.cxx
                                 ${CMAKE_CURRENT_BINARY_DIR}/excitationGenerator-schema.cxx
                                 ${CMAKE_CURRENT_BINARY_DIR}/inputData-schema.cxx
                                 ${CMAKE_CURRENT_BINARY_DIR}/ceinmsSetup-schema.cxx
-                                ${CMAKE_CURRENT_BINARY_DIR}/ceinmsCalibrationSetup-schema.cxx)
+                                ${CMAKE_CURRENT_BINARY_DIR}/ceinmsCalibrationSetup-schema.cxx
+                                ${CMAKE_CURRENT_BINARY_DIR}/contactModel-schema.cxx
+
+)
 
 set(xmlInput_HEADERS    ceinms/ExecutionXmlReader.h
                         ceinms/NMSmodelConfig.h
@@ -70,6 +77,7 @@ set(xmlInput_HEADERS    ceinms/ExecutionXmlReader.h
                         ceinms/InputDataXmlReader.h
                         ceinms/CeinmsSetupXmlReader.h
                         ceinms/CeinmsCalibrationSetupXmlReader.h
+						ceinms/ContactModelXmlReader.h
                         )
 
 set(xmlInput_IMPL_HEADERS   impl/grammar-input-stream.hxx
@@ -81,7 +89,8 @@ set(schemas_GENERATED_HEADERS  ${CMAKE_CURRENT_BINARY_DIR}/execution-schema.hxx
                                 ${CMAKE_CURRENT_BINARY_DIR}/excitationGenerator-schema.hxx
                                 ${CMAKE_CURRENT_BINARY_DIR}/inputData-schema.hxx
                                 ${CMAKE_CURRENT_BINARY_DIR}/ceinmsSetup-schema.hxx
-                                ${CMAKE_CURRENT_BINARY_DIR}/ceinmsCalibrationSetup-schema.hxx)
+                                ${CMAKE_CURRENT_BINARY_DIR}/ceinmsCalibrationSetup-schema.hxx
+								${CMAKE_CURRENT_BINARY_DIR}/contactModel-schema.hxx)
 
 source_group("Headers" FILES ${xmlInput_HEADERS})
 source_group("Private headers" FILES ${xmlInput_IMPL_HEADERS})
@@ -92,7 +101,9 @@ source_group("Generated headers" FILES  ${schemas_GENERATED_HEADERS}
                                         ${execution_GENERATED_HEADERS}
                                         ${inputData_GENERATED_HEADERS}
                                         ${ceinmsSetup_GENERATED_HEADERS}
-                                        ${ceinmsCalibrationSetup_GENERATED_HEADERS})
+                                        ${ceinmsCalibrationSetup_GENERATED_HEADERS}
+                                        ${contactModel_GENERATED_HEADERS})
+
 source_group("Sources" FILES ${xmlInput_SOURCES})
 source_group("Generated sources" FILES  ${schemas_GENERATED_SOURCES}
                                         ${subject_GENERATED_SOURCES}
@@ -101,7 +112,8 @@ source_group("Generated sources" FILES  ${schemas_GENERATED_SOURCES}
                                         ${execution_GENERATED_SOURCES}
                                         ${inputData_GENERATED_SOURCES}
                                         ${ceinmsSetup_GENERATED_SOURCES}
-                                        ${ceinmsCalibrationSetup_GENERATED_SOURCES})
+                                        ${ceinmsCalibrationSetup_GENERATED_SOURCES}
+										${contactModel_GENERATED_SOURCES})
 
 
 
@@ -117,6 +129,7 @@ add_library(xmlInput STATIC ${xmlInput_SOURCES}
                             ${inputData_GENERATED_HEADERS}
                             ${ceinmsSetup_GENERATED_HEADERS}
                             ${ceinmsCalibrationSetup_GENERATED_HEADERS}
+							${contactModel_GENERATED_HEADERS}
                             ${subject_GENERATED_SOURCES}
                             ${excitationGenerator_GENERATED_SOURCES}
                             ${calibration_GENERATED_SOURCES}
@@ -124,6 +137,7 @@ add_library(xmlInput STATIC ${xmlInput_SOURCES}
                             ${inputData_GENERATED_SOURCES}
                             ${ceinmsSetup_GENERATED_SOURCES}
                             ${ceinmsCalibrationSetup_GENERATED_SOURCES}
+							${contactModel_GENERATED_SOURCES}
                             )
 
 target_link_libraries(xmlInput ceinms_common ${XERCES_LIBRARIES})
@@ -140,7 +154,9 @@ install(FILES   ${xmlInput_HEADERS}
                 ${inputData_GENERATED_HEADERS}
                 ${ceinmsSetup_GENERATED_HEADERS}
                 ${ceinmsCalibrationSetup_GENERATED_HEADERS}
+			    ${contactModel_GENERATED_HEADERS}
         DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/ceinms COMPONENT Development)
+
 install(TARGETS xmlInput
         EXPORT CEINMSTargets
         RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT Applications

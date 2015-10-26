@@ -31,7 +31,8 @@
 
 #include <vector>
 #include <string>
-#include "OutputConnectors.h"
+#include "ceinms/concurrency/Queue.h"
+#include "ceinms/queues/LogQueue.h"
 
 namespace ceinms {
     class LoggerOnQueues {
@@ -39,12 +40,11 @@ namespace ceinms {
         LoggerOnQueues() = delete;
         LoggerOnQueues(const LoggerOnQueues&) = delete;
         LoggerOnQueues& operator=(const LoggerOnQueues&) = delete;
-        LoggerOnQueues(OutputConnectors& outputConnectors, const std::vector< std::string > & valuesToLog);
+        LoggerOnQueues(ScalarLogQueue& outputLogQueue, const std::vector< std::string > & valuesToLog);
         void log(double time, const std::vector< double >& dataToLog, const std::string& queuID);
 
     private:
-        OutputConnectors& outputConnectors_;
-
+        ScalarLogQueue& outputLogQueue_;
     };
 }
 

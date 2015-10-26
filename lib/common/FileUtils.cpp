@@ -65,6 +65,19 @@ namespace ceinms {
             return false;
         }
 
+        bool fileExists(const std::string& filename) {
+
+            return boost::filesystem::exists(filename);
+        }
+
+
+        std::string simplify(const std::string& filename) {
+
+            return boost::filesystem::canonical(filename).string();
+
+        }
+
+
         void trim(std::string& fileName)
         {
             boost::trim(fileName);

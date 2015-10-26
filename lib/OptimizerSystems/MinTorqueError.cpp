@@ -86,6 +86,7 @@ namespace ceinms {
             for (auto& name : dofsToCalibrate_) {
                 auto i(std::distance(dofNamesFromTrial.begin(), (std::find(dofNamesFromTrial.begin(), dofNamesFromTrial.end(), name))));
                 trialVariance.at(i) = getVariance(trial.torqueData.getColumn(i));
+                if (trialVariance.at(i) < 1) trialVariance.at(i) = 1;   //don't penalize if the variance in low
             }
             torqueVariance_.emplace_back(trialVariance);
         }

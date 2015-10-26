@@ -169,9 +169,29 @@ namespace ceinms {
         for (dofIt; dofIt != myDofs.end(); ++dofIt)
             calibrationStep.pushDofName(*dofIt);
         ObjectiveFunctionType& myObjFuc(step.objectiveFunction());
-        ObjectiveFunctionElementType& myObjFuncMinTorqueError(myObjFuc.minimizeTorqueError());
-        //  if (myObjFuncMinTorqueError.present())
-        calibrationStep.setObjectiveFunction(CalibrationCfg::MinimizeTorqueError);
+        
+        myObjFuc.minimizeTorqueError().present();
+
+       // ObjectiveFunctionElementType& myObjFuncMinTorqueError(myObjFuc.minimizeTorqueError());
+
+        if (myObjFuc.minimizeTorqueError().present()){
+            calibrationStep.setObjectiveFunction(CalibrationCfg::MinimizeTorqueError, 
+                myObjFuc.minimizeTorqueError()->weight(), 
+                myObjFuc.minimizeTorqueError()->exponent());
+        }
+        else if (myObjFuc.sumKneeContactForces().present()) {
+            calibrationStep.setObjectiveFunction(CalibrationCfg::SumKneeContactForces,
+                myObjFuc.sumKneeContactForces()->weight(),
+                myObjFuc.sumKneeContactForces()->exponent());
+            calibrationStep.setBarrierList(readBarrierList(myObjFuc.sumKneeContactForces().get()));
+        }
+        else if (myObjFuc.torqueErrorAndSumKneeContactForces().present()) {
+            calibrationStep.setObjectiveFunction(CalibrationCfg::TorqueErrorAndSumKneeContactForces,
+                myObjFuc.torqueErrorAndSumKneeContactForces()->weight(),
+                myObjFuc.torqueErrorAndSumKneeContactForces()->exponent());
+            calibrationStep.setBarrierList(readBarrierList(myObjFuc.torqueErrorAndSumKneeContactForces().get()));
+
+        }
         StepType::parameterSet_type::parameter_sequence& parameterSequence = step.parameterSet().parameter();
         StepType::parameterSet_type::parameter_iterator parIt = parameterSequence.begin();
         for (parIt; parIt != parameterSequence.end(); ++parIt) {
@@ -179,6 +199,26 @@ namespace ceinms {
             readParameter(*parIt, parameter);
             calibrationStep.pushParameter(parameter);
         }
+    }
+    
+    BarrierListSetup CalibrationXmlReader::readBarrierList(CalibrationXsd::ObjectiveFunctionElementType& node) {
+
+        BarrierListSetup barrierListSetup;
+        auto it(std::begin(node.barrier()));
+        auto itE(std::end(node.barrier()));
+
+        for (it; it != itE; ++it) {
+            BarrierSetup barrierSetup;
+            barrierSetup.weight = it->weight();
+            barrierSetup.targetName = it->targetName();
+            barrierSetup.exponent = it->exponent();
+            auto xIt = it->range().begin();
+            barrierSetup.xL = *xIt;
+            barrierSetup.xR = *(xIt + 1);
+            barrierListSetup.barrierSetup.push_back(barrierSetup);
+        }
+        barrierListSetup.numOfBarriers = barrierListSetup.barrierSetup.size();
+        return barrierListSetup;
     }
 
 
@@ -283,17 +323,30 @@ namespace ceinms {
 
 
 
-    void CalibrationStep::setObjectiveFunction(unsigned int objectiveFunction) {
+    void CalibrationStep::setObjectiveFunction(unsigned int objectiveFunction, double weight, double exponent) {
 
-        objectiveFunction_ = objectiveFunction;
+        objectiveFunctionSetup_.objectiveFunctionId = objectiveFunction;
+        objectiveFunctionSetup_.weight = weight;
+        objectiveFunctionSetup_.exponent = exponent;
+
     }
 
+    void CalibrationStep::setBarrierList(const BarrierListSetup& barrierListSetup) {
 
+        objectiveFunctionSetup_.barrierListSetup = barrierListSetup;
+    }
+
+    
     CalibrationCfg::Step CalibrationStep::getStepCfg() const {
 
-        return static_cast<CalibrationCfg::Step>(objectiveFunction_);
+        return static_cast<CalibrationCfg::Step>(objectiveFunctionSetup_.objectiveFunctionId);
     }
+    
 
+    ObjectiveFunctionSetup CalibrationStep::getObjectiveFunctionSetup() const {
+
+        return objectiveFunctionSetup_;
+    }
 
     void CalibrationStep::getDofNames(std::list< string >& dofNames) const {
 
@@ -365,7 +418,7 @@ namespace ceinms {
             output << *dIt << " ";
         output << std::endl;
         output << " --- Objective Function: ";
-        switch (rhs.objectiveFunction_) {
+        switch (rhs.objectiveFunctionSetup_.objectiveFunctionId) {
         case (CalibrationCfg::MinimizeTorqueError) :
             output << "Minimize Torque Error\n";
             break;

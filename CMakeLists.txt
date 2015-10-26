@@ -20,7 +20,7 @@ if(UNIX AND NOT CMAKE_BUILD_TYPE)
 endif()
 
 if(UNIX)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread -std=c++11 -Wno-deprecated-declarations ")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread -std=c++1y -Wno-deprecated-declarations --verbose ")
 endif(UNIX)
 
 set(CMAKE_VERBOSE_MAKEFILE OFF)
@@ -35,6 +35,14 @@ find_package(Boost REQUIRED COMPONENTS filesystem system)
 find_package(XSD REQUIRED)
 
 find_package(XERCES REQUIRED)
+
+find_package(OpenSim REQUIRED)
+
+find_package(mcbs REQUIRED)
+
+find_package(osimSpliner REQUIRED)
+
+
 
 # Choose common build locations for executables and libraries
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
@@ -69,7 +77,7 @@ install(EXPORT CEINMSTargets
 
 include(CMakePackageConfigHelpers)
 configure_package_config_file(cmake/CEINMSConfig.cmake.in
-                              ${CMAKE_CURRENT_BINARY_DIR}/CEINMSConfig.cmake
+                              ${CMAKE_CURRENT_BINARY_DIR}/CEINMSConfigForInstall.cmake
                               INSTALL_DESTINATION ${ConfigPackageLocation}
                               PATH_VARS CMAKE_INSTALL_INCLUDEDIR)
 
@@ -77,10 +85,13 @@ write_basic_package_version_file(${CMAKE_CURRENT_BINARY_DIR}/CEINMSConfigVersion
                                     VERSION ${CEINMS_MAJOR_VERSION}.${CEINMS_MINOR_VERSION}.${CEINMS_PATCH_VERSION}
                                     COMPATIBILITY ExactVersion )
 
-install(FILES ${CMAKE_CURRENT_BINARY_DIR}/CEINMSConfig.cmake
-              ${CMAKE_CURRENT_BINARY_DIR}/CEINMSConfigVersion.cmake
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/CEINMSConfigForInstall.cmake   
+              DESTINATION ${ConfigPackageLocation}
+              RENAME CEINMSConfig.cmake)
+              
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/CEINMSConfigVersion.cmake
               DESTINATION ${ConfigPackageLocation})
-
+              
 # Uninstall target
 configure_file(
     "${CMAKE_CURRENT_SOURCE_DIR}/cmake/cmake_uninstall.cmake.in"

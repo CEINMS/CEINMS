@@ -27,8 +27,7 @@
  * -------------------------------------------------------------------------- */
 
 #include "ceinms/ExternalTorquesFromX.h"
-#include "ceinms/InputConnectors.h"
-
+#include "ceinms/EndOfData.h"
 #include <iostream>
 using std::cout;
 using std::endl;
@@ -39,14 +38,28 @@ using std::vector;
 #include <cstdlib>
 
 namespace ceinms {
-    void ExternalTorquesFromX::updateExternalTorques(const vector<double>& currentExternalTorquesData, double currentTime)
+    void ExternalTorquesFromX::updateExternalTorques(const ExternalTorquesData& currentExternalTorquesData, double currentTime)
     {
-        QueueData< vector<double> > externalTorquesDataToPush;
-        externalTorquesDataToPush.data = currentExternalTorquesData;
-        externalTorquesDataToPush.time = currentTime;
-        inputConnectors_.queueExternalTorques.push(externalTorquesDataToPush);
+        ExternalTorquesFrame externalTorquesFrameToPush;
+        externalTorquesFrameToPush.data = currentExternalTorquesData;
+        externalTorquesFrameToPush.time = currentTime;
+        outputExternalTorquesQueue_.push(externalTorquesFrameToPush);
     }
 
+    void ExternalTorquesFromX::doneWithSubscriptions() {
+
+        doneWithSubscriptions_.wait();
+    }
+
+    void ExternalTorquesFromX::doneWithExecution() {
+
+        doneWithExecution_.wait();
+    }
+
+    void ExternalTorquesFromX::sendEndOfData() {
+
+        outputExternalTorquesQueue_.push(EndOfData::get<ExternalTorquesFrame>());
+    }
 
     ExternalTorquesFromX::~ExternalTorquesFromX() { }
 }

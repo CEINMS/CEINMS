@@ -53,7 +53,6 @@ namespace ceinms{
             return val;
         }
 
-
         // push data only when the queue has subscribers
         template <typename T>
         void Queue<T>::push(const T& item) {
@@ -76,9 +75,7 @@ namespace ceinms{
 
             // maybe no subscribers but do anyway
             cond_.notify_all();
-
         }
-
 
         template <typename T>
         void Queue<T>::subscribe() {
@@ -93,7 +90,6 @@ namespace ceinms{
             }
             mlock.unlock();
         }
-
 
         template <typename T>
         void Queue<T>::unsubscribe() {
@@ -117,12 +113,10 @@ namespace ceinms{
             mlock.unlock();
         }
 
-
         template <typename T>
         bool Queue<T>::pred(const std::pair< std::thread::id, int>& lhs, const std::pair< std::thread::id, int>& rhs) {
             return lhs.second < rhs.second;
         }
-
 
         template <typename T>
         bool Queue<T>::someoneSlowerThanMe() {
@@ -133,9 +127,7 @@ namespace ceinms{
                 return true;
 
             return false;
-
         }
-
 
         template <typename T>
         std::ostream& operator<<(std::ostream& os, const Queue<T>& queue) {

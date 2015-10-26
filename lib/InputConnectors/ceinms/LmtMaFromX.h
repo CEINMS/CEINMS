@@ -31,41 +31,61 @@
 
 #include <vector>
 #include <string>
-#include "InputConnectors.h"
+#include <memory>
+#include "ceinms/concurrency/Queue.h"
+#include "ceinms/concurrency/Latch.h"
+#include "ceinms/queues/LmtQueue.h"
+#include "ceinms/queues/MultipleMomentArmsQueues.h"
 
 namespace ceinms {
     class LmtMaFromX
     {
     public:
         template <typename NMSModelT>
-        LmtMaFromX(InputConnectors& inputConnectors, const NMSModelT& subject);
+        LmtMaFromX(
+            LmtQueue& outputLmtQueue,
+            MultipleMomentArmsQueues& outputMomentArmsQueue,
+            Concurrency::Latch& doneWithSubscriptions,
+            Concurrency::Latch& doneWithExecution,
+            const NMSModelT& subject);
         virtual ~LmtMaFromX();
-        virtual void operator()() {};
-        void updateLmt(const std::vector<double>& currentLmtData, double currentTime);
-        void updateMomentArms(const std::vector<double>& currentMomentArmsData, double currentTime, unsigned int whichDof);
+        virtual void operator()() = 0;
+        void updateLmt(const LmtData& currentLmtData, double currentTime);
+        void updateMomentArms(const MomentArmsData& currentMomentArmsData, double currentTime, unsigned int whichDof);
+        void doneWithSubscriptions();
+        void doneWithExecution();
+        void sendLmtEndOfData();
+        void sendMaEndOfData();
 
     protected:
         std::vector< std::string > musclesNames_;
         std::vector< std::string > dofNames_;
         std::vector< std::vector< std::string > > muscleNamesOnDofs_;
-        InputConnectors& inputConnectors_;
+    private:
+        void initialiseMomentArmsQueue();
+        LmtQueue& outputLmtQueue_;
+        MultipleMomentArmsQueues& outputMomentArmsQueue_;
+        Concurrency::Latch& doneWithSubscriptions_;
+        Concurrency::Latch& doneWithExecution_;
     };
 
-
     template <typename NMSModelT>
-    LmtMaFromX::LmtMaFromX(InputConnectors& inputConnectors, const NMSModelT& subject) : inputConnectors_(inputConnectors)
+    LmtMaFromX::LmtMaFromX(
+        LmtQueue& outputLmtQueue,
+        MultipleMomentArmsQueues& outputMomentArmsQueue,
+        Concurrency::Latch& doneWithSubscriptions,
+        Concurrency::Latch& doneWithExecution,
+        const NMSModelT& subject) :
+        outputLmtQueue_(outputLmtQueue),
+        outputMomentArmsQueue_(outputMomentArmsQueue),
+        doneWithSubscriptions_(doneWithSubscriptions),
+        doneWithExecution_(doneWithExecution)
+
     {
         subject.getMuscleNames(musclesNames_);
         subject.getDoFNames(dofNames_);
         subject.getMuscleNamesOnDofs(muscleNamesOnDofs_);
-        /*
-        std::cout << "SIZE:" << CEINMS::InputConnectors::queueMomentArms.size() << std::endl;
-        CEINMS::InputConnectors::queueMomentArms.resize(3);
-        */
-        //   for (int i= 0; i < dofNames_.size(); ++i) {
-        //     CEINMS::Concurrency::Queue< std::vector<double> > newQueue;
-        //     CEINMS::InputConnectors::queueMomentArms.push_back(newQueue);
-        //   }
+        initialiseMomentArmsQueue();
     }
 }
 #endif

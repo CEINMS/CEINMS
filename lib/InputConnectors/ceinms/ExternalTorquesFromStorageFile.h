@@ -30,44 +30,56 @@
 #define ceinms_ExternalTorquesFromFile_h
 
 #include "ExternalTorquesFromX.h"
-#include "InputConnectors.h"
 #include "Utilities.h"
 #include "ceinms/DataFromStorageFile.h"
 
 #include <string>
+#include <memory>
 
 namespace ceinms {
     class ExternalTorquesFromStorageFile :public ExternalTorquesFromX
     {
     public:
         template <typename NMSModelT>
-        ExternalTorquesFromStorageFile(InputConnectors& inputConnectors, const NMSModelT& subject, const std::string& dataDirectory);
+        ExternalTorquesFromStorageFile(
+            ExternalTorquesQueue& outputExternalTorques,
+            Concurrency::Latch& doneWithSubscriptions,
+            Concurrency::Latch& doneWithExecution,
+            const NMSModelT& subject,
+            const std::string& dataDirectory);
         void operator()();
         ~ExternalTorquesFromStorageFile();
     private:
         bool externalTorquesFileExist(const std::string& fileName);
         std::string dataDirectory_;
         std::vector<std::size_t> dofPosInStorage_;
-        DataFromStorageFile* externalTorquesDataFromFile_;
+        std::unique_ptr<DataFromStorageFile> externalTorquesDataFromFile_;
+        bool externalTorquesAvailable_;
     };
 
-
     template <typename NMSModelT>
-    ExternalTorquesFromStorageFile::ExternalTorquesFromStorageFile(InputConnectors& inputConnectors, const NMSModelT& subject, const std::string& externalTorqueFilename)
-        :ExternalTorquesFromX(inputConnectors, subject), externalTorquesDataFromFile_(nullptr)
+    ExternalTorquesFromStorageFile::ExternalTorquesFromStorageFile(
+        ExternalTorquesQueue& outputExternalTorques,
+        Concurrency::Latch& doneWithSubscriptions,
+        Concurrency::Latch& doneWithExecution,
+        const NMSModelT& subject,
+        const std::string& externalTorqueFilename)
+        :ExternalTorquesFromX(outputExternalTorques, doneWithSubscriptions, doneWithExecution, subject),
+        externalTorquesDataFromFile_(nullptr),
+        externalTorquesAvailable_(false)
     {
 
 #ifdef LOG
         std::cout << "\nExtTorque: starting externalTorqueProduce, reading from external torque data file" << std::endl;
 #endif
 
-        inputConnectors_.externalTorquesAvailable = externalTorquesFileExist(externalTorqueFilename);
+        externalTorquesAvailable_ = externalTorquesFileExist(externalTorqueFilename);
 
-        if (inputConnectors_.externalTorquesAvailable)  {
+        if (externalTorquesAvailable_)  {
 #ifdef LOG
             std::cout << "\n ExtTorque: external Torques available " << std::endl;
 #endif
-            externalTorquesDataFromFile_ = new DataFromStorageFile(externalTorqueFilename);
+            externalTorquesDataFromFile_.reset(new DataFromStorageFile(externalTorqueFilename));
             if (externalTorquesDataFromFile_ == nullptr)
             {
                 std::cout << "External Torque File ERROR: file \"" << externalTorqueFilename << "\" could not be open\n";
@@ -79,7 +91,6 @@ namespace ceinms {
                 torqueNamesToFind.push_back(it + "_moment");
 
             dofPosInStorage_ = findMapping(torqueNamesToFind, columnNamesInStorageFile);
-
         }
     }
 }

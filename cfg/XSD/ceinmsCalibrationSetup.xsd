@@ -12,6 +12,7 @@
         <xs:element maxOccurs="1" name="excitationGeneratorFile" type="xs:string"/>
         <xs:element maxOccurs="1" name="calibrationFile" type="xs:string"/>
         <xs:element maxOccurs="1" name="outputSubjectFile" type="xs:string"/>
+        <xs:element maxOccurs="1" minOccurs="0" name="contactModelFile" type="xs:token"/>
       </xs:choice>
     </xs:sequence>
   </xs:complexType>

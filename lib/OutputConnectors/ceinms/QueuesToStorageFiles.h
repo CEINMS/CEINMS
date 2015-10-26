@@ -32,8 +32,9 @@
 #include <iostream>
 #include <fstream>
 #include <boost/filesystem.hpp>
-#include "OutputConnectors.h"
-#include "ceinms/InputConnectors.h"
+#include "ceinms/concurrency/Latch.h"
+#include "ceinms/concurrency/Queue.h"
+#include "ceinms/queues/LogQueue.h"
 
 namespace ceinms {
     class QueuesToStorageFiles {
@@ -43,33 +44,50 @@ namespace ceinms {
         QueuesToStorageFiles& operator=(const QueuesToStorageFiles&) = delete;
 
         template <typename NMSmodelT>
-        QueuesToStorageFiles(InputConnectors& inputConnectors, OutputConnectors& outputConnectors, const NMSmodelT& subject, const std::vector< std::string >& valuesToWrite, const std::string& outputDir = "./Output/");
+        QueuesToStorageFiles(
+            ScalarLogQueue& inputLogQueue,
+            Concurrency::Latch& doneWithSubscriptions,
+            Concurrency::Latch& readyToWrite,
+            const NMSmodelT& subject,
+            const std::vector< std::string >& valuesToWrite,
+            const std::string& outputDir = "./Output/");
         ~QueuesToStorageFiles() = default;
         void operator()();
 
     private:
-        void initFile(const std::string& valueName, const std::vector< OutputConnectors::FrameType >& dataToWrite);
-        void addLog(std::string valueName);
 
-        std::string outputDir_;
-        std::string separator_;
-        std::map< std::string, std::shared_ptr<std::ostream> > outFiles_;
+        void initFile(const std::string& valueName, const std::vector< ScalarVectorFrame >& dataToWrite);
+        void addLog(std::string valueName);
+        ScalarLogQueue& inputLogQueue_;
+        Concurrency::Latch& doneWithSubscriptions_;
+        Concurrency::Latch& readyToWrite_;
         std::vector<std::string> valuesToWrite_;
         std::vector<std::string> torqueNames_;
         std::vector<std::string> muscleNames_;
-        InputConnectors& inputConnectors_;
-        OutputConnectors& outputConnectors_;
-
+        std::string outputDir_;
+        std::string separator_;
+        std::map< std::string, std::shared_ptr<std::ostream> > outFiles_;
     };
 
-
     template <typename NMSmodelT>
-    QueuesToStorageFiles::QueuesToStorageFiles(InputConnectors& inputConnectors, OutputConnectors& outputConnectors, const NMSmodelT& subject, const std::vector< std::string >& valuesToWrite, const std::string& outputDir)
-        :outputDir_(outputDir), separator_("\t"), valuesToWrite_(valuesToWrite), inputConnectors_(inputConnectors), outputConnectors_(outputConnectors) {
+    QueuesToStorageFiles::QueuesToStorageFiles(
+        ScalarLogQueue& inputLogQueue,
+        Concurrency::Latch& doneWithSubscriptions,
+        Concurrency::Latch& readyToWrite,
+        const NMSmodelT& subject,
+        const std::vector< std::string >& valuesToWrite,
+        const std::string& outputDir) :
+        inputLogQueue_(inputLogQueue),
+        doneWithSubscriptions_(doneWithSubscriptions),
+        readyToWrite_(readyToWrite),
+        valuesToWrite_(valuesToWrite),
+        outputDir_(outputDir),
+        separator_("\t") {
+
         outputDir_ += "/";
         boost::filesystem::path dir(outputDir_);
         if (!boost::filesystem::exists(dir)) {
-            if (!boost::filesystem::create_directory(dir)) {
+            if (!boost::filesystem::create_directories(dir)) {
                 std::cout << "Error: Cannot create the output directory " + outputDir_ << std::endl;
                 exit(EXIT_FAILURE);
             }
@@ -79,7 +97,6 @@ namespace ceinms {
 
         subject.getDoFNames(torqueNames_);
         subject.getMuscleNames(muscleNames_);
-
     }
 }
 #endif

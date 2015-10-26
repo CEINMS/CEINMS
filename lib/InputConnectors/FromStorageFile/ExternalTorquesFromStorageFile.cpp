@@ -29,8 +29,6 @@
 #include "ceinms/ExternalTorquesFromStorageFile.h"
 #include "ceinms/ExternalTorquesFromX.h"
 #include "ceinms/DataFromStorageFile.h"
-#include "ceinms/InputConnectors.h"
-
 
 #include <iostream>
 using std::cout;
@@ -47,8 +45,6 @@ using std::vector;
 namespace ceinms  {
     ExternalTorquesFromStorageFile::~ExternalTorquesFromStorageFile()
     {
-        if (externalTorquesDataFromFile_ != nullptr)
-            delete externalTorquesDataFromFile_;
     }
 
     bool ExternalTorquesFromStorageFile::externalTorquesFileExist(const string& fileName)
@@ -62,9 +58,9 @@ namespace ceinms  {
     void ExternalTorquesFromStorageFile::operator()()
     {
 
-        inputConnectors_.doneWithSubscription.wait();
+        ExternalTorquesFromX::doneWithSubscriptions();
 
-        if (inputConnectors_.externalTorquesAvailable)
+        if (externalTorquesAvailable_)
         {
             while (externalTorquesDataFromFile_->areStillData())
             {
@@ -77,11 +73,10 @@ namespace ceinms  {
                 updateExternalTorques(selectedTorquesData, externalTorquesDataFromFile_->getCurrentTime());
             }
 
-            vector<double> endOfTorques;
-            updateExternalTorques(endOfTorques, std::numeric_limits<double>::infinity());
-
+            ExternalTorquesFromX::sendEndOfData();
         }
         else {
+            ExternalTorquesFromX::sendEndOfData();
 #ifdef LOG
             cout << "\n ExtTorque: external Torques not available " << endl;
 #endif
@@ -91,5 +86,6 @@ namespace ceinms  {
         cout << "\nexternalTorque DONE\n";
 #endif
 
+        ExternalTorquesFromX::doneWithExecution();
     }
 }

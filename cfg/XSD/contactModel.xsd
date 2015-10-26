@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!--Authors: Claudio Pizzolato -->
+
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:annotation>
+    <xs:documentation xml:lang="en"/>
+  </xs:annotation>
+
+  <xs:simpleType name="JointsType">
+    <xs:list itemType="xs:token"/>
+  </xs:simpleType>
+
+  <xs:complexType name="FromOpenSimType">
+    <xs:choice maxOccurs="unbounded">
+      <xs:sequence>
+        <xs:element maxOccurs="1" minOccurs="1" name="osimModel" type="xs:token"/>
+        <xs:element maxOccurs="1" minOccurs="1" name="motion" type="xs:token"/>
+        <xs:element maxOccurs="1" minOccurs="1" name="externalLoads" type="xs:token"/>
+        <xs:element maxOccurs="1" minOccurs="1" name="joints" type="JointsType"/>
+      </xs:sequence>
+    </xs:choice>
+  </xs:complexType>
+
+  <xs:simpleType name="PositiveDouble">
+    <xs:restriction base="xs:double">
+      <xs:minExclusive value="0" />
+    </xs:restriction>
+  </xs:simpleType>
+  
+  <xs:complexType name="CondyleType">
+      <xs:sequence>
+        <xs:element maxOccurs="1" minOccurs="1" name="name" type="xs:token"/>
+        <xs:element maxOccurs="1" minOccurs="1" name="dof" type="xs:token"/>
+      </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="KneeBalanceType">
+      <xs:sequence>
+        <xs:element maxOccurs="1" minOccurs="1" name="intercondyleDistance" type="PositiveDouble"/>
+        <xs:element maxOccurs="2" minOccurs="2" name="condyle" type="CondyleType"/>
+      </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="ContactModelType">
+    <xs:choice maxOccurs="unbounded">
+        <xs:element maxOccurs="1" name="fromOpenSim" type="FromOpenSimType"/>
+        <xs:element maxOccurs="1" name="kneeBalance" type="KneeBalanceType"/>
+    </xs:choice>
+  </xs:complexType>
+
+  <xs:element name="contactModel" type="ContactModelType"/>
+</xs:schema>

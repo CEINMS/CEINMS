@@ -15,3 +15,7 @@ add_subdirectory(InputConnectors)
 add_subdirectory(OutputConnectors)
 add_subdirectory(Optimizers)
 add_subdirectory(OptimizerSystems)
+add_subdirectory(JointContactModels)
+add_subdirectory(ModelEvaluators)
+
+

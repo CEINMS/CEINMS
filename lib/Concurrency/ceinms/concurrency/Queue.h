@@ -29,7 +29,6 @@
 #ifndef ceinms_Queue_h
 #define ceinms_Queue_h
 
-
 #include <list>
 #include <map>
 #include <thread>
@@ -42,6 +41,7 @@ namespace ceinms {
         template <typename T>
         class Queue {
         public:
+            typedef T type;
             Queue() = default;
             Queue(const Queue&) = delete;
             Queue& operator=(const Queue&) = delete;

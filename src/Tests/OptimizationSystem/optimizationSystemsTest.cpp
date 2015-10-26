@@ -33,12 +33,8 @@
 #include "ceinms/SimulatedAnnealing.h"
 
 using ceinms::TrialData;
-#include "ceinms/InputConnectors.h"
-using ceinms::InputConnectors;
-#include "ceinms/OutputConnectors.h"
-using ceinms::OutputConnectors;
 #include "ceinms/QueuesToTrialData.h"
-#include "ceinms/EMGFromFile.h"
+#include "ceinms/EmgFromFile.h"
 #include "ceinms/LmtMaFromStorageFile.h"
 #include "ceinms/CeinmsCalibrationSetupXmlReader.h"
 #include "ceinms/CalibrationXmlReader.h"
@@ -53,6 +49,15 @@ using ceinms::OutputConnectors;
 #include "ceinms/Tendon/ElasticTendon.h"
 #include "ceinms/Tendon/ElasticTendon_BiSec.h"
 #include "ceinms/SetupDataStructure.h"
+
+#include "ceinms/concurrency/Queue.h"
+#include "ceinms/concurrency/Latch.h"
+#include "ceinms/queues/EmgQueue.h"
+#include "ceinms/queues/LmtQueue.h"
+#include "ceinms/queues/ExternalTorquesQueue.h"
+#include "ceinms/queues/MultipleMomentArmsQueues.h"
+#include "ceinms/QueuesToTrialData.h"
+
 #include <thread>
 #include <vector>
 using std::vector;
@@ -66,6 +71,8 @@ using std::list;
 #include <chrono>
 #include "ceinms/Utilities.h"
 using namespace ceinms;
+using ceinms::Concurrency::Queue;
+using ceinms::Concurrency::Latch;
 
 void setLmtMaFilenames(const string& directory, const vector< string > dofNames, string& lmtDataFilename, vector< string >& maDataFilenames)
 {
@@ -98,34 +105,35 @@ void sortMaFilenames(const std::map<string, string>& maMap, const vector< string
     }
 }
 
-
 template<typename NMSmodelT>
 TrialData readTrialData(std::string inputDataFilename, NMSmodelT& mySubject, std::string trialId, std::string emgGeneratorFile)
 {
     InputDataXmlReader dataLocations(inputDataFilename);
-    // CEINMS::InputConnectors* inputConnectors= new CEINMS::InputConnectors();
-    //CEINMS::OutputConnectors* outputConnectors = new CEINMS::OutputConnectors();
 
-    std::unique_ptr<InputConnectors> inputConnectors(new InputConnectors);
-    std::unique_ptr<OutputConnectors> outputConnectors(new OutputConnectors);
+    EmgQueue emgQueue;
+    LmtQueue lmtQueue;
+    ExternalTorquesQueue externalTorqueQueue;
+    MultipleMomentArmsQueues momentArmsQueues;
+
+    ceinms::Concurrency::Latch doneWithSubscription;
+    ceinms::Concurrency::Latch doneWithExecution;
 
     string emgFilename(dataLocations.getExcitationsFile());
-    EMGFromFile emgProducer(*inputConnectors, mySubject, emgFilename, emgGeneratorFile);
+    EmgFromFile emgProducer(emgQueue, doneWithSubscription, doneWithExecution, mySubject, emgFilename, emgGeneratorFile);
 
     vector< string > dofNames;
     mySubject.getDoFNames(dofNames);
     vector< string > maFilename;
     sortMaFilenames(dataLocations.getMaFiles(), dofNames, maFilename);
-    LmtMaFromStorageFile lmtMaProducer(*inputConnectors, mySubject, dataLocations.getLmtFile(), maFilename);
+    LmtMaFromStorageFile lmtMaProducer(lmtQueue, momentArmsQueues, doneWithSubscription, doneWithExecution, mySubject, dataLocations.getLmtFile(), maFilename);
 
     string externalTorqueFilename(dataLocations.getExternalTorqueFile());
-    ExternalTorquesFromStorageFile externalTorquesProducer(*inputConnectors, mySubject, externalTorqueFilename);
+    ExternalTorquesFromStorageFile externalTorquesProducer(externalTorqueQueue, doneWithSubscription, doneWithExecution, mySubject, externalTorqueFilename);
 
-    QueuesToTrialData queuesToTrialData(*inputConnectors, *outputConnectors, mySubject, trialId);
+    QueuesToTrialData queuesToTrialData(emgQueue, lmtQueue, externalTorqueQueue, momentArmsQueues, doneWithSubscription, doneWithExecution, mySubject, trialId);
 
-
-    inputConnectors->doneWithSubscription.setCount(4);
-    outputConnectors->doneWithExecution.setCount(1);
+    doneWithSubscription.setCount(4);
+    doneWithExecution.setCount(4);
 
     // 4. start the threads
     std::thread emgProdThread(std::ref(emgProducer));
@@ -138,7 +146,7 @@ TrialData readTrialData(std::string inputDataFilename, NMSmodelT& mySubject, std
     externalTorquesProdThread.join();
     queuesToTrialDataThread.join();
 
-    if (queuesToTrialData.getTrialData().lmtData.getNRows() < 1)
+    if (!queuesToTrialData.getTrialData().isConsistent())
     {
         std::cout << "ERROR: No data was read for trial " << trialId << std::endl;
         exit(EXIT_FAILURE);
@@ -155,12 +163,9 @@ void PrintUsage()
     cout << "-Help, -H                           Print the command-line options for " << progName << ".\n";
     cout << "-PrintSetup, -PS                    Generates a template Setup file\n";
     cout << "-Setup, -S        SetupFileName     Specify an xml setup file.\n";
-
 }
 
-
 int main(int argc, char** argv) {
-
 
     string option = "";
     string setupFileName;
@@ -231,7 +236,7 @@ int main(int argc, char** argv) {
 
     case NMSModelCfg::OpenLoopExponentialActivationStiffTendonOffline: {
 
-        using  MyNMSmodel = NMSmodel < ExponentialActivation, StiffTendon, CurveMode::Offline >;
+        using  MyNMSmodel = NMSmodel < ExponentialActivation, StiffTendon, CurveMode::Offline > ;
         MyNMSmodel mySubject;
         setupSubject(mySubject, uncalibratedSubjectXmlFile);
         for (list<string>::iterator trialIt = calibrationTrialIDs.begin(); trialIt != calibrationTrialIDs.end(); ++trialIt)
@@ -258,21 +263,17 @@ int main(int argc, char** argv) {
                 auto timeEnd = std::chrono::high_resolution_clock::now();
                 std::cout << std::chrono::duration_cast<std::chrono::milliseconds>(timeEnd - timeBegin).count() << "ms" << std::endl;
             }
-                break;
+                                                                         break;
             default:
                 std::cerr << "Calibration Step not valid\n";
             }
         } //end while
-
-
     } //end case
-        break;
-
-
+                                                                       break;
 
     case NMSModelCfg::OpenLoopExponentialActivationElasticTendonBiSecOffline: {
 
-        using  MyNMSmodel = NMSmodel < ExponentialActivation, ElasticTendon_BiSec, CurveMode::Offline >;
+        using  MyNMSmodel = NMSmodel < ExponentialActivation, ElasticTendon_BiSec, CurveMode::Offline > ;
         MyNMSmodel mySubject;
         setupSubject(mySubject, uncalibratedSubjectXmlFile);
         for (list<string>::iterator trialIt = calibrationTrialIDs.begin(); trialIt != calibrationTrialIDs.end(); ++trialIt)
@@ -287,7 +288,7 @@ int main(int argc, char** argv) {
                 currentCalibrationStep.getDofNames(dofsToCalibrate);
                 ParameterSet parameterSet;
                 currentCalibrationStep.getParameterSet(parameterSet);
-                using MySystem = NMSmodelSystem < MyNMSmodel, MinTorqueError >;
+                using MySystem = NMSmodelSystem < MyNMSmodel, MinTorqueError > ;
                 MySystem system(mySubject, trials, MinTorqueError(), parameterSet, dofsToCalibrate);
 
                 SimulatedAnnealingParameters simanParameters;
@@ -299,16 +300,13 @@ int main(int argc, char** argv) {
                 auto timeEnd = std::chrono::high_resolution_clock::now();
                 std::cout << std::chrono::duration_cast<std::chrono::milliseconds>(timeEnd - timeBegin).count() << "ms" << std::endl;
             }
-                break;
+                                                                         break;
             default:
                 std::cerr << "Calibration Step not valid\n";
             }
         } //end while
-
-
     } //end case
-        break;
-
+                                                                              break;
     }
     return 0;
 }

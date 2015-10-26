@@ -362,6 +362,7 @@ namespace ceinms {
 
         int n = x_.size();
         double yValue(.0);
+        if (n <= 0) return yValue;
         if (xValue < x_.at(0))
             yValue = b_.at(0);
         else if (xValue > x_.at(n - 1))

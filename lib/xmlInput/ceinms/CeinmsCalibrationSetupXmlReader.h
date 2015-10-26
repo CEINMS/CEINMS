@@ -42,6 +42,8 @@ namespace ceinms {
         std::string getCalibrationFile();
         std::string getExcitationGeneratorFile();
         std::string getOutputSubjectFile();
+        std::string getContactModelFile();
+        bool hasContactModel();
         static bool writeTemplateCeinmsCalibrationSetupFile(const std::string& templateFile);
 
     private:

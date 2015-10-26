@@ -31,25 +31,45 @@
 
 #include <vector>
 #include <string>
-#include "InputConnectors.h"
+#include "ceinms/concurrency/Queue.h"
+#include "ceinms/concurrency/Latch.h"
+#include "ceinms/queues/ExternalTorquesQueue.h"
 
 namespace ceinms {
     class ExternalTorquesFromX
     {
     public:
         template <typename NMSModelT>
-        ExternalTorquesFromX(InputConnectors& inputConnectors, const NMSModelT& subject);
+        ExternalTorquesFromX(
+            ExternalTorquesQueue& outputExternalTorquesQueue,
+            Concurrency::Latch& doneWithSubscriptions,
+            Concurrency::Latch& doneWithExecution,
+            const NMSModelT& subject);
+
         virtual ~ExternalTorquesFromX();
-        virtual void operator()() {};
-        void updateExternalTorques(const std::vector<double>& currentExternalTorquesData, double currentTime);
+        virtual void operator()() = 0;
+        void updateExternalTorques(const ExternalTorquesData& currentExternalTorquesData, double currentTime);
+        void doneWithSubscriptions();
+        void doneWithExecution();
+        void sendEndOfData();
+
     protected:
         std::vector< std::string > dofNames_;
-        InputConnectors& inputConnectors_;
+    private:
+        ExternalTorquesQueue& outputExternalTorquesQueue_;
+        Concurrency::Latch& doneWithSubscriptions_;
+        Concurrency::Latch& doneWithExecution_;
     };
 
-
     template <typename NMSModelT>
-    ExternalTorquesFromX::ExternalTorquesFromX(InputConnectors& inputConnectors, const NMSModelT& subject) :inputConnectors_(inputConnectors)
+    ExternalTorquesFromX::ExternalTorquesFromX(
+        ExternalTorquesQueue& outputExternalTorquesQueue,
+        Concurrency::Latch& doneWithSubscriptions,
+        Concurrency::Latch& doneWithExecution,
+        const NMSModelT& subject) :
+        outputExternalTorquesQueue_(outputExternalTorquesQueue),
+        doneWithSubscriptions_(doneWithSubscriptions),
+        doneWithExecution_(doneWithExecution)
     {
         subject.getDoFNames(dofNames_);
     }

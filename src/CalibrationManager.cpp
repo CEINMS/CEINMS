@@ -45,23 +45,30 @@ using std::vector;
 #include "ceinms/Activation/ExponentialActivation.h"
 #include "ceinms/Activation/PiecewiseActivation.h"
 #include "ceinms/MinTorqueError.h"
+#include "ceinms/SumKneeContactForces.h"
+#include "ceinms/MinTorqueErrorAndContactForces.h"
+
 #include "ceinms/SimulatedAnnealing.h"
 #include "ceinms/NMSmodelSystem.h"
 #include "ceinms/Curve.h"
 #include "ceinms/InputDataXmlReader.h"
-#include "ceinms/EMGFromFile.h"
+#include "ceinms/EmgFromFile.h"
 #include "ceinms/ExternalTorquesFromStorageFile.h"
 #include "ceinms/LmtMaFromStorageFile.h"
+#include "ceinms/ObjectiveFunctionSetup.h"
 
+#include "ceinms/concurrency/Queue.h"
+#include "ceinms/concurrency/Latch.h"
+#include "ceinms/queues/EmgQueue.h"
+#include "ceinms/queues/LmtQueue.h"
+#include "ceinms/queues/ExternalTorquesQueue.h"
+#include "ceinms/queues/MultipleMomentArmsQueues.h"
 #include "ceinms/QueuesToTrialData.h"
-#include "ceinms/InputConnectors.h"
-#include "ceinms/OutputConnectors.h"
 
 #include "XmlWriter.h"
 #include "ceinms/FileUtils.h"
 
 namespace ceinms {
-
 
     CalibrationManager::CalibrationManager(const string& setupFilename) :
         ceinmsCalibrationSetup_(setupFilename),
@@ -69,9 +76,17 @@ namespace ceinms {
         calibrationFile_(ceinmsCalibrationSetup_.getCalibrationFile()),
         calibrationXmlReader_(ceinmsCalibrationSetup_.getCalibrationFile()),
         calibratedSubjectFile_(ceinmsCalibrationSetup_.getOutputSubjectFile()),
-        emgGeneratorFile_(ceinmsCalibrationSetup_.getExcitationGeneratorFile()) {
+        emgGeneratorFile_(ceinmsCalibrationSetup_.getExcitationGeneratorFile()),
+        hasContactModel_(ceinmsCalibrationSetup_.hasContactModel()){
 
         calibrationXmlReader_.getCalibrationTrials(calibrationTrialIDs_);
+        cout << "Contact model ";
+        if (hasContactModel_) {
+            cout << "found" << endl;
+            contactModelCfg_.setXmlInputFile(ceinmsCalibrationSetup_.getContactModelFile());
+        }
+        else
+            cout << " not found" << endl;
     }
 
     template <typename NMSmodelT>
@@ -88,35 +103,55 @@ namespace ceinms {
         while (calibrationXmlReader_.popNextCalibrationStep(currentCalibrationStep)) {
             std::cout << "CalibrationStepCfg " << currentCalibrationStep.getStepCfg() << std::endl;
             switch (currentCalibrationStep.getStepCfg()) {
-                case CalibrationCfg::MinimizeTorqueErrorParameterSetDefault: {
+            case CalibrationCfg::MinimizeTorqueErrorParameterSetDefault: {
 
-                    vector<string> dofsToCalibrate;
-                    currentCalibrationStep.getDofNames(dofsToCalibrate);
-                    ParameterSet parameterSet;
-                    currentCalibrationStep.getParameterSet(parameterSet);
+                vector<string> dofsToCalibrate;
+                currentCalibrationStep.getDofNames(dofsToCalibrate);
+                ParameterSet parameterSet;
+                currentCalibrationStep.getParameterSet(parameterSet);
+                ObjectiveFunctionSetup objectiveFunctionSetup = currentCalibrationStep.getObjectiveFunctionSetup();
 
-                    using MySystem = NMSmodelSystem < NMSmodelT, MinTorqueError>;
-                    MySystem system(mySubject, trials, MinTorqueError(), parameterSet, dofsToCalibrate);
+                using MySystem = NMSmodelSystem < NMSmodelT, MinTorqueError > ;
+                MySystem system(mySubject, trials, MinTorqueError(), parameterSet, dofsToCalibrate);
 
-                    SimulatedAnnealingParameters simanParameters;
-                    calibrationXmlReader_.getOptimizationAlgorithmParameters(simanParameters);
-                    Optimizers::SimulatedAnnealing<MySystem> optimizer(system, simanParameters);
-                    exitflag = optimizer.optimize();
-                }   break;
+                SimulatedAnnealingParameters simanParameters;
+                calibrationXmlReader_.getOptimizationAlgorithmParameters(simanParameters);
+                Optimizers::SimulatedAnnealing<MySystem> optimizer(system, simanParameters);
+                exitflag = optimizer.optimize();
+            }   break;
 
+            case CalibrationCfg::TorqueErrorAndSumKneeContactForcesParameterSetDefault: {
+
+                vector<string> dofsToCalibrate;
+                currentCalibrationStep.getDofNames(dofsToCalibrate);
+                ParameterSet parameterSet;
+                currentCalibrationStep.getParameterSet(parameterSet);
+                ObjectiveFunctionSetup objectiveFunctionSetup = currentCalibrationStep.getObjectiveFunctionSetup();
+
+                SumKneeContactForces sumKneeContacts(objectiveFunctionSetup);
+                sumKneeContacts.setContactModelSetup(contactModelCfg_.getContactModelSetupKneeBalance());
+                MinTorqueError minTorqueError;
+                MinTorqueErrorAndContactForces minTorqueErrorAndContactForces(minTorqueError, sumKneeContacts);
+
+                using MySystem = NMSmodelSystem < NMSmodelT, MinTorqueErrorAndContactForces > ;
+                MySystem system(mySubject, trials, minTorqueErrorAndContactForces, parameterSet, dofsToCalibrate);
+
+                SimulatedAnnealingParameters simanParameters;
+                calibrationXmlReader_.getOptimizationAlgorithmParameters(simanParameters);
+                Optimizers::SimulatedAnnealing<MySystem> optimizer(system, simanParameters);
+                exitflag = optimizer.optimize();
+            }   break;
             } //end switch
         }//end while
         writeXml(mySubject, uncalibratedSubjectFile_, calibrationFile_, calibratedSubjectFile_);
         return exitflag;
     }
 
-
     template <typename NMSmodelT>
     bool  CalibrationManager::runHybrid() {
         cout << "Implementation not available in calibration yet. Verify you XML configuration file" << endl;
         return 1;
     }
-
 
     bool CalibrationManager::run() {
 
@@ -168,46 +203,47 @@ namespace ceinms {
             exitFlag = runHybrid<NMSmodel<PiecewiseActivation, StiffTendon, CurveMode::Online>>();
             break;
 
-
         case NMSModelCfg::HybridPiecewiseActivationElasticTendonBiSecOnline:
             exitFlag = runHybrid<NMSmodel<PiecewiseActivation, ElasticTendon_BiSec, CurveMode::Online>>();
             break;
-
 
         default:
             cout << "Implementation not available yet. Verify you XML configuration file" << endl;
             exitFlag = 1;
             break;
-
         }
         return exitFlag;
     }
-
 
     template<typename NMSmodelT>
     TrialData CalibrationManager::readTrialData(const string& inputDataFilename, NMSmodelT& mySubject, const string& trialId, const string& emgGeneratorFile) {
 
         InputDataXmlReader dataLocations(inputDataFilename);
 
-        std::unique_ptr<InputConnectors> inputConnectors(new InputConnectors);
-        std::unique_ptr<OutputConnectors> outputConnectors(new OutputConnectors);
+        EmgQueue emgQueue;
+        LmtQueue lmtQueue;
+        ExternalTorquesQueue externalTorqueQueue;
+        MultipleMomentArmsQueues momentArmsQueues;
+
+        Concurrency::Latch doneWithSubscription;
+        Concurrency::Latch doneWithExecution;
 
         string emgFilename(dataLocations.getExcitationsFile());
-        EMGFromFile emgProducer(*inputConnectors, mySubject, emgFilename, emgGeneratorFile);
+        EmgFromFile emgProducer(emgQueue, doneWithSubscription, doneWithExecution, mySubject, emgFilename, emgGeneratorFile);
 
         vector< string > dofNames;
         mySubject.getDoFNames(dofNames);
         vector< string > maFilename;
         sortMaFilenames(dataLocations.getMaFiles(), dofNames, maFilename);
-        LmtMaFromStorageFile lmtMaProducer(*inputConnectors, mySubject, dataLocations.getLmtFile(), maFilename);
+        LmtMaFromStorageFile lmtMaProducer(lmtQueue, momentArmsQueues, doneWithSubscription, doneWithExecution, mySubject, dataLocations.getLmtFile(), maFilename);
 
         string externalTorqueFilename(dataLocations.getExternalTorqueFile());
-        ExternalTorquesFromStorageFile externalTorquesProducer(*inputConnectors, mySubject, externalTorqueFilename);
+        ExternalTorquesFromStorageFile externalTorquesProducer(externalTorqueQueue, doneWithSubscription, doneWithExecution, mySubject, externalTorqueFilename);
 
-        QueuesToTrialData queuesToTrialData(*inputConnectors, *outputConnectors, mySubject, trialId);
+        QueuesToTrialData queuesToTrialData(emgQueue, lmtQueue, externalTorqueQueue, momentArmsQueues, doneWithSubscription, doneWithExecution, mySubject, trialId);
 
-        inputConnectors->doneWithSubscription.setCount(4);
-        outputConnectors->doneWithExecution.setCount(1);
+        doneWithSubscription.setCount(4);
+        doneWithExecution.setCount(4);
 
         // 4. start the threads
         std::thread emgProdThread(std::ref(emgProducer));
@@ -220,7 +256,7 @@ namespace ceinms {
         externalTorquesProdThread.join();
         queuesToTrialDataThread.join();
 
-        if (queuesToTrialData.getTrialData().lmtData.getNRows() < 1)
+        if (!queuesToTrialData.getTrialData().isConsistent())
         {
             std::cout << "ERROR: No data was read for trial " << trialId << std::endl;
             exit(EXIT_FAILURE);
@@ -230,9 +266,9 @@ namespace ceinms {
 
     template<typename NMSmodelT>
     void CalibrationManager::writeXml(NMSmodelT& mySubject,
-                                      const string& uncalibratedSubjectXmlFile,
-                                      const string& calibrationXmlFile,
-                                      const string& newCalibratedSubjectXmlFile) {
+        const string& uncalibratedSubjectXmlFile,
+        const string& calibrationXmlFile,
+        const string& newCalibratedSubjectXmlFile) {
         XmlWriter xmlWriter(uncalibratedSubjectXmlFile);
         xmlWriter.setParameters(mySubject);
         xmlWriter.addCalibrationInfo(calibrationXmlFile);
@@ -241,9 +277,9 @@ namespace ceinms {
     }
 
     void CalibrationManager::sortMaFilenames(const std::map<std::string,
-                                             std::string>& maMap,
-                                             const std::vector< std::string >& dofNames,
-                                             std::vector< std::string >& maDataFilenames) {
+        std::string>& maMap,
+        const std::vector< std::string >& dofNames,
+        std::vector< std::string >& maDataFilenames) {
 
         int currentDof = 0;
         for (auto& it : dofNames)

@@ -38,13 +38,11 @@ namespace ceinms {
         enum Interpolation{ Cubic, Linear };
     };
 
-
     template <int v>
     struct Int2Type {
 
         enum { value = v };
     };
-
 
     template <CurveMode::Mode mode, typename T, typename U>
     struct Select {
@@ -52,21 +50,17 @@ namespace ceinms {
         typedef T Result;
     };
 
-
     template <typename T, typename U>
     struct Select < CurveMode::Online, T, U > {
 
         typedef U Result;
     };
 
-
     template <CurveMode::Mode mode, CurveMode::Interpolation T, size_t N>
     class Curve;
 
-
     template <CurveMode::Mode mode, CurveMode::Interpolation T, size_t N>
     std::ostream& operator<< (std::ostream& output, const Curve<mode, T, N>& c);
-
 
     template <CurveMode::Mode mode, CurveMode::Interpolation T = CurveMode::Cubic, size_t N = 15>
     class Curve {
@@ -91,6 +85,16 @@ namespace ceinms {
         double getValue(double xValue) const;
         double getFirstDerivative(double xValue) const;
         double getSecondDerivative(double xValue) const;
+        double getMinX() const {
+            if (!x_.empty())
+                return x_.front();
+            return 0;
+        }
+        double getMaxX() const {
+            if (!x_.empty())
+                return x_.back();
+            return 0;
+        }
         friend std::ostream& operator<< <>(std::ostream& output, const Curve& c);
         bool empty() { return b_.empty(); }
     private:
@@ -107,14 +111,12 @@ namespace ceinms {
         unsigned getAbscissaPoint(double xValue, Int2Type<CurveMode::Online>) const;
         unsigned getAbscissaPoint(double xValue, Int2Type<CurveMode::Offline>) const;
 
-
         typedef typename Select<mode, std::vector<double>, CircularVector<double, N> >::Result VectorType;
         VectorType x_;
         VectorType y_;
         std::vector<double>    b_;
         std::vector<double>    c_;
         std::vector<double>    d_;
-
     };
 }
 
