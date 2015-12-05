@@ -43,164 +43,167 @@
 #include "ceinms/concurrency/Latch.h"
 #include <map>
 #include "ceinms/Mapper.h"
+#include <OpenSim/OpenSim.h>
+#include <algorithm>
 
 namespace ceinms {
-
+    /*
     class SplineSetBase {
     public:
-        virtual std::vector<std::string> getDofNames() = 0;
-        virtual void getLmt(
-            std::vector<double>& lmtValues,
-            const std::vector<double>& dofValues) = 0;
-        virtual void getMa(
-            const std::string& dofName,
-            const std::vector< std::string >& musclesConnectedToDofs,
-            const std::vector< double >& angleCombinations,
-            std::vector <double>& maValues) = 0;
-        virtual void evalLmt(
-            const std::string& outputDir,
-            const std::vector< std::vector< double > >& angleCombinations) = 0;
-        virtual void evalMa(
-            const std::string& outputDir,
-            const std::map< std::string,
-            std::vector< std::string > >& musclesConnectedToDofs,
-            const std::vector< std::vector< double > >& angleCombinations) = 0;
+    virtual std::vector<std::string> getDofNames() = 0;
+    virtual void getLmt(
+    std::vector<double>& lmtValues,
+    const std::vector<double>& dofValues) = 0;
+    virtual void getMa(
+    const std::string& dofName,
+    const std::vector< std::string >& musclesConnectedToDofs,
+    const std::vector< double >& angleCombinations,
+    std::vector <double>& maValues) = 0;
+    virtual void evalLmt(
+    const std::string& outputDir,
+    const std::vector< std::vector< double > >& angleCombinations) = 0;
+    virtual void evalMa(
+    const std::string& outputDir,
+    const std::map< std::string,
+    std::vector< std::string > >& musclesConnectedToDofs,
+    const std::vector< std::vector< double > >& angleCombinations) = 0;
     };
 
     template<int N>
     class SplineSetAdapter : public SplineSetBase {
     public:
-        SplineSetAdapter() = delete;
-        SplineSetAdapter(const std::string& inputDataFilename);
-        SplineSetAdapter(
-            const std::vector< std::string > dofNames,
-            const std::vector< std::string > musclesNames,
-            const std::vector<double>& a,
-            const std::vector<double>& b,
-            const std::vector<int>& n,
-            const std::vector<std::vector<double> >& y);
-        SplineSetAdapter(const std::string& coeffDir, const std::vector<std::string>& muscleNames);
-        SplineSetAdapter(const SplineSetAdapter& orig) = delete;
-        virtual std::vector<std::string> getDofNames() override { return splineSet_.getDofNames(); }
-        virtual void getLmt(
-            std::vector<double>& lmtValues,
-            const std::vector<double>& dofValues) override {
-            splineSet_.getLmt(lmtValues, dofValues);
-        }
+    SplineSetAdapter() = delete;
+    SplineSetAdapter(const std::string& inputDataFilename);
+    SplineSetAdapter(
+    const std::vector< std::string > dofNames,
+    const std::vector< std::string > musclesNames,
+    const std::vector<double>& a,
+    const std::vector<double>& b,
+    const std::vector<int>& n,
+    const std::vector<std::vector<double> >& y);
+    SplineSetAdapter(const std::string& coeffDir, const std::vector<std::string>& muscleNames);
+    SplineSetAdapter(const SplineSetAdapter& orig) = delete;
+    virtual std::vector<std::string> getDofNames() override { return splineSet_.getDofNames(); }
+    virtual void getLmt(
+    std::vector<double>& lmtValues,
+    const std::vector<double>& dofValues) override {
+    splineSet_.getLmt(lmtValues, dofValues);
+    }
 
-        virtual void getMa(
-            const std::string& dofName,
-            const std::vector< std::string >& musclesConnectedToDofs,
-            const std::vector< double >& angleCombinations,
-            std::vector <double>& maValues) override {
-            splineSet_.getMa(dofName, musclesConnectedToDofs, angleCombinations, maValues);
-        }
+    virtual void getMa(
+    const std::string& dofName,
+    const std::vector< std::string >& musclesConnectedToDofs,
+    const std::vector< double >& angleCombinations,
+    std::vector <double>& maValues) override {
+    splineSet_.getMa(dofName, musclesConnectedToDofs, angleCombinations, maValues);
+    }
 
-        virtual void evalLmt(
-            const std::string& outputDir,
-            const std::vector< std::vector< double > >& angleCombinations) override {
-            splineSet_.evalLmt(outputDir, angleCombinations);
-        }
+    virtual void evalLmt(
+    const std::string& outputDir,
+    const std::vector< std::vector< double > >& angleCombinations) override {
+    splineSet_.evalLmt(outputDir, angleCombinations);
+    }
 
-        virtual void evalMa(
-            const std::string& outputDir,
-            const std::map< std::string,
-            std::vector< std::string > >& musclesConnectedToDofs,
-            const std::vector< std::vector< double > >& angleCombinations) override {
-            splineSet_.evalMa(outputDir, musclesConnectedToDofs, angleCombinations);
-        }
+    virtual void evalMa(
+    const std::string& outputDir,
+    const std::map< std::string,
+    std::vector< std::string > >& musclesConnectedToDofs,
+    const std::vector< std::vector< double > >& angleCombinations) override {
+    splineSet_.evalMa(outputDir, musclesConnectedToDofs, angleCombinations);
+    }
 
-        static std::shared_ptr<SplineSetAdapter> make(const string& inputDataFilename);
-        static std::shared_ptr<SplineSetAdapter> make(
-            const std::vector< std::string > dofNames,
-            const std::vector< std::string > musclesNames,
-            const std::vector<double>& a,
-            const std::vector<double>& b,
-            const std::vector<int>& n,
-            const std::vector<std::vector<double> >& y);
-        static std::shared_ptr<SplineSetAdapter> make(const std::string& coeffDir, const std::vector<std::string>& muscleNames);
+    static std::shared_ptr<SplineSetAdapter> make(const string& inputDataFilename);
+    static std::shared_ptr<SplineSetAdapter> make(
+    const std::vector< std::string > dofNames,
+    const std::vector< std::string > musclesNames,
+    const std::vector<double>& a,
+    const std::vector<double>& b,
+    const std::vector<int>& n,
+    const std::vector<std::vector<double> >& y);
+    static std::shared_ptr<SplineSetAdapter> make(const std::string& coeffDir, const std::vector<std::string>& muscleNames);
 
     private:
-        osimSpliner::SplineSet<N> splineSet_;
+    osimSpliner::SplineSet<N> splineSet_;
     };
 
     std::shared_ptr<SplineSetBase> makeSplineSet(int degree, const std::string& inputDataFilename);
     std::shared_ptr<SplineSetBase> makeSplineSet(int degree,
-        const std::vector< std::string > dofNames,
-        const std::vector< std::string > musclesNames,
-        const std::vector<double>& a,
-        const std::vector<double>& b,
-        const std::vector<int>& n,
-        const std::vector<std::vector<double> >& y);
+    const std::vector< std::string > dofNames,
+    const std::vector< std::string > musclesNames,
+    const std::vector<double>& a,
+    const std::vector<double>& b,
+    const std::vector<int>& n,
+    const std::vector<std::vector<double> >& y);
     std::shared_ptr<SplineSetBase> makeSplineSet(int degree, const std::string& coeffDir, const std::vector<std::string>& muscleNames);
 
     template<int N>
     std::shared_ptr<SplineSetAdapter<N>> SplineSetAdapter<N>::make(const string& inputDataFilename) {
 
-        return std::shared_ptr<SplineSetAdapter<N>>(new SplineSetAdapter<N>(inputDataFilename));
+    return std::shared_ptr<SplineSetAdapter<N>>(new SplineSetAdapter<N>(inputDataFilename));
     }
 
     template<int N>
     std::shared_ptr<SplineSetAdapter<N>> SplineSetAdapter<N>::make(
-        const std::vector< std::string > dofNames,
-        const std::vector< std::string > musclesNames,
-        const std::vector<double>& a,
-        const std::vector<double>& b,
-        const std::vector<int>& n,
-        const std::vector<std::vector<double> >& y) {
+    const std::vector< std::string > dofNames,
+    const std::vector< std::string > musclesNames,
+    const std::vector<double>& a,
+    const std::vector<double>& b,
+    const std::vector<int>& n,
+    const std::vector<std::vector<double> >& y) {
 
-        return std::shared_ptr<SplineSetAdapter<N>>(new SplineSetAdapter<N>(dofNames, musclesNames, a, b, n, y));
+    return std::shared_ptr<SplineSetAdapter<N>>(new SplineSetAdapter<N>(dofNames, musclesNames, a, b, n, y));
     }
 
     template<int N>
     std::shared_ptr<SplineSetAdapter<N>> SplineSetAdapter<N>::make(const std::string& coeffDir, const std::vector<std::string>& muscleNames) {
 
-        return std::shared_ptr<SplineSetAdapter<N>>(new SplineSetAdapter<N>(coeffDir, muscleNames));
+    return std::shared_ptr<SplineSetAdapter<N>>(new SplineSetAdapter<N>(coeffDir, muscleNames));
     }
 
     template<int N>
     SplineSetAdapter<N>::SplineSetAdapter(const std::string& inputDataFilename) :
-        splineSet_(inputDataFilename)
+    splineSet_(inputDataFilename)
     {}
 
     template<int N>
     SplineSetAdapter<N>::SplineSetAdapter(
-        const std::vector< std::string > dofNames,
-        const std::vector< std::string > musclesNames,
-        const std::vector<double>& a,
-        const std::vector<double>& b,
-        const std::vector<int>& n,
-        const std::vector<std::vector<double> >& y) :
-        splineSet_(dofNames, musclesNames, a, b, n, y) {}
+    const std::vector< std::string > dofNames,
+    const std::vector< std::string > musclesNames,
+    const std::vector<double>& a,
+    const std::vector<double>& b,
+    const std::vector<int>& n,
+    const std::vector<std::vector<double> >& y) :
+    splineSet_(dofNames, musclesNames, a, b, n, y) {}
 
     template<int N>
     SplineSetAdapter<N>::SplineSetAdapter(const std::string& coeffDir, const std::vector<std::string>& muscleNames) :
-        splineSet_(coeffDir, muscleNames) {}
+    splineSet_(coeffDir, muscleNames) {}
 
     template<int N, typename... Args>
     auto wrap(Args... args) -> decltype(SplineSetAdapter<N>::make(args...)){
-        return SplineSetAdapter<N>::make(args...);
+    return SplineSetAdapter<N>::make(args...);
     }
 
     //we use this because the second constructor has plenty of arguments
     template<int N>
     std::shared_ptr<SplineSetBase> wrapAlias(
-        const std::vector< std::string > dofNames,
-        const std::vector< std::string > musclesNames,
-        const std::vector<double>& a,
-        const std::vector<double>& b,
-        const std::vector<int>& n,
-        const std::vector<std::vector<double> >& y) {
+    const std::vector< std::string > dofNames,
+    const std::vector< std::string > musclesNames,
+    const std::vector<double>& a,
+    const std::vector<double>& b,
+    const std::vector<int>& n,
+    const std::vector<std::vector<double> >& y) {
 
-        return wrap < N,
-            const std::vector< std::string >,
-            const std::vector< std::string >,
-            const std::vector<double>&,
-            const std::vector<double>&,
-            const std::vector<int>&,
-            const std::vector<std::vector<double> >& > (dofNames, musclesNames, a, b, n, y);
+    return wrap < N,
+    const std::vector< std::string >,
+    const std::vector< std::string >,
+    const std::vector<double>&,
+    const std::vector<double>&,
+    const std::vector<int>&,
+    const std::vector<std::vector<double> >& > (dofNames, musclesNames, a, b, n, y);
     }
-
+    */
+    template <int N>
     class LmtMaFromMcbs : public LmtMaFromX {
     public:
 
@@ -213,18 +216,37 @@ namespace ceinms {
             Concurrency::Latch& doneWithSubscriptions,
             Concurrency::Latch& doneWithExecution,
             const NMSModelT& subject,
-            const string& coeffDir);
+            const std::string& coeffDir);
+
+        template <typename NMSModelT>
+        LmtMaFromMcbs(
+            GeneralisedCoordinatesQueue& inputCoordinateQueue,
+            LmtQueue& outputLmtQueue,
+            MultipleMomentArmsQueues& outputMomentArmsQueue,
+            Concurrency::Latch& doneWithSubscriptions,
+            Concurrency::Latch& doneWithExecution,
+            const NMSModelT& subject,
+            const std::string& coeffDir,
+            const std::string& osimModelFilename);
+
         void operator()() override;
 
     private:
-        std::shared_ptr<SplineSetBase> splineSet_;
+        void readDefaultMomentArmsFromOsim(
+            const std::string& osimModelFIlename);
+        //     std::shared_ptr<SplineSetBase> splineSet_;
+        osimSpliner::SplineSet<N> splineSet_;
         GeneralisedCoordinatesQueue& inputCoordinateQueue_;
         std::map<std::string, std::vector<std::string>> muscleNamesOnDofsMap_;
+        std::map<std::string, std::vector<double>> defaultMomentArmsOnDofsMap_;
+        std::vector<std::string> dofNamesFromSpline_, dofsNamesFromOsimModel_;
+
         Mapper dofMapper_;
     };
 
+    template <int N>
     template <typename NMSModelT>
-    LmtMaFromMcbs::LmtMaFromMcbs(
+    LmtMaFromMcbs<N>::LmtMaFromMcbs(
         GeneralisedCoordinatesQueue& inputCoordinateQueue,
         ScalarVectorQueue& outputLmtQueue,
         MultipleMomentArmsQueues& outputMomentArmsQueue,
@@ -233,22 +255,70 @@ namespace ceinms {
         const NMSModelT& subject,
         const string& coeffDir) :
         LmtMaFromX(outputLmtQueue, outputMomentArmsQueue, doneWithSubscriptions, doneWithExecution, subject),
-        splineSet_(makeSplineSet(dofNames_.size(), coeffDir, musclesNames_)),
+        //  splineSet_(makeSplineSet(dofNames_.size(), coeffDir, musclesNames_)),
+        splineSet_(coeffDir, musclesNames_),
         inputCoordinateQueue_(inputCoordinateQueue) {
 
         subject.getMuscleNamesOnDofs(muscleNamesOnDofsMap_);
 
-        std::vector<string> dofNamesFromSpline(splineSet_->getDofNames());
+        if (N != dofNames_.size()) {
+            std::cout << "ERROR: The number of dofs and the order of the MCBS are different";
+            exit(EXIT_FAILURE);
+        }
+
+        dofNamesFromSpline_ = splineSet_.getDofNames();
         std::cout << "dof names from spline ";
-        for (auto dof : dofNamesFromSpline)
+        for (auto dof : dofNamesFromSpline_)
             std::cout << dof << " ";
         std::cout << std::endl;
 
-        dofMapper_.setNames(dofNames_, dofNamesFromSpline);
+        dofMapper_.setNames(dofNames_, dofNamesFromSpline_);
+
+        // inputCoordinateQueue_should receive data already formatted correctly because
+        // this object doesn't know opensim
+    }
+
+    template <int N>
+    template <typename NMSModelT>
+    LmtMaFromMcbs<N>::LmtMaFromMcbs(
+        GeneralisedCoordinatesQueue& inputCoordinateQueue,
+        ScalarVectorQueue& outputLmtQueue,
+        MultipleMomentArmsQueues& outputMomentArmsQueue,
+        Concurrency::Latch& doneWithSubscriptions,
+        Concurrency::Latch& doneWithExecution,
+        const NMSModelT& subject,
+        const string& coeffDir,
+        const std::string& osimModelFilename) :
+        LmtMaFromX(outputLmtQueue, outputMomentArmsQueue, doneWithSubscriptions, doneWithExecution, subject),
+        //  splineSet_(makeSplineSet(dofNames_.size(), coeffDir, musclesNames_)),
+        splineSet_(coeffDir, musclesNames_),
+        inputCoordinateQueue_(inputCoordinateQueue) {
+
+        subject.getMuscleNamesOnDofs(muscleNamesOnDofsMap_);
+
+        dofNamesFromSpline_ = splineSet_.getDofNames();
+        for (auto& dof : dofNames_) {
+            auto it(std::find(dofNamesFromSpline_.begin(), dofNamesFromSpline_.end(), dof));
+            if (it == dofNamesFromSpline_.end())
+                dofsNamesFromOsimModel_.emplace_back(dof);
+        }
+
+        for (auto& dof : dofsNamesFromOsimModel_)
+            std::cout << dof << " not included in MCBS, reading from Osim model" << std::endl;
+
+        readDefaultMomentArmsFromOsim(osimModelFilename);
+
+        std::cout << "dof names from spline ";
+        for (auto dof : dofsNamesFromOsimModel_)
+            std::cout << dof << " ";
+        std::cout << std::endl;
+
+        dofMapper_.setNames(dofNames_, dofNamesFromSpline_);
 
         // inputCoordinateQueue_should receive data already formatted correctly because
         // this object doesn't know opensim
     }
 }
 
+#include "ceinms/LmtMaFromMcbs.cpp"
 #endif

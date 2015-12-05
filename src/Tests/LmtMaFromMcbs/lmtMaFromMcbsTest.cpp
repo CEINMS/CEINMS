@@ -132,7 +132,7 @@ int main(){
         ikFilename,
         8,
         subject.getDoFNames());
-    LmtMaFromMcbs lmtMaFromMcbs(generalisedCoordinatesQueue,
+    LmtMaFromMcbs<4> lmtMaFromMcbs(generalisedCoordinatesQueue,
         lmtQueue,
         momentArmsQueue,
         doneWithSubscriptions,

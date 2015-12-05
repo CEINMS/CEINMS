@@ -68,7 +68,7 @@ set(OutputConnectors_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}" CACHE INTERNAL "
 
 # Install
 
-install(FILES ${OutputConnectors_HEADERS} ${OutputConnectors_TEMPLATE_IMPLEMENTATION} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/ceinms OMPONENT Development)
+install(FILES ${OutputConnectors_HEADERS} ${OutputConnectors_TEMPLATE_IMPLEMENTATION} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/ceinms COMPONENT Development)
 install(TARGETS OutputConnectors
         EXPORT CEINMSTargets
         RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT Applications

@@ -16,7 +16,10 @@ include_directories(
 add_definitions(/DBASE_DIR="${CMAKE_CURRENT_LIST_DIR}")
 add_executable(Test_LmtMaFromMcbs lmtMaFromMcbsTest.cpp)
 target_link_libraries(Test_LmtMaFromMcbs InputConnectors ceinms_common NMSmodel Concurrency xmlInput OutputConnectors SplineSetHelper mcbs::Spline optimized ${OPENSIM_LIBRARIES})
-target_link_libraries(Test_LmtMaFromMcbs InputConnectors ceinms_common NMSmodel Concurrency xmlInput OutputConnectors SplineSetHelper mcbs::Spline debug ${OPENSIM_LIBRARIES_DEBUG})
+
+add_executable(Test_LmtMaFromMcbsAndOsim lmtMaFromMcbsAndOsimTest.cpp)
+target_link_libraries(Test_LmtMaFromMcbsAndOsim InputConnectors ceinms_common NMSmodel Concurrency xmlInput OutputConnectors SplineSetHelper mcbs::Spline optimized ${OPENSIM_LIBRARIES})
+#target_link_libraries(Test_LmtMaFromMcbs InputConnectors ceinms_common NMSmodel Concurrency xmlInput OutputConnectors SplineSetHelper mcbs::Spline debug ${OPENSIM_LIBRARIES_DEBUG})
 
 
 set(N_DOFS 4)

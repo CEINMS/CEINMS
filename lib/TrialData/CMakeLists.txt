@@ -15,7 +15,7 @@ set_source_files_properties( ${TrialData_TEMPLATE_IMPLEMENTATION} PROPERTIES HEA
 source_group("Header Files" FILES ${TrialData_HEADERS})
 source_group("Source Files" FILES ${TrialData_TEMPLATE_IMPLEMENTATION})
 
-add_library(TrialData ${TrialData_HEADERS} ${TrialData_TEMPLATE_IMPLEMENTATION})
+#add_library(TrialData ${TrialData_HEADERS} ${TrialData_TEMPLATE_IMPLEMENTATION})
 
 
 
@@ -25,8 +25,8 @@ set(TrialData_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}"
 
 #Install
 install(FILES ${TrialData_HEADERS} ${TrialData_TEMPLATE_IMPLEMENTATION} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/ceinms COMPONENT Development) 
-install(TARGETS TrialData
-        EXPORT CEINMSTargets
-        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT Applications
-        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT Development
-        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT Development)
+#install(TARGETS TrialData
+#        EXPORT CEINMSTargets
+#        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT Applications
+#        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT Development
+#        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT Development)

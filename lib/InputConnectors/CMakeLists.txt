@@ -23,10 +23,12 @@ set(InputConnectors_SOURCES
   ExternalTorquesFromX.cpp
   LmtMaFromX.cpp
   ExternalForcesFromX.cpp
-  GeneralisedCoordinatesFromX.cpp
-  LmtMaFromMcbs.cpp
-  
+  GeneralisedCoordinatesFromX.cpp 
 )
+
+set(InputConnectors_TEMPLATE_IMPLEMENTATIONS ceinms/LmtMaFromMcbs.cpp)
+set_source_files_properties(${InputConnectors_TEMPLATE_IMPLEMENTATIONS} PROPERTIES HEADER_FILE_ONLY TRUE)
+
 set(InputConnectors_HEADERS
   ceinms/EmgFromX.h
   ceinms/ExternalTorquesFromX.h
@@ -45,6 +47,7 @@ add_library(InputConnectors STATIC
   ${FromStorageFile_SOURCES}
   ${InputConnectors_HEADERS}
   ${FromStorageFile_HEADERS}
+  ${InputConnectors_TEMPLATE_IMPLEMENTATIONS}
 )
 target_link_libraries(InputConnectors FileIO Concurrency ${Boost_FILESYSTEM_LIBRARY} optimized ${OPENSIM_LIBRARIES})
 #target_link_libraries(InputConnectors FileIO Concurrency ${Boost_FILESYSTEM_LIBRARY} debug ${OPENSIM_LIBRARIES_DEBUG})
@@ -67,7 +70,7 @@ set(InputConnectors_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}"  CACHE INTERNAL "
 
 
 # Install
-install(FILES ${FromStorageFile_HEADERS} ${InputConnectors_HEADERS} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/ceinms COMPONENT Development)
+install(FILES ${FromStorageFile_HEADERS} ${InputConnectors_HEADERS} ${InputConnectors_TEMPLATE_IMPLEMENTATIONS} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/ceinms COMPONENT Development)
 install(TARGETS InputConnectors
         EXPORT CEINMSTargets
         RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT Applications
