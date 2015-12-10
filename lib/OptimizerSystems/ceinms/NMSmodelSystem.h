@@ -53,7 +53,7 @@ namespace ceinms {
         void getUpperLowerBounds(std::vector<double>& upperBounds, std::vector<double>& lowerBounds) const;
         //       void setTrialData(const std::vector<TrialData>& trialData) { trialData_ = trialData; }
         //       void pushTrialData(const TrialData& trialData) { trialData_.emplace_back(trialData); }
-
+        void printCosts() const { objectiveFunction_.printCosts(); }
 
     private:
 
@@ -68,7 +68,6 @@ namespace ceinms {
         //      std::vector<TrialData> trialData_; //I'd like this to be here.. but it ended up in BatchEvaluator.. which has the advantage to hide
     };
 }
-
 
 #include "NMSmodelSystem.cpp"
 #endif

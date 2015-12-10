@@ -90,10 +90,7 @@ namespace ceinms {
             }
             torqueVariance_.emplace_back(trialVariance);
         }
-
     }
-
-
 
     void MinTorqueError::calculate(const std::vector<Result>& results) {
         //reset f
@@ -102,17 +99,7 @@ namespace ceinms {
         using TrialDataIt = std::vector<TrialData>::const_iterator;
         using ResultIt = std::vector<Result>::const_iterator;
 
-        class TrialCost {
-        public:
-            vector<double> torqueError;
-            double penalty;
-            TrialCost(size_t nDofs) :
-                torqueError(nDofs, 0.),
-                penalty(0.) {}
-            ;
-        };
-
-        std::vector<TrialCost> trialCosts;
+        trialCosts_.clear();
         auto tIt(trials_.cbegin());
         auto rIt(results.cbegin());
         for (tIt; tIt != trials_.cend(); ++tIt, ++rIt) {
@@ -129,14 +116,24 @@ namespace ceinms {
                 for (size_t c(0); c < rIt->penalties.getNColumns(); ++c)
                     trialCost.penalty += rIt->penalties.at(r, c);
 
-            trialCosts.emplace_back(trialCost);
+            trialCosts_.emplace_back(trialCost);
         }
-
 
         for (size_t trialIndex(0); trialIndex < trials_.size(); ++trialIndex) {
             for (auto& dofIdx : dofsToCalibrateIdx_.at(trialIndex))
-                f_ += (trialCosts.at(trialIndex).torqueError.at(dofIdx) / torqueVariance_.at(trialIndex).at(dofIdx) +
-                trialCosts.at(trialIndex).penalty) / results.at(trialIndex).torques.getNRows();
+                f_ += (trialCosts_.at(trialIndex).torqueError.at(dofIdx) / torqueVariance_.at(trialIndex).at(dofIdx) +
+                trialCosts_.at(trialIndex).penalty) / results.at(trialIndex).torques.getNRows();
+        }
+    }
+
+    void MinTorqueError::printCosts() const {
+
+        for (size_t d(0); d < dofsToCalibrate_.size(); ++d) {
+            std::cout << dofsToCalibrate_.at(d) << std::endl;
+            for (size_t t(0); t < trials_.size(); ++t) {
+                std::cout << "RMSE trial #" << t + 1 << "\t" << sqrt(trialCosts_.at(t).torqueError.at(d) / trials_.at(t).torqueData.getNRows()) << " Nm" << std::endl;
+            }
+            std::cout << std::endl;
         }
     }
 }

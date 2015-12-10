@@ -76,7 +76,6 @@ namespace ceinms {
             srand(1);
         }
 
-
         template<typename OptimizerSystem>
         void SimulatedAnnealing<OptimizerSystem>::checkBounds(int k) {
 
@@ -169,13 +168,9 @@ namespace ceinms {
                                     noAccepted_.at(k)++;
                                 }
                                 else {
-
                                 }
-
                             }
-
                         } // k
-
                     } // j
 
                     // Adjust V such that half of all trial are accepted
@@ -205,7 +200,6 @@ namespace ceinms {
 
                     for (int h = 0; h < noParameters_; ++h)
                         noAccepted_.at(h) = 0.;
-
                 } // i
 
                 // terminate?
@@ -216,7 +210,6 @@ namespace ceinms {
                 updateFandFlatest();
                 // restart
                 x_ = xOpt_;
-
             }  /* end while */
 
             optimizerSystem_.setParameters(xOpt_);
@@ -231,7 +224,6 @@ namespace ceinms {
             return exp(p / t);
         }
 
-
         template <typename OptimizerSystem>
         bool SimulatedAnnealing<OptimizerSystem>::doTerminate() {
 
@@ -244,14 +236,16 @@ namespace ceinms {
                     cout << "fLatest_.at(" << a << ") - fOpt_ = "
                         << fLatest_.at(a) << " - " << fOpt_ << " > "
                         << epsilon_ << endl;
+                    optimizerSystem_.printCosts();
                     return false;
                 }
             }
             cout << "Return true! " << endl;
             cout << "fOpt_ = " << fOpt_ << endl;
+            optimizerSystem_.printCosts();
+
             return true;
         }
-
 
         template<typename OptimizerSystem>
         void SimulatedAnnealing<OptimizerSystem>::updateFandFlatest() {

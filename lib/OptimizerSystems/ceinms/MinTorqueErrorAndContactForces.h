@@ -43,11 +43,12 @@ namespace ceinms {
     class MinTorqueErrorAndContactForces {
     public:
         MinTorqueErrorAndContactForces(const MinTorqueError& torqueErrorFun, const SumKneeContactForces& sumKneeContactFun);
-   //     MinTorqueErrorAndContactForces();
+        //     MinTorqueErrorAndContactForces();
         void setDofsToCalibrate(const std::vector<std::string>& dofsToCalibrate);
         void setTrials(const std::vector<TrialData>& trials);
         void calculate(const std::vector<Result>& results);
         double getValue() const { return f_; }
+        void printCosts() const { minTorqueError_.printCosts(); }
     private:
         MinTorqueError minTorqueError_;
         SumKneeContactForces sumKneeContactForces_;
@@ -55,7 +56,6 @@ namespace ceinms {
         std::vector<TrialData> trials_;
         std::vector<std::string> dofsToCalibrate_;
         std::vector<std::vector<unsigned>> dofsToCalibrateIdx_;
-
     };
 }
 

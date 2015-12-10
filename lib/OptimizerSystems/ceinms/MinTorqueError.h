@@ -35,6 +35,15 @@
 
 namespace ceinms {
 
+    class TrialCost {
+    public:
+        std::vector<double> torqueError;
+        double penalty;
+        TrialCost(size_t nDofs) :
+            torqueError(nDofs, 0.),
+            penalty(0.) {}
+    };
+
     class MinTorqueError {
     public:
         MinTorqueError() : f_(std::numeric_limits<double>::max()) {}
@@ -42,6 +51,7 @@ namespace ceinms {
         void setTrials(const std::vector<TrialData>& trials);
         void calculate(const std::vector<Result>& results);
         double getValue() const { return f_; }
+        void printCosts() const;
     private:
         void computeVariance();
         void updDofsToCalibrateIdx();
@@ -50,7 +60,7 @@ namespace ceinms {
         std::vector<std::vector<double>> torqueVariance_;
         std::vector<std::string> dofsToCalibrate_;
         std::vector<std::vector<unsigned>> dofsToCalibrateIdx_;
-
+        std::vector<TrialCost> trialCosts_;
     };
 }
 
