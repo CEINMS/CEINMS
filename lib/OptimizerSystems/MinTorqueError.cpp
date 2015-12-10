@@ -128,10 +128,12 @@ namespace ceinms {
 
     void MinTorqueError::printCosts() const {
 
-        for (size_t d(0); d < dofsToCalibrate_.size(); ++d) {
-            std::cout << dofsToCalibrate_.at(d) << std::endl;
-            for (size_t t(0); t < trials_.size(); ++t) {
-                std::cout << "RMSE trial #" << t + 1 << "\t" << sqrt(trialCosts_.at(t).torqueError.at(d) / trials_.at(t).torqueData.getNRows()) << " Nm" << std::endl;
+        for (size_t trialIndex(0); trialIndex < trials_.size(); ++trialIndex) {
+            std::cout <<"Trial #" << trialIndex+1 << std::endl;
+            for (auto& dofIdx : dofsToCalibrateIdx_.at(trialIndex)) {
+                        double val = sqrt(trialCosts_.at(trialIndex).torqueError.at(dofIdx) / 
+                            trials_.at(trialIndex).torqueData.getNRows());
+                        std::cout << trials_.at(trialIndex).dofNames.at(dofIdx)  << " " << val << " Nm" << std::endl;
             }
             std::cout << std::endl;
         }
