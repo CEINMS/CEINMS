@@ -63,16 +63,15 @@ namespace ceinms {
         void setSetup(const ObjectiveFunctionSetup& setup);
         void setContactModelSetup(const ContactModelKneeBalanceSetup& setup);
         void setBarrierParameters(double xL, double xR, double weight, double exponent);
+        void printCosts() const;
     private:
         double f_, weight_, exponent_;
         std::vector<TrialData> trials_;
         ContactModelKneeBalance kneeContactModel_;
         ContactModelKneeBalanceSetup kneeContactModelSetup_;
         BarrierFunction barrierFunc_;
+        std::vector<std::vector<std::vector<double>>> contactForces_;  //trial, row, med/lat
     };
-
 }
-
-
 
 #endif

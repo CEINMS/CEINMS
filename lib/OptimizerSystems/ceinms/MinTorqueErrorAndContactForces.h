@@ -48,7 +48,7 @@ namespace ceinms {
         void setTrials(const std::vector<TrialData>& trials);
         void calculate(const std::vector<Result>& results);
         double getValue() const { return f_; }
-        void printCosts() const { minTorqueError_.printCosts(); }
+        void printCosts() const { minTorqueError_.printCosts(); sumKneeContactForces_.printCosts(); }
     private:
         MinTorqueError minTorqueError_;
         SumKneeContactForces sumKneeContactForces_;

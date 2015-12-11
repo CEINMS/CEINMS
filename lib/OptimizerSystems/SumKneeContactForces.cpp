@@ -33,11 +33,9 @@ using std::vector;
 
 namespace ceinms {
 
-
     BarrierFunction::BarrierFunction() : f_(std::numeric_limits<double>::max()) {}
 
     void BarrierFunction::initialize(const BarrierListSetup& setup, const std::vector<std::string>& namesFromInput) {
-
 
         for (auto it : setup.barrierSetup) {
             barriers_.push_back(Barrier(it.xL, it.xR, it.weight, it.exponent));
@@ -45,7 +43,6 @@ namespace ceinms {
         }
         barrierMapper_.setNames(namesFromInput, barrierTargetNames_);
     }
-
 
     double BarrierFunction::getValue(const std::vector<double>& x) const {
 
@@ -56,18 +53,17 @@ namespace ceinms {
         return f;
     }
 
-
-    SumKneeContactForces::SumKneeContactForces(const ObjectiveFunctionSetup& setup) : f_(std::numeric_limits<double>::max()) 
+    SumKneeContactForces::SumKneeContactForces(const ObjectiveFunctionSetup& setup) : f_(std::numeric_limits<double>::max())
     {
         setSetup(setup);
         barrierFunc_.initialize(setup.barrierListSetup, kneeContactModel_.getCondyleNames());
-    
     }
 
     void SumKneeContactForces::setTrials(const vector<TrialData>& trials) {
 
         trials_ = trials;
         kneeContactModel_.initialize(kneeContactModelSetup_, trials_.front().dofNames);
+        contactForces_.resize(trials_.size());
     }
 
     void SumKneeContactForces::setContactModelSetup(const ContactModelKneeBalanceSetup& setup) {
@@ -75,37 +71,67 @@ namespace ceinms {
         kneeContactModelSetup_ = setup;
         if (!trials_.empty())
             kneeContactModel_.initialize(kneeContactModelSetup_, trials_.front().dofNames);
-
     }
-
 
     void SumKneeContactForces::setSetup(const ObjectiveFunctionSetup& setup) {
 
-        
         weight_ = setup.weight;
         exponent_ = setup.exponent;
-
     }
-
 
     void SumKneeContactForces::calculate(const vector<Result>& results) {
 
         f_ = 0;
-        vector<double> contactForces;
+        vector<double> currentContactForces;
         auto tIt(trials_.cbegin());
         auto rIt(results.cbegin());
-        for (tIt; tIt != trials_.cend(); ++tIt, ++rIt) {
+        size_t trialIndex(0);
+        for (tIt; tIt != trials_.cend(); ++tIt, ++rIt, ++trialIndex) {
+
             size_t nRows(std::min(tIt->torqueData.getNRows(), rIt->torques.getNRows()));
+            contactForces_.at(trialIndex).resize(nRows);
             for (size_t rowIdx(0); rowIdx < nRows; ++rowIdx) {
                 kneeContactModel_.setTorques(tIt->torqueData.getRow(rowIdx), rIt->torques.getRow(rowIdx));
-                kneeContactModel_.getContactForces(contactForces);
-                for (auto& cf : contactForces)
+                kneeContactModel_.getContactForces(currentContactForces);
+                contactForces_.at(trialIndex).at(rowIdx) = currentContactForces;
+                for (auto& cf : currentContactForces)
                     f_ += weight_*std::pow(cf, exponent_);
-                f_ += barrierFunc_.getValue(contactForces);
+                f_ += barrierFunc_.getValue(currentContactForces);
             }
-
         }
-
     }
 
+    void SumKneeContactForces::printCosts() const {
+
+        auto names = kneeContactModel_.getCondyleNames();
+        for (size_t trialIndex(0); trialIndex < contactForces_.size(); ++trialIndex) {
+            std::cout << "Trial #" << trialIndex + 1 << std::endl;
+
+            vector<double> maxValues;
+            auto val = std::max_element(
+                contactForces_.at(trialIndex).begin(),
+                contactForces_.at(trialIndex).end(),
+                [](const std::vector<double>& lhs, const std::vector<double>& rhs){
+                return lhs.front() < rhs.front();
+            }
+
+            );
+            maxValues.push_back(val->front());
+
+            val = std::max_element(
+                contactForces_.at(trialIndex).begin(),
+                contactForces_.at(trialIndex).end(),
+                [](const std::vector<double>& lhs, const std::vector<double>& rhs){
+                return lhs.back() < rhs.back();
+            }
+
+            );
+
+            maxValues.push_back(val->back());
+            std::cout << "max " << names.at(0) << " " << maxValues.at(1) << " N" << std::endl;
+            std::cout << "max " << names.at(1) << " " << maxValues.at(0) << " N" << std::endl;
+
+            std::cout << std::endl;
+        }
+    }
 }
