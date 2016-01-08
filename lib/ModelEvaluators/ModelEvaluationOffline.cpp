@@ -200,7 +200,6 @@ namespace ceinms {
                 }
             }
 
-
             subject_.setTime(emgTime);
             subject_.setEmgs(emgFrame.data);
             subject_.setMuscleTendonLengths(lmtFrame.data);
@@ -227,6 +226,13 @@ namespace ceinms {
             ModelEvaluationBase<Logger>::logger.log(lmtMaTime, data, "MuscleForces");
             subject_.getTorques(data);
             ModelEvaluationBase<Logger>::logger.log(lmtMaTime, data, "Torques");
+            data.clear();
+            for (unsigned i = 0; i < noDof_; ++i) {
+                vector<double> contribution;
+                subject_.getMusclesContribution(contribution, i);
+                data.insert(data.end(), contribution.begin(), contribution.end());
+            }
+            ModelEvaluationBase<Logger>::logger.log(lmtMaTime, data, "MusclesContribution");
 #endif
             cout << "modelEval time: " << lmtMaTime;
             for (unsigned i(0); i < 100; ++i) cout << ".";
@@ -286,6 +292,7 @@ namespace ceinms {
         ModelEvaluationBase<Logger>::logger.log(endTime, endData, "PennationAngles");
         ModelEvaluationBase<Logger>::logger.log(endTime, endData, "MuscleForces");
         ModelEvaluationBase<Logger>::logger.log(endTime, endData, "Torques");
+        ModelEvaluationBase<Logger>::logger.log(endTime, endData, "MusclesContribution");
 #endif
 
         ModelEvaluationBase<Logger>::doneWithExecution();

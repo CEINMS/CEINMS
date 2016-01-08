@@ -113,6 +113,10 @@ namespace ceinms {
         if (valueName == "Torques")
             for (auto& it : torqueNames_)
                 *outFile << it << separator_;
+        else if (valueName == "MusclesContribution")
+            for (auto& it : torqueNames_)
+                for (auto& jt : muscleNamesOnDofs_.at(it))
+                    *outFile << jt + "_" + it << separator_;
         else
             for (auto& it : muscleNames_)
                 *outFile << it << separator_;

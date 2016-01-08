@@ -170,6 +170,7 @@ namespace ceinms {
                 vector<double> dofsValues(dofMapper_.map(coordinates.data.getQ()));
 
                 auto timeBegin = std::chrono::high_resolution_clock::now();
+
                 splineSet_.getLmt(lmts, dofsValues);
                 auto timeEnd = std::chrono::high_resolution_clock::now();
                 //std::cout << "mcbs time: " << std::chrono::duration_cast<std::chrono::milliseconds>(timeEnd - timeBegin).count() << "ms" << std::endl;

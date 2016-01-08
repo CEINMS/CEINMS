@@ -41,6 +41,7 @@ namespace ceinms {
             virtual std::vector<double> getParameters() const = 0;
             virtual double getF() const = 0;
             virtual std::size_t getNoParameters() const = 0;
+            virtual void printCosts() const {}
         };
     }
 }

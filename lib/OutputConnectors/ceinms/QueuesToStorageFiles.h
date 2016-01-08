@@ -31,6 +31,7 @@
 
 #include <iostream>
 #include <fstream>
+#include <map>
 #include <boost/filesystem.hpp>
 #include "ceinms/concurrency/Latch.h"
 #include "ceinms/concurrency/Queue.h"
@@ -67,6 +68,7 @@ namespace ceinms {
         std::string outputDir_;
         std::string separator_;
         std::map< std::string, std::shared_ptr<std::ostream> > outFiles_;
+        std::map<std::string, std::vector<std::string>> muscleNamesOnDofs_;
     };
 
     template <typename NMSmodelT>
@@ -97,6 +99,7 @@ namespace ceinms {
 
         subject.getDoFNames(torqueNames_);
         subject.getMuscleNames(muscleNames_);
+        subject.getMuscleNamesOnDofs(muscleNamesOnDofs_);
     }
 }
 #endif

@@ -155,7 +155,8 @@ namespace ceinms {
             "NormFiberVelocities",
             "PennationAngles",
             "MuscleForces",
-            "Torques" };
+            "Torques",
+            "MusclesContribution" };
 
         vector<string> valuesToWrite = dataToLog;
         QueuesToStorageFiles queuesToStorageFiles(logQueue, doneWithSubscriptionsLatch, doneWithExecutionLatch, mySubject, valuesToWrite, outputDirectory_);
@@ -265,7 +266,8 @@ namespace ceinms {
             "NormFiberVelocities",
             "PennationAngles",
             "MuscleForces",
-            "Torques" };
+            "Torques",
+            "MusclesContribution" };
 
         // 2b. define the thread consuming the output sources
         vector<string> valuesToWrite = dataToLog;
@@ -430,7 +432,8 @@ namespace ceinms {
             "NormFiberVelocities",
             "PennationAngles",
             "MuscleForces",
-            "Torques" };
+            "Torques",
+            "MusclesContribution" };
         // 2b. define the thread consuming the output sources
         vector<string> valuesToWrite = dataToLog;
         QueuesToStorageFiles queuesToStorageFiles(logQueue, doneWithSubscriptionsLatch, doneWithExecutionLatch, mySubject, valuesToWrite, outputDirectory_);
@@ -506,7 +509,8 @@ namespace ceinms {
             "PennationAngles",
             "MuscleForces",
             "Torques",
-            "AdjustedEmgs" };
+            "AdjustedEmgs",
+            "MusclesContribution" };
         // 2b. define the thread consuming the output sources
         vector<string> valuesToWrite = dataToLog;
         QueuesToStorageFiles queuesToStorageFiles(logQueue, doneWithSubscriptionsLatch, doneWithExecutionLatch, mySubject, valuesToWrite, outputDirectory_);

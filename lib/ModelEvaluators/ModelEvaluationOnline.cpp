@@ -116,20 +116,20 @@ namespace ceinms {
                 }
             }
 
-            /* Note about firstLmtArrived: all the emgs before the first frame of lmt are 
+            /* Note about firstLmtArrived: all the emgs before the first frame of lmt are
             ** read, while after the first frame of lmt just the correspondant emgs are used.
             ** This is for a few different reasons:
             ** (i)   in the EMG-assisted mode we can work only with emgs that correspond to a lmt frame.
             **       Also, different modes should behave in the same way
             ** (ii)  Since the execution of the model behave in this way, we have to calibrate consistently
             **       to avoid problems with parameters c1 and c2 in the activation model
-            ** (iii) EMG are supposed to be sampled at a higher frequency than lmt, also undersampling 
-            **       emgs doesn't chenage the information content of the signal, since we are working 
+            ** (iii) EMG are supposed to be sampled at a higher frequency than lmt, also undersampling
+            **       emgs doesn't chenage the information content of the signal, since we are working
             **       with linear envelopes. Moreover, we save some time if we undersample emgs
             ** (iv)  Since the activation model uses a IIR filter, we prefer to 'charge' the filter
             **       with previous emgs, instead of starting a transient from 0.
             ** All of the above is subject to change, until we find a smarter way to do things
-             */
+            */
             // 4. read emgs
             EmgFrame emgFrameFromQueue;
             emgFrameFromQueue.data.resize(subject_.getNoMuscles());
@@ -174,6 +174,13 @@ namespace ceinms {
                 ModelEvaluationBase<Logger>::logger.log(lmtMaTime, data, "MuscleForces");
                 subject_.getTorques(data);
                 ModelEvaluationBase<Logger>::logger.log(lmtMaTime, data, "Torques");
+                data.clear();
+                for (unsigned i = 0; i < noDof_; ++i) {
+                    vector<double> contribution;
+                    subject_.getMusclesContribution(contribution, i);
+                    data.insert(data.end(), contribution.begin(), contribution.end());
+                }
+                ModelEvaluationBase<Logger>::logger.log(lmtMaTime, data, "MusclesContribution");
 #endif
 
 #ifdef LOG
@@ -224,6 +231,7 @@ namespace ceinms {
         ModelEvaluationBase<Logger>::logger.log(endTime, endData, "PennationAngles");
         ModelEvaluationBase<Logger>::logger.log(endTime, endData, "MuscleForces");
         ModelEvaluationBase<Logger>::logger.log(endTime, endData, "Torques");
+        ModelEvaluationBase<Logger>::logger.log(endTime, endData, "MusclesContribution");
 #endif
 
         ModelEvaluationBase<Logger>::doneWithExecution();

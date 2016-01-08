@@ -63,7 +63,6 @@ namespace ceinms {
         }
     }
 
-
     template <typename Activation, typename Tendon, CurveMode::Mode mode>
     void NMSmodel<Activation, Tendon, mode>::addMuscle(const MTUtype& muscle) {
 
@@ -71,14 +70,12 @@ namespace ceinms {
         muscleNames_.push_back(muscle.getMuscleName());
     }
 
-
     template <typename Activation, typename Tendon, CurveMode::Mode mode>
     void NMSmodel<Activation, Tendon, mode>::addDoF(const DoFtype& dof) {
 
         dofs_.push_back(dof);
         dofNames_.push_back(dof.getName());
     }
-
 
     template <typename Activation, typename Tendon, CurveMode::Mode mode>
     bool NMSmodel<Activation, Tendon, mode>::haveThisMuscle(const string& currentMuscle,
@@ -94,7 +91,6 @@ namespace ceinms {
             return true;
     }
 
-
     template <typename Activation, typename Tendon, CurveMode::Mode mode>
     bool NMSmodel<Activation, Tendon, mode>::haveTheseMuscles(const vector<string>& musclesNames) {
 
@@ -104,7 +100,6 @@ namespace ceinms {
                 return false;
         return true;
     }
-
 
     template <typename Activation, typename Tendon, CurveMode::Mode mode>
     bool NMSmodel<Activation, Tendon, mode>::compareMusclesNames(const vector<string>& muscleNames) const {
@@ -121,15 +116,12 @@ namespace ceinms {
         return true;
     }
 
-
     template <typename Activation, typename Tendon, CurveMode::Mode mode>
     bool NMSmodel<Activation, Tendon, mode>::compareMusclesNamesOnDoF(const vector<string>& muscleNames,
         int whichDoF) const {
 
         return dofs_.at(whichDoF).compareMusclesNames(muscleNames);
     }
-
-
 
     template <typename Activation, typename Tendon, CurveMode::Mode mode>
     void NMSmodel<Activation, Tendon, mode>::setTime(const double& time) {
@@ -138,7 +130,6 @@ namespace ceinms {
         for (muscleIt; muscleIt != muscles_.end(); ++muscleIt)
             muscleIt->setTime(time);
     }
-
 
     template <typename Activation, typename Tendon, CurveMode::Mode mode>
     void NMSmodel<Activation, Tendon, mode>::setEmgs(const std::vector<double>& currentEmgData) {
@@ -158,7 +149,6 @@ namespace ceinms {
         }
     }
 
-
     template <typename Activation, typename Tendon, CurveMode::Mode mode>
     void NMSmodel<Activation, Tendon, mode>::setEmgsSelective(const std::vector<double>& currentEmgData,
         const vector<unsigned>& selectedMusclesIndex) {
@@ -172,7 +162,6 @@ namespace ceinms {
             muscleIt->setEmg(*emgIt);
         }
     }
-
 
     template <typename Activation, typename Tendon, CurveMode::Mode mode>
     void NMSmodel<Activation, Tendon, mode>::setTime_emgs_updateActivations_pushState_selective(double time,
@@ -190,9 +179,7 @@ namespace ceinms {
             muscleIt->updateActivation();
             muscleIt->pushState();
         }
-
     }
-
 
     template <typename Activation, typename Tendon, CurveMode::Mode mode>
     void NMSmodel<Activation, Tendon, mode>::setMuscleTendonLengths(const vector<double>& currentLmtData) {
@@ -211,7 +198,6 @@ namespace ceinms {
         }
     }
 
-
     template <typename Activation, typename Tendon, CurveMode::Mode mode>
     void NMSmodel<Activation, Tendon, mode>::setMuscleTendonLengthsSelective(const std::vector<double>& currentLmtData,
         const vector<unsigned>& selectedMusclesIndex) {
@@ -226,13 +212,11 @@ namespace ceinms {
         }
     }
 
-
     template <typename Activation, typename Tendon, CurveMode::Mode mode>
     void NMSmodel<Activation, Tendon, mode>::setMomentArms(const vector<double>& currentMaData, unsigned whichDof) {
 
         dofs_.at(whichDof).setMomentArms(currentMaData);
     }
-
 
     template <typename Activation, typename Tendon, CurveMode::Mode mode>
     void NMSmodel<Activation, Tendon, mode>::updateState() {
@@ -243,7 +227,6 @@ namespace ceinms {
         updateTorques();
     }
 
-
     template <typename Activation, typename Tendon, CurveMode::Mode mode>
     void NMSmodel<Activation, Tendon, mode>::updateState(const vector<unsigned>& selectedmusclesIndex) {
 
@@ -252,7 +235,6 @@ namespace ceinms {
         updateMuscleForces(selectedmusclesIndex);
         updateTorques();
     }
-
 
     template <typename Activation, typename Tendon, CurveMode::Mode mode>
     void NMSmodel<Activation, Tendon, mode>::updateState_OFFLINE() {
@@ -263,7 +245,6 @@ namespace ceinms {
         updateTorques();
     }
 
-
     template <typename Activation, typename Tendon, CurveMode::Mode mode>
     void NMSmodel<Activation, Tendon, mode>::updateState_OFFLINE(const vector<unsigned>& selectedmusclesIndex) {
 
@@ -272,7 +253,6 @@ namespace ceinms {
         updateMuscleForces(selectedmusclesIndex);
         updateTorques();
     }
-
 
     template <typename Activation, typename Tendon, CurveMode::Mode mode>
     void NMSmodel<Activation, Tendon, mode>::updateState_HYBRID() {
@@ -283,7 +263,6 @@ namespace ceinms {
         updateTorques();
     }
 
-
     template <typename Activation, typename Tendon, CurveMode::Mode mode>
     void NMSmodel<Activation, Tendon, mode>::updateState_HYBRID(const vector<unsigned>& selectedmusclesIndex) {
 
@@ -293,16 +272,12 @@ namespace ceinms {
         updateTorques();
     }
 
-
     template <typename Activation, typename Tendon, CurveMode::Mode mode>
     void NMSmodel<Activation, Tendon, mode>::updateState_END_OF_HYBRID_MINIMIZATION() {
 
         for (auto& mIt : muscles_)
             mIt.updateFibreLengthsAndVelocities_END_OF_HYBRID_MINIMIZATION();
-        
     }
-
-
 
     template <typename Activation, typename Tendon, CurveMode::Mode mode>
     void NMSmodel<Activation, Tendon, mode>::updateActivations() {
@@ -311,7 +286,6 @@ namespace ceinms {
         for (muscleIt; muscleIt != muscles_.end(); ++muscleIt)
             muscleIt->updateActivation();
     }
-
 
     template <typename Activation, typename Tendon, CurveMode::Mode mode>
     void NMSmodel<Activation, Tendon, mode>::updateActivations(const vector<unsigned>& selectedMusclesIndex) {
@@ -324,7 +298,6 @@ namespace ceinms {
         }
     }
 
-
     template <typename Activation, typename Tendon, CurveMode::Mode mode>
     void NMSmodel<Activation, Tendon, mode>::updateFibreLengthsAndVelocities() {
 
@@ -332,7 +305,6 @@ namespace ceinms {
         for (muscleIt; muscleIt != muscles_.end(); ++muscleIt)
             muscleIt->updateFibreLengthAndVelocity();
     }
-
 
     template <typename Activation, typename Tendon, CurveMode::Mode mode>
     void NMSmodel<Activation, Tendon, mode>::updateFibreLengthsAndVelocities(const vector<unsigned>& selectedMusclesIndex) {
@@ -345,7 +317,6 @@ namespace ceinms {
         }
     }
 
-
     template <typename Activation, typename Tendon, CurveMode::Mode mode>
     void NMSmodel<Activation, Tendon, mode>::updateFibreLengthsAndVelocities_OFFLINE() {
 
@@ -353,7 +324,6 @@ namespace ceinms {
         for (muscleIt; muscleIt != muscles_.end(); ++muscleIt)
             muscleIt->updateFibreLengthAndVelocity_OFFLINE();
     }
-
 
     template <typename Activation, typename Tendon, CurveMode::Mode mode>
     void NMSmodel<Activation, Tendon, mode>::updateFibreLengthsAndVelocities_OFFLINE(const vector<unsigned>& selectedMusclesIndex) {
@@ -366,7 +336,6 @@ namespace ceinms {
         }
     }
 
-
     template <typename Activation, typename Tendon, CurveMode::Mode mode>
     void NMSmodel<Activation, Tendon, mode>::updateFibreLengthsAndVelocities_HYBRID() {
 
@@ -374,7 +343,6 @@ namespace ceinms {
         for (muscleIt; muscleIt != muscles_.end(); ++muscleIt)
             muscleIt->updateFibreLengthAndVelocity_HYBRID();
     }
-
 
     template <typename Activation, typename Tendon, CurveMode::Mode mode>
     void NMSmodel<Activation, Tendon, mode>::updateFibreLengthsAndVelocities_HYBRID(const vector<unsigned>& selectedMusclesIndex) {
@@ -387,7 +355,6 @@ namespace ceinms {
         }
     }
 
-
     template <typename Activation, typename Tendon, CurveMode::Mode mode>
     void NMSmodel<Activation, Tendon, mode>::updateFibreLengths_OFFLINEPREP() {
 
@@ -395,7 +362,6 @@ namespace ceinms {
         for (muscleIt; muscleIt != muscles_.end(); ++muscleIt)
             muscleIt->updateFibreLength_OFFLINEPREP();
     }
-
 
     template <typename Activation, typename Tendon, CurveMode::Mode mode>
     void NMSmodel<Activation, Tendon, mode>::updateFibreLengths_OFFLINEPREP(const vector<unsigned>& selectedMusclesIndex) {
@@ -408,7 +374,6 @@ namespace ceinms {
         }
     }
 
-
     template <typename Activation, typename Tendon, CurveMode::Mode mode>
     void NMSmodel<Activation, Tendon, mode>::updateMuscleForces() {
 
@@ -416,7 +381,6 @@ namespace ceinms {
         for (muscleIt; muscleIt != muscles_.end(); ++muscleIt)
             muscleIt->updateMuscleForce();
     }
-
 
     template <typename Activation, typename Tendon, CurveMode::Mode mode>
     void NMSmodel<Activation, Tendon, mode>::updateMuscleForces(const vector<unsigned>& selectedMusclesIndex) {
@@ -429,7 +393,6 @@ namespace ceinms {
         }
     }
 
-
     template <typename Activation, typename Tendon, CurveMode::Mode mode>
     void NMSmodel<Activation, Tendon, mode>::updateTorques() {
 
@@ -438,7 +401,6 @@ namespace ceinms {
             dofIt->updateTorque();
     }
 
-
     template <typename Activation, typename Tendon, CurveMode::Mode mode>
     void NMSmodel<Activation, Tendon, mode>::pushState() {
 
@@ -446,7 +408,6 @@ namespace ceinms {
         for (muscleIt; muscleIt != muscles_.end(); ++muscleIt)
             muscleIt->pushState();
     }
-
 
     template <typename Activation, typename Tendon, CurveMode::Mode mode>
     void NMSmodel<Activation, Tendon, mode>::pushState(const vector<unsigned>& selectedMusclesIndex) {
@@ -459,7 +420,6 @@ namespace ceinms {
         }
     }
 
-
     template <typename Activation, typename Tendon, CurveMode::Mode mode>
     void NMSmodel<Activation, Tendon, mode>::setMuscleForces(const std::vector<double>& muscleForces) {
 
@@ -469,9 +429,7 @@ namespace ceinms {
             muscleIt->setMuscleForce(*mtfIt);
             ++muscleIt;
         }
-
     }
-
 
     template <typename Activation, typename Tendon, CurveMode::Mode mode>
     void NMSmodel<Activation, Tendon, mode>::setActivations(const std::vector<double>& activations) {
@@ -484,7 +442,6 @@ namespace ceinms {
         }
     }
 
-
     template <typename Activation, typename Tendon, CurveMode::Mode mode>
     void NMSmodel<Activation, Tendon, mode>::updateFibreLengthTraces() {
 
@@ -493,7 +450,6 @@ namespace ceinms {
         for (muscleIt = muscles_.begin(); muscleIt < muscles_.end(); ++muscleIt)
             muscleIt->updateFibreLengthTrace();
     }
-
 
     template <typename Activation, typename Tendon, CurveMode::Mode mode>
     void NMSmodel<Activation, Tendon, mode>::updateFibreLengthTraces(const vector<unsigned>& selectedMusclesIndex) {
@@ -506,7 +462,6 @@ namespace ceinms {
         }
     }
 
-
     template <typename Activation, typename Tendon, CurveMode::Mode mode>
     void NMSmodel<Activation, Tendon, mode>::getActivations(vector<double>& activations) const {
 
@@ -515,9 +470,7 @@ namespace ceinms {
         vectorMTUconstItr muscleIt = muscles_.begin();
         for (muscleIt = muscles_.begin(); muscleIt < muscles_.end(); ++muscleIt)
             activations.emplace_back(muscleIt->getActivation());
-
     }
-
 
     template <typename Activation, typename Tendon, CurveMode::Mode mode>
     void NMSmodel<Activation, Tendon, mode>::getEmgs(vector<double>& currentEMGData) const {
@@ -527,9 +480,7 @@ namespace ceinms {
         vectorMTUconstItr muscleIt = muscles_.begin();
         for (muscleIt = muscles_.begin(); muscleIt != muscles_.end(); ++muscleIt)
             currentEMGData.emplace_back(muscleIt->getEmg());
-
     }
-
 
     template <typename Activation, typename Tendon, CurveMode::Mode mode>
     void NMSmodel<Activation, Tendon, mode>::getPastEmgs(vector<double>& pastEMGData) const {
@@ -541,7 +492,6 @@ namespace ceinms {
             pastEMGData.emplace_back(muscleIt->getPastEmg());
     }
 
-
     template <typename Activation, typename Tendon, CurveMode::Mode mode>
     void NMSmodel<Activation, Tendon, mode>::getNeuralActivations(std::vector<double>& neuralActivations) const {
 
@@ -552,7 +502,6 @@ namespace ceinms {
             neuralActivations.emplace_back(muscleIt->getNeuralActivation());
     }
 
-
     template <typename Activation, typename Tendon, CurveMode::Mode mode>
     void NMSmodel<Activation, Tendon, mode>::getFiberLengths(vector<double>& fibreLengths) const {
 
@@ -561,7 +510,6 @@ namespace ceinms {
         vectorMTUconstItr muscleIt = muscles_.begin();
         for (muscleIt = muscles_.begin(); muscleIt < muscles_.end(); ++muscleIt)
             fibreLengths.emplace_back(muscleIt->getFiberLength());
-
     }
 
     template <typename Activation, typename Tendon, CurveMode::Mode mode>
@@ -582,9 +530,7 @@ namespace ceinms {
         vectorMTUconstItr muscleIt = muscles_.begin();
         for (muscleIt = muscles_.begin(); muscleIt < muscles_.end(); ++muscleIt)
             fiberVelocities.emplace_back(muscleIt->getFiberVelocity());
-
     }
-
 
     template <typename Activation, typename Tendon, CurveMode::Mode mode>
     void NMSmodel<Activation, Tendon, mode>::getNormFiberVelocities(vector<double>& normFiberVelocities) const {
@@ -596,7 +542,6 @@ namespace ceinms {
             normFiberVelocities.emplace_back(muscleIt->getNormFiberVelocity());
     }
 
-
     template <typename Activation, typename Tendon, CurveMode::Mode mode>
     void NMSmodel<Activation, Tendon, mode>::getPennationAnglesAtT(vector<double>& pennationAnglesAtT) const {
 
@@ -606,8 +551,6 @@ namespace ceinms {
         for (muscleIt = muscles_.begin(); muscleIt < muscles_.end(); ++muscleIt)
             pennationAnglesAtT.emplace_back(muscleIt->getPennationAngleAtT());
     }
-
-
 
     template <typename Activation, typename Tendon, CurveMode::Mode mode>
     void NMSmodel<Activation, Tendon, mode>::getMuscleForces(vector<double>& muscleForces) const {
@@ -619,7 +562,6 @@ namespace ceinms {
             muscleForces.emplace_back(muscleIt->getMuscleForce());
     }
 
-
     template <typename Activation, typename Tendon, CurveMode::Mode mode>
     void NMSmodel<Activation, Tendon, mode>::getTorques(vector<double>& torques) const {
 
@@ -630,6 +572,11 @@ namespace ceinms {
             torques.emplace_back(dofIt->getTorque());
     }
 
+    template <typename Activation, typename Tendon, CurveMode::Mode mode>
+    void NMSmodel<Activation, Tendon, mode>::getMusclesContribution(std::vector<double>& musclesContribution, unsigned whichDof) const {
+
+        musclesContribution = dofs_.at(whichDof).getMusclesContribution();
+    }
 
     template <typename Activation, typename Tendon, CurveMode::Mode mode>
     void NMSmodel<Activation, Tendon, mode>::getStrengthCoefficients(vector<double>& strengthCoefficients) const {
@@ -641,7 +588,6 @@ namespace ceinms {
             strengthCoefficients.emplace_back(muscleIt->getStrengthCoefficient());
     }
 
-
     template <typename Activation, typename Tendon, CurveMode::Mode mode>
     void NMSmodel<Activation, Tendon, mode>::getTendonSlackLengths(vector<double>& tendonSlackLengths) const {
 
@@ -651,7 +597,6 @@ namespace ceinms {
         for (muscleIt = muscles_.begin(); muscleIt < muscles_.end(); ++muscleIt)
             tendonSlackLengths.emplace_back(muscleIt->getTendonSlackLength());
     }
-
 
     template <typename Activation, typename Tendon, CurveMode::Mode mode>
     void NMSmodel<Activation, Tendon, mode>::getOptimalFibreLengths(vector<double>& optimalFibreLengths) const {
@@ -663,7 +608,6 @@ namespace ceinms {
             optimalFibreLengths.emplace_back(muscleIt->getOptimalFibreLength());
     }
 
-
     template <typename Activation, typename Tendon, CurveMode::Mode mode>
     void NMSmodel<Activation, Tendon, mode>::getShapeFactors(vector<double>& shapeFactors) const {
 
@@ -673,7 +617,6 @@ namespace ceinms {
         for (muscleIt = muscles_.begin(); muscleIt < muscles_.end(); ++muscleIt)
             shapeFactors.emplace_back(muscleIt->getShapeFactor());
     }
-
 
     template <typename Activation, typename Tendon, CurveMode::Mode mode>
     void NMSmodel<Activation, Tendon, mode>::getC1Coefficients(vector<double>& c1Coefficients) const {
@@ -685,7 +628,6 @@ namespace ceinms {
             c1Coefficients.emplace_back(muscleIt->getC1());
     }
 
-
     template <typename Activation, typename Tendon, CurveMode::Mode mode>
     void NMSmodel<Activation, Tendon, mode>::getC2Coefficients(vector<double>& c2Coefficients) const {
 
@@ -695,7 +637,6 @@ namespace ceinms {
         for (muscleIt = muscles_.begin(); muscleIt < muscles_.end(); ++muscleIt)
             c2Coefficients.emplace_back(muscleIt->getC2());
     }
-
 
     template <typename Activation, typename Tendon, CurveMode::Mode mode>
     void NMSmodel<Activation, Tendon, mode>::getMaxContractionVelocities(vector<double>& maxContractionVelocities) const {
@@ -717,7 +658,6 @@ namespace ceinms {
             dampings.emplace_back(muscleIt->getDamping());
     }
 
-
     template <typename Activation, typename Tendon, CurveMode::Mode mode>
     void NMSmodel<Activation, Tendon, mode>::getMusclesIndexOnDof(vector<unsigned>& musclesIndex, unsigned whichDof) const {
 
@@ -731,7 +671,6 @@ namespace ceinms {
             musclesIndex.emplace_back(std::distance(muscleNames_.begin(), pos));
         }
     }
-
 
     template <typename Activation, typename Tendon, CurveMode::Mode mode>
     void NMSmodel<Activation, Tendon, mode>::getMuscleNamesOnDofs(vector<vector<string> >& muscleNamesOnDofs) const {
@@ -806,8 +745,6 @@ namespace ceinms {
         }
     }
 
-
-
     template <typename Activation, typename Tendon, CurveMode::Mode mode>
     void NMSmodel<Activation, Tendon, mode>::getMusclesIndexFromMusclesList(std::vector<unsigned>& muscleIndexList, const vector<string>& musclesList) {
 
@@ -826,8 +763,6 @@ namespace ceinms {
                 muscleIndexList.push_back(j);
         }
     }
-
-
 
     template <typename Activation, typename Tendon, CurveMode::Mode mode>
     void NMSmodel<Activation, Tendon, mode>::getGroupMusclesBasedOnStrengthCoefficients(vector<double>& values,
@@ -855,7 +790,6 @@ namespace ceinms {
             }
         }
     }
-
 
     //TODO: brrr.. questa e' da sistemare
     template <typename Activation, typename Tendon, CurveMode::Mode mode>
@@ -902,7 +836,6 @@ namespace ceinms {
 #endif
     }
 
-
     template <typename Activation, typename Tendon, CurveMode::Mode mode>
     void NMSmodel<Activation, Tendon, mode>::getMuscle(MTUtype& muscle,
         const string& muscleName) {
@@ -918,7 +851,6 @@ namespace ceinms {
         exit(EXIT_FAILURE);
     }
 
-
     template <typename Activation, typename Tendon, CurveMode::Mode mode>
     void NMSmodel<Activation, Tendon, mode>::setStrengthCoefficientsBasedOnGroups(const vector<double>& values,
         const vector< vector<int> >& muscleGroups) {
@@ -927,7 +859,6 @@ namespace ceinms {
             for (unsigned int j = 0; j < muscleGroups.at(i).size(); ++j)
                 muscles_.at(muscleGroups.at(i).at(j)).setStrengthCoefficient(values.at(i));
     }
-
 
     template <typename Activation, typename Tendon, CurveMode::Mode mode>
     void NMSmodel<Activation, Tendon, mode>::setStrengthCoefficients(const vector<double>& strengthCoefficients){
@@ -938,7 +869,6 @@ namespace ceinms {
             muscleIt->setStrengthCoefficient(*strengthCoefficientsIt);
     }
 
-
     template <typename Activation, typename Tendon, CurveMode::Mode mode>
     void NMSmodel<Activation, Tendon, mode>::setShapeFactor(double shapeFactor) {
 
@@ -946,7 +876,6 @@ namespace ceinms {
         for (muscleIt = muscles_.begin(); muscleIt < muscles_.end(); ++muscleIt)
             muscleIt->setShapeFactor(shapeFactor);
     }
-
 
     template <typename Activation, typename Tendon, CurveMode::Mode mode>
     void NMSmodel<Activation, Tendon, mode>::setShapeFactors(const vector<double>& shapeFactors){
@@ -957,7 +886,6 @@ namespace ceinms {
             muscleIt->setShapeFactor(*shapeFactorsIt);
     }
 
-
     template <typename Activation, typename Tendon, CurveMode::Mode mode>
     void NMSmodel<Activation, Tendon, mode>::setC1(double C1) {
 
@@ -965,7 +893,6 @@ namespace ceinms {
         for (muscleIt = muscles_.begin(); muscleIt < muscles_.end(); ++muscleIt)
             muscleIt->setC1(C1);
     }
-
 
     template <typename Activation, typename Tendon, CurveMode::Mode mode>
     void NMSmodel<Activation, Tendon, mode>::setC1Coefficients(const vector<double>& c1Coefficients){
@@ -976,7 +903,6 @@ namespace ceinms {
             muscleIt->setC1(*c1CoefficientsIt);
     }
 
-
     template <typename Activation, typename Tendon, CurveMode::Mode mode>
     void NMSmodel<Activation, Tendon, mode>::setC2(double C2){
 
@@ -984,7 +910,6 @@ namespace ceinms {
         for (muscleIt = muscles_.begin(); muscleIt < muscles_.end(); ++muscleIt)
             muscleIt->setC2(C2);
     }
-
 
     template <typename Activation, typename Tendon, CurveMode::Mode mode>
     void NMSmodel<Activation, Tendon, mode>::setC2Coefficients(const vector<double>& c2Coefficients){
@@ -995,7 +920,6 @@ namespace ceinms {
             muscleIt->setC2(*c2CoefficientsIt);
     }
 
-
     template <typename Activation, typename Tendon, CurveMode::Mode mode>
     void NMSmodel<Activation, Tendon, mode>::setTendonSlackLengths(const vector<double>& tendonSlackLengths){
 
@@ -1005,7 +929,6 @@ namespace ceinms {
             muscleIt->setTendonSlackLength(*tendonSlackLengthIt);
     }
 
-
     template <typename Activation, typename Tendon, CurveMode::Mode mode>
     void NMSmodel<Activation, Tendon, mode>::setOptimalFibreLengths(const vector<double>& optimalFibreLengths) {
 
@@ -1014,7 +937,6 @@ namespace ceinms {
         for (muscleIt = muscles_.begin(); muscleIt < muscles_.end(); ++muscleIt, ++optimalFibreLengthIt)
             muscleIt->setOptimalFibreLength(*optimalFibreLengthIt);
     }
-
 
     template <typename Activation, typename Tendon, CurveMode::Mode mode>
     void NMSmodel<Activation, Tendon, mode>::setMaxContractionVelocities(const vector<double>& maxContractionVelocities) {
@@ -1034,7 +956,6 @@ namespace ceinms {
             muscleIt->setDamping(*it);
     }
 
-
     template <typename Activation, typename Tendon, CurveMode::Mode mode>
     void NMSmodel<Activation, Tendon, mode>::setTendonTolerance(double tolerance) {
         for (auto &muscleIt : muscles_)
@@ -1047,9 +968,7 @@ namespace ceinms {
         vectorMTUitr muscleIt = muscles_.begin();
         for (muscleIt = muscles_.begin(); muscleIt < muscles_.end(); ++muscleIt)
             muscleIt->resetFibreLengthTrace();
-
     }
-
 
     template <typename Activation, typename Tendon, CurveMode::Mode mode>
     void NMSmodel<Activation, Tendon, mode>::resetFibreLengthTraces(const vector<unsigned>& selectedMusclesIndex) {
@@ -1062,13 +981,11 @@ namespace ceinms {
         }
     }
 
-
     template <typename Activation, typename Tendon, CurveMode::Mode mode>
     void NMSmodel<Activation, Tendon, mode>::getMomentArmsOnDof(vector<double>& momentArms, unsigned whichDof) const {
 
         dofs_.at(whichDof).getMomentArms(momentArms);
     }
-
 
     template <typename Activation, typename Tendon, CurveMode::Mode mode>
     double NMSmodel<Activation, Tendon, mode>::getMusclesPenalty() const {
@@ -1079,7 +996,6 @@ namespace ceinms {
             penalty += muscleIt->getPenalty();
         return penalty;
     }
-
 
     template <typename Activation, typename Tendon, CurveMode::Mode mode>
     double NMSmodel<Activation, Tendon, mode>::getMusclesPenalty(vector<unsigned>& selectedMusclesIndex) const {
@@ -1104,13 +1020,11 @@ namespace ceinms {
             penalties.emplace_back(muscleIt->getPenalty());
     }
 
-
     template <typename Activation, typename Tendon, CurveMode::Mode mode>
     double NMSmodel<Activation, Tendon, mode>::getGlobalEmDelay() const {
 
         return muscles_.begin()->getEmDelay();
     }
-
 
     template <typename Activation, typename Tendon, CurveMode::Mode mode>
     void NMSmodel<Activation, Tendon, mode>::getMusclesParameters(vector<MuscleParameters>& parameters) const {
@@ -1133,7 +1047,6 @@ namespace ceinms {
         }
     }
 
-
     template <typename Activation, typename Tendon, CurveMode::Mode mode>
     void NMSmodel<Activation, Tendon, mode>::setMusclesParameters(const vector<MuscleParameters>& parameters)  {
         //carefull with this.. there's no control over the order of muscles..
@@ -1152,11 +1065,8 @@ namespace ceinms {
             mIt->setEmDelay(pIt->getEmDelay());
             mIt->setMaxContractionVelocity(pIt->getMaxContractionVelocity());
             mIt->setDamping(pIt->getDamping());
-
         }
     }
-
-
 
     template <typename Activation, typename Tendon, CurveMode::Mode mode>
     std::ostream& operator<< (std::ostream& output, const NMSmodel<Activation, Tendon, mode>& b) {

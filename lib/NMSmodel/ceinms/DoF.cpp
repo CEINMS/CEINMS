@@ -56,7 +56,6 @@ namespace ceinms {
         : id_(orig.id_), muscles_(orig.muscles_),
         momentArms_(orig.momentArms_), torque_(orig.torque_) {  }
 
-
     template<typename Activation, typename Tendon, CurveMode::Mode mode>
     DoF<Activation, Tendon, mode>::~DoF() {
     }
@@ -70,11 +69,9 @@ namespace ceinms {
         muscles_.push_back(newMuscle);
     }
 
-
     // :TODO: probabilmente qui, invece di passargli una copia del vettore,
     //        è meglio passargli il vettore originale con i limiti che deve
     //        copiare
-
 
     /*!
       .
@@ -92,8 +89,18 @@ namespace ceinms {
         momentArms_.clear();
         momentArms_.resize(muscles_.size());
         copy(momentArms.begin(), momentArms.end(), momentArms_.begin());
+        updateMusclesContribution();
     }
 
+    template<typename Activation, typename Tendon, CurveMode::Mode mode>
+    void DoF<Activation, Tendon, mode>::updateMusclesContribution() {
+
+        musclesContribution_.clear();
+        for (unsigned i{ 0 }; i < muscles_.size(); ++i) {
+            double force{ muscles_.at(i)->getMuscleForce() };
+            musclesContribution_.emplace_back(force*momentArms_.at(i));
+        }
+    }
 
     /*!
       Compute the torque <a href="./biblio.html">[2]</a>:
@@ -126,7 +133,6 @@ namespace ceinms {
         }
     }
 
-
     template<typename Activation, typename Tendon, CurveMode::Mode mode>
     bool DoF<Activation, Tendon, mode>::compareMusclesNames(const vector<string>& muscleNames) const  {
 
@@ -141,7 +147,6 @@ namespace ceinms {
         return true;
     }
 
-
     template<typename Activation, typename Tendon, CurveMode::Mode mode>
     void DoF<Activation, Tendon, mode>::getMusclesNamesOnDof(std::vector<std::string>& musclesNames) const
     {
@@ -149,8 +154,6 @@ namespace ceinms {
         for (unsigned int i = 0; i < muscles_.size(); ++i)
             musclesNames.push_back(muscles_.at(i)->getMuscleName());
     }
-
-
 
     template<typename Activation, typename Tendon, CurveMode::Mode mode>
     std::ostream& operator<< (std::ostream& output, const DoF<Activation, Tendon, mode>& dof)
@@ -163,5 +166,4 @@ namespace ceinms {
         }
         return output;
     }
-
 }

@@ -133,7 +133,7 @@ namespace ceinms {
                 subject_.setMuscleTendonLengths(lmtFrameFromQueue.data);
                 for (unsigned int i = 0; i < noDof_; ++i)
                     subject_.setMomentArms(momentArmsFrameFromQueue.at(i).data, i);
-      //          subject_.updateState();
+                //          subject_.updateState();
 
                 for (unsigned int i = 0; i < noDof_; ++i)
                     torqueErrorMinimizer_.setSingleExternalTorque(externalTorquesFrameFromQueue.data.at(i), dofNames_.at(i));
@@ -164,6 +164,13 @@ namespace ceinms {
                 ModelEvaluationBase<Logger>::logger.log(emgTime, data, "Torques");
                 subject_.getEmgs(data);
                 ModelEvaluationBase<Logger>::logger.log(emgTime, data, "AdjustedEmgs");
+                data.clear();
+                for (unsigned i = 0; i < noDof_; ++i) {
+                    vector<double> contribution;
+                    subject_.getMusclesContribution(contribution, i);
+                    data.insert(data.end(), contribution.begin(), contribution.end());
+                }
+                ModelEvaluationBase<Logger>::logger.log(emgTime, data, "MusclesContribution");
 #endif
 
 #ifdef LOG
@@ -213,6 +220,7 @@ namespace ceinms {
         ModelEvaluationBase<Logger>::logger.log(endTime, endData, "MuscleForces");
         ModelEvaluationBase<Logger>::logger.log(endTime, endData, "Torques");
         ModelEvaluationBase<Logger>::logger.log(endTime, endData, "AdjustedEmgs");
+        ModelEvaluationBase<Logger>::logger.log(endTime, endData, "MusclesContribution");
 #endif
 
         ModelEvaluationBase<Logger>::doneWithExecution();

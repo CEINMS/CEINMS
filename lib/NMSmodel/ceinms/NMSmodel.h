@@ -46,7 +46,6 @@ namespace ceinms {
     template <typename Activation, typename Tendon, CurveMode::Mode mode>
     std::ostream& operator<< (std::ostream& output, const NMSmodel<Activation, Tendon, mode>& b);
 
-
     template <typename Activation, typename Tendon, CurveMode::Mode mode>
     class NMSmodel
     {
@@ -146,6 +145,7 @@ namespace ceinms {
         void getPennationAnglesAtT(std::vector<double>& pennationAnglesAtT) const; //instant pennationangle
         void getMuscleForces(std::vector<double>& muscleForces) const;
         void getTorques(std::vector<double>& torques) const;
+        void getMusclesContribution(std::vector<double>& musclesContribution, unsigned whichDof) const;
 
         // used during calibration
         void getGroupMusclesBasedOnStrengthCoefficients(std::vector<double>& values,
@@ -175,7 +175,6 @@ namespace ceinms {
         void getOptimalFibreLengths(std::vector<double>& optimalFibreLengths) const;
         void getMaxContractionVelocities(std::vector<double>& maxContractionVelocities) const;
         void getDampings(std::vector<double>& dampings) const;
-
 
         double getGlobalEmDelay() const; //NOTE: this will be replaced by singular muscles emdelay
 
