@@ -42,6 +42,7 @@ namespace ceinms {
     public:
         template <typename NMSModelT>
         EmgFromX(EmgQueue& outputEmgQueue, Concurrency::Latch& doneWithSubscriptions, Concurrency::Latch& doneWithExecution, const NMSModelT& subject);
+        EmgFromX(EmgQueue& outputEmgQueue, Concurrency::Latch& doneWithSubscriptions, Concurrency::Latch& doneWithExecution, const std::vector<std::string>& muscleNames);
         virtual ~EmgFromX();
         virtual void operator()() {};
         void updateEmg(const EmgData& currentEmgData, double currentTime);

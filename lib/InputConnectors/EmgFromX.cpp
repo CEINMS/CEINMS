@@ -36,6 +36,15 @@ using std::vector;
 #include "ceinms/EndOfData.h"
 
 namespace ceinms {
+
+    EmgFromX::EmgFromX(EmgQueue& outputEmgQueue, Concurrency::Latch& doneWithSubscriptions, Concurrency::Latch& doneWithExecution, const std::vector<std::string>& muscleNames) :
+        outputEmgQueue_(outputEmgQueue),
+        doneWithSubscriptions_(doneWithSubscriptions),
+        doneWithExecution_(doneWithExecution),
+        musclesNames_(muscleNames)
+    {
+    }
+
     void EmgFromX::updateEmg(const EmgData& currentEmgData, double currentTime)
     {
         QueueData< EmgData > emgDataToPush;
