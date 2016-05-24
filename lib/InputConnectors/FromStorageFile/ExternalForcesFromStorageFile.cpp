@@ -28,17 +28,16 @@
 
 #include "ceinms/ExternalForcesFromStorageFile.h"
 #include "ceinms/queues/MultipleExternalForcesQueue.h"
+#include "ceinms/concurrency/Latch.h"
+#include "ceinms/concurrency/Queue.h"
 #include "ceinms/ArrayConverter.h"
-#include "ceinms/FileUtils.h"
-#include <boost/filesystem.hpp>
-using boost::filesystem::path;
+
 #include <OpenSim/OpenSim.h>
 using OpenSim::Model;
 #include <string>
 using std::string;
 #include <vector>
 using std::vector;
-
 #include <iostream>
 
 namespace ceinms {
@@ -47,76 +46,84 @@ namespace ceinms {
         MultipleExternalForcesQueue& outputMultipleExternalForcesQueue,
         Concurrency::Latch& doneWithSubscriptions,
         Concurrency::Latch& doneWithExecution,
-        const std::string& osimModelFilename,
         const std::string& externalLoadsXmlFilename) :
         ExternalForcesFromX(outputMultipleExternalForcesQueue, doneWithSubscriptions, doneWithExecution),
-        osimModelFilename_(osimModelFilename),
-        externalLoadsXmlFilename_(externalLoadsXmlFilename),
-        useCustomForceFile_(false)
-    {}
+        externalLoadProperties_(externalLoadsXmlFilename),
+        externalForcesStorage_(externalLoadProperties_.getDatafile()){
+    }
 
     ExternalForcesFromStorageFile::ExternalForcesFromStorageFile(
         MultipleExternalForcesQueue& outputMultipleExternalForcesQueue,
         Concurrency::Latch& doneWithSubscriptions,
         Concurrency::Latch& doneWithExecution,
-        const std::string& osimModelFilename,
         const std::string& externalLoadsXmlFilename,
         const std::string& grfFilename) :
         ExternalForcesFromX(outputMultipleExternalForcesQueue, doneWithSubscriptions, doneWithExecution),
-        osimModelFilename_(osimModelFilename),
-        externalLoadsXmlFilename_(externalLoadsXmlFilename),
-        grfFilename_(grfFilename),
-        useCustomForceFile_(true)
+        externalLoadProperties_(externalLoadsXmlFilename),
+        externalForcesStorage_(grfFilename)  {
+    }
 
-    {}
+    SimTK::Vec3 ExternalForcesFromStorageFile::getForce(const std::string& forceName, int timeIndex) const {
+
+        string forceIdentifier = externalLoadProperties_.getForceIdentifier(forceName);
+        OpenSim::Array<double> data;
+        OpenSim::Array<int> indexes(externalForcesStorage_.getColumnIndicesForIdentifier(forceIdentifier));
+
+        SimTK::Vec3 force(0.);
+        for (int i(0); i < indexes.getSize(); ++i)
+            externalForcesStorage_.getData(timeIndex, indexes.get(i) - 1, force[i]);
+        return force;
+    }
+
+    SimTK::Vec3 ExternalForcesFromStorageFile::getTorque(const std::string& forceName, int timeIndex) const {
+
+        string torqueIdentifier = externalLoadProperties_.getTorqueIdentifier(forceName);
+        OpenSim::Array<double> data;
+        OpenSim::Array<int> indexes(externalForcesStorage_.getColumnIndicesForIdentifier(torqueIdentifier));
+
+        SimTK::Vec3 torque(0.);
+        for (int i(0); i < indexes.getSize(); ++i)
+            externalForcesStorage_.getData(timeIndex, indexes.get(i) - 1, torque[i]);
+        return torque;
+    }
+
+    SimTK::Vec3 ExternalForcesFromStorageFile::getApplicationPoint(const std::string& forceName, int timeIndex) const {
+
+        string pointIdentifier = externalLoadProperties_.getPointIdentifier(forceName);
+        OpenSim::Array<double> data;
+        OpenSim::Array<int> indexes(externalForcesStorage_.getColumnIndicesForIdentifier(pointIdentifier));
+
+        SimTK::Vec3 point(0.);
+        for (int i(0); i < indexes.getSize(); ++i)
+            externalForcesStorage_.getData(timeIndex, indexes.get(i) - 1, point[i]);
+        return point;
+    }
 
     void ExternalForcesFromStorageFile::operator()() {
 
-        path cwd(boost::filesystem::current_path());
-        Model model(osimModelFilename_);
-        OpenSim::ExternalLoads externalLoads(model, externalLoadsXmlFilename_);
-
-        path p(externalLoadsXmlFilename_);
-        path baseDir(p.parent_path());
-
-        //correct file path so it works relatively to the xml itself
-        if (!useCustomForceFile_)
-            grfFilename_ = externalLoads.getDataFileName();
-
-        if (!FileUtils::isAbsolute(grfFilename_.c_str()))
-            grfFilename_ = (baseDir / grfFilename_).string();
-        externalLoads.setDataFileName(grfFilename_);
-
-        auto kinematicsFilename = externalLoads.getExternalLoadsModelKinematicsFileName();
-        if (!FileUtils::isAbsolute(kinematicsFilename.c_str()))
-            kinematicsFilename = (baseDir / kinematicsFilename).string();
-        externalLoads.setExternalLoadsModelKinematicsFileName(kinematicsFilename);
-        externalLoads.invokeConnectToModel(model);
-
-        OpenSim::Storage externalForcesStorage(grfFilename_);
-        OpenSim::Array<double> timeColumnExternalLoadsOS;
-        vector<double> timeColumnExternalLoads;
-        externalForcesStorage.getTimeColumn(timeColumnExternalLoadsOS);
-        ArrayConverter::toStdVector(timeColumnExternalLoadsOS, timeColumnExternalLoads);
+        OpenSim::Array<string> tempLabels(externalForcesStorage_.getColumnLabels());
+        vector<string> labels;
+        ArrayConverter::toStdVector(tempLabels, labels);
 
         unsigned sleepTimeMilliseconds(0);
         if (pushFrequency_ > 0)
             sleepTimeMilliseconds = static_cast<unsigned>(std::floor(1000. / (pushFrequency_)));
 
-        boost::filesystem::current_path(cwd);
-
         ExternalForcesFromX::doneWithSubscriptions();
-        for (auto t : timeColumnExternalLoads) {
+        std::vector<std::string> extForceNames(externalLoadProperties_.getExternalForcesNames());
+        for (unsigned tIdx(0); tIdx < externalForcesStorage_.getSize(); ++tIdx) {
+
             if (pushFrequency_ > 0)
                 std::this_thread::sleep_for(std::chrono::milliseconds(sleepTimeMilliseconds));
+
             MultipleExternalForcesFrame externalForcesFrame;
-            externalForcesFrame.time = t;
-            for (unsigned i(0); i < externalLoads.getSize(); ++i) {
+            externalForcesStorage_.getTime(tIdx, externalForcesFrame.time);
+            for (auto& name : extForceNames) {
                 ExternalForceData currentExtForce;
-                currentExtForce.setForceVector(externalLoads.get(i).getForceAtTime(t));
-                currentExtForce.setApplicationPoint(externalLoads.get(i).getPointAtTime(t));
-                currentExtForce.setTorque(externalLoads.get(i).getTorqueAtTime(t));
-                currentExtForce.setSourceName(externalLoads.get(i).getName());
+                currentExtForce.setForceVector(getForce(name, tIdx));
+                currentExtForce.setApplicationPoint(getApplicationPoint(name, tIdx));
+                currentExtForce.setTorque(getTorque(name, tIdx));
+                currentExtForce.setSourceName(name);
                 externalForcesFrame.data.push_back(currentExtForce);
             }
             ExternalForcesFromX::updateExternalForces(externalForcesFrame.data, externalForcesFrame.time);

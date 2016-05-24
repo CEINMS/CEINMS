@@ -110,7 +110,7 @@ int main() {
     string osimModelFilename((inputDir / "model.osim").string());
     string kinematicsStorageFilename((inputDir / "ik.mot").string());
     string externalLoadsXmlFilename((inputDir / "ExtForcesSetup.xml").string());
-
+    string grfFile((inputDir / "grf.mot").string());
     NMSmodel<ExponentialActivation, ElasticTendon_BiSec, CurveMode::Online> subject;
     OpenSim::Model model(osimModelFilename);
     OpenSim::Array<string> names;
@@ -149,8 +149,8 @@ int main() {
         multipleExternalForcesQueue,
         doneWithSubscriptions,
         doneWithExecution,
-        osimModelFilename,
-        externalLoadsXmlFilename);
+        externalLoadsXmlFilename,
+        grfFile);
 
     QueueToStorageFile<ExternalTorquesData> logger(
         externalTorquesQueue,
@@ -171,6 +171,6 @@ int main() {
     loggerThr.join();
 
     compareSto((outputDir / "id.sto").string(), (outputReferenceDir / "id.sto").string());
-    getchar(); 
+    getchar();
     return 0;
 }

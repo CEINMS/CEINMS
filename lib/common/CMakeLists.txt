@@ -16,6 +16,9 @@ set(Common_HEADERS  ceinms/ArrayConverter.h
                     ceinms/QueuesSync.h
 					ceinms/ObjectiveFunctionSetup.h
                     ceinms/EndOfData.h
+                    ceinms/ExternalForceProperties.h
+                    ceinms/ExternalLoadProperties.h
+                    
 )
 
 set(Common_HEADERS_QUEUES 
@@ -37,7 +40,9 @@ set(Common_SOURCES  Parameter.cpp
                     FileUtils.cpp
                     ExternalForceData.cpp
 					Mapper.cpp
-                    ExternalForceDataSetup.cpp)
+                    ExternalForceDataSetup.cpp
+                    ExternalForceProperties.cpp
+                    ExternalLoadProperties.cpp)
 
 set(Common_TEMPLATE_IMPLEMENTATION		)
 

@@ -225,7 +225,7 @@ namespace ceinms {
 
     template <typename NMSmodelT, template <typename, typename> class ModelEvaluatorT, typename LoggerT>
     bool SimulationManager::runOpenLoopWithGenericContactModel() {
-
+        std::cout << "runOpenLoopWithGenericContactModel" << endl;
         //Create queues for input data
         EmgQueue emgQueue;
         LmtQueue lmtQueue;
@@ -247,6 +247,7 @@ namespace ceinms {
         setupSubject(mySubject, subjectFile_, executionCfg_.getTolerance());
 
         // 2. define the thread connecting with the input sources
+        std::cout << "-- define the threads connecting with the input sources" << endl;
         string emgFilename(dataLocations_.getExcitationsFile());
         EmgFromFile emgProducer(emgQueue, doneWithSubscriptionsLatch, doneWithExecutionLatch, mySubject, emgFilename, emgGeneratorFile_);
 
@@ -270,10 +271,12 @@ namespace ceinms {
             "MusclesContribution" };
 
         // 2b. define the thread consuming the output sources
+        cout << "-- define the thread consuming the output sources" << endl;
         vector<string> valuesToWrite = dataToLog;
         QueuesToStorageFiles queuesToStorageFiles(logQueue, doneWithSubscriptionsLatch, doneWithExecutionLatch, mySubject, valuesToWrite, outputDirectory_);
 
         // 3. define the model simulator
+        cout << "-- define the model simulator" << endl;
         vector<string> valuesToLog = dataToLog;
         ModelEvaluatorT<NMSmodelT, LoggerT>  simulator(
             emgQueue,
@@ -287,15 +290,14 @@ namespace ceinms {
             valuesToLog);
 
         // 4. start contact model stuff
-
+        cout << "-- initialise contact model" << endl;
         auto contactModelSetup(contactModelCfg_.getContactModelSetupOsim());
-        QueuesToIntersegmentalAndJointReactionForces jointReactionForcesEstimator(
+        QueuesToJointReactionForces jointReactionForcesEstimator(
             generalisedCoordinatesQueue,
             externalForcesQueue,
             *logQueue["MuscleForces"],
             *logQueue["Torques"],
             contactForcesQueue,
-            intersegmentalForcesQueue,
             doneWithSubscriptionsLatch,
             doneWithExecutionLatch,
             mySubject,
@@ -311,14 +313,15 @@ namespace ceinms {
             contactModelSetup.motion,
             8);
         //2 create external forces produces
+        cout << "-- Initialise external forces produces" << endl;
         ExternalForcesFromStorageFile externalForcesFromStorageFile(
             externalForcesQueue,
             doneWithSubscriptionsLatch,
             doneWithExecutionLatch,
-            contactModelSetup.osimModel,
             contactModelSetup.externalLoads);
 
         //3 create and launch log
+        cout << "-- Initialise loggers" << endl;
         QueueToStorageFile<VecContactForcesData> contactForcesLogger(
             contactForcesQueue,
             doneWithSubscriptionsLatch,
@@ -327,14 +330,14 @@ namespace ceinms {
             "ContactForces",
             outputDirectory_);
 
-        QueueToStorageFile<VecContactForcesData> intersegmentalForcesLogger(
-            intersegmentalForcesQueue,
-            doneWithSubscriptionsLatch,
-            doneWithExecutionLatch,
-            contactModelSetup.joints,
-            "IntersegmentalForces",
-            outputDirectory_);
-
+        /*    QueueToStorageFile<VecContactForcesData> intersegmentalForcesLogger(
+                intersegmentalForcesQueue,
+                doneWithSubscriptionsLatch,
+                doneWithExecutionLatch,
+                contactModelSetup.joints,
+                "IntersegmentalForces",
+                outputDirectory_);
+                */
         OpenSim::Model osimModel(contactModelSetup.osimModel);
         OpenSim::Array<std::string> osimCoordNames;
         osimModel.getCoordinateSet().getNames(osimCoordNames);
@@ -348,6 +351,7 @@ namespace ceinms {
             "ExternalTorques",
             outputDirectory_);
 
+        cout << "-- Initialise Inverse Dynamics" << endl;
         QueuesToInverseDynamics inverseDynamicsSolver(
             generalisedCoordinatesQueue,
             externalForcesQueue,
@@ -359,10 +363,10 @@ namespace ceinms {
             contactModelSetup.externalLoads,
             false);
 
-        doneWithSubscriptionsLatch.setCount(12);
-        doneWithExecutionLatch.setCount(12);
+        doneWithSubscriptionsLatch.setCount(11);
+        doneWithExecutionLatch.setCount(11);
 
-        //launch threads
+        cout << "-- Launch threads" << endl;
         std::thread contactForcesEstimatorThread(std::ref(jointReactionForcesEstimator));
         std::thread generalisedCoordinateThread(std::ref(generalisedCoordinateFromStorageFile));
         std::thread externalForcesThread(std::ref(externalForcesFromStorageFile));
@@ -373,7 +377,7 @@ namespace ceinms {
         std::thread simulatorThread(std::ref(simulator));
         std::thread queuesToStorageFilesThread(std::ref(queuesToStorageFiles));
         std::thread contactForcesLoggerThread(std::ref(contactForcesLogger));
-        std::thread intersegmentalForcesLoggerThread(std::ref(intersegmentalForcesLogger));
+        //      std::thread intersegmentalForcesLoggerThread(std::ref(intersegmentalForcesLogger));
         std::thread inverseDynamicsSolverThread(std::ref(inverseDynamicsSolver));
         std::thread externalTorquesLoggerThread(std::ref(externalTorquesLogger));
 
@@ -386,10 +390,10 @@ namespace ceinms {
         generalisedCoordinateThread.join();
         externalForcesThread.join();
         contactForcesLoggerThread.join();
-        intersegmentalForcesLoggerThread.join();
+        //     intersegmentalForcesLoggerThread.join();
         inverseDynamicsSolverThread.join();
         externalTorquesLoggerThread.join();
-
+        cout << "-- Closing" << endl;
         return 0;
     }
 

@@ -37,13 +37,14 @@ namespace ceinms {
 
     void QueuesToJointReactionForces::operator()() {
 
+        std::cout << "QueuesToJointReactionForces - initialising\n";
         QueuesToXForces::initialiseContactModel();
 
         inputGeneralisedCoordinatesQueue_.subscribe();
         inputMuscleForcesQueue_.subscribe();
         inputEstimatedTorquesQueue_.subscribe();
+        std::cout << "QueuesToJointReactionForces - done with initialisations\n";
         QueuesToXForces::doneWithSubscriptions();
-
         bool runCondition(true);
         while (runCondition) {
 
@@ -70,13 +71,11 @@ namespace ceinms {
                 contactForces.time = generalisedCoordinatesFrame.time;
                 QueuesToXForces::getJointReactionForcesInG(contactForces.data);
                 outputJointReactionForcesQueue_.push(contactForces);
-
             }
         }
         sendEndOfData();
         QueuesToXForces::doneWithExecution();
     }
-
 
     void QueuesToJointReactionForces::sendEndOfData() {
 

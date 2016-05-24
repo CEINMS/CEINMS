@@ -170,6 +170,7 @@ namespace ceinms {
     void QueuesToXForces::initialiseContactModel() {
 
         initialiseExternalForces();
+
         //Using a pointer to delay the initialization
         jointContactModel_.reset(new JointContactFromOpensim(osimModelFilename_, extForces_));
         std::vector<std::string> coordinateNamesFromOsim, dofNamesFromSubject, muscleNamesFromOsim, musclesNamesFromSubject, jointNamesFromOsim;

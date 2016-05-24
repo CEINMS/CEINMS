@@ -25,9 +25,16 @@
 * See the License for the specific language governing permissions and        *
 * limitations under the License.                                             *
 * -------------------------------------------------------------------------- */
+
 #ifndef ceinms_ExternalForcesFromStorageFile_h
 #define ceinms_ExternalForcesFromStorageFile_h
+
 #include "ceinms/ExternalForcesFromX.h"
+#include "ceinms/queues/MultipleExternalForcesQueue.h"
+#include "ceinms/concurrency/Latch.h"
+#include "ceinms/concurrency/Queue.h"
+#include "ceinms/ExternalLoadProperties.h"
+#include <OpenSim/OpenSim.h>
 #include <string>
 
 namespace ceinms {
@@ -39,7 +46,6 @@ namespace ceinms {
             MultipleExternalForcesQueue& outputMultipleExternalForcesQueue,
             Concurrency::Latch& doneWithSubscriptions,
             Concurrency::Latch& doneWithExecution,
-            const std::string& osimModelFilename,
             const std::string& externalLoadsXmlFilename);
 
         //using this constructor, grfFilename replace the grf in externalLoadsXml
@@ -47,16 +53,19 @@ namespace ceinms {
             MultipleExternalForcesQueue& outputMultipleExternalForcesQueue,
             Concurrency::Latch& doneWithSubscriptions,
             Concurrency::Latch& doneWithExecution,
-            const std::string& osimModelFilename,
             const std::string& externalLoadsXmlFilename,
             const std::string& grfFilename);
 
-        void operator()() override;
+        void operator()();
         void setPushFrequency(double f) { pushFrequency_ = f; }
-        virtual ~ExternalForcesFromStorageFile() override {}
     private:
+        SimTK::Vec3 getForce(const std::string& forceName, int timeIndex) const;
+        SimTK::Vec3 getTorque(const std::string& forceName, int timeIndex) const;
+        SimTK::Vec3 getApplicationPoint(const std::string& forceName, int timeIndex) const;
+
+        ExternalLoadProperties externalLoadProperties_;
+        OpenSim::Storage externalForcesStorage_;
         double pushFrequency_;
-        std::string osimModelFilename_, externalLoadsXmlFilename_, grfFilename_;
         bool useCustomForceFile_;
     };
 }
