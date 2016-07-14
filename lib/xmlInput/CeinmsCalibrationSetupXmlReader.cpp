@@ -121,7 +121,7 @@ namespace ceinms {
             return filepath_ + fileName;
     }
 
-
+    /*
     std::string CeinmsCalibrationSetupXmlReader::getContactModelFile() {
 
         std::string fileName(*(ceinmsCalibrationSetupPointer_->contactModelFile().begin()));
@@ -136,7 +136,7 @@ namespace ceinms {
 
         return !(ceinmsCalibrationSetupPointer_->contactModelFile().empty());
     }
-
+    */
 
     bool CeinmsCalibrationSetupXmlReader::writeTemplateCeinmsCalibrationSetupFile(const std::string& templateFile)
     {

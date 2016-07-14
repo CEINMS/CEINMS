@@ -84,14 +84,15 @@ namespace ceinms {
         executionCfg_(ceinmsSetup_.getExecutionFile()),
         subjectFile_(ceinmsSetup_.getSubjectFile()),
         outputDirectory_(ceinmsSetup_.getOutputDirectory()),
-        emgGeneratorFile_(ceinmsSetup_.getExcitationGeneratorFile()),
-        hasContactModel_(ceinmsSetup_.hasContactModel())
+        emgGeneratorFile_(ceinmsSetup_.getExcitationGeneratorFile())
     {
 
+        SubjectXmlReader subjectReader(ceinmsSetup_.getSubjectFile());
+        hasContactModel_ = subjectReader.hasContactModel();
         cout << "Contact model ";
         if (hasContactModel_) {
             cout << "found" << endl;
-            contactModelCfg_.setXmlInputFile(ceinmsSetup_.getContactModelFile());
+            contactModelCfg_.setXmlInputFile(subjectReader.getContactModelFile());
         }
         else
             cout << " not found" << endl;
@@ -245,7 +246,7 @@ namespace ceinms {
 
         NMSmodelT mySubject;
         setupSubject(mySubject, subjectFile_, executionCfg_.getTolerance());
-
+        std::string osimModelFilename = mySubject.getOpenSimModelFilename();
         // 2. define the thread connecting with the input sources
         std::cout << "-- define the threads connecting with the input sources" << endl;
         string emgFilename(dataLocations_.getExcitationsFile());
@@ -292,6 +293,7 @@ namespace ceinms {
         // 4. start contact model stuff
         cout << "-- initialise contact model" << endl;
         auto contactModelSetup(contactModelCfg_.getContactModelSetupOsim());
+        
         QueuesToJointReactionForces jointReactionForcesEstimator(
             generalisedCoordinatesQueue,
             externalForcesQueue,
@@ -301,16 +303,16 @@ namespace ceinms {
             doneWithSubscriptionsLatch,
             doneWithExecutionLatch,
             mySubject,
-            contactModelSetup.osimModel,
-            contactModelSetup.externalLoads,
+            osimModelFilename,
+            dataLocations_.getExternalLoadsFile(),
             contactModelSetup.joints);
 
         GeneralisedCoordinatesFromStorageFile generalisedCoordinateFromStorageFile(
             generalisedCoordinatesQueue,
             doneWithSubscriptionsLatch,
             doneWithExecutionLatch,
-            contactModelSetup.osimModel,
-            contactModelSetup.motion,
+            osimModelFilename,
+            dataLocations_.getMotionFile(),
             8);
         //2 create external forces produces
         cout << "-- Initialise external forces produces" << endl;
@@ -318,7 +320,7 @@ namespace ceinms {
             externalForcesQueue,
             doneWithSubscriptionsLatch,
             doneWithExecutionLatch,
-            contactModelSetup.externalLoads);
+            dataLocations_.getExternalLoadsFile());
 
         //3 create and launch log
         cout << "-- Initialise loggers" << endl;
@@ -338,7 +340,7 @@ namespace ceinms {
                 "IntersegmentalForces",
                 outputDirectory_);
                 */
-        OpenSim::Model osimModel(contactModelSetup.osimModel);
+        OpenSim::Model osimModel(osimModelFilename);
         OpenSim::Array<std::string> osimCoordNames;
         osimModel.getCoordinateSet().getNames(osimCoordNames);
         std::vector<std::string> coordNames;
@@ -359,8 +361,8 @@ namespace ceinms {
             doneWithSubscriptionsLatch,
             doneWithExecutionLatch,
             mySubject,
-            contactModelSetup.osimModel,
-            contactModelSetup.externalLoads,
+            osimModelFilename,
+            dataLocations_.getExternalLoadsFile(),
             false);
 
         doneWithSubscriptionsLatch.setCount(11);

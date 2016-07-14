@@ -165,6 +165,12 @@ namespace ceinms {
         }
     }
 
+    template<typename NMSmodelT>
+    void SetupDataStructure<NMSmodelT>::setExtraInfo(NMSmodelT& mySubject) {
+
+        if (subjectPointer_->opensimModelFile().present())
+            mySubject.setOpenSimModelFilename(subjectPointer_->opensimModelFile().get());
+    }
 
     template<typename NMSmodelT>
     void SetupDataStructure<NMSmodelT>::createDoFs(NMSmodelT& mySubject) {

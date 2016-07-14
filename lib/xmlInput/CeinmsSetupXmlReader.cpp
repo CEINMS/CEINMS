@@ -132,7 +132,7 @@ namespace ceinms {
             return filepath_ + fileName;
     }
 
-
+    /*
     std::string CeinmsSetupXmlReader::getContactModelFile() {
 
         std::string fileName(*(ceinmsSetupPointer_->contactModelFile().begin()));
@@ -147,7 +147,7 @@ namespace ceinms {
         
         return !(ceinmsSetupPointer_->contactModelFile().empty());
     }
-
+    */
     bool CeinmsSetupXmlReader::writeTemplateCeinmsSetupFile(const string& templateFile)
     {
         std::ofstream templateFileStream(templateFile);

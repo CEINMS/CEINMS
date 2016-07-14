@@ -1026,6 +1026,21 @@ namespace ceinms {
         return muscles_.begin()->getEmDelay();
     }
 
+
+    template <typename Activation, typename Tendon, CurveMode::Mode mode>
+    void NMSmodel<Activation, Tendon, mode>::setOpenSimModelFilename(const std::string& openSimModelFilename) {
+
+        osimModelFilename_ = openSimModelFilename;
+
+    }
+
+
+    template <typename Activation, typename Tendon, CurveMode::Mode mode>
+    std::string NMSmodel<Activation, Tendon, mode>::getOpenSimModelFilename() const {
+
+        return osimModelFilename_;
+    }
+
     template <typename Activation, typename Tendon, CurveMode::Mode mode>
     void NMSmodel<Activation, Tendon, mode>::getMusclesParameters(vector<MuscleParameters>& parameters) const {
         //this stuff with muscle parameters should be a call to the mtu instead..

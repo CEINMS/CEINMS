@@ -11,7 +11,9 @@ set(OptimizationSystems_HEADERS ceinms/NMSmodelSystem.h
 								ceinms/Result.h
                                 ceinms/MinTorqueErrorAndContactForces.h
                                 ceinms/Barrier.h
+                                ceinms/BarrierFunction.h
                                 ceinms/SumKneeContactForces.h
+                                ceinms/SumGenericContactForces.h
                         )
 
 set(OptimizationSystems_TEMPLATE_IMPLEMENTATION
@@ -20,7 +22,14 @@ set(OptimizationSystems_TEMPLATE_IMPLEMENTATION
 							ceinms/BatchEvaluator.cpp
 							)
                             
-set(OptimizationSystems_SOURCES MinTorqueError.cpp Result.cpp SumKneeContactForces.cpp MinTorqueErrorAndContactForces.cpp
+set(OptimizationSystems_SOURCES 
+    MinTorqueError.cpp 
+    Result.cpp 
+    SumKneeContactForces.cpp 
+    MinTorqueErrorAndContactForces.cpp
+    SumGenericContactForces.cpp
+    BarrierFunction.cpp
+    
 )
 
 set_source_files_properties( ${OptimizationSystems_TEMPLATE_IMPLEMENTATION} PROPERTIES HEADER_FILE_ONLY TRUE)
@@ -31,6 +40,9 @@ source_group("Source Files" FILES ${OptimizationSystems_TEMPLATE_IMPLEMENTATION}
 add_library(OptimizationSystems ${OptimizationSystems_HEADERS} ${OptimizationSystems_TEMPLATE_IMPLEMENTATION} ${OptimizationSystems_SOURCES})
 target_include_directories( OptimizationSystems
                             PRIVATE ceinms
+                                    ${OPENSIM_INCLUDE_DIRS}       
+                                    ${SIMTK_INCLUDE_DIRS}
+                                    ${CMAKE_CURRENT_SOURCE_DIR}
                                     ${NMSmodel_INCLUDE_DIRS}
                                     ${Curve_INCLUDE_DIRS}
                                     ${FileIO_INCLUDE_DIRS}
@@ -39,7 +51,7 @@ target_include_directories( OptimizationSystems
 									${TrialData_INCLUDE_DIRS}
                                     ${JointContactModels_INCLUDE_DIRS})
 
-target_link_libraries(OptimizationSystems ceinms_common JointContactModels)
+target_link_libraries(OptimizationSystems ceinms_common JointContactModels  ${OPENSIM_LIBRARIES})
 
 # Save path to include directory for "internal" usage
 set(OptimizationSystems_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}"

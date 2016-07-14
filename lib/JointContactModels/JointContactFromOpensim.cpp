@@ -86,6 +86,51 @@ namespace ceinms {
             m->overrideForce(state_, true);
     }
 
+    JointContactFromOpensim::JointContactFromOpensim(const std::string& modelFilename, std::string externalLoadXmlFilename) :
+    model_(modelFilename) {
+
+        OpenSim::Model modelCopy(modelFilename);
+        modelCopy.initSystem();
+        nCoordinates_ = modelCopy.getNumCoordinates();
+        nBodies_ = modelCopy.getNumBodies();
+        nMuscles_ = modelCopy.getMuscles().getSize();
+        rForcesInG_.resize(nBodies_);
+        rTorquesInG_.resize(nBodies_);
+
+        qdd_.resize(nCoordinates_);
+
+        //not sure if the model take ownership of the extLoads or not...
+        OpenSim::ExternalLoads extLoads(model_, externalLoadXmlFilename);
+        
+
+        OpenSim::Array<string> muscleNames;
+        model_.getMuscles().getNames(muscleNames);
+        for (unsigned i(0); i < nMuscles_; ++i)
+            muscleActuators_.push_back((const_cast<OpenSim::Muscle*>(&model_.updForceSet().getMuscles().get(muscleNames.get(i)))));
+
+        const OpenSim::CoordinateSet& cs = model_.getCoordinateSet();
+        for (unsigned i(0); i < nCoordinates_; ++i) {
+            OpenSim::CoordinateActuator *actuator = new OpenSim::CoordinateActuator();
+            actuator->setCoordinate(&cs.get(i));
+            string actuatorName(cs.get(i).getName() + "_actuator_ceinms");
+            actuator->setName(actuatorName);
+            actuator->setOptimalForce(1);
+            actuator->setMaxControl(100000);
+            actuator->setMinControl(-100000);
+            model_.addForce(actuator);
+            coordinateActuators_.push_back(dynamic_cast<OpenSim::CoordinateActuator*>(&(model_.updForceSet().get(actuatorName))));
+        }
+
+        idSolver_ = new OpenSim::InverseDynamicsSolver(model_);
+
+        state_ = model_.initSystem();
+        for (auto c : coordinateActuators_)
+            c->overrideForce(state_, true);
+        for (auto m : muscleActuators_)
+            m->overrideForce(state_, true);
+
+    }
+
     void JointContactFromOpensim::setTime(double time) {
 
         state_.updTime() = time;

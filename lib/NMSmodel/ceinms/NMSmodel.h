@@ -105,6 +105,8 @@ namespace ceinms {
         // called on model data initialization
         void addMuscle(const MTUtype& muscle);
         void addDoF(const DoFtype& dof);
+        void setOpenSimModelFilename(const std::string& openSimModelFilename);
+        std::string getOpenSimModelFilename() const;
 
         // called on model data initialization or in model calibration
         void setStrengthCoefficientsBasedOnGroups(
@@ -186,6 +188,7 @@ namespace ceinms {
         std::vector<DoFtype> dofs_;
         std::vector<std::string> muscleNames_;
         std::vector<std::string> dofNames_;
+        std::string osimModelFilename_;
     };
 }
 

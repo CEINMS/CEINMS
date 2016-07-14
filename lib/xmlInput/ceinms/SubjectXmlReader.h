@@ -38,7 +38,13 @@ namespace ceinms {
         SubjectXmlReader(const std::string& filename);
         std::auto_ptr<SubjectXsd::SubjectType> getSubject();
         friend std::ostream& operator<< (std::ostream& output, const SubjectXmlReader& b);
+        std::string getContactModelFile() const;
+        bool hasContactModel() const;
+        std::string getOpenSimModelFile() const;
+        bool hasOpenSimModel() const;
+
     private:
+        std::string filepath_;
         std::auto_ptr<SubjectXsd::SubjectType> subjectPointer_;
     };
 }

@@ -126,4 +126,29 @@ namespace ceinms {
         else
             return filepath_ + fileName;
     }
+
+    std::string InputDataXmlReader::getMotionFile() const {
+    
+        if (inputDataPointer_->motionFile().size() < 1)
+            return "";
+        std::string fileName(*(inputDataPointer_->motionFile().begin()));
+        FileUtils::trim(fileName);
+        if (FileUtils::isAbsolute(fileName.c_str()))
+            return fileName;
+        else
+            return filepath_ + fileName;
+    }
+
+
+    std::string InputDataXmlReader::getExternalLoadsFile() const {
+    
+        if (inputDataPointer_->externalLoadsFile().size() < 1)
+            return "";
+        std::string fileName(*(inputDataPointer_->externalLoadsFile().begin()));
+        FileUtils::trim(fileName);
+        if (FileUtils::isAbsolute(fileName.c_str()))
+            return fileName;
+        else
+            return filepath_ + fileName;
+    }
 }

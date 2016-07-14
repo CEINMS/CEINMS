@@ -34,9 +34,6 @@
 namespace ceinms {
     struct ContactModelFromOpenSimSetup{
 
-        std::string osimModel;
-        std::string motion;
-        std::string externalLoads;
         std::vector<std::string> joints;
     };
 }

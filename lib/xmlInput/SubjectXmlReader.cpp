@@ -33,6 +33,7 @@ using std::cout;
 using std::endl;
 
 #include "ceinms/SubjectXmlReader.h"
+#include "ceinms/FileUtils.h"
 #include "validation.h"
 #include "subject-schema.hxx"
 using SubjectXsd::SubjectType;
@@ -48,6 +49,14 @@ namespace ceinms {
             cout << e << endl;
             exit(EXIT_FAILURE);
         }
+                // save the location of input filename
+        string::size_type dirSep = filename.rfind('/'); // Unix/Mac dir separator
+
+        if (dirSep == string::npos)
+            dirSep = filename.rfind('\\'); // DOS dir separator
+
+        if (dirSep != string::npos) // if '_fileName' contains path information...
+            filepath_ = filename.substr(0, dirSep + 1); // include trailing slashes
 
     }
 
@@ -55,4 +64,39 @@ namespace ceinms {
     {
         return subjectPointer_;
     }
+
+    std::string SubjectXmlReader::getOpenSimModelFile() const {
+    
+
+        std::string fileName(subjectPointer_->opensimModelFile().get());
+        FileUtils::trim(fileName);
+        if (FileUtils::isAbsolute(fileName.c_str()))
+            return fileName;
+        else
+            return filepath_ + fileName;
+    }
+    
+    
+
+    bool SubjectXmlReader::hasOpenSimModel() const {
+        return !(subjectPointer_->opensimModelFile().get().empty());
+    }
+
+
+    
+    std::string SubjectXmlReader::getContactModelFile() const{
+
+        std::string fileName(subjectPointer_->contactModelFile().get());
+        FileUtils::trim(fileName);
+        if (FileUtils::isAbsolute(fileName.c_str()))
+            return fileName;
+        else
+            return filepath_ + fileName;
+    }
+
+    bool SubjectXmlReader::hasContactModel() const {
+
+        return !(subjectPointer_->contactModelFile().get().empty());
+    }
+    
 }

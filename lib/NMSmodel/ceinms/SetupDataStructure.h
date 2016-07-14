@@ -46,6 +46,7 @@ namespace ceinms {
         void  createCurves();
         void  createMuscles(NMSmodelT& mySubject);
         void  createDoFs(NMSmodelT& mySubject);
+        void  setExtraInfo(NMSmodelT& mySubject);
         void  writeXMLCalibratedFile(NMSmodelT& mySubject, const std::string& XMLfilename);
     private:
         // Create the body structure from the Input
@@ -64,6 +65,7 @@ namespace ceinms {
         setupData.createCurves();
         setupData.createMuscles(mySubject);
         setupData.createDoFs(mySubject);
+        setupData.setExtraInfo(mySubject);
         mySubject.setTendonTolerance(tolerance);
     }
 

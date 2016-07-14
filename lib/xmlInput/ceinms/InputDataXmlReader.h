@@ -41,6 +41,8 @@ namespace ceinms {
         std::map<std::string, std::string> getMaFiles();
         std::string getExcitationsFile();
         std::string getExternalTorqueFile();
+        std::string getMotionFile() const;
+        std::string getExternalLoadsFile() const;
 
     private:
         void readXml();

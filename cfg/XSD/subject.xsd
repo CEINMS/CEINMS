@@ -101,7 +101,9 @@
       <xs:element name="mtuDefault" type="MTUDefaultType"/>
       <xs:element name="mtuSet" type="MTUSetType"/>
       <xs:element name="dofSet" type="DoFSetType"/>
-      <xs:element name="calibrationInfo" type="CalibrationInfoType"/>
+      <xs:element maxOccurs="1" minOccurs="0" name="calibrationInfo" type="CalibrationInfoType"/>
+      <xs:element maxOccurs="1" minOccurs="0" name="contactModelFile" type="xs:token"/>
+      <xs:element maxOccurs="1" minOccurs="0" name="opensimModelFile" type="xs:token"/>
     </xs:sequence>
   </xs:complexType>
   <xs:element name="subject" type="SubjectType"/>

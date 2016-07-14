@@ -43,8 +43,8 @@ namespace ceinms {
         std::string getExecutionFile();
         std::string getExcitationGeneratorFile();
         std::string getOutputDirectory();
-        std::string getContactModelFile();
-        bool hasContactModel();
+    //    std::string getContactModelFile();
+    //    bool hasContactModel();
         static bool writeTemplateCeinmsSetupFile(const std::string& templateFile);
 
     private:

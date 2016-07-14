@@ -34,23 +34,12 @@
 #include "Result.h"
 #include "ceinms/ContactModelKneeBalanceSetup.h"
 #include "ceinms/ContactModelKneeBalance.h"
-#include "Barrier.h"
+#include "ceinms/BarrierFunction.h"
 #include "ceinms/Mapper.h"
 #include "ceinms/ObjectiveFunctionSetup.h"
 
 namespace ceinms {
 
-    class BarrierFunction {
-    public:
-        BarrierFunction();
-        void initialize(const BarrierListSetup& setup, const std::vector<std::string>& namesFromInput);
-        double getValue(const std::vector<double>& x) const;
-    private:
-        std::vector<Barrier> barriers_;
-        std::vector<std::string> barrierTargetNames_;
-        Mapper barrierMapper_;
-        double f_;
-    };
 
     class SumKneeContactForces {
     public:

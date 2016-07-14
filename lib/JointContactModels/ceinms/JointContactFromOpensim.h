@@ -42,6 +42,7 @@ namespace ceinms {
     class JointContactFromOpensim {
     public:
         JointContactFromOpensim(const std::string& modelFilename, std::vector<OpenSim::Force*> externalForces);
+        JointContactFromOpensim(const std::string& modelFilename, std::string externalLoadXmlFilename);
         virtual ~JointContactFromOpensim();
         void setMuscleForces(const std::vector<double>& forces);
         template<typename T>

@@ -98,7 +98,7 @@ namespace ceinms {
         if (contactModelPointer_->fromOpenSim().size() > 0) {
             contactModelType_ = ContactModelType::OpenSim;
             ContactModelXsd::FromOpenSimType& fromOsim(*(contactModelPointer_->fromOpenSim().begin()));
-            setupOsim_.osimModel = getCompleteFilename(*(fromOsim.osimModel().begin()));
+    /*        setupOsim_.osimModel = getCompleteFilename(*(fromOsim.osimModel().begin()));
             checkFile(setupOsim_.osimModel);
             setupOsim_.osimModel = FileUtils::simplify(setupOsim_.osimModel);
             setupOsim_.motion = getCompleteFilename(*(fromOsim.motion().begin()));
@@ -107,7 +107,7 @@ namespace ceinms {
             setupOsim_.externalLoads = getCompleteFilename(*(fromOsim.externalLoads().begin()));
             checkFile(setupOsim_.externalLoads);
             setupOsim_.externalLoads = FileUtils::simplify(setupOsim_.externalLoads);
-
+            */
             ContactModelXsd::JointsType& jointXsd(*fromOsim.joints().begin());
             for (ContactModelXsd::JointsType::iterator it = jointXsd.begin(); it != jointXsd.end(); ++it)
                 setupOsim_.joints.push_back(*it);
