@@ -76,17 +76,20 @@ namespace ceinms {
         calibrationFile_(ceinmsCalibrationSetup_.getCalibrationFile()),
         calibrationXmlReader_(ceinmsCalibrationSetup_.getCalibrationFile()),
         calibratedSubjectFile_(ceinmsCalibrationSetup_.getOutputSubjectFile()),
-        emgGeneratorFile_(ceinmsCalibrationSetup_.getExcitationGeneratorFile()),
-        hasContactModel_(ceinmsCalibrationSetup_.hasContactModel()){
+        emgGeneratorFile_(ceinmsCalibrationSetup_.getExcitationGeneratorFile()){
 
-        calibrationXmlReader_.getCalibrationTrials(calibrationTrialIDs_);
+        SubjectXmlReader subjectReader(ceinmsCalibrationSetup_.getSubjectFile());
+        hasContactModel_ = subjectReader.hasContactModel();
         cout << "Contact model ";
         if (hasContactModel_) {
             cout << "found" << endl;
-            contactModelCfg_.setXmlInputFile(ceinmsCalibrationSetup_.getContactModelFile());
+            contactModelCfg_.setXmlInputFile(subjectReader.getContactModelFile());
         }
         else
             cout << " not found" << endl;
+
+        calibrationXmlReader_.getCalibrationTrials(calibrationTrialIDs_);
+
     }
 
     template <typename NMSmodelT>

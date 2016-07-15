@@ -32,7 +32,7 @@ using std::string;
 using SubjectXsd::CalibrationInfoType;
 using SubjectXsd::CalibratedType;
 using SubjectXsd::SubjectType;
-
+#include "ceinms/SubjectXmlReader.h"
 #include <fstream>
 #include <iostream>
 #include <list>

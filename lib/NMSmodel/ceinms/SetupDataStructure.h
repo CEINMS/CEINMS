@@ -31,6 +31,7 @@
 
 #include "subject.hxx" // TODO: we should find a way to only include this from xmlInput
 #include "ceinms/Curve.h"
+#include "ceinms/SubjectXmlReader.h"
 #include <cmath>
 #include <string>
 
@@ -55,6 +56,7 @@ namespace ceinms {
         CurveOffline activeForceLengthCurve_;
         CurveOffline passiveForceLengthCurve_;
         CurveOffline tendonForceStrain_;
+        std::string osimModel_;
     };
 
     //non-member non-friend functions are the best!

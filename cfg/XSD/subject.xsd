@@ -55,18 +55,21 @@
   <xs:simpleType name="CalibrationSequenceType">
     <xs:list itemType="xs:token"/>
   </xs:simpleType>
+  
   <xs:complexType name="CalibratedType">
     <xs:sequence>
       <xs:element name="startSubjectFile" type="xs:string"/>
       <xs:element name="calibrationSequence" type="CalibrationSequenceType"/>
     </xs:sequence>
   </xs:complexType>
+  
   <xs:complexType name="UncalibratedType">
     <xs:sequence>
       <xs:element name="subjectID" type="xs:token"/>
       <xs:element name="additionalInfo" type="xs:string"/>
     </xs:sequence>
   </xs:complexType>
+  
   <xs:complexType name="CalibrationInfoType">
     <xs:choice>
       <xs:element name="uncalibrated" type="UncalibratedType"/>
@@ -101,7 +104,7 @@
       <xs:element name="mtuDefault" type="MTUDefaultType"/>
       <xs:element name="mtuSet" type="MTUSetType"/>
       <xs:element name="dofSet" type="DoFSetType"/>
-      <xs:element maxOccurs="1" minOccurs="0" name="calibrationInfo" type="CalibrationInfoType"/>
+      <xs:element name="calibrationInfo" type="CalibrationInfoType"/>
       <xs:element maxOccurs="1" minOccurs="0" name="contactModelFile" type="xs:token"/>
       <xs:element maxOccurs="1" minOccurs="0" name="opensimModelFile" type="xs:token"/>
     </xs:sequence>

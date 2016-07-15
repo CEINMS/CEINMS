@@ -40,7 +40,6 @@ using std::string;
 #include "MTU.h"
 #include "DoF.h"
 #include "ceinms/Curve.h"
-#include "ceinms/SubjectXmlReader.h"
 #include "subject.hxx"
 using SubjectXsd::SubjectType;
 using SubjectXsd::PointsSequenceType;
@@ -59,10 +58,13 @@ using SubjectXsd::DoFType;
 namespace ceinms {
 
     template<typename NMSmodelT>
-    SetupDataStructure<NMSmodelT>::SetupDataStructure(const string& configurationFile)
+    SetupDataStructure<NMSmodelT>::SetupDataStructure(const string& configurationFile)        
     {
         SubjectXmlReader sxr(configurationFile);
+        if (sxr.hasOpenSimModel())
+            osimModel_ = sxr.getOpenSimModelFile();
         subjectPointer_ = sxr.getSubject();
+
     }
 
 
@@ -168,8 +170,11 @@ namespace ceinms {
     template<typename NMSmodelT>
     void SetupDataStructure<NMSmodelT>::setExtraInfo(NMSmodelT& mySubject) {
 
-        if (subjectPointer_->opensimModelFile().present())
-            mySubject.setOpenSimModelFilename(subjectPointer_->opensimModelFile().get());
+        if (!osimModel_.empty()) {
+            mySubject.setOpenSimModelFilename(osimModel_);
+            std::cout << "Found OpenSim model associated to the subject: " << osimModel_ << std::endl;
+        }
+        std::cout << "No OpenSim model associated to the subject" << std::endl;
     }
 
     template<typename NMSmodelT>

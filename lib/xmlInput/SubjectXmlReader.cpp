@@ -79,7 +79,9 @@ namespace ceinms {
     
 
     bool SubjectXmlReader::hasOpenSimModel() const {
-        return !(subjectPointer_->opensimModelFile().get().empty());
+
+        return subjectPointer_->opensimModelFile().present();
+
     }
 
 
@@ -96,7 +98,7 @@ namespace ceinms {
 
     bool SubjectXmlReader::hasContactModel() const {
 
-        return !(subjectPointer_->contactModelFile().get().empty());
+        return subjectPointer_->contactModelFile().present();
     }
     
 }

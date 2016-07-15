@@ -247,6 +247,16 @@ namespace ceinms {
         NMSmodelT mySubject;
         setupSubject(mySubject, subjectFile_, executionCfg_.getTolerance());
         std::string osimModelFilename = mySubject.getOpenSimModelFilename();
+        try {
+            OpenSim::Model testModel(osimModelFilename);
+            std::cout << "Found valid OpenSim model: " << osimModelFilename << std::endl;
+        }
+        catch (...)
+        {
+            std::cout << "OpenSim model not valid: " << osimModelFilename << std::endl;
+            exit(EXIT_FAILURE);
+
+        }
         // 2. define the thread connecting with the input sources
         std::cout << "-- define the threads connecting with the input sources" << endl;
         string emgFilename(dataLocations_.getExcitationsFile());
