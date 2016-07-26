@@ -174,7 +174,8 @@ namespace ceinms {
             mySubject.setOpenSimModelFilename(osimModel_);
             std::cout << "Found OpenSim model associated to the subject: " << osimModel_ << std::endl;
         }
-        std::cout << "No OpenSim model associated to the subject" << std::endl;
+        else
+            std::cout << "No OpenSim model associated to the subject" << std::endl;
     }
 
     template<typename NMSmodelT>

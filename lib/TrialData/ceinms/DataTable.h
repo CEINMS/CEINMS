@@ -47,11 +47,11 @@ namespace ceinms {
         DataTable();
         DataTable(size_t nRows, size_t nCols); //do not include time column
         void setLabels(const std::vector<std::string>& labels); //do not include time column
-        std::vector<std::string> getLabels() { return labels_; }
+        std::vector<std::string> getLabels() const { return labels_; }
         void set(T value, size_t row, size_t col);
         const T& at(size_t row, size_t col) const;
         T& at(size_t row, size_t col);
-        void pushRow(T time, const std::vector<T>& values);
+        void pushRow(double time, const std::vector<T>& values);
         void setRow(size_t row, const std::vector<T>& values);
 
         static DataTable sum(const DataTable& lhs, const DataTable& rhs);
@@ -61,10 +61,11 @@ namespace ceinms {
 
         std::string getLabel(size_t col) const { return labels_.at(col); }
         T get(size_t row, size_t col) const { return data_.at(row, col); }
-        T getTime(size_t row) const { return time_.at(row); }
+        double getTime(size_t row) const { return time_.at(row); }
+        void setTime(double time, std::size_t row);
         T getStartTime() const { return time_.front(); }
         T getFinalTIme() const { return time_.back(); }
-        std::vector<T> getTimeColumn(size_t col) const { return time_; }
+        std::vector<double> getTimeColumn() const { return time_; }
         const std::vector<T>& getRow(size_t row) const; //return const ref is bad.. checking for performance
 
         std::vector<T> getColumn(size_t col) const;
@@ -77,7 +78,7 @@ namespace ceinms {
         size_t nRows_, nCols_;
         //internal implementation may be changed to something better.. e.g. nice matrices
         std::vector<std::vector<T>> data_;
-        std::vector<T> time_;
+        std::vector<double> time_;
         std::vector<std::string> labels_;
     };
 }

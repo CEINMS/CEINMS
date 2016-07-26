@@ -40,6 +40,8 @@ namespace ceinms {
     void MinTorqueError::setDofsToCalibrate(const std::vector<std::string>& dofsToCalibrate) {
 
         dofsToCalibrate_ = dofsToCalibrate;
+        for (auto& dof : dofsToCalibrate)
+            std::cout << dof << std::endl;
         updDofsToCalibrateIdx();
     }
 
@@ -53,14 +55,16 @@ namespace ceinms {
     void MinTorqueError::updDofsToCalibrateIdx() {
         dofsToCalibrateIdx_.clear();
         for (auto& trial : trials_) {
+            auto dofNames(trial.getDofNames());
             vector<unsigned> indeces;
             for (auto& dof : dofsToCalibrate_){
-                auto it(find(begin(trial.dofNames), end(trial.dofNames), dof));
-                if (it != end(trial.dofNames))
-                    indeces.emplace_back(std::distance(begin(trial.dofNames), it));
+                auto it(find(begin(dofNames), end(dofNames), dof));
+                if (it != end(dofNames))
+                    indeces.emplace_back(std::distance(begin(dofNames), it));
             }
             dofsToCalibrateIdx_.emplace_back(indeces);
         }
+        
     }
 
     void MinTorqueError::computeVariance() {
@@ -81,11 +85,11 @@ namespace ceinms {
         torqueVariance_.clear();
         //trialDataVariance: first dimension is the trial, second dimension is the DoF
         for (auto& trial : trials_) {
-            auto dofNamesFromTrial = trial.dofNames;
-            std::vector<double> trialVariance(trial.noDoF, .0);
+            auto dofNamesFromTrial = trial.getDofNames();
+            std::vector<double> trialVariance(trial.getNoDofs(), .0);
             for (auto& name : dofsToCalibrate_) {
                 auto i(std::distance(dofNamesFromTrial.begin(), (std::find(dofNamesFromTrial.begin(), dofNamesFromTrial.end(), name))));
-                trialVariance.at(i) = getVariance(trial.torqueData.getColumn(i));
+                trialVariance.at(i) = getVariance(trial.getTorqueData().getColumn(i));
                 if (trialVariance.at(i) < 1) trialVariance.at(i) = 1;   //don't penalize if the variance in low
             }
             torqueVariance_.emplace_back(trialVariance);
@@ -104,21 +108,19 @@ namespace ceinms {
         auto rIt(results.cbegin());
         for (tIt; tIt != trials_.cend(); ++tIt, ++rIt) {
             auto trialIndex(std::distance(trials_.cbegin(), tIt));
-            auto diff(tIt->torqueData - rIt->torques);
+            auto diff(tIt->getTorqueData() - rIt->torques);
             auto squaredDiff(diff*diff);
-
-            TrialCost trialCost(tIt->noDoF);
-            for (size_t r(0); r < squaredDiff.getNRows(); ++r)
-                for (auto& c : dofsToCalibrateIdx_.at(trialIndex))
+            TrialCost trialCost(tIt->getNoDofs());
+            for (size_t r(0); r < squaredDiff.getNRows(); ++r) {
+                for (auto& c : dofsToCalibrateIdx_.at(trialIndex)) {
                     trialCost.torqueError.at(c) += squaredDiff.at(r, c);
-
+                }
+            }
             for (size_t r(0); r < rIt->penalties.getNRows(); ++r)
                 for (size_t c(0); c < rIt->penalties.getNColumns(); ++c)
                     trialCost.penalty += rIt->penalties.at(r, c);
-
             trialCosts_.emplace_back(trialCost);
         }
-
         for (size_t trialIndex(0); trialIndex < trials_.size(); ++trialIndex) {
             for (auto& dofIdx : dofsToCalibrateIdx_.at(trialIndex))
                 f_ += (trialCosts_.at(trialIndex).torqueError.at(dofIdx) / torqueVariance_.at(trialIndex).at(dofIdx) +
@@ -132,8 +134,8 @@ namespace ceinms {
             std::cout <<"Trial #" << trialIndex+1 << std::endl;
             for (auto& dofIdx : dofsToCalibrateIdx_.at(trialIndex)) {
                         double val = sqrt(trialCosts_.at(trialIndex).torqueError.at(dofIdx) / 
-                            trials_.at(trialIndex).torqueData.getNRows());
-                        std::cout << trials_.at(trialIndex).dofNames.at(dofIdx)  << " " << val << " Nm" << std::endl;
+                            trials_.at(trialIndex).getTorqueData().getNRows());
+                        std::cout << trials_.at(trialIndex).getDofNames().at(dofIdx)  << " " << val << " Nm" << std::endl;
             }
             std::cout << std::endl;
         }

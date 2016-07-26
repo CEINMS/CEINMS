@@ -92,6 +92,7 @@ namespace ceinms {
         SimTK::Vector_<SimTK::Vec3> intForcesInG_, jrForcesInG_;;
         SimTK::Vector_<SimTK::Real> qdd_;
 
+       OpenSim::Array<std::string> muscleActuatorNames_;
         std::vector<OpenSim::Muscle*> muscleActuators_;
         std::vector<OpenSim::CoordinateActuator*> coordinateActuators_;
         //need to use raw ptr because OpenSim

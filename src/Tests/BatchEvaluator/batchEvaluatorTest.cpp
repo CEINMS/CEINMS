@@ -27,6 +27,7 @@
  * -------------------------------------------------------------------------- */
 
 #include "ceinms/BatchEvaluator.h"
+#include "ceinms/BatchOpenSimEvaluator.h"
 #include "ceinms/TrialData.h"
 #include "ceinms/MinTorqueError.h"
 using ceinms::TrialData;
@@ -145,7 +146,12 @@ ceinms::TrialData readTrialData(std::string inputDataFilename, NMSmodelT& mySubj
         std::cout << "ERROR: No data was read for trial " << trialId << std::endl;
         exit(EXIT_FAILURE);
     }
-    return queuesToTrialData.getTrialData();
+
+    auto trial(queuesToTrialData.getTrialData());
+    if (mySubject.hasOpenSimModel())
+        trial.setOpenSimData(mySubject.getOpenSimModelFilename(), dataLocations.getExternalLoadsFile(), dataLocations.getMotionFile());
+
+    return trial;
 }
 
 void PrintUsage()
@@ -240,21 +246,31 @@ int main(int argc, char** argv) {
         using  MyNMSmodel = NMSmodel < ExponentialActivation, ElasticTendon_BiSec, CurveMode::Offline > ;
         MyNMSmodel mySubject;
         setupSubject(mySubject, uncalibratedSubjectXmlFile);
-        for (list<string>::iterator trialIt = calibrationTrialIDs.begin(); trialIt != calibrationTrialIDs.end(); ++trialIt)
+        for (list<string>::iterator trialIt = calibrationTrialIDs.begin(); trialIt != calibrationTrialIDs.end(); ++trialIt) {
             trials.push_back(readTrialData(*trialIt, mySubject, *trialIt, emgGeneratorFile));
+        }
         CalibrationStep currentCalibrationStep;
         while (calibrationXmlReader.popNextCalibrationStep(currentCalibrationStep)) {
             std::cout << "CalibrationStepCfg " << currentCalibrationStep.getStepCfg() << std::endl;
             switch (currentCalibrationStep.getStepCfg()) {
             case CalibrationCfg::MinimizeTorqueErrorParameterSetDefault: {
                 BatchEvaluator batchEvaluator(trials);
+                BatchOpenSimEvaluator batchOsimEvaluator(trials);
                 batchEvaluator.evaluate(mySubject);
                 auto results(batchEvaluator.getResults());
+                std::cout << "E1\n" << std::flush;
+                batchOsimEvaluator.evaluate(results);
+                std::cout << "E2\n" << std::flush;
+
+                results = batchOsimEvaluator.getResults();
+                std::cout << "E3\n" << std::flush;
+
                 MinTorqueError error;
                 error.setDofsToCalibrate(mySubject.getDoFNames());
                 error.setTrials(trials);
                 error.calculate(results);
-                std::cout << "error value: " << error.getValue();
+              
+                std::cout << "error value: " << error.getValue() << std::flush;;
                 //                   batchEvaluator.evaluate(mySubject);
                 //                   auto results2(batchEvaluator.getResults());
 
@@ -266,6 +282,10 @@ int main(int argc, char** argv) {
                 std::ofstream oF2("results_activations.txt");
                 oF2 << results.front().activations;
                 oF2.close();
+
+                std::ofstream oF3("results_contactforces.txt");
+                oF3 << results.front().jointReactionForces;
+                oF3.close();
 
                 //                  batchEvaluator.evaluate(mySubject);
                 //                 auto results3(batchEvaluator.getResults());

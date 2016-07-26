@@ -134,7 +134,7 @@ namespace ceinms {
         void getDoFNames(std::vector<std::string>& dofNames) const { dofNames = dofNames_; }
         std::vector<std::string> getDoFNames() const { return dofNames_; };
         int  getNoDoF() const { return dofs_.size(); }
-
+        bool hasOpenSimModel() { return hasOpenSimModel_; }
         // called for get computed data
         void getEmgs(std::vector<double>& currentEMGData) const;
         void getPastEmgs(std::vector<double>& pastEMGData) const;
@@ -189,6 +189,7 @@ namespace ceinms {
         std::vector<std::string> muscleNames_;
         std::vector<std::string> dofNames_;
         std::string osimModelFilename_;
+        bool hasOpenSimModel_;
     };
 }
 

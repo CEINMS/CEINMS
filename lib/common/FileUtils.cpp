@@ -84,5 +84,17 @@ namespace ceinms {
             boost::trim_if(fileName, boost::is_any_of("\""));
         }
 
+        std::string getFilePath(const std::string& filename) {
+
+            // save the location of input filename
+            std::string::size_type dirSep = filename.rfind('/'); // Unix/Mac dir separator
+            std::string filepath("");
+            if (dirSep == std::string::npos)
+                dirSep = filename.rfind('\\'); // DOS dir separator
+
+            if (dirSep != std::string::npos) // if '_fileName' contains path information...
+                filepath = filename.substr(0, dirSep + 1); // include trailing slashes
+            return filepath;
+        }
     }
 }

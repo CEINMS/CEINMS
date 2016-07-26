@@ -8,7 +8,8 @@ include_directories(
 	${ceinms_common_INCLUDE_DIRS}
 	${TrialData_INCLUDE_DIRS}
 	${FileIO_INCLUDE_DIRS}
-	${Curve_INCLUDE_DIRS})
+	${Curve_INCLUDE_DIRS}
+	${JointContactModels_INCLUDE_DIRS})
 
 add_executable(Test_BatchEvaluator batchEvaluatorTest.cpp)
 TARGET_LINK_LIBRARIES(Test_BatchEvaluator       
@@ -17,5 +18,6 @@ TARGET_LINK_LIBRARIES(Test_BatchEvaluator
       InputConnectors
       OutputConnectors
       OptimizationSystems
-      Concurrency)
+      Concurrency
+	  TrialData)
 

@@ -42,7 +42,7 @@ namespace ceinms {
     void SumKneeContactForces::setTrials(const vector<TrialData>& trials) {
 
         trials_ = trials;
-        kneeContactModel_.initialize(kneeContactModelSetup_, trials_.front().dofNames);
+        kneeContactModel_.initialize(kneeContactModelSetup_, trials_.front().getDofNames());
         contactForces_.resize(trials_.size());
     }
 
@@ -50,7 +50,7 @@ namespace ceinms {
 
         kneeContactModelSetup_ = setup;
         if (!trials_.empty())
-            kneeContactModel_.initialize(kneeContactModelSetup_, trials_.front().dofNames);
+            kneeContactModel_.initialize(kneeContactModelSetup_, trials_.front().getDofNames());
     }
 
     void SumKneeContactForces::setSetup(const ObjectiveFunctionSetup& setup) {
@@ -68,10 +68,10 @@ namespace ceinms {
         size_t trialIndex(0);
         for (tIt; tIt != trials_.cend(); ++tIt, ++rIt, ++trialIndex) {
 
-            size_t nRows(std::min(tIt->torqueData.getNRows(), rIt->torques.getNRows()));
+            size_t nRows(std::min(tIt->getTorqueData().getNRows(), rIt->torques.getNRows()));
             contactForces_.at(trialIndex).resize(nRows);
             for (size_t rowIdx(0); rowIdx < nRows; ++rowIdx) {
-                kneeContactModel_.setTorques(tIt->torqueData.getRow(rowIdx), rIt->torques.getRow(rowIdx));
+                kneeContactModel_.setTorques(tIt->getTorqueData().getRow(rowIdx), rIt->torques.getRow(rowIdx));
                 kneeContactModel_.getContactForces(currentContactForces);
                 contactForces_.at(trialIndex).at(rowIdx) = currentContactForces;
                 for (auto& cf : currentContactForces)

@@ -39,7 +39,7 @@ namespace ceinms {
         bool fileExists(const std::string& filename);
         std::string simplify(const std::string& filename);
         void trim(std::string& fileName);
-
+        std::string getFilePath(const std::string& filename);
     }
 }
 

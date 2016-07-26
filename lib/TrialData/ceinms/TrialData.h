@@ -39,20 +39,75 @@ namespace ceinms {
 
     class TrialData {
     public:
-        std::string id;
-        DataTable<double> emgData;
-        DataTable<double> lmtData;
-        DataTable<double> torqueData;
+        TrialData();
+        TrialData(
+            const std::vector<std::string>& dofNames,
+            const std::vector<std::string>& muscleNames,
+            const std::string& id);
+        TrialData(
+            const DataTable<double>& emgData, 
+            const DataTable<double>& lmtData, 
+            const std::vector<DataTable<double>>& maData, 
+            const DataTable<double>& torqueData, 
+            const std::vector<std::string>& dofNames, 
+            const std::vector<std::string>& muscleNames, 
+            const std::string& id);
+        void setProperties(
+            const std::vector<std::string>& dofNames,
+            const std::vector<std::string>& muscleNames,
+            const std::string& id);
+        void setEmgData(const DataTable<double>& emgData);
+        void setLmtMaData(const DataTable<double>& emgData, const std::vector<DataTable<double>>& maData);
+        void setTorqueData(const DataTable<double>& torqueData);
+        void setOpenSimData(
+            const std::string& openSimModelFile, 
+            const std::string& externalLoadsFile, 
+            const std::string& motionFile);
+        bool hasEmgData() const { return hasEmgData_; }
+        bool hasLmtMaData() const { return hasLmtMaData_; }
+        bool hasTorqueData() const { return hasTorqueData_; }
+        bool hasOpenSimData() const { return hasOpenSimData_; }
         bool isConsistent() {
             bool consistent =
-                emgData.getNRows() > 0 &&
-                lmtData.getNRows() > 0 &&
-                torqueData.getNRows() > 0;
+                emgData_.getNRows() > 0 &&
+                lmtData_.getNRows() > 0 &&
+                torqueData_.getNRows() > 0;
             return consistent;
         }
-        size_t noDoF;
-        std::vector<std::string> dofNames;
-        std::vector<DataTable<double>> maData;
+
+        std::vector<std::string> getDofNames() const { return dofNames_; }
+        std::vector<std::string> getMuscleNames() const { return muscleNames_; }
+        std::size_t getNoDofs() const { return noDoF_; }
+        std::size_t getNoMuscles() const { return muscleNames_.size(); }
+        std::string getId() const { return id_; }
+        const DataTable<double>& getEmgData() const { return emgData_; }
+        const DataTable<double>& getLmtData() const { return lmtData_; }
+        const DataTable<double>& getTorqueData() const { return torqueData_; }
+        const std::vector<DataTable<double>>& getMaData() const { return maData_; }
+        const DataTable<double>& getQ() const { return q_; }
+        const DataTable<double>& getQd() const { return qd_; }
+        const DataTable<double>& getQdd() const { return qdd_; }
+        std::string getOpenSimModelFile() const { return openSimModelFile_; }
+        std::string getExternalLoadFile() const { return externalLoadsFile_; }
+    private:
+        std::string id_;
+        std::vector<std::string> dofNames_, muscleNames_;
+        size_t noDoF_;
+        DataTable<double> emgData_;
+        DataTable<double> lmtData_;
+        DataTable<double> torqueData_;
+        std::vector<DataTable<double>> maData_;
+
+        void updateKinematicData(const std::string& motionFile, double fc = 8);
+        std::string openSimModelFile_;
+        std::string externalLoadsFile_;
+        DataTable<double> q_, qd_, qdd_;
+
+        bool hasEmgData_;
+        bool hasLmtMaData_;
+        bool hasTorqueData_;
+        bool hasOpenSimData_;
+
     };
 }
 

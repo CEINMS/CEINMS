@@ -10,12 +10,26 @@ set(TrialData_HEADERS ceinms/DataTable.h
 set(TrialData_TEMPLATE_IMPLEMENTATION
                       ceinms/DataTable.cpp)
 
+set(TrialData_SOURCE
+                        TrialData.cpp)
+
 set_source_files_properties( ${TrialData_TEMPLATE_IMPLEMENTATION} PROPERTIES HEADER_FILE_ONLY TRUE)
 
 source_group("Header Files" FILES ${TrialData_HEADERS})
-source_group("Source Files" FILES ${TrialData_TEMPLATE_IMPLEMENTATION})
+source_group("Source Files" FILES ${TrialData_TEMPLATE_IMPLEMENTATION} ${TrialData_SOURCE})
 
-#add_library(TrialData ${TrialData_HEADERS} ${TrialData_TEMPLATE_IMPLEMENTATION})
+add_library(TrialData ${TrialData_HEADERS} ${TrialData_TEMPLATE_IMPLEMENTATION} ${TrialData_SOURCE})
+target_include_directories( TrialData
+                            PRIVATE 
+                                   ${OPENSIM_INCLUDE_DIRS}       
+                                   ${SIMTK_INCLUDE_DIRS}
+                            #       ${NMSmodel_INCLUDE_DIRS}
+                             #      ${Curve_INCLUDE_DIRS}
+                              #     ${FileIO_INCLUDE_DIRS}
+                                   ${ceinms_common_INCLUDE_DIRS}
+								#	${Optimizers_INCLUDE_DIRS}
+								#	${TrialData_INCLUDE_DIRS}
+                                    )
 
 
 

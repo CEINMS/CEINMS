@@ -45,17 +45,28 @@ namespace ceinms {
         bool lmtRunning = true;
         bool torqueRunning = true;
         bool emgRunning = true;
+
+        DataTable<double> lmtData, torqueData, emgData;
+        std::vector<DataTable<double>> maData;
+        
+        emgData.setLabels(muscleNames_);
+        lmtData.setLabels(muscleNames_);
+        maData.resize(dofNames_.size());
+        for (auto i(0); i < dofNames_.size(); ++i)
+            maData.at(i).setLabels(maMuscleNames_.at(i));
+        torqueData.setLabels(dofNames_);
+        
         do {  // while(runCondition)
 
             // 1. read lmt Data
             if (lmtRunning) {
                 ScalarVectorFrame lmtFrameFromQueue = inputLmtQueue_.pop();
                 if (!EndOfData::isEod(lmtFrameFromQueue)) {
-                    data_.lmtData.pushRow(lmtFrameFromQueue.time, lmtFrameFromQueue.data);
+                    lmtData.pushRow(lmtFrameFromQueue.time, lmtFrameFromQueue.data);
                     // 2. read moment arms data
                     for (unsigned int i = 0; i < inputMomentArmsQueues_.size(); ++i) {
                         MomentArmsFrame momentArmsFrameFromQueue = (*inputMomentArmsQueues_.at(i)).pop();
-                        data_.maData.at(i).pushRow(momentArmsFrameFromQueue.time, momentArmsFrameFromQueue.data);
+                        maData.at(i).pushRow(momentArmsFrameFromQueue.time, momentArmsFrameFromQueue.data);
                     }
                 }
                 else
@@ -68,7 +79,7 @@ namespace ceinms {
             if (torqueRunning) {
                 ScalarVectorFrame externalTorquesFrameFromQueue = inputExternalTorqueQueue_.pop();
                 if (!EndOfData::isEod(externalTorquesFrameFromQueue)) {
-                    data_.torqueData.pushRow(externalTorquesFrameFromQueue.time, externalTorquesFrameFromQueue.data);
+                    torqueData.pushRow(externalTorquesFrameFromQueue.time, externalTorquesFrameFromQueue.data);
                 }
                 else
                     torqueRunning = false;
@@ -77,12 +88,16 @@ namespace ceinms {
             if (emgRunning) {
                 ScalarVectorFrame emgFrameFromQueue = inputEmgQueue_.pop();
                 if (!EndOfData::isEod(emgFrameFromQueue)) {
-                    data_.emgData.pushRow(emgFrameFromQueue.time, emgFrameFromQueue.data);
+                    emgData.pushRow(emgFrameFromQueue.time, emgFrameFromQueue.data);
                 }
                 else
                     emgRunning = false;
             }
         } while (lmtRunning || emgRunning || torqueRunning);
+
+        data_.setEmgData(emgData);
+        data_.setLmtMaData(lmtData, maData);
+        data_.setTorqueData(torqueData);
     }
 
     TrialData QueuesToTrialData::getTrialData()

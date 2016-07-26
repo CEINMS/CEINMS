@@ -64,20 +64,11 @@ namespace ceinms {
             doneWithSubscriptions_(doneWithSubscriptions),
             doneWithExecution_(doneWithExecution)
         {
-            data_.id = id;
-            std::vector<std::string> muscleNames;
-            subject.getMuscleNames(muscleNames);
-            data_.emgData.setLabels(muscleNames);
-            data_.lmtData.setLabels(muscleNames);
-
-            subject.getDoFNames(data_.dofNames);
-            data_.noDoF = data_.dofNames.size();
-            std::vector<std::vector<std::string>> maMuscleNames;
-            subject.getMuscleNamesOnDofs(maMuscleNames);
-            data_.maData.resize(data_.noDoF);
-            for (auto i(0); i < data_.noDoF; ++i)
-                data_.maData.at(i).setLabels(maMuscleNames.at(i));
-            data_.torqueData.setLabels(data_.dofNames);
+           
+            subject.getMuscleNames(muscleNames_);
+            subject.getDoFNames(dofNames_);
+            subject.getMuscleNamesOnDofs(maMuscleNames_);
+            data_.setProperties(dofNames_, muscleNames_, id);
         };
         ~QueuesToTrialData() = default;
         void operator()();
@@ -91,6 +82,8 @@ namespace ceinms {
         MultipleMomentArmsQueues& inputMomentArmsQueues_;
         Concurrency::Latch& doneWithSubscriptions_;
         Concurrency::Latch& doneWithExecution_;
+        std::vector<std::string> muscleNames_, dofNames_;
+        std::vector<std::vector<std::string>> maMuscleNames_;
     };
 }
 

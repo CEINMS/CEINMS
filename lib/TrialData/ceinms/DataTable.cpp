@@ -37,8 +37,14 @@ namespace ceinms {
 
     template <typename T>
     DataTable<T>::DataTable(size_t nRows, size_t nCols) :
-        nRows_(nRows), nCols_(nCols), data_(std::vector<std::vector<T>>(nRows, std::vector<T>(nCols, 0))) {
+        nRows_(nRows), nCols_(nCols), data_(std::vector<std::vector<T>>(nRows, std::vector<T>(nCols, 0))), time_(nRows, 0) {
 
+    }
+
+    template <typename T>
+    void DataTable<T>::setTime(double time, std::size_t row) {
+
+        time_.at(row) = time;
     }
 
     template <typename T>
@@ -71,7 +77,7 @@ namespace ceinms {
 
 
     template <typename T>
-    void DataTable<T>::pushRow(T time, const std::vector<T>& values){
+    void DataTable<T>::pushRow(double time, const std::vector<T>& values){
 
         if (values.size() != nCols_ && !data_.empty())
             throw std::invalid_argument("pushRow: Wrong size of values");
@@ -187,14 +193,12 @@ namespace ceinms {
     std::ostream& operator<< (std::ostream & out, const DataTable<T> & rhs) {
 
         out << "DataTable " << rhs.nRows_ << "x" << rhs.nCols_ << std::endl;
-        out << rhs.labels_.size() << " labels" << std::endl;
+        out << "Time" << "\t";
         for (auto &l : rhs.labels_)
-            out << l << std::endl;
-        out << "Time column" << std::endl;
-        for (auto &t : rhs.time_)
-            out << t << std::endl;
-        out << "Data matrix" << std::endl;
+            out << l <<"\t";
+        out << std::endl;
         for (auto i(0); i < rhs.nRows_; ++i) {
+            out << rhs.time_.at(i) << "\t";
             for (auto &e : rhs.data_.at(i))
                 out << e << "\t";
             out << std::endl;

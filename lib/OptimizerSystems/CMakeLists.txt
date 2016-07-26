@@ -6,6 +6,7 @@ project(OptimizationSystems)
 set(OptimizationSystems_HEADERS ceinms/NMSmodelSystem.h
                                 ceinms/ParametersInterpreter.h
                                 ceinms/BatchEvaluator.h
+								ceinms/BatchOpenSimEvaluator.h
                                 ceinms/AbstractOptimizerSystem.h
                                 ceinms/MinTorqueError.h
 								ceinms/Result.h
@@ -20,6 +21,7 @@ set(OptimizationSystems_TEMPLATE_IMPLEMENTATION
                             ceinms/NMSmodelSystem.cpp
                             ceinms/ParametersInterpreter.cpp
 							ceinms/BatchEvaluator.cpp
+
 							)
                             
 set(OptimizationSystems_SOURCES 
@@ -29,6 +31,7 @@ set(OptimizationSystems_SOURCES
     MinTorqueErrorAndContactForces.cpp
     SumGenericContactForces.cpp
     BarrierFunction.cpp
+	BatchOpenSimEvaluator.cpp
     
 )
 

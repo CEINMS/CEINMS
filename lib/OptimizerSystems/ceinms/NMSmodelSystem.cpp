@@ -41,6 +41,8 @@ namespace ceinms {
         const std::vector<std::string>& dofsToCalibrate) :
         subject_(subject),
         batchEvaluator_(trials),
+        batchOpenSimEvaluator_(nullptr),
+        hasOpenSimData_(true),
         objectiveFunction_(objectiveFunction),
         parameterInterpreter_(subject, parameterSet, dofsToCalibrate),
         dofsToCalibrate_(dofsToCalibrate),
@@ -59,7 +61,12 @@ namespace ceinms {
         for (auto i(0.); i < nTrials; ++i)
             mockSubjects_.emplace_back(NMSmodelT(subject));
 
-
+        for (auto& t : trials) {
+            hasOpenSimData_ &= t.hasOpenSimData();
+        }
+        if (hasOpenSimData_) {
+            batchOpenSimEvaluator_.reset(trials);
+        }
     }
 
     //NOTE: when using global o single parameters, only the calibrating dofs are considered
@@ -98,7 +105,11 @@ namespace ceinms {
         //batchEvaluator_.evaluateParallel(subject_);
         //       batchEvaluator_.evaluate(subject_);
         auto results(batchEvaluator_.getResults());
-
+        if (hasOpenSimData_) {
+            batchOpenSimEvaluator_->evaluate(results);
+            results = batchOpenSimEvaluator_->getResults();
+        }
+        
         objectiveFunction_.calculate(results);
         f_ = objectiveFunction_.getValue();
         //      std::cout << "f = " << f_ << endl;

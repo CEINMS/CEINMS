@@ -29,17 +29,31 @@
 #ifndef ceinms_Result_h
 #define ceinms_Result_h
 
+#include <OpenSim/OpenSim.h>
 #include "ceinms/DataTable.h"
 
 namespace ceinms {
     class Result{
     public:
         DataTable<double> forces, torques, activations, penalties;
+        DataTable<SimTK::Vec3> jointReactionForces, jointReactionTorques;
         Result(size_t nMTUs, size_t nDofs, size_t nEmgs, size_t nLmtMa) :
             forces(nLmtMa, nMTUs),
             torques(nLmtMa, nDofs),
             activations(nEmgs, nMTUs),
-            penalties(nLmtMa, nMTUs) {}
+            penalties(nLmtMa, nMTUs) {
+        }
+
+        void setMuscleNames(std::vector<std::string>& muscleNames) {
+            forces.setLabels(muscleNames);
+            activations.setLabels(muscleNames);
+            penalties.setLabels(muscleNames);
+        }
+
+        void setDofNames(std::vector<std::string>& dofNames) {
+            torques.setLabels(dofNames);
+        }
+
         bool equals(const Result& rhs) const {
             return (forces == rhs.forces      &&
                 torques == rhs.torques     &&

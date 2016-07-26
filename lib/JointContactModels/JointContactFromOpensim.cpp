@@ -36,6 +36,7 @@ using std::cout;
 using std::endl;
 
 #include "ceinms/ArrayConverter.h"
+#include "ceinms/FileUtils.h"
 
 namespace ceinms {
 
@@ -84,11 +85,11 @@ namespace ceinms {
             c->overrideForce(state_, true);
         for (auto m : muscleActuators_)
             m->overrideForce(state_, true);
+
     }
 
     JointContactFromOpensim::JointContactFromOpensim(const std::string& modelFilename, std::string externalLoadXmlFilename) :
     model_(modelFilename) {
-
         OpenSim::Model modelCopy(modelFilename);
         modelCopy.initSystem();
         nCoordinates_ = modelCopy.getNumCoordinates();
@@ -96,17 +97,30 @@ namespace ceinms {
         nMuscles_ = modelCopy.getMuscles().getSize();
         rForcesInG_.resize(nBodies_);
         rTorquesInG_.resize(nBodies_);
-
         qdd_.resize(nCoordinates_);
 
         //not sure if the model take ownership of the extLoads or not...
-        OpenSim::ExternalLoads extLoads(model_, externalLoadXmlFilename);
-        
+        OpenSim::ExternalLoads* extLoads(new OpenSim::ExternalLoads(model_, externalLoadXmlFilename));
+        string baseDir(FileUtils::getFilePath(externalLoadXmlFilename));
+        string extLoadModelKinematicsFilename = extLoads->getExternalLoadsModelKinematicsFileName();
+        if (!FileUtils::isAbsolute(extLoadModelKinematicsFilename.c_str())) {
+            extLoadModelKinematicsFilename = FileUtils::simplify(baseDir + '/' + extLoadModelKinematicsFilename);
+            extLoads->setExternalLoadsModelKinematicsFileName(extLoadModelKinematicsFilename);
+        }
 
-        OpenSim::Array<string> muscleNames;
-        model_.getMuscles().getNames(muscleNames);
+        string dataFilename = extLoads->getDataFileName();
+        if (!FileUtils::isAbsolute(dataFilename.c_str())) {
+            dataFilename = FileUtils::simplify(baseDir + '/' + dataFilename);
+            extLoads->setDataFileName(dataFilename);
+        }
+
+        extLoads->setMemoryOwner(false);
+        extLoads->invokeConnectToModel(model_);
+  
+     //   OpenSim::Array<string> muscleNames;
+        model_.getMuscles().getNames(muscleActuatorNames_);
         for (unsigned i(0); i < nMuscles_; ++i)
-            muscleActuators_.push_back((const_cast<OpenSim::Muscle*>(&model_.updForceSet().getMuscles().get(muscleNames.get(i)))));
+            muscleActuators_.push_back((dynamic_cast<OpenSim::Muscle*>(&model_.updForceSet().get(muscleActuatorNames_.get(i)))));
 
         const OpenSim::CoordinateSet& cs = model_.getCoordinateSet();
         for (unsigned i(0); i < nCoordinates_; ++i) {
@@ -120,7 +134,6 @@ namespace ceinms {
             model_.addForce(actuator);
             coordinateActuators_.push_back(dynamic_cast<OpenSim::CoordinateActuator*>(&(model_.updForceSet().get(actuatorName))));
         }
-
         idSolver_ = new OpenSim::InverseDynamicsSolver(model_);
 
         state_ = model_.initSystem();
@@ -128,7 +141,6 @@ namespace ceinms {
             c->overrideForce(state_, true);
         for (auto m : muscleActuators_)
             m->overrideForce(state_, true);
-
     }
 
     void JointContactFromOpensim::setTime(double time) {
@@ -256,12 +268,15 @@ namespace ceinms {
         disableMuscleActuators();
         SimTK::Vector appliedMobilityForces(nCoordinates_, 0.); //Calculate ID
         calculateResidualMobilityForces(appliedMobilityForces);
-    }
+     }
 
     void JointContactFromOpensim::disableMuscleActuators() {
 
-        for (auto& m : muscleActuators_)
-            m->setDisabled(state_, true);
+        for (int i(0); i < muscleActuators_.size(); ++i)
+            muscleActuators_.at(i)->setDisabled(state_, true);
+            
+//      for (auto& m : muscleActuators_)
+   //         m->setDisabled(state_, true);
     }
 
     void JointContactFromOpensim::enableMuscleActuators() {
@@ -291,6 +306,7 @@ namespace ceinms {
         }
         model_.getMultibodySystem().realize(state_, SimTK::Stage::Acceleration);
         model_.getSimbodyEngine().computeReactions(state_, rForcesInG_, rTorquesInG_);
+
     }
 
     //if appliedMobilityForces is 0 then it is the ID
@@ -303,7 +319,11 @@ namespace ceinms {
     }
 
     void JointContactFromOpensim::getAllReactionForces(SimTK::Vector_<SimTK::Vec3>& reactionForces, SimTK::Vector_<SimTK::Vec3>& reactionTorques) const {
-        reactionForces = rForcesInG_;
+        reactionForces.clear();
+        reactionForces.resize(rForcesInG_.size() - 1);
+        for (int i(1); i < rForcesInG_.size(); ++i)
+            reactionForces[i - 1] = rForcesInG_[i];
+
         reactionTorques = rTorquesInG_;
     }
 

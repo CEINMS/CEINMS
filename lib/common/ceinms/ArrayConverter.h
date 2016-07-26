@@ -30,6 +30,7 @@
 #define ceinms_ArrayConverter_h
 
 #include <vector>
+#include <OpenSim/OpenSim.h>
 
 namespace ceinms {
     namespace ArrayConverter{
@@ -43,10 +44,37 @@ namespace ceinms {
                 dstVector.at(i) = srcArray.get(i);
         }
 
+        template<typename T>
+        std::vector<T> toStdVector(const OpenSim::Array<T>& srcArray) {
+            std::vector<T> dstVector;
+            for (int i = 0; i < srcArray.getSize(); ++i)
+                dstVector.emplace_back(srcArray.get(i));
+            return dstVector;
+        }
+
+
         template<typename T, typename U>
         void fromStdVector(T& dstArray, const U& srcVector) {
             for (typename U::const_iterator it(srcVector.begin()); it != srcVector.end(); ++it)
                 dstArray.append(*it);
+        }
+
+        template<typename T>
+        SimTK::Vector_<T> toSimTKVector(const std::vector<T>& v) {
+
+            SimTK::Vector_<T> ansV(v.size(), .0);
+            for (size_t i(0); i < v.size(); ++i)
+                ansV.set(i, v.at(i));
+            return ansV;
+        }
+
+        template<typename T>
+        std::vector<T> fromSimTKVector(const SimTK::Vector_<T>& v) {
+
+            std::vector<T> ansV;
+            for (size_t i(0); i < v.size(); ++i)
+                ansV.emplace_back(v[i]);
+            return ansV;
         }
     }
 }

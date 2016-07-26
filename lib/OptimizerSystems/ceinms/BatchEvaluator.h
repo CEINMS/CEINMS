@@ -48,7 +48,7 @@ namespace ceinms {
         static void evaluate(NMSmodelT&& subject, const TrialData& trialData, const std::vector<unsigned> musclesToUpdate, Result& previousResult);
     private:
         template<typename NMSmodelT>
-        static void initFiberLengthTraceCurves(NMSmodelT&& subject, const TrialData& trialData, const std::vector<unsigned> musclesToUpdate, Result& previousResult);
+        static void initFiberLengthTraceCurves(NMSmodelT&& subject, const TrialData& trialData, const std::vector<unsigned>& musclesToUpdate, Result& previousResult);
     };
 
 

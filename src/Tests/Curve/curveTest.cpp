@@ -114,8 +114,8 @@ void testOriginalMuscleCurves() {
     passiveForceLength.resetPointsWith(pfX, pfY);
     printCurve(passiveForceLength, "pflc_original.txt", -5, 5);
 
-    std::vector<double> fvX{ -10, -1, -0.6, -0.3, -0.1, 0, 0.1, 0.3, 0.6, 0.8, 10 };
-    std::vector<double> fvY{ 0, 0, 0.08, 0.2, 0.55, 1, 1.4, 1.6, 1.7, 1.75, 1.75 };
+    std::vector<double> fvX{ -1, -0.6, -0.3, -0.1, 0, 0.1, 0.3, 0.6, 0.8 };
+    std::vector<double> fvY{ 0, 0.08, 0.2, 0.55, 1, 1.4, 1.6, 1.7, 1.75 };
     forceVelocity.resetPointsWith(fvX, fvY);
     printCurve(forceVelocity, "fvc_original.txt", -10, 10);
 

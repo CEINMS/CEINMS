@@ -33,7 +33,9 @@
 
 #include "ParametersInterpreter.h" //TODO: rename this class
 #include "ceinms/TrialData.h"
-#include "BatchEvaluator.h"
+#include "ceinms/BatchEvaluator.h"
+#include "ceinms/BatchOpenSimEvaluator.h"
+#include <memory>
 #include <vector>
 
 namespace ceinms {
@@ -61,9 +63,11 @@ namespace ceinms {
         std::vector<NMSmodelT> mockSubjects_;
         NMSmodelT& subject_;
         BatchEvaluator batchEvaluator_;
+        std::unique_ptr<BatchOpenSimEvaluator> batchOpenSimEvaluator_;
         ObjectiveFunctionT objectiveFunction_;
         ParametersInterpreter<NMSmodelT> parameterInterpreter_;
         std::vector<std::string> dofsToCalibrate_;
+        bool hasOpenSimData_;
         double f_;
         //      std::vector<TrialData> trialData_; //I'd like this to be here.. but it ended up in BatchEvaluator.. which has the advantage to hide
     };
