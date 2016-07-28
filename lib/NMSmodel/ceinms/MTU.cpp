@@ -316,6 +316,9 @@ namespace ceinms {
         muscleForce_ = maxIsometricForce_*strengthCoefficient_*
             (fa*fv*activation_ + fp + damping_*normFiberVelocity)*
             cos(pennationAngleAtT);
+        //clamp muscle force
+        if (muscleForce_ < 0)
+            muscleForce_ = 0;
     }
 
 

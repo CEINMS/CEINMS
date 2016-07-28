@@ -121,12 +121,10 @@ namespace ceinms {
         externalLoadsFile_ = externalLoadsFile;
         updateKinematicData(motionFile);
         hasOpenSimData_ = true;
-        std::cout << "K6" << std::flush;
     }
 
     void TrialData::updateKinematicData(const string& motionFile, double fc) {
 
-        std::cout << "Updating kinematics\n" << std::flush;
         OpenSim::Model model(openSimModelFile_);
         model.initSystem();
         OpenSim::Storage kinematics(motionFile);
@@ -137,10 +135,8 @@ namespace ceinms {
         if (kinematics.isInDegrees()){
             model.getSimbodyEngine().convertDegreesToRadians(kinematics);
         }
-        std::cout << "K1" << std::flush;
         // Create differentiable splines of the coordinate data
         OpenSim::GCVSplineSet kinematicsSplines(5, &kinematics);
-        std::cout << "K2" << std::flush;
 
         //Functions must correspond to model coordinates and their order for the solver
         OpenSim::Array<string> coordinateNamesOS;
@@ -153,8 +149,6 @@ namespace ceinms {
                 kinematicsSplines.insert(i, OpenSim::Constant(model.getCoordinateSet().get(i).getDefaultValue()));
             }
         }
-        std::cout << "K3" << std::flush;
-
         if (kinematicsSplines.getSize() > coordinateNamesOS.getSize()){
             kinematicsSplines.setSize(coordinateNamesOS.getSize());
         }
@@ -165,7 +159,6 @@ namespace ceinms {
         q_.setLabels(coordinateNames);
         qd_.setLabels(coordinateNames);
         qdd_.setLabels(coordinateNames);
-        std::cout << "K4" << std::flush;
 
         vector<double> timeColumn(lmtData_.getTimeColumn());
         for (auto& t : timeColumn) {
