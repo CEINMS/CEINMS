@@ -36,6 +36,7 @@ namespace ceinms {
         const unsigned MinimizeTorqueError = 100;
         const unsigned SumKneeContactForces = 200;
         const unsigned TorqueErrorAndSumKneeContactForces = 300;
+        const unsigned TorqueErrorAndSumGenericContactForces = 400;
         //Algorithm
         const unsigned Siman = 1;
         const unsigned Nop = 0;
@@ -48,7 +49,7 @@ namespace ceinms {
             MinimizeTorqueErrorParameterSetDefault = 100,
             SumKneeContactForcesParameterSetDefault = 200,
             TorqueErrorAndSumKneeContactForcesParameterSetDefault = 300,
-
+            TorqueErrorAndSumGenericContactForcesParameterSetDefault = 400,
             Empty = -1
 
         };

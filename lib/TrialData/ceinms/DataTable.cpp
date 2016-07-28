@@ -115,6 +115,15 @@ namespace ceinms {
     }
 
     template <typename T>
+    std::vector<T> DataTable<T>::getColumn(std::string& columnName) const {
+
+        auto it = std::find(std::cbegin(labels_), std::cend(labels_), columnName);
+        if (it != std::cend(labels_))
+            return getColumn(std::distance(std::cbegin(labels_), it));
+        return std::vector<T>();
+    }
+
+    template <typename T>
     DataTable<T>  DataTable<T>::sum(const DataTable<T>& lhs, const DataTable<T>& rhs) {
 
         if (lhs.getNColumns() != rhs.getNColumns() || lhs.getNColumns() != rhs.getNColumns())

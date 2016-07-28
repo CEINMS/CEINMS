@@ -69,6 +69,7 @@ namespace ceinms {
         const std::vector<T>& getRow(size_t row) const; //return const ref is bad.. checking for performance
 
         std::vector<T> getColumn(size_t col) const;
+        std::vector<T> getColumn(std::string& columnName) const;
         size_t getNColumns() const { return nCols_; }
         size_t getNRows() const { return nRows_; }
 

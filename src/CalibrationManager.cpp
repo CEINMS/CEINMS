@@ -144,6 +144,28 @@ namespace ceinms {
                 Optimizers::SimulatedAnnealing<MySystem> optimizer(system, simanParameters);
                 exitflag = optimizer.optimize();
             }   break;
+
+            case CalibrationCfg::TorqueErrorAndSumGenericContactForcesParameterSetDefault: {
+
+                vector<string> dofsToCalibrate;
+                currentCalibrationStep.getDofNames(dofsToCalibrate);
+                ParameterSet parameterSet;
+                currentCalibrationStep.getParameterSet(parameterSet);
+                ObjectiveFunctionSetup objectiveFunctionSetup = currentCalibrationStep.getObjectiveFunctionSetup();
+
+                SumKneeContactForces sumKneeContacts(objectiveFunctionSetup);
+                sumKneeContacts.setContactModelSetup(contactModelCfg_.getContactModelSetupKneeBalance());
+                MinTorqueError minTorqueError;
+                MinTorqueErrorAndContactForces minTorqueErrorAndContactForces(minTorqueError, sumKneeContacts);
+
+                using MySystem = NMSmodelSystem < NMSmodelT, MinTorqueErrorAndContactForces >;
+                MySystem system(mySubject, trials, minTorqueErrorAndContactForces, parameterSet, dofsToCalibrate);
+
+                SimulatedAnnealingParameters simanParameters;
+                calibrationXmlReader_.getOptimizationAlgorithmParameters(simanParameters);
+                Optimizers::SimulatedAnnealing<MySystem> optimizer(system, simanParameters);
+                exitflag = optimizer.optimize();
+            }   break;
             } //end switch
         }//end while
         writeXml(mySubject, uncalibratedSubjectFile_, calibrationFile_, calibratedSubjectFile_);

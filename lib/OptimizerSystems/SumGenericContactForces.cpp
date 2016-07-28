@@ -32,10 +32,15 @@
 using std::vector;
 #include <string>
 using std::string;
+#include <iostream>
+using std::cout;
+using std::endl;
+#include <algorithm>
+#include <numeric>
 
 namespace ceinms {
-    
-    SumGenericContactForces::SumGenericContactForces(const ObjectiveFunctionSetup& setup) : 
+
+    SumGenericContactForces::SumGenericContactForces(const ObjectiveFunctionSetup& setup) :
         f_(std::numeric_limits<double>::max())
     {
         setSetup(setup);
@@ -46,96 +51,51 @@ namespace ceinms {
 
         weight_ = setup.weight;
         exponent_ = setup.exponent;
-    }
-
-    void SumGenericContactForces::setContactModelSetup(const ContactModelFromOpenSimSetup& setups) {
-
-        
-        barrierFunc_.initialize(setup.barrierListSetup, contactModel_.getCondyleNames());
+        barrierListSetup_ = setup.barrierListSetup;
 
     }
 
-    void SumGenericContactForces::initialiseContactModels() {
+    void SumGenericContactForces::setJointContactForcesNames(const std::vector<std::string>& contactForcesNames) {
 
-        for (unsigned i(0); i < contactModelSetups_.size(); ++i) {
-            string modelFilename(contactModelSetups_.at(i).osimModel);
-            string extLoadsXml(contactModelSetups_.at(i).externalLoads);
-            contactModels_.emplace_back(new JointContactFromOpensim(modelFilename, extLoadsXml));
-        }
-
-        std::vector<std::string> coordinateNamesFromOsim, dofNamesFromSubject, muscleNamesFromOsim, musclesNamesFromSubject, jointNamesFromOsim;
-        jointContactModel_->getCoordinateNamesFromOsimModel(coordinateNamesFromOsim);
-        dofsMapping_.setNames(dofNamesFromSubject_, coordinateNamesFromOsim);
-        jointContactModel_->getMuscleNamesFromOsimModel(muscleNamesFromOsim);
-        musclesMapping_.setNames(musclesNamesFromSubject_, muscleNamesFromOsim);
-
-        jointContactModel_->getJointNamesFromOsimModel(jointNamesFromOsim);
-        for (auto& jointToLog : jointsToLog_) {
-            auto it(std::find(jointNamesFromOsim.cbegin(), jointNamesFromOsim.cend(), jointToLog));
-            if (it == jointNamesFromOsim.end()) {
-                std::cout << jointToLog << " does not exist in the OpenSim model\nExit.";
-                exit(EXIT_FAILURE);
-            }
-        }
+        barrierFunc_.initialize(barrierListSetup_, contactForcesNames);
+        contactForcesNames_ = contactForcesNames;
     }
-
-
 
 
     void SumGenericContactForces::calculate(const vector<Result>& results) {
+        maxContactForces_.clear();
+        for (auto& r : results) {
 
-        f_ = 0;
-        vector<double> currentContactForces;
-        auto tIt(trials_.cbegin());
-        auto rIt(results.cbegin());
-        size_t trialIndex(0);
-        for (tIt; tIt != trials_.cend(); ++tIt, ++rIt, ++trialIndex) {
-
-            size_t nRows(std::min(tIt->torqueData.getNRows(), rIt->torques.getNRows()));
-            contactForces_.at(trialIndex).resize(nRows);
-            for (size_t rowIdx(0); rowIdx < nRows; ++rowIdx) {
-                kneeContactModel_.setTorques(tIt->torqueData.getRow(rowIdx), rIt->torques.getRow(rowIdx));
-                kneeContactModel_.getContactForces(currentContactForces);
-                contactForces_.at(trialIndex).at(rowIdx) = currentContactForces;
-                for (auto& cf : currentContactForces)
-                    f_ += weight_*std::pow(cf, exponent_);
-                f_ += barrierFunc_.getValue(currentContactForces);
+            std::vector<double> maxContactForcesForCurrentResult;
+            for (auto& joint : contactForcesNames_) {
+                auto column(r.jointReactionForces.getColumn(joint));
+                std::vector<double> magnitude;
+                std::transform(std::cbegin(column), std::cend(column), std::back_inserter(magnitude), [](const SimTK::Vec3& v) {
+                    return v.norm();
+                });
+                auto it(std::max_element(std::cbegin(magnitude), std::cend(magnitude)));
+                maxContactForcesForCurrentResult.emplace_back(*it);
             }
+            maxContactForces_.emplace_back(maxContactForcesForCurrentResult);
+            //sum of max
         }
+
+        f_ = 0.;
+        for (auto& v : maxContactForces_)
+            for (auto& e : v)
+                f_ += e;
+
     }
 
     void SumGenericContactForces::printCosts() const {
 
-        auto names = kneeContactModel_.getCondyleNames();
-        for (size_t trialIndex(0); trialIndex < contactForces_.size(); ++trialIndex) {
-            std::cout << "Trial #" << trialIndex + 1 << std::endl;
-
-            vector<double> maxValues;
-            auto val = std::max_element(
-                contactForces_.at(trialIndex).begin(),
-                contactForces_.at(trialIndex).end(),
-                [](const std::vector<double>& lhs, const std::vector<double>& rhs){
-                return lhs.front() < rhs.front();
+        cout << "Peak contact forces:" << endl;
+        for (int i(0); i < maxContactForces_.size(); ++i) {
+            cout << "Trial# " << i+1 << endl;
+            for (int j(0); j < contactForcesNames_.size(); ++j) {
+                cout << contactForcesNames_.at(j) << " " << maxContactForces_.at(i).at(j) << " N" << endl;
             }
-
-            );
-            maxValues.push_back(val->front());
-
-            val = std::max_element(
-                contactForces_.at(trialIndex).begin(),
-                contactForces_.at(trialIndex).end(),
-                [](const std::vector<double>& lhs, const std::vector<double>& rhs){
-                return lhs.back() < rhs.back();
-            }
-
-            );
-
-            maxValues.push_back(val->back());
-            std::cout << "max " << names.at(0) << " " << maxValues.at(1) << " N" << std::endl;
-            std::cout << "max " << names.at(1) << " " << maxValues.at(0) << " N" << std::endl;
-
-            std::cout << std::endl;
         }
     }
-    
 }
+  

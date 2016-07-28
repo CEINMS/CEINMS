@@ -30,6 +30,8 @@
 #include "ceinms/BatchOpenSimEvaluator.h"
 #include "ceinms/TrialData.h"
 #include "ceinms/MinTorqueError.h"
+#include "ceinms/SumGenericContactForces.h"
+#include "ceinms/ObjectiveFunctionSetup.h"
 using ceinms::TrialData;
 #include "ceinms/QueuesToTrialData.h"
 #include "ceinms/EmgFromFile.h"
@@ -269,8 +271,17 @@ int main(int argc, char** argv) {
                 error.setDofsToCalibrate(mySubject.getDoFNames());
                 error.setTrials(trials);
                 error.calculate(results);
-              
-                std::cout << "error value: " << error.getValue() << std::flush;;
+                error.printCosts();
+                std::cout << "Torque error value: " << error.getValue() << std::endl << std::flush;
+                
+         
+                SumGenericContactForces sumGenericCF;
+                sumGenericCF.setJointContactForcesNames(std::vector<std::string> {"hip_r", "knee_r", "ankle_r"});
+                sumGenericCF.setTrials(trials);
+                sumGenericCF.calculate(results);
+                sumGenericCF.printCosts();
+                std::cout << "Sum generic cf error value: " << sumGenericCF.getValue() << std::endl << std::flush;
+                
                 //                   batchEvaluator.evaluate(mySubject);
                 //                   auto results2(batchEvaluator.getResults());
 

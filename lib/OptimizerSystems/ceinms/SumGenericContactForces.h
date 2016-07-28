@@ -34,8 +34,6 @@
 #include <OpenSim/OpenSim.h>
 #include "ceinms/TrialData.h"
 #include "Result.h"
-#include "ceinms/ContactModelFromOpenSimSetup.h"
-#include "ceinms/JointContactFromOpensim.h"
 #include "ceinms/BarrierFunction.h"
 #include "ceinms/Mapper.h"
 #include "ceinms/ObjectiveFunctionSetup.h"
@@ -54,13 +52,16 @@ namespace ceinms {
         double getValue() const { return f_; }
         void setSetup(const ObjectiveFunctionSetup& setup);
         //the contact model is associated to the subject, oly a contact model per calibration
-        void setContactModelSetup(const ContactModelFromOpenSimSetup& setup);
+        void setJointContactForcesNames(const std::vector<std::string>& contactForcesNames);
         void setBarrierParameters(double xL, double xR, double weight, double exponent);
         void printCosts() const;
     private:
         std::size_t dim_;
         double f_, weight_, exponent_;
-        std::vector<BarrierFunction> barrierFunc_;
+        BarrierFunction barrierFunc_;
+        BarrierListSetup barrierListSetup_;
+        std::vector<std::string> contactForcesNames_;
+        std::vector<std::vector<double>> maxContactForces_; //1st -> trial, 2nd-> joint
     };
 }
 
