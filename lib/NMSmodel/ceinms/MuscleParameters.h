@@ -41,7 +41,7 @@ namespace ceinms {
         double getShapeFactor() const            { return shapeFactor_; }
         double getOptimalFiberLength() const     { return optimalFiberLength_; }
         double getPennationAngle() const         { return pennationAngle_; }
-        double getTendonSlackLenght() const      { return tendonSlackLength_; }
+        double getTendonSlackLength() const      { return tendonSlackLength_; }
         double getMaxContractionVelocity() const { return maxContractionVelocity_; }
         double getMaxIsometricForce() const      { return maxIsometricForce_; }
         double getStrengthCoefficient() const    { return strengthCoefficient_; }

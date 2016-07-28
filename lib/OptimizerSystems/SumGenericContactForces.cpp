@@ -34,43 +34,23 @@ using std::vector;
 using std::string;
 
 namespace ceinms {
-    /*
+    
     SumGenericContactForces::SumGenericContactForces(const ObjectiveFunctionSetup& setup) : 
-        f_(std::numeric_limits<double>::max()),
-        dim_(0)
+        f_(std::numeric_limits<double>::max())
     {
         setSetup(setup);
 
     }
 
-    void SumGenericContactForces::setTrials(const vector<TrialData>& trials) {
+    void SumGenericContactForces::setSetup(const ObjectiveFunctionSetup& setup) {
 
-        trials_ = trials;
-        contactForces_.resize(trials_.size());
-        if (trials_.size() == contactModelSetup_.size()) {
-            initialiseContactModels();
-            dim_ = trials_.size();
-        }
+        weight_ = setup.weight;
+        exponent_ = setup.exponent;
     }
 
-    void SumGenericContactForces::setContactModelSetup(const vector<ContactModelFromOpenSimSetup>& setups) {
+    void SumGenericContactForces::setContactModelSetup(const ContactModelFromOpenSimSetup& setups) {
 
-        contactModelSetup_ = setups;
-        if (trials_.size() == contactModelSetup_.size()) {
-            initialiseContactModels();
-            dim_ = trials_.size();
-        }
-
-        vector<string> jointNamesFromOsim;
-        contactModel_.getJointNamesFromOsimModel(jointNamesFromOsim);
         
-        for (auto& jointToLog : contactModelSetup_.joints) {
-            auto it(std::find(jointNamesFromOsim.cbegin(), jointNamesFromOsim.cend(), jointToLog));
-            if (it == jointNamesFromOsim.end()) {
-                std::cout << jointToLog << " does not exist in the OpenSim model\nExit.";
-                exit(EXIT_FAILURE);
-            }
-        }
         barrierFunc_.initialize(setup.barrierListSetup, contactModel_.getCondyleNames());
 
     }
@@ -100,11 +80,7 @@ namespace ceinms {
     }
 
 
-    void SumGenericContactForces::setSetup(const ObjectiveFunctionSetup& setup) {
 
-        weight_ = setup.weight;
-        exponent_ = setup.exponent;
-    }
 
     void SumGenericContactForces::calculate(const vector<Result>& results) {
 
@@ -161,5 +137,5 @@ namespace ceinms {
             std::cout << std::endl;
         }
     }
-    */
+    
 }

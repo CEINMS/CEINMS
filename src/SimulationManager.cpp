@@ -150,10 +150,10 @@ namespace ceinms {
         ExternalTorquesFromStorageFile externalTorquesProducer(externalTorqueQueue, doneWithSubscriptionsLatch, doneWithExecutionLatch, mySubject, externalTorqueFilename);
 
         vector<string> dataToLog = { "Activations",
-            "FiberLenghts",
-            "NormFiberLengths",
-            "FiberVelocities",
-            "NormFiberVelocities",
+            "FibreLengths",
+            "NormFibreLengths",
+            "FibreVelocities",
+            "NormFibreVelocities",
             "PennationAngles",
             "MuscleForces",
             "Torques",
@@ -272,10 +272,10 @@ namespace ceinms {
         ExternalTorquesFromStorageFile externalTorquesProducer(externalTorqueQueue, doneWithSubscriptionsLatch, doneWithExecutionLatch, mySubject, externalTorqueFilename);
 
         vector<string> dataToLog = { "Activations",
-            "FiberLenghts",
-            "NormFiberLengths",
-            "FiberVelocities",
-            "NormFiberVelocities",
+            "FibreLengths",
+            "NormFibreLengths",
+            "FibreVelocities",
+            "NormFibreVelocities",
             "PennationAngles",
             "MuscleForces",
             "Torques",
@@ -442,10 +442,10 @@ namespace ceinms {
         ExternalTorquesFromStorageFile externalTorquesProducer(externalTorqueQueue, doneWithSubscriptionsLatch, doneWithExecutionLatch, mySubject, externalTorqueFilename);
 
         vector<string> dataToLog = { "Activations",
-            "FiberLenghts",
-            "NormFiberLengths",
-            "FiberVelocities",
-            "NormFiberVelocities",
+            "FibreLengths",
+            "NormFibreLengths",
+            "FibreVelocities",
+            "NormFibreVelocities",
             "PennationAngles",
             "MuscleForces",
             "Torques",
@@ -518,10 +518,10 @@ namespace ceinms {
         string externalTorqueFilename(dataLocations_.getExternalTorqueFile());
         ExternalTorquesFromStorageFile externalTorquesProducer(externalTorqueQueue, doneWithSubscriptionsLatch, doneWithExecutionLatch, mySubject, externalTorqueFilename);
         vector<string> dataToLog = { "Activations",
-            "FiberLenghts",
-            "NormFiberLengths",
-            "FiberVelocities",
-            "NormFiberVelocities",
+            "FibreLengths",
+            "NormFibreLengths",
+            "FibreVelocities",
+            "NormFibreVelocities",
             "PennationAngles",
             "MuscleForces",
             "Torques",

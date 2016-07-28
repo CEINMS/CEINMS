@@ -46,23 +46,21 @@ namespace ceinms {
     public:
         SumGenericContactForces(const ObjectiveFunctionSetup& setup);
         SumGenericContactForces() : f_(std::numeric_limits<double>::max()) {}
+        //this is to respect the interface
         void setDofsToCalibrate(const std::vector<std::string>& dofsToCalibrate) {};
-        void setTrials(const std::vector<TrialData>& trials);
+
+        void setTrials(const std::vector<TrialData>& trials) { dim_ = trials.size(); }
         void calculate(const std::vector<Result>& results);
         double getValue() const { return f_; }
-        void setContactModelSetup(const std::vector<ContactModelFromOpenSimSetup>& setup);
+        void setSetup(const ObjectiveFunctionSetup& setup);
+        //the contact model is associated to the subject, oly a contact model per calibration
+        void setContactModelSetup(const ContactModelFromOpenSimSetup& setup);
         void setBarrierParameters(double xL, double xR, double weight, double exponent);
         void printCosts() const;
     private:
-        void initialiseContactModels();        
-        unsigned dim_;
+        std::size_t dim_;
         double f_, weight_, exponent_;
-        std::vector<TrialData> trials_;
-        std::vector< std::unique_ptr<JointContactFromOpensim> > contactModels_; //a contact model per trial
-        std::vector<ContactModelFromOpenSimSetup> contactModelSetups_; //a setup per trial
-        std::vector<BarrierFunction> barrierFunc_; //a barrier per contact model
-        std::vector<std::vector<std::vector<double>>> contactForces_;  //trial, row, contact forces
-        std::vector<std::vector<OpenSim::ExternalForce*>> externalForces_; //a set of external forces per trial
+        std::vector<BarrierFunction> barrierFunc_;
     };
 }
 

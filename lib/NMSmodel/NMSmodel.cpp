@@ -1075,7 +1075,7 @@ namespace ceinms {
             mIt->setShapeFactor(pIt->getShapeFactor());
             mIt->setOptimalFibreLength(pIt->getOptimalFiberLength());
             mIt->setPennationAngle(pIt->getPennationAngle());
-            mIt->setTendonSlackLength(pIt->getTendonSlackLenght());
+            mIt->setTendonSlackLength(pIt->getTendonSlackLength());
             mIt->setMaxIsometricForce(pIt->getMaxIsometricForce());
             mIt->setStrengthCoefficient(pIt->getStrengthCoefficient());
             mIt->setEmDelay(pIt->getEmDelay());
