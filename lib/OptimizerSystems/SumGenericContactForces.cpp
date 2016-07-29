@@ -40,8 +40,16 @@ using std::endl;
 
 namespace ceinms {
 
+
+    SumGenericContactForces::SumGenericContactForces() : 
+        f_(std::numeric_limits<double>::max()),
+        weight_(1.),
+        exponent_(1.)
+    {    }
+
+
     SumGenericContactForces::SumGenericContactForces(const ObjectiveFunctionSetup& setup) :
-        f_(std::numeric_limits<double>::max())
+        SumGenericContactForces()
     {
         setSetup(setup);
 
@@ -77,14 +85,16 @@ namespace ceinms {
                 maxContactForcesForCurrentResult.emplace_back(*it);
             }
             maxContactForces_.emplace_back(maxContactForcesForCurrentResult);
-            //sum of max
         }
 
         f_ = 0.;
-        for (auto& v : maxContactForces_)
-            for (auto& e : v)
+        for (auto& v : maxContactForces_) {
+            f_ += barrierFunc_.getValue(v);
+            for (auto& e : v) {
                 f_ += e;
-
+            }
+        }
+        f_ = weight_*std::pow(f_, exponent_);
     }
 
     void SumGenericContactForces::printCosts() const {

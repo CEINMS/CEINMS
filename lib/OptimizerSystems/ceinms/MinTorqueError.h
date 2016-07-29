@@ -32,6 +32,7 @@
 #include <limits>
 #include "ceinms/TrialData.h"
 #include "Result.h"
+#include "ceinms/ObjectiveFunctionBase.h"
 
 namespace ceinms {
 
@@ -44,14 +45,14 @@ namespace ceinms {
             penalty(0.) {}
     };
 
-    class MinTorqueError {
+    class MinTorqueError : public ObjectiveFunctionBase {
     public:
         MinTorqueError() : f_(std::numeric_limits<double>::max()) {}
-        void setDofsToCalibrate(const std::vector<std::string>& dofsToCalibrate);
-        void setTrials(const std::vector<TrialData>& trials);
-        void calculate(const std::vector<Result>& results);
-        double getValue() const { return f_; }
-        void printCosts() const;
+        void setDofsToCalibrate(const std::vector<std::string>& dofsToCalibrate) override;
+        void setTrials(const std::vector<TrialData>& trials) override;
+        void calculate(const std::vector<Result>& results) override;
+        double getValue() const override{ return f_; }
+        void printCosts() const override;
     private:
         void computeVariance();
         void updDofsToCalibrateIdx();

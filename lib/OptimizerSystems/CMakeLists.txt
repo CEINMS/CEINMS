@@ -15,13 +15,14 @@ set(OptimizationSystems_HEADERS ceinms/NMSmodelSystem.h
                                 ceinms/BarrierFunction.h
                                 ceinms/SumKneeContactForces.h
                                 ceinms/SumGenericContactForces.h
+								ceinms/ComposedObjectiveFunction.h
+								ceinms/ObjectiveFunctionBase.h
                         )
 
 set(OptimizationSystems_TEMPLATE_IMPLEMENTATION
                             ceinms/NMSmodelSystem.cpp
                             ceinms/ParametersInterpreter.cpp
 							ceinms/BatchEvaluator.cpp
-
 							)
                             
 set(OptimizationSystems_SOURCES 
@@ -32,7 +33,7 @@ set(OptimizationSystems_SOURCES
     SumGenericContactForces.cpp
     BarrierFunction.cpp
 	BatchOpenSimEvaluator.cpp
-    
+    ComposedObjectiveFunction.cpp
 )
 
 set_source_files_properties( ${OptimizationSystems_TEMPLATE_IMPLEMENTATION} PROPERTIES HEADER_FILE_ONLY TRUE)

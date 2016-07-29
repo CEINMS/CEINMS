@@ -43,7 +43,9 @@ namespace ceinms {
 
     };
 
-    struct ObjectiveFunctionSetup {
+    class ObjectiveFunctionSetup {
+    public:
+        ObjectiveFunctionSetup() : weight(1.), exponent(1.), objectiveFunctionId(0) {}
         unsigned objectiveFunctionId;
         double weight, exponent;
         BarrierListSetup barrierListSetup;

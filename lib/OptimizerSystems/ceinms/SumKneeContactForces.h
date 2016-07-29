@@ -37,22 +37,23 @@
 #include "ceinms/BarrierFunction.h"
 #include "ceinms/Mapper.h"
 #include "ceinms/ObjectiveFunctionSetup.h"
+#include "ceinms/ObjectiveFunctionBase.h"
 
 namespace ceinms {
 
 
-    class SumKneeContactForces {
+    class SumKneeContactForces : public ObjectiveFunctionBase {
     public:
         SumKneeContactForces(const ObjectiveFunctionSetup& setup);
         SumKneeContactForces() : f_(std::numeric_limits<double>::max()) {}
-        void setDofsToCalibrate(const std::vector<std::string>& dofsToCalibrate) {};
-        void setTrials(const std::vector<TrialData>& trials);
-        void calculate(const std::vector<Result>& results);
-        double getValue() const { return f_; }
+        void setDofsToCalibrate(const std::vector<std::string>& dofsToCalibrate) override {};
+        void setTrials(const std::vector<TrialData>& trials) override;
+        void calculate(const std::vector<Result>& results) override;
+        double getValue() const override { return f_; }
         void setSetup(const ObjectiveFunctionSetup& setup);
         void setContactModelSetup(const ContactModelKneeBalanceSetup& setup);
         void setBarrierParameters(double xL, double xR, double weight, double exponent);
-        void printCosts() const;
+        void printCosts() const override;
     private:
         double f_, weight_, exponent_;
         std::vector<TrialData> trials_;

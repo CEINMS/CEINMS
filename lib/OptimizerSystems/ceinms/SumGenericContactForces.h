@@ -31,6 +31,7 @@
 #include <vector>
 #include <string>
 #include <memory>
+#include "ceinms/ObjectiveFunctionBase.h"
 #include <OpenSim/OpenSim.h>
 #include "ceinms/TrialData.h"
 #include "Result.h"
@@ -40,21 +41,20 @@
 
 namespace ceinms {
 
-    class SumGenericContactForces {
+    class SumGenericContactForces : public ObjectiveFunctionBase {
     public:
+        SumGenericContactForces();
         SumGenericContactForces(const ObjectiveFunctionSetup& setup);
-        SumGenericContactForces() : f_(std::numeric_limits<double>::max()) {}
         //this is to respect the interface
-        void setDofsToCalibrate(const std::vector<std::string>& dofsToCalibrate) {};
-
-        void setTrials(const std::vector<TrialData>& trials) { dim_ = trials.size(); }
-        void calculate(const std::vector<Result>& results);
-        double getValue() const { return f_; }
+        void setDofsToCalibrate(const std::vector<std::string>& dofsToCalibrate) override {};
+        void setTrials(const std::vector<TrialData>& trials) override { dim_ = trials.size(); }
+        void calculate(const std::vector<Result>& results) override;
+        double getValue() const override { return f_; }
         void setSetup(const ObjectiveFunctionSetup& setup);
         //the contact model is associated to the subject, oly a contact model per calibration
         void setJointContactForcesNames(const std::vector<std::string>& contactForcesNames);
         void setBarrierParameters(double xL, double xR, double weight, double exponent);
-        void printCosts() const;
+        void printCosts() const override;
     private:
         std::size_t dim_;
         double f_, weight_, exponent_;

@@ -32,6 +32,7 @@
 #include "ceinms/MinTorqueError.h"
 #include "ceinms/SumGenericContactForces.h"
 #include "ceinms/ObjectiveFunctionSetup.h"
+#include "ceinms/ComposedObjectiveFunction.h"
 using ceinms::TrialData;
 #include "ceinms/QueuesToTrialData.h"
 #include "ceinms/EmgFromFile.h"
@@ -70,6 +71,7 @@ using std::list;
 #include <algorithm>
 #include "ceinms/Utilities.h"
 using namespace ceinms;
+#include <memory>
 
 void setLmtMaFilenames(const string& directory, const vector< string > dofNames, string& lmtDataFilename, vector< string >& maDataFilenames)
 {
@@ -260,27 +262,34 @@ int main(int argc, char** argv) {
                 BatchOpenSimEvaluator batchOsimEvaluator(trials);
                 batchEvaluator.evaluate(mySubject);
                 auto results(batchEvaluator.getResults());
-                std::cout << "E1\n" << std::flush;
                 batchOsimEvaluator.evaluate(results);
-                std::cout << "E2\n" << std::flush;
-
                 results = batchOsimEvaluator.getResults();
-                std::cout << "E3\n" << std::flush;
 
-                MinTorqueError error;
-                error.setDofsToCalibrate(mySubject.getDoFNames());
-                error.setTrials(trials);
-                error.calculate(results);
-                error.printCosts();
-                std::cout << "Torque error value: " << error.getValue() << std::endl << std::flush;
-                
+                std::cout << "Min Torque\n";
+                std::shared_ptr<MinTorqueError> error(new MinTorqueError());
+                error->setDofsToCalibrate(mySubject.getDoFNames());
+                error->setTrials(trials);
+                error->calculate(results);
+                error->printCosts();
+                std::cout << "Torque error value: " << error->getValue() << std::endl;
+                std::cout << "----------------------------\n\n";
          
-                SumGenericContactForces sumGenericCF;
-                sumGenericCF.setJointContactForcesNames(std::vector<std::string> {"hip_r", "knee_r", "ankle_r"});
-                sumGenericCF.setTrials(trials);
-                sumGenericCF.calculate(results);
-                sumGenericCF.printCosts();
-                std::cout << "Sum generic cf error value: " << sumGenericCF.getValue() << std::endl << std::flush;
+                std::cout << "SumGenericContactForces\n";
+                std::shared_ptr<SumGenericContactForces> sumGenericCF(new SumGenericContactForces());
+                sumGenericCF->setJointContactForcesNames(std::vector<std::string> {"hip_r", "knee_r", "ankle_r"});
+                sumGenericCF->setTrials(trials);
+                sumGenericCF->calculate(results);
+                sumGenericCF->printCosts();
+                std::cout << "Sum generic cf error value: " << sumGenericCF->getValue() << std::endl;
+                std::cout << "----------------------------\n\n";
+                std::cout << "Composed OBJ\n";
+                ComposedObjectiveFunction composedFunction({ error, sumGenericCF });
+                composedFunction.setDofsToCalibrate(mySubject.getDoFNames());
+                composedFunction.setTrials(trials);
+                composedFunction.calculate(results);
+                composedFunction.printCosts();
+                std::cout << "Composed function f value: " << composedFunction.getValue() << std::endl ;
+                std::cout << "----------------------------\n\n";
                 
                 //                   batchEvaluator.evaluate(mySubject);
                 //                   auto results2(batchEvaluator.getResults());
