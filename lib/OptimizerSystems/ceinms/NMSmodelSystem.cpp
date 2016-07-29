@@ -106,6 +106,7 @@ namespace ceinms {
         //batchEvaluator_.evaluateParallel(subject_);
         //       batchEvaluator_.evaluate(subject_);
         auto results(batchEvaluator_.getResults());
+
         if (hasOpenSimData_) {
             batchOpenSimEvaluator_->evaluate(results);
             results = batchOpenSimEvaluator_->getResults();

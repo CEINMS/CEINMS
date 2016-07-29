@@ -20,8 +20,7 @@ namespace ceinms {
 
     void BatchOpenSimEvaluator::evaluate(const std::vector<Result>& resultsFromCeinms) {
         
-        if (openSimResults_.empty())
-            openSimResults_ = resultsFromCeinms;
+        openSimResults_ = resultsFromCeinms;
        
         for (int i(0); i < resultsFromCeinms.size(); ++i) {
             openSimResults_.at(i).jointReactionForces = evaluate(jointContactForcesFromOpenSim_.at(i), resultsFromCeinms.at(i), osimTrialData_.at(i));

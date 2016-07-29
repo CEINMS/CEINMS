@@ -72,7 +72,7 @@
       <xs:element name="barrier" minOccurs="0" maxOccurs="unbounded" type="BarrierType"/>
    </xs:sequence>
     <xs:attribute type="xs:double" name="weight" use="optional" default="1"/>
-    <xs:attribute type="xs:double" name="exponent" use="optional" default="2" />
+    <xs:attribute type="xs:double" name="exponent" use="optional" default="1" />
   </xs:complexType>
   
   <xs:complexType name="GlobalParameterType"/>

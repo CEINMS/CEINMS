@@ -39,7 +39,7 @@ using std::string;
 #include <time.h>
 #include <limits>
 
-//#define LOG_SIMULATED_ANNEALING
+#define LOG_SIMULATED_ANNEALING
 
 namespace ceinms {
     namespace Optimizers {
@@ -117,7 +117,7 @@ namespace ceinms {
                             checkBounds(k);
 
 #ifdef LOG_SIMULATED_ANNEALING
-                            cout << "factorForV " << factorForV << endl;
+              /*              cout << "factorForV " << factorForV << endl;
                             cout << "x_ : ";
                             for (auto& val : x_)
                                 cout << val << " ";
@@ -126,7 +126,7 @@ namespace ceinms {
                             cout << "xp_ : ";
                             for (auto& val : xp_)
                                 cout << val << " ";
-                            cout << endl;
+                            cout << endl;*/
 #endif
 
                             optimizerSystem_.setParameters(xp_);
@@ -137,6 +137,7 @@ namespace ceinms {
 #ifdef LOG_SIMULATED_ANNEALING
                             cout << "fp_ : " << fp_ << endl;
                             cout << "evalNo " << noEval << endl;
+                            optimizerSystem_.printCosts();
 #endif
 
                             // if f' < f then
