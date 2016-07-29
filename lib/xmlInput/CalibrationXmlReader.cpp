@@ -192,6 +192,13 @@ namespace ceinms {
             calibrationStep.setBarrierList(readBarrierList(myObjFuc.torqueErrorAndSumKneeContactForces().get()));
 
         }
+        else if (myObjFuc.torqueErrorAndSumGenericContactForces().present()) {
+            calibrationStep.setObjectiveFunction(CalibrationCfg::TorqueErrorAndSumGenericContactForces,
+                myObjFuc.torqueErrorAndSumGenericContactForces()->weight(),
+                myObjFuc.torqueErrorAndSumGenericContactForces()->exponent());
+            calibrationStep.setBarrierList(readBarrierList(myObjFuc.torqueErrorAndSumGenericContactForces().get()));
+        }
+
         StepType::parameterSet_type::parameter_sequence& parameterSequence = step.parameterSet().parameter();
         StepType::parameterSet_type::parameter_iterator parIt = parameterSequence.begin();
         for (parIt; parIt != parameterSequence.end(); ++parIt) {

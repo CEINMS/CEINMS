@@ -52,4 +52,12 @@ namespace ceinms {
             it->printCosts();
 
     }
+
+    bool ComposedObjectiveFunction::calculateOpenSimData() const {
+
+        bool ans(false);
+        for (auto& obj : objectiveFunctions_)
+            ans |= obj->calculateOpenSimData();
+        return ans;
+    }
 }

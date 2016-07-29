@@ -71,7 +71,7 @@ target_link_libraries( CEINMScalibrate
       OutputConnectors
       OptimizationSystems
 	#  Optimizers
-	#  TrialData
+	  TrialData
       ${Boost_PROGRAM_OPTIONS_LIBRARY}
 )
 

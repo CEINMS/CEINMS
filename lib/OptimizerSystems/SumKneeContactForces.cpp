@@ -112,6 +112,7 @@ namespace ceinms {
             std::cout << "max " << names.at(1) << " " << maxValues.at(0) << " N" << std::endl;
 
             std::cout << std::endl;
+            std::cout << "Fobj = " << getValue() << std::endl;
         }
     }
 }

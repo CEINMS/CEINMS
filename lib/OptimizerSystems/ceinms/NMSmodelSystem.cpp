@@ -64,8 +64,9 @@ namespace ceinms {
         for (auto& t : trials) {
             hasOpenSimData_ &= t.hasOpenSimData();
         }
-        if (hasOpenSimData_) {
-            batchOpenSimEvaluator_.reset(trials);
+        hasOpenSimData_ &= objectiveFunction_.calculateOpenSimData();
+        if (hasOpenSimData_ ) {
+            batchOpenSimEvaluator_.reset(new BatchOpenSimEvaluator(trials));
         }
     }
 

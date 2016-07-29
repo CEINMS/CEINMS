@@ -106,6 +106,7 @@ namespace ceinms {
                 cout << contactForcesNames_.at(j) << " " << maxContactForces_.at(i).at(j) << " N" << endl;
             }
         }
+        std::cout << "Fobj = " << getValue() << std::endl;
     }
 }
   

@@ -53,6 +53,7 @@ namespace ceinms {
         void calculate(const std::vector<Result>& results) override;
         double getValue() const override{ return f_; }
         void printCosts() const override;
+        bool calculateOpenSimData() const override { return false; }
     private:
         void computeVariance();
         void updDofsToCalibrateIdx();

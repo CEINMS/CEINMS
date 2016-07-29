@@ -65,9 +65,6 @@ namespace ceinms {
         }
          std::vector<std::string> jointNames;
          jointContactModel->getJointNamesFromOsimModel(jointNames);
-         for (auto& e : jointNames)
-             std::cout << e << " ";
-         std::cout << std::endl;
          jointReactionForces.setLabels(jointNames);
         return jointReactionForces;
     }

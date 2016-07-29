@@ -55,6 +55,7 @@ namespace ceinms {
         void setJointContactForcesNames(const std::vector<std::string>& contactForcesNames);
         void setBarrierParameters(double xL, double xR, double weight, double exponent);
         void printCosts() const override;
+        bool calculateOpenSimData() const override { return true; }
     private:
         std::size_t dim_;
         double f_, weight_, exponent_;

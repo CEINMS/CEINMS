@@ -36,19 +36,21 @@
 #include "SumKneeContactForces.h"
 #include "Barrier.h"
 #include <cmath>
+#include "ceinms/ObjectiveFunctionBase.h"
 
 namespace ceinms {
 
     //this is going to become a composition of objective functions.. sooner or later..
-    class MinTorqueErrorAndContactForces {
+    class MinTorqueErrorAndContactForces : public ObjectiveFunctionBase {
     public:
         MinTorqueErrorAndContactForces(const MinTorqueError& torqueErrorFun, const SumKneeContactForces& sumKneeContactFun);
         //     MinTorqueErrorAndContactForces();
-        void setDofsToCalibrate(const std::vector<std::string>& dofsToCalibrate);
-        void setTrials(const std::vector<TrialData>& trials);
-        void calculate(const std::vector<Result>& results);
-        double getValue() const { return f_; }
-        void printCosts() const { minTorqueError_.printCosts(); sumKneeContactForces_.printCosts(); }
+        void setDofsToCalibrate(const std::vector<std::string>& dofsToCalibrate) override;
+        void setTrials(const std::vector<TrialData>& trials) override;
+        void calculate(const std::vector<Result>& results) override;
+        double getValue() const override { return f_; }
+        void printCosts() const override { minTorqueError_.printCosts(); sumKneeContactForces_.printCosts(); }
+        bool calculateOpenSimData() const override { return false; }
     private:
         MinTorqueError minTorqueError_;
         SumKneeContactForces sumKneeContactForces_;

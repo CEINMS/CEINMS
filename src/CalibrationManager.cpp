@@ -46,7 +46,9 @@ using std::vector;
 #include "ceinms/Activation/PiecewiseActivation.h"
 #include "ceinms/MinTorqueError.h"
 #include "ceinms/SumKneeContactForces.h"
+#include "ceinms/SumGenericContactForces.h"
 #include "ceinms/MinTorqueErrorAndContactForces.h"
+#include "ceinms/ComposedObjectiveFunction.h"
 
 #include "ceinms/SimulatedAnnealing.h"
 #include "ceinms/NMSmodelSystem.h"
@@ -113,9 +115,9 @@ namespace ceinms {
                 ParameterSet parameterSet;
                 currentCalibrationStep.getParameterSet(parameterSet);
                 ObjectiveFunctionSetup objectiveFunctionSetup = currentCalibrationStep.getObjectiveFunctionSetup();
-
+                MinTorqueError minTorqueError;
                 using MySystem = NMSmodelSystem < NMSmodelT, MinTorqueError > ;
-                MySystem system(mySubject, trials, MinTorqueError(), parameterSet, dofsToCalibrate);
+                MySystem system(mySubject, trials, minTorqueError, parameterSet, dofsToCalibrate);
 
                 SimulatedAnnealingParameters simanParameters;
                 calibrationXmlReader_.getOptimizationAlgorithmParameters(simanParameters);
@@ -153,13 +155,14 @@ namespace ceinms {
                 currentCalibrationStep.getParameterSet(parameterSet);
                 ObjectiveFunctionSetup objectiveFunctionSetup = currentCalibrationStep.getObjectiveFunctionSetup();
 
-                SumKneeContactForces sumKneeContacts(objectiveFunctionSetup);
-                sumKneeContacts.setContactModelSetup(contactModelCfg_.getContactModelSetupKneeBalance());
-                MinTorqueError minTorqueError;
-                MinTorqueErrorAndContactForces minTorqueErrorAndContactForces(minTorqueError, sumKneeContacts);
+                std::shared_ptr<SumGenericContactForces> sumGenericContacts(new SumGenericContactForces(objectiveFunctionSetup));
+                sumGenericContacts->setJointContactForcesNames(contactModelCfg_.getContactModelSetupOsim().joints);
+                std::shared_ptr<MinTorqueError> minTorqueError(new MinTorqueError());
 
-                using MySystem = NMSmodelSystem < NMSmodelT, MinTorqueErrorAndContactForces >;
-                MySystem system(mySubject, trials, minTorqueErrorAndContactForces, parameterSet, dofsToCalibrate);
+                ComposedObjectiveFunction objFunction({ minTorqueError, sumGenericContacts });
+
+                using MySystem = NMSmodelSystem < NMSmodelT, ComposedObjectiveFunction >;
+                MySystem system(mySubject, trials, objFunction, parameterSet, dofsToCalibrate);
 
                 SimulatedAnnealingParameters simanParameters;
                 calibrationXmlReader_.getOptimizationAlgorithmParameters(simanParameters);
@@ -286,7 +289,13 @@ namespace ceinms {
             std::cout << "ERROR: No data was read for trial " << trialId << std::endl;
             exit(EXIT_FAILURE);
         }
-        return queuesToTrialData.getTrialData();
+        
+        auto trial(queuesToTrialData.getTrialData());
+        if (mySubject.hasOpenSimModel())
+            trial.setOpenSimData(mySubject.getOpenSimModelFilename(), dataLocations.getExternalLoadsFile(), dataLocations.getMotionFile());
+
+        return trial;
+
     }
 
     template<typename NMSmodelT>

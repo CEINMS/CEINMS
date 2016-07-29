@@ -130,6 +130,7 @@ namespace ceinms {
 
     void MinTorqueError::printCosts() const {
 
+        std::cout << "Joint moments RMSE\n";
         for (size_t trialIndex(0); trialIndex < trials_.size(); ++trialIndex) {
             std::cout <<"Trial #" << trialIndex+1 << std::endl;
             for (auto& dofIdx : dofsToCalibrateIdx_.at(trialIndex)) {
@@ -139,5 +140,6 @@ namespace ceinms {
             }
             std::cout << std::endl;
         }
+        std::cout << "Fobj = " << getValue() << std::endl;
     }
 }

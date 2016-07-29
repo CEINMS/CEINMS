@@ -21,6 +21,7 @@ namespace ceinms {
         void calculate(const std::vector<Result>& results) override;
         double getValue() const override;
         void printCosts() const override;
+        bool calculateOpenSimData() const override; 
     private:
         std::vector<std::shared_ptr<ObjectiveFunctionBase>> objectiveFunctions_;
         double f_;

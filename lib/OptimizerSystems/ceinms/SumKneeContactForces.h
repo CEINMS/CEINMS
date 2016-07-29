@@ -54,6 +54,7 @@ namespace ceinms {
         void setContactModelSetup(const ContactModelKneeBalanceSetup& setup);
         void setBarrierParameters(double xL, double xR, double weight, double exponent);
         void printCosts() const override;
+        bool calculateOpenSimData() const override { return false; }
     private:
         double f_, weight_, exponent_;
         std::vector<TrialData> trials_;

@@ -14,6 +14,8 @@ namespace ceinms {
         virtual void calculate(const std::vector<Result>& results) = 0;
         virtual double getValue() const = 0;
         virtual void printCosts() const = 0;
+        virtual bool calculateOpenSimData() const = 0;
+
     };
 }
 #endif

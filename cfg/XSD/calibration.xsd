@@ -86,6 +86,7 @@
       <xs:element name="minimizeTorqueError" type="ObjectiveFunctionElementType"/>
       <xs:element name="sumKneeContactForces" type="ObjectiveFunctionElementType"/>
       <xs:element name="torqueErrorAndSumKneeContactForces" type="ObjectiveFunctionElementType"/>
+      <xs:element name="torqueErrorAndSumGenericContactForces" type="ObjectiveFunctionElementType"/>
     </xs:choice>
   </xs:complexType>
   <xs:simpleType name="DoFsType">
