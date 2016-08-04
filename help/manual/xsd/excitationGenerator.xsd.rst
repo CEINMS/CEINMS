@@ -1,3 +1,5 @@
+.. _excitationsDescFile:
+
 Excitation mappings description file
 ######################################
 
@@ -11,7 +13,8 @@ XML example
 .. code-block:: xml
 
     <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-    <excitationGenerator xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="excitationGenerator.xsd">
+    <excitationGenerator xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                         xsi:noNamespaceSchemaLocation="excitationGenerator.xsd">
 
     <inputSignals type="EMG">addmag_r bicfemlh_r gaslat_r gasmed_r
                 gmax_r gmed_r gra_r perlong_r
@@ -37,7 +40,7 @@ XML example
 
 An excitations mapping description file consists of a root element named ``excitationGenerator`` that contains the following elements:
 
-- ``inputSignals``: a list of identifiers for the input signals that are selected or combined to generate the excitation patterns for the model's MTUs. The identifiers need to match the labels that will be present in the excitations data file (TODO: add reference to the corresponding section in :ref:`prepareExperimentalData` ). Optionally, a ``type`` attribute can be added to specify the nature of these input signals *(e.g., *EMGenvelopes*, *synergies*, ...)
+- ``inputSignals``: a list of identifiers for the input signals that are selected or combined to generate the excitation patterns for the model's MTUs. The identifiers need to match the labels that will be present in the excitations data file ( see :ref:`prepareDataInputData` ). Optionally, a ``type`` attribute can be added to specify the nature of these input signals (e.g., *EMGenvelopes*, *synergies*, ...)
 - ``mapping``: a list of `excitation`_ elements
 
 excitation
@@ -50,8 +53,7 @@ Examples of most common cases:
 
 - one-to-one mapping is represented as a single input signal with weight 1
 - the mean of two signals is represented as a list of the two signals, each with weight 0.5
-- an unknown excitation is represented as an empty element. (TODO: reference the hybrid case, deep muscles, etc)
-
+- an unknown excitation is represented as an empty element.
 
 
 XSD grammar

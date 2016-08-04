@@ -15,7 +15,8 @@ XML example
 .. code-block:: xml
 
     <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-    <ceinmsCalibration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="ceinmsCalibrationSetup.xsd">
+    <ceinmsCalibration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                       xsi:noNamespaceSchemaLocation="ceinmsCalibrationSetup.xsd">
       <subjectFile>subject.xml</subjectFile>
       <excitationGeneratorFile>excitationGenerator-16To34.xml</excitationGeneratorFile>
       <calibrationFile>Calibration/calibrationTest.xml</calibrationFile>

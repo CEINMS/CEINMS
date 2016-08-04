@@ -8,4 +8,3 @@ Files in this category serve to define how to perform the simulation (see :ref:`
 
    xsd/ceinmsSetup.xsd
    xsd/execution.xsd
-

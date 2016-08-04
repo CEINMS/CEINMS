@@ -1,3 +1,5 @@
+.. _calibConfigFile:
+
 Calibration configuration file
 ##############################
 
@@ -12,16 +14,17 @@ XML example
 .. code-block:: xml
 
     <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-    <calibration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="calibration.xsd">
+    <calibration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                 xsi:noNamespaceSchemaLocation="calibration.xsd">
 
       <algorithm>
-          <simulatedAnnealing>
+        <simulatedAnnealing>
           <noEpsilon>4</noEpsilon>
-          <rt>0.3</rt>
-          <T>20</T>
-          <NS>15</NS>
-          <NT>5</NT>
-          <epsilon>1.E-3</epsilon>
+          <rt>0.1</rt>
+          <T>200000</T>
+          <NS>30</NS>
+          <NT>20</NT>
+          <epsilon>1.E-5</epsilon>
           <maxNoEval>200000</maxNoEval>
         </simulatedAnnealing>
       </algorithm>
@@ -47,43 +50,45 @@ XML example
                     <minimizeTorqueError/>
                 </objectiveFunction>
                 <parameterSet>
-	                <parameter>
-	                    <name>c1</name>
+                    <parameter>
+                        <name>c1</name>
                         <single/>
                         <absolute>
                             <range>-0.95 -0.05</range>
                         </absolute>
-	                </parameter>
-	                <parameter>
-	                    <name>c2</name>
+                    </parameter>
+                    <parameter>
+                        <name>c2</name>
                         <single/>
                         <absolute>
                             <range>-0.95 -0.05</range>
                         </absolute>
-	                </parameter>
-	                <parameter>
-	                    <name>shapeFactor</name>
+                    </parameter>
+                    <parameter>
+                        <name>shapeFactor</name>
                         <single/>
                         <absolute>
                             <range>-2.999 -0.001</range>
                         </absolute>
-	                </parameter>
-	                <parameter>
-	                    <name>tendonSlackLength</name>
+                    </parameter>
+                    <parameter>
+                        <name>tendonSlackLength</name>
                         <single/>
                         <relativeToSubjectValue>
                             <range>0.85 1.15</range>
                         </relativeToSubjectValue>
-	                </parameter>
+                    </parameter>
                     <parameter>
                         <name>strengthCoefficient</name>
                         <muscleGroups>
-                            <muscles>addbrev_r addlong_r addmag1_r addmag2_r addmag3_r </muscles>
+                            <muscles>addbrev_r addlong_r addmag1_r
+                                     addmag2_r addmag3_r </muscles>
                             <muscles>bicfemlh_r semimem_r semiten_r sar_r</muscles>
                             <muscles>bicfemsh_r</muscles>
                             <muscles>gaslat_r gasmed_r </muscles>
                             <muscles>gmax1_r gmax2_r gmax3_r</muscles>
-                            <muscles>gmed1_r gmed2_r gmed3_r gmin1_r gmin2_r gmin3_r</muscles>
+                            <muscles>gmed1_r gmed2_r gmed3_r
+                                     gmin1_r gmin2_r gmin3_r</muscles>
                             <muscles>gra_r recfem_r tfl_r</muscles>
                             <muscles>illiacus_r psoas_r</muscles>
                             <muscles>perbrev_r perlong_r perter_r tibant_r</muscles>
@@ -116,11 +121,17 @@ A calibration configuration file consists of a root element named ``calibration`
 algorithm
 =========
 
-This is the optimization algorithm that is used to minimize the objective function associated to each calibration `step`_ (``objectiveFunction`` element). At the moment, only the *simulated annealing* algorithm is available.
+This is the optimization algorithm that is used to minimize the objective function associated to each calibration `step`_ (``objectiveFunction`` element). At the moment, only the *simulated annealing* algorithm is available, that is described in :ref:`introSimAnnealing`.
 
+The parameters for the simulated annealing algorithm are:
 
-.. todo:: decide where to describe the simulated annealing and the meaning of its parameters
-
+- ``noEpsilon`` number of consecutive times that the cost function differs less than ``epsilon`` from the current optimum value
+- ``rt`` coefficient by which the temperature is multiplied when it is reduced
+- ``T`` initial value for the temperature
+- ``NS`` number of evaluation steps after which the step length is re-adjusted
+- ``NT`` number of step-length adjustment loops after which the temperature is decreased
+- ``epsilon`` threshold value to consider negligible the difference of current cost function value from optimal one
+- ``maxNoEval`` maximum number of evaluations of the cost function
 
 
 step

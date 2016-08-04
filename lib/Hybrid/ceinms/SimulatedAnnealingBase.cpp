@@ -1,0 +1,303 @@
+/* -------------------------------------------------------------------------- *
+ * CEINMS is a standalone toolbox for neuromusculoskeletal modelling and      *
+ * simulation. CEINMS can also be used as a plugin for OpenSim either         *
+ * through the OpenSim GUI or API. See https://simtk.org/home/ceinms and the  *
+ * NOTICE file for more information. CEINMS development was coordinated       *
+ * through Griffith University and supported by the Australian National       *
+ * Health and Medical Research Council (NHMRC), the US National Institutes of *
+ * Health (NIH), and the European Union Framework Programme 7 (EU FP7). Also  *
+ * see the PROJECTS file for more information about the funding projects.     *
+ *                                                                            *
+ * Copyright (c) 2010-2015 Griffith University and the Contributors           *
+ *                                                                            *
+ * CEINMS Contributors: C. Pizzolato, M. Reggiani, M. Sartori,                *
+ *                      E. Ceseracciu, and D.G. Lloyd                         *
+ *                                                                            *
+ * Author(s): M. Reggiani, C. Pizzolato                                       *
+ *                                                                            *
+ * CEINMS is licensed under the Apache License, Version 2.0 (the "License").  *
+ * You may not use this file except in compliance with the License. You may   *
+ * obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0.*
+ *                                                                            *
+ * Unless required by applicable law or agreed to in writing, software        *
+ * distributed under the License is distributed on an "AS IS" BASIS,          *
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.   *
+ * See the License for the specific language governing permissions and        *
+ * limitations under the License.                                             *
+ * -------------------------------------------------------------------------- */
+
+#include <iostream>
+using std::cout;
+using std::endl;
+
+#include <math.h>
+#include <vector>
+using std::vector;
+#include <string>
+using std::string;
+#include <cstdlib>
+#include "HybridWeightings.h"
+
+namespace ceinms {
+    //#define LOG_SIMULATED_ANNEALING
+    /*
+    template<typename NMSmodelT, typename Parameters, typename ObjectiveFunction, typename StaticComputationT>
+    SimulatedAnnealingBase<NMSmodelT, Parameters, ObjectiveFunction, StaticComputationT>::
+    SimulatedAnnealingBase (double nt, double ns, double rt, double t, double maxNoEval):
+    nt_(nt), ns_(ns), rt_(rt), t_(t), maxNoEval_(maxNoEval) {
+
+    srand(1.);
+    }*/
+
+
+
+    template<typename NMSmodelT, typename Parameters, typename ObjectiveFunction, typename StaticComputationT>
+    SimulatedAnnealingBase<NMSmodelT, Parameters, ObjectiveFunction, StaticComputationT>::SimulatedAnnealingBase(
+        NMSmodelT& mySubject,
+        vector<string>& muscleNamesWithEMGtoTrack,
+        vector<string>& muscleNamesWithEMGtoPredict,
+        const HybridWeightings hybridParameters,
+        StaticComputationT& staticComputation) :
+        parameters_(mySubject, muscleNamesWithEMGtoTrack, muscleNamesWithEMGtoPredict),
+        objectiveFunction_(staticComputation, 1e-4, 8, hybridParameters)
+    {
+
+        noParameters_ = parameters_.getNoParameters();
+        x_.resize(noParameters_);
+        parameters_.getStartingVectorParameters(x_);
+        parameters_.setUpperLowerBounds(upperBounds_, lowerBounds_);
+
+        xOpt_.resize(noParameters_);
+        v_.resize(noParameters_);
+        for (int i = 0; i < noParameters_; ++i)
+            v_.at(i) = (upperBounds_.at(i) - lowerBounds_.at(i)) / 2;
+        xp_.resize(noParameters_);
+        noAccepted_.resize(noParameters_);
+
+        nt_ = 5;
+        ns_ = 20;
+        rt_ = .4;
+        t_ = 20;
+        maxNoEval_ = 200000000;
+
+        srand(1.);
+
+    }
+
+
+    template<typename NMSmodelT, typename Parameters, typename ObjectiveFunction, typename StaticComputationT>
+    void SimulatedAnnealingBase<NMSmodelT, Parameters, ObjectiveFunction, StaticComputationT>::setAnnealingParameters(unsigned nt, unsigned ns, double rt, double t, unsigned maxNoEval, double epsilon, unsigned noEpsilon) {
+
+        nt_ = nt;
+        ns_ = ns;
+        rt_ = rt;
+        t_ = t;
+        maxNoEval_ = maxNoEval;
+        objectiveFunction_.setEpsilon(epsilon);
+        objectiveFunction_.setNoEpsilon(noEpsilon);
+    }
+
+
+    template<typename NMSmodelT, typename Parameters, typename ObjectiveFunction, typename StaticComputationT>
+    void SimulatedAnnealingBase<NMSmodelT, Parameters, ObjectiveFunction, StaticComputationT>::checkBounds(int k) {
+
+        if ((xp_.at(k) < lowerBounds_.at(k)) ||
+            (xp_.at(k) > upperBounds_.at(k)))
+            xp_.at(k) = lowerBounds_.at(k) + ((upperBounds_.at(k) - lowerBounds_.at(k)) * rand() / RAND_MAX);
+
+
+    }
+
+    template<typename NMSmodelT, typename Parameters, typename ObjectiveFunction, typename StaticComputationT>
+    void SimulatedAnnealingBase<NMSmodelT, Parameters, ObjectiveFunction, StaticComputationT>::optimize() {
+
+        int noEval = 0;
+        for (int i = 0; i < noParameters_; ++i)
+            noAccepted_.at(i) = 0;
+        // DO UNTIL convergence or maxNoEvaluation
+        bool terminate = false;
+        while ((!terminate) && (noEval < maxNoEval_)) {
+
+            // DO Nt times
+            for (int i = 0; i < nt_; ++i) {
+
+                // DO Ns times
+                for (int j = 0; j < ns_; ++j) {
+
+                    // DO i = 1, n
+                    for (int k = 0; k < noParameters_; ++k) {
+
+#ifdef LOG_SIMULATED_ANNEALING
+                        cout << "\ni: " << i << "/" << nt_
+                            << " j: " << j << "/" << ns_
+                            << " k: " << k << "/" << noParameters_ << endl;
+#endif
+                        //:TODO: check with massimo
+                        // loro mettono qui (if NEVALS>=MAXEVAL)
+                        //  return....
+                        // io penso abbia piu` senso metterlo fuori
+                        // (condizione while)
+
+#ifdef LOG_SIMULATED_ANNEALING
+                        cout << "x_ : ";
+                        for (unsigned int it = 0; it < x_.size(); ++it)
+                            cout << x_.at(it) << " ";
+                        cout << endl;
+#endif
+                        // x'_i = x_i + r v_i
+                        xp_ = x_;
+
+                        double factorForV = (2.*rand() / static_cast<double>(RAND_MAX)-1.);
+                        xp_.at(k) = x_.at(k) + v_.at(k) * factorForV;
+                        checkBounds(k);
+
+#ifdef LOG_SIMULATED_ANNEALING
+                        cout << "xp_ : ";
+                        for (unsigned int it = 0; it < xp_.size(); ++it)
+                            cout << xp_.at(it) << " ";
+                        cout << endl;
+#endif
+
+                        parameters_.setVectorParameters(xp_);
+
+                        // objectiveFunction_ ha al suo interno un riferimento
+                        // a TorqueComputation_ che fa girare il codice del modello
+                        // per avere come output torque e penalty
+                        objectiveFunction_.evalFp();
+                        ++noEval;
+
+#ifdef LOG_SIMULATED_ANNEALING
+                        cout << "eval no. " << noEval << endl;
+                        objectiveFunction_.printFs();
+#endif
+
+                        // if f' < f then
+                        if (objectiveFunction_.isFacceptable()) {
+                            // X = X'
+                            x_ = xp_;
+                            // f = f'
+                            objectiveFunction_.updateF();  // f_ = fp_;
+                            // update statistics
+                            noAccepted_.at(k)++;
+
+#ifdef LOG_SIMULATED_ANNEALING
+                            cout << "F is ACCEPTABLE\n";
+#endif
+
+                            // if f' < fopt then
+                            //if (fp_ < fOpt_) {
+                            if (objectiveFunction_.isFoptAcceptable()) {
+                                // Xopt = X'
+                                xOpt_ = xp_;
+                                // fOpt = f'
+                                objectiveFunction_.updateFopt(); // fOpt_ = fp_;
+
+#ifdef LOG_SIMULATED_ANNEALING
+                                cout << "Fopt is ACCEPTABLE\n";
+#endif
+                            }
+                        }
+                        else { // IF f' > f THEN
+                            double p = objectiveFunction_.computeMetropolisCriteria(t_);
+                            double randomValue = rand() / static_cast<double>(RAND_MAX);
+
+                            if (randomValue < p) {
+#ifdef LOG_SIMULATED_ANNEALING
+                                cout << "through Metropolis " << randomValue << "<" << p;
+                                cout << " is acceptable\n";
+#endif
+                                x_ = xp_;             // X = X'
+                                objectiveFunction_.updateF(); // f_ = fp_;
+                                noAccepted_.at(k)++;
+                            }
+                            else {
+#ifdef LOG_SIMULATED_ANNEALING
+                                cout << "through Metropolis NOT ACCEPTABLE\n";
+#endif
+                            }
+
+                        }
+
+                    } // k
+
+                } // j
+
+                // Adjust V such that half of all trial are accepted
+
+                vector<double> c;
+                c.resize(noParameters_);
+                for (int h = 0; h < noParameters_; ++h)
+                    c.at(h) = 2.;
+
+                for (int h = 0; h < noParameters_; ++h) {
+                    double ratio = noAccepted_.at(h) / ns_;
+                    if (ratio > 0.6)
+                        v_.at(h) = v_.at(h) * (1 + c.at(h) * (ratio - 0.6) / 0.4);
+                    else if (ratio < 0.4)
+                        v_.at(h) = v_.at(h) / (1 + c.at(h) * ((0.4 - ratio) / 0.4));
+                    if (v_.at(h) >(upperBounds_.at(h) - lowerBounds_.at(h)))
+                        v_.at(h) = upperBounds_.at(h) - lowerBounds_.at(h);
+                }
+
+                for (int h = 0; h < noParameters_; ++h)
+                    noAccepted_.at(h) = 0.;
+
+            } // i
+
+            // terminate?
+            terminate = objectiveFunction_.terminate();
+
+            // reduce temperature
+            t_ = t_ * rt_;
+#ifdef LOG_SIMULATED_ANNEALING
+            cout << "Temperature reduced at: " << t_ << endl;
+#endif
+            objectiveFunction_.updateFandFlatest();
+            // restart
+            x_ = xOpt_;
+
+        }  /* end while */
+        //NOTE: the following two lines are important for the static opt
+        parameters_.setVectorParameters(xOpt_);
+        objectiveFunction_.evalFp();
+        cout << "total evaluations:" << noEval << endl;
+        objectiveFunction_.printFs();
+    }
+
+
+    template<typename NMSmodelT, typename Parameters, typename ObjectiveFunction, typename StaticComputationT>
+    void SimulatedAnnealingBase<NMSmodelT, Parameters, ObjectiveFunction, StaticComputationT>::getXopt(vector<double>& xOpt) const {
+
+        xOpt = xOpt_;
+    }
+
+
+    template<typename NMSmodelT, typename Parameters, typename ObjectiveFunction, typename StaticComputationT>
+    std::ostream& operator<< (std::ostream& output,
+        const SimulatedAnnealingBase<NMSmodelT, Parameters, ObjectiveFunction, StaticComputationT>& sa)
+    {
+        output << "NT:        " << sa.nt_ << endl;
+        output << "NS:        " << sa.ns_ << endl;
+        output << "RT:        " << sa.rt_ << endl;
+        output << "T:         " << sa.t_ << endl;
+        output << "MaxNoEval: " << sa.maxNoEval_ << endl;
+
+        output << "X:  ";
+        for (unsigned int i = 0; i < sa.x_.size(); ++i)
+            output << sa.x_.at(i) << " ";
+        output << endl;
+
+        output << "Upper Bounds:  ";
+        for (unsigned int i = 0; i < sa.upperBounds_.size(); ++i)
+            output << sa.upperBounds_.at(i) << " ";
+        output << endl;
+
+        output << "Lower Bounds: ";
+        for (unsigned int i = 0; i < sa.lowerBounds_.size(); ++i)
+            output << sa.lowerBounds_.at(i) << " ";
+        output << endl;
+
+        return output;
+    }
+
+}

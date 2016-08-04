@@ -1,0 +1,75 @@
+CEINMS: NOTICE
+---------------
+
+The CEINMS Toolbox for OpenSim uses the open source Apache 2.0 license (below), 
+making it suitable for any use commercial, government, academic, or personal. 
+Please see the notes below the license for more information about how to 
+acknowledge us.
+
+/* -------------------------------------------------------------------------- *
+ *                               CEINMS License                               *
+ * -------------------------------------------------------------------------- *
+ * CEINMS is a standalone toolbox for neuromusculoskeletal modelling and      *
+ * simulation. CEINMS can also be used as a plugin for OpenSim as either      *
+ * through the OpenSim GUI or API. See https://simtk.org/home/ceinms and      *
+ * below for more information. CEINMS development is coordinated through      * 
+ * Griffith University and supported by the Australian National Health and    *
+ * Medical Research Council (NHMRC), the US National Institutes of Health     *
+ * (NIH), and the European Union Framework Programme 7 (EU FP7). Also see the *
+ * PROJECTS file for more information about the funding projects.             *
+ *                                                                            *
+ * Copyright (c) 2010-2015 Griffith University, the Contributors and Authors  *
+ *                                                                            *
+ * CEINMS Contributors: Pizzolato, C., Reggiani, M., Sartori, M.,             *
+ *                      Ceseracciu, E., and Lloyd, D.G.                       *
+ *                                                                            *
+ * CEINMS is licensed under the Apache License, Version 2.0 (the "License").  * 
+ * You may not use this CEINMS except in compliance with the License. You may *
+ * obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0.*
+ *                                                                            *
+ * Unless required by applicable law or agreed to in writing, software        *
+ * distributed under the License is distributed on an "AS IS" BASIS,          *
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.   *
+ * See the License for the specific language governing permissions and        *
+ * limitations under the License.                                             *
+ * -------------------------------------------------------------------------- */
+
+ How to Acknowledge Us
+---------------------
+Acknowledging the CEINMS project helps us and helps you. It allows us to track
+our impact, which is essential for securing funding to improve the software and
+provide support to our users (you).
+If you use the CEINMS, you must acknowledge the CEINMS where appropriate, by 
+citing the following paper. 
+
+Pizzolato, C., Lloyd D.G., Sartori, M., Fregly B.J., Ceseracciu E., 
+Besier T.F., Reggiani, M., CEINMS: a toolbox to investigate the influence 
+of different neural solutions on the prediction of muscle excitation 
+and joint moments during dynamic motor tasks, Journal of Biomechanics (submitted)
+
+In addition, if you use the EMG-driven operation mode on single-dof models could 
+you please cite
+
+Lloyd D.G., Besier T.F. An EMG-driven musculoskeletal model to estimate
+muscle forces and knee joint moments in vivo, Journal of Biomechanics 
+36(6):765-776, 2003.
+
+or if you use the EMG-driven operation mode on multi-dof models
+
+Sartori M., Reggiani, M., Pagello E., Lloyd D.G., EMG-driven forward-
+dynamic estimation of muscle force and joint moment about multiple degrees 
+of freedom in the human lower extremity, Plos One, 7(12): e52618, 2012.
+
+or if you use the EMG-assisted or static optimisation operation modes could you 
+please cite
+
+Sartori M., Farina D., Lloyd D.G. Hybrid neuromusculoskeletal modelling 
+best tracks joint moments using a balance between muscle-excitations derived 
+from EMG and optimization. Journal of Biomechanics 47(15): 3613–3621, 2014.
+
+If possible we would also be grateful if you mention that CEINMS was funded by 
+Australian National Health and Medical Research Council (NHMRC), the US National 
+Institutes of Health (NIH), and the European Union Framework Programme 7 (EU FP7). 
+We greatly appreciate this support, and the NHMRC, NIH and EU FP7 appreciate knowing 
+that their funds are having an impact, particularly on medical research and human 
+health.

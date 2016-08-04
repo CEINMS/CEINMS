@@ -5,16 +5,35 @@
   <xs:annotation>
     <xs:documentation xml:lang="en"/>
   </xs:annotation>
+
+  <xs:complexType name="AngleInputType">
+    <xs:simpleContent>
+      <xs:extension base="xs:double">
+        <xs:attribute name="unit" default="rad">
+          <xs:simpleType>
+            <xs:restriction base="xs:string">
+              <xs:enumeration value="deg" />
+              <xs:enumeration value="rad" />
+            </xs:restriction>
+          </xs:simpleType>
+        </xs:attribute>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+  
+  
   <xs:complexType name="MTUType">
     <xs:sequence>
-      <xs:element name="name" type="xs:string"/>
+      <xs:element name="name" type="xs:token"/>
       <xs:element minOccurs="0" name="emDelay" type="xs:double"/>
       <xs:element name="c1" type="xs:double"/>
       <xs:element name="c2" type="xs:double"/>
       <xs:element name="shapeFactor" type="xs:double"/>
       <xs:element name="optimalFibreLength" type="xs:double"/>
-      <xs:element name="pennationAngle" type="xs:double"/>
+      <xs:element name="pennationAngle" type="AngleInputType"/>
       <xs:element name="tendonSlackLength" type="xs:double"/>
+      <xs:element minOccurs="0" name="maxContractionVelocity" type="xs:double"/>
+      <xs:element minOccurs="0" name="damping" type="xs:double"/>
       <xs:element name="maxIsometricForce" type="xs:double"/>
       <xs:element name="strengthCoefficient" type="xs:double"/>
     </xs:sequence>
@@ -25,16 +44,16 @@
     </xs:sequence>
   </xs:complexType>
   <xs:simpleType name="MTUNameSetType">
-    <xs:list itemType="xs:string"/>
+    <xs:list itemType="xs:token"/>
   </xs:simpleType>
   <xs:complexType name="DoFType">
     <xs:sequence>
-      <xs:element name="name" type="xs:string"/>
+      <xs:element name="name" type="xs:token"/>
       <xs:element name="mtuNameSet" type="MTUNameSetType"/>
     </xs:sequence>
   </xs:complexType>
   <xs:simpleType name="CalibrationSequenceType">
-    <xs:list itemType="xs:string"/>
+    <xs:list itemType="xs:token"/>
   </xs:simpleType>
   <xs:complexType name="CalibratedType">
     <xs:sequence>
@@ -44,7 +63,7 @@
   </xs:complexType>
   <xs:complexType name="UncalibratedType">
     <xs:sequence>
-      <xs:element name="subjectID" type="xs:string"/>
+      <xs:element name="subjectID" type="xs:token"/>
       <xs:element name="additionalInfo" type="xs:string"/>
     </xs:sequence>
   </xs:complexType>
@@ -64,7 +83,7 @@
   </xs:simpleType>
   <xs:complexType name="CurveType">
     <xs:sequence>
-      <xs:element name="name" type="xs:string"/>
+      <xs:element name="name" type="xs:token"/>
       <xs:element name="xPoints" type="PointsSequenceType"/>
       <xs:element name="yPoints" type="PointsSequenceType"/>
     </xs:sequence>

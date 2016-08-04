@@ -209,5 +209,3 @@ template <typename XSDfile> std::auto_ptr<XSDfile> parseAndValidate(const std::s
   }
 
 }
-
-

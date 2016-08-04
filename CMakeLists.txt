@@ -2,6 +2,9 @@
 
 cmake_minimum_required (VERSION 2.8.11) # "target_include_directories" command  and VS12 generator are missing in previous versions
 project(CEINMS)
+set(CEINMS_MAJOR_VERSION 0)
+set(CEINMS_MINOR_VERSION 9)
+set(CEINMS_PATCH_VERSION 0)
 
 # Include GNUInstallDirs to get canonical paths
 include(GNUInstallDirs)
@@ -23,6 +26,7 @@ endif(UNIX)
 set(CMAKE_VERBOSE_MAKEFILE OFF)
 
 set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
+include(CeinmsPack)
 
 set(Boost_USE_STATIC_LIBS   ON)
 set(Boost_USE_MULTITHREADED ON)
@@ -41,6 +45,18 @@ if(MSVC)
     set(CMAKE_DEBUG_POSTFIX "d")
 endif(MSVC)
 
+option(CEINMS_VERBOSE_DEBUG "Print debug messages" OFF)
+option(CEINMS_VERBOSE_DEEP_DEBUG "Print LOTS of debug messages" OFF)
+if (CEINMS_VERBOSE_DEBUG)
+    add_definitions(/DDEBUG)
+endif()
+
+if (CEINMS_VERBOSE_DEEP_DEBUG)
+    add_definitions(/DDEEP_DEBUG)
+endif()
+
+add_definitions(/D_USE_MATH_DEFINES)
+
 add_subdirectory(lib)
 add_subdirectory(src)
 add_subdirectory(docs)
@@ -58,7 +74,7 @@ configure_package_config_file(cmake/CEINMSConfig.cmake.in
                               PATH_VARS CMAKE_INSTALL_INCLUDEDIR)
 
 write_basic_package_version_file(${CMAKE_CURRENT_BINARY_DIR}/CEINMSConfigVersion.cmake
-                                    VERSION 0.2.1
+                                    VERSION ${CEINMS_MAJOR_VERSION}.${CEINMS_MINOR_VERSION}.${CEINMS_PATCH_VERSION}
                                     COMPATIBILITY ExactVersion )
 
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/CEINMSConfig.cmake

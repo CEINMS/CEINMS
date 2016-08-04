@@ -35,13 +35,13 @@ schema_to_bin(${CMAKE_SOURCE_DIR}/cfg/XSD/ceinmsCalibrationSetup.xsd)
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
 # Generate c++ code for xsd schema files
-xsd_schema(subject_GENERATED ${CMAKE_SOURCE_DIR}/cfg/XSD/subject.xsd --generate-serialization)
-xsd_schema(excitationGenerator_GENERATED ${CMAKE_SOURCE_DIR}/cfg/XSD/excitationGenerator.xsd --generate-serialization)
+xsd_schema(subject_GENERATED ${CMAKE_SOURCE_DIR}/cfg/XSD/subject.xsd --generate-serialization --namespace-map =SubjectXsd)
+xsd_schema(excitationGenerator_GENERATED ${CMAKE_SOURCE_DIR}/cfg/XSD/excitationGenerator.xsd --generate-serialization --namespace-map =ExcitationGeneratorXsd)
 xsd_schema(calibration_GENERATED ${CMAKE_SOURCE_DIR}/cfg/XSD/calibration.xsd --generate-serialization --namespace-map =CalibrationXsd)
-xsd_schema(execution_GENERATED ${CMAKE_SOURCE_DIR}/cfg/XSD/execution.xsd --generate-serialization)
-xsd_schema(inputData_GENERATED ${CMAKE_SOURCE_DIR}/cfg/XSD/inputData.xsd --generate-serialization)
-xsd_schema(ceinmsSetup_GENERATED ${CMAKE_SOURCE_DIR}/cfg/XSD/ceinmsSetup.xsd --generate-serialization)
-xsd_schema(ceinmsCalibrationSetup_GENERATED ${CMAKE_SOURCE_DIR}/cfg/XSD/ceinmsCalibrationSetup.xsd --generate-serialization)
+xsd_schema(execution_GENERATED ${CMAKE_SOURCE_DIR}/cfg/XSD/execution.xsd --generate-serialization --namespace-map =ExecutionXsd)
+xsd_schema(inputData_GENERATED ${CMAKE_SOURCE_DIR}/cfg/XSD/inputData.xsd --generate-serialization --namespace-map =InputDataXsd)
+xsd_schema(ceinmsSetup_GENERATED ${CMAKE_SOURCE_DIR}/cfg/XSD/ceinmsSetup.xsd --generate-serialization --namespace-map =CeinmsSetupXsd)
+xsd_schema(ceinmsCalibrationSetup_GENERATED ${CMAKE_SOURCE_DIR}/cfg/XSD/ceinmsCalibrationSetup.xsd --generate-serialization --namespace-map =CeinmsCalibrationSetupXsd)
 
 set(xmlInput_SOURCES    ExecutionXmlReader.cpp
                         CalibrationXmlReader.cpp
@@ -61,15 +61,15 @@ set(schemas_GENERATED_SOURCES  ${CMAKE_CURRENT_BINARY_DIR}/execution-schema.cxx
                                 ${CMAKE_CURRENT_BINARY_DIR}/ceinmsSetup-schema.cxx
                                 ${CMAKE_CURRENT_BINARY_DIR}/ceinmsCalibrationSetup-schema.cxx)
 
-set(xmlInput_HEADERS    ExecutionXmlReader.h
-                        NMSmodelConfig.h
-                        CalibrationXmlReader.h
-                        CalibrationCfg.h
-                        SubjectXmlReader.h
-                        ExcitationGeneratorXmlReader.h
-                        InputDataXmlReader.h
-                        CeinmsSetupXmlReader.h
-                        CeinmsCalibrationSetupXmlReader.h
+set(xmlInput_HEADERS    ceinms/ExecutionXmlReader.h
+                        ceinms/NMSmodelConfig.h
+                        ceinms/CalibrationXmlReader.h
+                        ceinms/CalibrationCfg.h
+                        ceinms/SubjectXmlReader.h
+                        ceinms/ExcitationGeneratorXmlReader.h
+                        ceinms/InputDataXmlReader.h
+                        ceinms/CeinmsSetupXmlReader.h
+                        ceinms/CeinmsCalibrationSetupXmlReader.h
                         )
 
 set(xmlInput_IMPL_HEADERS   impl/grammar-input-stream.hxx
@@ -127,16 +127,24 @@ add_library(xmlInput STATIC ${xmlInput_SOURCES}
                             )
 
 target_link_libraries(xmlInput ceinms_common ${XERCES_LIBRARIES})
-target_include_directories(xmlInput PRIVATE ${ceinms_common_INCLUDE_DIRS} impl PUBLIC ${XSD_INCLUDE_DIR} ${XERCES_INCLUDE_DIR})
+target_include_directories(xmlInput PRIVATE ceinms ${ceinms_common_INCLUDE_DIRS} impl PUBLIC ${XSD_INCLUDE_DIR} ${XERCES_INCLUDE_DIR})
 
-set(xmlInput_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR} ${XSD_INCLUDE_DIR} ${XERCES_INCLUDE_DIR} CACHE INTERNAL "Include directory for xmlInput library")
-mark_as_advanced(xmlInput_INCLUDE_DIRS)
+set(xmlInput_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}" ${CMAKE_CURRENT_BINARY_DIR} ${XSD_INCLUDE_DIR} ${XERCES_INCLUDE_DIR} CACHE INTERNAL "Include directory for xmlInput library")
 
-install(FILES ${xmlInput_HEADERS} ${xmlInput_GENERATED_HEADERS} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}) #should add namespace
+install(FILES   ${xmlInput_HEADERS}
+                ${schemas_GENERATED_HEADERS}
+                ${subject_GENERATED_HEADERS}
+                ${excitationGenerator_GENERATED_HEADERS}
+                ${calibration_GENERATED_HEADERS}
+                ${execution_GENERATED_HEADERS}
+                ${inputData_GENERATED_HEADERS}
+                ${ceinmsSetup_GENERATED_HEADERS}
+                ${ceinmsCalibrationSetup_GENERATED_HEADERS}
+        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/ceinms COMPONENT Development)
 install(TARGETS xmlInput
         EXPORT CEINMSTargets
-        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT Applications
+        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT Development
+        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT Development
         # INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR} # only available from CMake 2.8.12
         )

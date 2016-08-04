@@ -2,14 +2,14 @@
 
 # List source files
 set(OutputConnectors_SOURCES
-    OutputQueues.cpp
+    OutputConnectors.cpp
     LoggerOnQueues.cpp
     QueuesToTrialData.cpp
 )
 set(OutputConnectors_HEADERS 
-    OutputQueues.h
-    LoggerOnQueues.h
-    QueuesToTrialData.h
+    ceinms/OutputConnectors.h
+    ceinms/LoggerOnQueues.h
+    ceinms/QueuesToTrialData.h
 )
 
 set(QueuesToStorageFiles_SOURCES
@@ -17,7 +17,7 @@ set(QueuesToStorageFiles_SOURCES
 )
 
 set(QueuesToStorageFiles_HEADERS
-  QueuesToStorageFiles/QueuesToStorageFiles.h
+    ceinms/QueuesToStorageFiles.h
 )
 
 # Define target
@@ -33,17 +33,16 @@ target_include_directories(OutputConnectors
                                         ${ceinms_common_INCLUDE_DIRS}
                                         ${InputConnectors_INCLUDE_DIRS}
                                         ${Concurrency_INCLUDE_DIRS}
-                                        ${Calibration_INCLUDE_DIRS}
+                                        ${TrialData_INCLUDE_DIRS}
                                 PUBLIC ${Boost_INCLUDE_DIRS})
 
 # Save path to include directory for "internal" usage
-set(OutputConnectors_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/QueuesToStorageFiles CACHE STRING "Include directories for OutputConnectors library" FORCE)
-mark_as_advanced(OutputConnectors_INCLUDE_DIRS)
+set(OutputConnectors_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}" CACHE INTERNAL "Include directories for OutputConnectors library")
 
 # Install
-install(FILES ${OutputConnectors_HEADERS} ${QueuesToStorageFiles_HEADERS} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}) #should add namespace
+install(FILES ${OutputConnectors_HEADERS} ${QueuesToStorageFiles_HEADERS} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/ceinms COMPONENT Development)
 install(TARGETS OutputConnectors
         EXPORT CEINMSTargets
-        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
+        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT Applications
+        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT Development
+        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT Development)

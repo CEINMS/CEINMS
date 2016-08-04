@@ -13,15 +13,18 @@ XML example
 .. code-block:: xml
 
     <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-    <subject xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="subject.xsd">
+    <subject xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:noNamespaceSchemaLocation="subject.xsd">
         <mtuDefault>
             <emDelay>0.015</emDelay>
             <percentageChange>0.15</percentageChange>
             <damping>0.1</damping>
             <curve>
                 <name>activeForceLength</name>
-                <xPoints>-5 0 0.401 0.402 0.4035 0.52725 0.62875 0.71875 0.86125 1.045 1.2175 1.43875 1.61875 1.62 1.621 2.2 5</xPoints>
-                <yPoints>0 0 0 0 0 0.226667 0.636667 0.856667 0.95 0.993333 0.77 0.246667 0 0 0 0 0</yPoints>
+                <xPoints>-5 0 0.401 0.402 0.4035 0.52725 0.62875 0.71875 0.86125 1.045
+                          1.2175 1.43875 1.61875 1.62 1.621 2.2 5</xPoints>
+                <yPoints>0 0 0 0 0 0.226667 0.636667 0.856667 0.95 0.993333 0.77
+                         0.246667 0 0 0 0 0</yPoints>
             </curve>
             <curve>
                 <name>passiveForceLength</name>
@@ -32,6 +35,13 @@ XML example
                 <name>forceVelocity</name>
                 <xPoints>-10 -1 -0.6 -0.3 -0.1 0 0.1 0.3 0.6 0.8 10</xPoints>
                 <yPoints>0 0 0.08 0.2 0.55 1 1.4 1.6 1.7 1.75 1.75</yPoints>
+            </curve>
+            <curve>
+                <name>tendonForceStrain</name>
+                <xPoints>-10 -0.002 -0.001 0 0.00131 0.00281 0.00431 0.00581
+                    0.00731 0.00881 0.0103 0.0118 0.0123 9.2 9.201 9.202 20</xPoints>
+                <yPoints>0 0 0 0 0.0108 0.0257 0.0435 0.0652 0.0915
+                         0.123 0.161 0.208 0.227 345 345 345 345</yPoints>
             </curve>
         </mtuDefault>
         <mtuSet>
@@ -64,23 +74,38 @@ XML example
         <dofSet>
             <dof>
                 <name>hip_flexion_r</name>
-                <mtuNameSet>add_brev_r add_long_r add_mag1_r add_mag2_r add_mag3_r bifemlh_r glut_max1_r glut_max2_r glut_max3_r glut_med1_r glut_med2_r glut_med3_r glut_min1_r glut_min2_r glut_min3_r grac_r iliacus_r psoas_r rect_fem_r sar_r semimem_r semiten_r tfl_r</mtuNameSet>
+                <mtuNameSet>add_brev_r add_long_r add_mag1_r add_mag2_r add_mag3_r
+                            bifemlh_r glut_max1_r glut_max2_r glut_max3_r glut_med1_r
+                            glut_med2_r glut_med3_r glut_min1_r glut_min2_r
+                            glut_min3_r grac_r iliacus_r psoas_r rect_fem_r
+                            sar_r semimem_r semiten_r tfl_r</mtuNameSet>
             </dof>
             <dof>
                 <name>hip_adduction_r</name>
-                <mtuNameSet>add_brev_r add_long_r add_mag1_r add_mag2_r add_mag3_r bifemlh_r glut_max1_r glut_max2_r glut_max3_r glut_med1_r glut_med2_r glut_med3_r glut_min1_r glut_min2_r glut_min3_r grac_r iliacus_r psoas_r rect_fem_r sar_r semimem_r semiten_r tfl_r</mtuNameSet>
+                <mtuNameSet>add_brev_r add_long_r add_mag1_r add_mag2_r add_mag3_r
+                            bifemlh_r glut_max1_r glut_max2_r glut_max3_r glut_med1_r
+                            glut_med2_r glut_med3_r glut_min1_r glut_min2_r
+                            glut_min3_r grac_r iliacus_r psoas_r rect_fem_r
+                            sar_r semimem_r semiten_r tfl_r</mtuNameSet>
             </dof>
             <dof>
                 <name>hip_rotation_r</name>
-                <mtuNameSet>add_brev_r add_long_r add_mag1_r add_mag2_r add_mag3_r bifemlh_r glut_max1_r glut_max2_r glut_max3_r glut_med1_r glut_med2_r glut_med3_r glut_min1_r glut_min2_r glut_min3_r grac_r iliacus_r psoas_r rect_fem_r sar_r semimem_r semiten_r tfl_r</mtuNameSet>
+                <mtuNameSet>add_brev_r add_long_r add_mag1_r add_mag2_r add_mag3_r
+                            bifemlh_r glut_max1_r glut_max2_r glut_max3_r glut_med1_r
+                            glut_med2_r glut_med3_r glut_min1_r glut_min2_r
+                            glut_min3_r grac_r iliacus_r psoas_r rect_fem_r
+                            sar_r semimem_r semiten_r tfl_r</mtuNameSet>
             </dof>
             <dof>
                 <name>knee_angle_r</name>
-                <mtuNameSet>bifemlh_r bifemsh_r lat_gas_r med_gas_r grac_r rect_fem_r sar_r semimem_r semiten_r tfl_r vas_int_r vas_lat_r vas_med_r</mtuNameSet>
+                <mtuNameSet>bifemlh_r bifemsh_r lat_gas_r med_gas_r grac_r
+                            rect_fem_r sar_r semimem_r semiten_r tfl_r
+                            vas_int_r vas_lat_r vas_med_r</mtuNameSet>
             </dof>
             <dof>
                 <name>ankle_angle_r</name>
-                <mtuNameSet>lat_gas_r med_gas_r per_brev_r per_long_r per_tert_r soleus_r tib_ant_r</mtuNameSet>
+                <mtuNameSet>lat_gas_r med_gas_r per_brev_r per_long_r
+                            per_tert_r soleus_r tib_ant_r</mtuNameSet>
             </dof>
         </dofSet>
         <calibrationInfo>
@@ -97,7 +122,7 @@ A subject description file consists of a root element named ``subject`` that con
 - ``mtuDefault`` that contains the parameters that describe muscle (or, to be more precise, muscle-tendon-unit, MTU) properties common to all muscles (see `mtuDefault`_)
 - ``mtuSet`` a list of ``mtu`` elements, each describing a muscle-tendon unit that actuates the model (see `mtu`_)
 - ``dofSet`` a list of ``dof`` elements, each describing a degree of freedom of the model (see `dof`_)
-- ``calibrationInfo`` that reports whether the current subjects has been calibrated (see `calibrationInfo`_)
+- ``calibrationInfo`` that reports whether the subject has been calibrated (see `calibrationInfo`_)
 
 mtuDefault
 ==========
@@ -107,7 +132,8 @@ The parameters common to all muscles are:
 - ``emDelay`` the electromechanical delay (:math:`d` in :ref:`introActivationDynamics`)
 - ``percentageChange`` the percentage change in optimal fibre length depending on activation (:math:`\gamma` in :ref:`introContractionDynamics`)
 - ``damping`` the muscle damping coefficient (:math:`d_m` in :ref:`introContractionDynamics`)
-- three ``curve`` elements, describing the normalized force/length and force/velocity curves shown in :num:`Fig. #forcelengthcurves`-a,b) in section :ref:`introContractionDynamics`. Each ``curve`` has a name, a list of y-coordinates, and the corresponding x-coordinates that can be interpolated to provide the complete curves.
+- ``maxContractionVelocity`` the normalised maximum contraction velocity of the fibre
+- four ``curve`` elements, describing the normalized force/length (active and passive), normalized force/velocity, normalized tendon force/strain curves shown in the :ref:`active and passive force curves <forcelengthcurves>`) figure in section :ref:`introContractionDynamics`. Each ``curve`` has a name, a list of y-coordinates, and the corresponding x-coordinates that can be interpolated to provide the complete curves.
 
 mtu
 ===
@@ -120,10 +146,9 @@ Each muscle tendon unit is further described by the following, muscle-specific p
 - ``optimalFibreLength`` is the optimal fibre length at maximum activation, (:math:`L_m^0` in :ref:`introContractionDynamics`)
 - ``pennationAngle`` is the pennation angle of the fibre at its optimal length (:math:`\varphi_0` in :ref:`introContractionDynamics`)
 - ``tendonSlackLength`` is the tendon slack length (:math:`l_{ts}` in :ref:`introContractionDynamics`)
+- ``maxContractionVelocity`` the normalised maximum contraction velocity of the fibre
 - ``maxIsometricForce`` is the maximum isometric muscle force (:math:`F^{max}` in :ref:`introContractionDynamics`)
-- ``strengthCoefficient``
-
-.. todo:: write something here
+- ``strengthCoefficient`` is a multiplicative factor for ``maxIsometricForce``; the rationale for its inclusion is that, instead of calibrating the ``maxIsometricForce`` parameter for each muscle, you may want to keep it fixed and calibrate a reduced number of ``strength coefficient`` parameters instead, that can be shared by multiple muscles (e.g., belonging to the same muscle group - this is under the assumption that muscles in the same group develop in the same way).
 
 
 .. _subjectDof:
@@ -131,10 +156,10 @@ Each muscle tendon unit is further described by the following, muscle-specific p
 dof
 ===
 
-Each degree of freedom (broadly speaking, a *joint* of the model) is thus defined:
+Each degree of freedom is thus defined:
 
 - ``name`` the identifier for the degree of freedom
-- ``mtuNameSet`` a list of the muscles that act on the joint
+- ``mtuNameSet`` a list of the muscles that act on it
 
 
 calibrationInfo
