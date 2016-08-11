@@ -326,42 +326,44 @@ namespace ceinms {
 
         double optimalFiberLengthAtT = optimalFibreLength_*(percentageChange_*(1.0 - activation_) + 1);
         ////:TODO: strong review with the code... lot of check for closeness to 0
-        double normFiberLength = fibreLength_ / optimalFiberLengthAtT;
-        //:TODO: THIS IS WRONG! timeScale_?  0.1 should be timeScale_
-        // double normFiberVelocity = timescale_ *fiberVelocity_ / optimalFiberLengthAtT;
-        double normFiberVelocity = 0.02*fibreVelocity_*0.1 / optimalFiberLengthAtT;
+        double normFiberLengthAtT = fibreLength_ / optimalFiberLengthAtT;
+        double normFiberLength = fibreLength_ / optimalFibreLength_;
+        double fiberVel = fibreVelocity_ / optimalFibreLength_;
+        if (fiberVel > maxContractionVelocity_)
+            fiberVel = maxContractionVelocity_;
+        if (fiberVel < -maxContractionVelocity_)
+            fiberVel = -maxContractionVelocity_;
+        double normFiberVelocity = fiberVel / maxContractionVelocity_;
 
         double fv = forceVelocityCurve_.getValue(normFiberVelocity);
-        double dfp = passiveForceLengthCurve_.getFirstDerivative(normFiberLength) / optimalFiberLengthAtT; // derivative respect to length, not normlength
-        double dfa = activeForceLengthCurve_.getFirstDerivative(normFiberLength) / optimalFiberLengthAtT;
+        double dfp = passiveForceLengthCurve_.getFirstDerivative(normFiberLength) / optimalFibreLength_; // derivative respect to length, not normlength
+        double dfa = activeForceLengthCurve_.getFirstDerivative(normFiberLengthAtT) / optimalFiberLengthAtT;
 
-        double tendonLength_ = muscleTendonLength_ - fibreLength_;
-        double tendonStrain_ = (tendonLength_ - tendonSlackLength_) / tendonSlackLength_;
+        double tendonLength = muscleTendonLength_ - fibreLength_;
+        double tendonStrain = (tendonLength - tendonSlackLength_) / tendonSlackLength_;
 
-        if (tendonStrain_ < 0)
+        if (tendonStrain < 0)
         {
             //cout << "MTU: TendonStrain_ is " << tendonStrain_ << ". Set to 0." << endl;
-            tendonStrain_ = 0;
+            tendonStrain = 0;
         }
 
-        double tendonStiffness_ = maxIsometricForce_*strengthCoefficient_*
-            tendonForceStrainCurve_.getFirstDerivative(tendonStrain_) / tendonSlackLength_; // derivative respect to length, not normlength
+        double tendonStiffness = maxIsometricForce_*strengthCoefficient_*
+            tendonForceStrainCurve_.getFirstDerivative(tendonStrain) / tendonSlackLength_; // derivative respect to length, not normlength
 
-        if (tendonStiffness_ < 0)
+        if (tendonStiffness < 0)
         {
             cout << "Warning: tendonStiffness_ is < 0" << endl;
         }
 
         double pennationAngleAtT = computePennationAngle(optimalFibreLength_);
 
-        normFibreVelocity_ = normFiberVelocity;
-
         // Approximation: d(cos(pennAng)) negligible
-        double muscleStiffness_ = maxIsometricForce_*strengthCoefficient_*
+        double muscleStiffness = maxIsometricForce_*strengthCoefficient_*
                (dfa*fv*activation_ + dfp)*
                cos(radians(pennationAngleAtT));
 
-        mtuStiffness_ =  (muscleStiffness_ * tendonStiffness_) / (muscleStiffness_ + tendonStiffness_);
+        mtuStiffness_ =  (muscleStiffness * tendonStiffness) / (muscleStiffness + tendonStiffness);
     }
 
     template<typename Activation, typename Tendon, CurveMode::Mode mode>
