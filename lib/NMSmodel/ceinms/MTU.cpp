@@ -358,11 +358,15 @@ namespace ceinms {
 
         double pennationAngleAtT = computePennationAngle(optimalFibreLength_);
 
-        // Approximation: d(cos(pennAng)) negligible
-        double muscleStiffness = maxIsometricForce_*strengthCoefficient_*
-               (dfa*fv*activation_ + dfp)*
-               cos(radians(pennationAngleAtT));
-
+        double fiberStiffness=maxIsometricForce_*strengthCoefficient_*(dfa*fv*activation_ + dfp);
+         //dFmAT/dlce = d/dlce( fiso * (a *fal*fv + fpe + beta*dlceN)*cosPhi )
+        double sinPennAngle=sin(pennationAngleAtT);
+        double dPennAngle_dlm=-sinPennAngle/fibreLength_ / sqrt(1.0 - sinPennAngle*sinPennAngle);
+        double dCosPennAngle_Dlm = -sinPennAngle*dPennAngle_dlm;
+        double dFmAlongTendon_dl = fiberStiffness*cos(pennationAngleAtT) + muscleForce_*dCosPennAngle_Dlm;
+        double dLmAlongTendon_dl = cos(pennationAngleAtT) - fibreLength_*sinPennAngle*dPennAngle_dlm;
+        double muscleStiffness = dFmAlongTendon_dl /dLmAlongTendon_dl; //dFmAlongTendon_dlAlongTendon
+        // TODO: check that the following is not NaN
         mtuStiffness_ =  (muscleStiffness * tendonStiffness) / (muscleStiffness + tendonStiffness);
     }
 
