@@ -1,4 +1,5 @@
 include_directories( 
+	${OPENSIM_INCLUDE_DIRS}
 	${NMSmodel_INCLUDE_DIRS}
 	${OptimizationSystems_INCLUDE_DIRS} 
 	${Optimizers_INCLUDE_DIRS}
@@ -9,7 +10,8 @@ include_directories(
 	${ceinms_common_INCLUDE_DIRS}
 	${TrialData_INCLUDE_DIRS}
 	${FileIO_INCLUDE_DIRS}
-	${Curve_INCLUDE_DIRS})
+	${Curve_INCLUDE_DIRS}
+	${JointContactModels_INCLUDE_DIRS})
 
 add_executable(Test_OptimizationSystems optimizationSystemsTest.cpp)
 TARGET_LINK_LIBRARIES(Test_OptimizationSystems       
@@ -19,5 +21,6 @@ TARGET_LINK_LIBRARIES(Test_OptimizationSystems
       OutputConnectors
       Concurrency
       OptimizationSystems
-      ceinms_common)
+      ceinms_common
+	  TrialData)
 

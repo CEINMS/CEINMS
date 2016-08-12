@@ -1,4 +1,5 @@
 include_directories( 
+	${OPENSIM_INCLUDE_DIRS}
 	${ceinms_common_INCLUDE_DIRS}
     ${JointContactModels_INCLUDE_DIRS}
     ${OptimizationSystems_INCLUDE_DIRS}
