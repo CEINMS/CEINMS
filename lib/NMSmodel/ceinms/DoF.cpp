@@ -95,13 +95,27 @@ namespace ceinms {
     }
 
     template<typename Activation, typename Tendon, CurveMode::Mode mode>
+    void DoF<Activation, Tendon, mode>::setMomentArmDerivatives(const vector<double>& momentArmDerivatives){
+
+        if (momentArmDerivatives.size() != muscles_.size())  {
+            std::cout << "We have " << momentArmDerivatives.size() << " ma data for "
+                << muscles_.size() << "muscles.\n";
+            std::cout << "Something went wrong, gotta exit!\n";
+            exit(EXIT_FAILURE);
+        }
+        momentArmDerivatives_.clear();
+        momentArmDerivatives_.resize(muscles_.size());
+        copy(momentArmDerivatives.begin(), momentArmDerivatives.end(), momentArmDerivatives_.begin());
+    }
+
+    template<typename Activation, typename Tendon, CurveMode::Mode mode>
     void DoF<Activation, Tendon, mode>::updateDofStiffness() {
         dofStiffness_ = 0;
         vector<double>::const_iterator currentMomentArm;
         currentMomentArm = momentArms_.begin();
         for (unsigned int i = 0; i < muscles_.size(); ++i) {
                 // Approximation! d(momentArm) negligible             -->                 Add (moment arm / angle) derivative here -> |
-            dofStiffness_ += muscles_.at(i)->getMtuStiffness() * pow((*currentMomentArm), 2) + muscles_.at(i)->getMuscleForce() * 0;
+            dofStiffness_ += muscles_.at(i)->getMtuStiffness() * pow((*currentMomentArm), 2) + muscles_.at(i)->getMuscleForce() * momentArmDerivatives_.at(i);
             currentMomentArm++;
         }
     }

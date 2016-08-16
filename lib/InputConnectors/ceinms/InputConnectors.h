@@ -46,11 +46,13 @@ namespace ceinms {
         Concurrency::Queue< FrameType > queueEmg;
         Concurrency::Queue< FrameType > queueLmt;
         std::vector< Concurrency::Queue< FrameType >* > queueMomentArms;
+        std::vector< Concurrency::Queue< FrameType >* > queueMomentArmDerivatives;
         Concurrency::Queue< FrameType >  queueExternalTorques;
         Concurrency::Latch doneWithSubscription;
 
         double globalTimeLimit;
         bool externalTorquesAvailable;
+        bool momentArmDerivativesAvailable;
     };
 }
 

@@ -54,5 +54,14 @@ namespace ceinms {
         (*inputConnectors_.queueMomentArms.at(whichDof)).push(momentArmsDataToPush);
     }
 
+    void LmtMaFromX::updateMomentArmDerivatives(const vector< double >& currentMomentArmDerivativesData, double currentTime, unsigned int whichDof)
+    {
+        QueueData< vector<double> > momentArmDerivativesDataToPush;
+        momentArmDerivativesDataToPush.data = currentMomentArmDerivativesData;
+        momentArmDerivativesDataToPush.time = currentTime;
+        (*inputConnectors_.queueMomentArmDerivatives.at(whichDof)).push(momentArmDerivativesDataToPush);
+    }
+
+
     LmtMaFromX::~LmtMaFromX() { }
 }

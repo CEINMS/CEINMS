@@ -43,7 +43,7 @@ namespace ceinms {
         virtual void operator()() {};
         void updateLmt(const std::vector<double>& currentLmtData, double currentTime);
         void updateMomentArms(const std::vector<double>& currentMomentArmsData, double currentTime, unsigned int whichDof);
-
+        void updateMomentArmDerivatives(const std::vector<double>& currentMomentArmDerivativesData, double currentTime, unsigned int whichDof);
     protected:
         std::vector< std::string > musclesNames_;
         std::vector< std::string > dofNames_;

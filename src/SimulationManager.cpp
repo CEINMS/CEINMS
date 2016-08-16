@@ -40,6 +40,7 @@
 
 #include "ceinms/EMGFromFile.h"
 #include "ceinms/LmtMaFromStorageFile.h"
+#include "ceinms/LmtMaDMaFromStorageFile.h"
 #include "ceinms/ExternalTorquesFromStorageFile.h"
 
 #include "ModelEvaluationOnline.h"
@@ -79,7 +80,7 @@ namespace ceinms {
 
 
     template <typename NMSmodelT, template <typename, typename> class ModelEvaluatorT, typename LoggerT>
-    bool SimulationManager::runOpenLoop(bool withStiffness) {
+    bool SimulationManager::runOpenLoop() {
 
         //Monica probably won't like this
         InputConnectors inputConnectors;
@@ -109,10 +110,70 @@ namespace ceinms {
                                      "PennationAngles",
                                      "MuscleForces",
                                      "Torques" };
-        if (withStiffness) {
-            dataToLog.push_back("MtusStiffness");
-            dataToLog.push_back("DofsStiffness");
-        }
+
+        // 2b. define the thread consuming the output sources
+        vector<string> valuesToWrite = dataToLog;
+        QueuesToStorageFiles queuesToStorageFiles(inputConnectors, outputConnectors, mySubject, valuesToWrite, outputDirectory_);
+
+        // 3. define the model simulator
+        vector<string> valuesToLog = dataToLog;
+        ModelEvaluatorT<NMSmodelT, LoggerT>  simulator(inputConnectors, outputConnectors, mySubject, valuesToLog);
+
+        inputConnectors.doneWithSubscription.setCount(5);
+        outputConnectors.doneWithExecution.setCount(2);
+
+        // 4. start the threads
+        std::thread emgProdThread(std::ref(emgProducer));
+        std::thread externalTorquesProdThread(std::ref(externalTorquesProducer));
+        std::thread lmtMaProdThread(std::ref(lmtMaProducer));
+        std::thread simulatorThread(std::ref(simulator));
+        std::thread queuesToStorageFilesThread(std::ref(queuesToStorageFiles));
+
+        emgProdThread.join();
+        lmtMaProdThread.join();
+        externalTorquesProdThread.join();
+        simulatorThread.join();
+        queuesToStorageFilesThread.join();
+
+        return 0;
+    }
+
+    template <typename NMSmodelT, template <typename, typename> class ModelEvaluatorT, typename LoggerT>
+    bool SimulationManager::runOpenLoopStiffness (){
+
+        //Monica probably won't like this
+        InputConnectors inputConnectors;
+        OutputConnectors outputConnectors;
+
+        NMSmodelT mySubject;
+        setupSubject(mySubject, subjectFile_, executionCfg_.getTolerance());
+
+        // 2. define the thread connecting with the input sources
+        string emgFilename(dataLocations_.getExcitationsFile());
+        EMGFromFile emgProducer(inputConnectors, mySubject, emgFilename, emgGeneratorFile_);
+
+        vector< string > dofNames;
+        mySubject.getDoFNames(dofNames);
+        vector< string > maFilename, dMaFilename;
+        sortMaFilenames(dataLocations_.getMaFiles(), dofNames, maFilename);
+        sortMaFilenames(dataLocations_.getMaDerivativeFiles(), dofNames, dMaFilename);
+        LmtMaDMaFromStorageFile lmtMaProducer(inputConnectors, mySubject, dataLocations_.getLmtFile(), maFilename, dMaFilename);
+
+        string externalTorqueFilename(dataLocations_.getExternalTorqueFile());
+        ExternalTorquesFromStorageFile externalTorquesProducer(inputConnectors, mySubject, externalTorqueFilename);
+
+        vector<string> dataToLog = { "Activations",
+                                     "FiberLenghts",
+                                     "NormFiberLengths",
+                                     "FiberVelocities",
+                                     "NormFiberVelocities",
+                                     "PennationAngles",
+                                     "MuscleForces",
+                                     "Torques",
+                                     "MtusStiffness",
+                                     "DofsStiffness"
+                                    };
+
         // 2b. define the thread consuming the output sources
         vector<string> valuesToWrite = dataToLog;
         QueuesToStorageFiles queuesToStorageFiles(inputConnectors, outputConnectors, mySubject, valuesToWrite, outputDirectory_);
@@ -259,7 +320,7 @@ namespace ceinms {
             break;
 
         case NMSModelCfg::StiffnessOpenLoopExponentialActivationElasticTendonBiSecOffline:
-            exitFlag = runOpenLoop<NMSmodel<ExponentialActivation, ElasticTendon_BiSec, CurveMode::Offline>, ModelEvaluationOfflineStiffness, LoggerOnQueues >(true);
+            exitFlag = runOpenLoopStiffness<NMSmodel<ExponentialActivation, ElasticTendon_BiSec, CurveMode::Offline>, ModelEvaluationOfflineStiffness, LoggerOnQueues >();
             break;
 
         case NMSModelCfg::HybridExponentialActivationStiffTendonOnline:
@@ -307,6 +368,4 @@ namespace ceinms {
             }
         }
     }
-
-
 }

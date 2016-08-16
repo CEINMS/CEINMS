@@ -76,6 +76,7 @@ namespace ceinms {
         void setMuscleTendonLengths(const std::vector<double>& currentLmtData);
         void setMuscleTendonLengthsSelective(const std::vector<double>& currentLmtData, const std::vector<unsigned>& selectedMusclesIndex);
         void setMomentArms(const std::vector<double>& currentMaData, unsigned whichDof);
+        void setMomentArmDerivatives(const std::vector<double>& currentMaDerivativeData, unsigned whichDof);
         void updateState();
         void updateState(const std::vector<unsigned>& selectedMusclesIndex);
         void updateState_OFFLINE();

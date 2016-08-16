@@ -234,6 +234,12 @@ namespace ceinms {
     }
 
     template <typename Activation, typename Tendon, CurveMode::Mode mode>
+    void NMSmodel<Activation, Tendon, mode>::setMomentArmDerivatives(const vector<double>& currentMaDerivativeData, unsigned whichDof) {
+
+        dofs_.at(whichDof).setMomentArmDerivatives(currentMaDerivativeData);
+    }
+
+    template <typename Activation, typename Tendon, CurveMode::Mode mode>
     void NMSmodel<Activation, Tendon, mode>::updateState() {
 
         updateActivations();

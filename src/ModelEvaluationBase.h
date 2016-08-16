@@ -49,16 +49,19 @@ namespace ceinms {
         void getEmgFromInputQueue(InputConnectors::FrameType& emgFromQueue);
         void getLmtFromInputQueue(InputConnectors::FrameType& lmtFromQueue);
         void getMomentArmsFromInputQueue(InputConnectors::FrameType& momentArmsFromQueue, unsigned int whichDof);
+        void getMomentArmDerivativesFromInputQueue(InputConnectors::FrameType& momentArmDerivativesFromQueue, unsigned int whichDof);
         void getExternalTorquesFromInputQueue(InputConnectors::FrameType& externalTorquesFromQueue);
         void doneWithExecution();
 
         InputConnectors::FrameType getEmgFromInputQueue();
         InputConnectors::FrameType getLmtFromInputQueue();
         InputConnectors::FrameType getMomentArmsFromInputQueue(unsigned int whichDof);
+        InputConnectors::FrameType getMomentArmDerivativesFromInputQueue(unsigned int whichDof);
         InputConnectors::FrameType getExternalTorquesFromInputQueue();
 
         void subscribeToInputConnectors();
         bool externalTorquesAvailable() const;
+        bool momentArmDerivativesAvailable() const;
         float getGlobalTimeLimit() const;
 
         Logger logger;

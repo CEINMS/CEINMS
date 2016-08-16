@@ -105,6 +105,21 @@ namespace ceinms {
         return result;
     }
 
+    std::map< std::string, std::string > InputDataXmlReader::getMaDerivativeFiles()
+    {
+        map<string, string> result;
+        for (auto it : inputDataPointer_->momentArmDerivativesFiles().begin()->momentArmDerivativesFile())
+        {
+            std::string pathToMaFile = it.c_str();
+            FileUtils::trim(pathToMaFile);
+            if (!FileUtils::isAbsolute(pathToMaFile.c_str()))
+                pathToMaFile = filepath_ + pathToMaFile;
+            result.insert(std::pair<string, string>(it.dofName(), pathToMaFile));
+        }
+        // return filepath_ + *(inputDataPointer_->momentArmsDirectory().begin());
+        return result;
+    }
+
     std::string InputDataXmlReader::getExcitationsFile()
     {
         std::string fileName(*(inputDataPointer_->excitationsFile().begin()));

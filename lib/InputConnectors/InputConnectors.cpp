@@ -32,13 +32,19 @@
 namespace ceinms {
 
     InputConnectors::InputConnectors() :
-        globalTimeLimit(std::numeric_limits<double>::infinity()), externalTorquesAvailable(false) { }
+        globalTimeLimit(std::numeric_limits<double>::infinity()),
+        externalTorquesAvailable(false), momentArmDerivativesAvailable(false) { }
 
 
     InputConnectors::~InputConnectors() {
 
         if (!queueMomentArms.empty()) {
             for (auto it : queueMomentArms)
+                delete it;
+        }
+
+        if (!queueMomentArmDerivatives.empty()) {
+            for (auto it : queueMomentArmDerivatives)
                 delete it;
         }
     }

@@ -35,7 +35,7 @@ namespace ceinms {
         std::vector< std::string > dofNamesWithExtTorque_;
 
         std::list< ceinms::InputConnectors::FrameType > lmtDataFromQueue_, emgDataFromQueue_, externalTorquesDataFromQueue_;
-        std::list< std::vector < ceinms::InputConnectors::FrameType > > maDataFromQueue_;
+        std::list< std::vector < ceinms::InputConnectors::FrameType > > maDataFromQueue_, dMaDataFromQueue_;
         unsigned noDof_;
         double globalEmDelay_;
     };

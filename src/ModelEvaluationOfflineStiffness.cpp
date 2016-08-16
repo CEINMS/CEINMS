@@ -83,6 +83,19 @@ namespace ceinms {
                 maDataFromQueue_.push_back(maFrame);
         } while (runCondition);
 
+        runCondition=ModelEvaluationBase<Logger>::momentArmDerivativesAvailable();
+        //read moment arm derivatives data
+        do{
+            vector< ceinms::InputConnectors::FrameType > dMaFrame;
+            for (unsigned i = 0; i < noDof_; ++i) {
+                auto currentMomentArmDerivs(ModelEvaluationBase<Logger>::getMomentArmDerivativesFromInputQueue(i));
+                if (!currentMomentArmDerivs.data.empty())
+                    dMaFrame.push_back(currentMomentArmDerivs);
+                else runCondition = false;
+            }
+            if (runCondition)
+                dMaDataFromQueue_.push_back(dMaFrame);
+        } while (runCondition);
     }
 
     template <typename NMSmodelT, typename Logger>
@@ -120,7 +133,7 @@ namespace ceinms {
 
         double externalTorqueTime = std::numeric_limits<double>::lowest();
         double emgTime = std::numeric_limits<double>::lowest();
-        bool runCondition = !(emgDataFromQueue_.empty() || maDataFromQueue_.empty() || lmtDataFromQueue_.empty());
+        bool runCondition = !(emgDataFromQueue_.empty() || maDataFromQueue_.empty() || lmtDataFromQueue_.empty() || dMaDataFromQueue_.empty());
         bool firstLmtArrived(false);
 
         while (runCondition) {  // while(runCondition)
@@ -133,6 +146,10 @@ namespace ceinms {
             // 2. read moment arms data
             vector< ceinms::InputConnectors::FrameType > momentArmsFrameFromQueue(maDataFromQueue_.front());
             maDataFromQueue_.pop_front();
+
+            // 2b. read moment arm derivatives data
+            vector< ceinms::InputConnectors::FrameType > momentArmDerivativesFrameFromQueue(dMaDataFromQueue_.front());
+            dMaDataFromQueue_.pop_front();
 
             // 3. read external Torque
             ceinms::InputConnectors::FrameType externalTorquesFrameFromQueue;
@@ -163,8 +180,10 @@ namespace ceinms {
             subject_.setTime(lmtMaTime);
             subject_.setEmgs(emgFrameFromQueue.data);
             subject_.setMuscleTendonLengths(lmtFrameFromQueue.data);
-            for (unsigned int i = 0; i < noDof_; ++i)
+            for (unsigned int i = 0; i < noDof_; ++i) {
                 subject_.setMomentArms(momentArmsFrameFromQueue.at(i).data, i);
+                subject_.setMomentArmDerivatives(momentArmDerivativesFrameFromQueue.at(i).data, i);
+            }
             subject_.updateState_OFFLINE();
             subject_.pushState();
     #ifdef LOG_FILES
@@ -218,7 +237,7 @@ namespace ceinms {
             }
             cout << endl << "----------------------------------------" << endl;
     #endif
-            runCondition = runCondition = !(emgDataFromQueue_.empty() || maDataFromQueue_.empty() || lmtDataFromQueue_.empty());
+            runCondition = runCondition = !(emgDataFromQueue_.empty() || maDataFromQueue_.empty() || lmtDataFromQueue_.empty() || dMaDataFromQueue_.empty());
         } //end while(runCondition)
 
 

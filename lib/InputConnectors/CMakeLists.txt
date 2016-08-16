@@ -5,12 +5,14 @@ set(FromStorageFile_SOURCES
   FromStorageFile/EMGFromFile.cpp
   FromStorageFile/ExternalTorquesFromStorageFile.cpp
   FromStorageFile/LmtMaFromStorageFile.cpp
+  FromStorageFile/LmtMaDMaFromStorageFile.cpp
   FromStorageFile/Utilities.cpp
 )
 set(FromStorageFile_HEADERS
   ceinms/EMGFromFile.h
   ceinms/ExternalTorquesFromStorageFile.h
   ceinms/LmtMaFromStorageFile.h
+  ceinms/LmtMaDMaFromStorageFile.h
   ceinms/Utilities.h
 )
 
