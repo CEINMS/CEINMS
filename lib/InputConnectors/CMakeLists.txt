@@ -26,7 +26,7 @@ set(InputConnectors_SOURCES
   GeneralisedCoordinatesFromX.cpp 
 )
 
-set(InputConnectors_TEMPLATE_IMPLEMENTATIONS ceinms/LmtMaFromMcbs.cpp)
+set(InputConnectors_TEMPLATE_IMPLEMENTATIONS ) #ceinms/LmtMaFromMcbs.cpp)
 set_source_files_properties(${InputConnectors_TEMPLATE_IMPLEMENTATIONS} PROPERTIES HEADER_FILE_ONLY TRUE)
 
 set(InputConnectors_HEADERS
@@ -35,7 +35,7 @@ set(InputConnectors_HEADERS
   ceinms/LmtMaFromX.h
   ceinms/ExternalForcesFromX.h
   ceinms/GeneralisedCoordinatesFromX.h
-  ceinms/LmtMaFromMcbs.h
+  #ceinms/LmtMaFromMcbs.h
 )
 
 source_group("Headers" FILES ${InputConnectors_HEADERS} ${FromStorageFile_HEADERS} )

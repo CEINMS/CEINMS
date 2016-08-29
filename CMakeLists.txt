@@ -38,9 +38,9 @@ find_package(XERCES REQUIRED)
 
 find_package(OpenSim REQUIRED)
 
-find_package(mcbs REQUIRED)
+#find_package(mcbs REQUIRED)
 
-find_package(osimSpliner REQUIRED)
+#find_package(osimSpliner REQUIRED)
 
 
 
