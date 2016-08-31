@@ -108,6 +108,8 @@ namespace ceinms {
     std::map< std::string, std::string > InputDataXmlReader::getMaDerivativeFiles()
     {
         map<string, string> result;
+        if (inputDataPointer_->momentArmDerivativesFiles().empty())
+            return result;
         for (auto it : inputDataPointer_->momentArmDerivativesFiles().begin()->momentArmDerivativesFile())
         {
             std::string pathToMaFile = it.c_str();
