@@ -11,6 +11,7 @@ find_path(XERCES_INCLUDE_DIR /xercesc/util/XercesVersion.hpp
             PATHS   "${XERCES_DIR}"
                     "C:/Program Files (x86)/CodeSynthesis XSD 3.3"
                     "C:/Program Files (x86)/CodeSynthesis XSD 4.0"
+					"C:/xerces-c-3.1.3_32r"
                     $ENV{XERCES_ROOT}
             PATH_SUFFIXES include)
 
@@ -67,6 +68,7 @@ else()
     /usr/lib/x86_64-linux-gnu/
     "C:/Program\ Files\ (x86)/CodeSynthesis\ XSD\ 3.3/bin"
     "C:/Program\ Files\ (x86)/CodeSynthesis\ XSD\ 3.3/lib/vc-10.0"
+	"C:/xerces-c-3.1.3_32r/lib"
   )
 
   FIND_LIBRARY(XERCES_LIBRARY_DEBUG
@@ -83,6 +85,7 @@ else()
     /usr/lib/x86_64-linux-gnu/
     "C:/Program\ Files\ (x86)/CodeSynthesis\ XSD\ 3.3/bin"
     "C:/Program\ Files\ (x86)/CodeSynthesis\ XSD\ 3.3/lib/vc-10.0"
+	"C:/xerces-c-3.1.3_32d/lib"
   )
 endif()
 
