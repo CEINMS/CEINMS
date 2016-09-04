@@ -36,6 +36,7 @@ using std::list;
 #include <vector>
 using std::vector;
 #include <thread>
+#include <stdlib.h>
 
 #include "ceinms/NMSmodel.h"
 
@@ -101,8 +102,20 @@ namespace ceinms {
         setupSubject(mySubject, uncalibratedSubjectFile_, calibrationXmlReader_.getTolerance());
 
         vector<TrialData> trials;
-        for (list<string>::iterator trialIt = calibrationTrialIDs_.begin(); trialIt != calibrationTrialIDs_.end(); ++trialIt)
-            trials.push_back(readTrialData(*trialIt, mySubject, *trialIt, emgGeneratorFile_));
+        //Somewhere in the following lines, CEINMScalibrate crashes.
+        for (list<string>::iterator trialIt = calibrationTrialIDs_.begin(); trialIt != calibrationTrialIDs_.end(); ++trialIt) {
+            //
+            try {
+                cout << "\nPrinted before trials.push_back" << endl;
+                trials.push_back(readTrialData(*trialIt, mySubject, *trialIt, emgGeneratorFile_));
+                cout << "\nPrinted after trials.push_back" << endl;
+                system("pause");
+                }
+            catch (char param) {
+                cout << "Error!" << endl;
+                //exit(EXIT_FAILURE);
+            }
+        }
 
         CalibrationStep currentCalibrationStep;
         while (calibrationXmlReader_.popNextCalibrationStep(currentCalibrationStep)) {
@@ -293,7 +306,7 @@ namespace ceinms {
         auto trial(queuesToTrialData.getTrialData());
         if (mySubject.hasOpenSimModel())
             trial.setOpenSimData(mySubject.getOpenSimModelFilename(), dataLocations.getExternalLoadsFile(), dataLocations.getMotionFile());
-
+        std::cout << "test output Thorben!" << std::endl;
         return trial;
 
     }
