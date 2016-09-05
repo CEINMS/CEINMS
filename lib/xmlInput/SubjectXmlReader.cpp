@@ -69,6 +69,8 @@ namespace ceinms {
     
 
         std::string fileName(subjectPointer_->opensimModelFile().get());
+        if (fileName.empty())
+            return "";
         FileUtils::trim(fileName);
         if (FileUtils::isAbsolute(fileName.c_str()))
             return fileName;

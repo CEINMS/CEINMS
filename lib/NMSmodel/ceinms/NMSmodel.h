@@ -60,7 +60,7 @@ namespace ceinms {
         typedef typename std::vector<MTUtype>::const_iterator vectorMTUconstItr;
         typedef typename std::vector<DoFtype>::const_iterator vectorDoFconstItr;
 
-        NMSmodel() {}
+        NMSmodel();
         NMSmodel(const NMSmodel& orig);// { std::cout << "YOU SHOULD NOT BE HERE!"; exit(EXIT_FAILURE); }
         virtual ~NMSmodel() {}
         bool haveThisMuscle(const std::string& currentMuscle, vectorMTUitr& found);
