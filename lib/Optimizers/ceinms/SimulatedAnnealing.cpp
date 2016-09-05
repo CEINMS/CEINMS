@@ -39,7 +39,7 @@ using std::string;
 #include <time.h>
 #include <limits>
 
-#define LOG_SIMULATED_ANNEALING
+//#define LOG_SIMULATED_ANNEALING
 
 namespace ceinms {
     namespace Optimizers {

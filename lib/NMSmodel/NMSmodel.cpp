@@ -46,9 +46,20 @@ using std::string;
 
 namespace ceinms {
 
+
+
+    template <typename Activation, typename Tendon, CurveMode::Mode mode>
+    NMSmodel<Activation, Tendon, mode>::NMSmodel() :
+        hasOpenSimModel_(false)
+    {}
+
     template <typename Activation, typename Tendon, CurveMode::Mode mode>
     NMSmodel<Activation, Tendon, mode>::NMSmodel(const NMSmodel<Activation, Tendon, mode>& orig) :
-        muscles_(orig.muscles_), muscleNames_(orig.muscleNames_), dofNames_(orig.dofNames_), hasOpenSimModel_(false)
+        muscles_(orig.muscles_), 
+        muscleNames_(orig.muscleNames_), 
+        dofNames_(orig.dofNames_), 
+        hasOpenSimModel_(orig.hasOpenSimModel_),
+        osimModelFilename_(orig.osimModelFilename_)
     {
 
         std::map<std::string, std::vector<std::string>> dofsToMuscles;
