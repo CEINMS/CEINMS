@@ -36,12 +36,38 @@ set(OptimizationSystems_SOURCES
     ComposedObjectiveFunction.cpp
 )
 
+set(OptimizationSystems_Hybrid_HEADERS 
+	ceinms/Hybrid/EmgInformedSystem.h
+	ceinms/Hybrid/TrackTorqueAdjustAndPredictExcitations.h
+    ceinms/Hybrid/MuscleExcitationParameterInterpreter.h
+	ceinms/Hybrid/NMSmodelFrameOptimisation.h)
+set(OptimizationSystems_Hybrid_TEMPLATE_IMPLEMENTATION 
+	ceinms/Hybrid/EmgInformedSystem.cpp
+    ceinms/Hybrid/NMSmodelFrameOptimisation.cpp
+	ceinms/Hybrid/MuscleExcitationParameterInterpreter.cpp)
+set(OptimizationSystems_Hybrid_SOURCES 
+	Hybrid/TrackTorqueAdjustAndPredictExcitations.cpp
+    
+	)
+
 set_source_files_properties( ${OptimizationSystems_TEMPLATE_IMPLEMENTATION} PROPERTIES HEADER_FILE_ONLY TRUE)
+set_source_files_properties( ${OptimizationSystems_Hybrid_TEMPLATE_IMPLEMENTATION} PROPERTIES HEADER_FILE_ONLY TRUE)
 
 source_group("Header Files" FILES ${OptimizationSystems_HEADERS})
 source_group("Source Files" FILES ${OptimizationSystems_TEMPLATE_IMPLEMENTATION} ${OptimizationSystems_SOURCES})
 
-add_library(OptimizationSystems ${OptimizationSystems_HEADERS} ${OptimizationSystems_TEMPLATE_IMPLEMENTATION} ${OptimizationSystems_SOURCES})
+source_group("Hybrid/Header Files" FILES ${OptimizationSystems_Hybrid_HEADERS})
+source_group("Hybrid/Source Files" FILES ${OptimizationSystems_Hybrid_TEMPLATE_IMPLEMENTATION} ${OptimizationSystems_Hybrid_SOURCES})
+
+add_library(OptimizationSystems 
+${OptimizationSystems_HEADERS} 
+${OptimizationSystems_TEMPLATE_IMPLEMENTATION} 
+${OptimizationSystems_SOURCES}
+${OptimizationSystems_Hybrid_HEADERS} 
+${OptimizationSystems_Hybrid_TEMPLATE_IMPLEMENTATION} 
+${OptimizationSystems_Hybrid_SOURCES}
+
+)
 target_include_directories( OptimizationSystems
                             PRIVATE ceinms
                                     ${OPENSIM_INCLUDE_DIRS}       
@@ -63,6 +89,10 @@ set(OptimizationSystems_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}"
 
 #Install
 install(FILES ${OptimizationSystems_HEADERS} ${OptimizationSystems_TEMPLATE_IMPLEMENTATION} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/ceinms COMPONENT Development)
+
+install(FILES ${OptimizationSystems_Hybrid_HEADERS} ${OptimizationSystems_Hybrid_TEMPLATE_IMPLEMENTATION} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/ceinms/Hybrid COMPONENT Development)
+
+
 install(TARGETS OptimizationSystems
         EXPORT CEINMSTargets
         RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT Applications

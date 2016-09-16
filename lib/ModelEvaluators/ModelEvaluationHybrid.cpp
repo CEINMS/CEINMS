@@ -135,11 +135,16 @@ namespace ceinms {
                     subject_.setMomentArms(momentArmsFrameFromQueue.at(i).data, i);
                 //          subject_.updateState();
 
+                /*OLD*/
+                /*
                 for (unsigned int i = 0; i < noDof_; ++i)
                     torqueErrorMinimizer_.setSingleExternalTorque(externalTorquesFrameFromQueue.data.at(i), dofNames_.at(i));
                 torqueErrorMinimizer_.setTime(lmtMaTime);
                 torqueErrorMinimizer_.minimize();
+                */
 
+                torqueErrorMinimizer_.setExternalTorques(externalTorquesFrameFromQueue.data);
+                torqueErrorMinimizer_.optimise();
                 subject_.updateState();
                 subject_.pushState();
 

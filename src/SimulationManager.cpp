@@ -69,6 +69,8 @@
 #include "ceinms/queues/LogQueue.h"
 #include "ceinms/QueueToStorageFile.h"
 #include "ceinms/ArrayConverter.h"
+
+#include "ceinms/Hybrid/NMSmodelFrameOptimisation.h"
 #include <string>
 using std::string;
 
@@ -538,10 +540,18 @@ namespace ceinms {
         doneWithExecutionLatch.setCount(5);
 
         // 4. define the optimiser
+        EmgInformedObjectiveFunctionSetup setup;
+        executionCfg_.getMusclesToAdjust(setup.musclesToAdjust);
+        executionCfg_.getMusclesToSynthesise(setup.musclesToSynthesise);
+        executionCfg_.getHybridWeightings(setup.weightings.alpha, setup.weightings.beta, setup.weightings.gamma);
+        NMSmodelFrameOptimisation<NMSmodelT> errorMinimizer(mySubject, setup);
+
+        /*OLD*/
+        /*
         typedef Hybrid::ErrorMinimizerAnnealing<NMSmodelT> MyErrorMinimizer;
         MyErrorMinimizer errorMinimizer(mySubject);
         HybridWeightings weightings;
-        executionCfg_.getHybridWeightings(weightings.alpha, weightings.beta, weightings.gamma);
+        
         errorMinimizer.setWeightings(weightings);
         vector<string> toSynth, toAdjust;
         executionCfg_.getMusclesToSynthesise(toSynth);
@@ -552,8 +562,11 @@ namespace ceinms {
         unsigned noEpsilon, ns, nt, maxNoEval;
         executionCfg_.getAnnealingParameters(nt, ns, rt, t, maxNoEval, epsilon, noEpsilon);
         errorMinimizer.setAnnealingParameters(nt, ns, rt, t, maxNoEval, epsilon, noEpsilon);
+        */
 
-        ModelEvaluationHybrid<NMSmodelT, MyErrorMinimizer, LoggerOnQueues> simulator(
+
+
+        ModelEvaluationHybrid<NMSmodelT, NMSmodelFrameOptimisation<NMSmodelT>, LoggerOnQueues> simulator(
             emgQueue,
             lmtQueue,
             externalTorqueQueue,

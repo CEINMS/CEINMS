@@ -18,6 +18,8 @@ set(Common_HEADERS  ceinms/ArrayConverter.h
                     ceinms/EndOfData.h
                     ceinms/ExternalForceProperties.h
                     ceinms/ExternalLoadProperties.h
+					ceinms/EmgInformedObjectiveFunctionSetup.h
+					ceinms/HybridWeightings.h
                     
 )
 
