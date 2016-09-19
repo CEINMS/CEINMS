@@ -16,7 +16,7 @@ namespace ceinms {
     void TrackTorqueAdjustAndPredictExcitations::calculate(const std::vector<double>& predictedTorques, const std::vector<double>& predictedExcitations){
 
         double torqueError(0.);
-        for (auto i : indexesOfTorquesToMinimise) {
+        for (auto i : indexesOfTorquesToMinimise_) {
             double diff(predictedTorques.at(i) - externalTorques_.at(i));
             torqueError += diff*diff;
         }
@@ -25,13 +25,13 @@ namespace ceinms {
         double excitationTrackingError(0.);
         double excitationSum(0.);
 
-        for (auto i : indexesOfMusclesWithExcitationsToAdjust) {
+        for (auto i : indexesOfMusclesWithExcitationsToAdjust_) {
             double diff(predictedExcitations.at(i) - measuredExcitations_.at(i));
             excitationTrackingError += diff*diff;
             excitationSum += measuredExcitations_.at(i)*measuredExcitations_.at(i);
         }
 
-        for (auto i : indexesOfMusclesWithExcitationsToPredict) {
+        for (auto i : indexesOfMusclesWithExcitationsToPredict_) {
             excitationSum += measuredExcitations_.at(i)*measuredExcitations_.at(i);
         }
 

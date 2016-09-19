@@ -27,7 +27,7 @@ namespace ceinms {
         typename ObjectiveFunctionT,
         typename ParametersInterpreterT
     >
-    void EmgInformedSystem<NMSmodelT, ObjectiveFunctionT, ParametersInterpreterT>::setExternalTorque(const std::vector<double>& externalTorques) {
+    void EmgInformedSystem<NMSmodelT, ObjectiveFunctionT, ParametersInterpreterT>::setExternalTorques(const std::vector<double>& externalTorques) {
 
         objectiveFunction_.setExternalTorques(externalTorques);
     }

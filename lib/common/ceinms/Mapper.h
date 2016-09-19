@@ -42,7 +42,10 @@ namespace ceinms {
         Mapper(const std::vector<std::string>& inNames, const std::vector<std::string>& outNames);
         void setNames(const std::vector<std::string>& inNames, const std::vector<std::string>& outNames);
         template<typename T>
-        std::vector<T> map(const std::vector<T>& in, T defaultValue = T{}) const; //the return object will be copy elided
+        std::vector<T> map(const std::vector<T>& in, T defaultValue = T{}) const; //the return object will be copy elided  
+        template<typename T>
+        std::vector<T> map(const std::vector<T>& in, std::vector<T> defaultVector) const; //the return object will be copy elided
+
         size_t getOutSize() const { return outSize_; }
         size_t getInSize() const { return inSize_; }
     private:
@@ -69,6 +72,29 @@ namespace ceinms {
         }
         return out;
     }
+
+
+    template<typename T>
+    std::vector<T> Mapper::map(const std::vector<T>& in, std::vector<T> defaultVector) const {
+        if (in.size() != inSize_) {
+            std::cout << "Mapper: provided " << in.size() << " values, expected " << inSize_ << std::endl;
+            std::exit(EXIT_FAILURE);
+        }
+        if (outSize_ != defaultVector.size()) {
+            std::cout << "Mapper: provided default vector of length" << defaultVector.size() << ", expected " << outSize_  << std::endl;
+            std::exit(EXIT_FAILURE);
+        }
+
+        for (unsigned i(0); i < inToOutMapping_.size(); ++i) {
+            int mapIdx(inToOutMapping_.at(i));
+            if (mapIdx >= 0)
+                defaultVector.at(mapIdx) = in.at(i);
+        }
+        return defaultVector;
+
+
+    }
+
 }
 
 #endif

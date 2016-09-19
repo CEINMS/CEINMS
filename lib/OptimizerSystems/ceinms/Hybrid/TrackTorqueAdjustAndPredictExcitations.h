@@ -18,9 +18,9 @@ namespace ceinms {
         double getValue() const;
     private:
         HybridWeightings weightings_;
-        std::vector<unsigned> indexesOfMusclesWithExcitationsToAdjust;
-        std::vector<unsigned> indexesOfMusclesWithExcitationsToPredict;
-        std::vector<unsigned> indexesOfTorquesToMinimise;
+        std::vector<unsigned> indexesOfMusclesWithExcitationsToAdjust_;
+        std::vector<unsigned> indexesOfMusclesWithExcitationsToPredict_;
+        std::vector<unsigned> indexesOfTorquesToMinimise_;
         std::vector<double> externalTorques_;
         std::vector<double> measuredExcitations_;
         double f_;
@@ -29,9 +29,13 @@ namespace ceinms {
     template<typename NMSmodelT>
     TrackTorqueAdjustAndPredictExcitations::TrackTorqueAdjustAndPredictExcitations(NMSmodelT& subject, const EmgInformedObjectiveFunctionSetup& setup) {
 
-        subject.getMusclesIndexFromMusclesList(indexesOfMusclesWithExcitationsToAdjust, setup.musclesToAdjust);
-        subject.getMusclesIndexFromMusclesList(indexesOfMusclesWithExcitationsToPredict, setup.musclesToSynthesise);
+        subject.getMusclesIndexFromMusclesList(indexesOfMusclesWithExcitationsToAdjust_, setup.musclesToAdjust);
+        subject.getMusclesIndexFromMusclesList(indexesOfMusclesWithExcitationsToPredict_, setup.musclesToSynthesise);
         weightings_ = setup.weightings;
+        //at the moment it's all the dofs, but we may want to set that through xml
+        for (unsigned i = 0; i < subject.getNoDoF(); ++i)
+            indexesOfTorquesToMinimise_.push_back(i);
+
         //get torques to optimise from setup
 
     }

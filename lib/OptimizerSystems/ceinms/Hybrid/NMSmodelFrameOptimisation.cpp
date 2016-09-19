@@ -17,7 +17,7 @@ namespace ceinms {
     template <typename NMSmodelT>
     void NMSmodelFrameOptimisation<NMSmodelT>::setExternalTorques(const std::vector<double>& externalTorques) {
 
-        objFun_.setExternalTorques(externalTorques);
+        emgInformed_.setExternalTorques(externalTorques);
     }
 
 
@@ -26,19 +26,21 @@ namespace ceinms {
 
         std::vector<double> measuredExcitations;
         subject_.getEmgs(measuredExcitations);
-        objFun_.setMeasuredExcitations(measuredExcitations);
+        emgInformed_.setMeasuredExcitations(measuredExcitations);
 
-        std::vector<double> pastEMGData;
-        subject_.getPastEmgs(pastEMGData);
+       // std::vector<double> pastEMGData;
+       // subject_.getPastEmgs(pastEMGData);
+        
+
         try {
             SimTK::Optimizer opt(simTkAdapter_);
 
-            opt.setConvergenceTolerance(.0001);
+            opt.setConvergenceTolerance(.00001);
             opt.useNumericalGradient(true);
             opt.useNumericalJacobian(true);
-
+            
             /* compute  optimization */
-            auto startingValues(ArrayConverter::toSimTKVector(pastEMGData));
+            auto startingValues(ArrayConverter::toSimTKVector(parameterInterpreter_.getStartingParameters()));
             opt.optimize(startingValues); //starting values
         }
         catch (const std::exception& e) {

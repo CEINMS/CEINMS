@@ -13,6 +13,7 @@ namespace ceinms{
         using ParameterSet = EmgInformedObjectiveFunctionSetup;
         MuscleExcitationParameterInterpreter(NMSmodelT& subject, const ParameterSet& setup);
         void setParameters(const std::vector<double>& x);
+        std::vector<double> getStartingParameters() const;
         std::vector<double> getParameters() const;
         std::size_t getNoParameters() const { return noParameters_; }
         void getUpperLowerBounds(std::vector<double>& upperBounds, std::vector<double>& lowerBounds) const;

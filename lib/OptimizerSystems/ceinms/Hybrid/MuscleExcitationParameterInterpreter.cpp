@@ -18,17 +18,17 @@ namespace ceinms {
         musclesToOptimise.insert(end(musclesToOptimise), begin(setup.musclesToSynthesise), end(setup.musclesToSynthesise));
         excitationsToParameters_.setNames(subject_.getMuscleNames(), musclesToOptimise);
         parametersToExcitations_.setNames(musclesToOptimise, subject_.getMuscleNames());
-        noParameters_ = subject_.getNoMuscles();
+        noParameters_ = musclesToOptimise.size();
 
     }
 
     template<typename NMSmodelT>
     void MuscleExcitationParameterInterpreter<NMSmodelT>::setParameters(const std::vector<double>& x) {
     
-        auto excitations(parametersToExcitations_.map(x));
 
         vector<double> excitationsT1;
-        subject_.getEmgs(excitationsT1);
+        subject_.getEmgs(excitationsT1); 
+        auto excitations(parametersToExcitations_.map(x, excitationsT1));
         subject_.setEmgs(excitations);
         vector<unsigned> changedExcitations;
         for (unsigned i(0); i < excitations.size(); ++i) {
@@ -48,10 +48,19 @@ namespace ceinms {
     }
 
     template<typename NMSmodelT>
+    std::vector<double> MuscleExcitationParameterInterpreter<NMSmodelT>::getStartingParameters() const {
+
+        vector<double> excitations;
+        subject_.getPastEmgs(excitations);
+        auto x(excitationsToParameters_.map(excitations));
+        return x;
+    }
+
+    template<typename NMSmodelT>
     void MuscleExcitationParameterInterpreter<NMSmodelT>::getUpperLowerBounds(std::vector<double>& upperBounds, std::vector<double>& lowerBounds) const {
 
-        upperBounds = std::vector<double>(noParameters_, 1);
-        lowerBounds = std::vector<double>(noParameters_, 0);
+        upperBounds = std::vector<double>(noParameters_, 0.999);
+        lowerBounds = std::vector<double>(noParameters_, 0.001);
     }
 
 

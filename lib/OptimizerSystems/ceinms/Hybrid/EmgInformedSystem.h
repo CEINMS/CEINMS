@@ -13,7 +13,7 @@ namespace ceinms {
         EmgInformedSystem(NMSmodelT& subject, const ObjectiveFunctionT& objectiveFunction, const typename ParametersInterpreterT::ParameterSet& parameterSet);
         void evaluate() override;
         void setParameters(const std::vector<double>& x) override;
-        void setExternalTorque(const std::vector<double>& externalTorques);
+        void setExternalTorques(const std::vector<double>& externalTorques);
         void setMeasuredExcitations(const std::vector<double>& measuredExcitations);
         std::vector<double> getParameters() const;
         double getF() const override;
