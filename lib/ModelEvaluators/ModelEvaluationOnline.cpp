@@ -224,7 +224,7 @@ namespace ceinms {
         vector<double> endData;
         double endTime = std::numeric_limits<double>::infinity();
         ModelEvaluationBase<Logger>::logger.log(endTime, endData, "Activations");
-        ModelEvaluationBase<Logger>::logger.log(endTime, endData, "FibreLenghts");
+        ModelEvaluationBase<Logger>::logger.log(endTime, endData, "FibreLengths");
         ModelEvaluationBase<Logger>::logger.log(endTime, endData, "NormFibreLengths");
         ModelEvaluationBase<Logger>::logger.log(endTime, endData, "FibreVelocities");
         ModelEvaluationBase<Logger>::logger.log(endTime, endData, "NormFibreVelocities");

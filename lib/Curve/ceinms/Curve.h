@@ -30,9 +30,18 @@
 #define ceinms_Curve_h
 
 #include <vector>
+#include <cmath>
 #include "CircularVector.h"
 
 namespace ceinms {
+
+    template<typename T>
+    bool nearly_equal(T a, T b)
+    {
+        return std::nextafter(a, std::numeric_limits<T>::lowest()) <= b
+            && std::nextafter(a, std::numeric_limits<T>::max()) >= b;
+    }
+
     namespace CurveMode {
         enum Mode{ Online, Offline };
         enum Interpolation{ Cubic, Linear };
@@ -97,6 +106,7 @@ namespace ceinms {
         }
         friend std::ostream& operator<< <>(std::ostream& output, const Curve& c);
         bool empty() { return b_.empty(); }
+        std::size_t getNoElements() const { return x_.size(); }
     private:
         void computeCoefficients(Int2Type<CurveMode::Cubic>);
         void computeCoefficients(Int2Type<CurveMode::Linear>);

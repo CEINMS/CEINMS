@@ -24,6 +24,8 @@ namespace ceinms {
     template <typename NMSmodelT>
     void NMSmodelFrameOptimisation<NMSmodelT>::optimise() {
 
+      
+
         std::vector<double> measuredExcitations;
         subject_.getEmgs(measuredExcitations);
         emgInformed_.setMeasuredExcitations(measuredExcitations);
@@ -49,7 +51,7 @@ namespace ceinms {
         }
 
         //finalise after optimization
-        subject_.updateState_END_OF_HYBRID_MINIMIZATION();
+   //     subject_.updateState_END_OF_HYBRID_MINIMIZATION();
     }
 }
     

@@ -118,6 +118,7 @@ namespace ceinms {
         double getFiberLength() const { return fibreLength_; }
         double getNormFiberLength() const { return fibreLength_ / optimalFibreLength_; }
         double getFiberVelocity() const { return fibreVelocity_; }
+        double getTendonLength() const { return tendonDynamic_.getTendonLength(); }
         double getNormFiberVelocity() const { return normFibreVelocity_; }
         double getPennationAngleAtT() const { return pennationAngleAtT_; };
         double getMuscleForce() const { return muscleForce_; }

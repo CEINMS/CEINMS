@@ -40,8 +40,8 @@ namespace ceinms {
     MTU<Activation, Tendon, mode>::MTU()
         :id_(""), emDelay_(.0), c1_(0.), c2_(0.), shapeFactor_(0.), activation_(0.),
         optimalFibreLength_(0.), pennationAngle_(0.), tendonSlackLength_(0.),
-        percentageChange_(0.), fibreLength_(0.), pennationAngleAtT_(0.),
-        fibreVelocity_(0.), damping_(0.), maxIsometricForce_(0.), time_(.0), timeScale_(0.),
+        percentageChange_(0.), fibreLength_(optimalFibreLength_), pennationAngleAtT_(0.),
+        fibreVelocity_(0.), damping_(0.), maxIsometricForce_(0.), time_(.0), timeScale_(0.005),
         strengthCoefficient_(0.), muscleForce_(0.), maxContractionVelocity_(0.)  { }
 
 
@@ -49,8 +49,8 @@ namespace ceinms {
     MTU<Activation, Tendon, mode>::MTU(std::string id)
         :id_(id), emDelay_(.0), c1_(0.), c2_(0.), shapeFactor_(0.), activation_(0.),
         optimalFibreLength_(0.), pennationAngle_(0.), tendonSlackLength_(0.),
-        percentageChange_(0.), fibreLength_(0.), pennationAngleAtT_(0.),
-        fibreVelocity_(0.), damping_(0.), maxIsometricForce_(0.), time_(.0), timeScale_(0.),
+        percentageChange_(0.), fibreLength_(optimalFibreLength_), pennationAngleAtT_(0.),
+        fibreVelocity_(0.), damping_(0.), maxIsometricForce_(0.), time_(.0), timeScale_(0.005),
         strengthCoefficient_(0.), muscleForce_(0.), maxContractionVelocity_(0.), tendonDynamic_(id)  { }
 
 
@@ -180,6 +180,8 @@ namespace ceinms {
         tendonDynamic_.resetState();
         fibreLengthTrace_.reset();
         activation_ = .0;
+        time_ = 0;
+        timeScale_ = 0.005;
     }
 
 
@@ -220,7 +222,10 @@ namespace ceinms {
     void MTU<Activation, Tendon, mode>::updateFibreLengthAndVelocity() {
 
         updateFibreLength();
+        //add extra point to control the derivative
+     //   fibreLengthTrace_.addPointNoUpdate(time_ + timeScale_, fibreLength_);
         updateFibreVelocity();
+     //   fibreLengthTrace_.removeLastPointNoUpdate();
     }
 
 
@@ -229,7 +234,11 @@ namespace ceinms {
 
         tendonDynamic_.updateFibreLength();
         fibreLength_ = tendonDynamic_.getFibreLength();
+  //      cout << fibreLengthTrace_.getNoElements() << std::endl;
         fibreLengthTrace_.addPointNoUpdate(time_, fibreLength_);
+        //helps control the derivative
+    //    cout << fibreLengthTrace_.getNoElements() << std::endl;
+
     }
 
 
@@ -238,6 +247,7 @@ namespace ceinms {
 
         fibreLengthTrace_.refresh();
         fibreVelocity_ = fibreLengthTrace_.getFirstDerivative(time_);
+        cout << fibreVelocity_ << endl;
     }
 
 
@@ -268,6 +278,7 @@ namespace ceinms {
     void MTU<Activation, Tendon, mode>::updateFibreVelocity_OFFLINE() {
 
         fibreVelocity_ = fibreLengthTrace_.getFirstDerivative(time_);
+  //      std::cout << id_ << " fibre velocity: " << fibreVelocity_ << std::endl;
     }
 
 
@@ -275,10 +286,10 @@ namespace ceinms {
     void MTU<Activation, Tendon, mode>::updateFibreLengthAndVelocity_HYBRID() {
 
         updateFibreLength_OFFLINE();
-        fibreLengthTrace_.removeLastPointNoUpdate();
-        fibreLengthTrace_.addPointNoUpdate(time_, fibreLength_);
-        fibreLengthTrace_.refresh();
+        fibreLengthTrace_.addPoint(time_, fibreLength_);
+//        fibreLengthTrace_.refresh();
         updateFibreVelocity_OFFLINE();
+        fibreLengthTrace_.removeLastPointNoUpdate();
     }
 
 

@@ -65,13 +65,14 @@ namespace ceinms {
             double strengthCoefficient,
             double maxContractionVelocity);
 
-        void setTime(const double& time) { time_ = time; }
+        void setTime(const double& time);
         void setMuscleTendonLength(double muscleTendonLength);
         void setActivation(double activation);
         void updateFibreLength();
         double getPenalty() const { return tendonPenalty_; }
 
-        double getFibreLength() { return fibreLength_; }
+        double getFibreLength() const { return fibreLength_; }
+        double getTendonLength() const { return tendonLength_; }
         void setStrengthCoefficient(double strengthCoefficient);
         void setTendonSlackLength(double tendonSlackLength);
         void setOptimalFibreLength(double optimalFibreLength);
@@ -122,12 +123,14 @@ namespace ceinms {
         CurveOffline forceVelocityCurve_;
         CurveOffline tendonForceStrainCurve_;
 
-        Curve<CurveMode::Online, CurveMode::Cubic, 4>  fibreLengthTrace_;
+        Curve<CurveMode::Online, CurveMode::Cubic, 5>  fibreLengthTrace_;
         double fibreLength_;
+        double tendonLength_;
         double muscleTendonLength_;
         double activation_;
         double tendonPenalty_;
         double time_;
+        double timeScale_;
         double tolerance_;
         std::string id_;
 
