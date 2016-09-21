@@ -54,8 +54,16 @@ namespace ceinms {
         bool runOpenLoopWithKneeBalanceContactModel();
         template <typename NMSmodelT, template <typename, typename> class ModelEvaluatorT, typename LoggerT>
         bool runOpenLoop();
+
+        template <typename T>
+        bool runHybrid(bool useContactForces);
+        template <typename NMSmodelT>
+        bool runHybridWithGenericContactModel();
+        template <typename NMSmodelT>
+        bool runHybridWithKneeBalanceContactModel();
         template <typename T>
         bool runHybrid();
+
 
         static void sortMaFilenames(const std::map<std::string, std::string>& maMap, const std::vector< std::string >& dofNames, std::vector< std::string >& maDataFilenames);
 
