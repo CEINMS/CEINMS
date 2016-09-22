@@ -339,32 +339,26 @@ namespace ceinms {
         double dfp = passiveForceLengthCurve_.getFirstDerivative(normFiberLength) / optimalFibreLength_; // derivative respect to length, not normlength
         double dfa = activeForceLengthCurve_.getFirstDerivative(normFiberLengthAtT) / optimalFiberLengthAtT;
 
-        double tendonLength = muscleTendonLength_ - fibreLength_;
+        double pennationAngleAtT = computePennationAngle(optimalFibreLength_);
+        double tendonLength = muscleTendonLength_ - fibreLength_*cos(pennationAngleAtT);
         double tendonStrain = (tendonLength - tendonSlackLength_) / tendonSlackLength_;
-
-        if (tendonStrain < 0)
-        {
-            //cout << "MTU: TendonStrain_ is " << tendonStrain_ << ". Set to 0." << endl;
-            tendonStrain = 0;
-        }
 
         double tendonStiffness = maxIsometricForce_*strengthCoefficient_*
             tendonForceStrainCurve_.getFirstDerivative(tendonStrain) / tendonSlackLength_; // derivative respect to length, not normlength
 
         if (tendonStiffness < 0)
         {
-            cout << "Warning: tendonStiffness_ is < 0" << endl;
+            tendonStiffness=0;
         }
-
-        double pennationAngleAtT = computePennationAngle(optimalFibreLength_);
 
         double fiberStiffness=maxIsometricForce_*strengthCoefficient_*(dfa*fv*activation_ + dfp);
          //dFmAT/dlce = d/dlce( fiso * (a *fal*fv + fpe + beta*dlceN)*cosPhi )
-        double sinPennAngle=sin(pennationAngleAtT);
-        double dPennAngle_dlm=-sinPennAngle/fibreLength_ / sqrt(1.0 - sinPennAngle*sinPennAngle);
-        double dCosPennAngle_Dlm = -sinPennAngle*dPennAngle_dlm;
+        double sinPennAngleAtT=sin(pennationAngleAtT);
+        double sinPennAngleOpt=sin(pennationAngle_);
+        double dPennAngle_dlm=-sinPennAngleOpt/fibreLength_ / sqrt(normFiberLength*normFiberLength - sinPennAngleOpt*sinPennAngleOpt);
+        double dCosPennAngle_Dlm = -sinPennAngleAtT*dPennAngle_dlm;
         double dFmAlongTendon_dl = fiberStiffness*cos(pennationAngleAtT) + muscleForce_*dCosPennAngle_Dlm;
-        double dLmAlongTendon_dl = cos(pennationAngleAtT) - fibreLength_*sinPennAngle*dPennAngle_dlm;
+        double dLmAlongTendon_dl = cos(pennationAngleAtT) - fibreLength_*sinPennAngleAtT*dPennAngle_dlm;
         double muscleStiffness = dFmAlongTendon_dl /dLmAlongTendon_dl; //dFmAlongTendon_dlAlongTendon
         // TODO: check that the following is not NaN
         mtuStiffness_ =  (muscleStiffness * tendonStiffness) / (muscleStiffness + tendonStiffness);
