@@ -498,7 +498,7 @@ namespace ceinms {
                 runHybridWithGenericContactModel <NMSmodelT>();
                 break;
             case ContactModelType::KneeBalance:
-                runHybridWithKneeBalanceContactModel <NMSmodelT>();
+                runHybrid <NMSmodelT>();
                 break;
             }
         }
@@ -514,7 +514,7 @@ namespace ceinms {
         //Create queues for input data
         EmgQueue emgQueue;
         LmtQueue lmtQueue;
-        ExternalTorquesQueue externalTorqueQueue;
+        ExternalTorquesQueue externalTorqueQueue, torquesFromIDQueue;
         MultipleMomentArmsQueues momentArmsQueues;
         GeneralisedCoordinatesQueue generalisedCoordinatesQueue;
         MultipleExternalForcesQueue externalForcesQueue;
@@ -529,7 +529,18 @@ namespace ceinms {
 
         NMSmodelT mySubject;
         setupSubject(mySubject, subjectFile_, executionCfg_.getTolerance());
+        
+        std::string osimModelFilename = mySubject.getOpenSimModelFilename();
+        try {
+            OpenSim::Model testModel(osimModelFilename);
+            std::cout << "Found valid OpenSim model: " << osimModelFilename << std::endl;
+        }
+        catch (...)
+        {
+            std::cout << "OpenSim model not valid: " << osimModelFilename << std::endl;
+            exit(EXIT_FAILURE);
 
+        }
         // 2. define the thread connecting with the input sources
         string emgFilename(dataLocations_.getExcitationsFile());
         EmgFromFile emgProducer(emgQueue, doneWithSubscriptionsLatch, doneWithExecutionLatch, mySubject, emgFilename, emgGeneratorFile_);
@@ -837,19 +848,19 @@ namespace ceinms {
             break;
 
         case NMSModelCfg::HybridExponentialActivationStiffTendonOnline:
-            exitFlag = runHybrid<NMSmodel<ExponentialActivation, StiffTendon, CurveMode::Online>>();
+            exitFlag = runHybrid<NMSmodel<ExponentialActivation, StiffTendon, CurveMode::Online>>(hasContactModel_);
             break;
 
         case NMSModelCfg::HybridExponentialActivationElasticTendonBiSecOnline:
-            exitFlag = runHybrid<NMSmodel<ExponentialActivation, ElasticTendon_BiSec, CurveMode::Online>>();
+            exitFlag = runHybrid<NMSmodel<ExponentialActivation, ElasticTendon_BiSec, CurveMode::Online>>(hasContactModel_);
             break;
 
         case NMSModelCfg::HybridPiecewiseActivationStiffTendonOnline:
-            exitFlag = runHybrid<NMSmodel<PiecewiseActivation, StiffTendon, CurveMode::Online>>();
+            exitFlag = runHybrid<NMSmodel<PiecewiseActivation, StiffTendon, CurveMode::Online>>(hasContactModel_);
             break;
 
         case NMSModelCfg::HybridPiecewiseActivationElasticTendonBiSecOnline:
-            exitFlag = runHybrid<NMSmodel<PiecewiseActivation, ElasticTendon_BiSec, CurveMode::Online>>();
+            exitFlag = runHybrid<NMSmodel<PiecewiseActivation, ElasticTendon_BiSec, CurveMode::Online>>(hasContactModel_);
             break;
 
         default:
