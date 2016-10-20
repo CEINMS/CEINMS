@@ -54,6 +54,11 @@ namespace ceinms {
         expShapeFactor_ = exp(shapeFactor_);
     }
 
+    void ExponentialActivation::setActivationScale(double activationScale) {
+
+        activationScale_ = activationScale;
+    }
+
     bool ExponentialActivation::setEmg(double emg) {
 
         emg_ = emg;
@@ -79,7 +84,7 @@ namespace ceinms {
         }
 
         neuralActivation_ = (alpha_*emg_) - (beta1_*neuralActivationT1_) - (beta2_*neuralActivationT2_);
-        activation_ = (exp(shapeFactor_*neuralActivation_) - 1) / (expShapeFactor_ - 1);
+        activation_ = activationScale_*(exp(shapeFactor_*neuralActivation_) - 1) / (expShapeFactor_ - 1);
     }
 
 

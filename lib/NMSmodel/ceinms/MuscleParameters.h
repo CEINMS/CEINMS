@@ -47,6 +47,7 @@ namespace ceinms {
         double getStrengthCoefficient() const    { return strengthCoefficient_; }
         double getEmDelay() const                { return emDelay_; }
         double getDamping() const                { return damping_; }
+        double getActivationScale() const        { return activationScale_; }
 
         void setC1(double c1)                                   { c1_ = c1; }
         void setC2(double c2)                                   { c2_ = c2; }
@@ -59,6 +60,7 @@ namespace ceinms {
         void setStrengthCoefficient(double strengthCoefficient) { strengthCoefficient_ = strengthCoefficient; }
         void setEmDelay(double emDelay)                         { emDelay_ = emDelay; }
         void setDamping(double damping)                         { damping_ = damping; }
+        void setActivationScale(double activationScale)         { activationScale_ = activationScale; }
 
     private:
         double c1_;
@@ -72,6 +74,7 @@ namespace ceinms {
         double strengthCoefficient_;
         double emDelay_;
         double damping_;
+        double activationScale_;
     };
 }
 

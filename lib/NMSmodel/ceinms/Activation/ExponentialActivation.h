@@ -39,6 +39,7 @@ namespace ceinms {
         void   setShapeFactor(double shapeFactor);
         void   setFilterParameters(double c1, double c2);
         bool   setEmg(double emg);
+        void   setActivationScale(double activationScale);
         void   updateActivation();
         void   resetState();
         void   pushState();
@@ -46,6 +47,7 @@ namespace ceinms {
         double getEmg() const { return emg_; }
         double getPastEmg() const { return pastEmgT1_; } //controllare se viene usata ancora 7Mar13
         double getNeuralActivation() const { return neuralActivation_; }
+        double getActivationScale() const { return activationScale_; }
 
     private:
         double beta1_;         /**< \f$\beta_1\f$ recursive coefficient */
@@ -63,6 +65,7 @@ namespace ceinms {
         double neuralActivationT1_; /**< \f$u(t-1)\f$ post-processed EMG of muscle at time t-1 */
         double neuralActivationT2_; /**< \f$u(t-2)\f$ post-processed EMG of muscle at time t-2 */
         double activation_;    /**< \f$a(t)\f$ activation of the muscle */
+        double activationScale_;
     };
 }
 

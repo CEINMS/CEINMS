@@ -133,6 +133,12 @@ namespace ceinms {
             double c1 = (*i).c1();
             double c2 = (*i).c2();
             double shapeFactor = (*i).shapeFactor();
+
+            double activationScale = 1;
+            MTUType::activationScale_optional& activationScaleOpt((*i).activationScale());
+            if (activationScaleOpt.present())
+                activationScale = (*i).activationScale().get();
+
             double optimalFiberLength = (*i).optimalFibreLength();
 
             MTUType::pennationAngle_type& xmlPennAngle((*i).pennationAngle());
@@ -149,7 +155,7 @@ namespace ceinms {
             }
             double tendonSlackLength = (*i).tendonSlackLength();
             double strengthCoefficient = (*i).strengthCoefficient();
-            newMuscle.setParametersToComputeActivation(c1, c2, shapeFactor);
+            newMuscle.setParametersToComputeActivation(c1, c2, shapeFactor, activationScale);
             newMuscle.setCurves(activeForceLengthCurve_, passiveForceLengthCurve_, forceVelocityCurve_, tendonForceStrain_);
             if ((*i).maxContractionVelocity().present())
             {

@@ -57,6 +57,11 @@ namespace ceinms {
         updateActivationParameters();
     }
 
+    void PiecewiseActivation::setActivationScale(double activationScale) {
+
+        activationScale_ = activationScale;
+    }
+
 
     bool PiecewiseActivation::setEmg(double emg) {
 
@@ -130,11 +135,11 @@ namespace ceinms {
         // non-linear region
         if (neuralActivation_ < Xo_) {
             if (((b_*neuralActivation_) + 1) > 0)
-                activation_ = a_*log((b_*neuralActivation_) + 1);
+                activation_ = activationScale_*a_*log((b_*neuralActivation_) + 1);
             else activation_ = 0;
         }
         else // linear region
-            activation_ = m_* neuralActivation_ + c_;
+            activation_ = activationScale_*m_* neuralActivation_ + c_;
 
     }
 

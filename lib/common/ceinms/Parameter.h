@@ -51,6 +51,7 @@ namespace ceinms {
             C1,
             C2,
             ShapeFactor,
+            ActivationScale,
             OptimalFibreLength,
             PennationAngle,
             TendonSlackLength,

@@ -235,6 +235,9 @@ namespace ceinms {
         case Parameter::ShapeFactor:
             subject_.getShapeFactors(coefficients);
             break;
+        case Parameter::ActivationScale:
+            subject_.getActivationScales(coefficients);
+            break;
         case Parameter::StrengthCoefficient:
             subject_.getStrengthCoefficients(coefficients);
             break;
@@ -274,6 +277,9 @@ namespace ceinms {
             break;
         case Parameter::ShapeFactor:
             subject_.setShapeFactors(coefficients);
+            break;
+        case Parameter::ActivationScale:
+            subject_.setActivationScales(coefficients);
             break;
         case Parameter::StrengthCoefficient:
             subject_.setStrengthCoefficients(coefficients);

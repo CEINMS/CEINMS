@@ -67,7 +67,8 @@ namespace ceinms {
 
         void setParametersToComputeActivation(double c1,
             double c2,
-            double shapeFactor);
+            double shapeFactor,
+            double activationScale);
 
         std::string getMuscleName() const { return id_; }
         bool   compareMusclesId(const std::string& id) const { return id_ == id; }
@@ -98,6 +99,8 @@ namespace ceinms {
         double getEmDelay() const { return emDelay_; }
         void   setShapeFactor(double shapeFactor);
         double getShapeFactor() const { return shapeFactor_; }
+        void   setActivationScale(double activationScale);
+        double getActivationScale() const { return activationScale_; }
         void   setC1(double c1);
         double getC1() const { return c1_; }
         void   setC2(double c2);
@@ -124,6 +127,7 @@ namespace ceinms {
         double getPercentageChange() const { return percentageChange_; }
         double getDamping() const { return damping_; }
         void   setDamping(double damping);
+
 
 
         void setTendonTolerance(double tolerance = 0.0);
@@ -156,6 +160,7 @@ namespace ceinms {
         double c1_;            /**< \f$C_1\f$ second-order filter coefficient */
         double c2_;            /**< \f$C_2\f$ second-order filter coefficient */
         double shapeFactor_;   /**< \f$A\f$ non-linear shape factor */
+        double activationScale_; /*//activation scaling factor*/
 
         // FIBER LENGTH, FIBER VELOCITY, and TENDON FORCE:
         Tendon tendonDynamic_;

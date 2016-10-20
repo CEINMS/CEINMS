@@ -115,6 +115,8 @@ namespace ceinms {
         void setStrengthCoefficients(const std::vector<double>& strengthCoefficients);
         void setShapeFactor(double shapeFactor);
         void setShapeFactors(const std::vector<double>& shapeFactors);
+        void setActivationScale(double activationScale);
+        void setActivationScales(const std::vector<double>& activationScales);
         void setC1(double C1);
         void setC1Coefficients(const std::vector<double>& c1Coefficients);
         void setC2(double C2);
@@ -160,6 +162,8 @@ namespace ceinms {
         void getMusclesIndexFromMusclesList(std::vector<unsigned>& muscleIndexList, const std::vector<std::string>& musclesList);
         double getShapeFactor() const { return muscles_.at(0).getShapeFactor(); }
         void getShapeFactors(std::vector<double>& shapeFactors) const;
+        //double getActivationScale() const { return muscles_.at(0).getActivationScale(); }
+        void getActivationScales(std::vector<double>& activationScales) const;
         double getC1() const { return muscles_.at(0).getC1(); }
         void getC1Coefficients(std::vector<double>& c1Coefficients) const;
         double getC2() const { return muscles_.at(0).getC2(); }

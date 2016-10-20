@@ -630,6 +630,16 @@ namespace ceinms {
     }
 
     template <typename Activation, typename Tendon, CurveMode::Mode mode>
+    void NMSmodel<Activation, Tendon, mode>::getActivationScales(vector<double>& activationScales) const {
+
+        activationScales.clear();
+        activationScales.reserve(muscles_.size());
+        vectorMTUconstItr muscleIt = muscles_.begin();
+        for (muscleIt = muscles_.begin(); muscleIt < muscles_.end(); ++muscleIt)
+            activationScales.emplace_back(muscleIt->getActivationScale());
+    }
+
+    template <typename Activation, typename Tendon, CurveMode::Mode mode>
     void NMSmodel<Activation, Tendon, mode>::getC1Coefficients(vector<double>& c1Coefficients) const {
 
         c1Coefficients.clear();
@@ -895,6 +905,15 @@ namespace ceinms {
         vector<double>::const_iterator shapeFactorsIt = shapeFactors.begin();
         for (muscleIt = muscles_.begin(); muscleIt < muscles_.end(); ++muscleIt, ++shapeFactorsIt)
             muscleIt->setShapeFactor(*shapeFactorsIt);
+    }
+
+    template <typename Activation, typename Tendon, CurveMode::Mode mode>
+    void NMSmodel<Activation, Tendon, mode>::setActivationScales(const vector<double>& activationScales) {
+
+        vectorMTUitr muscleIt = muscles_.begin();
+        vector<double>::const_iterator activationScalesIt = activationScales.begin();
+        for (muscleIt = muscles_.begin(); muscleIt < muscles_.end(); ++muscleIt, ++activationScalesIt)
+            muscleIt->setActivationScale(*activationScalesIt);
     }
 
     template <typename Activation, typename Tendon, CurveMode::Mode mode>

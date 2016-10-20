@@ -29,6 +29,7 @@
       <xs:element name="c1" type="xs:double"/>
       <xs:element name="c2" type="xs:double"/>
       <xs:element name="shapeFactor" type="xs:double"/>
+      <xs:element minOccurs="0" name="activationScale" type="xs:double"/>
       <xs:element name="optimalFibreLength" type="xs:double"/>
       <xs:element name="pennationAngle" type="AngleInputType"/>
       <xs:element name="tendonSlackLength" type="xs:double"/>

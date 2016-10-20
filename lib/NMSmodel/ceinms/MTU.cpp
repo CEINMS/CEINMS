@@ -162,13 +162,15 @@ namespace ceinms {
 
 
     template<typename Activation, typename Tendon, CurveMode::Mode mode>
-    void MTU<Activation, Tendon, mode>::setParametersToComputeActivation(double c1, double c2, double shapeFactor) {
+    void MTU<Activation, Tendon, mode>::setParametersToComputeActivation(double c1, double c2, double shapeFactor, double activationScale) {
 
         c1_ = c1;
         c2_ = c2;
         shapeFactor_ = shapeFactor;
+        activationScale_ = activationScale;
         activationDynamic_.setFilterParameters(c1_, c2_);
         activationDynamic_.setShapeFactor(shapeFactor_);
+        activationDynamic_.setActivationScale(activationScale_);
         resetState();
     }
 
@@ -374,6 +376,15 @@ namespace ceinms {
 
         shapeFactor_ = shapeFactor;
         activationDynamic_.setShapeFactor(shapeFactor_);
+        resetState();
+    }
+
+
+    template<typename Activation, typename Tendon, CurveMode::Mode mode>
+    void MTU<Activation, Tendon, mode>::setActivationScale(double activationScale) {
+
+        activationScale_ = activationScale;
+        activationDynamic_.setActivationScale(activationScale_);
         resetState();
     }
 

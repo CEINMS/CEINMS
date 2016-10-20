@@ -37,7 +37,8 @@ namespace ceinms {
         c1_(std::numeric_limits<double>::lowest()), c2_(dblLow), shapeFactor_(dblLow),
         optimalFiberLength_(dblLow), pennationAngle_(dblLow),
         tendonSlackLength_(dblLow), maxIsometricForce_(dblLow),
-        strengthCoefficient_(dblLow), emDelay_(dblLow), damping_(dblLow)
+        strengthCoefficient_(dblLow), emDelay_(dblLow), damping_(dblLow),
+        activationScale_(dblLow)
     {
 
     }
@@ -54,7 +55,8 @@ namespace ceinms {
                 strengthCoefficient_ == other.strengthCoefficient_  &&
                 damping_ == other.damping_                          &&
                 maxContractionVelocity_ == other.maxContractionVelocity_ &&
-                emDelay_ == other.emDelay_;
+                emDelay_ == other.emDelay_                          &&
+                activationScale_ == other.activationScale_;
 
     }
 
