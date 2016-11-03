@@ -117,6 +117,7 @@
       <xs:enumeration value="emDelay"/>
       <xs:enumeration value="percentageChange"/>
       <xs:enumeration value="damping"/>
+      <xs:enumeration value="activationScale"/>
     </xs:restriction>
   </xs:simpleType>
   
