@@ -37,7 +37,7 @@ namespace ceinms {
         try {
             SimTK::Optimizer opt(simTkAdapter_);
 
-            opt.setConvergenceTolerance(.00001);
+            opt.setConvergenceTolerance(SimTK::SignificantReal);
             opt.useNumericalGradient(true);
             opt.useNumericalJacobian(true);
             

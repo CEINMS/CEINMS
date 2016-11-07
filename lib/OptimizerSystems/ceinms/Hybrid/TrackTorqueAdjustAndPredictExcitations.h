@@ -36,6 +36,8 @@ namespace ceinms {
         for (unsigned i = 0; i < subject.getNoDoF(); ++i)
             indexesOfTorquesToMinimise_.push_back(i);
 
+
+
         //get torques to optimise from setup
 
     }

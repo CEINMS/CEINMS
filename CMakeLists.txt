@@ -3,8 +3,8 @@
 cmake_minimum_required (VERSION 2.8.11) # "target_include_directories" command  and VS12 generator are missing in previous versions
 project(CEINMS)
 set(CEINMS_MAJOR_VERSION 0)
-set(CEINMS_MINOR_VERSION 9)
-set(CEINMS_PATCH_VERSION 2)
+set(CEINMS_MINOR_VERSION 10)
+set(CEINMS_PATCH_VERSION 0)
 
 # Include GNUInstallDirs to get canonical paths
 include(GNUInstallDirs)
@@ -41,7 +41,6 @@ find_package(OpenSim REQUIRED)
 find_package(mcbs REQUIRED)
 
 find_package(osimSpliner REQUIRED)
-
 
 
 # Choose common build locations for executables and libraries

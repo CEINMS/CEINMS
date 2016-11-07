@@ -68,7 +68,7 @@ void printAuthors() {
     time_t now = std::time(0);
     tm *gmtm = std::gmtime(&now);
     cout << "Copyright (C) " << gmtm->tm_year+1900 << endl;
-    cout << "Claudio Pizzolato, Monica Reggiani, David Lloyd\n\n";
+    cout << "Claudio Pizzolato, Monica Reggiani, Massimo Sartori, David Lloyd\n\n";
 
     cout << "Software developers: Claudio Pizzolato, Elena Ceseracciu, Monica Reggiani\n";
 }

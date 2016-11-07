@@ -1,4 +1,5 @@
 #include "ceinms/Hybrid/TrackTorqueAdjustAndPredictExcitations.h"
+#include <iostream>
 
 namespace ceinms {
 
@@ -28,15 +29,15 @@ namespace ceinms {
         for (auto i : indexesOfMusclesWithExcitationsToAdjust_) {
             double diff(predictedExcitations.at(i) - measuredExcitations_.at(i));
             excitationTrackingError += diff*diff;
-            excitationSum += measuredExcitations_.at(i)*measuredExcitations_.at(i);
+            excitationSum += predictedExcitations.at(i)*predictedExcitations.at(i);
         }
 
         for (auto i : indexesOfMusclesWithExcitationsToPredict_) {
-            excitationSum += measuredExcitations_.at(i)*measuredExcitations_.at(i);
+            excitationSum += predictedExcitations.at(i)*predictedExcitations.at(i);
         }
 
         f_ = weightings_.alpha*torqueError + weightings_.beta*excitationSum + weightings_.gamma*excitationTrackingError;
-
+       
     }
 
     double TrackTorqueAdjustAndPredictExcitations::getValue() const {

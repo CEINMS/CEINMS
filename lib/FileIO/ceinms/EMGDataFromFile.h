@@ -50,6 +50,7 @@ namespace ceinms {
         ~EMGDataFromFile();
     private:
         std::ifstream EMGDataFile_;
+        bool exists_;
         int noMuscles_;
         int noTimeSteps_;
         int currentTimeStep_;
