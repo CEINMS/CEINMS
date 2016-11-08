@@ -111,6 +111,7 @@ namespace ceinms {
                 externalTorqueTime = externalTorquesFrameFromQueue.time;
             }
 
+
             // 4. read emgs
             EmgFrame emgFrameFromQueue;
             while (TimeCompare::less(emgTime, lmtMaTime) && runCondition) {
@@ -121,8 +122,8 @@ namespace ceinms {
                 if (!firstLmtArrived && runCondition) {
                     subject_.setTime(emgTime);
                     subject_.setEmgs(emgFrameFromQueue.data);
-                    subject_.updateActivations();
-                    subject_.pushState();
+  //                  subject_.updateActivations();
+  //                  subject_.pushState();
                 }
             }
 
@@ -179,8 +180,10 @@ namespace ceinms {
 #endif
 
 #ifdef LOG
-                cout << endl << endl << "EmgTime: " << emgTime << endl << "EMG" << endl;
-                for (auto& it : emgFrameFromQueue.data)
+                vector<double> adjustedEmg;
+                subject_.getEmgs(adjustedEmg);
+                cout << endl << endl << "EmgTime: " << emgTime << endl << "Adjusted EMG" << endl;
+                for (auto& it : adjustedEmg)
                     cout << it << "\t";
 
                 cout << endl << "LmtTime: " << lmtMaTime << endl << "Lmt" << endl;
@@ -192,7 +195,7 @@ namespace ceinms {
                     for (auto& it : momentArmsFrameFromQueue.at(j).data)
                         cout << it << "\t";
                 }
-
+                cout << endl;
                 cout << "External Torques: ";
                 for (auto& it : externalTorquesFrameFromQueue.data)
                     cout << it << " ";

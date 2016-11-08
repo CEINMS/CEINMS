@@ -30,10 +30,6 @@ namespace ceinms {
         subject_.getEmgs(measuredExcitations);
         emgInformed_.setMeasuredExcitations(measuredExcitations);
 
-       // std::vector<double> pastEMGData;
-       // subject_.getPastEmgs(pastEMGData);
-        
-
         try {
             SimTK::Optimizer opt(simTkAdapter_);
 
