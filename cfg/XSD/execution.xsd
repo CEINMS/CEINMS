@@ -51,7 +51,7 @@
       <xs:element name="gamma" type="xs:double"/>
       <xs:element name="synthMTUs" type="MuscleListType"/>
       <xs:element name="adjustMTUs" type="MuscleListType"/>
-      <xs:element name="algorithm" type="HybridAlgorithmType"/>
+      <xs:element minOccurs="0" name="algorithm" type="HybridAlgorithmType"/>
     </xs:sequence>
   </xs:complexType>
   <xs:complexType name="TypeType">

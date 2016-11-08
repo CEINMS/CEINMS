@@ -201,7 +201,7 @@ namespace ceinms {
 
 
     void ExecutionXmlReader::getAnnealingParameters(unsigned& nt, unsigned& ns, double& rt, double& t, unsigned& maxNoEval, double& epsilon, unsigned& noEpsilon) const {
-
+        /*
         ExecutionType::NMSmodel_type& myModel(executionPointer_->NMSmodel());
         ExecutionType::NMSmodel_type::type_type& myType(myModel.type());
         ExecutionType::NMSmodel_type::type_type::hybrid_optional& myHybOpt(myType.hybrid());
@@ -219,6 +219,7 @@ namespace ceinms {
         maxNoEval = mySimanType.maxNoEval();
         epsilon = mySimanType.epsilon();
         noEpsilon = mySimanType.noEpsilon();
+        */
     }
 
 
