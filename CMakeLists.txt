@@ -72,7 +72,7 @@ set(ConfigPackageLocation ${CMAKE_INSTALL_LIBDIR}/CEINMS)
 install(EXPORT CEINMSTargets
         FILE CEINMSTargets.cmake
         NAMESPACE CEINMS::
-        DESTINATION ${ConfigPackageLocation})
+        DESTINATION ${ConfigPackageLocation} COMPONENT Development)
 
 include(CMakePackageConfigHelpers)
 configure_package_config_file(cmake/CEINMSConfig.cmake.in
@@ -86,10 +86,10 @@ write_basic_package_version_file(${CMAKE_CURRENT_BINARY_DIR}/CEINMSConfigVersion
 
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/CEINMSConfigForInstall.cmake   
               DESTINATION ${ConfigPackageLocation}
-              RENAME CEINMSConfig.cmake)
+              RENAME CEINMSConfig.cmake COMPONENT Development)
               
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/CEINMSConfigVersion.cmake
-              DESTINATION ${ConfigPackageLocation})
+              DESTINATION ${ConfigPackageLocation} COMPONENT Development)
               
 # Uninstall target
 configure_file(

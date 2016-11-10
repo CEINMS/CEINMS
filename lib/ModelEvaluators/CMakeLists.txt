@@ -26,7 +26,7 @@ set_source_files_properties( ${ModelEvaluators_TEMPLATE_IMPLEMENTATION} PROPERTI
 source_group("Header Files" FILES ${ModelEvaluators_HEADERS})
 source_group("Source Files" FILES ${ModelEvaluators_TEMPLATE_IMPLEMENTATION} ${ModelEvaluators_SOURCES})
 
-#add_library(ModelEvaluators STATIC ${ModelEvaluators_HEADERS} ${ModelEvaluators_TEMPLATE_IMPLEMENTATION} ${ModelEvaluators_SOURCES})
+add_library(ModelEvaluators STATIC ${ModelEvaluators_HEADERS} ${ModelEvaluators_TEMPLATE_IMPLEMENTATION} ${ModelEvaluators_SOURCES})
 #target_include_directories( ModelEvaluators
 #                            PRIVATE 
                               
@@ -44,9 +44,10 @@ set(ModelEvaluators_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}" ceinms CACHE INTE
 #mark_as_advanced(JointContactModels_INCLUDE_DIRS)
 
 # Install
-install(FILES ${ModelEvaluators_HEADERS} ${ModelEvaluators_TEMPLATE_IMPLEMENTATION} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/ceinms)
+install(FILES ${ModelEvaluators_HEADERS} ${ModelEvaluators_TEMPLATE_IMPLEMENTATION} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/ceinms  COMPONENT Development)
 #install(TARGETS ModelEvaluators
 #        EXPORT CEINMSTargets
 #        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
 #        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
 #        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
+        
