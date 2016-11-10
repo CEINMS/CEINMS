@@ -90,7 +90,7 @@ namespace ceinms {
             } while (!myStream.eof() && ++noReadColumns < noMuscles_);
 
             if (noMuscles_ != muscleNames_.size()) {
-                cout << "Something is wrong. " << noMuscles_ << " muscles should be in the file "
+                cout << "Something is wrong. " << noMuscles_ << " muscles should be in the excitation file "
                     << "and we have : " << muscleNames_.size();
                 exit(EXIT_FAILURE);
             }
@@ -104,8 +104,7 @@ namespace ceinms {
                     if (genName != fileName) separator = "  <>  ";
                     std::cout << genName << separator << fileName << std::endl;
                 }
-                cout << "THE EMG generator is not able to generate EMG for your muscles starting from muscle in the file! (muscle names are different)\n";
-
+                cout << "The excitation generator is not able to generate excitations for your muscles.\nMuscle names are different between excitation generator and input file\n";
                 exit(EXIT_FAILURE);
             }
         }

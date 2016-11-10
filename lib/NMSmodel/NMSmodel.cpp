@@ -147,7 +147,8 @@ namespace ceinms {
 
 #ifdef CHECKS
         if (currentEmgData.size() != muscles_.size()) {
-            cout << "#EMGs != #muscles\n";
+            cout << "Error: the number of muscle excitations is different from the number of MTUs in the model\n";
+            cout << "Found " << currentEmgData.size() << " excitations and " << muscles_.size() << " MTUs\n";
             exit(EXIT_FAILURE);
         }
 #endif
@@ -197,7 +198,8 @@ namespace ceinms {
 
 #ifdef CHECKS
         if (currentLmtData.size() != muscles_.size()) {
-            cout << "#LMTs != #muscles\n";
+            cout << "Error: the number of musculotendon lengths is different from the number of MTUs in the model\n";
+            cout << "Found " << currentLmtData.size() << " musculotendon lengths and " << muscles_.size() << " MTUs\n";
             exit(EXIT_FAILURE);
         }
 #endif
