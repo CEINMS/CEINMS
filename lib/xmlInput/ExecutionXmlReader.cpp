@@ -154,11 +154,10 @@ namespace ceinms {
             cout << "Cannot get hybrid parameters, hybrid option not selected\n";
             exit(EXIT_FAILURE);
         }
-
         musclesToSynthesise.clear();
-        HybridType::synthMTUs_type& synthMTUs(myType.hybrid()->synthMTUs());
-        for (unsigned mi = 0; mi < synthMTUs.size(); ++mi)
-            musclesToSynthesise.push_back(synthMTUs.at(mi));
+        HybridType::synthMTUs_type& synthMTUs(myHybOpt->synthMTUs());
+        for (auto& e : synthMTUs)
+            musclesToSynthesise.push_back(e);
     }
 
 
@@ -172,11 +171,10 @@ namespace ceinms {
             exit(EXIT_FAILURE);
         }
 
-
         musclesToAdjust.clear();
-        HybridType::adjustMTUs_type& adjustMTUs(myType.hybrid()->adjustMTUs());
-        for (unsigned mi = 0; mi < adjustMTUs.size(); ++mi)
-            musclesToAdjust.push_back(adjustMTUs.at(mi));
+        HybridType::adjustMTUs_type& adjustMTUs(myHybOpt->adjustMTUs());
+        for (auto& e : adjustMTUs)
+            musclesToAdjust.push_back(e);
     }
 
     void ExecutionXmlReader::getHybridWeightings(double& alpha, double& beta, double& gamma) {
@@ -188,15 +186,21 @@ namespace ceinms {
             cout << "Cannot get hybrid parameters, hybrid option not selected\n";
             exit(EXIT_FAILURE);
         }
+        alpha = 1; beta = 1; gamma = 1;
 
-        HybridType::alpha_type& myAlpha(myType.hybrid()->alpha());
-        alpha = myAlpha;
+        if (myHybOpt->alpha().present())
+            alpha = myHybOpt->alpha().get();
+        
+        if (myHybOpt->beta().present())
+            beta = myHybOpt->alpha().get();
+        else if (myHybOpt->synthMTUs().weight().present())
+            beta = myHybOpt->synthMTUs().weight().get();
 
-        HybridType::beta_type& myBeta(myType.hybrid()->beta());
-        beta = myBeta;
+        if (myHybOpt->gamma().present())
+            gamma = myHybOpt->alpha().get();
+        else if (myHybOpt->adjustMTUs().weight().present())
+            gamma = myHybOpt->adjustMTUs().weight().get();
 
-        HybridType::gamma_type& myGamma(myType.hybrid()->gamma());
-        gamma = myGamma;
     }
 
 
