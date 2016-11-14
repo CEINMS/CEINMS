@@ -88,6 +88,7 @@ namespace ceinms {
             (*i).c1(currentMuscle.getC1());
             (*i).c2(currentMuscle.getC2());
             (*i).shapeFactor(currentMuscle.getShapeFactor());
+            (*i).activationScale(currentMuscle.getActivationScale());
             (*i).optimalFibreLength(currentMuscle.getOptimalFibreLength());
             (*i).pennationAngle(currentMuscle.getPennationAngle());
             (*i).tendonSlackLength(currentMuscle.getTendonSlackLength());

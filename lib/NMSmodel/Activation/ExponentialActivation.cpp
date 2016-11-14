@@ -34,7 +34,7 @@ namespace ceinms {
     ExponentialActivation::ExponentialActivation() :
         beta1_(0.0), beta2_(0.0), alpha_(0.0), shapeFactor_(0.0),
         emg_(0.0), noOfEmg_(0), pastEmgT1_(0.0), pastEmgT2_(0.0), neuralActivation_(0.0),
-        neuralActivationT1_(0.0), neuralActivationT2_(0.0), activation_(0.0), expShapeFactor_(0.0)
+        neuralActivationT1_(0.0), neuralActivationT2_(0.0), activation_(0.0), expShapeFactor_(0.0), activationScale_(1.)
 
     {
 

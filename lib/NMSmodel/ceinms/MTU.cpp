@@ -42,7 +42,7 @@ namespace ceinms {
         optimalFibreLength_(0.), pennationAngle_(0.), tendonSlackLength_(0.),
         percentageChange_(0.), fibreLength_(0.), pennationAngleAtT_(0.),
         fibreVelocity_(0.), damping_(0.), maxIsometricForce_(0.), time_(.0), timeScale_(0.),
-        strengthCoefficient_(0.), muscleForce_(0.), maxContractionVelocity_(0.)  { }
+        strengthCoefficient_(0.), muscleForce_(0.), maxContractionVelocity_(0.), activationScale_(1.)  { }
 
 
     template<typename Activation, typename Tendon, CurveMode::Mode mode>
@@ -51,7 +51,7 @@ namespace ceinms {
         optimalFibreLength_(0.), pennationAngle_(0.), tendonSlackLength_(0.),
         percentageChange_(0.), fibreLength_(0.), pennationAngleAtT_(0.),
         fibreVelocity_(0.), damping_(0.), maxIsometricForce_(0.), time_(.0), timeScale_(0.),
-        strengthCoefficient_(0.), muscleForce_(0.), maxContractionVelocity_(0.), tendonDynamic_(id)  { }
+        strengthCoefficient_(0.), muscleForce_(0.), maxContractionVelocity_(0.), activationScale_(1.), tendonDynamic_(id)  { }
 
 
 
@@ -65,6 +65,7 @@ namespace ceinms {
         c1_ = orig.c1_;
         c2_ = orig.c2_;
         shapeFactor_ = orig.shapeFactor_;
+        activationScale_ = orig.activationScale_;
 
         tendonDynamic_ = orig.tendonDynamic_;
         fibreVelocity_ = orig.fibreVelocity_;
@@ -103,6 +104,7 @@ namespace ceinms {
         c1_ = orig.c1_;
         c2_ = orig.c2_;
         shapeFactor_ = orig.shapeFactor_;
+        activationScale_ = orig.activationScale_;
 
         tendonDynamic_ = orig.tendonDynamic_;
         fibreVelocity_ = orig.fibreVelocity_;

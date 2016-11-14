@@ -123,10 +123,13 @@ namespace ceinms {
             switch (currentCalibrationStep.getStepCfg()) {
             case CalibrationCfg::MinimizeTorqueErrorParameterSetDefault: {
 
+                cout << currentCalibrationStep << endl;
                 vector<string> dofsToCalibrate;
                 currentCalibrationStep.getDofNames(dofsToCalibrate);
                 ParameterSet parameterSet;
                 currentCalibrationStep.getParameterSet(parameterSet);
+                for (auto p : parameterSet)
+                    cout << p << endl;
                 ObjectiveFunctionSetup objectiveFunctionSetup = currentCalibrationStep.getObjectiveFunctionSetup();
                 MinTorqueError minTorqueError;
                 using MySystem = NMSmodelSystem < NMSmodelT, MinTorqueError > ;
