@@ -192,12 +192,12 @@ namespace ceinms {
             alpha = myHybOpt->alpha().get();
         
         if (myHybOpt->beta().present())
-            beta = myHybOpt->alpha().get();
+            beta = myHybOpt->beta().get();
         else if (myHybOpt->synthMTUs().weight().present())
             beta = myHybOpt->synthMTUs().weight().get();
 
         if (myHybOpt->gamma().present())
-            gamma = myHybOpt->alpha().get();
+            gamma = myHybOpt->gamma().get();
         else if (myHybOpt->adjustMTUs().weight().present())
             gamma = myHybOpt->adjustMTUs().weight().get();
 
