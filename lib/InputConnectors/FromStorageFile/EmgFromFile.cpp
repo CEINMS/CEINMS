@@ -47,7 +47,7 @@ namespace ceinms {
         while (emgData_.areStillData())
         {
             emgData_.readNextEmgData();
-            EmgFromX::updateEmg(emgData_.getCurrentData(), emgData_.getCurrentTime());
+            EmgFromX::updateEmg(excitationMapper_.map(emgData_.getCurrentData()), emgData_.getCurrentTime());
         }
         EmgFromX::sendEndOfData();
 
