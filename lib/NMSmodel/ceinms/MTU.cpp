@@ -501,6 +501,7 @@ namespace ceinms {
         output << "emDelay: " << m.emDelay_ << endl;
         output << "C1: " << m.c1_ << " C2: " << m.c2_ << endl;
         output << "Shape Factor: " << m.shapeFactor_ << endl;
+        output << "Activation Scale: " << m.activationScale_ << endl;
         output << "activeForceLength" << endl << m.activeForceLengthCurve_ << endl;
         output << "passiveForceLength" << endl << m.passiveForceLengthCurve_ << endl;
         output << "forceVelocity" << endl << m.forceVelocityCurve_ << endl;
