@@ -6,32 +6,32 @@ Using CEINMS
 The CEINMS executable allows to run neuromusculoskeletal simulations in different operation modes, as was discussed in the :ref:`introduction <ceinmsOverview>`, depending on the content of the ``NMSmodel`` element in :ref:`executionConfigFile`.
 
 Within this element, the ``openLoop`` type means that the execution will run in *full-predictive open-loop*, therefore no joint moments file (see :ref:`prepareDataInputData`) is required for the trial that is being processed.
-The ``hybrid`` execution modality is more complex, as it allows to select the objective function weightings alpha, beta and gamma, the muscles considered in the optimization, and to select the optimization algorithm.
-Depending on the choice of ``trackedMuscles``, ``predictedMuscles`` and weightings, we label the algorithm differently (see also :ref:`introHybrid`): 
+The ``hybrid`` execution modality is more complex, as it allows to select the objective function weightings alpha, beta and gamma, and the muscles considered in the optimization..
+Depending on the choice of ``adjustMTUs``, ``synthMTUs`` and weightings, we label the algorithm differently (see also :ref:`introHybrid`): 
 
 *Hybrid mode*
 
-    alpha = 1, beta = 0, gamma > 0
+    alpha = 1, beta > 0, gamma = 0
 
-    trackedMuscles = none
+    adjustMTUs = none
 
-    predictedMuscles = every muscle without experimental excitations
+    synthMTUs = every muscle without experimental excitations
 
 *EMG-assisted mode*
 
     alpha = 1, beta > 1, gamma > 1
 
-    trackedMuscles = every muscle with experimental excitations
+    adjustMTUs = every muscle with experimental excitations
 
-    predictedMuscles = remaining muscles
+    synthMTUs = remaining muscles
 
 *Full optimization-driven closed-loop mode*
 
-    alpha = 1, beta = 0, gamma > 0
+    alpha = 1, beta > 0, gamma = 0
 
-    trackedMuscles = none
+    adjustMTUs = none
 
-    predictedMuscles = every muscle
+    synthMTUs = every muscle
 
 
 
