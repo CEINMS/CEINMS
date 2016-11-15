@@ -139,6 +139,7 @@ namespace ceinms {
                 calibrationXmlReader_.getOptimizationAlgorithmParameters(simanParameters);
                 Optimizers::SimulatedAnnealing<MySystem> optimizer(system, simanParameters);
                 exitflag = optimizer.optimize();
+
             }   break;
 
             case CalibrationCfg::TorqueErrorAndSumKneeContactForcesParameterSetDefault: {

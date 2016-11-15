@@ -56,7 +56,6 @@ namespace ceinms {
         //       void setTrialData(const std::vector<TrialData>& trialData) { trialData_ = trialData; }
         //       void pushTrialData(const TrialData& trialData) { trialData_.emplace_back(trialData); }
         void printCosts() const { objectiveFunction_.printCosts(); }
-
     private:
 
         size_t nParameters_;

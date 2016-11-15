@@ -150,7 +150,7 @@ namespace ceinms {
     void ModelEvaluationOffline<NMSmodelT, Logger>::operator()() {
 
         ModelEvaluationBase<Logger>::doneWithSubscriptions();
-
+        vector<vector<double>> squaredDiffs;
 #ifdef LOG
         cout << "starting consume" << endl;
 #endif
@@ -234,7 +234,7 @@ namespace ceinms {
             }
             ModelEvaluationBase<Logger>::logger.log(lmtMaTime, data, "MusclesContribution");
 #endif
-            cout << "modelEval time: " << lmtMaTime;
+            cout << "modelEval time: " << lmtMaTime << endl;
             for (unsigned i(0); i < 100; ++i) cout << ".";
             cout << endl;
 
@@ -276,6 +276,16 @@ namespace ceinms {
                 cout << cTorques.at(i);
             }
             cout << endl << "----------------------------------------" << endl;
+            vector<double> currentSquaredDiff;
+            std::transform(
+                std::begin(externalTorquesFrame.data),
+                std::end(externalTorquesFrame.data),
+                std::begin(cTorques),
+                std::back_inserter(currentSquaredDiff), [](double first, double second){
+                auto v =  (first - second)*(first - second); 
+                cout << "Squared diffs: " << v << endl;
+                return v; });
+            squaredDiffs.emplace_back(currentSquaredDiff);
 #endif
             runCondition = runCondition = !(emgFramesFromQueue_.empty() || maFramesFromQueue_.empty() || lmtFramesFromQueue_.empty());
         } //end while(runCondition)
@@ -296,7 +306,16 @@ namespace ceinms {
 #endif
 
         ModelEvaluationBase<Logger>::doneWithExecution();
-#ifdef LOG
+#ifdef Evaluation_LOG
+        std::cout << "Joint moments RMSE\n";
+        vector<double> rmse(squaredDiffs.front().size(), 0);
+
+        for (auto currentSquaredDiff : squaredDiffs) {
+            for (int i(0); i < currentSquaredDiff.size(); ++i)
+                rmse.at(i) += currentSquaredDiff.at(i);
+        }
+        for (int i(0); i < dofNames_.size(); ++i) 
+            cout << dofNames_.at(i) << " " << sqrt(rmse.at(i) / squaredDiffs.size()) << " Nm" << endl;
         cout << "Estimation completed. " << endl;
 #endif
     }

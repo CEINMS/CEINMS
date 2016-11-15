@@ -118,5 +118,6 @@ namespace ceinms {
         //need a way to get the breakdown of the errors from the obj function. There could be a member function that returns a vector<double>
         //and another member function that returns a vector<string> that describes the each entry of the error vector.
         //this is necessary for stats/error control..
+
     }
 }

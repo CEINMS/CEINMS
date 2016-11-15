@@ -1082,6 +1082,7 @@ namespace ceinms {
             parameters.at(i).setC1(muscles_.at(i).getC1());
             parameters.at(i).setC2(muscles_.at(i).getC2());
             parameters.at(i).setShapeFactor(muscles_.at(i).getShapeFactor());
+            parameters.at(i).setActivationScale(muscles_.at(i).getActivationScale());
             parameters.at(i).setOptimalFiberLength(muscles_.at(i).getOptimalFibreLength());
             parameters.at(i).setPennationAngle(muscles_.at(i).getPennationAngle());
             parameters.at(i).setTendonSlackLength(muscles_.at(i).getTendonSlackLength());
@@ -1103,6 +1104,7 @@ namespace ceinms {
             mIt->setC1(pIt->getC1());
             mIt->setC2(pIt->getC2());
             mIt->setShapeFactor(pIt->getShapeFactor());
+            mIt->setActivationScale(pIt->getActivationScale());
             mIt->setOptimalFibreLength(pIt->getOptimalFiberLength());
             mIt->setPennationAngle(pIt->getPennationAngle());
             mIt->setTendonSlackLength(pIt->getTendonSlackLength());
