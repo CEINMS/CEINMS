@@ -103,7 +103,7 @@ namespace ceinms {
     template <typename NMSmodelT, template <typename, typename> class ModelEvaluatorT, typename LoggerT>
     bool SimulationManager::runOpenLoop(bool useContactForces) {
 
-        if (useContactForces) {
+ /*       if (useContactForces) {
             switch (contactModelCfg_.getContactModelType()) {
             case ContactModelType::OpenSim:
                 runOpenLoopWithGenericContactModel < NMSmodelT, ModelEvaluatorT, LoggerT >();
@@ -113,7 +113,7 @@ namespace ceinms {
                 break;
             }
         }
-        else
+        else*/
             runOpenLoop< NMSmodelT, ModelEvaluatorT, LoggerT >();
         return true;
     }
@@ -492,7 +492,7 @@ namespace ceinms {
     template <typename NMSmodelT>
     bool SimulationManager::runHybrid(bool useContactForces) {
 
-        if (useContactForces) {
+  /*      if (useContactForces) {
             switch (contactModelCfg_.getContactModelType()) {
             case ContactModelType::OpenSim:
                 runHybridWithGenericContactModel <NMSmodelT>();
@@ -502,7 +502,7 @@ namespace ceinms {
                 break;
             }
         }
-        else
+        else*/
             runHybrid<NMSmodelT>();
         return true;
     }
@@ -847,18 +847,22 @@ namespace ceinms {
             exitFlag = runOpenLoop<NMSmodel<PiecewiseActivation, ElasticTendon_BiSec, CurveMode::Offline>, ModelEvaluationOffline, LoggerOnQueues >(hasContactModel_);
             break;
 
+        case NMSModelCfg::HybridExponentialActivationStiffTendonOffline:
         case NMSModelCfg::HybridExponentialActivationStiffTendonOnline:
             exitFlag = runHybrid<NMSmodel<ExponentialActivation, StiffTendon, CurveMode::Online>>(hasContactModel_);
             break;
 
+        case NMSModelCfg::HybridExponentialActivationElasticTendonBiSecOffline:
         case NMSModelCfg::HybridExponentialActivationElasticTendonBiSecOnline:
             exitFlag = runHybrid<NMSmodel<ExponentialActivation, ElasticTendon_BiSec, CurveMode::Online>>(hasContactModel_);
             break;
 
+        case NMSModelCfg::HybridPiecewiseActivationStiffTendonOffline:
         case NMSModelCfg::HybridPiecewiseActivationStiffTendonOnline:
             exitFlag = runHybrid<NMSmodel<PiecewiseActivation, StiffTendon, CurveMode::Online>>(hasContactModel_);
             break;
 
+        case NMSModelCfg::HybridPiecewiseActivationElasticTendonBiSecOffline:
         case NMSModelCfg::HybridPiecewiseActivationElasticTendonBiSecOnline:
             exitFlag = runHybrid<NMSmodel<PiecewiseActivation, ElasticTendon_BiSec, CurveMode::Online>>(hasContactModel_);
             break;
