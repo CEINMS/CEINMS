@@ -82,6 +82,9 @@ void PrintUsage()
 
 int main(int argc, char** argv){
 
+    printHeader();
+    printAuthors();
+
     string option = "";
     string setupFileName;
     if (argc < 2) {
