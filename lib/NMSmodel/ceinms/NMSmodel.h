@@ -162,7 +162,6 @@ namespace ceinms {
         void getMusclesIndexFromMusclesList(std::vector<unsigned>& muscleIndexList, const std::vector<std::string>& musclesList);
         double getShapeFactor() const { return muscles_.at(0).getShapeFactor(); }
         void getShapeFactors(std::vector<double>& shapeFactors) const;
-        //double getActivationScale() const { return muscles_.at(0).getActivationScale(); }
         void getActivationScales(std::vector<double>& activationScales) const;
         double getC1() const { return muscles_.at(0).getC1(); }
         void getC1Coefficients(std::vector<double>& c1Coefficients) const;
