@@ -30,7 +30,7 @@ namespace ceinms {
             return(0);
         }
     private:
-        mutable EmgInformedSystemT& emgInformedSystem_;
+        EmgInformedSystemT& emgInformedSystem_;
     };
 
 
