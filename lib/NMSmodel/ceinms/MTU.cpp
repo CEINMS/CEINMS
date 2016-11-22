@@ -44,7 +44,6 @@ namespace ceinms {
         fibreVelocity_(0.), damping_(0.), maxIsometricForce_(0.), time_(.0), timeScale_(0.),
         strengthCoefficient_(0.), muscleForce_(0.), maxContractionVelocity_(0.), activationScale_(1.)  { }
 
-
     template<typename Activation, typename Tendon, CurveMode::Mode mode>
     MTU<Activation, Tendon, mode>::MTU(std::string id)
         :id_(id), emDelay_(.0), c1_(0.), c2_(0.), shapeFactor_(0.), activation_(0.),
@@ -52,8 +51,6 @@ namespace ceinms {
         percentageChange_(0.), fibreLength_(0.), pennationAngleAtT_(0.),
         fibreVelocity_(0.), damping_(0.), maxIsometricForce_(0.), time_(.0), timeScale_(0.),
         strengthCoefficient_(0.), muscleForce_(0.), maxContractionVelocity_(0.), activationScale_(1.), tendonDynamic_(id)  { }
-
-
 
     template<typename Activation, typename Tendon, CurveMode::Mode mode>
     MTU<Activation, Tendon, mode>::MTU(const MTU<Activation, Tendon, mode>& orig) {
@@ -91,7 +88,6 @@ namespace ceinms {
         timeScale_ = orig.timeScale_;
         time_ = orig.time_;
     }
-
 
 
     template<typename Activation, typename Tendon, CurveMode::Mode mode>
@@ -184,6 +180,8 @@ namespace ceinms {
         tendonDynamic_.resetState();
         fibreLengthTrace_.reset();
         activation_ = .0;
+        time_ = 0;
+        timeScale_ = 0.005;
     }
 
 
@@ -224,7 +222,10 @@ namespace ceinms {
     void MTU<Activation, Tendon, mode>::updateFibreLengthAndVelocity() {
 
         updateFibreLength();
+        //add extra point to control the derivative
+     //   fibreLengthTrace_.addPointNoUpdate(time_ + timeScale_, fibreLength_);
         updateFibreVelocity();
+     //   fibreLengthTrace_.removeLastPointNoUpdate();
     }
 
 
@@ -233,7 +234,11 @@ namespace ceinms {
 
         tendonDynamic_.updateFibreLength();
         fibreLength_ = tendonDynamic_.getFibreLength();
+  //      cout << fibreLengthTrace_.getNoElements() << std::endl;
         fibreLengthTrace_.addPointNoUpdate(time_, fibreLength_);
+        //helps control the derivative
+    //    cout << fibreLengthTrace_.getNoElements() << std::endl;
+
     }
 
 
@@ -242,6 +247,7 @@ namespace ceinms {
 
         fibreLengthTrace_.refresh();
         fibreVelocity_ = fibreLengthTrace_.getFirstDerivative(time_);
+        cout << fibreVelocity_ << endl;
     }
 
 
@@ -272,6 +278,7 @@ namespace ceinms {
     void MTU<Activation, Tendon, mode>::updateFibreVelocity_OFFLINE() {
 
         fibreVelocity_ = fibreLengthTrace_.getFirstDerivative(time_);
+  //      std::cout << id_ << " fibre velocity: " << fibreVelocity_ << std::endl;
     }
 
 
@@ -279,10 +286,10 @@ namespace ceinms {
     void MTU<Activation, Tendon, mode>::updateFibreLengthAndVelocity_HYBRID() {
 
         updateFibreLength_OFFLINE();
-        fibreLengthTrace_.removeLastPointNoUpdate();
-        fibreLengthTrace_.addPointNoUpdate(time_, fibreLength_);
-        fibreLengthTrace_.refresh();
+        fibreLengthTrace_.addPoint(time_, fibreLength_);
+//        fibreLengthTrace_.refresh();
         updateFibreVelocity_OFFLINE();
+        fibreLengthTrace_.removeLastPointNoUpdate();
     }
 
 
@@ -297,11 +304,8 @@ namespace ceinms {
     void MTU<Activation, Tendon, mode>::updateMuscleForce() {
 
         double optimalFiberLengthAtT = optimalFibreLength_*(percentageChange_*(1.0 - activation_) + 1);
-        ////:TODO: strong review with the code... lot of check for closeness to 0
         double normFiberLengthAtT = fibreLength_ / optimalFiberLengthAtT;
         double normFiberLength = fibreLength_ / optimalFibreLength_;
-        //:TODO: THIS IS WRONG! timeScale_?  0.1 should be timeScale_
-        // double normFiberVelocity = timescale_ *fiberVelocity_ / optimalFiberLengthAtT;
         double fiberVel = fibreVelocity_ / optimalFibreLength_;
         if (fiberVel > maxContractionVelocity_)
             fiberVel = maxContractionVelocity_;
@@ -312,9 +316,7 @@ namespace ceinms {
         double fv = forceVelocityCurve_.getValue(normFiberVelocity);
         double fp = passiveForceLengthCurve_.getValue(normFiberLength);
         double fa = activeForceLengthCurve_.getValue(normFiberLengthAtT);
-        double pennationAngleAtT = computePennationAngle(optimalFibreLength_); //this is correct
-        //    double pennationAngleAtT = computePennationAngle(optimalFiberLengthAtT); //this is the one we used since the new version...
-
+        double pennationAngleAtT = computePennationAngle(optimalFibreLength_); 
         normFibreVelocity_ = normFiberVelocity;
         pennationAngleAtT_ = pennationAngleAtT; //for logging
         muscleForce_ = maxIsometricForce_*strengthCoefficient_*

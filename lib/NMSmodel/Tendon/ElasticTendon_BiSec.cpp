@@ -61,7 +61,8 @@ namespace ceinms {
         activation_(0.0),
         maxContractionVelocity_(0.0),
         id_(""),
-        tolerance_(.000001)
+        tolerance_(.000001),
+        timeScale_(0.005)
     { }
 
 
@@ -78,6 +79,7 @@ namespace ceinms {
         activation_(0.0),
         maxContractionVelocity_(0.0),
         tolerance_(.000001),
+        timeScale_(0.005),
         id_(id) { }
 
 
@@ -107,10 +109,11 @@ namespace ceinms {
         tendonForceStrainCurve_(tendonForceStrainCurve),
         maxContractionVelocity_(maxContractionVelocity),
         muscleTendonLength_(0.0),
-        fibreLength_(0.0),
+        fibreLength_(optimalFibreLength_),
         activation_(0.0),
         id_(""),
-        tolerance_(.000001)
+        tolerance_(.000001),
+        timeScale_(0.005)
     {   }
 
 
@@ -141,6 +144,7 @@ namespace ceinms {
         activation_ = orig.activation_;
         id_ = orig.id_;
         tolerance_ = orig.tolerance_;
+        timeScale_ = orig.timeScale_;
         return *this;
     }
 
@@ -165,6 +169,13 @@ namespace ceinms {
     }
 
 
+    void ElasticTendon_BiSec::setTime(const double& time) { 
+    
+        timeScale_ = time - time_;
+        time_ = time; 
+    
+    }
+
     void ElasticTendon_BiSec::setMuscleTendonLength(double muscleTendonLength) {
 
         muscleTendonLength_ = muscleTendonLength;
@@ -183,12 +194,14 @@ namespace ceinms {
         const unsigned nIter = 100;
         tendonPenalty_ = .0;
         fibreLength_ = estimateFiberLengthBiSec(tolerance_, nIter);
-        fibreLengthTrace_.addPoint(time_, fibreLength_);
+        double pennationAngleAtT = PennationAngle::compute(fibreLength_, optimalFibreLength_, pennationAngle_);
+        tendonLength_ = muscleTendonLength_ - fibreLength_*cos(pennationAngleAtT);
+
     }
 
 
     void ElasticTendon_BiSec::pushState() {
-
+        fibreLengthTrace_.addPoint(time_, fibreLength_);
     }
 
 
@@ -258,8 +271,10 @@ namespace ceinms {
     void ElasticTendon_BiSec::resetState() {
 
         muscleTendonLength_ = 0.0;
-        fibreLength_ = 0.0;
+        fibreLength_ = optimalFibreLength_;
         activation_ = 0.0;
+        time_ = 0;
+        timeScale_ = 0.005;
         fibreLengthTrace_.reset();
     }
 
@@ -364,6 +379,7 @@ namespace ceinms {
             (1.0 - activation_) + 1);
 
         fibreLengthTrace_.addPoint(time_, fibreLength);
+        
         double normFiberLength = fibreLength / optimalFibreLength_;
         double normFiberLengthAtT = fibreLength / optimalFiberLengthAtT;
 
@@ -385,7 +401,6 @@ namespace ceinms {
             cos(pennationAngleAtT);
 
         fibreLengthTrace_.removeLastPointNoUpdate();
-
         //    cout << "muscleForce " << muscleForce << endl;
         return muscleForce;
     }

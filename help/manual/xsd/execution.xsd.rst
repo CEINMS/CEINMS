@@ -18,29 +18,15 @@ XML example
       <NMSmodel>
          <type>
             <hybrid>
-                <alpha> 1 </alpha>
-                <beta> 2 </beta>
-                <gamma> 3 </gamma>
-                <trackedMuscles>
+                <synthMTUs weight="50">psoas_r illiacus_r</synthMTUs>
+                <adjustMTUs weight="10">
                                    recfem_r vasmed_r vaslat_r vasint_r bicfemsh_r
                                    gmin1_r gmin2_r gmin3_r gmed1_r gmed2_r gmed3_r
                                    tfl_r addbrev_r addlong_r addmag1_r addmag2_r
                                    addmag3_r gra_r sar_r semiten_r semimem_r bicfemlh_r
                                    gmax1_r gmax2_r gmax3_r gaslat_r gasmed_r sol_r perlong_r
                                    tibant_r perter_r perbrev_r
-                </trackedMuscles>
-                <predictedMuscles> psoas_r illiacus_r</predictedMuscles>
-                <algorithm>
-                    <simulatedAnnealing>
-                        <noEpsilon>4</noEpsilon>
-                        <rt>0.3</rt>
-                        <T>20</T>
-                        <NS>15</NS>
-                        <NT>5</NT>
-                        <epsilon>1.E-3</epsilon>
-                        <maxNoEval>200000</maxNoEval>
-                    </simulatedAnnealing>
-                </algorithm>
+                </adjustMTUs>
             </hybrid>
          </type>
 
@@ -52,12 +38,7 @@ XML example
               <exponential/>
          </activation>
       </NMSmodel>
-
-      <offline/>
-
-      <elaboratedDoFs>
-      </elaboratedDoFs>
-
+      <online/>
     </execution>
 
 An execution configuration file consists of a root element named ``execution`` that contains the following elements:
@@ -93,12 +74,13 @@ hybrid
 The hybrid execution modality (see :ref:`introHybrid`) configuration is provided here:
 
 - ``alpha`` weight for the sum of the squared difference between experimental joint moments provided as :ref:`input data <prepareDataInputData>` and the joint moments estimated by CEINMS
-- ``beta`` weight for the sum of the squared difference between experimental and predicted muscle excitations
-- ``gamma`` weight for the sum of squared muscle excitations
-- ``trackedMuscles`` list of muscles for which an EMG reference signal to "track" is provided
-- ``predictedMuscles`` list of muscles for which no EMG signal is available, therefore activation is only predicted using static optimization techniques
-- ``algorithm`` the optimization algorithm that solves the hybrid static optimization problem, see :ref:`optimizationalgorithm`
+- ``beta`` weight for the sum of squared muscle excitations
+- ``gamma`` weight for the sum of the squared difference between experimental and predicted muscle excitations
 
+By default, the weightings ``alpha``, ``beta``, and ``gamma`` are set to 1. To facilitate the creation of the xml, the parameter ``beta`` can be specified as the attribute ``weight`` of the ``synthMTUs`` tag, while ``gamma`` can be specified as the attribute ``weight`` of the ``adjustMTUs`` tag. See example above.
+
+- ``synthMTUs`` list of muscles for which no EMG signal is available, therefore excitation is only predicted using static optimization techniques
+- ``adjustMTUs`` list of muscles for which an EMG reference signal to "adjust" is provided
 
 
 XSD grammar

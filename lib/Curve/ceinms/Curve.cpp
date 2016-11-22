@@ -380,6 +380,7 @@ namespace ceinms {
 
         unsigned k(abscissaPoint);
         double dx = xValue - x_.at(k);
+        if (nearly_equal(dx, 0.)) return b_.at(k);
         return (b_.at(k) + dx * (2.0 * c_.at(k) + 3.0 * dx * d_.at(k)));
 
     }

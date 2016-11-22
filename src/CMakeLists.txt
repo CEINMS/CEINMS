@@ -51,6 +51,7 @@ TARGET_LINK_LIBRARIES( CEINMS
       InputConnectors
       OutputConnectors
 	  JointContactModels
+      OptimizationSystems
       #${CMAKE_THREAD_LIBS_INIT}
       ${Boost_PROGRAM_OPTIONS_LIBRARY}
       ${Boost_FILESYSTEM_LIBRARY}
@@ -76,5 +77,7 @@ target_link_libraries( CEINMScalibrate
 )
 
 install(TARGETS CEINMS CEINMScalibrate
-        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT Applications)
+        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT Applications
+        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT Development
+        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT Development)
 

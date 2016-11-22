@@ -1,0 +1,10 @@
+CEINMS 0.10.0
+-------------
+* Changed solver for hybrid, EMG-assisted, and static optimisation modes
+* Simplified XML to configure hybrid, EMG-assisted, and static optimisation modes
+* Remove the need to have an excitation input file when running static optimisation
+* Order does not matter for the generated signals in the excitation generator file
+* Added warning messages when signals in the excitation generator file do not correspond to MTU in the subject model
+* Show torque errors during calibration
+* Added calibration parallelisation, when calibrating multiple trials at the same time, the load is split into different CPUs
+* Fix minor bugs

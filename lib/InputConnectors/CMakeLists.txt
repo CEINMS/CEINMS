@@ -27,6 +27,8 @@ set(InputConnectors_SOURCES
 )
 
 set(InputConnectors_TEMPLATE_IMPLEMENTATIONS ) #ceinms/LmtMaFromMcbs.cpp)
+#set(InputConnectors_TEMPLATE_IMPLEMENTATIONS ceinms/LmtMaFromMcbs.cpp)
+
 set_source_files_properties(${InputConnectors_TEMPLATE_IMPLEMENTATIONS} PROPERTIES HEADER_FILE_ONLY TRUE)
 
 set(InputConnectors_HEADERS

@@ -83,7 +83,7 @@ namespace ceinms {
                         cout << experimentalEMGs.at(k) << "\t" << adjustedEMGs.at(k) << endl;
                         */
                 for (unsigned e = 0; e < adjustedEMGs.size(); ++e)
-                    emgTracking += fabs(experimentalEMGs.at(e) - adjustedEMGs.at(e));
+                    emgTracking += fabs(experimentalEMGs.at(e) - adjustedEMGs.at(e))*fabs(experimentalEMGs.at(e) - adjustedEMGs.at(e));
 
                 //3)
                 //sum of all EMGs

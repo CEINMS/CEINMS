@@ -36,6 +36,7 @@
 #include "ceinms/EmgFromX.h"
 #include "ceinms/EMGDataFromFile.h"
 #include "ceinms/ExcitationGeneratorFromXml.h"
+#include "ceinms/Mapper.h"
 
 #define LOG_EMGFromFile
 
@@ -54,6 +55,7 @@ namespace ceinms {
         void operator()();
         virtual ~EmgFromFile();
     private:
+        Mapper excitationMapper_;
         std::string inputDir_;
         EMGDataFromFile<ExcitationGeneratorFromXml> emgData_;
     };
@@ -75,17 +77,17 @@ namespace ceinms {
 
         std::vector<std::string> emgMusclesNames;
         emgData_.getMusclesNames(emgMusclesNames);
-        if (!(musclesNames_ == emgMusclesNames)) {
-            std::cout << "\n\n ERROR: Muscle names from emg file and subject differ!\n";
-            std::cout << "Subject muscles: ";
-            for (auto it : musclesNames_)
-                std::cout << it << "\t";
-            std::cout << "\nEMG muscles: ";
-            for (auto it : emgMusclesNames)
-                std::cout << it << "\t";
-            std::cout << std::endl;
-            exit(EXIT_FAILURE);
+        excitationMapper_.setNames(emgMusclesNames, musclesNames_);
+        auto mappedExcitationNames(excitationMapper_.map(emgMusclesNames, string("None")));
+        std::cout << "Muscle excitations to muscle mapping:\n";
+        for (int i(0); i < mappedExcitationNames.size(); ++i) {
+            cout << mappedExcitationNames.at(i) << " -> " << musclesNames_.at(i);
+            if (mappedExcitationNames.at(i) != musclesNames_.at(i))
+                cout << " WARNING. Mapping may be incorrect!";
+            cout << endl;
+
         }
+
     }
 }
 

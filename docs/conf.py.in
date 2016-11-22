@@ -96,7 +96,7 @@ latex_elements = {}
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
   ('index', 'CEINMSUserGuide.tex', u'CEINMS User Guide Documentation',
-   u'Elena Ceseracciu, Monica Reggiani', 'manual'),
+   u'Elena Ceseracciu, Monica Reggiani, Claudio Pizzolato', 'manual'),
 ]
 
 

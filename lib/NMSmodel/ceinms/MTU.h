@@ -73,7 +73,6 @@ namespace ceinms {
         std::string getMuscleName() const { return id_; }
         bool   compareMusclesId(const std::string& id) const { return id_ == id; }
         void   printName(std::ostream& output) { output << id_; }
-
         void   setTime(const double& time);
         void   setEmg(double emg);
         void   setMuscleTendonLength(double muscleTendonLength);
@@ -85,10 +84,6 @@ namespace ceinms {
         void   updateFibreLengthsAndVelocities_END_OF_HYBRID_MINIMIZATION();
         void   updateMuscleForce();
         void   pushState();
-
-
-        //   void   setEmgValueNoUpdate(double emg);
-        //   void   setEmgValueNoNeuralFilterUpdate(double emg);
         double getEmg() const { return activationDynamic_.getEmg(); }
         double getPastEmg() const { return activationDynamic_.getPastEmg(); }
         double getNeuralActivation() const { return activationDynamic_.getNeuralActivation(); }
@@ -117,21 +112,17 @@ namespace ceinms {
         void   setMaxIsometricForce(double maxIsometricForce);
         double getMaxContractionVelocity() const { return maxContractionVelocity_; }
         void   setMaxContractionVelocity(double maxContractionVelocity);
-
         double getFiberLength() const { return fibreLength_; }
         double getNormFiberLength() const { return fibreLength_ / optimalFibreLength_; }
         double getFiberVelocity() const { return fibreVelocity_; }
+        double getTendonLength() const { return tendonDynamic_.getTendonLength(); }
         double getNormFiberVelocity() const { return normFibreVelocity_; }
         double getPennationAngleAtT() const { return pennationAngleAtT_; };
         double getMuscleForce() const { return muscleForce_; }
         double getPercentageChange() const { return percentageChange_; }
         double getDamping() const { return damping_; }
         void   setDamping(double damping);
-
-
-
-        void setTendonTolerance(double tolerance = 0.0);
-
+        void   setTendonTolerance(double tolerance = 0.0);
         void   setMuscleForce(double muscleForce) { muscleForce_ = muscleForce; }
         void   updateFibreLengthTrace();
         void   resetFibreLengthTrace();

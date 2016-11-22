@@ -69,7 +69,8 @@ namespace ceinms {
 
         try {
             std::string& myLmtFile(*(inputDataPointer_->muscleTendonLengthFile().begin()));
-            std::string& myEmgFile(*(inputDataPointer_->excitationsFile().begin()));
+            if (inputDataPointer_->excitationsFile().size() > 0)
+                std::string& myEmgFile(*(inputDataPointer_->excitationsFile().begin()));
             //TODO std::string& myMomentArmDir(*(inputDataPointer_->momentArmsFDirectory().begin()));
             if (inputDataPointer_->externalTorquesFile().size() > 0)
                 std::string& myExtTorqueFile(*(inputDataPointer_->externalTorquesFile().begin()));
@@ -107,6 +108,8 @@ namespace ceinms {
 
     std::string InputDataXmlReader::getExcitationsFile()
     {
+        if (inputDataPointer_->excitationsFile().size() < 1)
+            return "";
         std::string fileName(*(inputDataPointer_->excitationsFile().begin()));
         FileUtils::trim(fileName);
         if (FileUtils::isAbsolute(fileName.c_str()))
