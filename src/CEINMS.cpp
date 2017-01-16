@@ -75,8 +75,12 @@ void printAuthors() {
 
 void PrintUsage()
 {
-    string progName= "CEINMS";
-    cout << "\n\n" << progName << ":\n";// << GetVersionAndDate() << "\n\n";
+    string progName = "CEINMS"; 
+    string version = 
+        string(CEINMS_MAJOR_VERSION) + "."+ 
+        string(CEINMS_MINOR_VERSION) +"."+ 
+        string(CEINMS_PATCH_VERSION);
+    cout << "\n" << progName << " version " << version << "\n";
     cout << "Option            Argument          Action / Notes\n";
     cout << "------            --------          --------------\n";
     cout << "-Help, -H                           Print the command-line options for " << progName << ".\n";

@@ -6,6 +6,10 @@ set(CEINMS_MAJOR_VERSION 0)
 set(CEINMS_MINOR_VERSION 10)
 set(CEINMS_PATCH_VERSION 0)
 
+add_definitions(/DCEINMS_MAJOR_VERSION="${CEINMS_MAJOR_VERSION}")
+add_definitions(/DCEINMS_MINOR_VERSION="${CEINMS_MINOR_VERSION}")
+add_definitions(/DCEINMS_PATCH_VERSION="${CEINMS_PATCH_VERSION}")
+
 # Include GNUInstallDirs to get canonical paths
 include(GNUInstallDirs)
 
