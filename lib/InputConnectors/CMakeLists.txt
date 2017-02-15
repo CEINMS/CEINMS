@@ -37,12 +37,11 @@ add_library(InputConnectors STATIC
   ${InputConnectors_HEADERS}
   ${FromStorageFile_HEADERS}
 )
-target_link_libraries(InputConnectors FileIO Concurrency ${Boost_FILESYSTEM_LIBRARY})
+target_link_libraries(InputConnectors FileIO rtb::Concurrency ${Boost_FILESYSTEM_LIBRARY})
 target_include_directories(InputConnectors
                                 PRIVATE     ${CMAKE_CURRENT_SOURCE_DIR}
                                             ${ceinms_common_INCLUDE_DIRS}
                                             ${FileIO_INCLUDE_DIRS}
-                                            ${Concurrency_INCLUDE_DIRS}
                                             ${Boost_INCLUDE_DIRS})
 
 # Save path to include directory for "internal" usage

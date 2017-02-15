@@ -29,8 +29,8 @@
 #ifndef ceinms_OutputConnectors_h
 #define ceinms_OutputConnectors_h
 
-#include "ceinms/concurrency/Queue.h"
-#include "ceinms/concurrency/Latch.h"
+#include "rtb/concurrency/Queue.h"
+#include "rtb/concurrency/Latch.h"
 #include "ceinms/QueueData.h"
 
 #include <map>
@@ -47,8 +47,8 @@ namespace ceinms {
         using FrameType = QueueData < DataType > ;
 
         const double TimePlaceholderForEndOfData = std::numeric_limits<double>::infinity();
-        std::map< std::string, Concurrency::Queue< FrameType >* > logQueues;
-        Concurrency::Latch doneWithExecution;
+        std::map< std::string, rtb::Concurrency::Queue< FrameType >* > logQueues;
+        rtb::Concurrency::Latch doneWithExecution;
     };
 }
 

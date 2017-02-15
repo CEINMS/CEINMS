@@ -27,12 +27,11 @@ add_library(OutputConnectors STATIC
   ${QueuesToStorageFiles_SOURCES}
   ${QueuesToStorageFiles_HEADERS}
 )
-target_link_libraries(OutputConnectors ${Boost_FILESYSTEM_LIBRARY})
+target_link_libraries(OutputConnectors rtb::Concurrency ${Boost_FILESYSTEM_LIBRARY})
 target_include_directories(OutputConnectors
                                 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}
                                         ${ceinms_common_INCLUDE_DIRS}
                                         ${InputConnectors_INCLUDE_DIRS}
-                                        ${Concurrency_INCLUDE_DIRS}
                                         ${TrialData_INCLUDE_DIRS}
                                 PUBLIC ${Boost_INCLUDE_DIRS})
 

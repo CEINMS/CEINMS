@@ -4,7 +4,6 @@ include_directories(
 	${InputConnectors_INCLUDE_DIRS}
 	${OutputConnectors_INCLUDE_DIRS}
 	${xmlInput_INCLUDE_DIRS}
-	${Concurrency_INCLUDE_DIRS}
 	${ceinms_common_INCLUDE_DIRS}
 	${TrialData_INCLUDE_DIRS}
 	${FileIO_INCLUDE_DIRS}
@@ -17,5 +16,5 @@ TARGET_LINK_LIBRARIES(Test_BatchEvaluator
       InputConnectors
       OutputConnectors
       OptimizationSystems
-      Concurrency)
+      rtb::Concurrency)
 

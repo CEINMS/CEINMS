@@ -8,7 +8,6 @@ include_directories(
   ${OutputConnectors_INCLUDE_DIRS}
   ${NMSmodel_INCLUDE_DIRS}
   ${Curve_INCLUDE_DIRS}
-  ${Concurrency_INCLUDE_DIRS}
   ${xmlInput_INCLUDE_DIRS}
   ${FileIO_INCLUDE_DIRS}
  # ${Calibration_INCLUDE_DIRS}
