@@ -1,6 +1,6 @@
 # Authors: Monica Reggiani, Claudio Pizzolato
 
-cmake_minimum_required (VERSION 2.8.11) # "target_include_directories" command  and VS12 generator are missing in previous versions
+cmake_minimum_required (VERSION 3.0.0) # need add_library(... INTERFACE)
 project(CEINMS)
 set(CEINMS_MAJOR_VERSION 0)
 set(CEINMS_MINOR_VERSION 9)
@@ -44,7 +44,7 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 
 if(MSVC)
-    set(CMAKE_DEBUG_POSTFIX "d")
+    set(CMAKE_DEBUG_POSTFIX "_d")
 endif(MSVC)
 
 option(CEINMS_VERBOSE_DEBUG "Print debug messages" OFF)

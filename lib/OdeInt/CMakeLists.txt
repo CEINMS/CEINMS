@@ -1,7 +1,9 @@
 # Author: Elena Ceseracciu
+set(OdeInt_HEADERS  ceinms/OdeInt.h
+                    ceinms/Output.h
+                    ceinms/StepperBase.h
+                    ceinms/StepperDopr5.h)
 
-# Save path to include directory for "internal" usage
-set(OdeInt_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}" CACHE INTERNAL "Include directory for OdeInt library")
-
-# Install
-#install(FILES ${_HEADERS} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}) #should add namespace
+add_library(OdeInt INTERFACE)
+add_custom_target(OdeInt_IDE SOURCES ${OdeInt_HEADERS})
+target_include_directories(OdeInt INTERFACE $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>)

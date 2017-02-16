@@ -2,31 +2,7 @@
 
 add_subdirectory(Tests)
 
-include_directories(
-  #${Producers_INCLUDE_DIRS}
-  ${InputConnectors_INCLUDE_DIRS}
-  ${OutputConnectors_INCLUDE_DIRS}
-  ${NMSmodel_INCLUDE_DIRS}
-  ${Curve_INCLUDE_DIRS}
-  ${xmlInput_INCLUDE_DIRS}
-  ${FileIO_INCLUDE_DIRS}
- # ${Calibration_INCLUDE_DIRS}
-  ${CMAKE_SOURCE_DIR}/lib/Hybrid
-  ${ceinms_common_INCLUDE_DIRS}
-  ${Optimizers_INCLUDE_DIRS}
-  ${OptimizationSystems_INCLUDE_DIRS}
-  ${TrialData_INCLUDE_DIRS}
-)
 include_directories(${Boost_INCLUDE_DIRS})
-
-#LINK_DIRECTORIES(
-#  ${CMAKE_SOURCE_DIR}/lib/xmlInput
-#  ${CMAKE_SOURCE_DIR}/lib/NMSmodel
-#  ${CMAKE_SOURCE_DIR}/lib/FileIO
-#  ${CMAKE_SOURCE_DIR}/lib/Producers
-#  ${CMAKE_SOURCE_DIR}/lib/Calibration
-#  ${CMAKE_SOURCE_DIR}/lib/Hybrid
-#)
 
 set(CEINMS_COMMON_SOURCES  ModelEvaluationHybrid.cpp ModelEvaluationOnline.cpp ModelEvaluationOffline.cpp ModelEvaluationBase.cpp SimulationManager.cpp)
 set_source_files_properties(ModelEvaluationHybrid.cpp
@@ -47,11 +23,14 @@ set(CEINMS_HEADERS ModelEvaluationBase.h
 set(CEINMS_SOURCES CEINMS.cpp ${CEINMS_COMMON_SOURCES})
 ADD_EXECUTABLE( CEINMS ${CEINMS_SOURCES} ${CEINMS_HEADERS} )
 TARGET_LINK_LIBRARIES( CEINMS
+      ceinms_common
+      Curve
       FileIO
       xmlInput
       NMSmodel
       InputConnectors
       OutputConnectors
+      Hybrid
       #${CMAKE_THREAD_LIBS_INIT}
       ${Boost_PROGRAM_OPTIONS_LIBRARY}
       ${Boost_FILESYSTEM_LIBRARY}
@@ -65,14 +44,17 @@ set_source_files_properties(XmlWriter.cpp CalibrationManager.cpp PROPERTIES HEAD
 
 add_executable( CEINMScalibrate ${CEINMScalibrate_SOURCES} ${CEINMScalibrate_HEADERS})
 target_link_libraries( CEINMScalibrate
+      ceinms_common
       xmlInput
       NMSmodel
       FileIO
+      Curve
       InputConnectors
       OutputConnectors
       OptimizationSystems
-	#  Optimizers
-	#  TrialData
+      Optimizers
+      TrialData
+      Hybrid
       ${Boost_PROGRAM_OPTIONS_LIBRARY}
 )
 
