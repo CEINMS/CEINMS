@@ -17,7 +17,6 @@ find_program( XSD_EXECUTABLE
                     /usr/bin
                     "C:/Program Files (x86)/CodeSynthesis XSD 3.3/bin"
                     "C:/Program Files (x86)/CodeSynthesis XSD 4.0/bin"
-                    $ENV{XSD_ROOT}/bin
                     ENV PATH )
 
 if( XSD_EXECUTABLE )
