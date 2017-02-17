@@ -41,7 +41,7 @@ namespace ceinms {
         LoggerOnQueues(const LoggerOnQueues&) = delete;
         LoggerOnQueues& operator=(const LoggerOnQueues&) = delete;
         LoggerOnQueues(ScalarLogQueue& outputLogQueue, const std::vector< std::string > & valuesToLog);
-        void log(double time, const std::vector< double >& dataToLog, const std::string& queuID);
+        void log(double time, const std::vector< double >& dataToLog, const std::string& queueID);
 
     private:
         ScalarLogQueue& outputLogQueue_;

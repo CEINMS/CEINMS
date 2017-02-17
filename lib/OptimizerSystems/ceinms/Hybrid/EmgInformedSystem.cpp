@@ -9,7 +9,7 @@ namespace ceinms {
     >
     EmgInformedSystem<NMSmodelT, ObjectiveFunctionT, ParametersInterpreterT>::EmgInformedSystem(
         NMSmodelT& subject,
-        const ObjectiveFunctionT& objectiveFunction,
+        ObjectiveFunctionT& objectiveFunction,
         const typename ParametersInterpreterT::ParameterSet& parameterSet) :
     subject_(subject),
     objectiveFunction_(objectiveFunction),

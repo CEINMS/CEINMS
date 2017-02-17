@@ -16,47 +16,65 @@ namespace ceinms {
 
     void TrackTorqueAdjustAndPredictExcitations::calculate(const std::vector<double>& predictedTorques, const std::vector<double>& predictedExcitations){
 
-        double torqueError(0.);
+        torqueError_ = 0.;
         for (auto i : indexesOfTorquesToMinimise_) {
             double diff(predictedTorques.at(i) - externalTorques_.at(i));
-            torqueError += diff*diff;
+            torqueError_ += diff*diff;
         }
 
         //I have to do the sum of all the excitations squared that undergo optimisation
-        double excitationTrackingError(0.);
-        double excitationSum(0.);
+        excitationTrackingError_ = 0.;
+        excitationSum_ = 0.;
 
-     //   std::cout << "muscle to adjust ";
         for (auto i : indexesOfMusclesWithExcitationsToAdjust_) {
-       //     std::cout << i << " ";
             double diff(predictedExcitations.at(i) - measuredExcitations_.at(i));
-            excitationTrackingError += diff*diff;
-            excitationSum += predictedExcitations.at(i)*predictedExcitations.at(i);
+            excitationTrackingError_ += diff*diff;
+            excitationSum_ += predictedExcitations.at(i)*predictedExcitations.at(i);
         }
-      //  std::cout <<  "\n";
-
-     //   std::cout << "muscle to predict ";
         for (auto i : indexesOfMusclesWithExcitationsToPredict_) {
-      //      std::cout << i << " ";
-            excitationSum += predictedExcitations.at(i)*predictedExcitations.at(i);
+            excitationSum_ += predictedExcitations.at(i)*predictedExcitations.at(i);
         }
 
-        f_ = weightings_.alpha*torqueError + weightings_.beta*excitationSum + weightings_.gamma*excitationTrackingError;
+        f_ = weightings_.alpha*torqueError_ + weightings_.beta*excitationSum_ + weightings_.gamma*excitationTrackingError_;
        
-    /*    std::cout << "excitations: ";
-        for (auto e : predictedExcitations) 
-            std::cout << e << " ";
-        std::cout << std::endl;
-        std::cout << "sum torque error squared: " << torqueError << std::endl;
-        std::cout << "sum excitations squared : " << excitationSum << std::endl;
-        std::cout << "sum tracking error squared: " << excitationTrackingError << std::endl;
+        //std::cout << std::endl;
+        //std::cout << "sum torque error squared: " << torqueError << std::endl;
+        //std::cout << "sum excitations squared : " << excitationSum << std::endl;
+        //std::cout << "sum tracking error squared: " << excitationTrackingError << std::endl;
         
-        std::cout << "f = " << f_ << std::endl;
-        */
     }
 
     double TrackTorqueAdjustAndPredictExcitations::getValue() const {
 
         return f_;
+    }
+
+    void  TrackTorqueAdjustAndPredictExcitations::getObjectiveFunctionComponents(
+        double& torqueError, double& excitationSum, double& excitationTrackingError) const {
+
+        torqueError = torqueError_;
+        excitationSum = excitationSum_;
+        excitationTrackingError = excitationTrackingError_;
+    }
+
+    void TrackTorqueAdjustAndPredictExcitations::
+        getObjectiveFunctionComponents(std::vector<double>& components) const {
+
+        components.resize(3);
+        getObjectiveFunctionComponents(components[0], components[1], components[2]);
+    }
+
+    HybridWeightings TrackTorqueAdjustAndPredictExcitations::getWeightings() const {
+
+        return weightings_;
+    }
+
+    void TrackTorqueAdjustAndPredictExcitations::
+        getObjectiveFunctionWeightings(std::vector<double>& weightings) const {
+
+        weightings.clear();
+        weightings.push_back(weightings_.alpha);
+        weightings.push_back(weightings_.beta);
+        weightings.push_back(weightings_.gamma);
     }
 }

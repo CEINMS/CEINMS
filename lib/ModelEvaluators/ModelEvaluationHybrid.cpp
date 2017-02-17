@@ -177,6 +177,12 @@ namespace ceinms {
                     data.insert(data.end(), contribution.begin(), contribution.end());
                 }
                 ModelEvaluationBase<Logger>::logger.log(emgTime, data, "MusclesContribution");
+                data.clear();
+                vector<double> components, weights;
+                torqueErrorMinimizer_.getObjectiveFunctionComponentsAndWeightings(components, weights);
+                data = components;
+                data.insert(data.end(), weights.begin(), weights.end());
+                ModelEvaluationBase<Logger>::logger.log(emgTime, data, "ObjectiveFunctionComponentsAndWeightings");
 #endif
 
 #ifdef LOG
@@ -229,6 +235,7 @@ namespace ceinms {
         ModelEvaluationBase<Logger>::logger.log(endTime, endData, "Torques");
         ModelEvaluationBase<Logger>::logger.log(endTime, endData, "AdjustedEmgs");
         ModelEvaluationBase<Logger>::logger.log(endTime, endData, "MusclesContribution");
+        ModelEvaluationBase<Logger>::logger.log(endTime, endData, "ObjectiveFunctionComponentsAndWeightings");
 #endif
 
         ModelEvaluationBase<Logger>::doneWithExecution();

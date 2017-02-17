@@ -18,6 +18,10 @@ namespace ceinms {
         void setMeasuredExcitations(const std::vector<double>& measuredExcitations);
         void calculate(const std::vector<double>& predictedTorques, const std::vector<double>& predictedExcitations);
         double getValue() const;
+        void getObjectiveFunctionComponents(double& torqueError, double& excitationSum, double& excitationTrackingError) const;
+        void getObjectiveFunctionComponents(std::vector<double>& components) const;
+        HybridWeightings getWeightings() const;
+        void getObjectiveFunctionWeightings(std::vector<double>& weightings) const;
     private:
         HybridWeightings weightings_;
         std::vector<unsigned> indexesOfMusclesWithExcitationsToAdjust_;
@@ -26,6 +30,10 @@ namespace ceinms {
         std::vector<double> externalTorques_;
         std::vector<double> measuredExcitations_;
         double f_;
+        double torqueError_;
+        double excitationSum_;
+        double excitationTrackingError_;
+
     };
 
     template<typename NMSmodelT>

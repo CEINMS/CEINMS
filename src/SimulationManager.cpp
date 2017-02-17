@@ -52,6 +52,7 @@
 #include "ceinms/HybridWeightings.h"
 
 #include "ceinms/LoggerOnQueues.h"
+#include "ceinms/QueueToStorageFile.h"
 #include "ceinms/QueuesToStorageFiles.h"
 #include "ceinms/QueuesToJointReactionForces.h"
 #include "ceinms/QueuesToIntersegmentalAndJointReactionForces.h"
@@ -712,6 +713,7 @@ namespace ceinms {
         MultipleMomentArmsQueues momentArmsQueues;
 
         //Creates queues for output data
+        //the queues are automatically created by the LoggerOnQueues template
         ScalarLogQueue logQueue;
 
         //Creates latches to sync threads
@@ -742,16 +744,11 @@ namespace ceinms {
             "MuscleForces",
             "Torques",
             "AdjustedEmgs",
-            "MusclesContribution" };
+            "MusclesContribution"};
         // 2b. define the thread consuming the output sources
         vector<string> valuesToWrite = dataToLog;
         QueuesToStorageFiles queuesToStorageFiles(logQueue, doneWithSubscriptionsLatch, doneWithExecutionLatch, mySubject, valuesToWrite, outputDirectory_);
 
-        // 3. define the model simulator
-        vector<string> valuesToLog = dataToLog;
-
-        doneWithSubscriptionsLatch.setCount(5);
-        doneWithExecutionLatch.setCount(5);
 
         // 4. define the optimiser
         EmgInformedObjectiveFunctionSetup setup;
@@ -778,7 +775,10 @@ namespace ceinms {
         errorMinimizer.setAnnealingParameters(nt, ns, rt, t, maxNoEval, epsilon, noEpsilon);
         */
 
-
+        // 3. define the model simulator
+        vector<string> valuesToLog = dataToLog;
+        //save the hybrid values in a semarate file
+        valuesToLog.push_back("ObjectiveFunctionComponentsAndWeightings");
 
         ModelEvaluationHybrid<NMSmodelT, NMSmodelFrameOptimisation<NMSmodelT>, LoggerOnQueues> simulator(
             emgQueue,
@@ -792,18 +792,31 @@ namespace ceinms {
             errorMinimizer,
             valuesToLog);
 
+        QueueToStorageFile<ScalarVectorData> hybridErrorLogger(
+            *(logQueue["ObjectiveFunctionComponentsAndWeightings"]),
+            doneWithSubscriptionsLatch,
+            doneWithExecutionLatch,
+            { "TorqueError", "SumExcitation", "ExcitationTrackingError", "alpha", "beta", "gamma" },
+            "ObjectiveFunctionComponentsAndWeightings",
+            outputDirectory_
+        );
+
+        doneWithSubscriptionsLatch.setCount(6);
+        doneWithExecutionLatch.setCount(6);
+
         // 5. start the threads
         std::thread emgProdThread(std::ref(emgProducer));
         std::thread externalTorquesProdThread(std::ref(externalTorquesProducer));
         std::thread lmtMaProdThread(std::ref(lmtMaProducer));
         std::thread simulatorThread(std::ref(simulator));
         std::thread queuesToStorageFilesThread(std::ref(queuesToStorageFiles));
-
+        std::thread hybridErrorLoggerThread(std::ref(hybridErrorLogger));
         emgProdThread.join();
         lmtMaProdThread.join();
         externalTorquesProdThread.join();
         simulatorThread.join();
         queuesToStorageFilesThread.join();
+        hybridErrorLoggerThread.join();
 
         return 0;
     }

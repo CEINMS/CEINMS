@@ -41,6 +41,9 @@ namespace ceinms {
         NMSmodelFrameOptimisation(NMSmodelT& subject, const EmgInformedObjectiveFunctionSetup& setup);
         void setExternalTorques(const std::vector<double>& externalTorques);
         void optimise();
+        //The ObjFun = w[0]*c[0] + w[1]*c[1] + ... + w[n]*c[n]
+        //where w is the weight and c the component
+        void getObjectiveFunctionComponentsAndWeightings(std::vector<double>& components, std::vector<double>& weights) const;
     private:
         using MyEmgInformedSystem = EmgInformedSystem<NMSmodelT, TrackTorqueAdjustAndPredictExcitations, MuscleExcitationParameterInterpreter<NMSmodelT>>;
         NMSmodelT& subject_;

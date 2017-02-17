@@ -10,7 +10,7 @@ namespace ceinms {
     class EmgInformedSystem : public Optimizers::AbstractOptimizerSystem {
 
     public:
-        EmgInformedSystem(NMSmodelT& subject, const ObjectiveFunctionT& objectiveFunction, const typename ParametersInterpreterT::ParameterSet& parameterSet);
+        EmgInformedSystem(NMSmodelT& subject, ObjectiveFunctionT& objectiveFunction, const typename ParametersInterpreterT::ParameterSet& parameterSet);
         void evaluate() override;
         void setParameters(const std::vector<double>& x) override;
         void setExternalTorques(const std::vector<double>& externalTorques);
@@ -20,7 +20,7 @@ namespace ceinms {
         std::size_t getNoParameters() const override { return nParameters_; }
     private:
         std::size_t nParameters_;
-        ObjectiveFunctionT objectiveFunction_;
+        ObjectiveFunctionT& objectiveFunction_;
         ParametersInterpreterT parametersInterpreter_;
         NMSmodelT& subject_;
         double f_;

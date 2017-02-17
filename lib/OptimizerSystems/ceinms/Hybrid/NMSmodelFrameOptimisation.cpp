@@ -49,6 +49,14 @@ namespace ceinms {
         //finalise after optimization
    //     subject_.updateState_END_OF_HYBRID_MINIMIZATION();
     }
+
+    template <typename NMSmodelT>
+    void NMSmodelFrameOptimisation<NMSmodelT>::getObjectiveFunctionComponentsAndWeightings(
+        std::vector<double>& components, std::vector<double>& weightings) const {
+
+        objFun_.getObjectiveFunctionComponents(components);
+        objFun_.getObjectiveFunctionWeightings(weightings);
+    }
 }
     
     
