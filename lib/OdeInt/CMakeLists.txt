@@ -1,5 +1,5 @@
 # Author: Elena Ceseracciu
-set(OdeInt_HEADERS  ceinms/OdeInt.h
+set(OdeInt_HEADERS  ceinms/Odeint.h
                     ceinms/Output.h
                     ceinms/StepperBase.h
                     ceinms/StepperDopr5.h)
