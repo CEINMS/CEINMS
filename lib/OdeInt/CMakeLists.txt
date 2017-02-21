@@ -7,3 +7,5 @@ set(OdeInt_HEADERS  ceinms/Odeint.h
 add_library(OdeInt INTERFACE)
 add_custom_target(OdeInt_IDE SOURCES ${OdeInt_HEADERS})
 target_include_directories(OdeInt INTERFACE $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>)
+install(TARGETS OdeInt # Needed on Linux
+        EXPORT CEINMSTargets)
