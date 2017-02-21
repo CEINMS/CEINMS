@@ -32,7 +32,6 @@ TARGET_LINK_LIBRARIES( CEINMS
       OutputConnectors
       Hybrid
       #${CMAKE_THREAD_LIBS_INIT}
-      ${Boost_PROGRAM_OPTIONS_LIBRARY}
       ${Boost_FILESYSTEM_LIBRARY}
 )
 
@@ -55,7 +54,6 @@ target_link_libraries( CEINMScalibrate
       Optimizers
       TrialData
       Hybrid
-      ${Boost_PROGRAM_OPTIONS_LIBRARY}
 )
 
 install(TARGETS CEINMS CEINMScalibrate

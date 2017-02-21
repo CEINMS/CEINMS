@@ -1,8 +1,7 @@
 ## Authors: Monica Reggiani, Claudio Pizzolato, Elena Ceseracciu
 
 # List source files
-set(Common_HEADERS  ceinms/ArrayConverter.h
-                    ceinms/FileUtils.h
+set(Common_HEADERS  ceinms/FileUtils.h
                     ceinms/Parameter.h
                     ceinms/SimulatedAnnealingParameters.h
                     ceinms/QueueData.h
