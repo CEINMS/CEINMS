@@ -54,18 +54,11 @@ add_library(NMSmodel STATIC
   ${Activation_SOURCES}
   ${Activation_HEADERS}
 )
-target_include_directories(NMSmodel PRIVATE ${Curve_INCLUDE_DIRS}
-                                            ${CMAKE_CURRENT_SOURCE_DIR}
-                                            ${OdeInt_INCLUDE_DIRS}
-                                            ${RootSolvers_INCLUDE_DIRS}
-                                            ${xmlInput_INCLUDE_DIRS}
-                                            ${ceinms_common_INCLUDE_DIRS}
-                                            ${FileIO_INCLUDE_DIRS}
-#                                    PUBLIC  ${Boost_INCLUDE_DIRS}
-                                    )
-target_link_libraries(NMSmodel xmlInput)
-# Save path to include directory for "internal" usage
-set(NMSmodel_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}" CACHE INTERNAL "Include directory for NMSmodel library")
+target_include_directories(NMSmodel PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+                                        $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
+target_link_libraries(NMSmodel PUBLIC xmlInput Curve ceinms_common FileIO)
+target_link_libraries(NMSmodel PUBLIC OdeInt RootSolvers) # supposed to be private, but doesn't work for CMake <=3.2.2
+target_compile_definitions(NMSmodel PUBLIC _USE_MATH_DEFINES)
 
 # Install
 install(FILES ${NMS_HEADERS} ${NMS_TEMPLATE_IMPLEMENTATION} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/ceinms COMPONENT Development)

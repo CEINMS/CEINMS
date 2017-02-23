@@ -92,11 +92,11 @@ namespace ceinms {
 
         inputConnectors_.queueMomentArms.clear();
         for (int i = 0; i < dofNames_.size(); ++i)
-            inputConnectors_.queueMomentArms.push_back(new Concurrency::Queue< InputConnectors::FrameType >);
+            inputConnectors_.queueMomentArms.push_back(new rtb::Concurrency::Queue< InputConnectors::FrameType >);
 
         inputConnectors_.queueMomentArmDerivatives.clear();
         for (int i = 0; i < dofNames_.size(); ++i)
-            inputConnectors_.queueMomentArmDerivatives.push_back(new Concurrency::Queue< InputConnectors::FrameType >);
+            inputConnectors_.queueMomentArmDerivatives.push_back(new rtb::Concurrency::Queue< InputConnectors::FrameType >);
 
         inputConnectors_.momentArmDerivativesAvailable = true;
 

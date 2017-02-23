@@ -32,7 +32,6 @@ schema_to_bin(${CMAKE_SOURCE_DIR}/cfg/XSD/inputData.xsd)
 schema_to_bin(${CMAKE_SOURCE_DIR}/cfg/XSD/ceinmsSetup.xsd)
 schema_to_bin(${CMAKE_SOURCE_DIR}/cfg/XSD/ceinmsCalibrationSetup.xsd)
 
-include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
 # Generate c++ code for xsd schema files
 xsd_schema(subject_GENERATED ${CMAKE_SOURCE_DIR}/cfg/XSD/subject.xsd --generate-serialization --namespace-map =SubjectXsd)
@@ -127,9 +126,10 @@ add_library(xmlInput STATIC ${xmlInput_SOURCES}
                             )
 
 target_link_libraries(xmlInput ceinms_common ${XERCES_LIBRARIES})
-target_include_directories(xmlInput PRIVATE ceinms ${ceinms_common_INCLUDE_DIRS} impl PUBLIC ${XSD_INCLUDE_DIR} ${XERCES_INCLUDE_DIR})
-
-set(xmlInput_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}" ${CMAKE_CURRENT_BINARY_DIR} ${XSD_INCLUDE_DIR} ${XERCES_INCLUDE_DIR} CACHE INTERNAL "Include directory for xmlInput library")
+target_include_directories(xmlInput PRIVATE impl PUBLIC ${XSD_INCLUDE_DIR} ${XERCES_INCLUDE_DIR}
+                                              $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+                                              $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
+                                              $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
 
 install(FILES   ${xmlInput_HEADERS}
                 ${schemas_GENERATED_HEADERS}
@@ -145,6 +145,4 @@ install(TARGETS xmlInput
         EXPORT CEINMSTargets
         RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT Applications
         LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT Development
-        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT Development
-        # INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR} # only available from CMake 2.8.12
-        )
+        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT Development)

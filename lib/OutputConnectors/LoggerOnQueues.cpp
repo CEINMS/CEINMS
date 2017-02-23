@@ -37,7 +37,7 @@ namespace ceinms{
         outputConnectors_(outputConnector) {
 
         for (auto& it : valuesToLog)
-            outputConnectors_.logQueues.insert(std::make_pair(it, new Concurrency::Queue< OutputConnectors::FrameType>));
+            outputConnectors_.logQueues.insert(std::make_pair(it, new rtb::Concurrency::Queue< OutputConnectors::FrameType>));
     }
 
 

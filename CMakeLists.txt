@@ -1,6 +1,6 @@
 # Authors: Monica Reggiani, Claudio Pizzolato
 
-cmake_minimum_required (VERSION 2.8.11) # "target_include_directories" command  and VS12 generator are missing in previous versions
+cmake_minimum_required (VERSION 3.0.0) # need add_library(... INTERFACE)
 project(CEINMS)
 set(CEINMS_MAJOR_VERSION 0)
 set(CEINMS_MINOR_VERSION 9)
@@ -20,7 +20,7 @@ if(UNIX AND NOT CMAKE_BUILD_TYPE)
 endif()
 
 if(UNIX)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread -std=c++11 -Wno-deprecated-declarations ")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wno-deprecated-declarations ")
 endif(UNIX)
 
 set(CMAKE_VERBOSE_MAKEFILE OFF)
@@ -36,13 +36,15 @@ find_package(XSD REQUIRED)
 
 find_package(XERCES REQUIRED)
 
+find_package(Concurrency REQUIRED)
+
 # Choose common build locations for executables and libraries
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 
 if(MSVC)
-    set(CMAKE_DEBUG_POSTFIX "d")
+    set(CMAKE_DEBUG_POSTFIX "_d")
 endif(MSVC)
 
 option(CEINMS_VERBOSE_DEBUG "Print debug messages" OFF)
@@ -55,7 +57,6 @@ if (CEINMS_VERBOSE_DEEP_DEBUG)
     add_definitions(/DDEEP_DEBUG)
 endif()
 
-add_definitions(/D_USE_MATH_DEFINES)
 
 add_subdirectory(lib)
 add_subdirectory(src)

@@ -52,8 +52,7 @@ void printHeader() {
          << "|N|e|u|r|o|m|u|s|c|u|l|o|s|k|e|l|e|t|a|l|\n"
          << "+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+\n"
          << "|T|o|o|l|b|o|x|\n"
-         << "+-+-+-+-+-+-+-+\n\n"
-         << "Calibration\n\n";
+         << "+-+-+-+-+-+-+-+\n\n";
 
     }
 
@@ -61,10 +60,14 @@ void printAuthors() {
 
     time_t now = time(0);
     tm *gmtm = gmtime(&now);
-    cout << "Copyright (C) " << gmtm->tm_year+1900 << endl;
-    cout << "Claudio Pizzolato, Monica Reggiani, Massimo Sartori, David Lloyd\n\n";
+    cout << "Copyright (C) 2010-" << gmtm->tm_year+1900;
+    cout << " Griffith University and the Contributors\n\n";
 
-    cout << "Software developers: Claudio Pizzolato, Monica Reggiani\n";
+    cout << "CEINMS Contributors: C. Pizzolato, M. Reggiani, M. Sartori\n";
+    cout << "                     E. Ceseracciu, and D.G. Lloyd\n\n";
+
+    cout << "Software developers: C. Pizzolato, E. Ceseracciu, and M. Reggiani\n\n\n";
+
 }
 
 void PrintUsage()
@@ -81,6 +84,10 @@ void PrintUsage()
 
 
 int main(int argc, char** argv){
+
+
+    printHeader();
+    printAuthors();
 
     string option = "";
     string setupFileName;

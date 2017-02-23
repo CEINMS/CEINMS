@@ -27,17 +27,10 @@ add_library(OutputConnectors STATIC
   ${QueuesToStorageFiles_SOURCES}
   ${QueuesToStorageFiles_HEADERS}
 )
-target_link_libraries(OutputConnectors ${Boost_FILESYSTEM_LIBRARY})
-target_include_directories(OutputConnectors
-                                PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}
-                                        ${ceinms_common_INCLUDE_DIRS}
-                                        ${InputConnectors_INCLUDE_DIRS}
-                                        ${Concurrency_INCLUDE_DIRS}
-                                        ${TrialData_INCLUDE_DIRS}
-                                PUBLIC ${Boost_INCLUDE_DIRS})
-
-# Save path to include directory for "internal" usage
-set(OutputConnectors_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}" CACHE INTERNAL "Include directories for OutputConnectors library")
+target_link_libraries(OutputConnectors rtb::Concurrency ${Boost_FILESYSTEM_LIBRARY} ceinms_common InputConnectors TrialData)
+target_include_directories(OutputConnectors PUBLIC ${Boost_INCLUDE_DIRS}
+                                                   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+                                                   $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
 
 # Install
 install(FILES ${OutputConnectors_HEADERS} ${QueuesToStorageFiles_HEADERS} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/ceinms COMPONENT Development)

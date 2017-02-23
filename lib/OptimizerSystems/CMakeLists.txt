@@ -8,14 +8,13 @@ set(OptimizationSystems_HEADERS ceinms/NMSmodelSystem.h
                                 ceinms/BatchEvaluator.h
                                 ceinms/AbstractOptimizerSystem.h
                                 ceinms/MinTorqueError.h
-								ceinms/Result.h
+                                ceinms/Result.h
                         )
 
 set(OptimizationSystems_TEMPLATE_IMPLEMENTATION
                             ceinms/NMSmodelSystem.cpp
                             ceinms/ParametersInterpreter.cpp
-							ceinms/BatchEvaluator.cpp
-							)
+                            ceinms/BatchEvaluator.cpp)
                             
 set(OptimizationSystems_SOURCES MinTorqueError.cpp Result.cpp
 )
@@ -26,19 +25,10 @@ source_group("Header Files" FILES ${OptimizationSystems_HEADERS})
 source_group("Source Files" FILES ${OptimizationSystems_TEMPLATE_IMPLEMENTATION} ${OptimizationSystems_SOURCES})
 
 add_library(OptimizationSystems ${OptimizationSystems_HEADERS} ${OptimizationSystems_TEMPLATE_IMPLEMENTATION} ${OptimizationSystems_SOURCES})
-target_include_directories( OptimizationSystems
-                            PRIVATE ceinms
-                                    ${NMSmodel_INCLUDE_DIRS}
-                                    ${Curve_INCLUDE_DIRS}
-                                    ${FileIO_INCLUDE_DIRS}
-                                    ${ceinms_common_INCLUDE_DIRS}
-									${Optimizers_INCLUDE_DIRS}
-									${TrialData_INCLUDE_DIRS})
+target_link_libraries(OptimizationSystems NMSmodel Curve FileIO ceinms_common Optimizers TrialData)
+target_include_directories( OptimizationSystems PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+                                              $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
 
-
-# Save path to include directory for "internal" usage
-set(OptimizationSystems_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}"
-        CACHE INTERNAL "Include directories for OptimizationSystems library")
 
 #Install
 install(FILES ${OptimizationSystems_HEADERS} ${OptimizationSystems_TEMPLATE_IMPLEMENTATION} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/ceinms COMPONENT Development)

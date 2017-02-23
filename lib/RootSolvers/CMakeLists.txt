@@ -1,8 +1,8 @@
 # Author: Elena Ceseracciu
+set(RootSolvers_HEADERS  ceinms/WDBsolver.h)
 
-# Save path to include directory for "internal" usage
-set(RootSolvers_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}" CACHE INTERNAL "Include directory for RootSolvers library")
-
-
-# Install
-#install(FILES ${_HEADERS} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}) #should add namespace
+add_library(RootSolvers INTERFACE)
+add_custom_target(RootSolvers_IDE SOURCES ${RootSolvers_HEADERS})
+target_include_directories(RootSolvers INTERFACE $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>)
+install(TARGETS RootSolvers # Needed on Linux
+        EXPORT CEINMSTargets)
