@@ -57,7 +57,6 @@ if (CEINMS_VERBOSE_DEEP_DEBUG)
     add_definitions(/DDEEP_DEBUG)
 endif()
 
-add_definitions(/D_USE_MATH_DEFINES)
 
 add_subdirectory(lib)
 add_subdirectory(src)
