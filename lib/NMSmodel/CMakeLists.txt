@@ -56,7 +56,8 @@ add_library(NMSmodel STATIC
 )
 target_include_directories(NMSmodel PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
                                         $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
-target_link_libraries(NMSmodel PUBLIC xmlInput Curve ceinms_common FileIO PRIVATE OdeInt RootSolvers)
+target_link_libraries(NMSmodel PUBLIC xmlInput Curve ceinms_common FileIO)
+target_link_libraries(NMSmodel PUBLIC OdeInt RootSolvers) # supposed to be private, but doesn't work for CMake <=3.2.2
 target_compile_definitions(NMSmodel PUBLIC _USE_MATH_DEFINES)
 
 # Install
