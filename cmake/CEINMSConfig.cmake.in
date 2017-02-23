@@ -1,8 +1,8 @@
 #CMake configuration file for CEINMS
 @PACKAGE_INIT@
 
-set_and_check(CEINMS_INCLUDE_DIRS @PACKAGE_CMAKE_INSTALL_INCLUDEDIR@)
+include(CMakeFindDependencyMacro)
+find_dependency(Concurrency REQUIRED)
+find_dependency(Boost REQUIRED)
 
 include("${CMAKE_CURRENT_LIST_DIR}/CEINMSTargets.cmake")
-
-#TODO: need to find dependencies (Boost, Opensim, XERCES...)
