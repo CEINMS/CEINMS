@@ -14,7 +14,7 @@ source_group("Headers" FILES ${Common_HEADERS})
 source_group("Sources" FILES ${Common_SOURCES})
 
 # Define target
-add_library(ceinms_common STATIC ${Common_SOURCES} ${Common_HEADERS})
+add_library(ceinms_common ${Common_SOURCES} ${Common_HEADERS})
 target_link_libraries(ceinms_common LINK_PRIVATE ${Boost_FILESYSTEM_LIBRARY} ${Boost_SYSTEM_LIBRARY})
 target_include_directories(ceinms_common PUBLIC ${Boost_INCLUDE_DIRS}
                                         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>

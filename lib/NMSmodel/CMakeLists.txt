@@ -45,7 +45,7 @@ source_group("Activation_headers" FILES ${Activation_HEADERS})
 source_group("Activation_sources" FILES ${Activation_SOURCES})
 
 # Define target
-add_library(NMSmodel STATIC
+add_library(NMSmodel
   ${NMS_SOURCES}
   ${NMS_HEADERS}
   ${NMS_TEMPLATE_IMPLEMENTATION}

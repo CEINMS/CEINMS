@@ -21,7 +21,7 @@ set(QueuesToStorageFiles_HEADERS
 )
 
 # Define target
-add_library(OutputConnectors STATIC
+add_library(OutputConnectors
   ${OutputConnectors_SOURCES}
   ${OutputConnectors_HEADERS}
   ${QueuesToStorageFiles_SOURCES}

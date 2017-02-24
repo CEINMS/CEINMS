@@ -20,7 +20,7 @@ source_group("Headers" FILES ${FileIO_HEADERS})
 source_group("Sources" FILES ${FileIO_SOURCES})
 
 # Define target
-add_library(FileIO STATIC ${FileIO_SOURCES} ${FileIO_HEADERS})
+add_library(FileIO ${FileIO_SOURCES} ${FileIO_HEADERS})
 target_link_libraries(FileIO xmlInput)
 target_include_directories(FileIO PUBLIC ${Boost_INCLUDE_DIRS}
                                         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>

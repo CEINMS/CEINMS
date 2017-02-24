@@ -33,7 +33,7 @@ source_group("Headers" FILES ${InputConnectors_HEADERS} ${FromStorageFile_HEADER
 source_group("Sources" FILES ${InputConnectors_SOURCES} ${FromStorageFile_SOURCES} )
 
 # Define targets
-add_library(InputConnectors STATIC
+add_library(InputConnectors
   ${InputConnectors_SOURCES}
   ${FromStorageFile_SOURCES}
   ${InputConnectors_HEADERS}
