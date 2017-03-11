@@ -45,8 +45,10 @@ namespace ceinms {
         void getMusclesToAdjust(std::vector<std::string>& musclesToAdjust);
         void getHybridWeightings(double& alpha, double& beta, double& gamma);
         void getAnnealingParameters(unsigned& nt, unsigned& ns, double& rt, double& t, unsigned& maxNoEval, double& epsilon, unsigned& noEpsilon) const;
+        bool getStiffnessEnabled() const;
 
     private:
+        bool stiffnessEnabled_;
         void readXml();
         double tolerance_;
         unsigned runMode_;

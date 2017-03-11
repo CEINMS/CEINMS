@@ -77,10 +77,10 @@ namespace ceinms {
         void setMuscleTendonLengthsSelective(const std::vector<double>& currentLmtData, const std::vector<unsigned>& selectedMusclesIndex);
         void setMomentArms(const std::vector<double>& currentMaData, unsigned whichDof);
         void setMomentArmDerivatives(const std::vector<double>& currentMaDerivativeData, unsigned whichDof);
-        void updateState();
-        void updateState(const std::vector<unsigned>& selectedMusclesIndex);
-        void updateState_OFFLINE();
-        void updateState_OFFLINE(const std::vector<unsigned>& selectedMusclesIndex);
+        void updateState(bool stiffnessEnabled=false);
+        void updateState(const std::vector<unsigned>& selectedMusclesIndex, bool stiffnessEnabled=false);
+        void updateState_OFFLINE(bool stiffnessEnabled=false);
+        void updateState_OFFLINE(const std::vector<unsigned>& selectedMusclesIndex, bool stiffnessEnabled=false);
         void updateState_HYBRID();
         void updateState_HYBRID(const std::vector<unsigned>& selectedMusclesIndex);
         void updateState_END_OF_HYBRID_MINIMIZATION();

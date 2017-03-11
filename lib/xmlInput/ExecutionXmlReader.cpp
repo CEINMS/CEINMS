@@ -39,7 +39,7 @@ using ExecutionXsd::HybridType;
 
 namespace ceinms {
     ExecutionXmlReader::ExecutionXmlReader(const string& filename)
-        :runMode_(0), tolerance_(1e-6) {
+        :runMode_(0), tolerance_(1e-6), stiffnessEnabled_(false) {
 
         try {
             std::auto_ptr<ExecutionType> executionPointer(parseAndValidate<ExecutionType>(filename, execution_schema, sizeof(execution_schema)));
@@ -112,6 +112,9 @@ namespace ceinms {
                 exit(EXIT_FAILURE);
             }
 
+            ExecutionType::stiffness_optional& myStiffnessOpt(executionPointer_->stiffness());
+            if(myStiffnessOpt.present())
+                stiffnessEnabled_=true;
 
             //ANCORA DA IMPLEMENTARE
             /*
@@ -226,5 +229,9 @@ namespace ceinms {
 
         return static_cast<NMSModelCfg::RunMode>(runMode_);
 
+    }
+
+    bool ExecutionXmlReader::getStiffnessEnabled() const {
+        return stiffnessEnabled_;
     }
 }

@@ -41,7 +41,7 @@ namespace ceinms {
 
     public:
         ModelEvaluationOffline() = delete;
-        ModelEvaluationOffline(InputConnectors& inputConnectors, OutputConnectors& outputConnectors, NMSmodelT& subject, const std::vector< std::string >& valuesToLog);
+        ModelEvaluationOffline(InputConnectors& inputConnectors, OutputConnectors& outputConnectors, NMSmodelT& subject, const std::vector< std::string >& valuesToLog, bool stiffnessEnabled=false);
         ~ModelEvaluationOffline();
 
         void setOutputDirectory(const std::string& outputDir);
@@ -56,7 +56,7 @@ namespace ceinms {
         std::vector< std::string > dofNamesWithExtTorque_;
 
         std::list< InputConnectors::FrameType > lmtDataFromQueue_, emgDataFromQueue_, externalTorquesDataFromQueue_;
-        std::list< std::vector < InputConnectors::FrameType > > maDataFromQueue_;
+        std::list< std::vector < InputConnectors::FrameType > > maDataFromQueue_, dMaDataFromQueue_;
         unsigned noDof_;
         double globalEmDelay_;
     };

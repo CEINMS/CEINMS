@@ -47,8 +47,8 @@ using std::string;
 
 namespace ceinms {
     template <typename NMSmodelT, typename Logger>
-    ModelEvaluationOffline<NMSmodelT, Logger>::ModelEvaluationOffline(InputConnectors& inputConnectors, OutputConnectors& outputConnectors, NMSmodelT& subject, const vector<string>& valuesToLog)
-        :ModelEvaluationBase<Logger>::ModelEvaluationBase(inputConnectors, outputConnectors, valuesToLog), subject_(subject)
+    ModelEvaluationOffline<NMSmodelT, Logger>::ModelEvaluationOffline(InputConnectors& inputConnectors, OutputConnectors& outputConnectors, NMSmodelT& subject, const vector<string>& valuesToLog, bool stiffnessEnabled)
+        :ModelEvaluationBase<Logger>::ModelEvaluationBase(inputConnectors, outputConnectors, valuesToLog, stiffnessEnabled), subject_(subject)
     {
         subject_.getDoFNames(dofNames_);
         noDof_ = dofNames_.size();
@@ -102,6 +102,21 @@ namespace ceinms {
                 maDataFromQueue_.push_back(maFrame);
         } while (runCondition);
 
+        if (ModelEvaluationBase<Logger>::stiffnessEnabled ){
+            runCondition= ModelEvaluationBase<Logger>::momentArmDerivativesAvailable();
+            //read moment arm derivatives data
+            do{
+                vector< ceinms::InputConnectors::FrameType > dMaFrame;
+                for (unsigned i = 0; i < noDof_; ++i) {
+                    auto currentMomentArmDerivs(ModelEvaluationBase<Logger>::getMomentArmDerivativesFromInputQueue(i));
+                    if (!currentMomentArmDerivs.data.empty())
+                        dMaFrame.push_back(currentMomentArmDerivs);
+                    else runCondition = false;
+                }
+                if (runCondition)
+                    dMaDataFromQueue_.push_back(dMaFrame);
+            } while (runCondition);
+        }
     }
 
     template <typename NMSmodelT, typename Logger>
@@ -153,6 +168,12 @@ namespace ceinms {
             vector< InputConnectors::FrameType > momentArmsFrameFromQueue(maDataFromQueue_.front());
             maDataFromQueue_.pop_front();
 
+            // 2b. read moment arm derivatives data
+            vector< ceinms::InputConnectors::FrameType > momentArmDerivativesFrameFromQueue;
+            if(ModelEvaluationBase<Logger>::stiffnessEnabled) {
+                momentArmDerivativesFrameFromQueue = dMaDataFromQueue_.front();
+                dMaDataFromQueue_.pop_front();
+            }
             // 3. read external Torque
             InputConnectors::FrameType externalTorquesFrameFromQueue;
             if (ModelEvaluationBase<Logger>::externalTorquesAvailable()){
@@ -186,7 +207,10 @@ namespace ceinms {
             subject_.setMuscleTendonLengths(lmtFrameFromQueue.data);
             for (unsigned int i = 0; i < noDof_; ++i)
                 subject_.setMomentArms(momentArmsFrameFromQueue.at(i).data, i);
-            subject_.updateState_OFFLINE();
+            if(ModelEvaluationBase<Logger>::stiffnessEnabled)
+                for (unsigned int i = 0; i < noDof_; ++i)
+                    subject_.setMomentArmDerivatives(momentArmDerivativesFrameFromQueue.at(i).data, i);
+            subject_.updateState_OFFLINE(ModelEvaluationBase<Logger>::stiffnessEnabled);
             subject_.pushState();
 #ifdef LOG_FILES
             //:TODO: Improve as now you are defining two times what you want to log
@@ -207,6 +231,12 @@ namespace ceinms {
             ModelEvaluationBase<Logger>::logger.log(lmtMaTime, data, "MuscleForces");
             subject_.getTorques(data);
             ModelEvaluationBase<Logger>::logger.log(lmtMaTime, data, "Torques");
+            if(ModelEvaluationBase<Logger>::stiffnessEnabled){
+                subject_.getMtusStiffness(data);
+                ModelEvaluationBase<Logger>::logger.log(lmtMaTime, data, "MtusStiffness");
+                subject_.getDofsStiffness(data);
+                ModelEvaluationBase<Logger>::logger.log(lmtMaTime, data, "DofsStiffness");
+            }
 #endif
 
 #ifdef LOG
@@ -265,6 +295,10 @@ namespace ceinms {
         ModelEvaluationBase<Logger>::logger.log(endTime, endData, "PennationAngles");
         ModelEvaluationBase<Logger>::logger.log(endTime, endData, "MuscleForces");
         ModelEvaluationBase<Logger>::logger.log(endTime, endData, "Torques");
+        if(ModelEvaluationBase<Logger>::stiffnessEnabled) {
+            ModelEvaluationBase<Logger>::logger.log(endTime, endData, "MtusStiffness");
+            ModelEvaluationBase<Logger>::logger.log(endTime, endData, "DofsStiffness");
+        }
 #endif
 
         this->doneWithExecution();

@@ -41,7 +41,7 @@ namespace ceinms {
 
     public:
         ModelEvaluationBase() = delete;
-        ModelEvaluationBase(InputConnectors& inputConnectors, OutputConnectors& outputConnectors, const std::vector<std::string>& valuesToLog);
+        ModelEvaluationBase(InputConnectors& inputConnectors, OutputConnectors& outputConnectors, const std::vector<std::string>& valuesToLog, bool stiffnessEnabled);
         virtual ~ModelEvaluationBase();
         virtual void operator()() = 0;
 
@@ -65,7 +65,7 @@ namespace ceinms {
         float getGlobalTimeLimit() const;
 
         Logger logger;
-
+        bool stiffnessEnabled;
     private:
         InputConnectors& inputConnectors_;
         OutputConnectors& outputConnectors_;

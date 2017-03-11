@@ -46,10 +46,7 @@ namespace ceinms {
 
     private:
         template <typename NMSmodelT, template <typename, typename> class ModelEvaluatorT, typename LoggerT>
-        bool runOpenLoop();
-
-        template <typename NMSmodelT, template <typename, typename> class ModelEvaluatorT, typename LoggerT>
-        bool runOpenLoopStiffness();
+        bool runOpenLoop(bool stiffnessEnabled);
 
         template <typename T>
         bool runHybrid();

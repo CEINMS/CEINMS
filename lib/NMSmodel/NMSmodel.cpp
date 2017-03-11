@@ -240,50 +240,59 @@ namespace ceinms {
     }
 
     template <typename Activation, typename Tendon, CurveMode::Mode mode>
-    void NMSmodel<Activation, Tendon, mode>::updateState() {
+    void NMSmodel<Activation, Tendon, mode>::updateState(bool stiffnessEnabled) {
 
         updateActivations();
         updateFibreLengthsAndVelocities();
         updateMuscleForces();
-        updateMtusStiffness();
         updateTorques();
-        updateDofsStiffness();
+        if (stiffnessEnabled) {
+            updateMtusStiffness();
+            updateDofsStiffness();
+        }
     }
 
 
     template <typename Activation, typename Tendon, CurveMode::Mode mode>
-    void NMSmodel<Activation, Tendon, mode>::updateState(const vector<unsigned>& selectedmusclesIndex) {
+    void NMSmodel<Activation, Tendon, mode>::updateState(const vector<unsigned>& selectedmusclesIndex, bool stiffnessEnabled) {
 
         updateActivations(selectedmusclesIndex);
         updateFibreLengthsAndVelocities(selectedmusclesIndex);
         updateMuscleForces(selectedmusclesIndex);
-        updateMtusStiffness(selectedmusclesIndex);
         updateTorques();
-        updateDofsStiffness();
+        if (stiffnessEnabled) {
+            updateMtusStiffness(selectedmusclesIndex);
+            updateDofsStiffness();
+        }
     }
 
 
     template <typename Activation, typename Tendon, CurveMode::Mode mode>
-    void NMSmodel<Activation, Tendon, mode>::updateState_OFFLINE() {
+    void NMSmodel<Activation, Tendon, mode>::updateState_OFFLINE(bool stiffnessEnabled) {
 
         updateActivations();
         updateFibreLengthsAndVelocities_OFFLINE();
         updateMuscleForces();
-        updateMtusStiffness();
         updateTorques();
-        updateDofsStiffness();
+        if (stiffnessEnabled) {
+            updateMtusStiffness();
+            updateDofsStiffness();
+        }
     }
 
 
     template <typename Activation, typename Tendon, CurveMode::Mode mode>
-    void NMSmodel<Activation, Tendon, mode>::updateState_OFFLINE(const vector<unsigned>& selectedmusclesIndex) {
+    void NMSmodel<Activation, Tendon, mode>::updateState_OFFLINE(const vector<unsigned>& selectedmusclesIndex, bool stiffnessEnabled) {
 
         updateActivations(selectedmusclesIndex);
         updateFibreLengthsAndVelocities_OFFLINE(selectedmusclesIndex);
         updateMuscleForces(selectedmusclesIndex);
         updateMtusStiffness(selectedmusclesIndex);
         updateTorques();
-        updateDofsStiffness();
+        if (stiffnessEnabled) {
+            updateMtusStiffness(selectedmusclesIndex);
+            updateDofsStiffness();
+        }
     }
 
 
@@ -293,9 +302,9 @@ namespace ceinms {
         updateActivations();
         updateFibreLengthsAndVelocities_HYBRID();
         updateMuscleForces();
-        updateMtusStiffness();
+      //  updateMtusStiffness();
         updateTorques();
-        updateDofsStiffness();
+      //  updateDofsStiffness();
     }
 
 
@@ -305,9 +314,9 @@ namespace ceinms {
         updateActivations(selectedmusclesIndex);
         updateFibreLengthsAndVelocities_HYBRID(selectedmusclesIndex);
         updateMuscleForces(selectedmusclesIndex);
-        updateMtusStiffness(selectedmusclesIndex);
+      //  updateMtusStiffness(selectedmusclesIndex);
         updateTorques();
-        updateDofsStiffness();
+      //  updateDofsStiffness();
     }
 
 
