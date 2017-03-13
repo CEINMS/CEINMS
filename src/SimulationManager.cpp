@@ -46,7 +46,6 @@
 #include "ModelEvaluationOnline.h"
 #include "ModelEvaluationOffline.h"
 #include "ModelEvaluationHybrid.h"
-#include "ModelEvaluationOfflineStiffness.h"
 
 //Hybrid optimiser
 #include "ceinms/ErrorMinimizerAnnealing.h"
@@ -79,7 +78,7 @@ namespace ceinms {
     }
 
     template <typename NMSmodelT, template <typename, typename> class ModelEvaluatorT, typename LoggerT>
-    bool SimulationManager::runOpenLoop(bool stiffnessEnabled=false){
+    bool SimulationManager::runOpenLoop(bool stiffnessEnabled){
 
         //Monica probably won't like this
         InputConnectors inputConnectors;
