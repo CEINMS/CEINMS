@@ -45,6 +45,7 @@ namespace ceinms {
 
     }
 
+
     void QueuesToStorageFiles::operator()() {
 
         for (auto& it : valuesToWrite_) {
@@ -113,7 +114,7 @@ namespace ceinms {
         *outFile << "datarows " << dataToWrite.size() << std::endl;
         *outFile << "endheader" << std::endl;
         *outFile << "time" + separator_;
-        if (valueName == "Torques")
+        if (valueName == "Torques" || valueName == "DofsStiffness")
             for (auto& it : torqueNames_)
                 *outFile << it << separator_;
         else

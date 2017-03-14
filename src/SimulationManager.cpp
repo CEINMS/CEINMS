@@ -27,6 +27,7 @@
  * -------------------------------------------------------------------------- */
 
 #include "ceinms/CeinmsSetupXmlReader.h"
+#include <ceinms/NMSmodelConfig.h>
 #include "ceinms/NMSmodel.h"
 
 #include "ceinms/Tendon/StiffTendon.h"
@@ -39,6 +40,7 @@
 
 #include "ceinms/EMGFromFile.h"
 #include "ceinms/LmtMaFromStorageFile.h"
+#include "ceinms/LmtMaDMaFromStorageFile.h"
 #include "ceinms/ExternalTorquesFromStorageFile.h"
 
 #include "ModelEvaluationOnline.h"
@@ -75,9 +77,8 @@ namespace ceinms {
 
     }
 
-
     template <typename NMSmodelT, template <typename, typename> class ModelEvaluatorT, typename LoggerT>
-    bool SimulationManager::runOpenLoop() {
+    bool SimulationManager::runOpenLoop(bool stiffnessEnabled){
 
         //Monica probably won't like this
         InputConnectors inputConnectors;
@@ -92,9 +93,16 @@ namespace ceinms {
 
         vector< string > dofNames;
         mySubject.getDoFNames(dofNames);
-        vector< string > maFilename;
+        vector< string > maFilename, dMaFilename;
         sortMaFilenames(dataLocations_.getMaFiles(), dofNames, maFilename);
-        LmtMaFromStorageFile lmtMaProducer(inputConnectors, mySubject, dataLocations_.getLmtFile(), maFilename);
+        if (stiffnessEnabled){
+            sortMaFilenames(dataLocations_.getMaDerivativeFiles(), dofNames, dMaFilename);
+        }
+        LmtMaFromX* lmtMaProducer;
+        if(stiffnessEnabled)
+            lmtMaProducer= new LmtMaDMaFromStorageFile(inputConnectors, mySubject, dataLocations_.getLmtFile(), maFilename, dMaFilename);
+        else
+            lmtMaProducer= new LmtMaFromStorageFile(inputConnectors, mySubject, dataLocations_.getLmtFile(), maFilename);
 
         string externalTorqueFilename(dataLocations_.getExternalTorqueFile());
         ExternalTorquesFromStorageFile externalTorquesProducer(inputConnectors, mySubject, externalTorqueFilename);
@@ -106,14 +114,19 @@ namespace ceinms {
                                      "NormFiberVelocities",
                                      "PennationAngles",
                                      "MuscleForces",
-                                     "Torques" };
+                                     "Torques"};
+        if(stiffnessEnabled){
+            dataToLog.push_back("MtusStiffness");
+            dataToLog.push_back("DofsStiffness");
+        }
+
         // 2b. define the thread consuming the output sources
         vector<string> valuesToWrite = dataToLog;
         QueuesToStorageFiles queuesToStorageFiles(inputConnectors, outputConnectors, mySubject, valuesToWrite, outputDirectory_);
 
         // 3. define the model simulator
         vector<string> valuesToLog = dataToLog;
-        ModelEvaluatorT<NMSmodelT, LoggerT>  simulator(inputConnectors, outputConnectors, mySubject, valuesToLog);
+        ModelEvaluatorT<NMSmodelT, LoggerT>  simulator(inputConnectors, outputConnectors, mySubject, valuesToLog, stiffnessEnabled);
 
         inputConnectors.doneWithSubscription.setCount(5);
         outputConnectors.doneWithExecution.setCount(2);
@@ -121,7 +134,7 @@ namespace ceinms {
         // 4. start the threads
         std::thread emgProdThread(std::ref(emgProducer));
         std::thread externalTorquesProdThread(std::ref(externalTorquesProducer));
-        std::thread lmtMaProdThread(std::ref(lmtMaProducer));
+        std::thread lmtMaProdThread(std::ref(*lmtMaProducer));
         std::thread simulatorThread(std::ref(simulator));
         std::thread queuesToStorageFilesThread(std::ref(queuesToStorageFiles));
 
@@ -130,7 +143,8 @@ namespace ceinms {
         externalTorquesProdThread.join();
         simulatorThread.join();
         queuesToStorageFilesThread.join();
-
+        if (lmtMaProducer)
+            delete lmtMaProducer;
         return 0;
     }
 
@@ -219,35 +233,35 @@ namespace ceinms {
         switch (runMode) {
 
         case NMSModelCfg::OpenLoopExponentialActivationStiffTendonOnline:
-            exitFlag = runOpenLoop < NMSmodel<ExponentialActivation, StiffTendon, CurveMode::Online>, ModelEvaluationOnline, LoggerOnQueues > ();
+            exitFlag = runOpenLoop < NMSmodel<ExponentialActivation, StiffTendon, CurveMode::Online>, ModelEvaluationOnline, LoggerOnQueues > (executionCfg_.getStiffnessEnabled());
             break;
 
         case NMSModelCfg::OpenLoopExponentialActivationStiffTendonOffline:
-            exitFlag = runOpenLoop < NMSmodel<ExponentialActivation, StiffTendon, CurveMode::Offline>, ModelEvaluationOffline, LoggerOnQueues >();
+            exitFlag = runOpenLoop < NMSmodel<ExponentialActivation, StiffTendon, CurveMode::Offline>, ModelEvaluationOffline, LoggerOnQueues >(executionCfg_.getStiffnessEnabled());
             break;
 
         case NMSModelCfg::OpenLoopExponentialActivationElasticTendonBiSecOnline:
-            exitFlag = runOpenLoop<NMSmodel<ExponentialActivation, ElasticTendon_BiSec, CurveMode::Online>, ModelEvaluationOnline, LoggerOnQueues>();
+            exitFlag = runOpenLoop<NMSmodel<ExponentialActivation, ElasticTendon_BiSec, CurveMode::Online>, ModelEvaluationOnline, LoggerOnQueues>(executionCfg_.getStiffnessEnabled());
             break;
 
         case NMSModelCfg::OpenLoopExponentialActivationElasticTendonBiSecOffline:
-            exitFlag = runOpenLoop<NMSmodel<ExponentialActivation, ElasticTendon_BiSec, CurveMode::Offline>, ModelEvaluationOffline, LoggerOnQueues >();
+            exitFlag = runOpenLoop<NMSmodel<ExponentialActivation, ElasticTendon_BiSec, CurveMode::Offline>, ModelEvaluationOffline, LoggerOnQueues >(executionCfg_.getStiffnessEnabled());
             break;
 
         case NMSModelCfg::OpenLoopPiecewiseActivationStiffTendonOnline:
-            exitFlag = runOpenLoop<NMSmodel<PiecewiseActivation, StiffTendon, CurveMode::Online>, ModelEvaluationOnline, LoggerOnQueues>();
+            exitFlag = runOpenLoop<NMSmodel<PiecewiseActivation, StiffTendon, CurveMode::Online>, ModelEvaluationOnline, LoggerOnQueues>(executionCfg_.getStiffnessEnabled());
             break;
 
         case NMSModelCfg::OpenLoopPiecewiseActivationStiffTendonOffline:
-            exitFlag = runOpenLoop<NMSmodel<PiecewiseActivation, StiffTendon, CurveMode::Offline>, ModelEvaluationOffline, LoggerOnQueues >();
+            exitFlag = runOpenLoop<NMSmodel<PiecewiseActivation, StiffTendon, CurveMode::Offline>, ModelEvaluationOffline, LoggerOnQueues >(executionCfg_.getStiffnessEnabled());
             break;
 
         case NMSModelCfg::OpenLoopPiecewiseActivationElasticTendonBiSecOnline:
-            exitFlag = runOpenLoop<NMSmodel<PiecewiseActivation, ElasticTendon_BiSec, CurveMode::Online>, ModelEvaluationOnline, LoggerOnQueues>();
+            exitFlag = runOpenLoop<NMSmodel<PiecewiseActivation, ElasticTendon_BiSec, CurveMode::Online>, ModelEvaluationOnline, LoggerOnQueues>(executionCfg_.getStiffnessEnabled());
             break;
 
         case NMSModelCfg::OpenLoopPiecewiseActivationElasticTendonBiSecOffline:
-            exitFlag = runOpenLoop<NMSmodel<PiecewiseActivation, ElasticTendon_BiSec, CurveMode::Offline>, ModelEvaluationOffline, LoggerOnQueues >();
+            exitFlag = runOpenLoop<NMSmodel<PiecewiseActivation, ElasticTendon_BiSec, CurveMode::Offline>, ModelEvaluationOffline, LoggerOnQueues >(executionCfg_.getStiffnessEnabled());
             break;
 
         case NMSModelCfg::HybridExponentialActivationStiffTendonOnline:
@@ -295,6 +309,4 @@ namespace ceinms {
             }
         }
     }
-
-
 }

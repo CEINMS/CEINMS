@@ -1,6 +1,3 @@
-include_directories( 
-	${Curve_INCLUDE_DIRS})
-
 add_executable(Test_Curve curveTest.cpp)
-
-
+target_link_libraries(Test_Curve Curve)
+target_compile_definitions(Test_Curve PRIVATE _USE_MATH_DEFINES)

@@ -60,15 +60,21 @@ namespace ceinms {
         friend std::ostream& operator<< <>(std::ostream& output, const DoF& dof);
         void setMomentArms(const std::vector<double>& momentArms);
         void getMomentArms(std::vector<double>& momentArms) const { momentArms = momentArms_; }
+        void setMomentArmDerivatives(const std::vector<double>& momentArmDerivatives);
+        void getMomentArmDerivatives(std::vector<double>& momentArmDerivatives) const { momentArmDerivatives = momentArmDerivatives_; }
         double getTorque() const { return torque_; }
+        double getDofStiffness() const { return dofStiffness_;}
         bool compareMusclesNames(const std::vector<std::string>& muscleNames) const;
         void getMusclesNamesOnDof(std::vector<std::string>& musclesNames) const;
         void updateTorque();
+        void updateDofStiffness();
     private:
         std::string id_;
         std::vector<  typename std::vector< MTUtype >::iterator > muscles_;
         std::vector<double> momentArms_;
+        std::vector<double> momentArmDerivatives_;
         double torque_;
+        double dofStiffness_;
     };
 }
 #include "DoF.cpp"

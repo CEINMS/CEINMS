@@ -29,8 +29,8 @@
 #ifndef ceinms_InputConnectors_h
 #define ceinms_InputConnectors_h
 
-#include "ceinms/concurrency/Queue.h"
-#include "ceinms/concurrency/Latch.h"
+#include "rtb/concurrency/Queue.h"
+#include "rtb/concurrency/Latch.h"
 #include "ceinms/QueueData.h"
 
 #include <list>
@@ -43,14 +43,16 @@ namespace ceinms {
         virtual ~InputConnectors();
         InputConnectors(const InputConnectors&) = delete;
         typedef QueueData< std::vector< double > > FrameType;
-        Concurrency::Queue< FrameType > queueEmg;
-        Concurrency::Queue< FrameType > queueLmt;
-        std::vector< Concurrency::Queue< FrameType >* > queueMomentArms;
-        Concurrency::Queue< FrameType >  queueExternalTorques;
-        Concurrency::Latch doneWithSubscription;
+        rtb::Concurrency::Queue< FrameType > queueEmg;
+        rtb::Concurrency::Queue< FrameType > queueLmt;
+        std::vector< rtb::Concurrency::Queue< FrameType >* > queueMomentArms;
+        std::vector< rtb::Concurrency::Queue< FrameType >* > queueMomentArmDerivatives;
+        rtb::Concurrency::Queue< FrameType >  queueExternalTorques;
+        rtb::Concurrency::Latch doneWithSubscription;
 
         double globalTimeLimit;
         bool externalTorquesAvailable;
+        bool momentArmDerivativesAvailable;
     };
 }
 

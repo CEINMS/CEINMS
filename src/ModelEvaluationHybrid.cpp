@@ -50,7 +50,7 @@ namespace ceinms {
         ErrorMinimizerT& torqueErrorMinimizer,
         const vector<string>& valuesToLog
         )
-        :ModelEvaluationBase<Logger>::ModelEvaluationBase(inputConnectors, outputConnectors, valuesToLog),
+        :ModelEvaluationBase<Logger>::ModelEvaluationBase(inputConnectors, outputConnectors, valuesToLog, false),
         subject_(subject),
         torqueErrorMinimizer_(torqueErrorMinimizer) {
 

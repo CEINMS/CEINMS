@@ -86,6 +86,7 @@
         <xs:element name="online" type="ExecutionElementType"/>
         <xs:element name="offline" type="ExecutionElementType"/>
       </xs:choice>
+      <xs:element minOccurs="0" name="stiffness" type="ExecutionElementType"/>
       <xs:element minOccurs="0" name="elaboratedDoFs" type="ElaboratedDoFsType"/>
     </xs:sequence>
   </xs:complexType>

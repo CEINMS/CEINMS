@@ -45,16 +45,16 @@ namespace ceinms {
 
     template<typename Activation, typename Tendon, CurveMode::Mode mode>
     DoF<Activation, Tendon, mode>::DoF()
-        :id_(""), muscles_(0), momentArms_(0), torque_(0) {  }
+        :id_(""), muscles_(0), momentArms_(0), torque_(0), dofStiffness_(0) {  }
 
     template<typename Activation, typename Tendon, CurveMode::Mode mode>
     DoF<Activation, Tendon, mode>::DoF(const string& id)
-        : id_(id), muscles_(0), momentArms_(0), torque_(0) {  }
+        : id_(id), muscles_(0), momentArms_(0), torque_(0), dofStiffness_(0){  }
 
     template<typename Activation, typename Tendon, CurveMode::Mode mode>
     DoF<Activation, Tendon, mode>::DoF(const DoF& orig)
         : id_(orig.id_), muscles_(orig.muscles_),
-        momentArms_(orig.momentArms_), torque_(orig.torque_) {  }
+        momentArms_(orig.momentArms_), torque_(orig.torque_), dofStiffness_(orig.dofStiffness_) {  }
 
 
     template<typename Activation, typename Tendon, CurveMode::Mode mode>
@@ -94,7 +94,31 @@ namespace ceinms {
         copy(momentArms.begin(), momentArms.end(), momentArms_.begin());
     }
 
+    template<typename Activation, typename Tendon, CurveMode::Mode mode>
+    void DoF<Activation, Tendon, mode>::setMomentArmDerivatives(const vector<double>& momentArmDerivatives){
 
+        if (momentArmDerivatives.size() != muscles_.size())  {
+            std::cout << "We have " << momentArmDerivatives.size() << " ma data for "
+                << muscles_.size() << "muscles.\n";
+            std::cout << "Something went wrong, gotta exit!\n";
+            exit(EXIT_FAILURE);
+        }
+        momentArmDerivatives_.clear();
+        momentArmDerivatives_.resize(muscles_.size());
+        copy(momentArmDerivatives.begin(), momentArmDerivatives.end(), momentArmDerivatives_.begin());
+    }
+
+    template<typename Activation, typename Tendon, CurveMode::Mode mode>
+    void DoF<Activation, Tendon, mode>::updateDofStiffness() {
+        dofStiffness_ = 0;
+        vector<double>::const_iterator currentMomentArm;
+        currentMomentArm = momentArms_.begin();
+        for (unsigned int i = 0; i < muscles_.size(); ++i) {
+                // Approximation! d(momentArm) negligible             -->                 Add (moment arm / angle) derivative here -> |
+            dofStiffness_ += muscles_.at(i)->getMtuStiffness() * pow((*currentMomentArm), 2) + muscles_.at(i)->getMuscleForce() * momentArmDerivatives_.at(i);
+            currentMomentArm++;
+        }
+    }
     /*!
       Compute the torque <a href="./biblio.html">[2]</a>:
       \f[

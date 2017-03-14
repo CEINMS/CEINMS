@@ -41,7 +41,7 @@ namespace ceinms {
 
     public:
         ModelEvaluationBase() = delete;
-        ModelEvaluationBase(InputConnectors& inputConnectors, OutputConnectors& outputConnectors, const std::vector<std::string>& valuesToLog);
+        ModelEvaluationBase(InputConnectors& inputConnectors, OutputConnectors& outputConnectors, const std::vector<std::string>& valuesToLog, bool stiffnessEnabled);
         virtual ~ModelEvaluationBase();
         virtual void operator()() = 0;
 
@@ -49,20 +49,23 @@ namespace ceinms {
         void getEmgFromInputQueue(InputConnectors::FrameType& emgFromQueue);
         void getLmtFromInputQueue(InputConnectors::FrameType& lmtFromQueue);
         void getMomentArmsFromInputQueue(InputConnectors::FrameType& momentArmsFromQueue, unsigned int whichDof);
+        void getMomentArmDerivativesFromInputQueue(InputConnectors::FrameType& momentArmDerivativesFromQueue, unsigned int whichDof);
         void getExternalTorquesFromInputQueue(InputConnectors::FrameType& externalTorquesFromQueue);
         void doneWithExecution();
 
         InputConnectors::FrameType getEmgFromInputQueue();
         InputConnectors::FrameType getLmtFromInputQueue();
         InputConnectors::FrameType getMomentArmsFromInputQueue(unsigned int whichDof);
+        InputConnectors::FrameType getMomentArmDerivativesFromInputQueue(unsigned int whichDof);
         InputConnectors::FrameType getExternalTorquesFromInputQueue();
 
         void subscribeToInputConnectors();
         bool externalTorquesAvailable() const;
+        bool momentArmDerivativesAvailable() const;
         float getGlobalTimeLimit() const;
 
         Logger logger;
-
+        bool stiffnessEnabled;
     private:
         InputConnectors& inputConnectors_;
         OutputConnectors& outputConnectors_;

@@ -39,7 +39,9 @@ namespace ceinms {
             NormFibreVelocities,
             PennationAngles,
             MuscleForces,
+            MtusStiffness,
             Torques,
+            DofsStiffness,
             Emgs,
             AdjustedEmgs
         };

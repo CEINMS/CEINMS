@@ -39,7 +39,7 @@ namespace ceinms {
 
     public:
         ModelEvaluationOnline() = delete;
-        ModelEvaluationOnline(InputConnectors& inputConnectors, OutputConnectors& outputConnectors, NMSmodelT& subject, const std::vector< std::string >& valuesToLog); // const std::string& outputDir = "./Output");
+        ModelEvaluationOnline(InputConnectors& inputConnectors, OutputConnectors& outputConnectors, NMSmodelT& subject, const std::vector< std::string >& valuesToLog, bool stiffnessEnabled=false); // const std::string& outputDir = "./Output");
         void setOutputDirectory(const std::string& outputDir);
         //    void setSubject(NMSmodelT& subject);
         void operator()();

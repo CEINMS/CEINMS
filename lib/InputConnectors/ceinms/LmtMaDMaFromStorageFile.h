@@ -26,8 +26,8 @@
  * limitations under the License.                                             *
  * -------------------------------------------------------------------------- */
 
-#ifndef ceinms_LmtMaFromStorageFile_h
-#define ceinms_LmtMaFromStorageFile_h
+#ifndef ceinms_LmtMaDMaFromStorageFile_h
+#define ceinms_LmtMaDMaFromStorageFile_h
 
 #include "LmtMaFromX.h"
 #include "Utilities.h"
@@ -36,28 +36,36 @@
 #include <vector>
 
 namespace ceinms {
-    class LmtMaFromStorageFile :public LmtMaFromX {
+    class LmtMaDMaFromStorageFile :public LmtMaFromX {
     public:
         template <typename NMSModelT>
-        LmtMaFromStorageFile(InputConnectors& inputConnectors, const NMSModelT& subject, const std::string& lmtDataFilename, const std::vector< std::string>& maDataFileName);
+        LmtMaDMaFromStorageFile(InputConnectors& inputConnectors, const NMSModelT& subject, const std::string& lmtDataFilename, const std::vector< std::string>& maDataFileName, const std::vector< std::string>& dMaDataFileName);
         void operator()();
 
     private:
         std::string dataDirectory_;
         std::vector<size_t> musclePositionInLmtStorage_;
         std::vector< std::vector<size_t> > musclePositionsInMaStorages_;
+        std::vector< std::vector<size_t> > musclePositionsInDMaStorages_;
         DataFromStorageFile lmtData_;
         std::vector< DataFromStorageFile* > maDataStorageFiles_;
+        std::vector< DataFromStorageFile* > dMaDataStorageFiles_;
     };
 
     template <typename NMSModelT>
-    LmtMaFromStorageFile::LmtMaFromStorageFile(InputConnectors& inputConnectors, const NMSModelT& subject, const std::string& lmtDataFilename, const std::vector< std::string>& maDataFileName)
+    LmtMaDMaFromStorageFile::LmtMaDMaFromStorageFile(InputConnectors& inputConnectors, const NMSModelT& subject, const std::string& lmtDataFilename, const std::vector< std::string>& maDataFileName, const std::vector< std::string>& dMaDataFileName)
         :LmtMaFromX(inputConnectors, subject), lmtData_(lmtDataFilename)
     {  // 1. Open the input files
         for (std::string it : maDataFileName)
         {
             DataFromStorageFile* nextMaDataPtr = new DataFromStorageFile(it);
             maDataStorageFiles_.push_back(nextMaDataPtr);
+        }
+
+        for (std::string it : dMaDataFileName)
+        {
+            DataFromStorageFile* nextDMaDataPtr = new DataFromStorageFile(it);
+            dMaDataStorageFiles_.push_back(nextDMaDataPtr);
         }
 
         // 2. setup the conversion matrixes
@@ -73,9 +81,24 @@ namespace ceinms {
             currentDof++;
         }
 
+        musclePositionsInDMaStorages_.resize(dofNames_.size());
+        currentDof = 0;
+        for (auto& it : dMaDataStorageFiles_)
+        {
+            std::vector<std::string> muscleNamesFromStorageFile = it->getColumnNames();
+            musclePositionsInDMaStorages_.at(currentDof) = findMapping(muscleNamesOnDofs_.at(currentDof), muscleNamesFromStorageFile);
+            currentDof++;
+        }
+
         inputConnectors_.queueMomentArms.clear();
         for (int i = 0; i < dofNames_.size(); ++i)
             inputConnectors_.queueMomentArms.push_back(new rtb::Concurrency::Queue< InputConnectors::FrameType >);
+
+        inputConnectors_.queueMomentArmDerivatives.clear();
+        for (int i = 0; i < dofNames_.size(); ++i)
+            inputConnectors_.queueMomentArmDerivatives.push_back(new rtb::Concurrency::Queue< InputConnectors::FrameType >);
+
+        inputConnectors_.momentArmDerivativesAvailable = true;
 
     }
 }

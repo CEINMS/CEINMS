@@ -19,6 +19,12 @@
                          name="momentArmsFile" type="momentArmsFileType"/>
         </xs:sequence>
     </xs:complexType>
+    <xs:complexType name="momentArmDerivativesListType">
+        <xs:sequence>
+             <xs:element maxOccurs="unbounded"
+                         name="momentArmDerivativesFile" type="momentArmsFileType"/>
+        </xs:sequence>
+    </xs:complexType>
     <xs:complexType name="InputDataType">
         <xs:sequence>
             <xs:choice maxOccurs="unbounded">
@@ -26,6 +32,8 @@
                             name="muscleTendonLengthFile" type="xs:string"/>
                 <xs:element minOccurs="1" maxOccurs="1"
                             name="momentArmsFiles" type="momentArmsListType"/>
+                <xs:element maxOccurs="1"
+                            name="momentArmDerivativesFiles" type="momentArmDerivativesListType"/>
                 <xs:element minOccurs="1" maxOccurs="1"
                             name="excitationsFile" type="xs:string"/>
                 <xs:element maxOccurs="1"

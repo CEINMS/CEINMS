@@ -76,10 +76,11 @@ namespace ceinms {
         void setMuscleTendonLengths(const std::vector<double>& currentLmtData);
         void setMuscleTendonLengthsSelective(const std::vector<double>& currentLmtData, const std::vector<unsigned>& selectedMusclesIndex);
         void setMomentArms(const std::vector<double>& currentMaData, unsigned whichDof);
-        void updateState();
-        void updateState(const std::vector<unsigned>& selectedMusclesIndex);
-        void updateState_OFFLINE();
-        void updateState_OFFLINE(const std::vector<unsigned>& selectedMusclesIndex);
+        void setMomentArmDerivatives(const std::vector<double>& currentMaDerivativeData, unsigned whichDof);
+        void updateState(bool stiffnessEnabled=false);
+        void updateState(const std::vector<unsigned>& selectedMusclesIndex, bool stiffnessEnabled=false);
+        void updateState_OFFLINE(bool stiffnessEnabled=false);
+        void updateState_OFFLINE(const std::vector<unsigned>& selectedMusclesIndex, bool stiffnessEnabled=false);
         void updateState_HYBRID();
         void updateState_HYBRID(const std::vector<unsigned>& selectedMusclesIndex);
         void updateState_END_OF_HYBRID_MINIMIZATION();
@@ -95,7 +96,10 @@ namespace ceinms {
         void updateFibreLengths_OFFLINEPREP(const std::vector<unsigned>& selectedMusclesIndex);
         void updateMuscleForces();
         void updateMuscleForces(const std::vector<unsigned>& selectedMusclesIndex);
+        void updateMtusStiffness();
+        void updateMtusStiffness(const std::vector<unsigned>& selectedMusclesIndex);
         void updateTorques();
+        void updateDofsStiffness();
         void pushState();
         void pushState(const std::vector<unsigned>& selectedMusclesIndex);
         void updateFibreLengthTraces();
@@ -145,7 +149,9 @@ namespace ceinms {
         void getNormFiberVelocities(std::vector<double>& normFiberVelocities) const;
         void getPennationAnglesAtT(std::vector<double>& pennationAnglesAtT) const; //instant pennationangle
         void getMuscleForces(std::vector<double>& muscleForces) const;
+        void getMtusStiffness(std::vector<double>& mtusStiffness) const;
         void getTorques(std::vector<double>& torques) const;
+        void getDofsStiffness(std::vector<double>& dofsStiffness) const;
 
         // used during calibration
         void getGroupMusclesBasedOnStrengthCoefficients(std::vector<double>& values,

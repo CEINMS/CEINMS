@@ -99,9 +99,15 @@ namespace ceinms {
             case MuscleForces:
                 filename = "MuscleTendonForces.sto";
                 break;
+            case MtusStiffness:
+                filename = "MtusStiffness.sto";
+                break;
             case Torques:
                 filename = "Torques.sto";
                 break;
+			case DofsStiffness:
+				filename = "DofsStiffness.sto";
+				break;	
             case Emgs:
                 filename = "Emgs.sto";
                 break;
@@ -141,9 +147,15 @@ namespace ceinms {
             case MuscleForces:
                 subject_.getMuscleForces(data);
                 break;
+            case MtusStiffness:
+                subject_.getMtusStiffness(data);
+                break;
             case Torques:
                 subject_.getTorques(data);
                 break;
+            case DofsStiffness:
+                subject_.getDofsStiffness(data);
+                break;	
             case Emgs:
             case AdjustedEmgs:
                 subject_.getEmgs(data);
@@ -175,7 +187,7 @@ namespace ceinms {
             outFile << "endheader" << std::endl;
 
             std::vector<std::string> names;
-            if (fileTypes_.at(index) == Torques)
+            if (fileTypes_.at(index) == Torques || (fileTypes_.at(index) == DofsStiffness))
                 subject_.getDoFNames(names);
             else
                 subject_.getMuscleNames(names);

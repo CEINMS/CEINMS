@@ -37,8 +37,8 @@ using std::string;
 
 namespace ceinms {
     template <typename Logger>
-    ModelEvaluationBase<Logger>::ModelEvaluationBase(InputConnectors& inputConnectors, OutputConnectors& outputConnectors, const vector<string>& valuesToLog)
-        :inputConnectors_(inputConnectors), outputConnectors_(outputConnectors), logger(outputConnectors, valuesToLog)
+    ModelEvaluationBase<Logger>::ModelEvaluationBase(InputConnectors& inputConnectors, OutputConnectors& outputConnectors, const vector<string>& valuesToLog, bool stiffnessEnabled)
+        :inputConnectors_(inputConnectors), outputConnectors_(outputConnectors), logger(outputConnectors, valuesToLog), stiffnessEnabled(stiffnessEnabled)
     { }
 
 
@@ -49,6 +49,8 @@ namespace ceinms {
         inputConnectors_.queueEmg.subscribe();
         for (auto& it : inputConnectors_.queueMomentArms)
             (*it).subscribe();
+        for (auto& it : inputConnectors_.queueMomentArmDerivatives)
+            (*it).subscribe();
         inputConnectors_.queueExternalTorques.subscribe();
 
         inputConnectors_.doneWithSubscription.wait();
@@ -58,6 +60,11 @@ namespace ceinms {
     template <typename Logger>
     bool ModelEvaluationBase<Logger>::externalTorquesAvailable() const {
         return inputConnectors_.externalTorquesAvailable;
+    }
+
+    template <typename Logger>
+    bool ModelEvaluationBase<Logger>::momentArmDerivativesAvailable() const {
+        return inputConnectors_.momentArmDerivativesAvailable;
     }
 
     template <typename Logger>
@@ -80,6 +87,11 @@ namespace ceinms {
     template <typename Logger>
     void ModelEvaluationBase<Logger>::getMomentArmsFromInputQueue(InputConnectors::FrameType& momentArms, unsigned int whichDof) {
         momentArms = (*inputConnectors_.queueMomentArms.at(whichDof)).pop();
+    }
+
+    template <typename Logger>
+    void ModelEvaluationBase<Logger>::getMomentArmDerivativesFromInputQueue(InputConnectors::FrameType& momentArmDerivatives, unsigned int whichDof) {
+        momentArmDerivatives = (*inputConnectors_.queueMomentArmDerivatives.at(whichDof)).pop();
     }
 
 
@@ -106,6 +118,10 @@ namespace ceinms {
         return (*inputConnectors_.queueMomentArms.at(whichDof)).pop();
     }
 
+    template <typename Logger>
+    InputConnectors::FrameType ModelEvaluationBase<Logger>::getMomentArmDerivativesFromInputQueue(unsigned int whichDof) {
+        return (*inputConnectors_.queueMomentArmDerivatives.at(whichDof)).pop();
+    }
 
     template <typename Logger>
     InputConnectors::FrameType ModelEvaluationBase<Logger>::getExternalTorquesFromInputQueue(){

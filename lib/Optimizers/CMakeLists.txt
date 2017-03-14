@@ -14,13 +14,12 @@ set_source_files_properties( ${Optimizers_TEMPLATE_IMPLEMENTATION} PROPERTIES HE
 source_group("Header Files" FILES ${Optimizers_HEADERS})
 source_group("Template implementation Files" FILES ${Optimizers_TEMPLATE_IMPLEMENTATION})
 
-add_library(Optimizers STATIC ${Optimizers_HEADERS} ${Optimizers_TEMPLATE_IMPLEMENTATION})
-
-# target_link_libraries(Calibration xmlInput FileIO)
-target_include_directories( Optimizers
-                             PRIVATE ceinms ${ceinms_common_INCLUDE_DIRS})
-
-# Save path to include directory for "internal" usage
-set(Optimizers_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}" ${ceinms_common_INCLUDE_DIRS} CACHE INTERNAL "Include directories for Optimizers library")
+add_library(Optimizers INTERFACE)
+add_custom_target(Optimizers_IDE SOURCES ${Optimizers_HEADERS} ${Optimizers_TEMPLATE_IMPLEMENTATION})
+target_link_libraries(Optimizers INTERFACE ceinms_common)
+target_include_directories( Optimizers INTERFACE $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+                                              $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
 
 install(FILES ${Optimizers_HEADERS} ${Optimizers_TEMPLATE_IMPLEMENTATION} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/ceinms COMPONENT Development)
+install(TARGETS Optimizers
+        EXPORT CEINMSTargets)

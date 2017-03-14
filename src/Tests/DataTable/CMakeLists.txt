@@ -1,6 +1,2 @@
-include_directories( 
-	${TrialData_INCLUDE_DIRS})
-
 add_executable(Test_DataTable dataTableTest.cpp)
-
-
+target_link_libraries(Test_DataTable TrialData)

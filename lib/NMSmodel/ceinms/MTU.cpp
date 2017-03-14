@@ -40,7 +40,7 @@ namespace ceinms {
     MTU<Activation, Tendon, mode>::MTU()
         :id_(""), emDelay_(.0), c1_(0.), c2_(0.), shapeFactor_(0.), activation_(0.),
         optimalFibreLength_(0.), pennationAngle_(0.), tendonSlackLength_(0.),
-        percentageChange_(0.), fibreLength_(0.), pennationAngleAtT_(0.),
+        percentageChange_(0.), fibreLength_(0.), pennationAngleAtT_(0.), muscleTendonLength_(0.),
         fibreVelocity_(0.), damping_(0.), maxIsometricForce_(0.), time_(.0), timeScale_(0.),
         strengthCoefficient_(0.), muscleForce_(0.), maxContractionVelocity_(0.)  { }
 
@@ -49,7 +49,7 @@ namespace ceinms {
     MTU<Activation, Tendon, mode>::MTU(std::string id)
         :id_(id), emDelay_(.0), c1_(0.), c2_(0.), shapeFactor_(0.), activation_(0.),
         optimalFibreLength_(0.), pennationAngle_(0.), tendonSlackLength_(0.),
-        percentageChange_(0.), fibreLength_(0.), pennationAngleAtT_(0.),
+        percentageChange_(0.), fibreLength_(0.), pennationAngleAtT_(0.), muscleTendonLength_(0.),
         fibreVelocity_(0.), damping_(0.), maxIsometricForce_(0.), time_(.0), timeScale_(0.),
         strengthCoefficient_(0.), muscleForce_(0.), maxContractionVelocity_(0.), tendonDynamic_(id)  { }
 
@@ -71,6 +71,7 @@ namespace ceinms {
         normFibreVelocity_ = orig.normFibreVelocity_;
         fibreLength_ = orig.fibreLength_;
         fibreLengthTrace_ = orig.fibreLengthTrace_;
+        muscleTendonLength_ = orig.muscleTendonLength_;
         muscleForce_ = orig.muscleForce_;
         pennationAngleAtT_ = orig.pennationAngleAtT_;
 
@@ -109,6 +110,7 @@ namespace ceinms {
         normFibreVelocity_ = orig.normFibreVelocity_;
         fibreLength_ = orig.fibreLength_;
         fibreLengthTrace_ = orig.fibreLengthTrace_;
+        muscleTendonLength_ = orig.muscleTendonLength_;
         muscleForce_ = orig.muscleForce_;
         pennationAngleAtT_ = orig.pennationAngleAtT_;
 
@@ -203,6 +205,7 @@ namespace ceinms {
     template<typename Activation, typename Tendon, CurveMode::Mode mode>
     void MTU<Activation, Tendon, mode>::setMuscleTendonLength(double muscleTendonLength) {
 
+        muscleTendonLength_ = muscleTendonLength;
         tendonDynamic_.setMuscleTendonLength(muscleTendonLength);
     }
 
@@ -318,6 +321,48 @@ namespace ceinms {
             cos(pennationAngleAtT);
     }
 
+    template<typename Activation, typename Tendon, CurveMode::Mode mode>
+    void MTU<Activation, Tendon, mode>::updateMtuStiffness() {
+
+        double optimalFiberLengthAtT = optimalFibreLength_*(percentageChange_*(1.0 - activation_) + 1);
+        ////:TODO: strong review with the code... lot of check for closeness to 0
+        double normFiberLengthAtT = fibreLength_ / optimalFiberLengthAtT;
+        double normFiberLength = fibreLength_ / optimalFibreLength_;
+        double fiberVel = fibreVelocity_ / optimalFibreLength_;
+        if (fiberVel > maxContractionVelocity_)
+            fiberVel = maxContractionVelocity_;
+        if (fiberVel < -maxContractionVelocity_)
+            fiberVel = -maxContractionVelocity_;
+        double normFiberVelocity = fiberVel / maxContractionVelocity_;
+
+        double fv = forceVelocityCurve_.getValue(normFiberVelocity);
+        double dfp = passiveForceLengthCurve_.getFirstDerivative(normFiberLength) / optimalFibreLength_; // derivative respect to length, not normlength
+        double dfa = activeForceLengthCurve_.getFirstDerivative(normFiberLengthAtT) / optimalFiberLengthAtT;
+
+        double pennationAngleAtT = computePennationAngle(optimalFibreLength_);
+        double tendonLength = muscleTendonLength_ - fibreLength_*cos(pennationAngleAtT);
+        double tendonStrain = (tendonLength - tendonSlackLength_) / tendonSlackLength_;
+
+        double tendonStiffness = maxIsometricForce_*strengthCoefficient_*
+            tendonForceStrainCurve_.getFirstDerivative(tendonStrain) / tendonSlackLength_; // derivative respect to length, not normlength
+
+        if (tendonStiffness < 0)
+        {
+            tendonStiffness=0;
+        }
+
+        double fiberStiffness=maxIsometricForce_*strengthCoefficient_*(dfa*fv*activation_ + dfp);
+         //dFmAT/dlce = d/dlce( fiso * (a *fal*fv + fpe + beta*dlceN)*cosPhi )
+        double sinPennAngleAtT=sin(pennationAngleAtT);
+        double sinPennAngleOpt=sin(pennationAngle_);
+        double dPennAngle_dlm=-sinPennAngleOpt/fibreLength_ / sqrt(normFiberLength*normFiberLength - sinPennAngleOpt*sinPennAngleOpt);
+        double dCosPennAngle_Dlm = -sinPennAngleAtT*dPennAngle_dlm;
+        double dFmAlongTendon_dl = fiberStiffness*cos(pennationAngleAtT) + muscleForce_*dCosPennAngle_Dlm;
+        double dLmAlongTendon_dl = cos(pennationAngleAtT) - fibreLength_*sinPennAngleAtT*dPennAngle_dlm;
+        double muscleStiffness = dFmAlongTendon_dl /dLmAlongTendon_dl; //dFmAlongTendon_dlAlongTendon
+        // TODO: check that the following is not NaN
+        mtuStiffness_ =  (muscleStiffness * tendonStiffness) / (muscleStiffness + tendonStiffness);
+    }
 
     template<typename Activation, typename Tendon, CurveMode::Mode mode>
     void MTU<Activation, Tendon, mode>::pushState() {

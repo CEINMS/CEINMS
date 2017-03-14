@@ -57,6 +57,8 @@ namespace ceinms {
             OpenLoopExponentialActivationElasticTendonBiSecOnline = 1131,
             OpenLoopExponentialActivationElasticTendonBiSecOffline = 1132,
 
+            StiffnessOpenLoopExponentialActivationElasticTendonBiSecOffline = 11132,
+
             OpenLoopPiecewiseActivationStiffTendonOnline = 1211,
             OpenLoopPiecewiseActivationStiffTendonOffline = 1212,
             OpenLoopPiecewiseActivationElasticTendonOnline = 1221,

@@ -83,6 +83,7 @@ namespace ceinms {
         void   updateFibreLength_OFFLINEPREP();
         void   updateFibreLengthsAndVelocities_END_OF_HYBRID_MINIMIZATION();
         void   updateMuscleForce();
+        void   updateMtuStiffness();
         void   pushState();
 
 
@@ -121,6 +122,7 @@ namespace ceinms {
         double getNormFiberVelocity() const { return normFibreVelocity_; }
         double getPennationAngleAtT() const { return pennationAngleAtT_; };
         double getMuscleForce() const { return muscleForce_; }
+        double getMtuStiffness() const { return mtuStiffness_;}
         double getPercentageChange() const { return percentageChange_; }
         double getDamping() const { return damping_; }
         void   setDamping(double damping);
@@ -129,6 +131,7 @@ namespace ceinms {
         void setTendonTolerance(double tolerance = 0.0);
 
         void   setMuscleForce(double muscleForce) { muscleForce_ = muscleForce; }
+        void   setMtuStiffness(double mtuStiffness) {mtuStiffness_ = mtuStiffness;}
         void   updateFibreLengthTrace();
         void   resetFibreLengthTrace();
         double getPenalty() const;
@@ -162,9 +165,11 @@ namespace ceinms {
         double fibreVelocity_;       /**< \f$v^m\f$ */
         double normFibreVelocity_;
         double fibreLength_;         /**< \f$l^m\f$ */
+        double muscleTendonLength_;
         double pennationAngleAtT_;
         CurveT  fibreLengthTrace_;
         double muscleForce_;    /**< \f$F^{mt}\f$ */
+        double mtuStiffness_;
 
         // parameters
         double optimalFibreLength_;  /**< \f$l_0^m\f$ */

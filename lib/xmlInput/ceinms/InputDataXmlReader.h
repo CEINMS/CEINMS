@@ -39,6 +39,7 @@ namespace ceinms {
         InputDataXmlReader(const std::string& filename);
         std::string getLmtFile();
         std::map<std::string, std::string> getMaFiles();
+        std::map<std::string, std::string> getMaDerivativeFiles();
         std::string getExcitationsFile();
         std::string getExternalTorqueFile();
 
