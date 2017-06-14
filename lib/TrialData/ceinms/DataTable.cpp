@@ -117,9 +117,9 @@ namespace ceinms {
     template <typename T>
     std::vector<T> DataTable<T>::getColumn(std::string& columnName) const {
 
-        auto it = std::find(std::cbegin(labels_), std::cend(labels_), columnName);
-        if (it != std::cend(labels_))
-            return getColumn(std::distance(std::cbegin(labels_), it));
+        auto it = std::find(labels_.cbegin(), labels_.cend(), columnName);
+        if (it != labels_.cend())
+            return getColumn(std::distance(labels_.cbegin(), it));
         return std::vector<T>();
     }
 
