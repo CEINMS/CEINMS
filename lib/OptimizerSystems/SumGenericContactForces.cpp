@@ -78,10 +78,10 @@ namespace ceinms {
             for (auto& joint : contactForcesNames_) {
                 auto column(r.jointReactionForces.getColumn(joint));
                 std::vector<double> magnitude;
-                std::transform(std::cbegin(column), std::cend(column), std::back_inserter(magnitude), [](const SimTK::Vec3& v) {
+                std::transform(column.cbegin(), column.cend(), std::back_inserter(magnitude), [](const SimTK::Vec3& v) {
                     return v.norm();
                 });
-                auto it(std::max_element(std::cbegin(magnitude), std::cend(magnitude)));
+                auto it(std::max_element(magnitude.cbegin(), magnitude.cend()));
                 maxContactForcesForCurrentResult.emplace_back(*it);
             }
             maxContactForces_.emplace_back(maxContactForcesForCurrentResult);
