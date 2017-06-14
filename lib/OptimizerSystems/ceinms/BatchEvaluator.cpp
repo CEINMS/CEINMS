@@ -30,6 +30,7 @@
 #include <thread>
 
 #include "ceinms/TimeCompare.h"
+#include "ceinms/Result.h"
 #include <vector>
 
 namespace ceinms {
