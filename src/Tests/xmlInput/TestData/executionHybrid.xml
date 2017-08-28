@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<execution xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="execution.xsd">
+  <NMSmodel>
+     <type>
+        <hybrid>
+            <dofSet>dof1 dof2 dof3</dofSet>
+            <synthMTUs weight="1">mtu1 mtu2 mtu3</synthMTUs>
+            <adjustMTUs weight="1">bifemlh_r bifemsh_r grac_r lat_gas_r med_gas_r rect_fem_r sar_r semimem_r semiten_r vas_int_r vas_lat_r vas_med_r</adjustMTUs>
+         </hybrid>
+     </type>
+
+     <tendon>
+          <equilibriumElastic/>
+     </tendon>
+
+     <activation>
+          <exponential/>
+     </activation>
+  </NMSmodel>
+
+  <online/>
+
+
+  <elaboratedDoFs>
+  </elaboratedDoFs>
+
+</execution>

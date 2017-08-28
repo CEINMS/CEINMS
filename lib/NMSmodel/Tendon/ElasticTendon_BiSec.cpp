@@ -284,7 +284,7 @@ namespace ceinms {
         //   cout << "------------------\n";
         //   cout << "Fibre Length for " << id_ << endl;
 
-#ifdef DEEP_DEBUG
+#ifdef DEEP_DEBUG_
         cout << "Start DD\n";
         const unsigned nSteps = 100;
         double incr = 2.0*optimalFibreLength_/nSteps;

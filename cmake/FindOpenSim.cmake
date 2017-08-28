@@ -105,7 +105,7 @@ find_library(osimTools
 
              
 find_library(${NameSpace}SimTKcommon
-             NAMES ${NameSpace}SimTKcommon SimTKcommon
+             NAMES ${NameSpace}SimTKcommon 
              PATHS ${OPENSIM_POSSIBLE_DIRECTORIES}
              PATH_SUFFIXES sdk/lib lib)
 
@@ -116,7 +116,7 @@ find_library(${NameSpace}SimTKcommon
 
              
 find_library(${NameSpace}SimTKmath
-             NAMES ${NameSpace}SimTKmath SimTKmath
+             NAMES ${NameSpace}SimTKmath 
              PATHS ${OPENSIM_POSSIBLE_DIRECTORIES}
              PATH_SUFFIXES sdk/lib lib)
 
@@ -126,7 +126,7 @@ find_library(${NameSpace}SimTKmath
 #             PATH_SUFFIXES sdk/lib lib)
 
              
-find_library(${NameSpace}SimTKsimbody SimTKsimbody
+find_library(${NameSpace}SimTKsimbody 
              NAMES ${NameSpace}SimTKsimbody
              PATHS ${OPENSIM_POSSIBLE_DIRECTORIES}
              PATH_SUFFIXES sdk/lib lib)

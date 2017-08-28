@@ -4,6 +4,8 @@ if (WIN32)
 find_file(xerces_dll NAMES "xerces-c_3_1.dll" PATHS "C:/xerces-c-3.1.3_32r/bin" PATH)
 install(PROGRAMS ${xerces_dll} DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT ThirdParty)
 install(PROGRAMS ${OPENSIM_LIBRARIES} DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT ThirdParty)
+message("OpenSim libraries in CPack  ${OPENSIM_LIBRARIES}")
+
 #list(APPEND CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS ${xerces_dll})
 include(InstallRequiredSystemLibraries)
 endif()

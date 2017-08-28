@@ -145,7 +145,9 @@ namespace ceinms {
     }
 
 
-    void ExecutionXmlReader::getMusclesToSynthesise(std::vector<std::string>& musclesToSynthesise) {
+
+
+    void ExecutionXmlReader::getMusclesToSynthesise(std::vector<std::string>& musclesToSynthesise) const {
 
         ExecutionType::NMSmodel_type& myModel(executionPointer_->NMSmodel());
         ExecutionType::NMSmodel_type::type_type& myType(myModel.type());
@@ -161,7 +163,7 @@ namespace ceinms {
     }
 
 
-    void ExecutionXmlReader::getMusclesToAdjust(std::vector<std::string>& musclesToAdjust) {
+    void ExecutionXmlReader::getMusclesToAdjust(std::vector<std::string>& musclesToAdjust) const {
 
         ExecutionType::NMSmodel_type& myModel(executionPointer_->NMSmodel());
         ExecutionType::NMSmodel_type::type_type& myType(myModel.type());
@@ -177,7 +179,7 @@ namespace ceinms {
             musclesToAdjust.push_back(e);
     }
 
-    void ExecutionXmlReader::getHybridWeightings(double& alpha, double& beta, double& gamma) {
+    void ExecutionXmlReader::getHybridWeightings(double& alpha, double& beta, double& gamma) const {
 
         ExecutionType::NMSmodel_type& myModel(executionPointer_->NMSmodel());
         ExecutionType::NMSmodel_type::type_type& myType(myModel.type());
@@ -201,6 +203,23 @@ namespace ceinms {
         else if (myHybOpt->adjustMTUs().weight().present())
             gamma = myHybOpt->adjustMTUs().weight().get();
 
+    }
+
+    void ExecutionXmlReader::getDofSet(std::vector<std::string>& dofs) const {
+      
+        ExecutionType::NMSmodel_type& myModel(executionPointer_->NMSmodel());
+        ExecutionType::NMSmodel_type::type_type& myType(myModel.type());
+        ExecutionType::NMSmodel_type::type_type::hybrid_optional& myHybOpt(myType.hybrid());
+        if (!myHybOpt.present()) {
+            cout << "Cannot get hybrid parameters, hybrid option not selected\n";
+            exit(EXIT_FAILURE);
+        }
+   
+        if (myHybOpt->dofSet().present()) {
+            HybridType::dofSet_optional& dofSet(myHybOpt->dofSet());
+            for (auto& e : *dofSet)
+                dofs.push_back(e);
+        }
     }
 
 

@@ -27,6 +27,7 @@
  * -------------------------------------------------------------------------- */
 
 #include "ceinms/ContactModelXmlReader.h"
+#include "ceinms/ExecutionXmlReader.h"
 #include <iostream>
 using std::cout;
 using std::endl;
@@ -36,11 +37,9 @@ using std::string;
 using boost::filesystem::absolute;
 using boost::filesystem::canonical;
 using boost::filesystem::path;
-int main() {
 
-    boost::filesystem::path dir = path(BASE_DIR) /= "TestData";
-    string filename((dir /= "contactModelKnee.xml").string());
-
+void testContactModels(std::string filename) {
+    
     ceinms::ContactModelXmlReader contactModelReader(filename);
     switch (contactModelReader.getContactModelType()) {
     case ceinms::ContactModelType::OpenSim:
@@ -56,5 +55,39 @@ int main() {
         cout << "----- Dof: " << setupKnee.condyle2.dof << endl;
         break;
     }
+}
+
+
+void testExecutionXmlReader(std::string filename) {
+      
+    auto print([](std::vector<std::string> v) {
+        for (auto& e : v) {
+            cout << e << " ";
+        }
+        cout << "\n";
+    });
+    ceinms::ExecutionXmlReader executionReader(filename);
+    std::vector<std::string> v;
+    executionReader.getDofSet(v);
+    cout << "DofSet\n";
+    print(v);
+    v.clear();
+    executionReader.getMusclesToAdjust(v);
+    cout << "MusclesToAdjust\n";
+    print(v);
+    v.clear();
+    executionReader.getMusclesToSynthesise(v);
+    cout << "MusclesToSynthesise\n";
+    print(v);
+    v.clear();
+}
+
+int main() {
+
+    boost::filesystem::path dir = path(BASE_DIR) /= "TestData";
+
+    testContactModels((dir / "contactModelKnee.xml").string());
+    testExecutionXmlReader((dir / "executionHybrid.xml").string());
+   
     return 0;
 }
