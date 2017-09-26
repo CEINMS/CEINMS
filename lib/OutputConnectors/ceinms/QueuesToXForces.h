@@ -34,7 +34,6 @@
 #include <future>
 #include <algorithm>
 #include <OpenSim/OpenSim.h>
-#include "ceinms/JointContactFromOpensim.h"
 #include "ceinms/concurrency/Queue.h"
 #include "ceinms/concurrency/Latch.h"
 #include "ceinms/QueueData.h"
@@ -84,6 +83,7 @@ namespace OpenSim {
 
 namespace ceinms {
 
+    class JointContactFromOpensim;
     class QueuesToXForces {
     public:
 
