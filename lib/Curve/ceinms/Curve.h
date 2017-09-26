@@ -31,6 +31,7 @@
 
 #include <vector>
 #include <cmath>
+#include <limits>
 #include "CircularVector.h"
 
 namespace ceinms {

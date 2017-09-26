@@ -27,6 +27,7 @@
 * -------------------------------------------------------------------------- */
 
 #include "ceinms/QueuesToXForces.h"
+#include "ceinms/JointContactFromOpensim.h" 
 #include <limits>
 #include <vector>
 using std::vector;

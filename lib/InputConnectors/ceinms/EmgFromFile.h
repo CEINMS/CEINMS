@@ -78,13 +78,13 @@ namespace ceinms {
         std::vector<std::string> emgMusclesNames;
         emgData_.getMusclesNames(emgMusclesNames);
         excitationMapper_.setNames(emgMusclesNames, musclesNames_);
-        auto mappedExcitationNames(excitationMapper_.map(emgMusclesNames, string("None")));
+        auto mappedExcitationNames(excitationMapper_.map(emgMusclesNames, std::string("None")));
         std::cout << "Muscle excitations to muscle mapping:\n";
         for (int i(0); i < mappedExcitationNames.size(); ++i) {
-            cout << mappedExcitationNames.at(i) << " -> " << musclesNames_.at(i);
+            std::cout << mappedExcitationNames.at(i) << " -> " << musclesNames_.at(i);
             if (mappedExcitationNames.at(i) != musclesNames_.at(i))
-                cout << " WARNING. Mapping may be incorrect!";
-            cout << endl;
+                std::cout << " WARNING. Mapping may be incorrect!";
+            std::cout << std::endl;
 
         }
 

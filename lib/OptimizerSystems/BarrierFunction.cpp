@@ -1,4 +1,5 @@
 #include "ceinms/BarrierFunction.h"
+#include <limits>
 
 namespace ceinms {
 

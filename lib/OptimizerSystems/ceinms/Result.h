@@ -44,13 +44,13 @@ namespace ceinms {
             penalties(nLmtMa, nMTUs) {
         }
 
-        void setMuscleNames(std::vector<std::string>& muscleNames) {
+        void setMuscleNames(std::vector<std::string> muscleNames) {
             forces.setLabels(muscleNames);
             activations.setLabels(muscleNames);
             penalties.setLabels(muscleNames);
         }
 
-        void setDofNames(std::vector<std::string>& dofNames) {
+        void setDofNames(std::vector<std::string> dofNames) {
             torques.setLabels(dofNames);
         }
 

@@ -70,29 +70,29 @@ namespace ceinms {
         auto muscleNames(subject.getMuscleNames());
         for (auto m :musclesToSynthesise) {
             if (std::find(begin(muscleNames), end(muscleNames), m) == muscleNames.end())
-                cout << "WARNING. MTU " << m << " is on the synthMTUs list, but does not exist in the subject.\n";
+                std::cout << "WARNING. MTU " << m << " is on the synthMTUs list, but does not exist in the subject.\n";
         }
 
         for (auto m : musclesToAdjust) {
             if (std::find(begin(muscleNames), end(muscleNames), m) == muscleNames.end())
-                cout << "WARNING. MTU " << m << " is on the adjustMTUs list, but does not exist in the subject.\n";
+                std::cout << "WARNING. MTU " << m << " is on the adjustMTUs list, but does not exist in the subject.\n";
         }
 
         
         for (auto m : muscleNames) {
-            cout << m << " -> ";
+            std::cout << m << " -> ";
             if (std::find(begin(musclesToSynthesise), end(musclesToSynthesise), m) != musclesToSynthesise.end())
-                cout << " Synthetising\n";
+                std::cout << " Synthetising\n";
             else if (std::find(begin(musclesToAdjust), end(musclesToAdjust), m) != musclesToAdjust.end())
-                cout << " Adjusting\n";
+                std::cout << " Adjusting\n";
             else
-                cout << " Unchanged\n";
+                std::cout << " Unchanged\n";
         }
 
         weightings_ = setup.weightings;
-        cout << "Using alpha = " << weightings_.alpha << ", "
+        std::cout << "Using alpha = " << weightings_.alpha << ", "
             << "beta = " << weightings_.beta << ", "
-            << "gamma = " << weightings_.gamma << endl;
+            << "gamma = " << weightings_.gamma << std::endl;
         
         //at the moment it's all the dofs, but we may want to set that through xml
         for (unsigned i = 0; i < subject.getNoDoF(); ++i)
