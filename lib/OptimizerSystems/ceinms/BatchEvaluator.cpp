@@ -118,7 +118,7 @@ namespace ceinms {
     }
 
     template<typename NMSmodelT>
-    void OpenLoopEvaluator::evaluate(NMSmodelT&& subject, const TrialData& trialData, const std::vector<unsigned> musclesToUpdate, Result& previousResult) { //pass previousResult by copy, because I need a copy later
+    void OpenLoopEvaluator::evaluate(NMSmodelT&& subject, const TrialData& trialData, const std::vector<unsigned> musclesToUpdate, Result& previousResult) {
 
         const double emDelay(subject.getGlobalEmDelay());
         //ct trial index
@@ -229,5 +229,92 @@ namespace ceinms {
             subject.pushState();
         }
         subject.updateFibreLengthTraces(musclesToUpdate);
+    }
+
+    template<typename NMSmodelT>
+    void HybridEvaluator::evaluate(
+        NMSmodelT&& subject,
+        const TrialData& trialData,
+        const EmgInformedObjectiveFunctionSetup& setup,
+        const std::vector<unsigned> musclesToUpdate,
+        Result& previousResult) {
+
+        NMSmodelFrameOptimisation<NMSmodelT> errorMinimizer(subject, setup);
+        const double emDelay(subject.getGlobalEmDelay());
+        //ct trial index
+
+        unsigned lmtMaIndex(0); // k is the index for lmt and ma data
+        double lmtTime = trialData.getLmtData().getStartTime();
+        double emgTime = trialData.getEmgData().getStartTime() + emDelay;
+        bool firstLmtArrived(false);
+
+        // Let's start going through the EMG, lmt, and ma data...
+        for (unsigned emgIndex(0); emgIndex < trialData.getEmgData().getNRows(); ++emgIndex) {
+
+            emgTime = trialData.getEmgData().getTime(emgIndex) + emDelay;
+            if (!firstLmtArrived && TimeCompare::less(emgTime, lmtTime)) {
+                subject.setActivations(previousResult.activations.getRow(emgIndex));
+                subject.setEmgsSelective(trialData.getEmgData().getRow(emgIndex), musclesToUpdate);
+                subject.updateActivations(musclesToUpdate);
+                subject.pushState(musclesToUpdate);
+            }
+
+            if (TimeCompare::lessEqual(lmtTime, emgTime) && 
+                (lmtMaIndex < trialData.getLmtData().getNRows()) && 
+                (lmtMaIndex < trialData.getMaData().front().getNRows())) {
+                firstLmtArrived = true;
+                subject.setMuscleForces(previousResult.forces.getRow(lmtMaIndex));
+                subject.setTime(lmtTime);
+
+                subject.setActivations(previousResult.activations.getRow(emgIndex));
+                subject.setEmgsSelective(trialData.getEmgData().getRow(emgIndex), musclesToUpdate);
+                subject.setMuscleTendonLengthsSelective(trialData.getLmtData().getRow(lmtMaIndex), musclesToUpdate); //might save computation by having a set muscle tendon length selective.. to check ;)
+                                                                                                                     //   subject.setMuscleTendonLengths(trialData.lmtData.getRow(lmtMaIndex)); 
+                for (unsigned dofIndex(0); dofIndex < trialData.getNoDofs(); ++dofIndex)
+                    subject.setMomentArms(trialData.getMaData().at(dofIndex).getRow(lmtMaIndex), dofIndex);
+
+                errorMinimizer.setExternalTorques(trialData.getTorqueData().getRow(lmtMaIndex));
+                errorMinimizer.optimise();
+                subject.updateState();
+                subject.pushState();
+
+
+                std::vector<double> currentTorques, currentForces, currentEmgs;
+                subject.getTorques(currentTorques);
+                subject.getMuscleForces(currentForces);
+                subject.getEmgs(currentEmgs);
+                // when I'm done with the moment arm, I can ask for the new torque, and put it in the matrix
+                previousResult.torques.setRow(lmtMaIndex, currentTorques);
+                previousResult.torques.setTime(lmtTime, lmtMaIndex);
+                previousResult.forces.setRow(lmtMaIndex, currentForces);
+                previousResult.forces.setTime(lmtTime, lmtMaIndex);
+                previousResult.emgs.setRow(lmtTime, currentEmgs);
+                previousResult.emgs.setTime(lmtTime, lmtMaIndex)
+                
+                //calcolo delle penalty modificato per accomodare l'update di un sottoinsieme di muscoli
+                std::vector<double> penaltiesAtT;
+                subject.getMusclesPenaltyVector(penaltiesAtT);
+                previousResult.penalties.setTime(lmtTime, lmtMaIndex);
+                for (auto &it : musclesToUpdate)
+                    previousResult.penalties.at(lmtMaIndex, it) = penaltiesAtT.at(it);
+
+                vector<double> data, components, weights;
+                errorMinimizer.getObjectiveFunctionComponentsAndWeightings(components, weights);
+                data = components;
+                data.insert(data.end(), weights.begin(), weights.end());
+                previousResult.errors.setTime(lmtTime, lmtMaIndex);
+                previousResult.errors.setRow(lmtTime, data);
+
+                ++lmtMaIndex;
+                if (lmtMaIndex < trialData.getLmtData().getNRows())
+                    lmtTime = trialData.getLmtData().getTime(lmtMaIndex);
+            }
+            std::vector<double> currentActivations;
+            subject.getActivations(currentActivations);
+            for (auto &it : musclesToUpdate) {
+                previousResult.activations.at(emgIndex, it) = currentActivations.at(it);
+                previousResult.activations.setTime(emgTime, emgIndex);
+            }
+        }
     }
 }

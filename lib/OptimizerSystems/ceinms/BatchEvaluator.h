@@ -37,6 +37,8 @@
 #include "ceinms/MuscleParameters.h"
 #include "ceinms/DataTable.h"
 #include "ceinms/TrialData.h"
+#include "ceinms/EmgInformedObjectiveFunctionSetup.h"
+#include "ceinms/Hybrid/NMSmodelFrameOptimisation.h"
 #include "Result.h"
 
 namespace ceinms {
@@ -49,6 +51,18 @@ namespace ceinms {
     private:
         template<typename NMSmodelT>
         static void initFiberLengthTraceCurves(NMSmodelT&& subject, const TrialData& trialData, const std::vector<unsigned>& musclesToUpdate, Result& previousResult);
+    };
+
+    class HybridEvaluator {
+    public:
+        HybridEvaluator() = delete;
+        template<typename NMSmodelT>
+        static void evaluate(
+            NMSmodelT&& subject, 
+            const TrialData& trialData, 
+            const EmgInformedObjectiveFunctionSetup& setup,
+            const std::vector<unsigned> musclesToUpdate, 
+            Result& previousResult);
     };
 
 

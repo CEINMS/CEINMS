@@ -80,4 +80,26 @@ install(TARGETS CEINMS CEINMScalibrate
         RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT Applications
         LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT Development
         ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT Development)
+        
+        
+    
+add_executable( CEINMSoptimise CEINMSoptimise.cpp)
+target_link_libraries( CEINMSoptimise
+      FileIO
+      xmlInput
+      NMSmodel
+      InputConnectors
+      OutputConnectors
+	  JointContactModels
+      OptimizationSystems
+      #${CMAKE_THREAD_LIBS_INIT}
+      ${Boost_PROGRAM_OPTIONS_LIBRARY}
+      ${Boost_FILESYSTEM_LIBRARY}
+)
+
+install(TARGETS CEINMS CEINMSoptimise
+        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT Applications
+        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT Development
+        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT Development)
+
 

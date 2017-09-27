@@ -35,18 +35,23 @@
 namespace ceinms {
     class Result{
     public:
-        DataTable<double> forces, torques, activations, penalties;
+        DataTable<double> forces, torques, activations, emgs, penalties, errors;
         DataTable<SimTK::Vec3> jointReactionForces, jointReactionTorques;
         Result(size_t nMTUs, size_t nDofs, size_t nEmgs, size_t nLmtMa) :
             forces(nLmtMa, nMTUs),
             torques(nLmtMa, nDofs),
             activations(nEmgs, nMTUs),
-            penalties(nLmtMa, nMTUs) {
+            emgs(nEmgs, nMTUs),
+            penalties(nLmtMa, nMTUs),
+            errors(nLmtMa, 6){
+
+            errors.setLabels({ "TorqueError", "SumExcitation", "ExcitationTrackingError", "alpha", "beta", "gamma" });
         }
 
         void setMuscleNames(std::vector<std::string> muscleNames) {
             forces.setLabels(muscleNames);
             activations.setLabels(muscleNames);
+            emgs.setLabels(muscleNames);
             penalties.setLabels(muscleNames);
         }
 
@@ -58,6 +63,7 @@ namespace ceinms {
             return (forces == rhs.forces      &&
                 torques == rhs.torques     &&
                 activations == rhs.activations &&
+                emgs == rhs.emgs &&
                 penalties == rhs.penalties);
         }
     };
