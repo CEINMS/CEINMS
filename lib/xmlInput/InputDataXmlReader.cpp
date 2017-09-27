@@ -88,7 +88,7 @@ namespace ceinms {
         if (FileUtils::isAbsolute(fileName.c_str()))
             return fileName;
         else
-            return filepath_ + fileName;
+            return FileUtils::simplify(filepath_ + fileName);
     }
 
     std::map<std::string, std::string> InputDataXmlReader::getMaFiles()
@@ -99,7 +99,7 @@ namespace ceinms {
             std::string pathToMaFile = it.c_str();
             FileUtils::trim(pathToMaFile);
             if (!FileUtils::isAbsolute(pathToMaFile.c_str()))
-                pathToMaFile = filepath_ + pathToMaFile;
+                pathToMaFile = FileUtils::simplify(filepath_ + pathToMaFile);
             result.insert(std::pair<string, string>(it.dofName(), pathToMaFile));
         }
         // return filepath_ + *(inputDataPointer_->momentArmsDirectory().begin());
@@ -115,7 +115,7 @@ namespace ceinms {
         if (FileUtils::isAbsolute(fileName.c_str()))
             return fileName;
         else
-            return filepath_ + fileName;
+            return  FileUtils::simplify(filepath_ + fileName);
     }
 
     std::string InputDataXmlReader::getExternalTorqueFile()
@@ -127,7 +127,7 @@ namespace ceinms {
         if (FileUtils::isAbsolute(fileName.c_str()))
             return fileName;
         else
-            return filepath_ + fileName;
+            return  FileUtils::simplify(filepath_ + fileName);
     }
 
     std::string InputDataXmlReader::getMotionFile() const {
@@ -141,7 +141,7 @@ namespace ceinms {
             if (FileUtils::isAbsolute(fileName.c_str()))
                 return fileName;
             else
-                return filepath_ + fileName;
+                return  FileUtils::simplify(filepath_ + fileName);
         }
         catch (...)
         {
@@ -161,7 +161,7 @@ namespace ceinms {
             if (FileUtils::isAbsolute(fileName.c_str()))
                 return fileName;
             else
-                return filepath_ + fileName;
+                return  FileUtils::simplify(filepath_ + fileName);
         }
         catch (...)
         {

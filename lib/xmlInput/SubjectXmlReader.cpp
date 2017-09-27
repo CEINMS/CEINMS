@@ -75,7 +75,7 @@ namespace ceinms {
         if (FileUtils::isAbsolute(fileName.c_str()))
             return fileName;
         else
-            return filepath_ + fileName;
+            return FileUtils::simplify(filepath_ + fileName);
     }
     
     
@@ -90,12 +90,13 @@ namespace ceinms {
     
     std::string SubjectXmlReader::getContactModelFile() const{
 
+
         std::string fileName(subjectPointer_->contactModelFile().get());
         FileUtils::trim(fileName);
         if (FileUtils::isAbsolute(fileName.c_str()))
             return fileName;
         else
-            return filepath_ + fileName;
+            return FileUtils::simplify(filepath_ + fileName);
     }
 
     bool SubjectXmlReader::hasContactModel() const {

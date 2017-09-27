@@ -4,7 +4,7 @@ cmake_minimum_required (VERSION 2.8.11) # "target_include_directories" command  
 project(CEINMS)
 set(CEINMS_MAJOR_VERSION 0)
 set(CEINMS_MINOR_VERSION 10)
-set(CEINMS_PATCH_VERSION 0)
+set(CEINMS_PATCH_VERSION 1)
 
 add_definitions(/DCEINMS_MAJOR_VERSION="${CEINMS_MAJOR_VERSION}")
 add_definitions(/DCEINMS_MINOR_VERSION="${CEINMS_MINOR_VERSION}")
