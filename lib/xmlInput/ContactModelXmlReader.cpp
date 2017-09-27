@@ -133,7 +133,7 @@ namespace ceinms {
         if (FileUtils::isAbsolute(filename.c_str()))
             return filename;
         else
-            return filepath_ + filename;
+            return  FileUtils::simplify(filepath_ + filename);
     }
 
 

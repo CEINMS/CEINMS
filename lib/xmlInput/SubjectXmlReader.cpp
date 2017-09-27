@@ -75,7 +75,7 @@ namespace ceinms {
         if (FileUtils::isAbsolute(fileName.c_str()))
             return fileName;
         else
-            return filepath_ + fileName;
+            return FileUtils::simplify(filepath_ + fileName);
     }
     
     

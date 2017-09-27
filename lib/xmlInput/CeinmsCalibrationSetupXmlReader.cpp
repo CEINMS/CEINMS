@@ -88,7 +88,7 @@ namespace ceinms {
         if (FileUtils::isAbsolute(fileName.c_str()))
             return fileName;
         else
-            return filepath_ + fileName;
+            return  FileUtils::simplify(filepath_ + fileName);
     }
 
     std::string CeinmsCalibrationSetupXmlReader::getCalibrationFile()
@@ -98,7 +98,7 @@ namespace ceinms {
         if (FileUtils::isAbsolute(fileName.c_str()))
             return fileName;
         else
-            return filepath_ + fileName;
+            return  FileUtils::simplify(filepath_ + fileName);
     }
 
     std::string CeinmsCalibrationSetupXmlReader::getExcitationGeneratorFile()
@@ -108,7 +108,7 @@ namespace ceinms {
         if (FileUtils::isAbsolute(fileName.c_str()))
             return fileName;
         else
-            return filepath_ + fileName;
+            return  FileUtils::simplify(filepath_ + fileName);
     }
 
     std::string CeinmsCalibrationSetupXmlReader::getOutputSubjectFile()
@@ -118,7 +118,7 @@ namespace ceinms {
         if (FileUtils::isAbsolute(fileName.c_str()))
             return fileName;
         else
-            return filepath_ + fileName;
+            return  FileUtils::simplify(filepath_ + fileName);
     }
 
     /*
