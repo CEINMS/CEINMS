@@ -72,9 +72,15 @@ namespace ceinms {
 
 
         std::string simplify(const std::string& filename) {
+            std::string fullpath = filename;
+            try {
+                fullpath = boost::filesystem::canonical(filename).generic_string();
+            }
+            catch (std::exception& e) {
+                std::cout << e.what();
 
-            return boost::filesystem::canonical(filename).string();
-
+            }
+            return fullpath;
         }
 
 

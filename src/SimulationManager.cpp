@@ -237,7 +237,7 @@ namespace ceinms {
         MultipleMomentArmsQueues momentArmsQueues;
         GeneralisedCoordinatesQueue generalisedCoordinatesQueue;
         MultipleExternalForcesQueue externalForcesQueue;
-        ExternalTorquesQueue torquesFromIDQueue;
+   //     ExternalTorquesQueue torquesFromIDQueue;
 
         //Creates queues for output data
         ScalarLogQueue logQueue;
@@ -358,28 +358,28 @@ namespace ceinms {
         osimModel.getCoordinateSet().getNames(osimCoordNames);
         std::vector<std::string> coordNames;
         ArrayConverter::toStdVector(osimCoordNames, coordNames);
-        QueueToStorageFile<ExternalTorquesData> externalTorquesLogger(
-            torquesFromIDQueue,
-            doneWithSubscriptionsLatch,
-            doneWithExecutionLatch,
-            coordNames,
-            "ExternalTorques",
-            outputDirectory_);
+        //QueueToStorageFile<ExternalTorquesData> externalTorquesLogger(
+        //    torquesFromIDQueue,
+        //    doneWithSubscriptionsLatch,
+        //    doneWithExecutionLatch,
+        //    coordNames,
+        //    "ExternalTorques",
+        //    outputDirectory_);
 
-        cout << "-- Initialise Inverse Dynamics" << endl;
-        QueuesToInverseDynamics inverseDynamicsSolver(
-            generalisedCoordinatesQueue,
-            externalForcesQueue,
-            torquesFromIDQueue,
-            doneWithSubscriptionsLatch,
-            doneWithExecutionLatch,
-            mySubject,
-            osimModelFilename,
-            dataLocations_.getExternalLoadsFile(),
-            false);
+        //cout << "-- Initialise Inverse Dynamics" << endl;
+        //QueuesToInverseDynamics inverseDynamicsSolver(
+        //    generalisedCoordinatesQueue,
+        //    externalForcesQueue,
+        //    torquesFromIDQueue,
+        //    doneWithSubscriptionsLatch,
+        //    doneWithExecutionLatch,
+        //    mySubject,
+        //    osimModelFilename,
+        //    dataLocations_.getExternalLoadsFile(),
+        //    false);
 
-        doneWithSubscriptionsLatch.setCount(11);
-        doneWithExecutionLatch.setCount(11);
+        doneWithSubscriptionsLatch.setCount(9);
+        doneWithExecutionLatch.setCount(9);
 
         cout << "-- Launch threads" << endl;
         std::thread contactForcesEstimatorThread(std::ref(jointReactionForcesEstimator));
@@ -393,8 +393,8 @@ namespace ceinms {
         std::thread queuesToStorageFilesThread(std::ref(queuesToStorageFiles));
         std::thread contactForcesLoggerThread(std::ref(contactForcesLogger));
         //      std::thread intersegmentalForcesLoggerThread(std::ref(intersegmentalForcesLogger));
-        std::thread inverseDynamicsSolverThread(std::ref(inverseDynamicsSolver));
-        std::thread externalTorquesLoggerThread(std::ref(externalTorquesLogger));
+   //     std::thread inverseDynamicsSolverThread(std::ref(inverseDynamicsSolver));
+    //    std::thread externalTorquesLoggerThread(std::ref(externalTorquesLogger));
 
         emgProdThread.join();
         lmtMaProdThread.join();
@@ -406,8 +406,8 @@ namespace ceinms {
         externalForcesThread.join();
         contactForcesLoggerThread.join();
         //     intersegmentalForcesLoggerThread.join();
-        inverseDynamicsSolverThread.join();
-        externalTorquesLoggerThread.join();
+   //     inverseDynamicsSolverThread.join();
+//        externalTorquesLoggerThread.join();
         cout << "-- Closing" << endl;
         return 0;
     }
@@ -515,7 +515,7 @@ namespace ceinms {
         //Create queues for input data
         EmgQueue emgQueue;
         LmtQueue lmtQueue;
-        ExternalTorquesQueue externalTorqueQueue, torquesFromIDQueue;
+        ExternalTorquesQueue externalTorqueQueue;// , torquesFromIDQueue;
         MultipleMomentArmsQueues momentArmsQueues;
         GeneralisedCoordinatesQueue generalisedCoordinatesQueue;
         MultipleExternalForcesQueue externalForcesQueue;
@@ -648,15 +648,15 @@ namespace ceinms {
         osimModel.getCoordinateSet().getNames(osimCoordNames);
         std::vector<std::string> coordNames;
         ArrayConverter::toStdVector(osimCoordNames, coordNames);
-        QueueToStorageFile<ExternalTorquesData> externalTorquesLogger(
+   /*     QueueToStorageFile<ExternalTorquesData> externalTorquesLogger(
             torquesFromIDQueue,
             doneWithSubscriptionsLatch,
             doneWithExecutionLatch,
             coordNames,
             "ExternalTorques",
-            outputDirectory_);
+            outputDirectory_);*/
 
-        cout << "-- Initialise Inverse Dynamics" << endl;
+  /*      cout << "-- Initialise Inverse Dynamics" << endl;
         QueuesToInverseDynamics inverseDynamicsSolver(
             generalisedCoordinatesQueue,
             externalForcesQueue,
@@ -667,10 +667,10 @@ namespace ceinms {
             osimModelFilename,
             dataLocations_.getExternalLoadsFile(),
             false);
+*/
 
-
-        doneWithSubscriptionsLatch.setCount(11);
-        doneWithExecutionLatch.setCount(11);
+        doneWithSubscriptionsLatch.setCount(9);
+        doneWithExecutionLatch.setCount(9);
 
         // 5. start the threads
         std::thread emgProdThread(std::ref(emgProducer));
@@ -683,8 +683,8 @@ namespace ceinms {
         std::thread generalisedCoordinateThread(std::ref(generalisedCoordinateFromStorageFile));
         std::thread externalForcesThread(std::ref(externalForcesFromStorageFile));
         std::thread contactForcesLoggerThread(std::ref(contactForcesLogger));
-        std::thread inverseDynamicsSolverThread(std::ref(inverseDynamicsSolver));
-        std::thread externalTorquesLoggerThread(std::ref(externalTorquesLogger));
+     //   std::thread inverseDynamicsSolverThread(std::ref(inverseDynamicsSolver));
+     //   std::thread externalTorquesLoggerThread(std::ref(externalTorquesLogger));
 
         emgProdThread.join();
         lmtMaProdThread.join();
@@ -695,8 +695,8 @@ namespace ceinms {
         generalisedCoordinateThread.join();
         externalForcesThread.join();
         contactForcesLoggerThread.join();
-        inverseDynamicsSolverThread.join();
-        externalTorquesLoggerThread.join();
+ //       inverseDynamicsSolverThread.join();
+ //       externalTorquesLoggerThread.join();
 
 
         return 0;
