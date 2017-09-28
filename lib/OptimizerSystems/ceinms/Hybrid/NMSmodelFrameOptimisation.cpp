@@ -42,8 +42,8 @@ namespace ceinms {
             opt.optimize(startingValues); //starting values
         }
         catch (const std::exception& e) {
-            std::cout << "NMSmodelFrameOptimisation.cpp: Caught exception" << std::endl;
-            std::cout << e.what() << std::endl;
+         //   std::cerr << "NMSmodelFrameOptimisation.cpp: Caught exception" << std::endl;
+         //   std::cerr << e.what() << std::endl;
         }
 
         //finalise after optimization

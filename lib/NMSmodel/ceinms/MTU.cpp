@@ -247,7 +247,7 @@ namespace ceinms {
 
         fibreLengthTrace_.refresh();
         fibreVelocity_ = fibreLengthTrace_.getFirstDerivative(time_);
-        cout << fibreVelocity_ << endl;
+  //      cout << fibreVelocity_ << endl;
     }
 
 

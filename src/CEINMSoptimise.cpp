@@ -57,6 +57,7 @@
 #include "ceinms/HybridWeightings.h"
 
 #include "ceinms/LoggerOnQueues.h"
+#include "ceinms/QueuesToTrialData.h"
 #include "ceinms/QueueToStorageFile.h"
 #include "ceinms/QueuesToStorageFiles.h"
 #include "ceinms/QueuesToJointReactionForces.h"
@@ -75,9 +76,12 @@
 #include "ceinms/queues/LogQueue.h"
 #include "ceinms/QueueToStorageFile.h"
 #include "ceinms/ArrayConverter.h"
-
+#include "ceinms/TrialData.h"
 #include "ceinms/Hybrid/NMSmodelFrameOptimisation.h"
-using namespace ceinms;
+#include "ceinms/BatchEvaluator.h"
+
+#include <numeric>
+#include <algorithm>
 #include <string>
 using std::string;
 #include <iostream>
@@ -143,32 +147,48 @@ void PrintUsage()
 }
 
 
+void sortMaFilenames(const std::map<std::string, std::string>& maMap, const std::vector< std::string >& dofNames, std::vector< std::string >& maDataFilenames)
+{
+    int currentDof = 0;
+    for (auto& it : dofNames)
+    {
+        try
+        {
+            maDataFilenames.push_back(maMap.at(it));
+        }
+        catch (std::out_of_range)
+        {
+            std::cerr << "Could not find moment arm file for " << it << " degree of freedom" << std::endl;
+            exit(EXIT_FAILURE);
+        }
+    }
+}
+
 template<typename NMSmodelT>
-TrialData readTrialData(const string& inputDataFilename, NMSmodelT& mySubject, const string& trialId, const string& emgGeneratorFile) {
+ceinms::TrialData readTrialData(const string& inputDataFilename, NMSmodelT& mySubject, const string& emgGeneratorFile) {
 
-    InputDataXmlReader dataLocations(inputDataFilename);
+    ceinms::InputDataXmlReader dataLocations(inputDataFilename);
+    ceinms::EmgQueue emgQueue;
+    ceinms::LmtQueue lmtQueue;
+    ceinms::ExternalTorquesQueue externalTorqueQueue;
+    ceinms::MultipleMomentArmsQueues momentArmsQueues;
 
-    EmgQueue emgQueue;
-    LmtQueue lmtQueue;
-    ExternalTorquesQueue externalTorqueQueue;
-    MultipleMomentArmsQueues momentArmsQueues;
-
-    Concurrency::Latch doneWithSubscription;
-    Concurrency::Latch doneWithExecution;
+    ceinms::Concurrency::Latch doneWithSubscription;
+    ceinms::Concurrency::Latch doneWithExecution;
 
     string emgFilename(dataLocations.getExcitationsFile());
-    EmgFromFile emgProducer(emgQueue, doneWithSubscription, doneWithExecution, mySubject, emgFilename, emgGeneratorFile);
+    ceinms::EmgFromFile emgProducer(emgQueue, doneWithSubscription, doneWithExecution, mySubject, emgFilename, emgGeneratorFile);
 
     vector< string > dofNames;
     mySubject.getDoFNames(dofNames);
     vector< string > maFilename;
     sortMaFilenames(dataLocations.getMaFiles(), dofNames, maFilename);
-    LmtMaFromStorageFile lmtMaProducer(lmtQueue, momentArmsQueues, doneWithSubscription, doneWithExecution, mySubject, dataLocations.getLmtFile(), maFilename);
+    ceinms::LmtMaFromStorageFile lmtMaProducer(lmtQueue, momentArmsQueues, doneWithSubscription, doneWithExecution, mySubject, dataLocations.getLmtFile(), maFilename);
 
     string externalTorqueFilename(dataLocations.getExternalTorqueFile());
-    ExternalTorquesFromStorageFile externalTorquesProducer(externalTorqueQueue, doneWithSubscription, doneWithExecution, mySubject, externalTorqueFilename);
+    ceinms::ExternalTorquesFromStorageFile externalTorquesProducer(externalTorqueQueue, doneWithSubscription, doneWithExecution, mySubject, externalTorqueFilename);
 
-    QueuesToTrialData queuesToTrialData(emgQueue, lmtQueue, externalTorqueQueue, momentArmsQueues, doneWithSubscription, doneWithExecution, mySubject, trialId);
+    ceinms::QueuesToTrialData queuesToTrialData(emgQueue, lmtQueue, externalTorqueQueue, momentArmsQueues, doneWithSubscription, doneWithExecution, mySubject, inputDataFilename);
 
     doneWithSubscription.setCount(4);
     doneWithExecution.setCount(4);
@@ -186,11 +206,11 @@ TrialData readTrialData(const string& inputDataFilename, NMSmodelT& mySubject, c
 
     if (!queuesToTrialData.getTrialData().isConsistent())
     {
-        std::cout << "ERROR: No data was read for trial " << trialId << std::endl;
+        std::cout << "ERROR: No data was read for trial "  << std::endl;
         exit(EXIT_FAILURE);
     }
 
-    auto trial(queuesToTrialData.getTrialData());
+    ceinms::TrialData trial(queuesToTrialData.getTrialData());
     if (mySubject.hasOpenSimModel())
         trial.setOpenSimData(mySubject.getOpenSimModelFilename(), dataLocations.getExternalLoadsFile(), dataLocations.getMotionFile());
     return trial;
@@ -200,65 +220,97 @@ TrialData readTrialData(const string& inputDataFilename, NMSmodelT& mySubject, c
 
 void optimiseWeights() {
 
-    NMSModelCfg::RunMode runMode = executionCfg_.getRunMode();
-    switch (runMode) {
-
-    case NMSModelCfg::OpenLoopExponentialActivationStiffTendonOnline:
-        exitFlag = runOpenLoop < NMSmodel<ExponentialActivation, StiffTendon, CurveMode::Online>, ModelEvaluationOnline, LoggerOnQueues >(hasContactModel_);
-        break;
-
-    case NMSModelCfg::OpenLoopExponentialActivationStiffTendonOffline:
-        exitFlag = runOpenLoop < NMSmodel<ExponentialActivation, StiffTendon, CurveMode::Offline>, ModelEvaluationOffline, LoggerOnQueues >(hasContactModel_);
-        break;
-
-    case NMSModelCfg::OpenLoopExponentialActivationElasticTendonBiSecOnline:
-        exitFlag = runOpenLoop<NMSmodel<ExponentialActivation, ElasticTendon_BiSec, CurveMode::Online>, ModelEvaluationOnline, LoggerOnQueues>(hasContactModel_);
-        break;
-
-    case NMSModelCfg::OpenLoopExponentialActivationElasticTendonBiSecOffline:
-        exitFlag = runOpenLoop<NMSmodel<ExponentialActivation, ElasticTendon_BiSec, CurveMode::Offline>, ModelEvaluationOffline, LoggerOnQueues >(hasContactModel_);
-        break;
-
-    case NMSModelCfg::OpenLoopPiecewiseActivationStiffTendonOnline:
-        exitFlag = runOpenLoop<NMSmodel<PiecewiseActivation, StiffTendon, CurveMode::Online>, ModelEvaluationOnline, LoggerOnQueues>(hasContactModel_);
-        break;
-
-    case NMSModelCfg::OpenLoopPiecewiseActivationStiffTendonOffline:
-        exitFlag = runOpenLoop<NMSmodel<PiecewiseActivation, StiffTendon, CurveMode::Offline>, ModelEvaluationOffline, LoggerOnQueues >(hasContactModel_);
-        break;
-
-    case NMSModelCfg::OpenLoopPiecewiseActivationElasticTendonBiSecOnline:
-        exitFlag = runOpenLoop<NMSmodel<PiecewiseActivation, ElasticTendon_BiSec, CurveMode::Online>, ModelEvaluationOnline, LoggerOnQueues>(hasContactModel_);
-        break;
-
-    case NMSModelCfg::OpenLoopPiecewiseActivationElasticTendonBiSecOffline:
-        exitFlag = runOpenLoop<NMSmodel<PiecewiseActivation, ElasticTendon_BiSec, CurveMode::Offline>, ModelEvaluationOffline, LoggerOnQueues >(hasContactModel_);
-        break;
-
-    case NMSModelCfg::HybridExponentialActivationStiffTendonOnline:
-        exitFlag = runHybrid<NMSmodel<ExponentialActivation, StiffTendon, CurveMode::Online>>(hasContactModel_);
-        break;
-
-    case NMSModelCfg::HybridExponentialActivationElasticTendonBiSecOnline:
-        exitFlag = runHybrid<NMSmodel<ExponentialActivation, ElasticTendon_BiSec, CurveMode::Online>>(hasContactModel_);
-        break;
-
-    case NMSModelCfg::HybridPiecewiseActivationStiffTendonOnline:
-        exitFlag = runHybrid<NMSmodel<PiecewiseActivation, StiffTendon, CurveMode::Online>>(hasContactModel_);
-        break;
-
-    case NMSModelCfg::HybridPiecewiseActivationElasticTendonBiSecOnline:
-        exitFlag = runHybrid<NMSmodel<PiecewiseActivation, ElasticTendon_BiSec, CurveMode::Online>>(hasContactModel_);
-        break;
-
-    default:
-        cout << "Implementation not available yet. Verify you XML configuration file" << endl;
-        exitFlag = 1;
-        break;
-    } //end switch
-
-    return exitFlag;
+    
 }
+
+class HybridOptimisationManager {
+
+public:
+    HybridOptimisationManager(const std::string& setupFilename):
+        ceinmsSetup_(setupFilename),
+        dataLocations_(ceinmsSetup_.getInputDataFile()),
+        executionCfg_(ceinmsSetup_.getExecutionFile()),
+        subjectFile_(ceinmsSetup_.getSubjectFile()),
+        outputDirectory_(ceinmsSetup_.getOutputDirectory()),
+        emgGeneratorFile_(ceinmsSetup_.getExcitationGeneratorFile()) {    
+    }
+    bool run() {
+        
+        struct HybridErrors{
+            int beta, gamma;
+            double trackError, torqueError;
+        };
+        
+        int betaIdx, alphaIdx, gammaIdx;
+        std::vector<HybridErrors> allErrors;
+
+        ceinms::NMSmodel<ceinms::ExponentialActivation, ceinms::ElasticTendon_BiSec, ceinms::CurveMode::Online> subject;
+        setupSubject(subject, subjectFile_, executionCfg_.getTolerance());
+        ceinms::TrialData trial(readTrialData(ceinmsSetup_.getInputDataFile(), subject, emgGeneratorFile_));
+        ceinms::EmgInformedObjectiveFunctionSetup setup;
+        executionCfg_.getMusclesToAdjust(setup.musclesToAdjust);
+        executionCfg_.getMusclesToSynthesise(setup.musclesToSynthesise);
+        executionCfg_.getHybridWeightings(setup.weightings.alpha, setup.weightings.beta, setup.weightings.gamma);
+        vector<unsigned> musclesToUpdate;
+        subject.getMusclesIndexFromMusclesList(musclesToUpdate, subject.getMuscleNames());
+        int nMtu = subject.getNoMuscles();
+        int nDofs = subject.getNoDoF();
+        for (betaIdx = 1; betaIdx < 30; ++betaIdx) {
+            for (gammaIdx = 1; gammaIdx < 300; ++gammaIdx) {
+             //   std::cout << "Evaluating for alpha = 1, beta = " << betaIdx << ", gamma = " << gammaIdx << endl;
+                setup.weightings.beta = static_cast<double>(betaIdx);
+                setup.weightings.gamma = static_cast<double>(gammaIdx);
+                ceinms::Result results(nMtu, nDofs, trial.getEmgData().getNRows(), trial.getLmtData().getNRows());
+                ceinms::HybridEvaluator::evaluate(subject, trial, setup, musclesToUpdate, results);
+                HybridErrors simulationError;
+                simulationError.beta = betaIdx;
+                simulationError.gamma = gammaIdx;
+                std::vector<double> torqueErrors(results.errors.getColumn(std::string("TorqueError")));
+                simulationError.torqueError = std::accumulate(torqueErrors.begin(), torqueErrors.end(), 0.) / torqueErrors.size();
+                std::vector<double> trackingError(results.errors.getColumn(std::string("ExcitationTrackingError")));
+                simulationError.trackError = std::accumulate(trackingError.begin(), trackingError.end(), 0.)/ trackingError.size();
+                allErrors.push_back(simulationError);
+            }
+        }
+    
+        //find max errors
+        double maxTorqueErr = std::max_element(allErrors.begin(), allErrors.end(), [](auto& first, auto& second) {
+            return first.torqueError < second.torqueError;
+        })->torqueError;
+        std::cout << "Found max torque error = " << maxTorqueErr << "Nm\n";
+        double maxTrackErr = std::max_element(allErrors.begin(), allErrors.end(), [](auto& first, auto& second) {
+            return first.trackError < second.trackError;
+        })->trackError;
+        std::cout << "Found max emg tracking error = " << maxTrackErr << "\n";
+        vector<double> errorDistance;
+        for (auto& e : allErrors) {
+            errorDistance.push_back(
+                std::pow(e.torqueError / maxTorqueErr, 2) +
+                std::pow(e.trackError / maxTrackErr, 2));
+        }
+        size_t index = std::distance(errorDistance.begin(),std::min_element(errorDistance.begin(), errorDistance.end()));
+        std::cout << "Optimal values:\n"
+            "alpha = " << 1 << "\n"
+            "beta  = " << allErrors[index].beta << "\n"
+            "gamma  = " << allErrors[index].gamma << "\n";
+        
+        return true;
+    }
+
+private:
+
+    ceinms::CeinmsSetupXmlReader ceinmsSetup_;
+    ceinms::InputDataXmlReader dataLocations_;
+    ceinms::ExecutionXmlReader executionCfg_;
+    ceinms::ContactModelXmlReader contactModelCfg_;
+    std::string subjectFile_;
+    std::string executionFile_;
+    std::string inputData_;
+    std::string outputDirectory_;
+    std::string emgGeneratorFile_;
+
+};
+
 
 int main(int argc, char** argv) {
 
@@ -318,7 +370,7 @@ int main(int argc, char** argv) {
     }
 
 
-    ceinms::SimulationManager simulation(setupFileName);
+    HybridOptimisationManager simulation(setupFileName);
     bool flag = simulation.run();
 
     return flag;

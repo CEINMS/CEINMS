@@ -37,13 +37,13 @@ namespace ceinms {
     public:
         DataTable<double> forces, torques, activations, emgs, penalties, errors;
         DataTable<SimTK::Vec3> jointReactionForces, jointReactionTorques;
-        Result(size_t nMTUs, size_t nDofs, size_t nEmgs, size_t nLmtMa) :
-            forces(nLmtMa, nMTUs),
-            torques(nLmtMa, nDofs),
-            activations(nEmgs, nMTUs),
-            emgs(nEmgs, nMTUs),
-            penalties(nLmtMa, nMTUs),
-            errors(nLmtMa, 6){
+        Result(size_t nMTUs, size_t nDofs, size_t nEmgFrames, size_t nLmtMaFrames) :
+            forces(nLmtMaFrames, nMTUs),
+            torques(nLmtMaFrames, nDofs),
+            activations(nEmgFrames, nMTUs),
+            emgs(nEmgFrames, nMTUs),
+            penalties(nLmtMaFrames, nMTUs),
+            errors(nLmtMaFrames, 6){
 
             errors.setLabels({ "TorqueError", "SumExcitation", "ExcitationTrackingError", "alpha", "beta", "gamma" });
         }

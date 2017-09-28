@@ -92,6 +92,7 @@ target_link_libraries( CEINMSoptimise
       OutputConnectors
 	  JointContactModels
       OptimizationSystems
+      TrialData
       #${CMAKE_THREAD_LIBS_INIT}
       ${Boost_PROGRAM_OPTIONS_LIBRARY}
       ${Boost_FILESYSTEM_LIBRARY}

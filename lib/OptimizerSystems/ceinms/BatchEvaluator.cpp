@@ -250,18 +250,18 @@ namespace ceinms {
 
         // Let's start going through the EMG, lmt, and ma data...
         for (unsigned emgIndex(0); emgIndex < trialData.getEmgData().getNRows(); ++emgIndex) {
-
             emgTime = trialData.getEmgData().getTime(emgIndex) + emDelay;
             if (!firstLmtArrived && TimeCompare::less(emgTime, lmtTime)) {
                 subject.setActivations(previousResult.activations.getRow(emgIndex));
                 subject.setEmgsSelective(trialData.getEmgData().getRow(emgIndex), musclesToUpdate);
-                subject.updateActivations(musclesToUpdate);
-                subject.pushState(musclesToUpdate);
+            //    subject.updateActivations(musclesToUpdate);
+            //    subject.pushState(musclesToUpdate);
             }
 
             if (TimeCompare::lessEqual(lmtTime, emgTime) && 
                 (lmtMaIndex < trialData.getLmtData().getNRows()) && 
-                (lmtMaIndex < trialData.getMaData().front().getNRows())) {
+                (lmtMaIndex < trialData.getMaData().front().getNRows()) &&
+                (lmtMaIndex < trialData.getTorqueData().getNRows())) {
                 firstLmtArrived = true;
                 subject.setMuscleForces(previousResult.forces.getRow(lmtMaIndex));
                 subject.setTime(lmtTime);
@@ -289,7 +289,7 @@ namespace ceinms {
                 previousResult.forces.setRow(lmtMaIndex, currentForces);
                 previousResult.forces.setTime(lmtTime, lmtMaIndex);
                 previousResult.emgs.setRow(lmtTime, currentEmgs);
-                previousResult.emgs.setTime(lmtTime, lmtMaIndex)
+                previousResult.emgs.setTime(lmtMaIndex, lmtMaIndex);
                 
                 //calcolo delle penalty modificato per accomodare l'update di un sottoinsieme di muscoli
                 std::vector<double> penaltiesAtT;
@@ -303,18 +303,19 @@ namespace ceinms {
                 data = components;
                 data.insert(data.end(), weights.begin(), weights.end());
                 previousResult.errors.setTime(lmtTime, lmtMaIndex);
-                previousResult.errors.setRow(lmtTime, data);
+                previousResult.errors.setRow(lmtMaIndex, data);
 
                 ++lmtMaIndex;
                 if (lmtMaIndex < trialData.getLmtData().getNRows())
                     lmtTime = trialData.getLmtData().getTime(lmtMaIndex);
-            }
-            std::vector<double> currentActivations;
-            subject.getActivations(currentActivations);
-            for (auto &it : musclesToUpdate) {
-                previousResult.activations.at(emgIndex, it) = currentActivations.at(it);
-                previousResult.activations.setTime(emgTime, emgIndex);
-            }
+            
+                std::vector<double> currentActivations;
+                subject.getActivations(currentActivations);
+                for (auto &it : musclesToUpdate) {
+                    previousResult.activations.at(emgIndex, it) = currentActivations.at(it);
+                    previousResult.activations.setTime(emgTime, emgIndex);
+                }
+             }
         }
     }
 }
