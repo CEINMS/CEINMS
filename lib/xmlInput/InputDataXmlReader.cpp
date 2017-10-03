@@ -106,31 +106,35 @@ namespace ceinms {
         return result;
     }
 
-    std::string InputDataXmlReader::getExcitationsFile()
+    std::string InputDataXmlReader::getExcitationsFile(bool relative)
     {
         if (inputDataPointer_->excitationsFile().size() < 1)
             return "";
         std::string fileName(*(inputDataPointer_->excitationsFile().begin()));
         FileUtils::trim(fileName);
-        if (FileUtils::isAbsolute(fileName.c_str()))
-            return fileName;
-        else
-            return  FileUtils::simplify(filepath_ + fileName);
+        if (!FileUtils::isAbsolute(fileName.c_str()))
+            if (relative)
+                fileName = FileUtils::simplify(fileName);
+            else
+                fileName = FileUtils::makeGeneric(filepath_ + fileName);
+        return fileName;
     }
 
-    std::string InputDataXmlReader::getExternalTorqueFile()
+    std::string InputDataXmlReader::getExternalTorqueFile(bool relative)
     {
         if (inputDataPointer_->externalTorquesFile().size() < 1)
             return "";
         std::string fileName(*(inputDataPointer_->externalTorquesFile().begin()));
         FileUtils::trim(fileName);
-        if (FileUtils::isAbsolute(fileName.c_str()))
-            return fileName;
-        else
-            return  FileUtils::simplify(filepath_ + fileName);
+        if (!FileUtils::isAbsolute(fileName.c_str()))
+            if (relative)
+                fileName = FileUtils::simplify(fileName);
+            else
+                fileName = FileUtils::makeGeneric(filepath_ + fileName);
+        return fileName;
     }
 
-    std::string InputDataXmlReader::getMotionFile() const {
+    std::string InputDataXmlReader::getMotionFile(bool relative) const {
     
 
         try {
@@ -138,10 +142,12 @@ namespace ceinms {
                 return "";
             std::string fileName(*(inputDataPointer_->motionFile().begin()));
             FileUtils::trim(fileName);
-            if (FileUtils::isAbsolute(fileName.c_str()))
-                return fileName;
-            else
-                return  FileUtils::simplify(filepath_ + fileName);
+            if (!FileUtils::isAbsolute(fileName.c_str()))
+                if (relative)
+                    fileName = FileUtils::simplify(fileName);
+                else
+                    fileName = FileUtils::makeGeneric(filepath_ + fileName);
+            return fileName;
         }
         catch (...)
         {
@@ -151,17 +157,19 @@ namespace ceinms {
     }
 
 
-    std::string InputDataXmlReader::getExternalLoadsFile() const {
+    std::string InputDataXmlReader::getExternalLoadsFile(bool relative) const {
     
         try {
             if (inputDataPointer_->externalLoadsFile().size() < 1)
                 return "";
             std::string fileName(*(inputDataPointer_->externalLoadsFile().begin()));
             FileUtils::trim(fileName);
-            if (FileUtils::isAbsolute(fileName.c_str()))
-                return fileName;
-            else
-                return  FileUtils::simplify(filepath_ + fileName);
+            if (!FileUtils::isAbsolute(fileName.c_str()))
+                if (relative)
+                    fileName = FileUtils::simplify(fileName);
+                else
+                    fileName = FileUtils::makeGeneric(filepath_ + fileName);
+            return fileName;
         }
         catch (...)
         {

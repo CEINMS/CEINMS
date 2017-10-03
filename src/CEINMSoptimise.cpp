@@ -79,7 +79,7 @@
 #include "ceinms/TrialData.h"
 #include "ceinms/Hybrid/NMSmodelFrameOptimisation.h"
 #include "ceinms/BatchEvaluator.h"
-
+#include "SimulationManager.h"
 #include <numeric>
 #include <algorithm>
 #include <string>
@@ -218,15 +218,11 @@ ceinms::TrialData readTrialData(const string& inputDataFilename, NMSmodelT& mySu
 
 
 
-void optimiseWeights() {
-
-    
-}
-
 class HybridOptimisationManager {
 
 public:
     HybridOptimisationManager(const std::string& setupFilename):
+        setupFilename_(setupFilename),
         ceinmsSetup_(setupFilename),
         dataLocations_(ceinmsSetup_.getInputDataFile()),
         executionCfg_(ceinmsSetup_.getExecutionFile()),
@@ -234,8 +230,21 @@ public:
         outputDirectory_(ceinmsSetup_.getOutputDirectory()),
         emgGeneratorFile_(ceinmsSetup_.getExcitationGeneratorFile()) {    
     }
+
     bool run() {
-        
+        if (executionCfg_.isHybrid())
+            runWeightingOptimisation();
+        else
+            runOpenLoop();
+        return true;
+    }
+private:
+    bool runOpenLoop() {
+        ceinms::SimulationManager simulationManager(setupFilename_);
+        return simulationManager.run();
+    }
+
+    bool runWeightingOptimisation() {
         struct HybridErrors{
             int beta, gamma;
             double trackError, torqueError;
@@ -255,9 +264,8 @@ public:
         subject.getMusclesIndexFromMusclesList(musclesToUpdate, subject.getMuscleNames());
         int nMtu = subject.getNoMuscles();
         int nDofs = subject.getNoDoF();
-        for (betaIdx = 1; betaIdx < 30; ++betaIdx) {
-            for (gammaIdx = 1; gammaIdx < 300; ++gammaIdx) {
-             //   std::cout << "Evaluating for alpha = 1, beta = " << betaIdx << ", gamma = " << gammaIdx << endl;
+        for (betaIdx = 1; betaIdx < 31; ++betaIdx) {
+            for (gammaIdx = 1; gammaIdx < 301; ++gammaIdx) {
                 setup.weightings.beta = static_cast<double>(betaIdx);
                 setup.weightings.gamma = static_cast<double>(gammaIdx);
                 ceinms::Result results(nMtu, nDofs, trial.getEmgData().getNRows(), trial.getLmtData().getNRows());
@@ -294,10 +302,30 @@ public:
             "beta  = " << allErrors[index].beta << "\n"
             "gamma  = " << allErrors[index].gamma << "\n";
         
-        return true;
-    }
+        executionCfg_.setHybridWeightings(1, allErrors[index].beta, allErrors[index].gamma);
+        std::string trialId(ceinmsSetup_.getInputDataFile(false));
+        size_t endpos = trialId.find(".xml");
+        size_t startpos = trialId.rfind("/") + 1;
+        trialId = trialId.substr(startpos, endpos - startpos);
+        std::string newExecutionFilename(ceinmsSetup_.getExecutionFile(true));
+        std::size_t pos = newExecutionFilename.find(".xml");
+        if (pos != std::string::npos) {
+            newExecutionFilename.insert(pos, "-optimised-"+trialId);
+        }
+        executionCfg_.print(newExecutionFilename);
+        ceinmsSetup_.setExecutionFile(newExecutionFilename);
+        
+        std::string newSetupFilename(setupFilename_);
+        pos = newSetupFilename.find(".xml");
+        if (pos != std::string::npos) {
+            newSetupFilename.insert(pos, "-optimised");
+        }
+        ceinmsSetup_.print(newSetupFilename);
 
-private:
+        std::cout << "Running best solution\n";
+        ceinms::SimulationManager simulationManager(newSetupFilename);
+        return simulationManager.run();
+    }
 
     ceinms::CeinmsSetupXmlReader ceinmsSetup_;
     ceinms::InputDataXmlReader dataLocations_;
@@ -308,6 +336,7 @@ private:
     std::string inputData_;
     std::string outputDirectory_;
     std::string emgGeneratorFile_;
+    std::string setupFilename_;
 
 };
 

@@ -83,7 +83,7 @@ install(TARGETS CEINMS CEINMScalibrate
         
         
     
-add_executable( CEINMSoptimise CEINMSoptimise.cpp)
+add_executable( CEINMSoptimise CEINMSoptimise.cpp SimulationManager.cpp SimulationManager.h)
 target_link_libraries( CEINMSoptimise
       FileIO
       xmlInput

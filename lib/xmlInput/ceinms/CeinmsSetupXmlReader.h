@@ -38,14 +38,16 @@ namespace ceinms {
 
     public:
         CeinmsSetupXmlReader(const std::string& filename);
-        std::string getSubjectFile();
-        std::string getInputDataFile();
-        std::string getExecutionFile();
-        std::string getExcitationGeneratorFile();
-        std::string getOutputDirectory();
+        std::string getSubjectFile(bool relative = false) const;
+        std::string getInputDataFile(bool relative = false) const;
+        std::string getExecutionFile(bool relative = false) const;
+        void setExecutionFile(const std::string& filename);
+        std::string getExcitationGeneratorFile(bool relative = false) const;
+        std::string getOutputDirectory(bool relative = false) const;
     //    std::string getContactModelFile();
     //    bool hasContactModel();
         static bool writeTemplateCeinmsSetupFile(const std::string& templateFile);
+        void CeinmsSetupXmlReader::print(const std::string& filename);
 
     private:
         void readXml();

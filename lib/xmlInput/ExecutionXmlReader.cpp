@@ -205,6 +205,18 @@ namespace ceinms {
 
     }
 
+    void ExecutionXmlReader::setHybridWeightings(double alpha, double beta, double gamma) {
+        ExecutionType::NMSmodel_type& myModel(executionPointer_->NMSmodel());
+        ExecutionType::NMSmodel_type::type_type& myType(myModel.type());
+        ExecutionType::NMSmodel_type::type_type::hybrid_optional& myHybOpt(myType.hybrid());
+        myHybOpt->alpha() = alpha;
+        myHybOpt->beta() = beta;
+        myHybOpt->gamma() = gamma;
+
+        myHybOpt->synthMTUs().weight().reset();
+        myHybOpt->adjustMTUs().weight().reset();
+    }
+
     void ExecutionXmlReader::getDofSet(std::vector<std::string>& dofs) const {
       
         ExecutionType::NMSmodel_type& myModel(executionPointer_->NMSmodel());
@@ -222,6 +234,12 @@ namespace ceinms {
         }
     }
 
+    bool ExecutionXmlReader::isHybrid() const {
+        ExecutionType::NMSmodel_type& myModel(executionPointer_->NMSmodel());
+        ExecutionType::NMSmodel_type::type_type& myType(myModel.type());
+        ExecutionType::NMSmodel_type::type_type::hybrid_optional& myHybOpt(myType.hybrid());
+        return myHybOpt.present();
+    }
 
     void ExecutionXmlReader::getAnnealingParameters(unsigned& nt, unsigned& ns, double& rt, double& t, unsigned& maxNoEval, double& epsilon, unsigned& noEpsilon) const {
         /*
@@ -245,6 +263,16 @@ namespace ceinms {
         */
     }
 
+
+    void ExecutionXmlReader::print(const std::string& filename) {
+
+        xml_schema::namespace_infomap map;
+        map[""].name = "";
+        map[""].schema = "execution.xsd";
+
+        std::ofstream ofs(filename.c_str());
+        ExecutionXsd::execution(ofs, *executionPointer_, map);
+    }
 
     NMSModelCfg::RunMode ExecutionXmlReader::getRunMode() const {
 

@@ -40,6 +40,7 @@ namespace ceinms {
         std::string simplify(const std::string& filename);
         void trim(std::string& fileName);
         std::string getFilePath(const std::string& filename);
+        std::string makeGeneric(const std::string& filename);
     }
 }
 

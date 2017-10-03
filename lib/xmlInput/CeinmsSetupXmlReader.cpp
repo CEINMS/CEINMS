@@ -82,54 +82,70 @@ namespace ceinms {
         }
     }
 
-    std::string CeinmsSetupXmlReader::getSubjectFile()
+    std::string CeinmsSetupXmlReader::getSubjectFile(bool relative) const
     {
         std::string fileName(*(ceinmsSetupPointer_->subjectFile().begin()));
         FileUtils::trim(fileName);
-        if (FileUtils::isAbsolute(fileName.c_str()))
-            return fileName;
-        else
-            return  FileUtils::simplify(filepath_ + fileName);
+        if (!FileUtils::isAbsolute(fileName.c_str()))
+            if (relative)
+                fileName = FileUtils::simplify(fileName);
+            else
+                fileName = FileUtils::makeGeneric(filepath_ + fileName);
+        return fileName;
     }
 
-    std::string CeinmsSetupXmlReader::getInputDataFile()
+    std::string CeinmsSetupXmlReader::getInputDataFile(bool relative) const
     {
         std::string fileName(*(ceinmsSetupPointer_->inputDataFile().begin()));
         FileUtils::trim(fileName);
-        if (FileUtils::isAbsolute(fileName.c_str()))
-            return fileName;
-        else
-            return  FileUtils::simplify(filepath_ + fileName);
+        if (!FileUtils::isAbsolute(fileName.c_str()))
+            if (relative)
+                fileName = FileUtils::simplify(fileName);
+            else
+                fileName = FileUtils::makeGeneric(filepath_ + fileName);
+        return fileName;
     }
 
-    std::string CeinmsSetupXmlReader::getExecutionFile()
+    std::string CeinmsSetupXmlReader::getExecutionFile(bool relative) const
     {
         std::string fileName(*(ceinmsSetupPointer_->executionFile().begin()));
         FileUtils::trim(fileName);
-        if (FileUtils::isAbsolute(fileName.c_str()))
-            return fileName;
-        else
-            return  FileUtils::simplify(filepath_ + fileName);
+        if (!FileUtils::isAbsolute(fileName.c_str()))
+            if (relative)
+                fileName = FileUtils::simplify(fileName);
+            else
+                fileName = FileUtils::makeGeneric(filepath_ + fileName);
+        return fileName;
     }
 
-    std::string CeinmsSetupXmlReader::getExcitationGeneratorFile()
+    std::string CeinmsSetupXmlReader::getExcitationGeneratorFile(bool relative) const
     {
         std::string fileName(*(ceinmsSetupPointer_->excitationGeneratorFile().begin()));
         FileUtils::trim(fileName);
-        if (FileUtils::isAbsolute(fileName.c_str()))
-            return fileName;
-        else
-            return  FileUtils::simplify(filepath_ + fileName);
+        if (!FileUtils::isAbsolute(fileName.c_str()))
+            if (relative)
+                fileName = FileUtils::simplify(fileName);
+            else
+                fileName = FileUtils::makeGeneric(filepath_ + fileName);
+        return fileName;
     }
 
-    std::string CeinmsSetupXmlReader::getOutputDirectory()
+    std::string CeinmsSetupXmlReader::getOutputDirectory(bool relative) const
     {
         std::string fileName(*(ceinmsSetupPointer_->outputDirectory().begin()));
         FileUtils::trim(fileName);
-        if (FileUtils::isAbsolute(fileName.c_str()))
-            return fileName;
-        else
-            return  FileUtils::simplify(filepath_ + fileName);
+        if (!FileUtils::isAbsolute(fileName.c_str()))
+            if (relative)
+                fileName = FileUtils::simplify(fileName);
+            else
+                fileName = FileUtils::makeGeneric(filepath_ + fileName);
+        return fileName;
+    }
+
+    void CeinmsSetupXmlReader::setExecutionFile(const std::string& filename) {
+
+        ceinmsSetupPointer_->executionFile().clear();
+        ceinmsSetupPointer_->executionFile() .push_back(filename);
     }
 
     /*
@@ -162,5 +178,15 @@ namespace ceinms {
         CeinmsSetupXsd::ceinms(templateFileStream, templateCeinmsSetup);
         templateFileStream.close();
         return true;
+    }
+
+    void CeinmsSetupXmlReader::print(const std::string& filename) {
+
+        xml_schema::namespace_infomap map;
+        map[""].name = "";
+        map[""].schema = "ceinmsSetup.xsd";
+
+        std::ofstream ofs(filename.c_str());
+        CeinmsSetupXsd::ceinms(ofs, *ceinmsSetupPointer_, map);
     }
 }

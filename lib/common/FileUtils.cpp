@@ -83,6 +83,17 @@ namespace ceinms {
             return fullpath;
         }
 
+        std::string makeGeneric(const std::string& filename) {
+            std::string fullpath = filename;
+            try {
+                fullpath = boost::filesystem::path(filename).generic_string();
+            }
+            catch (std::exception& e) {
+                std::cout << e.what();
+
+            }
+            return fullpath;
+        }
 
         void trim(std::string& fileName)
         {
