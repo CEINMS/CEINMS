@@ -30,25 +30,135 @@
 #define ceinms_ObjectiveFunctionSetup_h
 #include <string>
 #include <vector>
+#include <memory>
 
 namespace ceinms {
-    struct BarrierSetup {
-        std::string targetName;
-        double xL, xR, exponent, weight;
+
+ 
+    enum class CalibrationObjectiveFunction {
+        TorqueError,
+        Peak,
+        PeakGenericContactForces,
+        Penalty,
+        None
     };
 
-    struct BarrierListSetup {
-        size_t numOfBarriers;
-        std::vector<BarrierSetup> barrierSetup;
-
+    enum class CalibrationTargetType {
+        Torque,
+        Activation,
+        FibreLength,
+        FibreVelocity,
+        PennationAngle,
+        PlanarContactForces,
+        GenericContactForces,
+        None
     };
-
+    /*
+    Generally, objective function should work like
+    f = weight * sum(target^exponent)
+    */
     class ObjectiveFunctionSetup {
     public:
-        ObjectiveFunctionSetup() : weight(1.), exponent(1.), objectiveFunctionId(0) {}
-        unsigned objectiveFunctionId;
-        double weight, exponent;
-        BarrierListSetup barrierListSetup;
+        ObjectiveFunctionSetup() : 
+            weight_(1.), 
+            exponent_(1.), 
+            objectiveFunction_(CalibrationObjectiveFunction::None),
+            targetType_(CalibrationTargetType::None) {}
+
+        ObjectiveFunctionSetup(
+            CalibrationObjectiveFunction objectiveFunction, 
+            CalibrationTargetType targetType,
+            std::vector<std::string> targetNames,
+            double weight, double exponent):
+            weight_(weight),
+            exponent_(exponent),
+            objectiveFunction_(objectiveFunction),
+            targetType_(targetType),
+            targetNames_(targetNames){}
+
+        virtual void setWeight(double weight) {
+            weight_ = weight;
+        }
+        virtual void setExponent(double exponent) {
+            exponent_ = exponent;
+        }
+        virtual void setCalibrationObjectiveFunction(CalibrationObjectiveFunction objectiveFunction) {
+            objectiveFunction_ = objectiveFunction;
+        }
+
+        virtual void setCalibrationTargetType(CalibrationTargetType calibrationTargetType) {
+            targetType_ = calibrationTargetType;
+        }
+
+        virtual void setTargetNames(std::vector<std::string> targetNames) {
+            targetNames_ = targetNames;
+        }
+
+        virtual double getWeight() const {
+            return weight_;
+        }
+
+        virtual double getExponent() const {
+            return exponent_;
+        }
+
+        virtual CalibrationObjectiveFunction getCalibrationObjectiveFunction() const {
+            return objectiveFunction_;
+        }
+
+        virtual CalibrationTargetType getCalibrationTargetType() const {
+            return targetType_;
+        }
+
+        virtual  std::vector<std::string> getTargetNames() const {
+            return targetNames_;
+        }
+
+    private:
+        CalibrationObjectiveFunction objectiveFunction_;
+        CalibrationTargetType targetType_;
+        std::vector<std::string> targetNames_;
+        double weight_, exponent_;
+    };
+
+
+    class BarrierSetup : public ObjectiveFunctionSetup {
+    public:
+        BarrierSetup() :
+            ObjectiveFunctionSetup(),
+            xL_(0), xR_(1000) {}
+
+        BarrierSetup(
+            CalibrationTargetType targetType,
+            std::vector<std::string> targetNames,
+            double weight, double exponent,
+            double minVal, double maxVal) :
+            ObjectiveFunctionSetup(
+                CalibrationObjectiveFunction::Penalty,
+                targetType, targetNames, weight, exponent),
+            xL_(minVal), xR_(maxVal) {}
+
+        void setInterval(double minVal, double maxVal) {
+            xL_ = minVal;
+            xR_ = maxVal;
+        }
+
+        double getMinValue() const {
+            return xL_;
+        }
+
+        double getMaxValue() const {
+            return xR_;
+        }
+
+    private:
+        double xL_, xR_;
+    };
+
+
+    struct ObjectiveFunctionListSetup {
+        std::vector<std::shared_ptr<ObjectiveFunctionSetup>> objectiveFunctionSetup;
+ //       std::vector<BarrierSetup> barrierSetup;
     };
 }
 #endif

@@ -16,7 +16,6 @@ namespace ceinms {
         ComposedObjectiveFunction();
         ComposedObjectiveFunction(const std::vector<std::shared_ptr<ObjectiveFunctionBase>>& objectiveFunctions);
         void appendObjectiveFunction(std::shared_ptr<ObjectiveFunctionBase> objectiveFunction);
-        void setDofsToCalibrate(const std::vector<std::string>& dofsToCalibrate) override;
         void setTrials(const std::vector<TrialData>& trials) override;
         void calculate(const std::vector<Result>& results) override;
         double getValue() const override;

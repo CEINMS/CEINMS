@@ -82,6 +82,7 @@ namespace ceinms {
             return results_;
         }
 
+
     private:
         void updMusclesToUpdate();
         std::vector<MuscleParameters> subjectParameters_, subjectParametersT1_; //this should be something like typename NMSmodelT::MTUtype::MuscleParameters.. since it should depend on the muscle model we are using

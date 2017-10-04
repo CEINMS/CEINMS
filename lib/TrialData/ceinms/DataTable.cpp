@@ -28,6 +28,7 @@
 
 #include <algorithm>
 #include <stdexcept>
+#include "DataTable.h"
 
 namespace ceinms {
 
@@ -115,12 +116,22 @@ namespace ceinms {
     }
 
     template <typename T>
-    std::vector<T> DataTable<T>::getColumn(std::string& columnName) const {
+    std::vector<T> DataTable<T>::getColumn(const std::string& columnName) const {
 
+        int idx(getColumnIndex(columnName));
+        if (idx != -1)
+            return getColumn(static_cast<size_t>(idx));
+        return std::vector<T>();
+    }
+
+    /* Return -1 if not found*/
+    template<typename T>
+    int DataTable<T>::getColumnIndex(const std::string & columnName) const
+    {
         auto it = std::find(labels_.cbegin(), labels_.cend(), columnName);
         if (it != labels_.cend())
-            return getColumn(std::distance(labels_.cbegin(), it));
-        return std::vector<T>();
+            return std::distance(labels_.cbegin(), it);
+        return -1;
     }
 
     template <typename T>

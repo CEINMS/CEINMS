@@ -33,6 +33,7 @@
 #include "ceinms/TrialData.h"
 #include "Result.h"
 #include "ceinms/ObjectiveFunctionBase.h"
+#include "ceinms/ObjectiveFunctionSetup.h"
 
 namespace ceinms {
 
@@ -47,16 +48,17 @@ namespace ceinms {
 
     class MinTorqueError : public ObjectiveFunctionBase {
     public:
+        /* exponent and weight not enables yet*/
         MinTorqueError() : f_(std::numeric_limits<double>::max()) {}
-        void setDofsToCalibrate(const std::vector<std::string>& dofsToCalibrate) override;
+        MinTorqueError(const ObjectiveFunctionSetup& setup);
         void setTrials(const std::vector<TrialData>& trials) override;
         void calculate(const std::vector<Result>& results) override;
         double getValue() const override{ return f_; }
         void printCosts() const override;
-        bool calculateOpenSimData() const override { return false; }
     private:
         void computeVariance();
         void updDofsToCalibrateIdx();
+        ObjectiveFunctionSetup setup_;
         double f_;
         std::vector<TrialData> trials_;
         std::vector<std::vector<double>> torqueVariance_;

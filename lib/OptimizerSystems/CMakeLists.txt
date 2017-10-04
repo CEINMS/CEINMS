@@ -7,14 +7,15 @@ set(OptimizationSystems_HEADERS ceinms/NMSmodelSystem.h
                                 ceinms/ParametersInterpreter.h
                                 ceinms/BatchEvaluator.h
 								ceinms/BatchOpenSimEvaluator.h
+                                ceinms/BatchContactModelEvaluator.h
                                 ceinms/AbstractOptimizerSystem.h
                                 ceinms/MinTorqueError.h
 								ceinms/Result.h
-                                ceinms/MinTorqueErrorAndContactForces.h
+                        #        ceinms/MinTorqueErrorAndContactForces.h
                                 ceinms/Barrier.h
                                 ceinms/BarrierFunction.h
                                 ceinms/SumKneeContactForces.h
-                                ceinms/SumGenericContactForces.h
+                      #          ceinms/SumGenericContactForces.h
 								ceinms/ComposedObjectiveFunction.h
 								ceinms/ObjectiveFunctionBase.h
                         )
@@ -29,10 +30,11 @@ set(OptimizationSystems_SOURCES
     MinTorqueError.cpp 
     Result.cpp 
     SumKneeContactForces.cpp 
-    MinTorqueErrorAndContactForces.cpp
-    SumGenericContactForces.cpp
+#    MinTorqueErrorAndContactForces.cpp
+#    SumGenericContactForces.cpp
     BarrierFunction.cpp
 	BatchOpenSimEvaluator.cpp
+    BatchContactModelEvaluator.cpp
     ComposedObjectiveFunction.cpp
 )
 

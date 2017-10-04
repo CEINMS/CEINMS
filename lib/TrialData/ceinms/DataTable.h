@@ -44,7 +44,11 @@ namespace ceinms {
     class DataTable {
 
     public:
+        typedef typename std::vector<std::vector<T>>::iterator iterator;
+        typedef typename std::vector<std::vector<T>>::const_iterator const_iterator;
+
         DataTable();
+        virtual ~DataTable() {}
         DataTable(size_t nRows, size_t nCols); //do not include time column
         void setLabels(const std::vector<std::string>& labels); //do not include time column
         std::vector<std::string> getLabels() const { return labels_; }
@@ -69,12 +73,18 @@ namespace ceinms {
         const std::vector<T>& getRow(size_t row) const; //return const ref is bad.. checking for performance
 
         std::vector<T> getColumn(size_t col) const;
-        std::vector<T> getColumn(std::string& columnName) const;
+        std::vector<T> getColumn(const std::string& columnName) const;
+        int getColumnIndex(const std::string& columnName) const;
         size_t getNColumns() const { return nCols_; }
         size_t getNRows() const { return nRows_; }
 
         bool equals(const DataTable& rhs) const;
         friend std::ostream& operator<< <> (std::ostream& output, const DataTable& ths);
+
+        iterator begin() { return data_.begin(); }
+        const_iterator begin() const { return data_.begin(); }
+        iterator end() { return data_.end(); }
+        const_iterator end() const { return data_.end(); }
     private:
         size_t nRows_, nCols_;
         //internal implementation may be changed to something better.. e.g. nice matrices

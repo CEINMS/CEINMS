@@ -63,7 +63,7 @@ namespace ceinms {
         subject.getMusclesParameters(subjectParameters_);
         updMusclesToUpdate();
         subjectParametersT1_ = subjectParameters_; //for next evaluation
-
+        
         for (unsigned i(0); i < trials_.size(); ++i) {
             OpenLoopEvaluator::evaluate(subject, trials_.at(i), musclesToUpdate_, results_.at(i));
         }

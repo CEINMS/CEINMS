@@ -14,22 +14,14 @@ namespace ceinms {
     void ComposedObjectiveFunction::appendObjectiveFunction(std::shared_ptr<ObjectiveFunctionBase> objectiveFunction) {
         
         objectiveFunctions_.emplace_back(objectiveFunction);
-        objectiveFunctions_.back()->setDofsToCalibrate(dofsToCalibrate_);
         objectiveFunctions_.back()->setTrials(trials_);
     }
     
-    void ComposedObjectiveFunction::setDofsToCalibrate(const std::vector<std::string>& dofsToCalibrate) {
-
-        dofsToCalibrate_ = dofsToCalibrate;
-        for (auto& it : objectiveFunctions_)
-            it->setDofsToCalibrate(dofsToCalibrate);
-    }
-
     void ComposedObjectiveFunction::setTrials(const std::vector<TrialData>& trials) {
-
+        
         trials_ = trials;
         for (auto& it : objectiveFunctions_)
-            it->setTrials(trials_);
+            it->setTrials(trials);
     }
 
     void ComposedObjectiveFunction::calculate(const std::vector<Result>& results) {

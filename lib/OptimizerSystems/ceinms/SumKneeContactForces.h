@@ -46,22 +46,15 @@ namespace ceinms {
     public:
         SumKneeContactForces(const ObjectiveFunctionSetup& setup);
         SumKneeContactForces() : f_(std::numeric_limits<double>::max()) {}
-        void setDofsToCalibrate(const std::vector<std::string>& dofsToCalibrate) override {};
-        void setTrials(const std::vector<TrialData>& trials) override;
+        void setSetup(const ObjectiveFunctionSetup& setup);
+        void setTrials(const std::vector<TrialData>& trials) override { /* blank */}
         void calculate(const std::vector<Result>& results) override;
         double getValue() const override { return f_; }
-        void setSetup(const ObjectiveFunctionSetup& setup);
-        void setContactModelSetup(const ContactModelKneeBalanceSetup& setup);
-        void setBarrierParameters(double xL, double xR, double weight, double exponent);
         void printCosts() const override;
-        bool calculateOpenSimData() const override { return false; }
     private:
-        double f_, weight_, exponent_;
-        std::vector<TrialData> trials_;
-        ContactModelKneeBalance kneeContactModel_;
-        ContactModelKneeBalanceSetup kneeContactModelSetup_;
-        BarrierFunction barrierFunc_;
-        std::vector<std::vector<std::vector<double>>> contactForces_;  //trial, row, med/lat
+        ObjectiveFunctionSetup setup_;
+        double f_;
+        std::vector<std::vector<double>> currentMax_; //trial, max contact force value
     };
 }
 

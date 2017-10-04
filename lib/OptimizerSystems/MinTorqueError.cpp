@@ -37,12 +37,11 @@ using std::vector;
 
 namespace ceinms {
 
-    void MinTorqueError::setDofsToCalibrate(const std::vector<std::string>& dofsToCalibrate) {
 
-        dofsToCalibrate_ = dofsToCalibrate;
-        for (auto& dof : dofsToCalibrate)
-            std::cout << dof << std::endl;
-        updDofsToCalibrateIdx();
+    MinTorqueError::MinTorqueError(const ObjectiveFunctionSetup& setup) :
+        f_(std::numeric_limits<double>::max()),
+        setup_(setup) {
+        dofsToCalibrate_ = setup_.getTargetNames();
     }
 
     void MinTorqueError::setTrials(const std::vector<TrialData>& trials) {
@@ -64,7 +63,6 @@ namespace ceinms {
             }
             dofsToCalibrateIdx_.emplace_back(indeces);
         }
-        
     }
 
     void MinTorqueError::computeVariance() {
@@ -79,7 +77,7 @@ namespace ceinms {
                 var += (e - avg)*(e - avg);
                 ep += (e - avg);
             }
-            return ((var - ep*ep / v.size()) / (v.size() - 1)); //adjust roundoff error.. apparently
+            return ((var - ep*ep / v.size()) / (v.size() - 1)); //adjust roundoff error
         });
 
         torqueVariance_.clear();
@@ -126,6 +124,7 @@ namespace ceinms {
                 f_ += (trialCosts_.at(trialIndex).torqueError.at(dofIdx) / torqueVariance_.at(trialIndex).at(dofIdx) +
                 trialCosts_.at(trialIndex).penalty) / results.at(trialIndex).torques.getNRows();
         }
+        f_ *= setup_.getWeight();
     }
 
     void MinTorqueError::printCosts() const {

@@ -35,6 +35,7 @@
 #include "ceinms/TrialData.h"
 #include "ceinms/BatchEvaluator.h"
 #include "ceinms/BatchOpenSimEvaluator.h"
+#include "ceinms/BatchContactModelEvaluator.h"
 #include <memory>
 #include <vector>
 
@@ -42,10 +43,14 @@ namespace ceinms {
     template <typename NMSmodelT, typename ObjectiveFunctionT>
     class NMSmodelSystem : public Optimizers::AbstractOptimizerSystem  {
     public:
-        NMSmodelSystem(NMSmodelT& subject, const std::vector<TrialData>& trialData, const ObjectiveFunctionT& objectiveFunction, const Parameter::Set& parameterSet, const std::vector<std::string>& dofsToCalibrate);
-
+        NMSmodelSystem(NMSmodelT& subject, 
+            const std::vector<TrialData>& trialData, 
+            const ObjectiveFunctionT& objectiveFunction, 
+            const Parameter::Set& parameterSet, 
+            const std::vector<std::string>& dofsToCalibrate);
         virtual ~NMSmodelSystem() {}
         //    void setDofsToCalibrate(const std::vector<std::string>& dofsToCalibrate);
+        void setContactModelSetup(const ContactModelKneeBalanceSetup& setup);
         void evaluate();
         void setParameters(const std::vector<double>& x);
         std::vector<double> getParameters();
@@ -53,8 +58,6 @@ namespace ceinms {
         size_t getNoParameters() const { return nParameters_; }
         std::vector<double> getParameters() const { return parameterInterpreter_.getSubjectParameters(); }
         void getUpperLowerBounds(std::vector<double>& upperBounds, std::vector<double>& lowerBounds) const;
-        //       void setTrialData(const std::vector<TrialData>& trialData) { trialData_ = trialData; }
-        //       void pushTrialData(const TrialData& trialData) { trialData_.emplace_back(trialData); }
         void printCosts() const { objectiveFunction_.printCosts(); }
     private:
 
@@ -63,12 +66,15 @@ namespace ceinms {
         NMSmodelT& subject_;
         BatchEvaluator batchEvaluator_;
         std::unique_ptr<BatchOpenSimEvaluator> batchOpenSimEvaluator_;
+        BatchContactModelEvaluator batchContactModelEvaluator_;
         ObjectiveFunctionT objectiveFunction_;
         ParametersInterpreter<NMSmodelT> parameterInterpreter_;
-        std::vector<std::string> dofsToCalibrate_;
+        std::vector<std::string> dofsToCalibrate_, dofsFromSubject_;
         bool hasOpenSimData_;
+        bool hasContactModel_;
         double f_;
-        //      std::vector<TrialData> trialData_; //I'd like this to be here.. but it ended up in BatchEvaluator.. which has the advantage to hide
+        std::vector<TrialData> trialData_;
+
     };
 }
 
