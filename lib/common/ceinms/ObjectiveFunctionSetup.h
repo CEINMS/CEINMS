@@ -122,6 +122,12 @@ namespace ceinms {
         }
 
         friend std::ostream& operator<< (std::ostream& os, const ObjectiveFunctionSetup& obj) {
+            obj.print(os);
+            return os;
+        }
+
+    protected:
+        virtual void print(std::ostream& os) const {
             using ObjFunMap = std::map<CalibrationObjectiveFunction, std::string>;
 
             ObjFunMap objFunMap = {
@@ -138,23 +144,22 @@ namespace ceinms {
                 { CalibrationTargetType::Activation,"Activation" },
                 { CalibrationTargetType::GenericContactForce,"Generic Contact Force" },
                 { CalibrationTargetType::NormalisedFibreLength,"Normalised Fibre Length" },
-                { CalibrationTargetType::NormalisedFibreVelocity,"Normalised Fibre Velocity"  },
+                { CalibrationTargetType::NormalisedFibreVelocity,"Normalised Fibre Velocity" },
                 { CalibrationTargetType::PennationAngle,"Pennation Angle" },
                 { CalibrationTargetType::PlanarContactForce,"Planar Contact Force" },
                 { CalibrationTargetType::Torque,"Torque" },
                 { CalibrationTargetType::None,"Not Found" }
             };
 
-            os << " Objective Function: " << objFunMap[obj.objectiveFunction_] << "\n";
+            os << " Objective Function: " << objFunMap[objectiveFunction_] << "\n";
             os << " - Targets: ";
-            for (auto& e : obj.getTargetNames())
+            for (auto& e : getTargetNames())
                 os << e << " ";
             os << "\n";
-            os << " - Targets Type: " << targetType[obj.targetType_] << "\n";
-            os << " - Weight: " << obj.weight_ << "\n";
-            os << " - Exponent: " << obj.exponent_ << "\n";
+            os << " - Targets Type: " << targetType[targetType_] << "\n";
+            os << " - Weight: " << weight_ << "\n";
+            os << " - Exponent: " << exponent_ << "\n";
 
-           return os;
         }
 
     private:
@@ -197,6 +202,11 @@ namespace ceinms {
             return xR_;
         }
 
+    protected:
+        virtual void print(std::ostream& os) const {
+            ObjectiveFunctionSetup::print(os);
+            os << " - Range: " << xL_ << ", " << xR_ << "\n";
+        }
     private:
         double xL_, xR_;
     };

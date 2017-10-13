@@ -28,6 +28,7 @@
 
 #include "ceinms/ContactModelXmlReader.h"
 #include "ceinms/ExecutionXmlReader.h"
+#include "ceinms/CalibrationXmlReader.h"
 #include <iostream>
 using std::cout;
 using std::endl;
@@ -82,12 +83,22 @@ void testExecutionXmlReader(std::string filename) {
     v.clear();
 }
 
+
+void testCalibrationXmlReader(std::string filename) {
+
+    ceinms::CalibrationXmlReader reader(filename);
+    cout << reader;
+
+}
+
 int main() {
 
     boost::filesystem::path dir = path(BASE_DIR) /= "TestData";
 
     testContactModels((dir / "contactModelKnee.xml").string());
     testExecutionXmlReader((dir / "executionHybrid.xml").string());
-   
+    testCalibrationXmlReader((dir / "deprecatedCalibrationCfg.xml").string());
+    testCalibrationXmlReader((dir / "calibrationCfg1.xml").string());
+    testCalibrationXmlReader((dir / "calibrationCfg2.xml").string());
     return 0;
 }

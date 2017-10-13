@@ -363,7 +363,7 @@ namespace ceinms {
         for (csIt; csIt != rhs.calibrationSteps_.end(); ++csIt) {
             output << " -- Step\n"; 
             for (auto& objfElement : csIt->objFunctionsSetup_)
-                output << objfElement;
+                output << *objfElement;
         }
         output << " - Trials\n";
         for (std::list<std::string>::const_iterator tIt = rhs.calibrationTrials_.begin(); tIt != rhs.calibrationTrials_.end(); ++tIt)
