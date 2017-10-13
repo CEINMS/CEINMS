@@ -189,7 +189,7 @@ namespace ceinms {
     template <typename T>
     DataTable<T>  DataTable<T>::multiplyByScalar(const DataTable<T>& lhs, T scalar) {
 
-        DataTable<T> ans(lhs.getNRows());
+        DataTable<T> ans(lhs.getNRows(), lhs.getNColumns());
         for (size_t r(0); r < lhs.nRows_; ++r)
             for (size_t c(0); c < lhs.nCols_; ++c)
                 ans.at(r, c) = lhs.at(r, c)*scalar;

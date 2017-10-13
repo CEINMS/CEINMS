@@ -26,8 +26,8 @@
  * limitations under the License.                                             *
  * -------------------------------------------------------------------------- */
 
-#ifndef ceinms_MinTorqueError_h
-#define ceinms_MinTorqueError_h
+#ifndef ceinms_TorqueErrorNormalisedObjectiveFunction_h
+#define ceinms_TorqueErrorNormalisedObjectiveFunction_h
 #include <vector>
 #include <limits>
 #include "ceinms/TrialData.h"
@@ -46,11 +46,12 @@ namespace ceinms {
             penalty(0.) {}
     };
 
-    class MinTorqueError : public ObjectiveFunctionBase {
+    class TorqueErrorNormalisedObjectiveFunction : public ObjectiveFunctionBase {
     public:
         /* exponent and weight not enables yet*/
-        MinTorqueError() : f_(std::numeric_limits<double>::max()) {}
-        MinTorqueError(const ObjectiveFunctionSetup& setup);
+        TorqueErrorNormalisedObjectiveFunction() : f_(std::numeric_limits<double>::max()) {}
+        TorqueErrorNormalisedObjectiveFunction(const ObjectiveFunctionSetup& setup);
+        void setSetup(const ObjectiveFunctionSetup& setup);
         void setTrials(const std::vector<TrialData>& trials) override;
         void calculate(const std::vector<Result>& results) override;
         double getValue() const override{ return f_; }

@@ -31,14 +31,16 @@
 #include <string>
 #include <vector>
 #include <memory>
+#include <map>
 
 namespace ceinms {
 
  
     enum class CalibrationObjectiveFunction {
         TorqueError,
-        Peak,
-        PeakGenericContactForces,
+        TorqueErrorNormalised,
+        MaxPeak,
+        MaxPeakGenericContactForces,
         Penalty,
         None
     };
@@ -46,8 +48,8 @@ namespace ceinms {
     enum class CalibrationTargetType {
         Torque,
         Activation,
-        FibreLength,
-        FibreVelocity,
+        NormalisedFibreLength,
+        NormalisedFibreVelocity,
         PennationAngle,
         PlanarContactForces,
         GenericContactForces,
@@ -59,6 +61,7 @@ namespace ceinms {
     */
     class ObjectiveFunctionSetup {
     public:
+       
         ObjectiveFunctionSetup() : 
             weight_(1.), 
             exponent_(1.), 
@@ -94,6 +97,10 @@ namespace ceinms {
             targetNames_ = targetNames;
         }
 
+        virtual void setTargetNames(std::string targetNames) {
+            targetNames_ = { targetNames };
+        }
+
         virtual double getWeight() const {
             return weight_;
         }
@@ -114,6 +121,42 @@ namespace ceinms {
             return targetNames_;
         }
 
+        friend std::ostream& operator<< (std::ostream& os, const ObjectiveFunctionSetup& obj) {
+            using ObjFunMap = std::map<CalibrationObjectiveFunction, std::string>;
+
+            ObjFunMap objFunMap = {
+                { CalibrationObjectiveFunction::MaxPeak,"MaxPeak" },
+                { CalibrationObjectiveFunction::MaxPeakGenericContactForces,"MaxPeakGenericContactForces" },
+                { CalibrationObjectiveFunction::Penalty,"Penalty" },
+                { CalibrationObjectiveFunction::TorqueErrorNormalised,"TorqueErrorNormalised" },
+                { CalibrationObjectiveFunction::None,"Not Found" }
+            };
+
+            using TargetTypeMap = std::map<CalibrationTargetType, std::string>;
+
+            TargetTypeMap targetType = {
+                { CalibrationTargetType::Activation,"Activation" },
+                { CalibrationTargetType::GenericContactForces,"Generic Contact Force" },
+                { CalibrationTargetType::NormalisedFibreLength,"Normalised Fibre Length" },
+                { CalibrationTargetType::NormalisedFibreVelocity,"Normalised Fibre Velocity"  },
+                { CalibrationTargetType::PennationAngle,"Pennation Angle" },
+                { CalibrationTargetType::PlanarContactForces,"Planar Contact Force" },
+                { CalibrationTargetType::Torque,"Torque" },
+                { CalibrationTargetType::None,"Not Found" }
+            };
+
+            os << " Objective Function: " << objFunMap[obj.objectiveFunction_] << "\n";
+            os << " - Targets: ";
+            for (auto& e : obj.getTargetNames())
+                os << e << " ";
+            os << "\n";
+            os << " - Targets Type: " << targetType[obj.targetType_] << "\n";
+            os << " - Weight: " << obj.weight_ << "\n";
+            os << " - Exponent: " << obj.exponent_ << "\n";
+
+           return os;
+        }
+
     private:
         CalibrationObjectiveFunction objectiveFunction_;
         CalibrationTargetType targetType_;
@@ -122,13 +165,16 @@ namespace ceinms {
     };
 
 
-    class BarrierSetup : public ObjectiveFunctionSetup {
+
+    using ObjectiveFunctionSetupList = std::vector<std::shared_ptr<ObjectiveFunctionSetup>>;
+
+    class PenaltyObjectiveFunctionSetup : public ObjectiveFunctionSetup {
     public:
-        BarrierSetup() :
+        PenaltyObjectiveFunctionSetup() :
             ObjectiveFunctionSetup(),
             xL_(0), xR_(1000) {}
 
-        BarrierSetup(
+        PenaltyObjectiveFunctionSetup(
             CalibrationTargetType targetType,
             std::vector<std::string> targetNames,
             double weight, double exponent,
@@ -156,9 +202,5 @@ namespace ceinms {
     };
 
 
-    struct ObjectiveFunctionListSetup {
-        std::vector<std::shared_ptr<ObjectiveFunctionSetup>> objectiveFunctionSetup;
- //       std::vector<BarrierSetup> barrierSetup;
-    };
 }
 #endif

@@ -9,14 +9,14 @@ set(OptimizationSystems_HEADERS ceinms/NMSmodelSystem.h
 								ceinms/BatchOpenSimEvaluator.h
                                 ceinms/BatchContactModelEvaluator.h
                                 ceinms/AbstractOptimizerSystem.h
-                                ceinms/MinTorqueError.h
+                                ceinms/TorqueErrorNormalisedObjectiveFunction.h
 								ceinms/Result.h
                         #        ceinms/MinTorqueErrorAndContactForces.h
                                 ceinms/Barrier.h
-                                ceinms/BarrierFunction.h
-                                ceinms/SumKneeContactForces.h
+                                ceinms/PenaltyObjectiveFunction.h
+                                ceinms/MaxPeakObjectiveFunction.h
                       #          ceinms/SumGenericContactForces.h
-								ceinms/ComposedObjectiveFunction.h
+								ceinms/CompositeObjectiveFunction.h
 								ceinms/ObjectiveFunctionBase.h
                         )
 
@@ -27,15 +27,15 @@ set(OptimizationSystems_TEMPLATE_IMPLEMENTATION
 							)
                             
 set(OptimizationSystems_SOURCES 
-    MinTorqueError.cpp 
+    TorqueErrorNormalisedObjectiveFunction.cpp 
     Result.cpp 
-    SumKneeContactForces.cpp 
+    MaxPeakObjectiveFunction.cpp 
 #    MinTorqueErrorAndContactForces.cpp
 #    SumGenericContactForces.cpp
-    BarrierFunction.cpp
+    PenaltyObjectiveFunction.cpp
 	BatchOpenSimEvaluator.cpp
     BatchContactModelEvaluator.cpp
-    ComposedObjectiveFunction.cpp
+    CompositeObjectiveFunction.cpp
 )
 
 set(OptimizationSystems_Hybrid_HEADERS 

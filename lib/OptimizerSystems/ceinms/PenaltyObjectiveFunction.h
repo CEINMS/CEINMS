@@ -1,5 +1,5 @@
-#ifndef ceinms_BarrierFunction_h
-#define ceinms_BarrierFunction_h
+#ifndef ceinms_PenaltyObjectiveFunction_h
+#define ceinms_PenaltyObjectiveFunction_h
 
 #include <vector>
 #include "ceinms/Barrier.h"
@@ -9,22 +9,20 @@
 #include "ceinms/TrialData.h"
 
 namespace ceinms {
-    class BarrierFunction : public ObjectiveFunctionBase {
+    class PenaltyObjectiveFunction : public ObjectiveFunctionBase {
     public:
-        BarrierFunction(const BarrierSetup& setup);
+        PenaltyObjectiveFunction(const PenaltyObjectiveFunctionSetup& setup);
         void setTrials(const std::vector<TrialData>& trials) {/*blank*/} 
         void calculate(const std::vector<Result>& results);
         double getValue() const;
         void printCosts() const;
     private:
-        double calculatePenalty(const std::vector<double>& vec);
         double calculatePenalty(const DataTable<double>& data);
         double calculatePenalty(const DataTable<SimTK::Vec3>& data);
         Barrier barrier_;
-        BarrierSetup setup_;
+        PenaltyObjectiveFunctionSetup setup_;
         double f_;
     };
 }
-
 
 #endif

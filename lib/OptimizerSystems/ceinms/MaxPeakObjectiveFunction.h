@@ -26,52 +26,36 @@
 * limitations under the License.                                             *
 * -------------------------------------------------------------------------- */
 
-#include "ceinms/SumKneeContactForces.h"
+#ifndef ceinms_MaxPeakObjectiveFunction_h
+#define ceinms_MaxPeakObjectiveFunction_h
 #include <vector>
-#include <cmath>
-using std::vector;
+#include <string>
+#include "ceinms/TrialData.h"
+#include "Result.h"
+#include "ceinms/ObjectiveFunctionSetup.h"
+#include "ceinms/ObjectiveFunctionBase.h"
 
 namespace ceinms {
 
-    SumKneeContactForces::SumKneeContactForces(const ObjectiveFunctionSetup& setup) :
-        f_(std::numeric_limits<double>::max()),
-        setup_(setup)
-    {
-    }
-
-    void SumKneeContactForces::setSetup(const ObjectiveFunctionSetup& setup) {
-        setup_ = setup;
-    }
-
-    void SumKneeContactForces::calculate(const vector<Result>& results) {
-        currentMax_.clear();
-        f_ = 0;
-        for (auto& r : results) {
-            std::vector<double> trialMax;
-            for (auto& target : setup_.getTargetNames()) {
-                //this is not very efficient, as it makes a copy of the column
-                auto col(r.planarContactForces.getColumn(target));
-                double val = *std::max_element(
-                    col.begin(),
-                    col.end());
-                f_ += setup_.getWeight() * std::pow(val, setup_.getExponent());
-                trialMax.push_back(val);
-            }
-            currentMax_.emplace_back(trialMax);
-        }
-    }
-
-    void SumKneeContactForces::printCosts() const {
-
-        auto names = setup_.getTargetNames();
-        for (size_t trialIndex(0); trialIndex < currentMax_.size(); ++trialIndex) {
-            std::cout << "Trial #" << trialIndex + 1 << std::endl;
-            for (size_t i(0); i < names.size(); ++i) {
-                std::cout << "max " << names.at(i) << " " << currentMax_.at(trialIndex).at(i) << " N" << std::endl;
-            }
-        }
-        std::cout << std::endl;
-        std::cout << "Fobj = " << getValue() << std::endl;
-        
-    }
+    // For each target name and each results, finds the max peak. 
+    // Peaks are elevated to the exponent specified in the setup
+    // and the summed. This value is then averaged by the number of 
+    // total peaks found and multiplied by the weight
+    class MaxPeakObjectiveFunction : public ObjectiveFunctionBase {
+    public:
+        MaxPeakObjectiveFunction(const ObjectiveFunctionSetup& setup);
+        MaxPeakObjectiveFunction() : f_(std::numeric_limits<double>::max()) {}
+        void setSetup(const ObjectiveFunctionSetup& setup);
+        void setTrials(const std::vector<TrialData>& trials) override { /* blank */}
+        void calculate(const std::vector<Result>& results) override;
+        double getValue() const override { return f_; }
+        void printCosts() const override;
+    private:
+        const DataTable<double>& getDataTable(const Result& result) const;
+        ObjectiveFunctionSetup setup_;
+        double f_;
+        std::vector<std::vector<double>> currentMax_; //trial, max contact force value
+    };
 }
+
+#endif

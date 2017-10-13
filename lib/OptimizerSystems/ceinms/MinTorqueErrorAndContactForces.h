@@ -32,9 +32,9 @@
 #include <limits>
 #include "ceinms/TrialData.h"
 #include "Result.h"
-#include "MinTorqueError.h"
-#include "SumKneeContactForces.h"
-#include "Barrier.h"
+#include "TorqueErrorNormalisedObjectiveFunction.h"
+#include "PeakObjectiveFunction.h"
+#include "PenaltyObjectiveFunction.h"
 #include <cmath>
 #include "ceinms/ObjectiveFunctionBase.h"
 

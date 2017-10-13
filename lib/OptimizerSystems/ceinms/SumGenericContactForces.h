@@ -35,7 +35,6 @@
 #include <OpenSim/OpenSim.h>
 #include "ceinms/TrialData.h"
 #include "Result.h"
-#include "ceinms/BarrierFunction.h"
 #include "ceinms/Mapper.h"
 #include "ceinms/ObjectiveFunctionSetup.h"
 
