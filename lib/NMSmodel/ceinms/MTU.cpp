@@ -476,9 +476,9 @@ namespace ceinms {
     double MTU<Activation, Tendon, mode>::getPenalty() const {
 
         double penalty(tendonDynamic_.getPenalty());
-        double const normalisedFibreRatio(fabs(fibreLength_ / optimalFibreLength_ - 1.0));
-        if (normalisedFibreRatio > 0.5)
-            penalty += normalisedFibreRatio*normalisedFibreRatio * 100;
+     //   double const normalisedFibreRatio(fabs(fibreLength_ / optimalFibreLength_ - 1.0));
+     //   if (normalisedFibreRatio > 0.5)
+     //       penalty += normalisedFibreRatio*normalisedFibreRatio * 100;
         return penalty;
     }
 

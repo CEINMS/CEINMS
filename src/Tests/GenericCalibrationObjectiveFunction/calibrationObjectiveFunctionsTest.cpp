@@ -243,7 +243,6 @@ bool testCompositeFuntion() {
     objFunction.printCosts();
     isValid &= equals(objFunction.getValue(), 1.5+1.08+1.555);
     return isValid;
-
 }
 
 
