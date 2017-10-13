@@ -46,8 +46,7 @@ namespace ceinms {
         NMSmodelSystem(NMSmodelT& subject, 
             const std::vector<TrialData>& trialData, 
             const ObjectiveFunctionT& objectiveFunction, 
-            const Parameter::Set& parameterSet, 
-            const std::vector<std::string>& dofsToCalibrate);
+            const Parameter::Set& parameterSet);
         virtual ~NMSmodelSystem() {}
         //    void setDofsToCalibrate(const std::vector<std::string>& dofsToCalibrate);
         void setContactModelSetup(const ContactModelKneeBalanceSetup& setup);
@@ -69,7 +68,7 @@ namespace ceinms {
         BatchContactModelEvaluator batchContactModelEvaluator_;
         ObjectiveFunctionT objectiveFunction_;
         ParametersInterpreter<NMSmodelT> parameterInterpreter_;
-        std::vector<std::string> dofsToCalibrate_, dofsFromSubject_;
+        std::vector<std::string> dofsFromSubject_;
         bool hasOpenSimData_;
         bool hasContactModel_;
         double f_;

@@ -37,16 +37,14 @@ namespace ceinms {
         NMSmodelSystem(NMSmodelT& subject,
         const std::vector<TrialData>& trials,
         const ObjectiveFunctionT& objectiveFunction,
-        const Parameter::Set& parameterSet,
-        const std::vector<std::string>& dofsToCalibrate) :
+        const Parameter::Set& parameterSet) :
         subject_(subject),
         batchEvaluator_(trials),
         batchOpenSimEvaluator_(nullptr),
         hasOpenSimData_(true),
         hasContactModel_(false),
         objectiveFunction_(objectiveFunction),
-        parameterInterpreter_(subject, parameterSet, dofsToCalibrate),
-        dofsToCalibrate_(dofsToCalibrate),
+        parameterInterpreter_(subject, parameterSet, subject.getDoFNames()),
         dofsFromSubject_(subject.getDoFNames()),
         trialData_(trials),
         f_(std::numeric_limits<double>::max()) {
@@ -55,7 +53,7 @@ namespace ceinms {
         //all dofs in the subject by default
         //subject_.getDoFNames(dofsToCalibrate_);
         //parameterInterpreter_.setDofsToCalibrate(dofsToCalibrate_);
-        objectiveFunction_.setDofsToCalibrate(dofsToCalibrate_);
+
         objectiveFunction_.setTrials(trials);
 
         //the following is the trick for the parallel evaluation
@@ -114,7 +112,7 @@ namespace ceinms {
         }
         
         if (hasContactModel_) {
-            batchContactModelEvaluator_.evaluate(resuls);
+            batchContactModelEvaluator_.evaluate(results);
             batchContactModelEvaluator_.updateResults(results);
         }
         objectiveFunction_.calculate(results);

@@ -45,11 +45,7 @@ using std::vector;
 #include "ceinms/Tendon/ElasticTendon_BiSec.h"
 #include "ceinms/Activation/ExponentialActivation.h"
 #include "ceinms/Activation/PiecewiseActivation.h"
-#include "ceinms/MinTorqueError.h"
-#include "ceinms/SumKneeContactForces.h"
-#include "ceinms/SumGenericContactForces.h"
-#include "ceinms/MinTorqueErrorAndContactForces.h"
-#include "ceinms/ComposedObjectiveFunction.h"
+#include "ceinms/CompositeObjectiveFunction.h"
 
 #include "ceinms/SimulatedAnnealing.h"
 #include "ceinms/NMSmodelSystem.h"
@@ -92,7 +88,7 @@ namespace ceinms {
             cout << " not found" << endl;
 
         calibrationXmlReader_.getCalibrationTrials(calibrationTrialIDs_);
-
+        cout << calibrationXmlReader_ << endl;
     }
 
     template <typename NMSmodelT>
@@ -108,74 +104,15 @@ namespace ceinms {
 
         CalibrationStep currentCalibrationStep;
         while (calibrationXmlReader_.popNextCalibrationStep(currentCalibrationStep)) {
-            std::cout << "CalibrationStepCfg " << currentCalibrationStep.getStepCfg() << std::endl;
-            switch (currentCalibrationStep.getStepCfg()) {
-            case CalibrationCfg::MinimizeTorqueErrorParameterSetDefault: {
+            CompositeObjectiveFunction objectiveFunction =
+                CompositeObjectiveFunction::makeComposite(currentCalibrationStep.objFunctionsSetup_);
+            using MySystem = NMSmodelSystem < NMSmodelT, CompositeObjectiveFunction >;
+            MySystem system(mySubject, trials, objectiveFunction, currentCalibrationStep.parameterSet_);
+            SimulatedAnnealingParameters simanParameters;
+            calibrationXmlReader_.getOptimizationAlgorithmParameters(simanParameters);
+            Optimizers::SimulatedAnnealing<MySystem> optimizer(system, simanParameters);
+            exitflag = optimizer.optimize();
 
-                cout << currentCalibrationStep << endl;
-                vector<string> dofsToCalibrate;
-                currentCalibrationStep.getDofNames(dofsToCalibrate);
-                ParameterSet parameterSet;
-                currentCalibrationStep.getParameterSet(parameterSet);
-                for (auto p : parameterSet)
-                    cout << p << endl;
-                ObjectiveFunctionSetup objectiveFunctionSetup = currentCalibrationStep.getObjectiveFunctionSetup();
-                MinTorqueError minTorqueError;
-                using MySystem = NMSmodelSystem < NMSmodelT, MinTorqueError > ;
-                MySystem system(mySubject, trials, minTorqueError, parameterSet, dofsToCalibrate);
-
-                SimulatedAnnealingParameters simanParameters;
-                calibrationXmlReader_.getOptimizationAlgorithmParameters(simanParameters);
-                Optimizers::SimulatedAnnealing<MySystem> optimizer(system, simanParameters);
-                exitflag = optimizer.optimize();
-
-            }   break;
-
-            case CalibrationCfg::TorqueErrorAndSumKneeContactForcesParameterSetDefault: {
-
-                vector<string> dofsToCalibrate;
-                currentCalibrationStep.getDofNames(dofsToCalibrate);
-                ParameterSet parameterSet;
-                currentCalibrationStep.getParameterSet(parameterSet);
-                ObjectiveFunctionSetup objectiveFunctionSetup = currentCalibrationStep.getObjectiveFunctionSetup();
-
-                SumKneeContactForces sumKneeContacts(objectiveFunctionSetup);
-                sumKneeContacts.setContactModelSetup(contactModelCfg_.getContactModelSetupKneeBalance());
-                MinTorqueError minTorqueError;
-                MinTorqueErrorAndContactForces minTorqueErrorAndContactForces(minTorqueError, sumKneeContacts);
-
-                using MySystem = NMSmodelSystem < NMSmodelT, MinTorqueErrorAndContactForces > ;
-                MySystem system(mySubject, trials, minTorqueErrorAndContactForces, parameterSet, dofsToCalibrate);
-
-                SimulatedAnnealingParameters simanParameters;
-                calibrationXmlReader_.getOptimizationAlgorithmParameters(simanParameters);
-                Optimizers::SimulatedAnnealing<MySystem> optimizer(system, simanParameters);
-                exitflag = optimizer.optimize();
-            }   break;
-
-            case CalibrationCfg::TorqueErrorAndSumGenericContactForcesParameterSetDefault: {
-
-                vector<string> dofsToCalibrate;
-                currentCalibrationStep.getDofNames(dofsToCalibrate);
-                ParameterSet parameterSet;
-                currentCalibrationStep.getParameterSet(parameterSet);
-                ObjectiveFunctionSetup objectiveFunctionSetup = currentCalibrationStep.getObjectiveFunctionSetup();
-
-                std::shared_ptr<SumGenericContactForces> sumGenericContacts(new SumGenericContactForces(objectiveFunctionSetup));
-                sumGenericContacts->setJointContactForcesNames(contactModelCfg_.getContactModelSetupOsim().joints);
-                std::shared_ptr<MinTorqueError> minTorqueError(new MinTorqueError());
-
-                ComposedObjectiveFunction objFunction({ minTorqueError, sumGenericContacts });
-
-                using MySystem = NMSmodelSystem < NMSmodelT, ComposedObjectiveFunction >;
-                MySystem system(mySubject, trials, objFunction, parameterSet, dofsToCalibrate);
-
-                SimulatedAnnealingParameters simanParameters;
-                calibrationXmlReader_.getOptimizationAlgorithmParameters(simanParameters);
-                Optimizers::SimulatedAnnealing<MySystem> optimizer(system, simanParameters);
-                exitflag = optimizer.optimize();
-            }   break;
-            } //end switch
         }//end while
         writeXml(mySubject, uncalibratedSubjectFile_, calibrationFile_, calibratedSubjectFile_);
         return exitflag;
