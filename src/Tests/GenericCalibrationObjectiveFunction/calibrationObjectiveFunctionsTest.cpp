@@ -131,7 +131,7 @@ bool testMaxPeak() {
 
     ObjectiveFunctionSetup setup(
         CalibrationObjectiveFunction::MaxPeak,
-        CalibrationTargetType::PlanarContactForces,
+        CalibrationTargetType::PlanarContactForce,
         getCondyleNames(), 1, 1);
 
     bool isValid = true;
@@ -217,7 +217,7 @@ bool testCompositeFuntion() {
     std::shared_ptr<ObjectiveFunctionSetup> obf1(
         new ObjectiveFunctionSetup(
             CalibrationObjectiveFunction::MaxPeak,
-            CalibrationTargetType::PlanarContactForces,
+            CalibrationTargetType::PlanarContactForce,
             getCondyleNames(), 0.001, 1));
   
     std::shared_ptr<ObjectiveFunctionSetup> obf2(

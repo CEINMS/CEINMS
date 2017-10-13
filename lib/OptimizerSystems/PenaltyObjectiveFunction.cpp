@@ -19,9 +19,9 @@ namespace ceinms {
         for (auto& r : results) {
             if (setup_.getCalibrationTargetType() == CalibrationTargetType::Activation)
                 f_ += calculatePenalty(r.activations);
-            else if (setup_.getCalibrationTargetType() == CalibrationTargetType::PlanarContactForces)
+            else if (setup_.getCalibrationTargetType() == CalibrationTargetType::PlanarContactForce)
                 f_ += calculatePenalty(r.planarContactForces);
-            else if (setup_.getCalibrationTargetType() == CalibrationTargetType::GenericContactForces)
+            else if (setup_.getCalibrationTargetType() == CalibrationTargetType::GenericContactForce)
                 f_ += calculatePenalty(r.jointReactionForces);
             else if (setup_.getCalibrationTargetType() == CalibrationTargetType::NormalisedFibreLength)
                 f_ += calculatePenalty(r.normalisedFibreLengths);

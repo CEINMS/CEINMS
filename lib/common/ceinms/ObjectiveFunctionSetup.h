@@ -51,8 +51,8 @@ namespace ceinms {
         NormalisedFibreLength,
         NormalisedFibreVelocity,
         PennationAngle,
-        PlanarContactForces,
-        GenericContactForces,
+        PlanarContactForce,
+        GenericContactForce,
         None
     };
     /*
@@ -136,11 +136,11 @@ namespace ceinms {
 
             TargetTypeMap targetType = {
                 { CalibrationTargetType::Activation,"Activation" },
-                { CalibrationTargetType::GenericContactForces,"Generic Contact Force" },
+                { CalibrationTargetType::GenericContactForce,"Generic Contact Force" },
                 { CalibrationTargetType::NormalisedFibreLength,"Normalised Fibre Length" },
                 { CalibrationTargetType::NormalisedFibreVelocity,"Normalised Fibre Velocity"  },
                 { CalibrationTargetType::PennationAngle,"Pennation Angle" },
-                { CalibrationTargetType::PlanarContactForces,"Planar Contact Force" },
+                { CalibrationTargetType::PlanarContactForce,"Planar Contact Force" },
                 { CalibrationTargetType::Torque,"Torque" },
                 { CalibrationTargetType::None,"Not Found" }
             };

@@ -76,7 +76,7 @@ namespace ceinms {
      //       break;
      //   case CalibrationTargetType::PennationAngle:
      //       break;
-        case CalibrationTargetType::PlanarContactForces:
+        case CalibrationTargetType::PlanarContactForce:
             return result.planarContactForces;
         case CalibrationTargetType::Torque:
             return result.torques;
