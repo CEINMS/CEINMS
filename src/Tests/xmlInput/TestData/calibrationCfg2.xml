@@ -1,0 +1,130 @@
+<calibration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="calibration.xsd">
+
+  <algorithm>
+      <simulatedAnnealing>
+      <noEpsilon>4</noEpsilon>
+      <rt>0.1</rt>
+      <T>200000</T>
+      <NS>15</NS>
+      <NT>5</NT>
+      <epsilon>1.E-3</epsilon>
+      <maxNoEval>2000000</maxNoEval>
+    </simulatedAnnealing>
+  </algorithm>
+
+  <NMSmodel>
+    <type>
+      <openLoop />
+    </type>
+
+    <tendon>
+      <equilibriumElastic />
+    </tendon>
+
+    <activation>
+      <exponential />
+    </activation>
+  </NMSmodel>
+
+    <calibrationSteps>
+        <step>
+            <objectiveFunction>
+                <torqueErrorNormalised>
+                    <targets>dof1 dof2 dof3</targets>
+                  <!--  <targetsType></targetsType> -->
+                    <weight>1</weight>
+                    <exponent>1</exponent>
+                </torqueErrorNormalised>
+                <maxPeak>
+                    <targets>cf1 cf2</targets>
+                    <targetsType>contactForce</targetsType>
+                    <weight>10</weight>
+                    <exponent>1</exponent>
+                </maxPeak>
+                  <maxPeak>
+                    <targets>cf3</targets>
+                    <targetsType>contactForce</targetsType>
+                    <weight>20</weight>
+                    <exponent>2</exponent>
+                </maxPeak>
+                  <maxPeak>
+                    <targets>mtu1</targets>
+                    <targetsType>activation</targetsType>
+                    <weight>20</weight>
+                    <exponent>2</exponent>
+                </maxPeak>
+                <penalty>
+                    <targets>all</targets>
+                    <targetsType>normalisedFibreLength</targetsType>
+                    <weight>100</weight>
+                    <exponent>2</exponent>
+                    <range>0.6 1.1</range>
+                </penalty>
+                <penalty>
+                    <targets>all</targets>
+                    <targetsType>activation</targetsType>
+                    <weight>100</weight>
+                    <exponent>2</exponent>
+                    <range>0 0.8</range>
+                </penalty>
+                </objectiveFunction>
+            <parameterSet>
+	            <parameter>
+	                <name>c1</name>
+                    <global />
+                    <absolute>
+                        <range>-0.95 -0.05</range>
+                    </absolute>
+	            </parameter>
+	            <parameter>
+	                <name>c2</name>
+                    <global />
+                    <absolute>
+                        <range>-0.95 -0.05</range>
+                    </absolute>
+	            </parameter>
+	            <parameter>
+	                <name>shapeFactor</name>
+                    <global />
+                    <absolute>
+                        <range>-2.999 -0.001</range>
+                    </absolute>
+	            </parameter>
+	            <parameter>
+	                <name>tendonSlackLength</name>
+                    <single />
+                    <relativeToSubjectValue>
+                        <range>0.95 1.05</range>
+                    </relativeToSubjectValue>
+	            </parameter>
+                <parameter>
+	                <name>optimalFibreLength</name>
+                    <single />
+                    <relativeToSubjectValue>
+                        <range>0.95 1.05</range>
+                    </relativeToSubjectValue>
+	            </parameter>
+                <parameter>
+                    <name>strengthCoefficient</name>
+                    <muscleGroups>
+                        <muscles>bifemlh_r bifemsh_r semimem_r semiten_r</muscles> 
+						<muscles>grac_r</muscles>
+						<muscles>sar_r</muscles>						
+                        <muscles>lat_gas_r med_gas_r soleus_r</muscles>
+						<muscles>per_brev_r per_long_r</muscles>						
+						<muscles>per_tert_r tib_ant_r</muscles>
+                        <muscles>rect_fem_r vas_int_r vas_lat_r vas_med_r</muscles>      					
+                    </muscleGroups>
+                    <absolute>
+                        <range>0.5 3.5</range>
+                    </absolute>
+                </parameter>
+
+            </parameterSet>
+        </step> 
+    </calibrationSteps>
+
+  <trialSet>../../../trials/Rstance1/OvergroundGaitTrials_DM_ngait_og3.xml ../../../trials/Rstance1/OvergroundGaitTrials_DM_ngait_og4.xml ../../../trials/Rstance1/OvergroundGaitTrials_DM_smooth4.xml ../../../trials/calTrials/calibrationTrials_DM_calfrise1.xml</trialSet>
+
+
+</calibration>
