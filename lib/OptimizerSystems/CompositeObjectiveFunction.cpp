@@ -43,8 +43,10 @@ namespace ceinms {
     void CompositeObjectiveFunction::printCosts() const {
 
         std::cout << "------------------------------------------------------------------------------\n";
-        for (auto& it : objectiveFunctions_)
+        for (auto& it : objectiveFunctions_) {
             it->printCosts();
+            std::cout << "\n";
+        }
         std::cout << "------------------------------------------------------------------------------\n";
         std::cout << "   Fobj = " << getValue() << std::endl;
         std::cout << "------------------------------------------------------------------------------\n";
