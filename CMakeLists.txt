@@ -3,8 +3,8 @@
 cmake_minimum_required (VERSION 2.8.11) # "target_include_directories" command  and VS12 generator are missing in previous versions
 project(CEINMS)
 set(CEINMS_MAJOR_VERSION 0)
-set(CEINMS_MINOR_VERSION 10)
-set(CEINMS_PATCH_VERSION 1)
+set(CEINMS_MINOR_VERSION 11)
+set(CEINMS_PATCH_VERSION 0)
 
 add_definitions(/DCEINMS_MAJOR_VERSION="${CEINMS_MAJOR_VERSION}")
 add_definitions(/DCEINMS_MINOR_VERSION="${CEINMS_MINOR_VERSION}")
@@ -94,7 +94,9 @@ install(FILES ${CMAKE_CURRENT_BINARY_DIR}/CEINMSConfigForInstall.cmake
               
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/CEINMSConfigVersion.cmake
               DESTINATION ${ConfigPackageLocation} COMPONENT Development)
-              
+ 
+install(FILES "${CMAKE_SOURCE_DIR}/CHANGELOG.txt" DESTINATION   ${CMAKE_INSTALL_BINDIR} )
+ 
 # Uninstall target
 configure_file(
     "${CMAKE_CURRENT_SOURCE_DIR}/cmake/cmake_uninstall.cmake.in"

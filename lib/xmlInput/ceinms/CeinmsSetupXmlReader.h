@@ -47,7 +47,7 @@ namespace ceinms {
     //    std::string getContactModelFile();
     //    bool hasContactModel();
         static bool writeTemplateCeinmsSetupFile(const std::string& templateFile);
-        void CeinmsSetupXmlReader::print(const std::string& filename);
+        void print(const std::string& filename);
 
     private:
         void readXml();
