@@ -96,7 +96,6 @@ namespace ceinms {
         bool exitflag(false);
         NMSmodelT mySubject;
         setupSubject(mySubject, uncalibratedSubjectFile_, calibrationXmlReader_.getTolerance());
-
         vector<TrialData> trials;
         for (list<string>::iterator trialIt = calibrationTrialIDs_.begin(); trialIt != calibrationTrialIDs_.end(); ++trialIt) {
             trials.push_back(readTrialData(*trialIt, mySubject, *trialIt, emgGeneratorFile_));
@@ -108,6 +107,10 @@ namespace ceinms {
                 CompositeObjectiveFunction::makeComposite(currentCalibrationStep.objFunctionsSetup_);
             using MySystem = NMSmodelSystem < NMSmodelT, CompositeObjectiveFunction >;
             MySystem system(mySubject, trials, objectiveFunction, currentCalibrationStep.parameterSet_);
+            if (hasContactModel_) {
+                if (contactModelCfg_.getContactModelType() == ContactModelType::KneeBalance)
+                    system.setContactModelSetup(contactModelCfg_.getContactModelSetupKneeBalance());
+            }
             SimulatedAnnealingParameters simanParameters;
             calibrationXmlReader_.getOptimizationAlgorithmParameters(simanParameters);
             Optimizers::SimulatedAnnealing<MySystem> optimizer(system, simanParameters);
@@ -120,7 +123,7 @@ namespace ceinms {
 
     template <typename NMSmodelT>
     bool  CalibrationManager::runHybrid() {
-        cout << "Implementation not available in calibration yet. Verify you XML configuration file" << endl;
+        cout << "Cannot calibrate in hybrid mode. Verify you XML configuration file" << endl;
         return 1;
     }
 

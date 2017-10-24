@@ -51,7 +51,8 @@ namespace ceinms {
         double getValue() const override { return f_; }
         void printCosts() const override;
     private:
-        const DataTable<double>& getDataTable(const Result& result) const;
+        std::vector<double> calculate(const DataTable<double>& result) const;
+        std::vector<double> calculate(const DataTable<SimTK::Vec3>& result) const;
         ObjectiveFunctionSetup setup_;
         double f_;
         std::vector<std::vector<double>> currentMax_; //trial, max contact force value

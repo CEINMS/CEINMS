@@ -43,21 +43,24 @@ namespace ceinms {
         setup_ = setup;
     }
 
-    void MaxPeakObjectiveFunction::calculate(const vector<Result>& results) {
+    void MaxPeakObjectiveFunction::calculate(const std::vector<Result>& results) {
         currentMax_.clear();
         f_ = 0;
         for (auto& r : results) {
-            std::vector<double> trialMax;
-            for (auto& target : setup_.getTargetNames()) {
-                //this is not very efficient, as it makes a copy of the column
-                auto col(getDataTable(r).getColumn(target));
-                double val = *std::max_element(
-                    col.begin(),
-                    col.end());
-                f_ += setup_.getWeight() * std::pow(val, setup_.getExponent());
-                trialMax.push_back(val);
-            }
-            currentMax_.emplace_back(trialMax);
+            vector<double> maxes;
+            if (setup_.getCalibrationTargetType() == CalibrationTargetType::Activation)
+                maxes = calculate(r.activations);
+            else if (setup_.getCalibrationTargetType() == CalibrationTargetType::PlanarContactForce)
+                maxes = calculate(r.planarContactForces);
+            else if (setup_.getCalibrationTargetType() == CalibrationTargetType::GenericContactForce)
+                auto maxes = calculate(r.jointReactionForces);
+            else if (setup_.getCalibrationTargetType() == CalibrationTargetType::NormalisedFibreLength)
+                maxes = calculate(r.normalisedFibreLengths);
+            else if (setup_.getCalibrationTargetType() == CalibrationTargetType::NormalisedFibreVelocity)
+                maxes = calculate(r.normalisedFibreVelocities);
+            for(auto& m : maxes)
+                f_ += setup_.getWeight() * std::pow(m, setup_.getExponent());
+            currentMax_.push_back(maxes);
         }
         // normalise the weight of the objective function
         // so that the weight of the function doesn't need to change when changing the
@@ -65,28 +68,35 @@ namespace ceinms {
         f_ /= (results.size()*setup_.getTargetNames().size());
     }
 
-    const DataTable<double>& MaxPeakObjectiveFunction::getDataTable(const Result& result) const {
-       
-        switch (setup_.getCalibrationTargetType()) {
-        case CalibrationTargetType::Activation:
-            return result.activations;
-     //   case CalibrationTargetType::FibreLength:
-     //       return result
-     //   case CalibrationTargetType::FibreVelocity:
-     //       break;
-     //   case CalibrationTargetType::PennationAngle:
-     //       break;
-        case CalibrationTargetType::PlanarContactForce:
-            return result.planarContactForces;
-        case CalibrationTargetType::Torque:
-            return result.torques;
-        default:
-            throw std::exception("MaxPeakObjectiveFunction::getDataTable(const Result& result)\n"
-                "data not available");
+    vector<double> MaxPeakObjectiveFunction::calculate(const DataTable<double>& result) const{
+        vector<double> trialMax;
+        for (auto& target : setup_.getTargetNames()) {
+            //this is not very efficient, as it makes a copy of the column
+            double val = 0;
+            if (result.getColumnIndex(target) != -1) {
+                auto col(result.getColumn(target));
+                val = *std::max_element(col.begin(),col.end());
+            }
+            trialMax.push_back(val);
         }
-        //this should never happen
-        return result.penalties;
+        return trialMax;
+    }
 
+
+    vector<double> MaxPeakObjectiveFunction::calculate(const DataTable<SimTK::Vec3>& result) const {
+        vector<double> trialMax;
+        for (auto& target : setup_.getTargetNames()) {
+            //this is not very efficient, as it makes a copy of the column
+            SimTK::Vec3 val(0);
+            if (result.getColumnIndex(target) != -1) {
+                auto col(result.getColumn(target));
+                val = *std::max_element(col.begin(), col.end(), [](auto& first, auto& second) {
+                    return first.norm() < second.norm();
+                });
+            }
+            trialMax.push_back(val.norm());
+        }
+        return trialMax;
     }
 
     void MaxPeakObjectiveFunction::printCosts() const {

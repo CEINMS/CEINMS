@@ -57,6 +57,8 @@ namespace ceinms {
             activations.setLabels(muscleNames);
             emgs.setLabels(muscleNames);
             penalties.setLabels(muscleNames);
+            normalisedFibreLengths.setLabels(muscleNames);
+            normalisedFibreVelocities.setLabels(muscleNames);
         }
 
         void setDofNames(std::vector<std::string> dofNames) {

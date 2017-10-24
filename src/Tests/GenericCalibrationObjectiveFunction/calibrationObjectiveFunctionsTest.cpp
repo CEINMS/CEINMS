@@ -66,6 +66,16 @@ DataTable<double> getContactForces() {
     return contactForces;
 }
 
+DataTable<SimTK::Vec3> getGenericContactForces() {
+
+    DataTable<SimTK::Vec3> contactForces(3, 2);
+    contactForces.setLabels(getCondyleNames());
+    contactForces.setRow(0, { {1,2,3}, {4,5,6} });
+    contactForces.setRow(1, { { 1,6,3 },{ 1,5,6 } });
+    contactForces.setRow(2, { { 1,7,3 },{ 4,5,1 } });
+    return contactForces;
+}
+
 DataTable<double> getNormalisedFibreLengths() {
 
     DataTable<double> normFibreLengths(3, 3);
@@ -126,6 +136,7 @@ bool testMaxPeak() {
         Result result(0, 6, 0, 0);
         result.torques = DataTable<double>::multiplyByScalar(trials[i].getTorqueData(), 1.1);
         result.planarContactForces = getContactForces();
+        result.jointReactionForces = getGenericContactForces();
         results.push_back(result);
     }
 
@@ -164,6 +175,11 @@ bool testMaxPeak() {
     fun.setSetup(setup);
     fun.calculate(results);
     isValid &= equals(fun.getValue(), 2.*(2000*2000+1000*1000)/2);
+
+    setup.setCalibrationTargetType(CalibrationTargetType::GenericContactForce);
+    fun.setSetup(setup);
+    fun.calculate(results);
+    fun.printCosts();
 
     return isValid;
 }
