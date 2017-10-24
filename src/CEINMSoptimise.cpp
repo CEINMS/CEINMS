@@ -116,7 +116,13 @@ void printHeader() {
         << "|N|e|u|r|o|m|u|s|c|u|l|o|s|k|e|l|e|t|a|l|\n"
         << "+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+\n"
         << "|T|o|o|l|b|o|x|\n"
-        << "+-+-+-+-+-+-+-+\n\n";
+        << "+-+-+-+-+-+-+-+\n";
+    string progName = "CEINMSoptimise";
+    string version =
+        string(CEINMS_MAJOR_VERSION) + "." +
+        string(CEINMS_MINOR_VERSION) + "." +
+        string(CEINMS_PATCH_VERSION);
+    cout << "\n" << progName << " version " << version << "\n";
 
 }
 
@@ -125,19 +131,13 @@ void printAuthors() {
     time_t now = std::time(0);
     tm *gmtm = std::gmtime(&now);
     cout << "Copyright (C) " << gmtm->tm_year + 1900 << endl;
-    cout << "Claudio Pizzolato, Monica Reggiani, Massimo Sartori, David Lloyd\n\n";
-
+    cout << "Claudio Pizzolato, Monica Reggiani, Massimo Sartori, David Lloyd\n";
     cout << "Software developers: Claudio Pizzolato, Elena Ceseracciu, Monica Reggiani\n";
 }
 
 void PrintUsage()
 {
     string progName = "CEINMSoptimise";
-    string version =
-        string(CEINMS_MAJOR_VERSION) + "." +
-        string(CEINMS_MINOR_VERSION) + "." +
-        string(CEINMS_PATCH_VERSION);
-    cout << "\n" << progName << " version " << version << "\n";
     cout << "Option            Argument          Action / Notes\n";
     cout << "------            --------          --------------\n";
     cout << "-Help, -H                           Print the command-line options for " << progName << ".\n";
