@@ -28,6 +28,8 @@
 
 #include <algorithm>
 #include <stdexcept>
+#include <functional>
+#include <iterator>
 #include "DataTable.h"
 
 namespace ceinms {
@@ -97,6 +99,33 @@ namespace ceinms {
             throw std::invalid_argument("setRow: Wrong size of values");
         data_.at(row) = values;
 
+    }
+
+    template<typename T>
+    void DataTable<T>::cropToTime(double startTime, double finalTime) {
+        startTime = std::max(getStartTime(), startTime);
+        finalTime = std::min(getFinalTime(), finalTime);
+        auto tBegin = std::upper_bound(time_.begin(), time_.end(), startTime, std::less_equal<double>());
+        auto tEnd = std::upper_bound(time_.begin(), time_.end(), finalTime, std::less<double>());
+ //       auto tEnd = (rtEnd + 1).base();
+//        auto tEnd = time_.end();
+        auto dBegin = data_.begin();
+        auto dEnd = data_.end();
+
+        if (tBegin != time_.end()) {
+            auto d = std::distance(time_.begin(), tBegin);
+            dBegin = std::next(dBegin,d); 
+        }
+ 
+        if (tEnd != time_.end() && std::next(tEnd,1) != time_.end() ) {
+            auto d = std::distance(time_.begin(), tEnd);
+            dEnd = std::next(data_.begin(), d);
+        }
+
+        time_.assign(tBegin, tEnd);
+        data_.assign(dBegin, dEnd);
+
+        nRows_ = time_.size();
     }
 
     template <typename T>

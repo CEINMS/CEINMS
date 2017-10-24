@@ -53,7 +53,7 @@ namespace ceinms {
             else if (setup_.getCalibrationTargetType() == CalibrationTargetType::PlanarContactForce)
                 maxes = calculate(r.planarContactForces);
             else if (setup_.getCalibrationTargetType() == CalibrationTargetType::GenericContactForce)
-                auto maxes = calculate(r.jointReactionForces);
+                maxes = calculate(r.jointReactionForces);
             else if (setup_.getCalibrationTargetType() == CalibrationTargetType::NormalisedFibreLength)
                 maxes = calculate(r.normalisedFibreLengths);
             else if (setup_.getCalibrationTargetType() == CalibrationTargetType::NormalisedFibreVelocity)

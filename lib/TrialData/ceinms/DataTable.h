@@ -57,6 +57,7 @@ namespace ceinms {
         T& at(size_t row, size_t col);
         void pushRow(double time, const std::vector<T>& values);
         void setRow(size_t row, const std::vector<T>& values);
+        void cropToTime(double startTime, double finalTime);
 
         static DataTable sum(const DataTable& lhs, const DataTable& rhs);
         static DataTable subtract(const DataTable& lhs, const DataTable& rhs);
@@ -68,7 +69,7 @@ namespace ceinms {
         double getTime(size_t row) const { return time_.at(row); }
         void setTime(double time, std::size_t row);
         T getStartTime() const { return time_.front(); }
-        T getFinalTIme() const { return time_.back(); }
+        T getFinalTime() const { return time_.back(); }
         std::vector<double> getTimeColumn() const { return time_; }
         const std::vector<T>& getRow(size_t row) const; //return const ref is bad.. checking for performance
 

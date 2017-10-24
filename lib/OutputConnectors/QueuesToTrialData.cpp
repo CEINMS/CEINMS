@@ -96,6 +96,14 @@ namespace ceinms {
         } while (lmtRunning || emgRunning || torqueRunning);
 
         data_.setEmgData(emgData);
+
+        double startTime = std::max(lmtData.getStartTime(), torqueData.getStartTime());
+        double finalTime = std::min(lmtData.getFinalTime(), torqueData.getFinalTime());
+        lmtData.cropToTime(startTime, finalTime);
+        for (auto& m : maData) {
+            m.cropToTime(startTime, finalTime);
+        }
+        torqueData.cropToTime(startTime, finalTime);
         data_.setLmtMaData(lmtData, maData);
         data_.setTorqueData(torqueData);
     }

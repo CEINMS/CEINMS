@@ -179,7 +179,7 @@ bool testMaxPeak() {
     setup.setCalibrationTargetType(CalibrationTargetType::GenericContactForce);
     fun.setSetup(setup);
     fun.calculate(results);
-    fun.printCosts();
+    isValid &= equals(fun.getValue(), 136);
 
     return isValid;
 }

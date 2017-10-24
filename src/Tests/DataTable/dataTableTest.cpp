@@ -75,5 +75,15 @@ int main() {
 
     cout << "Table 2 minus Table 1:" << endl;
     cout << t2 - t1;
+
+    DataTable<double> t3;
+    for(int i(0); i < 100; ++i)
+        t3.pushRow(static_cast<double>(i), { 4, 2, 4 });
+
+    t3.cropToTime(10, 80);
+    t3.cropToTime(11, 120);
+    t3.cropToTime(-1, 120);
+
+
     return 0;
 }
