@@ -2,7 +2,6 @@ CEINMS 0.11.0
 --------------
 * Add CEINMSoptimise executable to automatically estimate alpha, beta, gamma weightings for the EMG-assisted execution
 
-
 CEINMS 0.10.1
 --------------
 * Fix minor bugs when calculating contact forces

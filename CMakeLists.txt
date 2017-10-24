@@ -94,7 +94,9 @@ install(FILES ${CMAKE_CURRENT_BINARY_DIR}/CEINMSConfigForInstall.cmake
               
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/CEINMSConfigVersion.cmake
               DESTINATION ${ConfigPackageLocation} COMPONENT Development)
-              
+ 
+install(FILES "${CMAKE_SOURCE_DIR}/CHANGELOG.txt" DESTINATION   ${CMAKE_INSTALL_BINDIR} )
+ 
 # Uninstall target
 configure_file(
     "${CMAKE_CURRENT_SOURCE_DIR}/cmake/cmake_uninstall.cmake.in"
