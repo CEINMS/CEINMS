@@ -84,6 +84,9 @@ int main() {
     t3.cropToTime(11, 120);
     t3.cropToTime(-1, 120);
 
+    auto it = t3.begin();
+    std::cout << it->size() << endl;
+    std::cout << t3.getRow(0).size() << endl;
 
     return 0;
 }

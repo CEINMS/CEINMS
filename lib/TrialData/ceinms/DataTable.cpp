@@ -107,8 +107,6 @@ namespace ceinms {
         finalTime = std::min(getFinalTime(), finalTime);
         auto tBegin = std::upper_bound(time_.begin(), time_.end(), startTime, std::less_equal<double>());
         auto tEnd = std::upper_bound(time_.begin(), time_.end(), finalTime, std::less<double>());
- //       auto tEnd = (rtEnd + 1).base();
-//        auto tEnd = time_.end();
         auto dBegin = data_.begin();
         auto dEnd = data_.end();
 
@@ -123,8 +121,7 @@ namespace ceinms {
         }
 
         time_.assign(tBegin, tEnd);
-        data_.assign(dBegin, dEnd);
-
+        data_ = std::vector<std::vector<double>>(dBegin, dEnd);
         nRows_ = time_.size();
     }
 
