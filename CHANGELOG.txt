@@ -1,4 +1,4 @@
-CEINMS 0.10.2
+CEINMS 0.11.0
 --------------
 * Add CEINMSoptimise executable to automatically estimate alpha, beta, gamma weightings for the EMG-assisted execution
 
