@@ -243,7 +243,7 @@ public:
     }
 private:
     struct HybridErrors {
-        int beta, gamma;
+        double beta, gamma;
         double trackError, torqueError;
     };
 
@@ -258,7 +258,7 @@ private:
         NMSmodelT subject;
         setupSubject(subject, subjectFile_, executionCfg_.getTolerance());
         ceinms::TrialData trial(readTrialData(ceinmsSetup_.getInputDataFile(), subject, emgGeneratorFile_));
-        /*
+        
         auto f([=](double beta, double gamma, NMSmodelT subject, ceinms::TrialData trial) {
             int nMtu = subject.getNoMuscles();
             int nDofs = subject.getNoDoF();
@@ -314,6 +314,34 @@ private:
             return values;
         });
 
+
+        auto getVec([](double min, double max, double interval) {
+            vector<double> v;
+            int nsteps = round((max - min) / interval);
+            for (int i(0); i < nsteps; ++i) {
+                v.push_back(min+i*interval);
+            }
+            return v;
+        });
+
+
+        auto betas = getVec(0, 30, 5);
+        auto gammas = getVec(0, 300, 10);
+        auto values = runGridParallel(betas, gammas);
+
+        std::sort(values.begin(), values.end(), [](auto e1, auto e2) {
+            if ((e1.beta - e2.beta) < 0.00001)
+                return e1.gamma < e2.gamma;
+            return e1.beta < e2.beta;
+        });
+
+        std::ofstream outF("values.csv");
+            for (auto& v : values) {
+                outF << v.beta << "," << v.gamma << "," << v.torqueError << "," << v.trackError << "\n";
+        }
+
+
+        /*
         auto getVec([](int min, int max, int nSteps) {
             vector<double> v;
             int step = (max - min) / nSteps;
@@ -370,7 +398,7 @@ private:
             "beta  = " << lowest.beta << "\n"
             "gamma  = " << lowest.gamma << "\n";
         */
-
+        /*
         class WeightingOptimiserSystem : public ceinms::Optimizers::AbstractOptimizerSystem {
         public:
             WeightingOptimiserSystem(NMSmodelT subject, ceinms::TrialData trial, ceinms::ExecutionXmlReader executionCfg) :
@@ -501,7 +529,7 @@ private:
     //    for (auto& v : values) {
     //        outF << v.beta << "," << v.gamma << "," << v.torqueError << "," << v.trackError << "\n";
     //    }
-        
+        */
 /*
         auto f([&](double beta, double gamma) {
             setup.weightings.beta = beta;

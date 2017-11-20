@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <algorithm>
+#include <iterator>
 
 #include "ceinms/EmgInformedObjectiveFunctionSetup.h"
 #include "ceinms/Mapper.h"
@@ -67,6 +68,25 @@ namespace ceinms {
         subject.getMusclesIndexFromMusclesList(indexesOfMusclesWithExcitationsToAdjust_, musclesToAdjust);
         subject.getMusclesIndexFromMusclesList(indexesOfMusclesWithExcitationsToPredict_, musclesToSynthesise);
         
+
+        //Get Dofs to track from setup
+        std::cout << "Joint moments\n";
+        std::vector<std::string> dofNames(subject.getDoFNames());
+        for (const auto& d : dofNames) {
+            if (std::find(begin(setup.dofsToTrack), end(setup.dofsToTrack), d) 
+                == setup.dofsToTrack.end()) {
+                std::cout << d << " -> Unchanged\n";
+            }
+            else {
+                int dist = std::distance(begin(dofNames), std::find(begin(dofNames), end(dofNames), d));
+                if (dist >= 0) {
+                    indexesOfTorquesToMinimise_.push_back(static_cast<unsigned>(dist));
+                    std::cout << d << " -> Tracking\n";
+                }
+            }
+        }
+
+        std::cout << "Muscle excitations\n";
         auto muscleNames(subject.getMuscleNames());
         for (auto m :musclesToSynthesise) {
             if (std::find(begin(muscleNames), end(muscleNames), m) == muscleNames.end())
@@ -77,7 +97,6 @@ namespace ceinms {
             if (std::find(begin(muscleNames), end(muscleNames), m) == muscleNames.end())
                 std::cout << "WARNING. MTU " << m << " is on the adjustMTUs list, but does not exist in the subject.\n";
         }
-
         
         for (auto m : muscleNames) {
             std::cout << m << " -> ";
@@ -93,14 +112,6 @@ namespace ceinms {
         std::cout << "Using alpha = " << weightings_.alpha << ", "
             << "beta = " << weightings_.beta << ", "
             << "gamma = " << weightings_.gamma << std::endl;
-        
-        //at the moment it's all the dofs, but we may want to set that through xml
-        for (unsigned i = 0; i < subject.getNoDoF(); ++i)
-            indexesOfTorquesToMinimise_.push_back(i);
-
-
-
-        //get torques to optimise from setup
 
     }
 }

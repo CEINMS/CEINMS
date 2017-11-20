@@ -11,6 +11,7 @@ namespace ceinms {
         HybridWeightings weightings;
         std::vector<std::string> musclesToSynthesise;
         std::vector<std::string> musclesToAdjust;
+        std::vector<std::string> dofsToTrack;
 
     };
 }

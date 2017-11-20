@@ -577,6 +577,10 @@ namespace ceinms {
         executionCfg_.getMusclesToAdjust(setup.musclesToAdjust);
         executionCfg_.getMusclesToSynthesise(setup.musclesToSynthesise);
         executionCfg_.getHybridWeightings(setup.weightings.alpha, setup.weightings.beta, setup.weightings.gamma);
+        executionCfg_.getDofSet(setup.dofsToTrack);
+        if (setup.dofsToTrack.empty()) {
+            mySubject.getDoFNames(setup.dofsToTrack);
+        }
         NMSmodelFrameOptimisation<NMSmodelT> errorMinimizer(mySubject, setup);
 
    
@@ -755,6 +759,10 @@ namespace ceinms {
         executionCfg_.getMusclesToAdjust(setup.musclesToAdjust);
         executionCfg_.getMusclesToSynthesise(setup.musclesToSynthesise);
         executionCfg_.getHybridWeightings(setup.weightings.alpha, setup.weightings.beta, setup.weightings.gamma);
+        executionCfg_.getDofSet(setup.dofsToTrack);
+        if (setup.dofsToTrack.empty()) {
+            mySubject.getDoFNames(setup.dofsToTrack);
+        }
         NMSmodelFrameOptimisation<NMSmodelT> errorMinimizer(mySubject, setup);
 
         /*OLD*/
