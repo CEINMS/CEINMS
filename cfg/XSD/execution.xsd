@@ -57,10 +57,10 @@
   
   <xs:complexType name="HybridType">
     <xs:sequence>
-      <xs:element minOccurs="0" name="dofSet" type="DofSetType"/>
       <xs:element minOccurs="0" name="alpha" type="xs:double"/>
       <xs:element minOccurs="0" name="beta" type="xs:double"/>
       <xs:element minOccurs="0" name="gamma" type="xs:double"/>
+      <xs:element minOccurs="0" name="dofSet" type="DofSetType"/>
       <xs:element name="synthMTUs" type="WeightedMuscleListType"/>
       <xs:element name="adjustMTUs" type="WeightedMuscleListType"/>
       <xs:element minOccurs="0" name="algorithm" type="HybridAlgorithmType"/>

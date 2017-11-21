@@ -708,6 +708,141 @@ namespace ceinms {
     }
 
     template <typename NMSmodelT>
+    bool SimulationManager::runHybridWithKneeBalanceContactModel() {
+
+        //Create queues for input data
+        EmgQueue emgQueue;
+        LmtQueue lmtQueue;
+        ExternalTorquesQueue externalTorqueQueue;
+        MultipleMomentArmsQueues momentArmsQueues;
+
+        //Creates queues for output data
+        //the queues are automatically created by the LoggerOnQueues template
+        ScalarLogQueue logQueue;
+
+        //Creates latches to sync threads
+        Concurrency::Latch doneWithSubscriptionsLatch;
+        Concurrency::Latch doneWithExecutionLatch;
+
+        NMSmodelT mySubject;
+        setupSubject(mySubject, subjectFile_, executionCfg_.getTolerance());
+
+        // 2. define the thread connecting with the input sources
+        string emgFilename(dataLocations_.getExcitationsFile());
+        EmgFromFile emgProducer(emgQueue, doneWithSubscriptionsLatch, doneWithExecutionLatch, mySubject, emgFilename, emgGeneratorFile_);
+
+        vector< string > dofNames;
+        mySubject.getDoFNames(dofNames);
+        vector< string > maFilename;
+        sortMaFilenames(dataLocations_.getMaFiles(), dofNames, maFilename);
+        LmtMaFromStorageFile lmtMaProducer(lmtQueue, momentArmsQueues, doneWithSubscriptionsLatch, doneWithExecutionLatch, mySubject, dataLocations_.getLmtFile(), maFilename);
+
+        string externalTorqueFilename(dataLocations_.getExternalTorqueFile());
+        ExternalTorquesFromStorageFile externalTorquesProducer(externalTorqueQueue, doneWithSubscriptionsLatch, doneWithExecutionLatch, mySubject, externalTorqueFilename);
+        vector<string> dataToLog = { "Activations",
+            "FibreLengths",
+            "NormFibreLengths",
+            "FibreVelocities",
+            "NormFibreVelocities",
+            "PennationAngles",
+            "MuscleForces",
+            "Torques",
+            "AdjustedEmgs",
+            "MusclesContribution" };
+        // 2b. define the thread consuming the output sources
+        vector<string> valuesToWrite = dataToLog;
+        QueuesToStorageFiles queuesToStorageFiles(logQueue, doneWithSubscriptionsLatch, doneWithExecutionLatch, mySubject, valuesToWrite, outputDirectory_);
+
+        //4. define contact forces queue
+        ScalarContactForcesQueue outputContactForcesQueue;
+        //5. define contact forces estimator
+        QueuesToKneeBalanceContactForces queuesToKneeBalanceContactForces(
+            *logQueue["Torques"],
+            externalTorqueQueue,
+            contactForcesQueue,
+            doneWithSubscriptionsLatch,
+            doneWithExecutionLatch,
+            contactModelCfg_.getContactModelSetupKneeBalance(),
+            mySubject);
+
+        const vector<string> contactForcesNames{
+            contactModelCfg_.getContactModelSetupKneeBalance().condyle1.name + "_force",
+            contactModelCfg_.getContactModelSetupKneeBalance().condyle2.name + "_force",
+        };
+
+        //6. define logging for contact forces
+        QueueToStorageFile<ScalarVectorData> contactForcesLogger(
+            contactForcesQueue,
+            doneWithSubscriptionsLatch,
+            doneWithExecutionLatch,
+            contactForcesNames,
+            "ContactForces",
+            outputDirectory_);
+
+
+        // 4. define the optimiser
+        EmgInformedObjectiveFunctionSetup setup;
+        executionCfg_.getMusclesToAdjust(setup.musclesToAdjust);
+        executionCfg_.getMusclesToSynthesise(setup.musclesToSynthesise);
+        executionCfg_.getHybridWeightings(setup.weightings.alpha, setup.weightings.beta, setup.weightings.gamma);
+        executionCfg_.getDofSet(setup.dofsToTrack);
+        if (setup.dofsToTrack.empty()) {
+            mySubject.getDoFNames(setup.dofsToTrack);
+        }
+        NMSmodelFrameOptimisation<NMSmodelT> errorMinimizer(mySubject, setup);
+
+        // 3. define the model simulator
+        vector<string> valuesToLog = dataToLog;
+        //save the hybrid values in a semarate file
+        valuesToLog.push_back("ObjectiveFunctionComponentsAndWeightings");
+
+        ModelEvaluationHybrid<NMSmodelT, NMSmodelFrameOptimisation<NMSmodelT>, LoggerOnQueues> simulator(
+            emgQueue,
+            lmtQueue,
+            externalTorqueQueue,
+            momentArmsQueues,
+            logQueue,
+            doneWithSubscriptionsLatch,
+            doneWithExecutionLatch,
+            mySubject,
+            errorMinimizer,
+            valuesToLog);
+
+        QueueToStorageFile<ScalarVectorData> hybridErrorLogger(
+            *(logQueue["ObjectiveFunctionComponentsAndWeightings"]),
+            doneWithSubscriptionsLatch,
+            doneWithExecutionLatch,
+            { "TorqueError", "SumExcitation", "ExcitationTrackingError", "alpha", "beta", "gamma" },
+            "ObjectiveFunctionComponentsAndWeightings",
+            outputDirectory_
+        );
+
+        doneWithSubscriptionsLatch.setCount(8);
+        doneWithExecutionLatch.setCount(8);
+
+        // 5. start the threads
+        std::thread emgProdThread(std::ref(emgProducer));
+        std::thread externalTorquesProdThread(std::ref(externalTorquesProducer));
+        std::thread lmtMaProdThread(std::ref(lmtMaProducer));
+        std::thread simulatorThread(std::ref(simulator));
+        std::thread queuesToStorageFilesThread(std::ref(queuesToStorageFiles));
+        std::thread hybridErrorLoggerThread(std::ref(hybridErrorLogger));
+        std::thread kneeContactModelThread(std::ref(queuesToKneeBalanceContactForces));
+        std::thread kneeContactModelLoggerThread(std::ref(contactForcesLogger));
+        emgProdThread.join();
+        lmtMaProdThread.join();
+        externalTorquesProdThread.join();
+        simulatorThread.join();
+        queuesToStorageFilesThread.join();
+        hybridErrorLoggerThread.join();
+        kneeContactModelThread.join();
+        kneeContactModelLoggerThread.join();
+
+        return 0;
+    }
+
+
+    template <typename NMSmodelT>
     bool SimulationManager::runHybrid() {
 
         //Create queues for input data
