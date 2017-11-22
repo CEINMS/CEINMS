@@ -496,10 +496,10 @@ namespace ceinms {
         if (useContactForces) {
             switch (contactModelCfg_.getContactModelType()) {
             case ContactModelType::OpenSim:
-                runHybridWithGenericContactModel <NMSmodelT>();
+                runHybridWithGenericContactModel<NMSmodelT>();
                 break;
             case ContactModelType::KneeBalance:
-                runHybrid <NMSmodelT>();
+                runHybridWithKneeBalanceContactModel<NMSmodelT>();
                 break;
             }
         }
@@ -709,7 +709,7 @@ namespace ceinms {
 
     template <typename NMSmodelT>
     bool SimulationManager::runHybridWithKneeBalanceContactModel() {
-
+        std::cout << "runHybridWithKneeBalanceContactModel" << endl;
         //Create queues for input data
         EmgQueue emgQueue;
         LmtQueue lmtQueue;
@@ -735,10 +735,22 @@ namespace ceinms {
         mySubject.getDoFNames(dofNames);
         vector< string > maFilename;
         sortMaFilenames(dataLocations_.getMaFiles(), dofNames, maFilename);
-        LmtMaFromStorageFile lmtMaProducer(lmtQueue, momentArmsQueues, doneWithSubscriptionsLatch, doneWithExecutionLatch, mySubject, dataLocations_.getLmtFile(), maFilename);
+        LmtMaFromStorageFile lmtMaProducer(
+            lmtQueue, 
+            momentArmsQueues, 
+            doneWithSubscriptionsLatch, 
+            doneWithExecutionLatch, 
+            mySubject, 
+            dataLocations_.getLmtFile(), 
+            maFilename);
 
         string externalTorqueFilename(dataLocations_.getExternalTorqueFile());
-        ExternalTorquesFromStorageFile externalTorquesProducer(externalTorqueQueue, doneWithSubscriptionsLatch, doneWithExecutionLatch, mySubject, externalTorqueFilename);
+        ExternalTorquesFromStorageFile externalTorquesProducer(
+            externalTorqueQueue, 
+            doneWithSubscriptionsLatch, 
+            doneWithExecutionLatch, 
+            mySubject, 
+            externalTorqueFilename);
         vector<string> dataToLog = { "Activations",
             "FibreLengths",
             "NormFibreLengths",
@@ -754,32 +766,8 @@ namespace ceinms {
         QueuesToStorageFiles queuesToStorageFiles(logQueue, doneWithSubscriptionsLatch, doneWithExecutionLatch, mySubject, valuesToWrite, outputDirectory_);
 
         //4. define contact forces queue
-        ScalarContactForcesQueue outputContactForcesQueue;
-        //5. define contact forces estimator
-        QueuesToKneeBalanceContactForces queuesToKneeBalanceContactForces(
-            *logQueue["Torques"],
-            externalTorqueQueue,
-            contactForcesQueue,
-            doneWithSubscriptionsLatch,
-            doneWithExecutionLatch,
-            contactModelCfg_.getContactModelSetupKneeBalance(),
-            mySubject);
 
-        const vector<string> contactForcesNames{
-            contactModelCfg_.getContactModelSetupKneeBalance().condyle1.name + "_force",
-            contactModelCfg_.getContactModelSetupKneeBalance().condyle2.name + "_force",
-        };
-
-        //6. define logging for contact forces
-        QueueToStorageFile<ScalarVectorData> contactForcesLogger(
-            contactForcesQueue,
-            doneWithSubscriptionsLatch,
-            doneWithExecutionLatch,
-            contactForcesNames,
-            "ContactForces",
-            outputDirectory_);
-
-
+            
         // 4. define the optimiser
         EmgInformedObjectiveFunctionSetup setup;
         executionCfg_.getMusclesToAdjust(setup.musclesToAdjust);
@@ -817,6 +805,30 @@ namespace ceinms {
             outputDirectory_
         );
 
+        ScalarContactForcesQueue outputContactForcesQueue;
+        //5. define contact forces estimator
+        QueuesToKneeBalanceContactForces queuesToKneeBalanceContactForces(
+        *logQueue["Torques"],
+        externalTorqueQueue,
+        outputContactForcesQueue,
+        doneWithSubscriptionsLatch,
+        doneWithExecutionLatch,
+        contactModelCfg_.getContactModelSetupKneeBalance(),
+        mySubject);
+        
+        const vector<string> contactForcesNames{
+            contactModelCfg_.getContactModelSetupKneeBalance().condyle1.name + "_force",
+            contactModelCfg_.getContactModelSetupKneeBalance().condyle2.name + "_force",
+        };
+
+        //6. define logging for contact forces
+        QueueToStorageFile<ScalarVectorData> contactForcesLogger(
+            outputContactForcesQueue,
+            doneWithSubscriptionsLatch,
+            doneWithExecutionLatch,
+            contactForcesNames,
+            "ContactForces",
+            outputDirectory_);
         doneWithSubscriptionsLatch.setCount(8);
         doneWithExecutionLatch.setCount(8);
 
