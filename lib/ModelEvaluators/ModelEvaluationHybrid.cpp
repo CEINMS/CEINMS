@@ -169,7 +169,7 @@ namespace ceinms {
                 subject_.getTorques(data);
                 ModelEvaluationBase<Logger>::logger.log(emgTime, data, "Torques");
                 subject_.getEmgs(data);
-                ModelEvaluationBase<Logger>::logger.log(emgTime, data, "AdjustedEmgs");
+                ModelEvaluationBase<Logger>::logger.log(emgTime-globalEmDelay_, data, "AdjustedEmgs");
                 data.clear();
                 for (unsigned i = 0; i < noDof_; ++i) {
                     vector<double> contribution;
