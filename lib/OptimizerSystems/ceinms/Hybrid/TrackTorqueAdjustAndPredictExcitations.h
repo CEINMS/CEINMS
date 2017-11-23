@@ -29,7 +29,13 @@ namespace ceinms {
         std::vector<unsigned> indexesOfMusclesWithExcitationsToPredict_;
         std::vector<unsigned> indexesOfTorquesToMinimise_;
         std::vector<double> externalTorques_;
+        std::vector<double> maxExternalTorques_;
         std::vector<double> measuredExcitations_;
+        std::vector<double> maxMeasuredExcitations_;
+        unsigned nDofs_; //N dofs to track
+        unsigned nSynth_; //N excitations to synthesis
+        unsigned nAdj_; //N excitations to adjust
+
         double f_;
         double torqueError_;
         double excitationSum_;
@@ -68,6 +74,19 @@ namespace ceinms {
         subject.getMusclesIndexFromMusclesList(indexesOfMusclesWithExcitationsToAdjust_, musclesToAdjust);
         subject.getMusclesIndexFromMusclesList(indexesOfMusclesWithExcitationsToPredict_, musclesToSynthesise);
         
+
+        for (auto &e : setup.dofsToTrack)
+            std::cout << e << endl;
+        Mapper maxTorqueMapper(setup.dofsToTrack, subject.getDoFNames());
+        maxExternalTorques_ = maxTorqueMapper.map(setup.dofsToTrackMaxTorque, std::numeric_limits<double>::max());
+        for (int i(0); i < subject.getDoFNames().size(); ++i)
+            std::cout << "maxExternalTorques_ " << subject.getDoFNames()[i] << " " << maxExternalTorques_[i] << endl;
+
+        Mapper maxEmgMapper(setup.musclesToAdjust, subject.getMuscleNames());
+        maxMeasuredExcitations_ = maxEmgMapper.map(setup.musclesToAdjustMaxExcitations, std::numeric_limits<double>::max());
+        for (int i(0); i < subject.getMuscleNames().size(); ++i)
+            std::cout << "maxMeasuredExcitations_ " << subject.getMuscleNames()[i] << " " << maxMeasuredExcitations_[i] << endl;
+
 
         //Get Dofs to track from setup
         std::cout << "Joint moments\n";
@@ -113,6 +132,10 @@ namespace ceinms {
             << "beta = " << weightings_.beta << ", "
             << "gamma = " << weightings_.gamma << std::endl;
 
+
+        nDofs_ = std::max<unsigned>(1, indexesOfTorquesToMinimise_.size());
+        nSynth_ = std::max<unsigned>(1, indexesOfMusclesWithExcitationsToPredict_.size());
+        nAdj_ = std::max<unsigned>(1, indexesOfMusclesWithExcitationsToAdjust_.size());
     }
 }
 

@@ -269,6 +269,21 @@ private:
             executionCfg_.getMusclesToAdjust(setup.musclesToAdjust);
             executionCfg_.getMusclesToSynthesise(setup.musclesToSynthesise);
             executionCfg_.getHybridWeightings(setup.weightings.alpha, setup.weightings.beta, setup.weightings.gamma);
+            executionCfg_.getDofSet(setup.dofsToTrack);
+            if (setup.dofsToTrack.empty())
+                setup.dofsToTrack = subject.getDoFNames();
+            for (const auto& m : setup.musclesToAdjust) {
+                auto col = trial.getEmgData().getColumn(m);
+                setup.musclesToAdjustMaxExcitations.push_back(*std::max_element(col.begin(), col.end())); 
+            }
+            
+            for (const auto& m : setup.dofsToTrack) {
+                auto col = trial.getTorqueData().getColumn(m);
+                setup.dofsToTrackMaxTorque.push_back(*std::max_element(col.begin(), col.end(), [](auto e1, auto e2) {
+                    return std::abs(e1) < std::abs(e2);
+                }));
+             }
+            
             setup.weightings.beta = beta;
             setup.weightings.gamma = gamma;
             ceinms::HybridEvaluator::evaluate(subject, trial, setup, musclesToUpdate, results);
@@ -283,8 +298,6 @@ private:
             errs.trackError = trackError;
             return errs;
         });
-
-
 
         auto runGrid([&](vector<double> betas, vector<double> gammas) {
             std::vector<HybridErrors> values;
@@ -325,8 +338,8 @@ private:
         });
 
 
-        auto betas = getVec(0, 30, 5);
-        auto gammas = getVec(0, 300, 10);
+        auto betas = getVec(1, 2, 1);
+        auto gammas = getVec(0, 2, 0.1);
         auto values = runGridParallel(betas, gammas);
 
         std::sort(values.begin(), values.end(), [](auto e1, auto e2) {

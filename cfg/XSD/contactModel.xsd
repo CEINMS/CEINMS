@@ -33,7 +33,7 @@
 
   <xs:complexType name="KneeBalanceType">
       <xs:sequence>
-        <xs:element maxOccurs="1" minOccurs="1" name="intercondyleDistance" type="PositiveDouble"/>
+        <xs:element maxOccurs="1" minOccurs="1" name="intercondyleDistance" type="xs:double"/>
         <xs:element maxOccurs="2" minOccurs="2" name="condyle" type="CondyleType"/>
       </xs:sequence>
   </xs:complexType>

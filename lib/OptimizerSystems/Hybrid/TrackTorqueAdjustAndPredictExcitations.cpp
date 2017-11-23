@@ -16,40 +16,48 @@ namespace ceinms {
 
     void TrackTorqueAdjustAndPredictExcitations::calculate(const std::vector<double>& predictedTorques, const std::vector<double>& predictedExcitations){
 
+
+        torqueError_ = 0.;
+        for (auto i : indexesOfTorquesToMinimise_) {
+            double diff(predictedTorques.at(i) - externalTorques_.at(i));
+            torqueError_ += diff*diff/(maxExternalTorques_.at(i)*maxExternalTorques_.at(i));
+        }
+    
+        excitationTrackingError_ = 0.;
+        for (auto i : indexesOfMusclesWithExcitationsToAdjust_) {
+            double diff(predictedExcitations.at(i) - measuredExcitations_.at(i));
+            excitationTrackingError_ += diff*diff/(maxMeasuredExcitations_.at(i)*maxMeasuredExcitations_.at(i));
+        }
+
+        excitationSum_ = 0.;
+        for (auto i : indexesOfMusclesWithExcitationsToPredict_) {
+            excitationSum_ += predictedExcitations.at(i)*predictedExcitations.at(i);
+        }
+        //    if (!indexesOfMusclesWithExcitationsToPredict_.empty()) {
+        //       excitationSum_ /= indexesOfMusclesWithExcitationsToPredict_.size();
+        //    }
+
+        f_ = 
+            weightings_.alpha/nDofs_*torqueError_ + 
+            weightings_.beta/nSynth_*excitationSum_ + 
+            weightings_.gamma/nAdj_*excitationTrackingError_;
+
+
         torqueError_ = 0.;
         for (auto i : indexesOfTorquesToMinimise_) {
             double diff(predictedTorques.at(i) - externalTorques_.at(i));
             torqueError_ += diff*diff;
         }
-        // normalise by the number of torques, so the result is independent from the model
-   //     if (!indexesOfTorquesToMinimise_.empty()) {
-   //         torqueError_ /= indexesOfTorquesToMinimise_.size();
-    //    }
-        //I have to do the sum of all the excitations squared that undergo optimisation
         excitationTrackingError_ = 0.;
         for (auto i : indexesOfMusclesWithExcitationsToAdjust_) {
             double diff(predictedExcitations.at(i) - measuredExcitations_.at(i));
             excitationTrackingError_ += diff*diff;
-   //         excitationSum_ += predictedExcitations.at(i)*predictedExcitations.at(i);
         }
-//        if (!indexesOfMusclesWithExcitationsToAdjust_.empty()) {
- //           excitationTrackingError_ /= indexesOfMusclesWithExcitationsToAdjust_.size();
-  //      }
         excitationSum_ = 0.;
         for (auto i : indexesOfMusclesWithExcitationsToPredict_) {
             excitationSum_ += predictedExcitations.at(i)*predictedExcitations.at(i);
         }
-    //    if (!indexesOfMusclesWithExcitationsToPredict_.empty()) {
-     //       excitationSum_ /= indexesOfMusclesWithExcitationsToPredict_.size();
-    //    }
-    
-        f_ = weightings_.alpha*torqueError_ + weightings_.beta*excitationSum_ + weightings_.gamma*excitationTrackingError_;
-         
-        //std::cout << std::endl;
-        //std::cout << "sum torque error squared: " << torqueError << std::endl;
-        //std::cout << "sum excitations squared : " << excitationSum << std::endl;
-        //std::cout << "sum tracking error squared: " << excitationTrackingError << std::endl;
-        
+
     }
 
     double TrackTorqueAdjustAndPredictExcitations::getValue() const {
