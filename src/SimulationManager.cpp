@@ -74,12 +74,17 @@
 #include "ceinms/Hybrid/NMSmodelFrameOptimisation.h"
 #include "ceinms/TrialData.h"
 #include "ceinms/QueuesToTrialData.h"
+
+#include "ceinms/BatchEvaluator.h"
 #include <string>
 using std::string;
 
 #include <iostream>
 using std::cout;
 using std::endl;
+#include <algorithm>
+using std::end;
+using std::begin;
 
 
 void sortMaFilenames(const std::map<std::string, std::string>& maMap, const std::vector< std::string >& dofNames, std::vector< std::string >& maDataFilenames)
@@ -97,6 +102,17 @@ void sortMaFilenames(const std::map<std::string, std::string>& maMap, const std:
             exit(EXIT_FAILURE);
         }
     }
+}
+
+double rmse(const std::vector<double>& v1, const std::vector<double>& v2) {
+
+    double sum = 0;
+    for (int i(0); i < v1.size(); ++i) {
+        sum += (v1[i] - v2[i])*(v1[i] - v2[i]);
+    }
+    sum /= v1.size();
+    return std::sqrt(sum);
+
 }
 
 template<typename NMSmodelT>
@@ -648,28 +664,38 @@ namespace ceinms {
 
         // 4. define the optimiser
         EmgInformedObjectiveFunctionSetup setup;
-     
 
         executionCfg_.getMusclesToAdjust(setup.musclesToAdjust);
         executionCfg_.getMusclesToSynthesise(setup.musclesToSynthesise);
         executionCfg_.getHybridWeightings(setup.weightings.alpha, setup.weightings.beta, setup.weightings.gamma);
         executionCfg_.getDofSet(setup.dofsToTrack);
-        if (setup.dofsToTrack.empty()) {
-            mySubject.getDoFNames(setup.dofsToTrack);
-        }
-        auto trial = readTrialData(dataLocations_, mySubject, emgGeneratorFile_);
         if (setup.dofsToTrack.empty())
             setup.dofsToTrack = mySubject.getDoFNames();
-        for (const auto& m : setup.musclesToAdjust) {
-            auto col = trial.getEmgData().getColumn(m);
-            setup.musclesToAdjustMaxExcitations.push_back(*std::max_element(col.begin(), col.end()));
+
+        auto trial = readTrialData(dataLocations_, mySubject, emgGeneratorFile_);
+        std::vector<unsigned> musclesToUpdate;
+        mySubject.getMusclesIndexFromMusclesList(musclesToUpdate, mySubject.getMuscleNames());
+        Result results(mySubject.getNoMuscles(), mySubject.getNoDoF(), trial.getEmgData().getNRows(), trial.getLmtData().getNRows());
+        results.setDofNames(mySubject.getDoFNames());
+        results.setMuscleNames(mySubject.getMuscleNames());
+
+        OpenLoopEvaluator::OpenLoopEvaluator::evaluate(mySubject, trial, musclesToUpdate, results);
+        for (const auto& m : setup.dofsToTrack) {
+            auto v1 = results.torques.getColumn(m);
+            auto v2 = trial.getTorqueData().getColumn(m);
+            std::vector<double> diff;
+            std::transform(begin(v1), end(v1),
+                begin(v2), std::back_inserter(diff), [](auto& e1, auto& e2) {
+                return std::abs(e1 - e2);
+            });
+            setup.dofsToTrackTorqueErrors.push_back(
+                *std::max_element(begin(diff), end(diff)));
         }
 
-        for (const auto& m : setup.dofsToTrack) {
-            auto col = trial.getTorqueData().getColumn(m);
-            setup.dofsToTrackMaxTorque.push_back(*std::max_element(col.begin(), col.end(), [](auto e1, auto e2) {
-                return std::abs(e1) < std::abs(e2);
-            }));
+
+        setup.musclesToAdjustExcitationErrors.clear();
+        for (const auto& m : setup.musclesToAdjust) {
+            setup.musclesToAdjustExcitationErrors.push_back(1);
         }
 
         NMSmodelFrameOptimisation<NMSmodelT> errorMinimizer(mySubject, setup);
@@ -730,39 +756,11 @@ namespace ceinms {
             "ContactForces",
             outputDirectory_);
 
-        /*    QueueToStorageFile<VecContactForcesData> intersegmentalForcesLogger(
-        intersegmentalForcesQueue,
-        doneWithSubscriptionsLatch,
-        doneWithExecutionLatch,
-        contactModelSetup.joints,
-        "IntersegmentalForces",
-        outputDirectory_);
-        */
         OpenSim::Model osimModel(osimModelFilename);
         OpenSim::Array<std::string> osimCoordNames;
         osimModel.getCoordinateSet().getNames(osimCoordNames);
         std::vector<std::string> coordNames;
         ArrayConverter::toStdVector(osimCoordNames, coordNames);
-   /*     QueueToStorageFile<ExternalTorquesData> externalTorquesLogger(
-            torquesFromIDQueue,
-            doneWithSubscriptionsLatch,
-            doneWithExecutionLatch,
-            coordNames,
-            "ExternalTorques",
-            outputDirectory_);*/
-
-  /*      cout << "-- Initialise Inverse Dynamics" << endl;
-        QueuesToInverseDynamics inverseDynamicsSolver(
-            generalisedCoordinatesQueue,
-            externalForcesQueue,
-            torquesFromIDQueue,
-            doneWithSubscriptionsLatch,
-            doneWithExecutionLatch,
-            mySubject,
-            osimModelFilename,
-            dataLocations_.getExternalLoadsFile(),
-            false);
-*/
 
         doneWithSubscriptionsLatch.setCount(9);
         doneWithExecutionLatch.setCount(9);
@@ -778,8 +776,7 @@ namespace ceinms {
         std::thread generalisedCoordinateThread(std::ref(generalisedCoordinateFromStorageFile));
         std::thread externalForcesThread(std::ref(externalForcesFromStorageFile));
         std::thread contactForcesLoggerThread(std::ref(contactForcesLogger));
-     //   std::thread inverseDynamicsSolverThread(std::ref(inverseDynamicsSolver));
-     //   std::thread externalTorquesLoggerThread(std::ref(externalTorquesLogger));
+
 
         emgProdThread.join();
         lmtMaProdThread.join();
@@ -790,8 +787,6 @@ namespace ceinms {
         generalisedCoordinateThread.join();
         externalForcesThread.join();
         contactForcesLoggerThread.join();
- //       inverseDynamicsSolverThread.join();
- //       externalTorquesLoggerThread.join();
 
 
         return 0;
@@ -861,23 +856,38 @@ namespace ceinms {
             
         // 4. define the optimiser
         EmgInformedObjectiveFunctionSetup setup;
+
         executionCfg_.getMusclesToAdjust(setup.musclesToAdjust);
         executionCfg_.getMusclesToSynthesise(setup.musclesToSynthesise);
         executionCfg_.getHybridWeightings(setup.weightings.alpha, setup.weightings.beta, setup.weightings.gamma);
         executionCfg_.getDofSet(setup.dofsToTrack);
-        auto trial = readTrialData(dataLocations_, mySubject, emgGeneratorFile_);
         if (setup.dofsToTrack.empty())
             setup.dofsToTrack = mySubject.getDoFNames();
-        for (const auto& m : setup.musclesToAdjust) {
-            auto col = trial.getEmgData().getColumn(m);
-            setup.musclesToAdjustMaxExcitations.push_back(*std::max_element(col.begin(), col.end()));
+
+        auto trial = readTrialData(dataLocations_, mySubject, emgGeneratorFile_);
+        std::vector<unsigned> musclesToUpdate;
+        mySubject.getMusclesIndexFromMusclesList(musclesToUpdate, mySubject.getMuscleNames());
+        Result results(mySubject.getNoMuscles(), mySubject.getNoDoF(), trial.getEmgData().getNRows(), trial.getLmtData().getNRows());
+        results.setDofNames(mySubject.getDoFNames());
+        results.setMuscleNames(mySubject.getMuscleNames());
+
+        OpenLoopEvaluator::OpenLoopEvaluator::evaluate(mySubject, trial, musclesToUpdate, results);
+        for (const auto& m : setup.dofsToTrack) {
+            auto v1 = results.torques.getColumn(m);
+            auto v2 = trial.getTorqueData().getColumn(m);
+            std::vector<double> diff;
+            std::transform(begin(v1), end(v1),
+                begin(v2), std::back_inserter(diff), [](const auto& e1, const auto& e2) {
+                return std::abs(e1 - e2);
+            });
+            setup.dofsToTrackTorqueErrors.push_back(
+                *std::max_element(begin(diff), end(diff)));
         }
 
-        for (const auto& m : setup.dofsToTrack) {
-            auto col = trial.getTorqueData().getColumn(m);
-            setup.dofsToTrackMaxTorque.push_back(*std::max_element(col.begin(), col.end(), [](auto e1, auto e2) {
-                return std::abs(e1) < std::abs(e2);
-            }));
+
+        setup.musclesToAdjustExcitationErrors.clear();
+        for (const auto& m : setup.musclesToAdjust) {
+            setup.musclesToAdjustExcitationErrors.push_back(1);
         }
         NMSmodelFrameOptimisation<NMSmodelT> errorMinimizer(mySubject, setup);
 
@@ -1002,7 +1012,6 @@ namespace ceinms {
         vector<string> valuesToWrite = dataToLog;
         QueuesToStorageFiles queuesToStorageFiles(logQueue, doneWithSubscriptionsLatch, doneWithExecutionLatch, mySubject, valuesToWrite, outputDirectory_);
 
-
         // 4. define the optimiser
         EmgInformedObjectiveFunctionSetup setup;
     
@@ -1010,42 +1019,36 @@ namespace ceinms {
         executionCfg_.getMusclesToSynthesise(setup.musclesToSynthesise);
         executionCfg_.getHybridWeightings(setup.weightings.alpha, setup.weightings.beta, setup.weightings.gamma);
         executionCfg_.getDofSet(setup.dofsToTrack);
-        if (setup.dofsToTrack.empty()) {
-            mySubject.getDoFNames(setup.dofsToTrack);
-        }
-        auto trial = readTrialData(dataLocations_, mySubject, emgGeneratorFile_);
         if (setup.dofsToTrack.empty())
             setup.dofsToTrack = mySubject.getDoFNames();
-        for (const auto& m : setup.musclesToAdjust) {
-            auto col = trial.getEmgData().getColumn(m);
-            setup.musclesToAdjustMaxExcitations.push_back(*std::max_element(col.begin(), col.end()));
-        }
 
+        auto trial = readTrialData(dataLocations_, mySubject, emgGeneratorFile_);
+        std::vector<unsigned> musclesToUpdate;
+        mySubject.getMusclesIndexFromMusclesList(musclesToUpdate, mySubject.getMuscleNames());
+        Result results(mySubject.getNoMuscles(), mySubject.getNoDoF(), trial.getEmgData().getNRows(), trial.getLmtData().getNRows());
+        results.setDofNames(mySubject.getDoFNames());
+        results.setMuscleNames(mySubject.getMuscleNames());
+
+        OpenLoopEvaluator::OpenLoopEvaluator::evaluate(mySubject, trial, musclesToUpdate, results);
         for (const auto& m : setup.dofsToTrack) {
-            auto col = trial.getTorqueData().getColumn(m);
-            setup.dofsToTrackMaxTorque.push_back(*std::max_element(col.begin(), col.end(), [](auto e1, auto e2) {
-                return std::abs(e1) < std::abs(e2);
-            }));
+            auto v1 = results.torques.getColumn(m);
+            auto v2 = trial.getTorqueData().getColumn(m);
+            std::vector<double> diff;
+            std::transform(begin(v1), end(v1),
+                begin(v2), std::back_inserter(diff), [](const auto& e1, const auto& e2) {
+                return std::abs(e1 - e2);
+            });
+            setup.dofsToTrackTorqueErrors.push_back(
+                *std::max_element(begin(diff), end(diff)));
         }
-        NMSmodelFrameOptimisation<NMSmodelT> errorMinimizer(mySubject, setup);
 
-        /*OLD*/
-        /*
-        typedef Hybrid::ErrorMinimizerAnnealing<NMSmodelT> MyErrorMinimizer;
-        MyErrorMinimizer errorMinimizer(mySubject);
-        HybridWeightings weightings;
+       
+        setup.musclesToAdjustExcitationErrors.clear();
+        for (const auto& m : setup.musclesToAdjust) {
+            setup.musclesToAdjustExcitationErrors.push_back(1);
+        }
         
-        errorMinimizer.setWeightings(weightings);
-        vector<string> toSynth, toAdjust;
-        executionCfg_.getMusclesToSynthesise(toSynth);
-        executionCfg_.getMusclesToAdjust(toAdjust);
-        errorMinimizer.setMusclesNamesWithEmgToPredict(toSynth);
-        errorMinimizer.setMusclesNamesWithEmgToTrack(toAdjust);
-        double rt, t, epsilon;
-        unsigned noEpsilon, ns, nt, maxNoEval;
-        executionCfg_.getAnnealingParameters(nt, ns, rt, t, maxNoEval, epsilon, noEpsilon);
-        errorMinimizer.setAnnealingParameters(nt, ns, rt, t, maxNoEval, epsilon, noEpsilon);
-        */
+        NMSmodelFrameOptimisation<NMSmodelT> errorMinimizer(mySubject, setup);
 
         // 3. define the model simulator
         vector<string> valuesToLog = dataToLog;

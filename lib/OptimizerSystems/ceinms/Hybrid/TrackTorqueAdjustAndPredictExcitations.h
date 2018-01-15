@@ -29,9 +29,9 @@ namespace ceinms {
         std::vector<unsigned> indexesOfMusclesWithExcitationsToPredict_;
         std::vector<unsigned> indexesOfTorquesToMinimise_;
         std::vector<double> externalTorques_;
-        std::vector<double> maxExternalTorques_;
+        std::vector<double> externalTorqueErrors_;
         std::vector<double> measuredExcitations_;
-        std::vector<double> maxMeasuredExcitations_;
+        std::vector<double> measuredExcitationErrors_;
         unsigned nDofs_; //N dofs to track
         unsigned nSynth_; //N excitations to synthesis
         unsigned nAdj_; //N excitations to adjust
@@ -77,15 +77,15 @@ namespace ceinms {
 
         for (auto &e : setup.dofsToTrack)
             std::cout << e << endl;
-        Mapper maxTorqueMapper(setup.dofsToTrack, subject.getDoFNames());
-        maxExternalTorques_ = maxTorqueMapper.map(setup.dofsToTrackMaxTorque, std::numeric_limits<double>::max());
+        Mapper errorTorqueMapper(setup.dofsToTrack, subject.getDoFNames());
+        externalTorqueErrors_ = errorTorqueMapper.map(setup.dofsToTrackTorqueErrors, std::numeric_limits<double>::max());
         for (int i(0); i < subject.getDoFNames().size(); ++i)
-            std::cout << "maxExternalTorques_ " << subject.getDoFNames()[i] << " " << maxExternalTorques_[i] << endl;
+            std::cout << "externalTorqueErrors_ " << subject.getDoFNames()[i] << " " << externalTorqueErrors_[i] << endl;
 
-        Mapper maxEmgMapper(setup.musclesToAdjust, subject.getMuscleNames());
-        maxMeasuredExcitations_ = maxEmgMapper.map(setup.musclesToAdjustMaxExcitations, std::numeric_limits<double>::max());
+        Mapper errorEmgMapper(setup.musclesToAdjust, subject.getMuscleNames());
+        measuredExcitationErrors_ = errorEmgMapper.map(setup.musclesToAdjustExcitationErrors, std::numeric_limits<double>::max());
         for (int i(0); i < subject.getMuscleNames().size(); ++i)
-            std::cout << "maxMeasuredExcitations_ " << subject.getMuscleNames()[i] << " " << maxMeasuredExcitations_[i] << endl;
+            std::cout << "measuredExcitationErrors_ " << subject.getMuscleNames()[i] << " " << measuredExcitationErrors_[i] << endl;
 
 
         //Get Dofs to track from setup
@@ -134,7 +134,7 @@ namespace ceinms {
 
 
         nDofs_ = std::max<unsigned>(1, indexesOfTorquesToMinimise_.size());
-        nSynth_ = std::max<unsigned>(1, indexesOfMusclesWithExcitationsToPredict_.size());
+        nSynth_ = std::max<unsigned>(1, indexesOfMusclesWithExcitationsToPredict_.size()+ indexesOfMusclesWithExcitationsToAdjust_.size());
         nAdj_ = std::max<unsigned>(1, indexesOfMusclesWithExcitationsToAdjust_.size());
     }
 }

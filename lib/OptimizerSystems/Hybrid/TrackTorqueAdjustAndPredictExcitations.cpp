@@ -20,44 +20,34 @@ namespace ceinms {
         torqueError_ = 0.;
         for (auto i : indexesOfTorquesToMinimise_) {
             double diff(predictedTorques.at(i) - externalTorques_.at(i));
-            torqueError_ += diff*diff/(maxExternalTorques_.at(i)*maxExternalTorques_.at(i));
+            torqueError_ += diff*diff/(externalTorqueErrors_.at(i)*externalTorqueErrors_.at(i));
         }
     
         excitationTrackingError_ = 0.;
+        excitationSum_ = 0.;
         for (auto i : indexesOfMusclesWithExcitationsToAdjust_) {
             double diff(predictedExcitations.at(i) - measuredExcitations_.at(i));
-            excitationTrackingError_ += diff*diff/(maxMeasuredExcitations_.at(i)*maxMeasuredExcitations_.at(i));
+            excitationTrackingError_ += diff*diff;// / (measuredExcitations_.at(i));
+            excitationSum_ += predictedExcitations.at(i)*predictedExcitations.at(i);
         }
 
-        excitationSum_ = 0.;
         for (auto i : indexesOfMusclesWithExcitationsToPredict_) {
             excitationSum_ += predictedExcitations.at(i)*predictedExcitations.at(i);
         }
-        //    if (!indexesOfMusclesWithExcitationsToPredict_.empty()) {
-        //       excitationSum_ /= indexesOfMusclesWithExcitationsToPredict_.size();
-        //    }
 
+        torqueError_ /= nDofs_;
+        excitationSum_ /= nSynth_;
+        excitationTrackingError_ /= nAdj_;
         f_ = 
-            weightings_.alpha/nDofs_*torqueError_ + 
-            weightings_.beta/nSynth_*excitationSum_ + 
-            weightings_.gamma/nAdj_*excitationTrackingError_;
-
-
-        torqueError_ = 0.;
-        for (auto i : indexesOfTorquesToMinimise_) {
-            double diff(predictedTorques.at(i) - externalTorques_.at(i));
-            torqueError_ += diff*diff;
-        }
-        excitationTrackingError_ = 0.;
-        for (auto i : indexesOfMusclesWithExcitationsToAdjust_) {
-            double diff(predictedExcitations.at(i) - measuredExcitations_.at(i));
-            excitationTrackingError_ += diff*diff;
-        }
-        excitationSum_ = 0.;
-        for (auto i : indexesOfMusclesWithExcitationsToPredict_) {
-            excitationSum_ += predictedExcitations.at(i)*predictedExcitations.at(i);
-        }
-
+            weightings_.alpha*torqueError_ + 
+            weightings_.beta*excitationSum_ + 
+            weightings_.gamma*excitationTrackingError_;
+            
+   /*     f_ =
+            weightings_.alpha *torqueError_ +
+            weightings_.beta*excitationSum_ +
+            weightings_.gamma*excitationTrackingError_;
+            */
     }
 
     double TrackTorqueAdjustAndPredictExcitations::getValue() const {
