@@ -17,6 +17,8 @@
 #include "ceinms/GeneralisedCoordinatesFromStorageFile.h"
 #include "ceinms/ExternalForcesFromStorageFile.h"
 #include "ceinms/QueueToStorageFile.h"
+#include "ceinms/QueueToDataTable.h"
+#include "ceinms/BatchOpenSimEvaluator.h"
 #include <boost/filesystem.hpp>
 using namespace ceinms;
 
@@ -35,90 +37,92 @@ using std::endl;
 
 
 
-
-
 class KriggGenericCF {
 
 public:
-    KriggGenericCF(const string& modelFilename, const string& kinematicsFilename, const string& externalLoadsXmlFilename) :
-        modelFilename_(modelFilename), kinematicsFilename_(kinematicsFilename), externalLoadsXmlFilename_(externalLoadsXmlFilename)
-    {}
-    void setKinematics();
-    void setExternalLoads();
-    void trainModel();
-    vector<double> getContactForces(const DataTable<double>& muscleForces);
+    KriggGenericCF(const string& modelFilename, const string& kinematicsFilename, const string& externalLoadsXmlFilename);
+    DataTable<SimTK::Vec3> getReactionForces(const DataTable<double>& muscleForces);
 private:
     void calculateIntersegmentalForces();
-    string modelFilename_, kinematicsFilename_, externalLoadsXmlFilename_;
+    void calculateUnitaryContributionOfMuscleToContactForces();
+    OpenSim::Model model_;
+    int nForces_, nJoints_, nFrames_;
+    vector<string> muscleNames_;
+    BatchOpenSimEvaluator evaluator_;
+    DataTable<SimTK::Vec3> intersegmentalForces_;
+    std::map<string, DataTable<SimTK::Vec3>> unitaryContributionOfMuscleToContactForces_;
+
 };
 
+KriggGenericCF::KriggGenericCF(const string& modelFilename, const string& kinematicsFilename, const string& externalLoadsXmlFilename) :
+    model_(modelFilename)
+{
+    nForces_ = model_.getForceSet().getSize();
+    nJoints_ = model_.getJointSet().getSize();
+    TrialData trialData;
+    trialData.setOpenSimData(modelFilename, externalLoadsXmlFilename, kinematicsFilename);
+    nFrames_ = trialData.getQ().getNRows();
+    vector<TrialData> osimTrialData{ trialData };
+    evaluator_.setOpenSimTrialData(osimTrialData);
+    
+    OpenSim::Array<string> muscleNames;
+    model_.getForceSet().getNames(muscleNames);
+    muscleNames_ = ArrayConverter::toStdVector(muscleNames);
+
+    calculateIntersegmentalForces();
+    calculateUnitaryContributionOfMuscleToContactForces();
+}
 
 void KriggGenericCF::calculateIntersegmentalForces() {
 
-    GeneralisedCoordinatesQueue generalisedCoordinateQueue;
-    MultipleExternalForcesQueue multipleExternalForcesQueue;
-    VecContactForcesQueue contactForcesQueue;
-    NMSmodel<ExponentialActivation, ElasticTendon_BiSec, CurveMode::Online> subject;
-    ceinms::Concurrency::Latch doneWithSubscriptions(4), doneWithExecution(4);
-    OpenSim::Array<string> jointNamesOS;
+    //forces will be at 0 by default
+    Result result(nForces_, nJoints_, nFrames_, nFrames_);
+    vector<Result> results{ result };
+    evaluator_.evaluate(results);
+    intersegmentalForces_ = results[0].jointReactionForces;
+}
 
-    OpenSim::Model osimModel(modelFilename_);
-    osimModel.getJointSet().getNames(jointNamesOS);
-    std::vector<std::string> jointNames;
-    ArrayConverter::toStdVector(jointNamesOS, jointNames);
-    GeneralisedCoordinatesFromStorageFile generalisedCoordinatesFromStorageFile(
-        generalisedCoordinateQueue,
-        doneWithSubscriptions,
-        doneWithExecution,
-        modelFilename_,
-        kinematicsFilename_,
-        8);
+void KriggGenericCF::calculateUnitaryContributionOfMuscleToContactForces() {
 
-    QueuesToIntersegmentalForces queuesToIntersegmentalForces(
-        generalisedCoordinateQueue,
-        multipleExternalForcesQueue,
-        contactForcesQueue,
-        doneWithSubscriptions,
-        doneWithExecution,
-        subject,
-        modelFilename_,
-        externalLoadsXmlFilename_,
-        jointNames
-    );
-
-    ExternalForcesFromStorageFile externalForcesFromStorageFile(
-        multipleExternalForcesQueue,
-        doneWithSubscriptions,
-        doneWithExecution,
-        modelFilename_,
-        externalLoadsXmlFilename_);
-
-    QueueToFileLogger
-    QueueToStorageFile<VecContactForcesData> logger(
-        contactForcesQueue,
-        doneWithSubscriptions,
-        doneWithExecution,
-        jointNames,
-        "ceinms_int_forces",
-        outputDir);
-
-
-    std::thread coordinateThr(std::ref(generalisedCoordinatesFromStorageFile));
-    std::thread ifThread(std::ref(queuesToIntersegmentalForces));
-    std::thread externalForcesThr(std::ref(externalForcesFromStorageFile));
-    std::thread loggerThr(std::ref(logger));
-
-    coordinateThr.join();
-    ifThread.join();
-    externalForcesThr.join();
-    loggerThr.join();
+    Result result(nForces_, nJoints_, nFrames_, nFrames_);
+    result.setMuscleNames(muscleNames_);
+    vector<Result> results{ result };
+    vector<double> empty(nForces_, 0.);
+    for (int i(0); i < muscleNames_.size(); ++i) {
+        vector<double> unitForce(empty);
+        unitForce[i] = 1.;
+        for (int r(0); r < nFrames_; ++r) {
+            results[0].forces.setRow(r, unitForce);
+        }
+        evaluator_.evaluate(results);
+        unitaryContributionOfMuscleToContactForces_.insert(
+            std::make_pair(muscleNames_[i], results[0].jointReactionForces - intersegmentalForces_)
+        );
+    }
 }
 
 
+DataTable<SimTK::Vec3> KriggGenericCF::getReactionForces(const DataTable<double>& muscleForces) {
+
+    DataTable<SimTK::Vec3> reactionForces = intersegmentalForces_;
+    for (int i(0); i < muscleNames_.size(); ++i) {
+        auto column(muscleForces.getColumn(i));
+        auto& unitContribution(unitaryContributionOfMuscleToContactForces_[muscleNames_[i]]);
+        for (int r(0); r < column.size(); ++r) {
+            for (int c(0); c < unitContribution.getNColumns(); ++c) {
+                unitContribution.at(r, c) *= column[i];
+            }
+        }
+        reactionForces = reactionForces + unitContribution;
+    }
+    return reactionForces;
+}
 
 int main() {
 
-    // (i) implement OpenSim-less calculation of joint contact forces using a Krigging method
+    
+
+    //NEED TO BE TESTED
 
     return 0;
 }

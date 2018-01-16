@@ -40,28 +40,32 @@
 
 namespace ceinms {
 
+template<typename DataType>
 class QueueToDataTable {
 public:
+    using ValueType = typename DataType::value_type;
+    using FrameType = QueueData < DataType >;
+    using QueueType = Concurrency::Queue < FrameType >;
     QueueToDataTable() = delete;
     QueueToDataTable(const QueueToDataTable&) = delete;
     QueueToDataTable& operator=(const QueueToDataTable&) = delete;
 
     QueueToDataTable(
-        ScalarVectorQueue& inputQueue,
+        QueueType& inputQueue,
         Concurrency::Latch& doneWithSubscriptions,
         Concurrency::Latch& doneWithExecution,
         const std::vector<std::string>& columnLabels
         );
     ~QueueToDataTable() = default;
     void operator()();
-    const DataTable<double>& getDataTable() const;
+    const DataTable<ValueType>& getDataTable() const;
 private:
-    ScalarVectorQueue& inputQueue_;
+    QueueType& inputQueue_;
     Concurrency::Latch& doneWithSubscription_;
     Concurrency::Latch& doneWithExecution_;
-    DataTable<double> dataTable_;
+    DataTable<ValueType> dataTable_;
 };
 
 }
-
+#include "QueueToDataTable.cpp"
 #endif

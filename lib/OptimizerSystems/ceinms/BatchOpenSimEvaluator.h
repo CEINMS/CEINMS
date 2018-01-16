@@ -15,7 +15,9 @@ namespace ceinms {
     class BatchOpenSimEvaluator {
 
     public:
+        BatchOpenSimEvaluator();
         BatchOpenSimEvaluator(const std::vector<TrialData>& osimTrialData);
+        void setOpenSimTrialData(const std::vector<TrialData>& osimTrialData);
         void evaluate(const std::vector<Result>& resultsFromCeinms);
         std::vector<Result> getResults() const;
     private:

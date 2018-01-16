@@ -11,7 +11,7 @@ set(OutputConnectors_SOURCES
 	QueuesToKneeBalanceContactForces.cpp
     QueuesToInverseDynamics.cpp
     QueuesToStorageFiles.cpp
-    QueueToDataTable.cpp
+
 )
 set(OutputConnectors_HEADERS 
     ceinms/LoggerOnQueues.h
@@ -30,7 +30,7 @@ set(OutputConnectors_HEADERS
 
 set(OutputConnectors_TEMPLATE_IMPLEMENTATION
     ceinms/QueueToStorageFile.cpp
-
+    ceinms/QueueToDataTable.cpp
 	)
   
 set_source_files_properties( ${OutputConnectors_TEMPLATE_IMPLEMENTATION} PROPERTIES HEADER_FILE_ONLY TRUE)

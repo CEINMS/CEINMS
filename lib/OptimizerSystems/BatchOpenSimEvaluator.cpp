@@ -6,11 +6,16 @@ using std::vector;
 
 namespace ceinms {
 
+    BatchOpenSimEvaluator::BatchOpenSimEvaluator() {}
+
     BatchOpenSimEvaluator::BatchOpenSimEvaluator(
-        const std::vector<TrialData>& osimTrialData) :
-        osimTrialData_(osimTrialData)
-        {
-    
+        const std::vector<TrialData>& osimTrialData) {
+        setOpenSimTrialData(osimTrialData);
+    }
+
+    void BatchOpenSimEvaluator::setOpenSimTrialData(const std::vector<TrialData>& osimTrialData) {
+
+        osimTrialData_ = osimTrialData;
         for (auto& e : osimTrialData) {
             std::cout << e.getExternalLoadFile() << std::endl << std::flush;
             std::cout << e.getOpenSimModelFile() << std::endl << std::flush;

@@ -1,10 +1,10 @@
-#include "ceinms/QueueToDataTable.h"
 #include "ceinms/EndOfData.h"
 
 namespace ceinms {
 
-QueueToDataTable::QueueToDataTable(
-    ScalarVectorQueue& inputQueue,
+template<typename DataType>
+QueueToDataTable<DataType>::QueueToDataTable(
+    QueueType& inputQueue,
     Concurrency::Latch& doneWithSubscription,
     Concurrency::Latch& doneWithExecution,
     const std::vector<std::string>& columnLabels) :
@@ -16,7 +16,8 @@ QueueToDataTable::QueueToDataTable(
     
 }
 
-void QueueToDataTable::operator()() {
+template<typename DataType>
+void QueueToDataTable<DataType>::operator()() {
 
     inputQueue_.subscribe();
     doneWithSubscription_.wait();
@@ -31,7 +32,10 @@ void QueueToDataTable::operator()() {
     doneWithExecution_.wait();
 }
 
-const DataTable<double>& QueueToDataTable::getDataTable() const {
+
+template<typename DataType>
+const DataTable<typename QueueToDataTable<DataType>::ValueType>& 
+QueueToDataTable<DataType>::getDataTable() const {
 
     return dataTable_;
 }
