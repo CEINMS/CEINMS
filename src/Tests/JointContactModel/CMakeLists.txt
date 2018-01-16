@@ -9,12 +9,13 @@ include_directories(
 	${Concurrency_INCLUDE_DIRS}
 	${NMSmodel_INCLUDE_DIRS}
 	${Curve_INCLUDE_DIRS}
-	${FileIO_INCLUDE_DIRS})
+	${FileIO_INCLUDE_DIRS}
+    ${TrialData_INCLUDE_DIRS})
 add_definitions(/DBASE_DIR="${CMAKE_CURRENT_LIST_DIR}")
 
-#add_executable(Test_JointContactModel jointContactModelTest.cpp)
-#target_link_libraries(Test_JointContactModel  JointContactModels xmlInput optimized ${OPENSIM_LIBRARIES})
-#target_link_libraries(Test_JointContactModel  JointContactModels xmlInput debug ${OPENSIM_LIBRARIES_DEBUG})
+add_executable(Test_JointContactModelFastExecution jointContactModelFastExecutionTest.cpp)
+target_link_libraries(Test_JointContactModelFastExecution  JointContactModels xmlInput TrialData optimized ${OPENSIM_LIBRARIES})
+target_link_libraries(Test_JointContactModelFastExecution  JointContactModels xmlInput TrialData debug ${OPENSIM_LIBRARIES_DEBUG})
 
 
 add_executable(Test_JointContactModelQueues jointContactModelQueueTest.cpp)
