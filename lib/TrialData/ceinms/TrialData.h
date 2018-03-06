@@ -57,7 +57,7 @@ namespace ceinms {
             const std::vector<std::string>& muscleNames,
             const std::string& id);
         void setEmgData(const DataTable<double>& emgData);
-        void setLmtMaData(const DataTable<double>& emgData, const std::vector<DataTable<double>>& maData);
+        void setLmtMaData(const DataTable<double>& lmtData, const std::vector<DataTable<double>>& maData);
         void setTorqueData(const DataTable<double>& torqueData);
         void setOpenSimData(
             const std::string& openSimModelFile, 

@@ -37,7 +37,7 @@ namespace ceinms {
 
     template <typename T>
     DataTable<T>::DataTable(size_t nRows, size_t nCols) :
-        nRows_(nRows), nCols_(nCols), data_(std::vector<std::vector<T>>(nRows, std::vector<T>(nCols, 0))), time_(nRows, 0) {
+        nRows_(nRows), nCols_(nCols), data_(std::vector<std::vector<T>>(nRows, std::vector<T>(nCols, T{ 0 }))), time_(nRows, 0) {
 
     }
 

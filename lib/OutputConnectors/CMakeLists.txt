@@ -62,8 +62,7 @@ target_include_directories(OutputConnectors
 										${JointContactModels_INCLUDE_DIRS}
 										${FileIO_INCLUDE_DIRS}
                                 PUBLIC  ${Boost_INCLUDE_DIRS}
-								        ${OPENSIM_INCLUDE_DIRS}
-                                        ${SIMTK_INCLUDE_DIRS})
+								        ${OPENSIMSIMBODY_INCLUDE_DIRS})
 
 # Save path to include directory for "internal" usage
 set(OutputConnectors_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}" CACHE INTERNAL "Include directories for OutputConnectors library")

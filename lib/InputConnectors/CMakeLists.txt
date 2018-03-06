@@ -62,8 +62,7 @@ target_include_directories(InputConnectors
                                             ${Concurrency_INCLUDE_DIRS}
                                             ${Boost_INCLUDE_DIRS}
 								PUBLIC
-											${OPENSIM_INCLUDE_DIRS}
-											${SIMTK_INCLUDE_DIRS}
+											${OPENSIMSIMBODY_INCLUDE_DIRS}
 											${mcbs_INCLUDE_DIRS}
 											${osimSpliner_INCLUDE_DIRS})
 

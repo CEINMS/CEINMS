@@ -1,7 +1,6 @@
 include_directories( 
 	${JointContactModels_INCLUDE_DIRS}
-	${OPENSIM_INCLUDE_DIRS}       
-    ${SIMTK_INCLUDE_DIRS}
+	${OPENSIMSIMBODY_INCLUDE_DIRS}
     ${ceinms_common_INCLUDE_DIRS}      
 	${xmlInput_INCLUDE_DIRS}
 	${OutputConnectors_INCLUDE_DIRS}
@@ -15,10 +14,10 @@ include_directories(
 add_definitions(/DBASE_DIR="${CMAKE_CURRENT_LIST_DIR}")
 
 add_executable(Test_JointContactModelFastExecution jointContactModelFastExecutionTest.cpp)
-target_link_libraries(Test_JointContactModelFastExecution  JointContactModels OptimizationSystems xmlInput TrialData optimized ${OPENSIM_LIBRARIES})
-target_link_libraries(Test_JointContactModelFastExecution  JointContactModels OptimizationSystems xmlInput TrialData debug ${OPENSIM_LIBRARIES_DEBUG})
+target_link_libraries(Test_JointContactModelFastExecution  JointContactModels OptimizationSystems OutputConnectors InputConnectors  xmlInput TrialData NMSmodel ${OPENSIMSIMBODY_LIBRARIES})
+#target_link_libraries(Test_JointContactModelFastExecution  JointContactModels OptimizationSystems OutputConnectors InputConnectors  xmlInput TrialData NMSmodel debug ${OPENSIM_LIBRARIES_DEBUG})
 
 
 add_executable(Test_JointContactModelQueues jointContactModelQueueTest.cpp)
-target_link_libraries(Test_JointContactModelQueues  JointContactModels OutputConnectors InputConnectors xmlInput Concurrency NMSmodel optimized ${OPENSIM_LIBRARIES})
-target_link_libraries(Test_JointContactModelQueues  JointContactModels OutputConnectors InputConnectors xmlInput Concurrency NMSmodel debug ${OPENSIM_LIBRARIES_DEBUG})
+target_link_libraries(Test_JointContactModelQueues  JointContactModels OutputConnectors InputConnectors xmlInput Concurrency NMSmodel  ${OPENSIMSIMBODY_LIBRARIES})
+#target_link_libraries(Test_JointContactModelQueues  JointContactModels OutputConnectors InputConnectors xmlInput Concurrency NMSmodel debug ${OPENSIM_LIBRARIES_DEBUG})

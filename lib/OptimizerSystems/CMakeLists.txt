@@ -70,8 +70,7 @@ ${OptimizationSystems_Hybrid_SOURCES}
 )
 target_include_directories( OptimizationSystems
                             PRIVATE ceinms
-                                    ${OPENSIM_INCLUDE_DIRS}       
-                                    ${SIMTK_INCLUDE_DIRS}
+                                    ${OPENSIMSIMBODY_INCLUDE_DIRS}
                                     ${CMAKE_CURRENT_SOURCE_DIR}
                                     ${NMSmodel_INCLUDE_DIRS}
                                     ${Curve_INCLUDE_DIRS}

@@ -75,6 +75,11 @@ namespace ceinms {
             std::string fullpath = filename;
             try {
                 fullpath = boost::filesystem::canonical(filename).generic_string();
+
+                // fix a problem with boost not replacing the separator correctly in windows
+                if (boost::filesystem::path::preferred_separator == L'\x5c') {
+                    std::replace(fullpath.begin(), fullpath.end(), '/', '\\');
+                }
             }
             catch (std::exception& e) {
                 std::cout << e.what();

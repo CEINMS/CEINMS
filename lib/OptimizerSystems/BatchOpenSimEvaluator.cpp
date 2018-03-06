@@ -35,7 +35,7 @@ namespace ceinms {
     DataTable<SimTK::Vec3> BatchOpenSimEvaluator::evaluate(std::unique_ptr<JointContactFromOpensim>& jointContactModel, const Result& resultFromCeinms, const TrialData& osimTrialData) {
         //map muscles and torques from resultsFromCeinms to a mapper.. so it's possible to put them in the correct order
        
-        vector<string> inputMuscleNames(resultFromCeinms.forces.getLabels());
+       vector<string> inputMuscleNames(resultFromCeinms.forces.getLabels());
        vector<string> outputMuslceNames;
        jointContactModel->getMuscleNamesFromOsimModel(outputMuslceNames);
        
