@@ -39,7 +39,7 @@ namespace ceinms {
        vector<string> outputMuslceNames;
        jointContactModel->getMuscleNamesFromOsimModel(outputMuslceNames);
        
-         Mapper muscleMapper(inputMuscleNames, outputMuslceNames);
+       Mapper muscleMapper(inputMuscleNames, outputMuslceNames);
        
        vector<string> inputDofNames(resultFromCeinms.torques.getLabels());
        vector<string> outputDofNames;

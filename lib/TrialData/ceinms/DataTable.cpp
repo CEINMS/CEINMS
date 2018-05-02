@@ -48,10 +48,19 @@ namespace ceinms {
     }
 
     template <typename T>
+    void DataTable<T>::setTimeColumn(const std::vector<double>& timeColumn) {
+
+        if (timeColumn.size() != nRows_)
+            throw std::invalid_argument("pushRow: Wrong size of timeColumn");
+        time_ = timeColumn;
+    }
+
+
+    template <typename T>
     void DataTable<T>::setLabels(const std::vector<std::string>& labels) {
 
         if (!data_.empty() && labels.size() != nCols_)
-            throw std::invalid_argument("wrong number of labels.");
+            throw std::invalid_argument("setLabels: wrong number of labels.");
         labels_ = labels;
     }
 
@@ -60,6 +69,31 @@ namespace ceinms {
     void DataTable<T>::set(T value, size_t row, size_t col) {
 
         data_.at(row).at(col) = value;
+    }
+
+    template <typename T>
+    void DataTable<T>::setColumn(size_t col, const std::vector<T>& values) {
+
+        if (col > nCols_)
+            throw std::invalid_argument("setColumn: index out of bounds.");
+
+        if(values.size() != nRows_)
+            throw std::invalid_argument("setColumn: column size is different than number of rows in DataTable.");
+
+        for (std::size_t row(0); row < nRows_; ++row) {
+            set(values[row], row, col);
+        }
+    }
+
+
+    template <typename T>
+    void DataTable<T>::setColumn(const std::string& columnName, const std::vector<T>& values) {
+
+        auto it = std::find(labels_.begin(), labels_.end(), columnName);
+        if (it == labels.end()) {
+            throw std::invalid_argument("setColumn: columnName does not exist.");
+        }
+        setColumn(std::distance(value.begin(), it), values);
     }
 
 
@@ -141,6 +175,17 @@ namespace ceinms {
     }
 
     template <typename T>
+    std::vector<double> DataTable<T>::accumulateColumns() const {
+        std::vector<double> accum(nRows_, 0.);
+        for (std::size_t row(0); row < nRows_; ++row) {
+            for (std::size_t col(0); col < nCols_; ++col) {
+                accum[row] += at(row, col);
+            }
+        }
+        return accum;
+    }
+
+    template <typename T>
     DataTable<T> DataTable<T>::subtract(const DataTable<T>& lhs, const DataTable<T>& rhs) {
 
         if (lhs.getNColumns() != rhs.getNColumns() || lhs.getNColumns() != rhs.getNColumns())
@@ -196,6 +241,17 @@ namespace ceinms {
             nRows_ == rhs.nRows_);
 
 
+    }
+
+    template<typename T>
+    void DataTable<T>::print(const std::string& filename) {
+
+        std::ofstream f(filename);
+        if (!f.is_open()) {
+            std::cout << "Cannot print DataTable to file " << filename << std::endl;
+        }
+        f << *this;
+        f.close();
     }
 
     template<typename T>

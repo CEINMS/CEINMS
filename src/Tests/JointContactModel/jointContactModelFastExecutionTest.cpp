@@ -34,15 +34,29 @@ using std::vector;
 #include <iostream>
 using std::cout;
 using std::endl;
+#include <random>
 
 #include <boost/filesystem.hpp>
 using boost::filesystem::absolute;
 using boost::filesystem::path;
 using boost::filesystem::canonical;
 
+template<typename T>
+void printDataTable(const DataTable<T>& table, const string& outputDir, const string& filename) {
+
+    FileLogger<vector<T>> logger(table.getLabels(), filename, outputDir);
+    for (size_t r(0); r < table.getNRows(); ++r) {
+        QueueData<vector<T>> data;
+        data.time = table.getTime(r);
+        data.data = table.getRow(r);
+        logger.logFrame(data);
+    }
+    logger.print();
+}
+
 
 class KriggGenericCF {
-
+    /* TODO: fix moment arm calculation, remove unused functions, calculate, test reaction analysis*/
 public:
     KriggGenericCF(const string& modelFilename, const string& kinematicsFilename, const string& externalLoadsXmlFilename);
     DataTable<SimTK::Vec3> getReactionForces(const DataTable<double>& muscleForces) const;
@@ -58,8 +72,16 @@ public:
         return intersegmentalForces_.getNRows();
     }
 
+    std::vector<double> getTimeColumn() const {
+        return timeColumm_;
+    }
 
 private:
+
+    void calculateMomentArms();
+  //  void setModelKinematics(int frameNumber);
+ //   double getMomentArm(const std::string& muscleName, const std::string& dofName, int frameNumber);
+ //   double getJointMoment(const std::string& dofName, int frameNumber);
     void calculateIntersegmentalForces();
     void calculateUnitaryContributionOfMuscleToContactForces();
     OpenSim::Model model_;
@@ -69,17 +91,18 @@ private:
     BatchOpenSimEvaluator evaluator_;
     DataTable<SimTK::Vec3> intersegmentalForces_;
     std::map<string, DataTable<SimTK::Vec3>> unitaryContributionOfMuscleToContactForces_;
-
+    OpenSim::Storage kinematicsData_;
+    vector<DataTable<double>> maData_;
 };
 
 KriggGenericCF::KriggGenericCF(const string& modelFilename, const string& kinematicsFilename, const string& externalLoadsXmlFilename) :
-    model_(modelFilename)
+    model_(modelFilename), kinematicsData_(kinematicsFilename)
 {
+
     nForces_ = model_.getForceSet().getSize();
     nDofs_ = model_.getCoordinateSet().getSize();
-    OpenSim::Storage kinematicsData(kinematicsFilename);
     OpenSim::Array<double> tempTimeCol;
-    kinematicsData.getTimeColumn(tempTimeCol);
+    kinematicsData_.getTimeColumn(tempTimeCol);
     timeColumm_ = ArrayConverter::toStdVector(tempTimeCol);
     TrialData trialData;
     trialData.setOpenSimData(modelFilename, externalLoadsXmlFilename, kinematicsFilename);
@@ -95,10 +118,112 @@ KriggGenericCF::KriggGenericCF(const string& modelFilename, const string& kinema
     model_.getCoordinateSet().getNames(dofNames);
     dofNames_ = ArrayConverter::toStdVector(dofNames);
 
+    // This can be used to conditionally use external moment arm data
+    calculateMomentArms();
     calculateIntersegmentalForces();
     calculateUnitaryContributionOfMuscleToContactForces();
 }
 
+
+void KriggGenericCF::calculateMomentArms() {
+   
+    OpenSim::Array<std::string> muscles;
+    model_.getMuscles().getNames(muscles);
+    std::unique_ptr<OpenSim::MuscleAnalysis> muscleTendonLengthAnalysis(new OpenSim::MuscleAnalysis(&model_));
+    muscleTendonLengthAnalysis->setMuscles(muscles);
+    muscleTendonLengthAnalysis->setStartTime(timeColumm_.front());
+    muscleTendonLengthAnalysis->setEndTime(timeColumm_.back());
+    muscleTendonLengthAnalysis->setComputeMoments(true);
+    muscleTendonLengthAnalysis->setPrintResultFiles(false);
+
+    //add analysis to model and update the model state
+    model_.addAnalysis(muscleTendonLengthAnalysis.get());
+    SimTK::State& stateMuscleAnalysis = model_.initSystem();
+    model_.getMultibodySystem().realize(stateMuscleAnalysis, SimTK::Stage::Position);
+
+    //create an AnalyzeTool with a passed in OpenSim Model (a model with the muscle analysis)
+    OpenSim::AnalyzeTool musclePlotterTool(model_);
+    //create a storage from a motion file
+    //load motion file into the AnalyzeTool
+    musclePlotterTool.setStatesFromMotion(stateMuscleAnalysis, kinematicsData_, true);
+
+    //add analysis to the model and update model's state
+    musclePlotterTool.addAnalysisSetToModel();
+    stateMuscleAnalysis = model_.initSystem();
+    model_.getMultibodySystem().realize(stateMuscleAnalysis, SimTK::Stage::Position);
+    musclePlotterTool.setInitialTime(timeColumm_.front());
+    musclePlotterTool.setFinalTime(timeColumm_.back());
+    musclePlotterTool.setPrintResultFiles(false);
+    //musclePlotterTool.setResultsDir("MuscleAnalysis");
+    musclePlotterTool.setStatesFileName("MuscleAnalysis/test");
+    musclePlotterTool.run();
+
+    //retrieve ma values
+    const OpenSim::ArrayPtrs<OpenSim::MuscleAnalysis::StorageCoordinatePair>& myMaArraysOfStorage = muscleTendonLengthAnalysis->getMomentArmStorageArray();
+    size_t numCoordinates = myMaArraysOfStorage.getSize();
+    for (size_t coordinateIterator = 0; coordinateIterator < numCoordinates; ++coordinateIterator) {
+
+        string currentCoordinateName = myMaArraysOfStorage[coordinateIterator]->q->getName();
+        auto it = find(dofNames_.begin(), dofNames_.end(), currentCoordinateName);
+        if (it != dofNames_.end()) {
+            DataTable<double> currentCoordinateMomentArm(timeColumm_.size(), muscleNames_.size());
+            currentCoordinateMomentArm.setLabels(muscleNames_);
+            for (size_t iCol = 0; iCol < muscleNames_.size(); ++iCol) {
+                OpenSim::Array<double> tempCol;
+                myMaArraysOfStorage[coordinateIterator]->momentArmStore->getDataColumn(iCol, tempCol);
+                vector<double> column;
+                ArrayConverter::toStdVector(tempCol, column);
+                currentCoordinateMomentArm.setColumn(iCol, column);
+            }
+            maData_.push_back(currentCoordinateMomentArm);
+        }
+    }
+}
+
+/*void KriggGenericCF::setModelKinematics(int frameNumber) {
+    auto labels = kinematicsData_.getColumnLabels();
+    for (int i(0); i < labels.getSize(); ++i) {
+        for (int j(0); j < model_.getCoordinateSet().getSize(); ++j) {
+            if (model_.getCoordinateSet().get(j).getName() == labels[i]) {
+                OpenSim::Array<double> data;
+                //very inefficient way of doing it
+                kinematicsData_.getDataColumn(labels[i], data);
+                model_.getCoordinateSet().get(j).setValue(state_, data[frameNumber]);
+            }
+        }
+    }
+    model_.getMultibodySystem().realize(state_, SimTK::Stage::Position);
+}
+
+double KriggGenericCF::getMomentArm(const std::string& muscleName, const std::string& dofName, int frameNumber) {
+
+    double momentArm;
+    {
+        try
+        {
+            momentArm = model_.getMuscles().get(muscleName).computeMomentArm(state_, model_.updCoordinateSet().get(dofName));
+        }
+        catch (OpenSim::Exception &e)
+        {
+            std::cout << e.what();
+            return -1;
+        }
+    }
+    return momentArm;
+}
+
+
+double KriggGenericCF::getJointMoment(const std::string& dofName, int frameNumber) {
+
+    double jointMoment = 0;
+    for (int i(0); i < model_.getMuscles().getSize(); ++i) {
+        auto muscleName = model_.getMuscles().get(i).getName();
+        jointMoment += getMomentArm(muscleName, dofName, frameNumber) * model_.getMuscles().get(i).getForce(state_);
+    }
+    return jointMoment;
+}
+
+*/
 void KriggGenericCF::calculateIntersegmentalForces() {
 
     //forces will be at 0 by default
@@ -117,18 +242,27 @@ void KriggGenericCF::calculateUnitaryContributionOfMuscleToContactForces() {
     Result result(nForces_, nDofs_, nFrames_, nFrames_);
     result.setMuscleNames(muscleNames_);
     result.setDofNames(dofNames_);
-    vector<Result> results{ result };
     vector<double> empty(nForces_, 0.);
     for (int i(0); i < muscleNames_.size(); ++i) {
         vector<double> unitForce(empty);
         unitForce[i] = 1.;
         for (int r(0); r < nFrames_; ++r) {
-            results[0].forces.setRow(r, unitForce);
+            result.forces.setRow(r, unitForce);
         }
-        evaluator_.evaluate(results);
+        result.forces.setTimeColumn(timeColumm_);
+        for (int dofIdx(0); dofIdx < dofNames_.size(); ++ dofIdx) {
+            vector<double> currentJointMoment = (maData_.at(dofIdx)* result.forces).accumulateColumns();
+            result.torques.setColumn(dofIdx, currentJointMoment);
+        }
+        result.torques.setTimeColumn(timeColumm_);
+        evaluator_.evaluate({ result });
         unitaryContributionOfMuscleToContactForces_.insert(
             std::make_pair(muscleNames_[i], evaluator_.getResults()[0].jointReactionForces - intersegmentalForces_)
         );
+
+        path dataPath(path(FileUtils::simplify(BASE_DIR)) / "Data");
+        path outputPath(dataPath / "output");
+        printDataTable(unitaryContributionOfMuscleToContactForces_[muscleNames_[i]], outputPath.string(), "contribution_" + muscleNames_[i] + ".csv");
     }
 }
 
@@ -160,14 +294,16 @@ void addCoordinateActuators(OpenSim::Model& model, double control, bool removeMu
     if (removeMuscles)
         model.updForceSet().setSize(0); //remove all actuators from the model
     for (unsigned i(0); i < model.getNumCoordinates(); ++i) {
-        CoordinateActuator *actuator = new CoordinateActuator();
-        actuator->setCoordinate(&cs.get(i));
-        string actuatorName(cs.get(i).getName() + "_actuator");
-        actuator->setName(actuatorName);
-        actuator->setOptimalForce(1);
-        actuator->setMaxControl(control);
-        actuator->setMinControl(-control);
-        model.addForce(actuator);
+ //       if (cs.get(i).getMotionType() == OpenSim::Coordinate::MotionType::Rotational) {
+            CoordinateActuator *actuator = new CoordinateActuator();
+            actuator->setCoordinate(&cs.get(i));
+            string actuatorName(cs.get(i).getName() + "_actuator");
+            actuator->setName(actuatorName);
+            actuator->setOptimalForce(1);
+            actuator->setMaxControl(control);
+            actuator->setMinControl(-control);
+            model.addForce(actuator);
+   //     }
     }
 }
 
@@ -176,7 +312,7 @@ void calculateIntersegmentaForcesWithOpensim(std::string modelFilename, const Op
     OpenSim::Model model(modelFilename);
     double firstTime = timeColumn.front();
     double lastTime = timeColumn.back();
-    addCoordinateActuators(model, 100000, true);
+    addCoordinateActuators(model, 200000, true);
     model.print(outputDir + "/musclelessModel.osim");
     OpenSim::Model modelJR = model;
     SimTK::State state = model.initSystem();
@@ -337,6 +473,7 @@ void calculateReactionForcesWithCEINMS(
     std::string osimModelFilename,
     std::string kinematicsStorageFilename,
     std::string externalLoadsXmlFilename,
+    const DataTable<double>& muscleForces,
     std::string outputDir) {
 
     GeneralisedCoordinatesQueue generalisedCoordinateQueue;
@@ -345,7 +482,12 @@ void calculateReactionForcesWithCEINMS(
     VecContactForcesQueue contactForcesQueue;
     EstimatedTorquesQueue estimatedTorquesQueue;
     NMSmodel<ExponentialActivation, ElasticTendon_BiSec, CurveMode::Online> subject;
-    ceinms::Concurrency::Latch doneWithSubscriptions(4), doneWithExecution(4);
+    using MTUT = MTU<ExponentialActivation, ElasticTendon_BiSec, CurveMode::Online>;
+    for (auto& label : muscleForces.getLabels()) {
+        subject.addMuscle(MTUT(label));
+    }
+
+    ceinms::Concurrency::Latch doneWithSubscriptions(5), doneWithExecution(5);
 
     OpenSim::Model model(osimModelFilename);
     OpenSim::Array<string> jointNamesOS;
@@ -381,38 +523,38 @@ void calculateReactionForcesWithCEINMS(
         jointNames
     );
 
-
-
     QueueToStorageFile<VecContactForcesData> logger(
         contactForcesQueue,
         doneWithSubscriptions,
         doneWithExecution,
         jointNames,
-        "ceinms_int_forces",
+        "ceinms_rct_forces",
         outputDir);
 
+    auto producerFromDataTable([&]() {
+
+        doneWithSubscriptions.wait();
+        for (int i(0); i < muscleForces.getNRows(); ++i) {
+            MuscleForcesFrame frame;
+            frame.time = muscleForces.getTime(i);
+            frame.data = muscleForces.getRow(i);
+            muscleForcesQueue.push(frame);
+        }
+        muscleForcesQueue.push(EndOfData::get<MuscleForcesFrame>());
+        doneWithExecution.wait();    
+    });
+
     std::thread coordinateThr(std::ref(generalisedCoordinatesFromStorageFile));
-    std::thread ifThread(std::ref(queuesToIntersegmentalForces));
+    std::thread ifThread(std::ref(queuesToJointReactionForces));
     std::thread externalForcesThr(std::ref(externalForcesFromStorageFile));
     std::thread loggerThr(std::ref(logger));
+    std::thread muscleForceThr(producerFromDataTable);
 
     coordinateThr.join();
     ifThread.join();
     externalForcesThr.join();
     loggerThr.join();
-}
-
-template<typename T>
-void printDataTable(const DataTable<T>& table, const string& outputDir, const string& filename) {
-
-    FileLogger<vector<T>> logger(table.getLabels(), filename, outputDir);
-    for (size_t r(0); r < table.getNRows(); ++r) {
-        QueueData<vector<T>> data;
-        data.time = table.getTime(r);
-        data.data = table.getRow(r);
-        logger.logFrame(data);
-    }
-    logger.print();
+    muscleForceThr.join();
 }
 
 
@@ -434,7 +576,6 @@ int main() {
     muscleForces.setLabels(krigg.getMuscleNames());
 
     //calculate intersegmental forces
-    //auto intersegmentalForces(krigg.getReactionForces(muscleForces));
     OpenSim::Model model(osimModelFilename);
     auto intersegmentalForces(krigg.getIntersegmentalForces());
     printDataTable(intersegmentalForces, outputDir, "krigg_intersegmental.sto");
@@ -450,11 +591,33 @@ int main() {
         outputDir);
 
 
-  /*  OpenSim::Storage originalKinematics(kinematicsStorageFilename);
-    OpenSim::Array<double> tempTimeCol;
-    originalKinematics.getTimeColumn(tempTimeCol);
-    vector<double> timeColumn = ArrayConverter::toStdVector(tempTimeCol);
-    calculateIntersegmentaForcesWithOpensim(osimModelFilename, kinematicsStorageFilename, externalLoadsXmlFilename, timeColumn, outputPath.string());
-    */
+    //calculate reaction forces
+    //populate muscle forces with random values
+    std::random_device randDev;
+    std::default_random_engine randomEngine(randDev());
+    std::uniform_real_distribution<double> uniformDistAmplitude(0, 500);
+    double amplitude = uniformDistAmplitude(randomEngine);
+    std::uniform_real_distribution<double> uniformDistPhase(0, 2*SimTK::Pi);
+    double phase = uniformDistPhase(randomEngine);
+    std::uniform_real_distribution<double> uniformDistFreq(1, 6);
+    double freq = uniformDistFreq(randomEngine);
+    auto timeColumm = krigg.getTimeColumn();
+    for (int c(0); c < muscleForces.getNColumns(); ++c) {
+        for (int r(0); r < muscleForces.getNRows(); ++r) {
+        //    muscleForces.at(r, c) = amplitude / 2. + amplitude*std::sin(2 * SimTK::Pi*freq*timeColumm.at(r) + phase);
+            muscleForces.at(r, c) = 1;
+            muscleForces.setTime(timeColumm.at(r), r);
+        }
+    }
+    auto reactionForces(krigg.getReactionForces(muscleForces));
+    printDataTable(reactionForces, outputDir, "krigg_reaction1.sto");
+/*
+    calculateReactionForcesWithCEINMS(
+        osimModelFilename,
+        kinematicsStorageFilename,
+        externalLoadsXmlFilename,
+        muscleForces,
+        outputDir);
+        */
     return 0;
 }

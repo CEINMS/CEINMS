@@ -49,6 +49,9 @@ namespace ceinms {
         void setLabels(const std::vector<std::string>& labels); //do not include time column
         std::vector<std::string> getLabels() const { return labels_; }
         void set(T value, size_t row, size_t col);
+        void setTimeColumn(const std::vector<double>& timeColumn);
+        void setColumn(size_t col, const std::vector<T>& values);
+        void setColumn(const std::string& columnName, const std::vector<T>& values);
         const T& at(size_t row, size_t col) const;
         T& at(size_t row, size_t col);
         void pushRow(double time, const std::vector<T>& values);
@@ -58,6 +61,8 @@ namespace ceinms {
         static DataTable subtract(const DataTable& lhs, const DataTable& rhs);
         static DataTable multiplyByElement(const DataTable& lhs, const DataTable& rhs);
         static DataTable multiplyByScalar(const DataTable& lhs, T scalar);
+
+        std::vector<double> accumulateColumns() const;
 
         std::string getLabel(size_t col) const { return labels_.at(col); }
         T get(size_t row, size_t col) const { return data_.at(row, col); }
@@ -75,6 +80,7 @@ namespace ceinms {
 
         bool equals(const DataTable& rhs) const;
         friend std::ostream& operator<< <> (std::ostream& output, const DataTable& ths);
+        void print(const std::string& filename);
     private:
         size_t nRows_, nCols_;
         //internal implementation may be changed to something better.. e.g. nice matrices
