@@ -77,11 +77,7 @@ public:
     }
 
 private:
-
     void calculateMomentArms();
-  //  void setModelKinematics(int frameNumber);
- //   double getMomentArm(const std::string& muscleName, const std::string& dofName, int frameNumber);
- //   double getJointMoment(const std::string& dofName, int frameNumber);
     void calculateIntersegmentalForces();
     void calculateUnitaryContributionOfMuscleToContactForces();
     OpenSim::Model model_;
@@ -180,50 +176,6 @@ void KriggGenericCF::calculateMomentArms() {
     }
 }
 
-/*void KriggGenericCF::setModelKinematics(int frameNumber) {
-    auto labels = kinematicsData_.getColumnLabels();
-    for (int i(0); i < labels.getSize(); ++i) {
-        for (int j(0); j < model_.getCoordinateSet().getSize(); ++j) {
-            if (model_.getCoordinateSet().get(j).getName() == labels[i]) {
-                OpenSim::Array<double> data;
-                //very inefficient way of doing it
-                kinematicsData_.getDataColumn(labels[i], data);
-                model_.getCoordinateSet().get(j).setValue(state_, data[frameNumber]);
-            }
-        }
-    }
-    model_.getMultibodySystem().realize(state_, SimTK::Stage::Position);
-}
-
-double KriggGenericCF::getMomentArm(const std::string& muscleName, const std::string& dofName, int frameNumber) {
-
-    double momentArm;
-    {
-        try
-        {
-            momentArm = model_.getMuscles().get(muscleName).computeMomentArm(state_, model_.updCoordinateSet().get(dofName));
-        }
-        catch (OpenSim::Exception &e)
-        {
-            std::cout << e.what();
-            return -1;
-        }
-    }
-    return momentArm;
-}
-
-
-double KriggGenericCF::getJointMoment(const std::string& dofName, int frameNumber) {
-
-    double jointMoment = 0;
-    for (int i(0); i < model_.getMuscles().getSize(); ++i) {
-        auto muscleName = model_.getMuscles().get(i).getName();
-        jointMoment += getMomentArm(muscleName, dofName, frameNumber) * model_.getMuscles().get(i).getForce(state_);
-    }
-    return jointMoment;
-}
-
-*/
 void KriggGenericCF::calculateIntersegmentalForces() {
 
     //forces will be at 0 by default
@@ -275,7 +227,7 @@ DataTable<SimTK::Vec3> KriggGenericCF::getReactionForces(const DataTable<double>
         const DataTable<SimTK::Vec3>& unitContribution = unitaryContributionOfMuscleToContactForces_.at(muscleNames_[i]);
         for (int r(0); r < column.size(); ++r) {
             for (int c(0); c < unitContribution.getNColumns(); ++c) {
-                reactionForces.at(r,c) += unitContribution.at(r, c) * column[i];
+                reactionForces.at(r,c) = reactionForces.at(r, c) + unitContribution.at(r, c) * column[r];
             }
         }
     }
@@ -288,18 +240,20 @@ vector<string> KriggGenericCF::getMuscleNames() const {
 }
 
 //this is already done internally in JointContactFromOpensim, so we just do it for the test
-void addCoordinateActuators(OpenSim::Model& model, double control, bool removeMuscles) {
+void addCoordinateActuators(OpenSim::Model& model, double control, double optForce, bool removeMuscles, 
+    const std::vector<string>& coordNameList) {
 
-    const OpenSim::CoordinateSet& cs = model.getCoordinateSet();
+    OpenSim::CoordinateSet& cs = model.updCoordinateSet();
     if (removeMuscles)
         model.updForceSet().setSize(0); //remove all actuators from the model
-    for (unsigned i(0); i < model.getNumCoordinates(); ++i) {
+
+    for (unsigned i(0); i < coordNameList.size(); ++i) {
  //       if (cs.get(i).getMotionType() == OpenSim::Coordinate::MotionType::Rotational) {
             CoordinateActuator *actuator = new CoordinateActuator();
-            actuator->setCoordinate(&cs.get(i));
+            actuator->setCoordinate(&cs.get(coordNameList[i]));
             string actuatorName(cs.get(i).getName() + "_actuator");
             actuator->setName(actuatorName);
-            actuator->setOptimalForce(1);
+            actuator->setOptimalForce(optForce);
             actuator->setMaxControl(control);
             actuator->setMinControl(-control);
             model.addForce(actuator);
@@ -307,12 +261,26 @@ void addCoordinateActuators(OpenSim::Model& model, double control, bool removeMu
     }
 }
 
-void calculateIntersegmentaForcesWithOpensim(std::string modelFilename, const OpenSim::Storage& kinematics, const string& externalLoadsFilename, const vector<double>& timeColumn, std::string outputDir) {
+void calculateIntersegmentaForcesWithOpensim(
+    std::string modelFilename, 
+    const OpenSim::Storage& kinematics, 
+    const string& externalLoadsFilename, 
+    std::string outputDir) {
 
     OpenSim::Model model(modelFilename);
-    double firstTime = timeColumn.front();
-    double lastTime = timeColumn.back();
-    addCoordinateActuators(model, 200000, true);
+    double firstTime = kinematics.getFirstTime();
+    double lastTime = kinematics.getLastTime();
+    OpenSim::Array<string> coordsOS;
+    model.getCoordinateSet().getNames(coordsOS);
+    std::vector<string> coords = ArrayConverter::toStdVector(coordsOS);
+ //   std::vector<string> coordsToRemove{ "pelvis_tilt", "pelvis_list", "pelvis_rotation", "pelvis_tx", "pelvis_ty", "pelvis_tz" };
+    std::vector<string> coordsToRemove{ };
+    std::vector<string> diff;
+    std::sort(coords.begin(), coords.end());
+    std::sort(coordsToRemove.begin(), coordsToRemove.end());
+    std::set_difference(coords.begin(), coords.end(), coordsToRemove.begin(), coordsToRemove.end(),
+        std::inserter(diff, diff.begin()));
+    addCoordinateActuators(model, 100000, 100000, true, diff);
     model.print(outputDir + "/musclelessModel.osim");
     OpenSim::Model modelJR = model;
     SimTK::State state = model.initSystem();
@@ -342,6 +310,83 @@ void calculateIntersegmentaForcesWithOpensim(std::string modelFilename, const Op
         analTool.setPrintResultFiles(true);
         analTool.setSolveForEquilibrium(false);
         analTool.setLowpassCutoffFrequency(8);
+        analTool.setReplaceForceSet(true);
+    });
+
+    //static opt
+    OpenSim::StaticOptimization* sopt = new OpenSim::StaticOptimization(&model);
+    model.addAnalysis(sopt);
+    OpenSim::AnalyzeTool analiseToolForSO(model);
+    setupAnalTool(analiseToolForSO, state);
+    analiseToolForSO.run();
+    sopt->printResults("", outputDir);
+    model.removeAnalysis(sopt, false);
+
+    //joint reaction
+    SimTK::State stateJR = modelJR.initSystem();
+    OpenSim::JointReaction* jreact = new OpenSim::JointReaction(&modelJR);
+    modelJR.addAnalysis(jreact);
+    OpenSim::Array<string> jointNames;
+    modelJR.getJointSet().getNames(jointNames);
+    jreact->setForcesFileName("_StaticOptimization_force.sto");
+    jreact->setJointNames(jointNames);
+    jreact->print("JRsetup.xml");
+    jreact->setName("JointReactionIntF");
+    OpenSim::AnalyzeTool analiseToolForJR(modelJR);
+    setupAnalTool(analiseToolForJR, stateJR);
+    analiseToolForJR.run();
+    jreact->printResults("", outputDir);
+}
+
+
+void calculateReactionForcesWithOpensim(
+    std::string modelFilename,
+    const OpenSim::Storage& kinematics,
+    const string& externalLoadsFilename,
+    std::string outputDir) {
+
+    OpenSim::Model model(modelFilename);
+    double firstTime = kinematics.getFirstTime();
+    double lastTime = kinematics.getLastTime();
+    OpenSim::Array<string> coordsOS;
+    model.getCoordinateSet().getNames(coordsOS);
+    std::vector<string> coords = ArrayConverter::toStdVector(coordsOS);
+    std::vector<string> coordsToRemove{ "pelvis_tilt", "pelvis_list", "pelvis_rotation", "pelvis_tx", "pelvis_ty", "pelvis_tz" };
+    std::vector<string> diff;
+    std::sort(coords.begin(), coords.end());
+    std::sort(coordsToRemove.begin(), coordsToRemove.end());
+    std::set_difference(coords.begin(), coords.end(), coordsToRemove.begin(), coordsToRemove.end(),
+        std::inserter(diff, diff.begin()));
+    addCoordinateActuators(model, 100000, 100000, true, diff);
+    model.print(outputDir + "/static_opt_model.osim");
+    OpenSim::Model modelJR = model;
+    SimTK::State state = model.initSystem();
+
+    auto setupAnalTool([&](OpenSim::AnalyzeTool& analTool, const SimTK::State& modelState) {
+        //      analTool.setCoordinatesFileName(kinematicsFilename);
+        path p(externalLoadsFilename);
+        path baseDir(p.parent_path());
+        OpenSim::ExternalLoads externalLoads(model, externalLoadsFilename);
+        auto forcesFilename = externalLoads.getDataFileName();
+        if (!FileUtils::isAbsolute(forcesFilename.c_str())) {
+            forcesFilename = (baseDir / forcesFilename).string();
+            externalLoads.setDataFileName(forcesFilename);
+        }
+        auto ikFilename = externalLoads.getExternalLoadsModelKinematicsFileName();
+        if (!FileUtils::isAbsolute(ikFilename.c_str())) {
+            ikFilename = (baseDir / ikFilename).string();
+            externalLoads.setExternalLoadsModelKinematicsFileName(ikFilename);
+        }
+        //     std::string correctExtLoads((baseDir / "fixedExtLoads.xml").string());
+        //     externalLoads.print(correctExtLoads);
+        //     analTool.setExternalLoadsFileName(correctExtLoads);
+        analTool.setStatesFromMotion(modelState, kinematics, true);
+        analTool.updExternalLoads().setDataFileName(forcesFilename);
+        analTool.setStartTime(firstTime);
+        analTool.setFinalTime(lastTime);
+        analTool.setPrintResultFiles(true);
+        analTool.setSolveForEquilibrium(false);
+        analTool.setLowpassCutoffFrequency(6);
         analTool.setReplaceForceSet(true);
     });
 
@@ -567,8 +612,20 @@ int main() {
     string outputDir(outputPath.string());
     string osimModelFilename((inputPath / "model.osim").string());
     string kinematicsStorageFilename((inputPath / "ik.mot").string());
-    string externalLoadsXmlFilename((inputPath / "ExtForcesSetup.xml").string());
+    string externalLoadsXmlFilename((inputPath / "ExtForcesSetup_gui.xml").string());
     
+    OpenSim::Storage kinematics(kinematicsStorageFilename);
+    double fc = 6;
+     if (fc > 0) {
+        double first = kinematics.getFirstTime();
+        double last = kinematics.getLastTime();
+
+        kinematics.pad(kinematics.getSize() / 2.);
+        kinematics.lowpassIIR(fc);
+        kinematics.crop(first, last);
+    }
+
+
     KriggGenericCF krigg(osimModelFilename, kinematicsStorageFilename, externalLoadsXmlFilename);
     cout << "Number of muscles in Krigg model: " << krigg.getMusclesSize() << endl;
     cout << "Number of frames in Krigg model: " << krigg.getFrameNumber() << endl;
@@ -590,34 +647,25 @@ int main() {
         externalLoadsXmlFilename,
         outputDir);
 
-
+    calculateIntersegmentaForcesWithOpensim(osimModelFilename, kinematics, externalLoadsXmlFilename, outputDir);
     //calculate reaction forces
+    return 0;
+    calculateReactionForcesWithOpensim(osimModelFilename, kinematics, externalLoadsXmlFilename, outputDir);
+    Storage muscleForcesFromStaticOpt((outputPath / "_StaticOptimization_force.sto").string());
+    OpenSim::Array<string> muscleNames;
+    model.getMuscles().getNames(muscleNames);
     //populate muscle forces with random values
-    std::random_device randDev;
-    std::default_random_engine randomEngine(randDev());
-    std::uniform_real_distribution<double> uniformDistAmplitude(0, 500);
-    double amplitude = uniformDistAmplitude(randomEngine);
-    std::uniform_real_distribution<double> uniformDistPhase(0, 2*SimTK::Pi);
-    double phase = uniformDistPhase(randomEngine);
-    std::uniform_real_distribution<double> uniformDistFreq(1, 6);
-    double freq = uniformDistFreq(randomEngine);
     auto timeColumm = krigg.getTimeColumn();
     for (int c(0); c < muscleForces.getNColumns(); ++c) {
-        for (int r(0); r < muscleForces.getNRows(); ++r) {
-        //    muscleForces.at(r, c) = amplitude / 2. + amplitude*std::sin(2 * SimTK::Pi*freq*timeColumm.at(r) + phase);
-            muscleForces.at(r, c) = 1;
+        OpenSim::Array<double> currentData;
+        muscleForcesFromStaticOpt.getDataColumn(muscleNames.get(c), currentData);
+        for(int r(0); r < muscleForces.getNRows(); ++r) {
+            muscleForces.at(r, c) = currentData[r];
             muscleForces.setTime(timeColumm.at(r), r);
         }
     }
     auto reactionForces(krigg.getReactionForces(muscleForces));
     printDataTable(reactionForces, outputDir, "krigg_reaction1.sto");
-/*
-    calculateReactionForcesWithCEINMS(
-        osimModelFilename,
-        kinematicsStorageFilename,
-        externalLoadsXmlFilename,
-        muscleForces,
-        outputDir);
-        */
+
     return 0;
 }

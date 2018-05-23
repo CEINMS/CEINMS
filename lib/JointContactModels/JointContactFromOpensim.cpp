@@ -73,7 +73,7 @@ namespace ceinms {
             actuator->setCoordinate(&cs.get(i));
             string actuatorName(cs.get(i).getName() + "_actuator_ceinms");
             actuator->setName(actuatorName);
-            actuator->setOptimalForce(1);
+            actuator->setOptimalForce(10000);
             actuator->setMaxControl(100000);
             actuator->setMinControl(-100000);
             model_.addForce(actuator);
@@ -135,7 +135,7 @@ namespace ceinms {
             actuator->setCoordinate(&cs.get(i));
             string actuatorName(cs.get(i).getName() + "_actuator_ceinms");
             actuator->setName(actuatorName);
-            actuator->setOptimalForce(1);
+            actuator->setOptimalForce(10000);
             actuator->setMaxControl(100000);
             actuator->setMinControl(-100000);
             model_.addForce(actuator);
