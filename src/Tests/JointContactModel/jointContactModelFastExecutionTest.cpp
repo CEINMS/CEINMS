@@ -280,7 +280,7 @@ void calculateIntersegmentaForcesWithOpensim(
     std::sort(coordsToRemove.begin(), coordsToRemove.end());
     std::set_difference(coords.begin(), coords.end(), coordsToRemove.begin(), coordsToRemove.end(),
         std::inserter(diff, diff.begin()));
-    addCoordinateActuators(model, 100000, 100000, true, diff);
+    addCoordinateActuators(model, 1, 5000, true, diff);
     model.print(outputDir + "/musclelessModel.osim");
     OpenSim::Model modelJR = model;
     SimTK::State state = model.initSystem();
@@ -310,7 +310,7 @@ void calculateIntersegmentaForcesWithOpensim(
         analTool.setPrintResultFiles(true);
         analTool.setSolveForEquilibrium(false);
         analTool.setLowpassCutoffFrequency(8);
-        analTool.setReplaceForceSet(true);
+        analTool.setReplaceForceSet(false);
     });
 
     //static opt
@@ -326,12 +326,16 @@ void calculateIntersegmentaForcesWithOpensim(
     SimTK::State stateJR = modelJR.initSystem();
     OpenSim::JointReaction* jreact = new OpenSim::JointReaction(&modelJR);
     modelJR.addAnalysis(jreact);
+    modelJR.print(outputDir + "/jr_musclelessModel.osim");
     OpenSim::Array<string> jointNames;
     modelJR.getJointSet().getNames(jointNames);
     jreact->setForcesFileName("_StaticOptimization_force.sto");
     jreact->setJointNames(jointNames);
     jreact->print("JRsetup.xml");
     jreact->setName("JointReactionIntF");
+    //OpenSim::Array<std::string> onBody;
+    //onBody.append("child");
+    //jreact->setOnBody(onBody);
     OpenSim::AnalyzeTool analiseToolForJR(modelJR);
     setupAnalTool(analiseToolForJR, stateJR);
     analiseToolForJR.run();
@@ -351,13 +355,15 @@ void calculateReactionForcesWithOpensim(
     OpenSim::Array<string> coordsOS;
     model.getCoordinateSet().getNames(coordsOS);
     std::vector<string> coords = ArrayConverter::toStdVector(coordsOS);
-    std::vector<string> coordsToRemove{ "pelvis_tilt", "pelvis_list", "pelvis_rotation", "pelvis_tx", "pelvis_ty", "pelvis_tz" };
+//    std::vector<string> coordsToRemove{ "pelvis_tilt", "pelvis_list", "pelvis_rotation", "pelvis_tx", "pelvis_ty", "pelvis_tz" };
+    std::vector<string> coordsToRemove{};
+
     std::vector<string> diff;
     std::sort(coords.begin(), coords.end());
     std::sort(coordsToRemove.begin(), coordsToRemove.end());
     std::set_difference(coords.begin(), coords.end(), coordsToRemove.begin(), coordsToRemove.end(),
         std::inserter(diff, diff.begin()));
-    addCoordinateActuators(model, 100000, 100000, true, diff);
+    addCoordinateActuators(model, 1, 1000, true, diff);
     model.print(outputDir + "/static_opt_model.osim");
     OpenSim::Model modelJR = model;
     SimTK::State state = model.initSystem();
@@ -387,7 +393,7 @@ void calculateReactionForcesWithOpensim(
         analTool.setPrintResultFiles(true);
         analTool.setSolveForEquilibrium(false);
         analTool.setLowpassCutoffFrequency(6);
-        analTool.setReplaceForceSet(true);
+        analTool.setReplaceForceSet(false);
     });
 
     //static opt
@@ -403,6 +409,7 @@ void calculateReactionForcesWithOpensim(
     SimTK::State stateJR = modelJR.initSystem();
     OpenSim::JointReaction* jreact = new OpenSim::JointReaction(&modelJR);
     modelJR.addAnalysis(jreact);
+    modelJR.print(outputDir + "/joint_reaction_model.osim");
     OpenSim::Array<string> jointNames;
     modelJR.getJointSet().getNames(jointNames);
     jreact->setForcesFileName("_StaticOptimization_force.sto");
