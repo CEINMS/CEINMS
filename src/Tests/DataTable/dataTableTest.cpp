@@ -75,5 +75,16 @@ int main() {
 
     cout << "Table 2 minus Table 1:" << endl;
     cout << t2 - t1;
+
+    // Test cropping gata table
+    cout << "Testing table cropping" << endl;
+    DataTable<double> t4;
+    for (int i(0); i < 1000; ++i) {
+        t4.pushRow(i*0.1, { i * 10., i * 20. });
+    }
+    t4.crop(10.01, 13.07);
+    cout << t4;
+
+
     return 0;
 }

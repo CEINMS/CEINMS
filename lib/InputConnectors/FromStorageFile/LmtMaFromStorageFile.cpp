@@ -38,7 +38,9 @@ using std::string;
 #include <vector>
 using std::vector;
 #include <cstdlib>
-
+#include <thread>
+#include <chrono>
+using namespace std::chrono_literals;
 #define LOG
 
 namespace ceinms {
@@ -50,6 +52,9 @@ namespace ceinms {
         double time;
         while (lmtData_.areStillData())
         {
+
+    
+       //     std::this_thread::sleep_for(5ms);
             lmtData_.readNextData();
             auto newLmtData = lmtData_.getCurrentData();
             time = lmtData_.getCurrentTime(); //lmt and momentArms times are equal, ALWAYS!

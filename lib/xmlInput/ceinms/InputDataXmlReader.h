@@ -43,7 +43,8 @@ namespace ceinms {
         std::string getExternalTorqueFile(bool relative = false);
         std::string getMotionFile(bool relative = false) const;
         std::string getExternalLoadsFile(bool relative = false) const;
-
+        double getStartTime() const;
+        double getStopTime() const;
     private:
         void readXml();
         std::string filepath_;

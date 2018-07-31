@@ -177,4 +177,18 @@ namespace ceinms {
             return "";
         }
     }
+
+    double  InputDataXmlReader::getStartTime() const {
+
+        if (inputDataPointer_->startStopTime().size() > 0) 
+            return inputDataPointer_->startStopTime().begin()->at(0);
+        return -1;
+    }
+
+    double  InputDataXmlReader::getStopTime() const {
+
+        if (inputDataPointer_->startStopTime().size() > 0)
+            return inputDataPointer_->startStopTime().begin()->at(1);
+        return -1;
+    }
 }

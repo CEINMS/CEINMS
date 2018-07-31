@@ -89,6 +89,7 @@ namespace ceinms {
         const DataTable<double>& getQdd() const { return qdd_; }
         std::string getOpenSimModelFile() const { return openSimModelFile_; }
         std::string getExternalLoadFile() const { return externalLoadsFile_; }
+        void crop(double startTime, double stopTime);
     private:
         std::string id_;
         std::vector<std::string> dofNames_, muscleNames_;

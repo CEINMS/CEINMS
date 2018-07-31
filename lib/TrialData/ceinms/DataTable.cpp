@@ -28,6 +28,7 @@
 
 #include <algorithm>
 #include <stdexcept>
+#include <algorithm>
 
 namespace ceinms {
 
@@ -195,6 +196,24 @@ namespace ceinms {
             nCols_ == rhs.nCols_  &&
             nRows_ == rhs.nRows_);
 
+    }
+
+    template<typename T>
+    void DataTable<T>::crop(double startTime, double stopTime) {
+
+        auto timeStartIt = std::lower_bound(time_.begin(), time_.end(), startTime);
+        auto timeStopIt = std::upper_bound(time_.begin(), time_.end(), stopTime);
+        if (timeStartIt == time_.end() || timeStopIt == time_.end()) {
+            std::cout << "WARNING: Cannot crop DataTable\n";
+            return;
+        }
+        auto startIdx = std::distance(time_.begin(), timeStartIt);
+        auto stopIdx = std::distance(time_.begin(), timeStopIt);
+        time_ = std::vector<double>(timeStartIt, timeStopIt);
+        auto dataStartIt = std::next(data_.begin(), startIdx);
+        auto dataStopIt = std::next(data_.begin(), stopIdx);
+        data_ = std::vector<std::vector<T>>(dataStartIt, dataStopIt);
+        nRows_ = data_.size();
 
     }
 

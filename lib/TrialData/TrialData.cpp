@@ -174,5 +174,27 @@ namespace ceinms {
 
         }
     }
+    void TrialData::crop(double startTime, double stopTime) {
+
+        if (hasEmgData_) {
+            emgData_.crop(startTime, stopTime);
+        }
+
+        if (hasLmtMaData_) {
+            lmtData_.crop(startTime, stopTime);
+            for (auto& ma : maData_)
+                ma.crop(startTime, stopTime);
+        }
         
+        if (hasTorqueData_) {
+            torqueData_.crop(startTime, stopTime);
+        }
+
+        if (hasOpenSimData_) {
+            q_.crop(startTime, stopTime);
+            qd_.crop(startTime, stopTime);
+            qdd_.crop(startTime, stopTime);
+        }
+
+    }
 }

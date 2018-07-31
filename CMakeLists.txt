@@ -37,14 +37,16 @@ set(Boost_USE_MULTITHREADED ON)
 find_package(Boost REQUIRED COMPONENTS filesystem system)
 
 find_package(XSD REQUIRED)
-
 find_package(XERCES REQUIRED)
-
 find_package(OpenSim REQUIRED)
-
-#find_package(mcbs REQUIRED)
-
-#find_package(osimSpliner REQUIRED)
+find_package(mcbs REQUIRED)
+find_package(Filter REQUIRED)
+find_package(MR3tools REQUIRED)
+find_package(IKExtended REQUIRED)
+find_package(RTOSIM REQUIRED)
+find_package(Plsr REQUIRED)
+find_package(Concurrency REQUIRED)
+find_package(osimSpliner REQUIRED)
 
 
 # Choose common build locations for executables and libraries

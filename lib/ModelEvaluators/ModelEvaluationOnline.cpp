@@ -39,7 +39,7 @@ using std::string;
 #include "ceinms/EndOfData.h"
 
 #define LOG_FILES
-#define LOG
+//#define LOG
 
 namespace ceinms {
     template <typename NMSmodelT, typename Logger>
@@ -74,7 +74,6 @@ namespace ceinms {
     template <typename NMSmodelT, typename Logger>
     void ModelEvaluationOnline<NMSmodelT, Logger>::operator()() {
 
-        ModelEvaluationBase<Logger>::doneWithSubscriptions();
 
 #ifdef LOG
         cout << "starting consume" << endl;
@@ -87,6 +86,8 @@ namespace ceinms {
         bool firstLmtArrived(false);
         bool externalTorquesRunCondition(true); //we first assume there are ext forces
         cout << subject_ << endl;
+
+        ModelEvaluationBase<Logger>::doneWithSubscriptions();
         do {  // while(runCondition)
 
             // 1. read lmt Data

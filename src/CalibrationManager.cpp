@@ -297,6 +297,12 @@ namespace ceinms {
         }
         
         auto trial(queuesToTrialData.getTrialData());
+        double start = dataLocations.getStartTime();
+        double stop = dataLocations.getStopTime();
+        if (start > 0 && stop > 0 && start < stop) {
+            trial.crop(start, stop);
+            std::cout << "Cropping trial: " << start << ", " << stop << endl;
+        }
         if (mySubject.hasOpenSimModel())
             trial.setOpenSimData(mySubject.getOpenSimModelFilename(), dataLocations.getExternalLoadsFile(), dataLocations.getMotionFile());
         return trial;

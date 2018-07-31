@@ -6,6 +6,10 @@
         <xs:documentation xml:lang="en"/>
     </xs:annotation>
 
+  <xs:simpleType name="TwoDoublesType">
+    <xs:list itemType="xs:double"/>
+  </xs:simpleType>
+  
     <xs:complexType name="momentArmsFileType">
         <xs:simpleContent>
             <xs:extension base="xs:string">
@@ -27,8 +31,10 @@
                 <xs:element maxOccurs="1" name="externalTorquesFile" type="xs:string"/>
                 <xs:element maxOccurs="1" name="motionFile" type="xs:token"/>
                 <xs:element maxOccurs="1" name="externalLoadsFile" type="xs:token"/>
+                <xs:element maxOccurs="1" name="startStopTime" type="TwoDoublesType"/>
             </xs:choice>
         </xs:sequence>
     </xs:complexType>
     <xs:element name="inputData" type="InputDataType"/>
+  
 </xs:schema>

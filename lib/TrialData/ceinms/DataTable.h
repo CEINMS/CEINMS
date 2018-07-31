@@ -75,6 +75,7 @@ namespace ceinms {
 
         bool equals(const DataTable& rhs) const;
         friend std::ostream& operator<< <> (std::ostream& output, const DataTable& ths);
+        void crop(double startTime, double stopTime);
     private:
         size_t nRows_, nCols_;
         //internal implementation may be changed to something better.. e.g. nice matrices
