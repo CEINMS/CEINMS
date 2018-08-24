@@ -135,14 +135,14 @@ bool testMaxPeak() {
     for (int i(0); i < 3; ++i) {
         Result result(0, 6, 0, 0);
         result.torques = DataTable<double>::multiplyByScalar(trials[i].getTorqueData(), 1.1);
-        result.planarContactForces = getContactForces();
+        result.scalarContactForces = getContactForces();
         result.jointReactionForces = getGenericContactForces();
         results.push_back(result);
     }
 
     ObjectiveFunctionSetup setup(
         CalibrationObjectiveFunction::MaxPeak,
-        CalibrationTargetType::PlanarContactForce,
+        CalibrationTargetType::ScalarContactForce,
         getCondyleNames(), 1, 1);
 
     bool isValid = true;
@@ -225,7 +225,7 @@ bool testCompositeFuntion() {
         Result result(0, 6, 0, 0);
         result.normalisedFibreLengths = getNormalisedFibreLengths();
         result.torques = DataTable<double>::multiplyByScalar(trials[i].getTorqueData(), 1.1);
-        result.planarContactForces = getContactForces();
+        result.scalarContactForces = getContactForces();
         results.push_back(result);
     }
     bool isValid = true;
@@ -233,7 +233,7 @@ bool testCompositeFuntion() {
     std::shared_ptr<ObjectiveFunctionSetup> obf1(
         new ObjectiveFunctionSetup(
             CalibrationObjectiveFunction::MaxPeak,
-            CalibrationTargetType::PlanarContactForce,
+            CalibrationTargetType::ScalarContactForce,
             getCondyleNames(), 0.001, 1));
   
     std::shared_ptr<ObjectiveFunctionSetup> obf2(

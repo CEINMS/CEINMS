@@ -50,8 +50,8 @@ namespace ceinms {
             vector<double> maxes;
             if (setup_.getCalibrationTargetType() == CalibrationTargetType::Activation)
                 maxes = calculate(r.activations);
-            else if (setup_.getCalibrationTargetType() == CalibrationTargetType::PlanarContactForce)
-                maxes = calculate(r.planarContactForces);
+            else if (setup_.getCalibrationTargetType() == CalibrationTargetType::ScalarContactForce)
+                maxes = calculate(r.scalarContactForces);
             else if (setup_.getCalibrationTargetType() == CalibrationTargetType::GenericContactForce)
                 maxes = calculate(r.jointReactionForces);
             else if (setup_.getCalibrationTargetType() == CalibrationTargetType::NormalisedFibreLength)

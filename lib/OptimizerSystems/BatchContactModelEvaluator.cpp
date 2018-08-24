@@ -54,7 +54,7 @@ void BatchContactModelEvaluator::evaluate(const std::vector<Result>& resultsFrom
 void BatchContactModelEvaluator::updateResults(std::vector<Result>& results) const {
 
     for (unsigned i(0); i < results.size(); ++i) {
-        results.at(i).planarContactForces = contactForcesResults_.at(i);
+        results.at(i).scalarContactForces = contactForcesResults_.at(i);
     }
 }
 

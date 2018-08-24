@@ -51,7 +51,7 @@ namespace ceinms {
         NormalisedFibreLength,
         NormalisedFibreVelocity,
         PennationAngle,
-        PlanarContactForce,
+        ScalarContactForce,
         GenericContactForce,
         None
     };
@@ -146,7 +146,7 @@ namespace ceinms {
                 { CalibrationTargetType::NormalisedFibreLength,"Normalised Fibre Length" },
                 { CalibrationTargetType::NormalisedFibreVelocity,"Normalised Fibre Velocity" },
                 { CalibrationTargetType::PennationAngle,"Pennation Angle" },
-                { CalibrationTargetType::PlanarContactForce,"Planar Contact Force" },
+                { CalibrationTargetType::ScalarContactForce,"Scalar Contact Force" },
                 { CalibrationTargetType::Torque,"Torque" },
                 { CalibrationTargetType::None,"Not Found" }
             };

@@ -171,7 +171,7 @@ namespace ceinms {
             { "normalisedFibreLength", CalibrationTargetType::NormalisedFibreLength},
             { "normalisedFibreVelocity", CalibrationTargetType::NormalisedFibreVelocity},
             { "pennationAngle", CalibrationTargetType::PennationAngle },
-            { "contactForce", CalibrationTargetType::PlanarContactForce},
+            { "scalarContactForce", CalibrationTargetType::ScalarContactForce},
             { "torque", CalibrationTargetType::Torque },
             { "none", CalibrationTargetType::None }
         };

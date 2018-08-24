@@ -82,6 +82,7 @@
 #include "SimulationManager.h"
 #include "ceinms/SimulatedAnnealing.h"
 #include "ceinms/FileUtils.h"
+
 #include <numeric>
 #include <algorithm>
 #include <string>
@@ -293,7 +294,7 @@ private:
         });
 
         auto runGridParallel([&](vector<double> betas, vector<double> gammas) {
-
+            int threadCount = 0;
             std::vector<std::future<HybridErrors>> futures;
             for (auto beta : betas)
                 for (auto gamma : gammas) {
@@ -301,11 +302,13 @@ private:
                         return f(beta, gamma, subject, trial); }
                     ));
                     futures.emplace_back(std::move(fut));
+                    std::cout << "Creating thread " << ++threadCount << "/" << gammas.size()*betas.size() << std::endl;
                 }
 
             std::vector<HybridErrors> values;
             for (auto& f : futures) {
                 f.wait();
+                std::cout << "Joining thread " << --threadCount << "/" << gammas.size()*betas.size() << std::endl;
                 values.emplace_back(f.get());
             }
             return values;
@@ -320,38 +323,12 @@ private:
             }
             return v;
         });
-
-
-        auto betas = getVec(1, 2, 1);
-        auto gammas = getVec(0, 2, 0.1);
-        auto values = runGridParallel(betas, gammas);
-
-        std::sort(values.begin(), values.end(), [](auto e1, auto e2) {
-            if ((e1.beta - e2.beta) < 0.00001)
-                return e1.gamma < e2.gamma;
-            return e1.beta < e2.beta;
-        });
-
-        std::ofstream outF("values.csv");
-            for (auto& v : values) {
-                outF << v.beta << "," << v.gamma << "," << v.torqueError << "," << v.trackError << "\n";
-        }
-
-
-        /*
-        auto getVec([](int min, int max, int nSteps) {
-            vector<double> v;
-            int step = (max - min) / nSteps;
-            for (min; min < max; min += step) {
-                v.push_back(min);
-            }
-            return v;
-        });
-        int bmin = 1, bmax = 31, gmin = 1, gmax = 301;
+       
+        double bmin = 1, bmax = 2, bdelta=1, gmin = 1, gmax = 50, gdelta=5;
         std::vector<HybridErrors> values;
-        vector<double> betas = getVec(bmin, bmax,5);
-        vector<double> gammas = getVec(gmin, gmax,5);
-        values = runGrid(betas, gammas);
+        vector<double> betas = getVec(bmin, bmax,bdelta);
+        vector<double> gammas = getVec(gmin, gmax,gdelta);
+        values = runGridParallel(betas, gammas);
         double maxTorque = std::max_element(values.begin(), values.end(), [](auto e1, auto e2) {
             return e1.torqueError < e2.torqueError;
         })->torqueError;
@@ -364,218 +341,41 @@ private:
             return v1 < v2;
         });
           
-        bool terminate = false;
-        while (!terminate) {
-            cout << "bmin = " << bmin << "\n"
-                << "bmax = " << bmax << "\n"
-                << "gmin = " << gmin << "\n"
-                << "gmax = " << gmax << "\n";
 
-            bmin = (lowest.beta + bmin) / 2;
-            bmax = (lowest.beta + bmax) / 2;
-            gmin = (lowest.gamma + gmin) / 2;
-            gmax = (lowest.gamma + gmax) / 2;
+        cout << "bmin = " << bmin << "\n"
+            << "bmax = " << bmax << "\n"
+            << "gmin = " << gmin << "\n"
+            << "gmax = " << gmax << "\n";
 
-            betas = getVec(bmin, bmax, 5);
-            gammas = getVec(gmin, gmax, 5);
-            terminate = (betas.size() == 1) && (gammas.size() == 1);
-            values = runGrid(betas, gammas);
-            HybridErrors lowest = *std::min_element(values.begin(), values.end(), [maxTorque, maxTrack](auto e1, auto e2) {
-                double v1 = std::pow(e1.torqueError / maxTorque, 2) + std::pow(e1.trackError / maxTrack, 2);
-                double v2 = std::pow(e2.torqueError / maxTorque, 2) + std::pow(e2.trackError / maxTrack, 2);
-                return v1 < v2;
-            });
+        bmin = std::max((lowest.beta - bdelta),bmin);
+        bmax = std::min((lowest.beta + bdelta), bmax);
+        gmin = std::max((lowest.gamma - gdelta), gmin);
+        gmax = std::min((lowest.gamma + gdelta), gmax);
+        
+        betas = getVec(bmin, bmax, 1);
+        gammas = getVec(gmin, gmax, 1);
 
-            cout << "lowest\nbeta = " << lowest.beta << "\ngamma = " << lowest.gamma << endl;
-            cout << "f = " << std::pow(lowest.torqueError / maxTorque, 2) + std::pow(lowest.trackError / maxTrack, 2) << endl;
-        }
+        values = runGridParallel(betas, gammas);
+        lowest = *std::min_element(values.begin(), values.end(), [maxTorque, maxTrack](auto e1, auto e2) {
+            double v1 = std::pow(e1.torqueError / maxTorque, 2) + std::pow(e1.trackError / maxTrack, 2);
+            double v2 = std::pow(e2.torqueError / maxTorque, 2) + std::pow(e2.trackError / maxTrack, 2);
+            return v1 < v2;
+        });
 
+        cout << "lowest\nbeta = " << lowest.beta << "\ngamma = " << lowest.gamma << endl;
+        cout << "f = " << std::pow(lowest.torqueError / maxTorque, 2) + std::pow(lowest.trackError / maxTrack, 2) << endl;
+        
         std::cout << "Optimal values:\n"
             "alpha = " << 1 << "\n"
             "beta  = " << lowest.beta << "\n"
             "gamma  = " << lowest.gamma << "\n";
-        */
-        /*
-        class WeightingOptimiserSystem : public ceinms::Optimizers::AbstractOptimizerSystem {
-        public:
-            WeightingOptimiserSystem(NMSmodelT subject, ceinms::TrialData trial, ceinms::ExecutionXmlReader executionCfg) :
-                subject_(subject), trial_(trial), executionCfg_(executionCfg),
-                beta_(1), gamma_(1), torqueError_(0), trackError_(0), maxTorqueError_(1), maxTrackError_(1) {
-            
-                // Evaluate max torque error and track error to normalise objective function 
-                gamma_ = 0;
-                beta_ = 300;
-                evaluate();
-                maxTrackError_ = trackError_;
-                gamma_ = 300;
-                evaluate();
-                maxTorqueError_ = torqueError_;
-
-                beta_ = 1;
-                gamma_ = 1;
-            }
-
-            virtual void evaluate() {
-   
-                int nMtu = subject_.getNoMuscles();
-                int nDofs = subject_.getNoDoF();
-                ceinms::Result results(nMtu, nDofs, trial_.getEmgData().getNRows(), trial_.getLmtData().getNRows());
-                vector<unsigned> musclesToUpdate;
-                subject_.getMusclesIndexFromMusclesList(musclesToUpdate, subject_.getMuscleNames());
-                ceinms::EmgInformedObjectiveFunctionSetup setup;
-                executionCfg_.getMusclesToAdjust(setup.musclesToAdjust);
-                executionCfg_.getMusclesToSynthesise(setup.musclesToSynthesise);
-                executionCfg_.getHybridWeightings(setup.weightings.alpha, setup.weightings.beta, setup.weightings.gamma);
-                setup.weightings.alpha = 1;
-                setup.weightings.beta = beta_;
-                setup.weightings.gamma = gamma_;
-                ceinms::HybridEvaluator::evaluate(subject_, trial_, setup, musclesToUpdate, results);
-                std::vector<double> torqueErrors(results.errors.getColumn("TorqueError"));
-                torqueError_ = std::accumulate(torqueErrors.begin(), torqueErrors.end(), 0.) / torqueErrors.size();
-                std::vector<double> trackingError(results.errors.getColumn("ExcitationTrackingError"));
-                trackError_ = std::accumulate(trackingError.begin(), trackingError.end(), 0.) / trackingError.size();
-            }
-            virtual void setParameters(const std::vector<double>& x) {
-                beta_ = x[0];
-                gamma_ = x[1];
-            }
-
-            virtual std::vector<double> getParameters() const {
-
-                return vector<double>{beta_, gamma_};
-            }
-
-            virtual double getF() const {
-               double f = (torqueError_ / maxTorqueError_) + (trackError_ / maxTrackError_);
-               cout << "f(" << beta_ << "," << gamma_ << ")=" << f << endl;
-               return f;
-            }
-
-
-            virtual std::size_t getNoParameters() const {
-                return 2;
-            }
-
-            void getUpperLowerBounds(std::vector<double>& upperBounds, std::vector<double>& lowerBounds) const {
-
-                upperBounds.resize(getNoParameters());
-                upperBounds[0] = 300;
-                upperBounds[1] = 300;
-
-                lowerBounds.resize(getNoParameters());
-                lowerBounds[0] = .1;
-                lowerBounds[1] = .1;
-            }
-
-        private:
-            NMSmodelT subject_;
-            ceinms::TrialData trial_;
-            ceinms::ExecutionXmlReader executionCfg_;
-            double beta_, gamma_, trackError_, torqueError_, maxTorqueError_, maxTrackError_;
-        };
         
-        WeightingOptimiserSystem system(subject, trial, executionCfg_);
-        ceinms::SimulatedAnnealingParameters params;
-        params.noEpsilon = 2;
-        params.NS = 10;
-        params.NT = 1;
-        params.maxNoEval=500;
-        params.rt = 0.05;
-        params.T = 10000;
-        params.epsilon = 0.01;
-        ceinms::Optimizers::SimulatedAnnealing<WeightingOptimiserSystem> opt(system, params);
-  
-        opt.optimize();
-        auto x = opt.getOptimizedParameters();
-        std::cout << "Optimal values:\n"
-            "alpha = " << 1 << "\n"
-            "beta  = " << x[0] << "\n"
-            "gamma  = " << x[1] << "\n";
-            
-        /*
-        //using variance
-        auto getVariance([](const std::vector<double>& v) {
-            double ans(0);
-            for (auto& e : v)
-                ans += e;
-            double avg(ans / v.size());
-            double var(0), ep(0);
-            for (auto& e : v) {
-                var += (e - avg)*(e - avg);
-                ep += (e - avg);
-            }
-            return ((var - ep*ep / v.size()) / (v.size() - 1)); //adjust roundoff error.. apparently
-        });
-
-
-        auto getMax([](const std::vector<double>& v) {
-            return *std::max_element(v.begin(), v.end());
-        });
-        double torqueVar = getMax(trial.getTorqueData().getColumn(0));
-        double emgVar = 0;
-        for (int i(0); i < trial.getEmgData().getNColumns(); ++i) {
-            emgVar += getMax(trial.getEmgData().getColumn(i));
-        }
-        emgVar *= emgVar;
-        torqueVar *= torqueVar;
-        cout << "var(torque)=" << torqueVar << endl;
-        cout << "var(emg)=" << emgVar<< endl;
-        cout << "gammavar = " << torqueVar / emgVar << endl;
-      
-    //    std::ofstream outF("values.csv");
-    //    for (auto& v : values) {
-    //        outF << v.beta << "," << v.gamma << "," << v.torqueError << "," << v.trackError << "\n";
-    //    }
-        */
-/*
-        auto f([&](double beta, double gamma) {
-            setup.weightings.beta = beta;
-            setup.weightings.gamma = gamma;
-            ceinms::HybridEvaluator::evaluate(subject, trial, setup, musclesToUpdate, results);
-            std::vector<double> torqueErrors(results.errors.getColumn("TorqueError"));
-            double torqueError = std::accumulate(torqueErrors.begin(), torqueErrors.end(), 0.) / torqueErrors.size();
-            std::vector<double> trackingError(results.errors.getColumn("ExcitationTrackingError"));
-            double trackError = std::accumulate(trackingError.begin(), trackingError.end(), 0.) / trackingError.size();
-            double val =  std::pow(torqueError, 2) + std::pow(trackError, 2);
-            cout << "f(" << beta << "," << gamma << ")=" << val << endl;
-            return val;
-        });
-    
-    
-        auto df([&](double beta, double gamma) {
-            const double delta = 0.05;
-            double df1 = (f(beta + delta, gamma) - f(beta - delta, gamma)) / (2* delta);
-            double df2 = (f(beta, gamma + delta) - f(beta, gamma - delta)) / (2* delta);
-            cout << "df(" << beta << "," << gamma << ")/dbeta=" << df1 << endl;
-            cout << "df(" << beta << "," << gamma << ")/dgamma=" << df2 << endl;
-            return vector<double>{df1, df2};
-        });
-
-
-        auto step([&](double beta, double gamma, double stepSize) {
-            
-            auto grad(df(beta, gamma));
-            double beta1 = beta - stepSize*grad[0];
-            double gamma1 = gamma - stepSize*grad[1];
-            return vector<double>{beta1, gamma1};
-        });
-
-
-
-
-
-
-        std::cout << "Optimal values:\n"
-            "alpha = " << 1 << "\n"
-            "beta  = " << x[0] << "\n"
-            "gamma  = " << x[1] << "\n";
-         
-        executionCfg_.setHybridWeightings(1, x[0], x[1]);
+        executionCfg_.setHybridWeightings(1, lowest.beta, lowest.gamma);
         std::string trialId(ceinmsSetup_.getInputDataFile(false));
         size_t endpos = trialId.find(".xml");
         size_t startpos = trialId.rfind("/") + 1;
         trialId = trialId.substr(startpos, endpos - startpos);
-        std::string newExecutionFilename(ceinmsSetup_.getExecutionFile(true));
+        std::string newExecutionFilename(ceinmsSetup_.getExecutionFile(false));
         std::size_t pos = newExecutionFilename.find(".xml");
         if (pos != std::string::npos) {
             newExecutionFilename.insert(pos, "-optimised-"+trialId);
@@ -592,8 +392,7 @@ private:
         std::cout << "Running best solution\n";
         ceinms::SimulationManager simulationManager(newSetupFilename);
         return simulationManager.run();
-        */
-        return true;
+      
     }
 
     ceinms::CeinmsSetupXmlReader ceinmsSetup_;
