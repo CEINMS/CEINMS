@@ -76,6 +76,8 @@
 #include "ceinms/QueuesToTrialData.h"
 
 #include "ceinms/BatchEvaluator.h"
+#include "ceinms/FileUtils.h"
+
 #include <string>
 using std::string;
 
@@ -87,22 +89,6 @@ using std::end;
 using std::begin;
 
 
-void sortMaFilenames(const std::map<std::string, std::string>& maMap, const std::vector< std::string >& dofNames, std::vector< std::string >& maDataFilenames)
-{
-    int currentDof = 0;
-    for (auto& it : dofNames)
-    {
-        try
-        {
-            maDataFilenames.push_back(maMap.at(it));
-        }
-        catch (std::out_of_range)
-        {
-            std::cerr << "Could not find moment arm file for " << it << " degree of freedom" << std::endl;
-            exit(EXIT_FAILURE);
-        }
-    }
-}
 
 double rmse(const std::vector<double>& v1, const std::vector<double>& v2) {
 
@@ -132,7 +118,7 @@ ceinms::TrialData readTrialData(ceinms::InputDataXmlReader dataLocations, NMSmod
     vector< string > dofNames;
     mySubject.getDoFNames(dofNames);
     vector< string > maFilename;
-    sortMaFilenames(dataLocations.getMaFiles(), dofNames, maFilename);
+    ceinms::FileUtils::sortMaFilenames(dataLocations.getMaFiles(), dofNames, maFilename);
     ceinms::LmtMaFromStorageFile lmtMaProducer(lmtQueue, momentArmsQueues, doneWithSubscription, doneWithExecution, mySubject, dataLocations.getLmtFile(), maFilename);
 
     string externalTorqueFilename(dataLocations.getExternalTorqueFile());
@@ -236,7 +222,7 @@ namespace ceinms {
         vector< string > dofNames;
         mySubject.getDoFNames(dofNames);
         vector< string > maFilename;
-        sortMaFilenames(dataLocations_.getMaFiles(), dofNames, maFilename);
+        ceinms::FileUtils::sortMaFilenames(dataLocations_.getMaFiles(), dofNames, maFilename);
         LmtMaFromStorageFile lmtMaProducer(lmtQueue, momentArmsQueues, doneWithSubscriptionsLatch, doneWithExecutionLatch, mySubject, dataLocations_.getLmtFile(), maFilename);
 
         string externalTorqueFilename(dataLocations_.getExternalTorqueFile());
@@ -358,7 +344,7 @@ namespace ceinms {
         vector< string > dofNames;
         mySubject.getDoFNames(dofNames);
         vector< string > maFilename;
-        sortMaFilenames(dataLocations_.getMaFiles(), dofNames, maFilename);
+        ceinms::FileUtils::sortMaFilenames(dataLocations_.getMaFiles(), dofNames, maFilename);
         LmtMaFromStorageFile lmtMaProducer(lmtQueue, momentArmsQueues, doneWithSubscriptionsLatch, doneWithExecutionLatch, mySubject, dataLocations_.getLmtFile(), maFilename);
 
         string externalTorqueFilename(dataLocations_.getExternalTorqueFile());
@@ -528,7 +514,7 @@ namespace ceinms {
         vector< string > dofNames;
         mySubject.getDoFNames(dofNames);
         vector< string > maFilename;
-        sortMaFilenames(dataLocations_.getMaFiles(), dofNames, maFilename);
+        ceinms::FileUtils::sortMaFilenames(dataLocations_.getMaFiles(), dofNames, maFilename);
         LmtMaFromStorageFile lmtMaProducer(lmtQueue, momentArmsQueues, doneWithSubscriptionsLatch, doneWithExecutionLatch, mySubject, dataLocations_.getLmtFile(), maFilename);
 
         string externalTorqueFilename(dataLocations_.getExternalTorqueFile());
@@ -639,7 +625,7 @@ namespace ceinms {
         vector< string > dofNames;
         mySubject.getDoFNames(dofNames);
         vector< string > maFilename;
-        sortMaFilenames(dataLocations_.getMaFiles(), dofNames, maFilename);
+        ceinms::FileUtils::sortMaFilenames(dataLocations_.getMaFiles(), dofNames, maFilename);
         LmtMaFromStorageFile lmtMaProducer(lmtQueue, momentArmsQueues, doneWithSubscriptionsLatch, doneWithExecutionLatch, mySubject, dataLocations_.getLmtFile(), maFilename);
 
         string externalTorqueFilename(dataLocations_.getExternalTorqueFile());
@@ -672,35 +658,7 @@ namespace ceinms {
         if (setup.dofsToTrack.empty())
             setup.dofsToTrack = mySubject.getDoFNames();
 
-        auto trial = readTrialData(dataLocations_, mySubject, emgGeneratorFile_);
-        std::vector<unsigned> musclesToUpdate;
-        mySubject.getMusclesIndexFromMusclesList(musclesToUpdate, mySubject.getMuscleNames());
-        Result results(mySubject.getNoMuscles(), mySubject.getNoDoF(), trial.getEmgData().getNRows(), trial.getLmtData().getNRows());
-        results.setDofNames(mySubject.getDoFNames());
-        results.setMuscleNames(mySubject.getMuscleNames());
-
-        OpenLoopEvaluator::OpenLoopEvaluator::evaluate(mySubject, trial, musclesToUpdate, results);
-        for (const auto& m : setup.dofsToTrack) {
-            auto v1 = results.torques.getColumn(m);
-            auto v2 = trial.getTorqueData().getColumn(m);
-            std::vector<double> diff;
-            std::transform(begin(v1), end(v1),
-                begin(v2), std::back_inserter(diff), [](auto& e1, auto& e2) {
-                return std::abs(e1 - e2);
-            });
-            setup.dofsToTrackTorqueErrors.push_back(
-                *std::max_element(begin(diff), end(diff)));
-        }
-
-
-        setup.musclesToAdjustExcitationErrors.clear();
-        for (const auto& m : setup.musclesToAdjust) {
-            setup.musclesToAdjustExcitationErrors.push_back(1);
-        }
-
-        NMSmodelFrameOptimisation<NMSmodelT> errorMinimizer(mySubject, setup);
-
-   
+        NMSmodelFrameOptimisation<NMSmodelT> errorMinimizer(mySubject, setup); 
         ModelEvaluationHybrid<NMSmodelT, NMSmodelFrameOptimisation<NMSmodelT>, LoggerOnQueues> simulator(
             emgQueue,
             lmtQueue,
@@ -820,7 +778,7 @@ namespace ceinms {
         vector< string > dofNames;
         mySubject.getDoFNames(dofNames);
         vector< string > maFilename;
-        sortMaFilenames(dataLocations_.getMaFiles(), dofNames, maFilename);
+        ceinms::FileUtils::sortMaFilenames(dataLocations_.getMaFiles(), dofNames, maFilename);
         LmtMaFromStorageFile lmtMaProducer(
             lmtQueue, 
             momentArmsQueues, 
@@ -871,24 +829,6 @@ namespace ceinms {
         results.setDofNames(mySubject.getDoFNames());
         results.setMuscleNames(mySubject.getMuscleNames());
 
-        OpenLoopEvaluator::OpenLoopEvaluator::evaluate(mySubject, trial, musclesToUpdate, results);
-        for (const auto& m : setup.dofsToTrack) {
-            auto v1 = results.torques.getColumn(m);
-            auto v2 = trial.getTorqueData().getColumn(m);
-            std::vector<double> diff;
-            std::transform(begin(v1), end(v1),
-                begin(v2), std::back_inserter(diff), [](const auto& e1, const auto& e2) {
-                return std::abs(e1 - e2);
-            });
-            setup.dofsToTrackTorqueErrors.push_back(
-                *std::max_element(begin(diff), end(diff)));
-        }
-
-
-        setup.musclesToAdjustExcitationErrors.clear();
-        for (const auto& m : setup.musclesToAdjust) {
-            setup.musclesToAdjustExcitationErrors.push_back(1);
-        }
         NMSmodelFrameOptimisation<NMSmodelT> errorMinimizer(mySubject, setup);
 
         // 3. define the model simulator
@@ -993,7 +933,7 @@ namespace ceinms {
         vector< string > dofNames;
         mySubject.getDoFNames(dofNames);
         vector< string > maFilename;
-        sortMaFilenames(dataLocations_.getMaFiles(), dofNames, maFilename);
+        ceinms::FileUtils::sortMaFilenames(dataLocations_.getMaFiles(), dofNames, maFilename);
         LmtMaFromStorageFile lmtMaProducer(lmtQueue, momentArmsQueues, doneWithSubscriptionsLatch, doneWithExecutionLatch, mySubject, dataLocations_.getLmtFile(), maFilename);
 
         string externalTorqueFilename(dataLocations_.getExternalTorqueFile());
@@ -1022,37 +962,12 @@ namespace ceinms {
         if (setup.dofsToTrack.empty())
             setup.dofsToTrack = mySubject.getDoFNames();
 
-        auto trial = readTrialData(dataLocations_, mySubject, emgGeneratorFile_);
-        std::vector<unsigned> musclesToUpdate;
-        mySubject.getMusclesIndexFromMusclesList(musclesToUpdate, mySubject.getMuscleNames());
-        Result results(mySubject.getNoMuscles(), mySubject.getNoDoF(), trial.getEmgData().getNRows(), trial.getLmtData().getNRows());
-        results.setDofNames(mySubject.getDoFNames());
-        results.setMuscleNames(mySubject.getMuscleNames());
-
-        OpenLoopEvaluator::OpenLoopEvaluator::evaluate(mySubject, trial, musclesToUpdate, results);
-        for (const auto& m : setup.dofsToTrack) {
-            auto v1 = results.torques.getColumn(m);
-            auto v2 = trial.getTorqueData().getColumn(m);
-            std::vector<double> diff;
-            std::transform(begin(v1), end(v1),
-                begin(v2), std::back_inserter(diff), [](const auto& e1, const auto& e2) {
-                return std::abs(e1 - e2);
-            });
-            setup.dofsToTrackTorqueErrors.push_back(
-                *std::max_element(begin(diff), end(diff)));
-        }
-
-       
-        setup.musclesToAdjustExcitationErrors.clear();
-        for (const auto& m : setup.musclesToAdjust) {
-            setup.musclesToAdjustExcitationErrors.push_back(1);
-        }
-        
+     
         NMSmodelFrameOptimisation<NMSmodelT> errorMinimizer(mySubject, setup);
 
         // 3. define the model simulator
         vector<string> valuesToLog = dataToLog;
-        //save the hybrid values in a semarate file
+        //save the hybrid values in a separate file
         valuesToLog.push_back("ObjectiveFunctionComponentsAndWeightings");
 
         ModelEvaluationHybrid<NMSmodelT, NMSmodelFrameOptimisation<NMSmodelT>, LoggerOnQueues> simulator(
@@ -1160,20 +1075,4 @@ namespace ceinms {
         return exitFlag;
     }
 
-    void SimulationManager::sortMaFilenames(const std::map<std::string, std::string>& maMap, const std::vector< std::string >& dofNames, std::vector< std::string >& maDataFilenames)
-    {
-        int currentDof = 0;
-        for (auto& it : dofNames)
-        {
-            try
-            {
-                maDataFilenames.push_back(maMap.at(it));
-            }
-            catch (std::out_of_range)
-            {
-                std::cerr << "Could not find moment arm file for " << it << " degree of freedom" << std::endl;
-                exit(EXIT_FAILURE);
-            }
-        }
-    }
 }

@@ -63,7 +63,7 @@ namespace ceinms {
         subject.getMusclesParameters(subjectParameters_);
         updMusclesToUpdate();
         subjectParametersT1_ = subjectParameters_; //for next evaluation
-
+        
         for (unsigned i(0); i < trials_.size(); ++i) {
             OpenLoopEvaluator::evaluate(subject, trials_.at(i), musclesToUpdate_, results_.at(i));
         }
@@ -167,7 +167,16 @@ namespace ceinms {
 
                 for (auto &it : musclesToUpdate)
                     previousResult.penalties.at(lmtMaIndex, it) = penaltiesAtT.at(it);
+                std::vector<double> currentFibreLengths;
+                subject.getNormFiberLengths(currentFibreLengths);
+                previousResult.normalisedFibreLengths.setRow(lmtMaIndex, currentFibreLengths);
+                previousResult.normalisedFibreLengths.setTime(lmtTime, lmtMaIndex);
 
+                std::vector<double> currentFibreVelocities;
+                subject.getNormFiberVelocities(currentFibreVelocities);
+                previousResult.normalisedFibreVelocities.setRow(lmtMaIndex, currentFibreVelocities);
+                previousResult.normalisedFibreVelocities.setTime(lmtTime, lmtMaIndex);
+               
                 ++lmtMaIndex;
                 if (lmtMaIndex < trialData.getLmtData().getNRows())
                     lmtTime = trialData.getLmtData().getTime(lmtMaIndex);
@@ -291,6 +300,16 @@ namespace ceinms {
                 previousResult.emgs.setRow(lmtTime, currentEmgs);
                 previousResult.emgs.setTime(lmtMaIndex, lmtMaIndex);
                 
+                std::vector<double> currentFibreLengths;
+                subject.getNormFiberLengths(currentFibreLengths);
+                previousResult.normalisedFibreLengths.setRow(lmtMaIndex, currentFibreLengths);
+                previousResult.normalisedFibreLengths.setTime(lmtTime, lmtMaIndex);
+
+                std::vector<double> currentFibreVelocities;
+                subject.getNormFiberVelocities(currentFibreVelocities);
+                previousResult.normalisedFibreVelocities.setRow(lmtMaIndex, currentFibreVelocities);
+                previousResult.normalisedFibreVelocities.setTime(lmtTime, lmtMaIndex);
+
                 //calcolo delle penalty modificato per accomodare l'update di un sottoinsieme di muscoli
                 std::vector<double> penaltiesAtT;
                 subject.getMusclesPenaltyVector(penaltiesAtT);

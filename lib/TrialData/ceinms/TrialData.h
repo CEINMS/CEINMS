@@ -40,6 +40,7 @@ namespace ceinms {
     class TrialData {
     public:
         TrialData();
+        virtual ~TrialData() {}
         TrialData(
             const std::vector<std::string>& dofNames,
             const std::vector<std::string>& muscleNames,

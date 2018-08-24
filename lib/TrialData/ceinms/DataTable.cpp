@@ -28,6 +28,9 @@
 
 #include <algorithm>
 #include <stdexcept>
+#include <functional>
+#include <iterator>
+#include "DataTable.h"
 
 namespace ceinms {
 
@@ -38,7 +41,6 @@ namespace ceinms {
     template <typename T>
     DataTable<T>::DataTable(size_t nRows, size_t nCols) :
         nRows_(nRows), nCols_(nCols), data_(std::vector<std::vector<T>>(nRows, std::vector<T>(nCols, T{ 0 }))), time_(nRows, 0) {
-
     }
 
     template <typename T>
@@ -132,6 +134,30 @@ namespace ceinms {
 
     }
 
+    template<typename T>
+    void DataTable<T>::cropToTime(double startTime, double finalTime) {
+        startTime = std::max(getStartTime(), startTime);
+        finalTime = std::min(getFinalTime(), finalTime);
+        auto tBegin = std::upper_bound(time_.begin(), time_.end(), startTime, std::less_equal<double>());
+        auto tEnd = std::upper_bound(time_.begin(), time_.end(), finalTime, std::less<double>());
+        auto dBegin = data_.begin();
+        auto dEnd = data_.end();
+
+        if (tBegin != time_.end()) {
+            auto d = std::distance(time_.begin(), tBegin);
+            dBegin = std::next(dBegin,d); 
+        }
+ 
+        if (tEnd != time_.end() && std::next(tEnd,1) != time_.end() ) {
+            auto d = std::distance(time_.begin(), tEnd);
+            dEnd = std::next(data_.begin(), d);
+        }
+
+        time_.assign(tBegin, tEnd);
+        data_ = std::vector<std::vector<double>>(dBegin, dEnd);
+        nRows_ = time_.size();
+    }
+
     template <typename T>
     const std::vector<T>& DataTable<T>::getRow(size_t row) const {
 
@@ -151,10 +177,20 @@ namespace ceinms {
     template <typename T>
     std::vector<T> DataTable<T>::getColumn(const std::string& columnName) const {
 
+        int idx(getColumnIndex(columnName));
+        if (idx != -1)
+            return getColumn(static_cast<size_t>(idx));
+        return std::vector<T>();
+    }
+
+    /* Return -1 if not found*/
+    template<typename T>
+    int DataTable<T>::getColumnIndex(const std::string & columnName) const
+    {
         auto it = std::find(labels_.cbegin(), labels_.cend(), columnName);
         if (it != labels_.cend())
-            return getColumn(std::distance(labels_.cbegin(), it));
-        return std::vector<T>();
+            return std::distance(labels_.cbegin(), it);
+        return -1;
     }
 
     template <typename T>
@@ -223,7 +259,7 @@ namespace ceinms {
     template <typename T>
     DataTable<T>  DataTable<T>::multiplyByScalar(const DataTable<T>& lhs, T scalar) {
 
-        DataTable<T> ans(lhs.getNRows());
+        DataTable<T> ans(lhs.getNRows(), lhs.getNColumns());
         for (size_t r(0); r < lhs.nRows_; ++r)
             for (size_t c(0); c < lhs.nCols_; ++c)
                 ans.at(r, c) = lhs.at(r, c)*scalar;

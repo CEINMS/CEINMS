@@ -20,14 +20,14 @@ namespace ceinms {
         torqueError_ = 0.;
         for (auto i : indexesOfTorquesToMinimise_) {
             double diff(predictedTorques.at(i) - externalTorques_.at(i));
-            torqueError_ += diff*diff/(externalTorqueErrors_.at(i)*externalTorqueErrors_.at(i));
+            torqueError_ += diff*diff;
         }
-    
+
         excitationTrackingError_ = 0.;
         excitationSum_ = 0.;
         for (auto i : indexesOfMusclesWithExcitationsToAdjust_) {
             double diff(predictedExcitations.at(i) - measuredExcitations_.at(i));
-            excitationTrackingError_ += diff*diff;// / (measuredExcitations_.at(i));
+            excitationTrackingError_ += diff*diff;
             excitationSum_ += predictedExcitations.at(i)*predictedExcitations.at(i);
         }
 
@@ -35,19 +35,15 @@ namespace ceinms {
             excitationSum_ += predictedExcitations.at(i)*predictedExcitations.at(i);
         }
 
-        torqueError_ /= nDofs_;
-        excitationSum_ /= nSynth_;
-        excitationTrackingError_ /= nAdj_;
+        // Normalise by the number of dofs and muscles is disables
+//        torqueError_ /= nDofs_;
+//        excitationSum_ /= nSynth_;
+//        excitationTrackingError_ /= nAdj_;
         f_ = 
             weightings_.alpha*torqueError_ + 
             weightings_.beta*excitationSum_ + 
             weightings_.gamma*excitationTrackingError_;
             
-   /*     f_ =
-            weightings_.alpha *torqueError_ +
-            weightings_.beta*excitationSum_ +
-            weightings_.gamma*excitationTrackingError_;
-            */
     }
 
     double TrackTorqueAdjustAndPredictExcitations::getValue() const {

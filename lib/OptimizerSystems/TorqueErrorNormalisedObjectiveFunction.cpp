@@ -26,8 +26,7 @@
  * limitations under the License.                                             *
  * -------------------------------------------------------------------------- */
 
-#include "ceinms/MinTorqueError.h"
-
+#include "ceinms/TorqueErrorNormalisedObjectiveFunction.h"
 #include <algorithm>
 using std::begin;
 using std::end;
@@ -37,22 +36,29 @@ using std::vector;
 
 namespace ceinms {
 
-    void MinTorqueError::setDofsToCalibrate(const std::vector<std::string>& dofsToCalibrate) {
-
-        dofsToCalibrate_ = dofsToCalibrate;
-        for (auto& dof : dofsToCalibrate)
-            std::cout << dof << std::endl;
+    TorqueErrorNormalisedObjectiveFunction::TorqueErrorNormalisedObjectiveFunction(const ObjectiveFunctionSetup& setup) :
+        f_(std::numeric_limits<double>::max()),
+        setup_(setup) {
+        dofsToCalibrate_ = setup_.getTargetNames();
         updDofsToCalibrateIdx();
     }
 
-    void MinTorqueError::setTrials(const std::vector<TrialData>& trials) {
+    void TorqueErrorNormalisedObjectiveFunction::setSetup(const ObjectiveFunctionSetup & setup) {
+        setup_ = setup;
+        dofsToCalibrate_ = setup_.getTargetNames();
+        f_ = std::numeric_limits<double>::max();
+        computeVariance();
+        updDofsToCalibrateIdx();
+    }
+
+    void TorqueErrorNormalisedObjectiveFunction::setTrials(const std::vector<TrialData>& trials) {
 
         trials_ = trials;
         computeVariance();
         updDofsToCalibrateIdx();
     }
 
-    void MinTorqueError::updDofsToCalibrateIdx() {
+    void TorqueErrorNormalisedObjectiveFunction::updDofsToCalibrateIdx() {
         dofsToCalibrateIdx_.clear();
         for (auto& trial : trials_) {
             auto dofNames(trial.getDofNames());
@@ -64,10 +70,9 @@ namespace ceinms {
             }
             dofsToCalibrateIdx_.emplace_back(indeces);
         }
-        
     }
 
-    void MinTorqueError::computeVariance() {
+    void TorqueErrorNormalisedObjectiveFunction::computeVariance() {
 
         auto getVariance([](const std::vector<double>& v) {
             double ans(0);
@@ -79,7 +84,7 @@ namespace ceinms {
                 var += (e - avg)*(e - avg);
                 ep += (e - avg);
             }
-            return ((var - ep*ep / v.size()) / (v.size() - 1)); //adjust roundoff error.. apparently
+            return ((var - ep*ep / v.size()) / (v.size() - 1)); //adjust roundoff error
         });
 
         torqueVariance_.clear();
@@ -96,7 +101,7 @@ namespace ceinms {
         }
     }
 
-    void MinTorqueError::calculate(const std::vector<Result>& results) {
+    void TorqueErrorNormalisedObjectiveFunction::calculate(const std::vector<Result>& results) {
         //reset f
         f_ = 0;
 
@@ -126,20 +131,21 @@ namespace ceinms {
                 f_ += (trialCosts_.at(trialIndex).torqueError.at(dofIdx) / torqueVariance_.at(trialIndex).at(dofIdx) +
                 trialCosts_.at(trialIndex).penalty) / results.at(trialIndex).torques.getNRows();
         }
+        f_ *= setup_.getWeight();
     }
 
-    void MinTorqueError::printCosts() const {
+    void TorqueErrorNormalisedObjectiveFunction::printCosts() const {
 
-        std::cout << "Joint moments RMSE\n";
+        std::cout << setup_;
+        std::cout << " - Value: " << getValue() << std::endl;
+        std::cout << " -- Root Mean Square Errors\n";
         for (size_t trialIndex(0); trialIndex < trials_.size(); ++trialIndex) {
-            std::cout <<"Trial #" << trialIndex+1 << std::endl;
+            std::cout <<" --- Trial #" << trialIndex+1 << std::endl;
             for (auto& dofIdx : dofsToCalibrateIdx_.at(trialIndex)) {
                         double val = sqrt(trialCosts_.at(trialIndex).torqueError.at(dofIdx) / 
                             trials_.at(trialIndex).getTorqueData().getNRows());
-                        std::cout << trials_.at(trialIndex).getDofNames().at(dofIdx)  << " " << val << " Nm" << std::endl;
+                        std::cout << " ---- " << trials_.at(trialIndex).getDofNames().at(dofIdx)  << ": " << val << " Nm" << std::endl;
             }
-            std::cout << std::endl;
         }
-        std::cout << "Fobj = " << getValue() << std::endl;
     }
 }

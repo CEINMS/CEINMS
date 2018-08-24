@@ -45,30 +45,10 @@ namespace ceinms {
 
     typedef std::list<Parameter> ParameterSet;
 
-    class CalibrationStep {
-
-    public:
-        void setObjectiveFunction(unsigned objectiveFunction, double weight, double exponent);
-        void setParametersPolicy(unsigned parametersPolicy);
-        CalibrationCfg::Step getStepCfg() const;
-        ObjectiveFunctionSetup getObjectiveFunctionSetup() const;
-        void pushDofName(std::string& dofName);
-        void getDofNames(std::list<std::string>& dofNames) const;
-        void getDofNames(std::vector<std::string>& dofNames) const;
-
-        void pushParameter(const Parameter& parameter);
-        void getParameterSet(ParameterSet& parameterSet) const;
-        void setBarrierList(const BarrierListSetup& barrierListSetup);
-
-        friend std::ostream& operator<< (std::ostream& output, const CalibrationStep& b);
-
-    private:
-        ObjectiveFunctionSetup objectiveFunctionSetup_;
-        std::list<std::string> dofNames_;
+    struct CalibrationStep {
+        ObjectiveFunctionSetupList objFunctionsSetup_;
         ParameterSet parameterSet_;
     };
-
-
 
     class CalibrationXmlReader {
 
@@ -87,10 +67,9 @@ namespace ceinms {
         void readNMSmodelCfg();
         void readOptimizationAlgorithmCfg();
         void readCalibrationStepsCfg();
-        void readStep(CalibrationXsd::StepType& stepType, CalibrationStep& calibrationStep);
-        void readParameter(CalibrationXsd::ParameterType& parameterType, Parameter& parameter);
+        CalibrationStep readStep(const CalibrationXsd::StepType& stepType);
+        Parameter readParameter(const CalibrationXsd::ParameterType& parameterType);
         void readCalibrationTrialList();
-        BarrierListSetup readBarrierList(CalibrationXsd::ObjectiveFunctionElementType& objectiveFunctionType);
         unsigned runMode_;
         unsigned optimizationAlgorithm_;
         std::string trialsDirectory_;

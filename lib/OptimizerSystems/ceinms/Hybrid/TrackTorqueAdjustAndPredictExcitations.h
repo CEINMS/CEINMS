@@ -75,19 +75,6 @@ namespace ceinms {
         subject.getMusclesIndexFromMusclesList(indexesOfMusclesWithExcitationsToPredict_, musclesToSynthesise);
         
 
-        for (auto &e : setup.dofsToTrack)
-            std::cout << e << endl;
-        Mapper errorTorqueMapper(setup.dofsToTrack, subject.getDoFNames());
-        externalTorqueErrors_ = errorTorqueMapper.map(setup.dofsToTrackTorqueErrors, std::numeric_limits<double>::max());
-        for (int i(0); i < subject.getDoFNames().size(); ++i)
-            std::cout << "externalTorqueErrors_ " << subject.getDoFNames()[i] << " " << externalTorqueErrors_[i] << endl;
-
-        Mapper errorEmgMapper(setup.musclesToAdjust, subject.getMuscleNames());
-        measuredExcitationErrors_ = errorEmgMapper.map(setup.musclesToAdjustExcitationErrors, std::numeric_limits<double>::max());
-        for (int i(0); i < subject.getMuscleNames().size(); ++i)
-            std::cout << "measuredExcitationErrors_ " << subject.getMuscleNames()[i] << " " << measuredExcitationErrors_[i] << endl;
-
-
         //Get Dofs to track from setup
         std::cout << "Joint moments\n";
         std::vector<std::string> dofNames(subject.getDoFNames());

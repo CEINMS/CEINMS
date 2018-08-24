@@ -44,7 +44,11 @@ namespace ceinms {
     class DataTable {
 
     public:
+        typedef typename std::vector<std::vector<T>>::iterator iterator;
+        typedef typename std::vector<std::vector<T>>::const_iterator const_iterator;
+
         DataTable();
+        virtual ~DataTable() {}
         DataTable(size_t nRows, size_t nCols); //do not include time column
         void setLabels(const std::vector<std::string>& labels); //do not include time column
         std::vector<std::string> getLabels() const { return labels_; }
@@ -56,6 +60,7 @@ namespace ceinms {
         T& at(size_t row, size_t col);
         void pushRow(double time, const std::vector<T>& values);
         void setRow(size_t row, const std::vector<T>& values);
+        void cropToTime(double startTime, double finalTime);
 
         static DataTable sum(const DataTable& lhs, const DataTable& rhs);
         static DataTable subtract(const DataTable& lhs, const DataTable& rhs);
@@ -69,18 +74,24 @@ namespace ceinms {
         double getTime(size_t row) const { return time_.at(row); }
         void setTime(double time, std::size_t row);
         T getStartTime() const { return time_.front(); }
-        T getFinalTIme() const { return time_.back(); }
+        T getFinalTime() const { return time_.back(); }
         std::vector<double> getTimeColumn() const { return time_; }
         const std::vector<T>& getRow(size_t row) const; //return const ref is bad.. checking for performance
 
         std::vector<T> getColumn(size_t col) const;
         std::vector<T> getColumn(const std::string& columnName) const;
+        int getColumnIndex(const std::string& columnName) const;
         size_t getNColumns() const { return nCols_; }
         size_t getNRows() const { return nRows_; }
 
         bool equals(const DataTable& rhs) const;
         friend std::ostream& operator<< <> (std::ostream& output, const DataTable& ths);
         void print(const std::string& filename);
+        iterator begin() { return data_.begin(); }
+        const_iterator begin() const { return data_.begin(); }
+        iterator end() { return data_.end(); }
+        const_iterator end() const { return data_.end(); }
+
     private:
         size_t nRows_, nCols_;
         //internal implementation may be changed to something better.. e.g. nice matrices

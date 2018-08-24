@@ -81,6 +81,7 @@
 #include "ceinms/BatchEvaluator.h"
 #include "SimulationManager.h"
 #include "ceinms/SimulatedAnnealing.h"
+#include "ceinms/FileUtils.h"
 #include <numeric>
 #include <algorithm>
 #include <string>
@@ -150,23 +151,6 @@ void PrintUsage()
 }
 
 
-void sortMaFilenames(const std::map<std::string, std::string>& maMap, const std::vector< std::string >& dofNames, std::vector< std::string >& maDataFilenames)
-{
-    int currentDof = 0;
-    for (auto& it : dofNames)
-    {
-        try
-        {
-            maDataFilenames.push_back(maMap.at(it));
-        }
-        catch (std::out_of_range)
-        {
-            std::cerr << "Could not find moment arm file for " << it << " degree of freedom" << std::endl;
-            exit(EXIT_FAILURE);
-        }
-    }
-}
-
 template<typename NMSmodelT>
 ceinms::TrialData readTrialData(const string& inputDataFilename, NMSmodelT& mySubject, const string& emgGeneratorFile) {
 
@@ -185,7 +169,7 @@ ceinms::TrialData readTrialData(const string& inputDataFilename, NMSmodelT& mySu
     vector< string > dofNames;
     mySubject.getDoFNames(dofNames);
     vector< string > maFilename;
-    sortMaFilenames(dataLocations.getMaFiles(), dofNames, maFilename);
+    ceinms::FileUtils::sortMaFilenames(dataLocations.getMaFiles(), dofNames, maFilename);
     ceinms::LmtMaFromStorageFile lmtMaProducer(lmtQueue, momentArmsQueues, doneWithSubscription, doneWithExecution, mySubject, dataLocations.getLmtFile(), maFilename);
 
     string externalTorqueFilename(dataLocations.getExternalTorqueFile());

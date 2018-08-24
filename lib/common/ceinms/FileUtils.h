@@ -30,6 +30,8 @@
 #define ceinms_FileUtils_h
 
 #include <string>
+#include <map>
+#include <string>
 
 namespace ceinms {
     namespace FileUtils {
@@ -41,6 +43,8 @@ namespace ceinms {
         void trim(std::string& fileName);
         std::string getFilePath(const std::string& filename);
         std::string makeGeneric(const std::string& filename);
+        void sortMaFilenames(const std::map<std::string, std::string>& maMap,
+            const std::vector< std::string >& dofNames, std::vector< std::string >& maDataFilenames);
     }
 }
 
