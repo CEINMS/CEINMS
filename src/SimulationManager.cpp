@@ -646,7 +646,7 @@ namespace ceinms {
 
         // 3. define the model simulator
         vector<string> valuesToLog = dataToLog;
-
+        valuesToLog.push_back("ObjectiveFunctionComponentsAndWeightings");
 
         // 4. define the optimiser
         EmgInformedObjectiveFunctionSetup setup;
@@ -833,7 +833,7 @@ namespace ceinms {
 
         // 3. define the model simulator
         vector<string> valuesToLog = dataToLog;
-        //save the hybrid values in a semarate file
+        //save the hybrid values in a separate file
         valuesToLog.push_back("ObjectiveFunctionComponentsAndWeightings");
 
         ModelEvaluationHybrid<NMSmodelT, NMSmodelFrameOptimisation<NMSmodelT>, LoggerOnQueues> simulator(
