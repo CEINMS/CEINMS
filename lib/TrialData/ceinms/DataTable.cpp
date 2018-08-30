@@ -30,6 +30,7 @@
 #include <stdexcept>
 #include <functional>
 #include <iterator>
+#include <fstream>
 #include "DataTable.h"
 
 namespace ceinms {
