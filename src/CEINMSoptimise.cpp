@@ -324,7 +324,7 @@ private:
             return v;
         });
        
-        double bmin = 1, bmax = 2, bdelta=1, gmin = 1, gmax = 50, gdelta=5;
+        double bmin = 1, bmax = 2, bdelta=1, gmin = 1, gmax = 5, gdelta=5;
         std::vector<HybridErrors> values;
         vector<double> betas = getVec(bmin, bmax,bdelta);
         vector<double> gammas = getVec(gmin, gmax,gdelta);

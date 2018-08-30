@@ -92,10 +92,10 @@ namespace ceinms {
     void DataTable<T>::setColumn(const std::string& columnName, const std::vector<T>& values) {
 
         auto it = std::find(labels_.begin(), labels_.end(), columnName);
-        if (it == labels.end()) {
+        if (it == labels_.end()) {
             throw std::invalid_argument("setColumn: columnName does not exist.");
         }
-        setColumn(std::distance(value.begin(), it), values);
+        setColumn(std::distance(values.begin(), it), values);
     }
 
 
