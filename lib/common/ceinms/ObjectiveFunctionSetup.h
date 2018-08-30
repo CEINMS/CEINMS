@@ -32,6 +32,7 @@
 #include <vector>
 #include <memory>
 #include <map>
+#include <iostream>
 
 namespace ceinms {
 

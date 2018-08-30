@@ -31,6 +31,7 @@
 #include <functional>
 #include <iterator>
 #include <fstream>
+#include <iostream>
 #include "DataTable.h"
 
 namespace ceinms {

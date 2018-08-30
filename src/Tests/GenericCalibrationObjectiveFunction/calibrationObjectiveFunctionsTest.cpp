@@ -114,7 +114,7 @@ bool testTorqueErrorNormalised() {
     isValid &= equals(fun.getValue(), 1.08);
 
     for (auto& d : getDofNames()) {
-        setup.setTargetNames({ d });
+        setup.setTargetNames(d);
         fun.setSetup(setup);
         fun.calculate(results);
         isValid &= equals(fun.getValue(), 0.18);
