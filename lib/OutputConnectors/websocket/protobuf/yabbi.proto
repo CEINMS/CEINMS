@@ -1,0 +1,46 @@
+syntax = "proto3";
+
+package yabbi;
+
+// Data available on the server side
+// nChannels: number of available channels 
+// 		names: array with names of each channel
+//		 dim: array with dimension of each channels 
+message AvailableChannels {
+	int32 nChannels = 1;
+	repeated string names = 2;
+	repeated int32 dim = 3;
+}
+
+// A single frame of data. Time is provided by the server for 
+// each sample, as the data production is asynchronous and not 
+// every channel may have the same time. Data is an array of float
+// with dimension equal to the dimension of the data, e.g., 1 for 
+// scalar, 3 for 3D data
+message DataFrame {
+	float time = 1;
+	string channelName = 2;
+	repeated float data = 3;
+}
+
+message DataFrameSet {
+	repeated DataFrame dataFrame = 1;
+}
+
+// 		req: type of request
+//	nFrames: how many frames the client requests. In this way the client
+//			 doesn't have to request every frame to the server, but can just
+//			 listen for a number of frames equal to the request.			 
+message ClientRequest {
+enum Request {
+    DATA = 0;
+	CHANNELS = 1;
+  }
+  Request request = 1;
+  int32 nFrames = 2;
+}
+
+
+
+
+

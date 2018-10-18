@@ -47,7 +47,7 @@ MESSAGE( STATUS "SimTK Include path: ${SIMTK_INCLUDE_DIRS}")
 if(UNIX)
     set(NameSpace )
 else()
-    set(NameSpace OpenSim_)
+    set(NameSpace )
 endif()
 
 find_library(osimSimulation

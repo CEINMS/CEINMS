@@ -45,7 +45,7 @@ target_link_libraries(itrain
       ${Boost_FILESYSTEM_LIBRARY}
     #  rtb::Common 
    mcbs::Spline 
-       MR3tools 
+   #    MR3tools 
        rtb::rtosim
       rtb::Filter 
     rtb::Plsr

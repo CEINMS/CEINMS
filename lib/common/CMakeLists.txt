@@ -33,6 +33,7 @@ set(Common_HEADERS_QUEUES
                     ceinms/queues/MuscleForcesQueue.h
 					ceinms/queues/SingleExternalForceQueue.h
                     ceinms/queues/ScalarVectorQueue.h
+					ceinms/queues/ScalarVectorVectorQueue.h
                     ceinms/queues/MultipleMomentArmsQueues.h
 					ceinms/queues/LogQueue.h
                     ceinms/queues/LmtQueue.h
