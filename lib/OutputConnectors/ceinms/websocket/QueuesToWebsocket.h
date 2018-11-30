@@ -6,6 +6,7 @@
 #include <string>
 #include <vector>
 #include <boost/asio/ip/tcp.hpp>
+#include <google/protobuf/stubs/common.h>
 
 namespace ceinms {
 	// we are going to get this to work with a single queue at the moment
@@ -18,8 +19,10 @@ namespace ceinms {
 			std::string address = "127.0.0.1",
 			std::string port = "8080") :
 			inputPointCloud_(inputPointCloud),
-			address_(address), port_(port)
-			{}
+			address_(address), port_(port), names_(names)
+			{
+			GOOGLE_PROTOBUF_VERIFY_VERSION;
+		}
 		void operator()();
 	private:
 		static void doSession(boost::asio::ip::tcp::socket& socket, 

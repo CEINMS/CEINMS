@@ -16,6 +16,7 @@ set(FromStorageFile_HEADERS
   ceinms/Utilities.h
   ceinms/ExternalForcesFromStorageFile.h
   ceinms/GeneralisedCoordinatesFromStorageFile.h
+  ceinms/EmgFromQueue.h
 )
 
 set(InputConnectors_SOURCES
@@ -24,10 +25,11 @@ set(InputConnectors_SOURCES
   LmtMaFromX.cpp
   ExternalForcesFromX.cpp
   GeneralisedCoordinatesFromX.cpp 
+  EmgFromQueue.cpp
+  LmtMaFromMcbs.cpp
 )
 
-set(InputConnectors_TEMPLATE_IMPLEMENTATIONS ) #ceinms/LmtMaFromMcbs.cpp)
-#set(InputConnectors_TEMPLATE_IMPLEMENTATIONS ceinms/LmtMaFromMcbs.cpp)
+set(InputConnectors_TEMPLATE_IMPLEMENTATIONS)
 
 set_source_files_properties(${InputConnectors_TEMPLATE_IMPLEMENTATIONS} PROPERTIES HEADER_FILE_ONLY TRUE)
 
@@ -37,11 +39,11 @@ set(InputConnectors_HEADERS
   ceinms/LmtMaFromX.h
   ceinms/ExternalForcesFromX.h
   ceinms/GeneralisedCoordinatesFromX.h
-  #ceinms/LmtMaFromMcbs.h
+  ceinms/LmtMaFromMcbs.h
 )
 
 source_group("Headers" FILES ${InputConnectors_HEADERS} ${FromStorageFile_HEADERS} )
-source_group("Sources" FILES ${InputConnectors_SOURCES} ${FromStorageFile_SOURCES} )
+source_group("Sources" FILES ${InputConnectors_SOURCES} ${FromStorageFile_SOURCES}  ${InputConnectors_TEMPLATE_IMPLEMENTATIONS})
 
 # Define targets
 add_library(InputConnectors STATIC
@@ -51,7 +53,7 @@ add_library(InputConnectors STATIC
   ${FromStorageFile_HEADERS}
   ${InputConnectors_TEMPLATE_IMPLEMENTATIONS}
 )
-target_link_libraries(InputConnectors FileIO Concurrency ${Boost_FILESYSTEM_LIBRARY} optimized ${OPENSIM_LIBRARIES})
+target_link_libraries(InputConnectors FileIO Concurrency ${Boost_FILESYSTEM_LIBRARY} optimized ${OPENSIM_LIBRARIES} rtb::Filter)
 #target_link_libraries(InputConnectors FileIO Concurrency ${Boost_FILESYSTEM_LIBRARY} debug ${OPENSIM_LIBRARIES_DEBUG})
 
 
@@ -61,6 +63,7 @@ target_include_directories(InputConnectors
                                             ${FileIO_INCLUDE_DIRS}
                                             ${Concurrency_INCLUDE_DIRS}
                                             ${Boost_INCLUDE_DIRS}
+											${RTOSIM_INCLUDE_DIRS}
 								PUBLIC
 											${OPENSIM_INCLUDE_DIRS}
 											${SIMTK_INCLUDE_DIRS}

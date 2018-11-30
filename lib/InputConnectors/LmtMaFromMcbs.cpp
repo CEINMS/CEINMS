@@ -39,92 +39,12 @@ using std::vector;
 #include <ceinms/ArrayConverter.h>
 
 namespace ceinms {
-    /*
-    shared_ptr<SplineSetBase> makeSplineSet(int degree, const string& inputDataFilename) {
-
-    std::function<shared_ptr<SplineSetBase>(const string&)> ftable[] = {
-    nullptr,
-    nullptr,
-    &wrap<2, string>,
-    &wrap<3, string>,
-    &wrap<4, string>,
-    &wrap<5, string>,
-    &wrap<6, string>,
-    &wrap<7, string>,
-    };
-
-    if (degree > 7) {
-    std::cout << "Degree of mcbs too high.\nExit.\n";
-    std::exit(EXIT_FAILURE);
-    }
-    return ftable[degree](inputDataFilename);
-    }
-
-    shared_ptr<SplineSetBase> makeSplineSet(int degree,
-    const vector<string > dofNames,
-    const vector<string > musclesNames,
-    const vector<double>& a,
-    const vector<double>& b,
-    const vector<int>& n,
-    const vector<vector<double>>& y) {
-
-    std::function < shared_ptr<SplineSetBase>(
-    const vector<string >,
-    const vector<string >,
-    const vector<double>&,
-    const vector<double>&,
-    const vector<int>&,
-    const vector<vector<double> >&) > ftable[] = {
-
-    nullptr,
-    nullptr,
-    &wrapAlias<2>,
-    &wrapAlias<3>,
-    &wrapAlias<4>,
-    &wrapAlias<5>,
-    &wrapAlias<6>,
-    &wrapAlias<7>,
-    };
-
-    if (degree > 7) {
-    std::cout << "Degree of mcbs too high.\nExit.\n";
-    std::exit(EXIT_FAILURE);
-    }
-    return ftable[degree](dofNames, musclesNames, a, b, n, y);
-    }
-
-    shared_ptr<SplineSetBase> makeSplineSet(
-    int degree,
-    const string& coeffDir,
-    const vector<string>& muscleNames) {
-
-    std::function < shared_ptr<SplineSetBase>(
-    const string&,
-    const vector<string>&) > ftable[] = {
-    nullptr,
-    nullptr,
-    &wrap<2, const string&, const vector<string>&>,
-    &wrap<3, const string&, const vector<string>&>,
-    &wrap<4, const string&, const vector<string>&>,
-    &wrap<5, const string&, const vector<string>&>,
-    &wrap<6, const string&, const vector<string>&>,
-    &wrap<7, const string&, const vector<string>&>,
-    };
-
-    if (degree > 7) {
-    std::cout << "Degree of mcbs too high.\nExit.\n";
-    std::exit(EXIT_FAILURE);
-    }
-    return ftable[degree](coeffDir, muscleNames);
-    }
-    */
-
-    template<int N>
-    void LmtMaFromMcbs<N>::readDefaultMomentArmsFromOsim(
+   
+    void LmtMaFromMcbs::readDefaultMomentArmsFromOsim(
         const std::string& osimModelFIlename) {
 
         OpenSim::Model model(osimModelFIlename);
-
+		SimTK::State s(model.initSystem());
         OpenSim::Array<std::string> osimMuscleNames_;
         ArrayConverter::fromStdVector(osimMuscleNames_, musclesNames_);
 
@@ -133,8 +53,8 @@ namespace ceinms {
         muscleTendonLengthAnalysis->setComputeMoments(true);
         muscleTendonLengthAnalysis->setPrintResultFiles(false);
         model.addAnalysis(muscleTendonLengthAnalysis.get());
-        SimTK::State s(model.initSystem());
-        model.getMultibodySystem().realize(s, SimTK::Stage::Position);
+        s = model.initSystem();
+        model.getMultibodySystem().realize(s, SimTK::Stage::Velocity);
         muscleTendonLengthAnalysis->step(s, 1);
         const OpenSim::ArrayPtrs<OpenSim::MuscleAnalysis::StorageCoordinatePair>& momentArmStorage(muscleTendonLengthAnalysis->getMomentArmStorageArray());
         size_t numCoordinates = momentArmStorage.getSize();
@@ -154,8 +74,7 @@ namespace ceinms {
         }
     }
 
-    template<int N>
-    void LmtMaFromMcbs<N>::operator()() {
+    void LmtMaFromMcbs::operator()() {
 
         inputCoordinateQueue_.subscribe();
         LmtMaFromX::doneWithSubscriptions();
@@ -171,14 +90,14 @@ namespace ceinms {
 
                 auto timeBegin = std::chrono::high_resolution_clock::now();
 
-                splineSet_.getLmt(lmts, dofsValues);
+                splineSet_->getLmt(lmts, dofsValues);
                 auto timeEnd = std::chrono::high_resolution_clock::now();
                 //std::cout << "mcbs time: " << std::chrono::duration_cast<std::chrono::milliseconds>(timeEnd - timeBegin).count() << "ms" << std::endl;
 
                 LmtMaFromX::updateLmt(lmts, currentTime);
                 for (auto dofIt(dofNamesFromSpline_.cbegin()); dofIt != dofNamesFromSpline_.cend(); ++dofIt) {
                     MomentArmsData maValues;
-                    splineSet_.getMa(*dofIt, muscleNamesOnDofsMap_[*dofIt], dofsValues, maValues);
+                    splineSet_->getMa(*dofIt, muscleNamesOnDofsMap_[*dofIt], dofsValues, maValues);
                     auto it(std::find(dofNames_.cbegin(), dofNames_.cend(), *dofIt));
                     unsigned dofIdx(std::distance(dofNames_.cbegin(), it));
                     LmtMaFromX::updateMomentArms(maValues, currentTime, dofIdx);

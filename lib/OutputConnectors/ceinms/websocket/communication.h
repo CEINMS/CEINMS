@@ -26,7 +26,7 @@ namespace ceinms {
 		std::stringstream sstream;
 		sstream << boost::beast::buffers(buffer.data());
 		protoData.ParseFromString(sstream.str());
-		//	std::cout << "Received: " << sstream.str() << std::endl;
+		std::cout << "Received: " << sstream.str() << std::endl;
 	}
 }
 #endif

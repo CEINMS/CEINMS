@@ -10,7 +10,7 @@ namespace websocket = boost::beast::websocket;  // from <boost/beast/websocket.h
 
 namespace ceinms {
 	void QueuesToWebsocket::operator()() {
-	
+
 		try
 		{		
 			auto const address = boost::asio::ip::make_address(address_);
@@ -37,7 +37,7 @@ namespace ceinms {
 		}
 		catch (const std::exception& e)
 		{
-			std::cerr << "Error: " << e.what() << std::endl;
+			std::cout << "Error [QueuesToWebsocket::operator()()]: " << e.what() << std::endl;
 		}
 	
 	}
@@ -54,12 +54,14 @@ namespace ceinms {
 			auto pc(inputPointCloud.pop());
 			runCondition = !EndOfData::isEod(pc);
 			yabbi::DataFrameSet dataFrameSet;
-			yabbi::DataFrame* currentDataFrame;
-			for (int i(0); i < pc.data.size(); ++i) {
-				currentDataFrame = dataFrameSet.add_dataframe();
-				fillDataFrame(pc.data[i], currentDataFrame);
-				currentDataFrame->set_channelname(names[i]);
-				currentDataFrame->set_time(pc.time);
+			if (runCondition) {
+				yabbi::DataFrame* currentDataFrame;
+				for (int i(0); i < pc.data.size(); ++i) {
+					currentDataFrame = dataFrameSet.add_dataframe();
+					fillDataFrame(pc.data[i], currentDataFrame);
+					currentDataFrame->set_channelname(names[i]);
+					currentDataFrame->set_time(pc.time);
+				}
 			}
 			//std::this_thread::sleep_for(std::chrono::milliseconds(10));
 			return dataFrameSet;
@@ -81,7 +83,7 @@ namespace ceinms {
 			for (auto &d : dataFrameSet.dataframe()) {
 				std::cout << "channelName: " << d.channelname() << "\n";
 				std::cout << "       time: " << d.time() << "\n";
-				std::cout << "data.size(): " << d.data().size() << "\n";
+				std::cout << "data.size(): " << d.data().size() << std::endl;
 				//		std::cout << "       data: [";
 				//		for (auto &data : d.data())
 				//			std::cout << data << " ";
@@ -119,29 +121,33 @@ namespace ceinms {
 					int n = clientRequest.nframes();
 					for (int i(0); i < n; ++i) {
 						auto dataFrameSet(getDataFrameSet());
-						if (!runCondition) {
-							ws.close("End of data");
-							break;
+						if (runCondition) {
+							//		printDataFrameSet(dataFrameSet);
+							sendMessage(dataFrameSet, ws);
 						}
-						printDataFrameSet(dataFrameSet);
-						sendMessage(dataFrameSet, ws);
+						else {
+							std::cout << "END OF DATA" << std::endl;
+						}
 					}
 					break;
 				}
 				}
-				std::cout << "Done" << std::endl;
 			}
+			std::cout << "Closing websocket" << std::endl;
+			ws.close("End of data");
+			
 		}
 		catch (boost::system::system_error const& se)
 		{
 			// This indicates that the session was closed
 			if (se.code() != websocket::error::closed)
-				std::cerr << "Error: " << se.code().message() << std::endl;
+				std::cout << "Error [QueuesToWebsocket::doSession]: " << se.code().message() << std::endl;
 		}
 		catch (std::exception const& e)
 		{
-			std::cerr << "Error: " << e.what() << std::endl;
+			std::cout << "Error [QueuesToWebsocket::doSession]: " << e.what() << std::endl;
 		}
+		std::cout << "Unsubscribing" << std::endl;
 		inputPointCloud.unsubscribe();
 
 	}

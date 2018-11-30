@@ -35,7 +35,7 @@ set(OutputConnectors_TEMPLATE_IMPLEMENTATION
 	)
   
 find_package(protobuf CONFIG REQUIRED)
-set(Protobuf_FILES protobuf/yabbi.proto)
+set(Protobuf_FILES websocket/protobuf/yabbi.proto)
 set_source_files_properties(${Proto_SRC} ${Proto_HEADERS} PROPERTIES GENERATED TRUE)
 protobuf_generate_cpp(Proto_SRC Proto_HEADERS ${Protobuf_FILES})
 if(${CMAKE_VERBOSE_MAKEFILE})
