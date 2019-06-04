@@ -404,9 +404,10 @@ int run_from_nexus() {
 	string strainoutput(baseDir + "output\\strain.csv");
 	string outputDirectory(baseDir + "output");
 	string nodesFilename = "C:\\Users\\s2849511\\coding\\unversioned\\boostwebsockettest\\data\\nodes.csv";
-	string osimModelFilename = baseDir + "TestData\\20151214\\models\\scaledAndRegistered_opt_N5_AA.osim";
+	string osimModelFilename = baseDir + "TestData\\20151214\\models\\2392_scaled_clusters.osim";
 	string mcbsDir = baseDir + "TestData\\20151214\\ceinms\\mcbs\\coefficients\\";
 	string ikTaskSet = baseDir + "TestData\\20151214\\inverseKinematics\\01\\baseline_walking\\Setup\\iktasksets.xml";
+	string maxEmgFile = baseDir + "TestData\\20151214\\maxemg.txt";
 	vector<string> emgChannelNames{
 		"VasMed",
 		"VasLat",
@@ -458,7 +459,7 @@ int run_from_nexus() {
 	rtosim::GeneralisedCoordinatesQueue generalisedCoordinatesQueue, reducedGeneralisedCoordinatesQueue, filteredGeneralisedCoordinatesQueue;
 	rtosim::DataFromNexus dataProducerFromNexus(markerSetQueue, rawEmgQueue, l1, l2, flowCondition, osimModelFilename, emgChannelNames);
 	dataProducerFromNexus.setLoopMode(true);
-	rtosim::QueueToInverseKinametics queueToInverseKinematics(markerSetQueue, generalisedCoordinatesQueue, l1, l2, osimModelFilename, 1, ikTaskSet, 1e-5, 10000);
+	rtosim::QueueToInverseKinametics queueToInverseKinematics(markerSetQueue, generalisedCoordinatesQueue, l1, l2, osimModelFilename, 2, ikTaskSet, 1e-5, 10000);
 	
 	//define the filter
 	double fc = 8;
@@ -529,6 +530,7 @@ int run_from_nexus() {
 			for (auto &e : cFrame.data) {
 				if (e > threshold_)
 					e = 0.;
+		
 			}
 			return cFrame;
 		}
@@ -541,7 +543,10 @@ int run_from_nexus() {
 		l2,
 		FixMissingEmgData(1000.));
 
-	ceinms::EmgFromQueue emgFromQueue(fixedRawEmgQueue, emgLinearEnvelopesQueue, doneWithSubscriptionsLatch, doneWithExecutionLatch, emgChannelNames, emgGeneratorFile, mySubject, 6.);
+	ceinms::EmgFromQueue emgFromQueue(
+		fixedRawEmgQueue, emgLinearEnvelopesQueue, 
+		doneWithSubscriptionsLatch, doneWithExecutionLatch, maxEmgFile, 
+		emgGeneratorFile, mySubject, 6.);
 
 	vector< string > dofNames;
 	mySubject.getDoFNames(dofNames);

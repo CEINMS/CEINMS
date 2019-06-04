@@ -2,7 +2,27 @@
 #include "ceinms/EndOfData.h"
 
 namespace ceinms {
+	void parseMaxEmgFile(const std::string& maxEmgFilename, std::vector<std::string>& emgNames, std::vector<double>& normalisationWeights) {
 
+
+		std::ifstream iF(maxEmgFilename);
+		std::string line;
+		std::getline(iF, line); //garbage
+		while (std::getline(iF, line))
+		{
+			std::istringstream iss(line);
+			std::string emgName, trial;
+			double emgMax, time;
+
+			if (!(iss >> emgName >> emgMax >> trial >> time)) { break; } // error
+
+			emgNames.push_back(emgName);
+			normalisationWeights.push_back(emgMax);
+		}
+
+		for (unsigned i(0); i < emgNames.size(); ++i)
+			std::cout << emgNames.at(i) << " -> " << normalisationWeights.at(i) << std::endl;
+	}
     void EmgFromQueue::operator()() {
         inputEmgQueue_.subscribe();
         EmgFromX::doneWithSubscriptions();

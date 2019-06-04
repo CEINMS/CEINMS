@@ -224,6 +224,10 @@ namespace ceinms {
             ModelEvaluationBase<Logger>::logger.log(lmtMaTime, data, "PennationAngles");
             subject_.getMuscleForces(data);
             ModelEvaluationBase<Logger>::logger.log(lmtMaTime, data, "MuscleForces");
+			subject_.getTendonLengths(data);
+			ModelEvaluationBase<Logger>::logger.log(lmtMaTime, data, "TendonLengths");
+			subject_.getNormTendonLengths(data);
+			ModelEvaluationBase<Logger>::logger.log(lmtMaTime, data, "NormTendonLengths");
             subject_.getTorques(data);
             ModelEvaluationBase<Logger>::logger.log(lmtMaTime, data, "Torques");
             data.clear();
@@ -301,6 +305,8 @@ namespace ceinms {
         ModelEvaluationBase<Logger>::logger.log(endTime, endData, "NormFibreVelocities");
         ModelEvaluationBase<Logger>::logger.log(endTime, endData, "PennationAngles");
         ModelEvaluationBase<Logger>::logger.log(endTime, endData, "MuscleForces");
+		ModelEvaluationBase<Logger>::logger.log(endTime, endData, "TendonLengths");
+		ModelEvaluationBase<Logger>::logger.log(endTime, endData, "NormTendonLengths");
         ModelEvaluationBase<Logger>::logger.log(endTime, endData, "Torques");
         ModelEvaluationBase<Logger>::logger.log(endTime, endData, "MusclesContribution");
 #endif

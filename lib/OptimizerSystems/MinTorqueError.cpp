@@ -99,7 +99,9 @@ namespace ceinms {
     void MinTorqueError::calculate(const std::vector<Result>& results) {
         //reset f
         f_ = 0;
-
+		//Hardcoded. As the model needs to settle down at the beginning of the trial, we don`t want
+		//the errors at the begining of the trials to affect the calibration..
+		const int skipRows = 10;
         using TrialDataIt = std::vector<TrialData>::const_iterator;
         using ResultIt = std::vector<Result>::const_iterator;
 
@@ -111,12 +113,12 @@ namespace ceinms {
             auto diff(tIt->getTorqueData() - rIt->torques);
             auto squaredDiff(diff*diff);
             TrialCost trialCost(tIt->getNoDofs());
-            for (size_t r(0); r < squaredDiff.getNRows(); ++r) {
+            for (size_t r(skipRows); r < squaredDiff.getNRows(); ++r) {
                 for (auto& c : dofsToCalibrateIdx_.at(trialIndex)) {
                     trialCost.torqueError.at(c) += squaredDiff.at(r, c);
                 }
             }
-            for (size_t r(0); r < rIt->penalties.getNRows(); ++r)
+            for (size_t r(skipRows); r < rIt->penalties.getNRows(); ++r)
                 for (size_t c(0); c < rIt->penalties.getNColumns(); ++c)
                     trialCost.penalty += rIt->penalties.at(r, c);
             trialCosts_.emplace_back(trialCost);

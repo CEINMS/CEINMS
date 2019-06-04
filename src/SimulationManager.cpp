@@ -160,6 +160,8 @@ namespace ceinms {
             "PennationAngles",
             "MuscleForces",
             "Torques",
+			"TendonLengths",
+			"NormTendonLengths",
             "MusclesContribution" };
 
         vector<string> valuesToWrite = dataToLog;
@@ -282,6 +284,8 @@ namespace ceinms {
             "PennationAngles",
             "MuscleForces",
             "Torques",
+			"TendonLengths",
+			"NormTendonLengths",
             "MusclesContribution" };
 
         // 2b. define the thread consuming the output sources
@@ -452,6 +456,8 @@ namespace ceinms {
             "PennationAngles",
             "MuscleForces",
             "Torques",
+			"TendonLengths",
+			"NormTendonLengths",
             "MusclesContribution" };
         // 2b. define the thread consuming the output sources
         vector<string> valuesToWrite = dataToLog;
@@ -562,14 +568,19 @@ namespace ceinms {
             "PennationAngles",
             "MuscleForces",
             "Torques",
+			"TendonLengths",
+			"NormTendonLengths",
             "AdjustedEmgs",
             "MusclesContribution" };
         // 2b. define the thread consuming the output sources
         vector<string> valuesToWrite = dataToLog;
+			
+
         QueuesToStorageFiles queuesToStorageFiles(logQueue, doneWithSubscriptionsLatch, doneWithExecutionLatch, mySubject, valuesToWrite, outputDirectory_);
 
         // 3. define the model simulator
         vector<string> valuesToLog = dataToLog;
+		valuesToLog.push_back("ObjectiveFunctionComponentsAndWeightings");
 
 
         // 4. define the optimiser
@@ -617,6 +628,15 @@ namespace ceinms {
             osimModelFilename,
             dataLocations_.getMotionFile(),
             8);
+
+		QueueToStorageFile<ScalarVectorData> hybridErrorLogger(
+			*(logQueue["ObjectiveFunctionComponentsAndWeightings"]),
+			doneWithSubscriptionsLatch,
+			doneWithExecutionLatch,
+			{ "TorqueError", "SumExcitation", "ExcitationTrackingError", "alpha", "beta", "gamma" },
+			"ObjectiveFunctionComponentsAndWeightings",
+			outputDirectory_
+		);
         //2 create external forces produces
         cout << "-- Initialise external forces produces" << endl;
         ExternalForcesFromStorageFile externalForcesFromStorageFile(
@@ -669,8 +689,8 @@ namespace ceinms {
             false);
 */
 
-        doneWithSubscriptionsLatch.setCount(9);
-        doneWithExecutionLatch.setCount(9);
+        doneWithSubscriptionsLatch.setCount(10);
+        doneWithExecutionLatch.setCount(10);
 
         // 5. start the threads
         std::thread emgProdThread(std::ref(emgProducer));
@@ -683,6 +703,7 @@ namespace ceinms {
         std::thread generalisedCoordinateThread(std::ref(generalisedCoordinateFromStorageFile));
         std::thread externalForcesThread(std::ref(externalForcesFromStorageFile));
         std::thread contactForcesLoggerThread(std::ref(contactForcesLogger));
+		std::thread hybridErrorLoggerThread(std::ref(hybridErrorLogger));
      //   std::thread inverseDynamicsSolverThread(std::ref(inverseDynamicsSolver));
      //   std::thread externalTorquesLoggerThread(std::ref(externalTorquesLogger));
 
@@ -695,6 +716,7 @@ namespace ceinms {
         generalisedCoordinateThread.join();
         externalForcesThread.join();
         contactForcesLoggerThread.join();
+		hybridErrorLoggerThread.join();
  //       inverseDynamicsSolverThread.join();
  //       externalTorquesLoggerThread.join();
 
@@ -743,6 +765,8 @@ namespace ceinms {
             "PennationAngles",
             "MuscleForces",
             "Torques",
+			"TendonLengths",
+			"NormTendonLengths",
             "AdjustedEmgs",
             "MusclesContribution"};
         // 2b. define the thread consuming the output sources

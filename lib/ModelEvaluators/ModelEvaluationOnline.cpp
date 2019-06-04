@@ -85,7 +85,7 @@ namespace ceinms {
         bool runCondition(true);
         bool firstLmtArrived(false);
         bool externalTorquesRunCondition(true); //we first assume there are ext forces
-        cout << subject_ << endl;
+ //       cout << subject_ << endl;
 
         ModelEvaluationBase<Logger>::doneWithSubscriptions();
         do {  // while(runCondition)
@@ -177,6 +177,10 @@ namespace ceinms {
                 ModelEvaluationBase<Logger>::logger.log(lmtMaTime, data, "MuscleForces");
                 subject_.getTorques(data);
                 ModelEvaluationBase<Logger>::logger.log(lmtMaTime, data, "Torques");
+				subject_.getTendonLengths(data);
+				ModelEvaluationBase<Logger>::logger.log(lmtMaTime, data, "TendonLengths");
+				subject_.getNormTendonLengths(data);
+				ModelEvaluationBase<Logger>::logger.log(lmtMaTime, data, "NormTendonLengths");
                 data.clear();
                 for (unsigned i = 0; i < noDof_; ++i) {
                     vector<double> contribution;
@@ -246,6 +250,8 @@ namespace ceinms {
         ModelEvaluationBase<Logger>::logger.log(endTime, endData, "PennationAngles");
         ModelEvaluationBase<Logger>::logger.log(endTime, endData, "MuscleForces");
         ModelEvaluationBase<Logger>::logger.log(endTime, endData, "Torques");
+		ModelEvaluationBase<Logger>::logger.log(endTime, endData, "TendonLengths");
+		ModelEvaluationBase<Logger>::logger.log(endTime, endData, "NormTendonLengths");
         ModelEvaluationBase<Logger>::logger.log(endTime, endData, "MusclesContribution");
 #endif
 

@@ -575,6 +575,26 @@ namespace ceinms {
             muscleForces.emplace_back(muscleIt->getMuscleForce());
     }
 
+	template <typename Activation, typename Tendon, CurveMode::Mode mode>
+	void NMSmodel<Activation, Tendon, mode>::getTendonLengths(std::vector<double>& tendonLengths) const {
+
+		tendonLengths.clear();
+		tendonLengths.reserve(muscles_.size());
+		vectorMTUconstItr muscleIt = muscles_.begin();
+		for (muscleIt = muscles_.begin(); muscleIt != muscles_.end(); ++muscleIt)
+			tendonLengths.emplace_back(muscleIt->getTendonLength());
+	}
+
+	template <typename Activation, typename Tendon, CurveMode::Mode mode>
+	void NMSmodel<Activation, Tendon, mode>::getNormTendonLengths(std::vector<double>& normTendonLengths) const {
+
+		normTendonLengths.clear();
+		normTendonLengths.reserve(muscles_.size());
+		vectorMTUconstItr muscleIt = muscles_.begin();
+		for (muscleIt = muscles_.begin(); muscleIt != muscles_.end(); ++muscleIt)
+			normTendonLengths.emplace_back(muscleIt->getNormTendonLength());
+	}
+
     template <typename Activation, typename Tendon, CurveMode::Mode mode>
     void NMSmodel<Activation, Tendon, mode>::getTorques(vector<double>& torques) const {
 

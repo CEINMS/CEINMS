@@ -69,6 +69,7 @@ namespace ceinms {
         double getPenalty() const { return .0; }
 
         double getFibreLength() { return fibreLength_; }
+		double getTendonLength() const { return tendonSlackLength_; }
         void setStrengthCoefficient(double strengthCoefficient) { /*intentionally left blank*/ };
         void setTendonSlackLength(double tendonSlackLength) { tendonSlackLength_ = tendonSlackLength; }
         void setOptimalFibreLength(double optimalFibreLength) { optimalFibreLength_ = optimalFibreLength; }

@@ -72,8 +72,8 @@ namespace ceinms {
             xp_.resize(noParameters_);
             noAccepted_.resize(noParameters_);
 
-            // srand(time(NULL));
-            srand(1);
+            srand(time(NULL));
+            //srand(1);
         }
 
         template<typename OptimizerSystem>

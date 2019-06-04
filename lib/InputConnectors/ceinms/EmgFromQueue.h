@@ -12,8 +12,12 @@
 #include <ceinms/Mapper.h>
 #include <iostream>
 #include "Utilities.h"
+#include <fstream>
 
 namespace ceinms {
+
+	void parseMaxEmgFile(const std::string& maxEmgFilename, std::vector<std::string>& emgNames,
+		std::vector<double>& normalisationWeights);
 
     class EmgFromQueue : public ceinms::EmgFromX{
 

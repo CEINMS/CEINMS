@@ -477,7 +477,7 @@ namespace ceinms {
 
         double penalty(tendonDynamic_.getPenalty());
         double const normalisedFibreRatio(fabs(fibreLength_ / optimalFibreLength_ - 1.0));
-        if (normalisedFibreRatio > 0.5)
+        if (normalisedFibreRatio > 0.3)
             penalty += normalisedFibreRatio*normalisedFibreRatio * 100;
         return penalty;
     }

@@ -31,8 +31,12 @@
 #include <boost/algorithm/string.hpp>
 #include <iostream>
 #include "ceinms/FileUtils.h"
+#include<fstream>
+#include<sstream>
 
 namespace ceinms {
+	
+
     namespace FileUtils {
 
         std::string getFile(const std::string& aPath, const std::string& mask) {

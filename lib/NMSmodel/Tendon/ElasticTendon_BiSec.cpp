@@ -322,7 +322,11 @@ namespace ceinms {
         try {
             currentFibreLength = wdbSolve(*this, minFibreLength, maxFibreLength, tol);
             //     currentFibreLength = rtSafe(*this, minFibreLength, maxFibreLength, tol);
-
+			double pennationAngleAtT = PennationAngle::compute(currentFibreLength, optimalFibreLength_, pennationAngle_);
+			double tendonLength = muscleTendonLength_ - currentFibreLength * cos(pennationAngleAtT);
+			double tendonStrain = (tendonLength - tendonSlackLength_) / tendonSlackLength_;
+			if(tendonStrain < 0)
+				tendonPenalty_ += 100;
         }
         catch (...) {
 
