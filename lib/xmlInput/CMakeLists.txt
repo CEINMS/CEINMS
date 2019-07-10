@@ -78,6 +78,7 @@ set(xmlInput_HEADERS    ceinms/ExecutionXmlReader.h
                         ceinms/CeinmsSetupXmlReader.h
                         ceinms/CeinmsCalibrationSetupXmlReader.h
 						ceinms/ContactModelXmlReader.h
+						ceinms/XmlWriter.h
                         )
 
 set(xmlInput_IMPL_HEADERS   impl/grammar-input-stream.hxx
@@ -92,6 +93,7 @@ set(schemas_GENERATED_HEADERS  ${CMAKE_CURRENT_BINARY_DIR}/execution-schema.hxx
                                 ${CMAKE_CURRENT_BINARY_DIR}/ceinmsCalibrationSetup-schema.hxx
 								${CMAKE_CURRENT_BINARY_DIR}/contactModel-schema.hxx)
 
+set_source_files_properties(ceinms/XmlWriter.cpp PROPERTIES HEADER_FILE_ONLY TRUE)
 source_group("Headers" FILES ${xmlInput_HEADERS})
 source_group("Private headers" FILES ${xmlInput_IMPL_HEADERS})
 source_group("Generated headers" FILES  ${schemas_GENERATED_HEADERS}

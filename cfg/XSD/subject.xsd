@@ -37,6 +37,7 @@
       <xs:element minOccurs="0" name="damping" type="xs:double"/>
       <xs:element name="maxIsometricForce" type="xs:double"/>
       <xs:element name="strengthCoefficient" type="xs:double"/>
+      <xs:element maxOccurs="4" minOccurs="0" name="curve" type="CurveType"/>
     </xs:sequence>
   </xs:complexType>
   <xs:complexType name="MTUSetType">

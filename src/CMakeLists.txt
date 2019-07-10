@@ -58,11 +58,11 @@ TARGET_LINK_LIBRARIES( CEINMS
       ${Boost_FILESYSTEM_LIBRARY}
 )
 
-set(CEINMScalibrate_HEADERS XmlWriter.h CalibrationManager.h)
-set(CEINMScalibrate_COMMON_SOURCES XmlWriter.cpp CalibrationManager.cpp)
+set(CEINMScalibrate_HEADERS CalibrationManager.h)
+set(CEINMScalibrate_COMMON_SOURCES CalibrationManager.cpp)
 set(CEINMScalibrate_SOURCES CEINMScalibration.cpp ${CEINMScalibrate_COMMON_SOURCES})
 
-set_source_files_properties(XmlWriter.cpp CalibrationManager.cpp PROPERTIES HEADER_FILE_ONLY TRUE)
+set_source_files_properties(CalibrationManager.cpp PROPERTIES HEADER_FILE_ONLY TRUE)
 
 add_executable( CEINMScalibrate ${CEINMScalibrate_SOURCES} ${CEINMScalibrate_HEADERS})
 target_link_libraries( CEINMScalibrate

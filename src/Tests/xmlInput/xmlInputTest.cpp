@@ -26,8 +26,15 @@
  * limitations under the License.                                             *
  * -------------------------------------------------------------------------- */
 
+#include "ceinms/NMSmodel.h"
+#include "ceinms/Activation/ExponentialActivation.h"
+#include "ceinms/Tendon/ElasticTendon_BiSec.h"
+#include "ceinms/Curve.h"
 #include "ceinms/ContactModelXmlReader.h"
 #include "ceinms/ExecutionXmlReader.h"
+#include "ceinms/XmlWriter.h"
+
+#include <sstream>
 #include <iostream>
 using std::cout;
 using std::endl;
@@ -82,12 +89,34 @@ void testExecutionXmlReader(std::string filename) {
     v.clear();
 }
 
+void testSubjectXmlFile(std::string inFilename, string outFilename) {
+
+	ceinms::NMSmodel<ceinms::ExponentialActivation, ceinms::ElasticTendon_BiSec, ceinms::CurveMode::Offline> subject1, subject2;
+	ceinms::setupSubject(subject1, inFilename);
+	ceinms::XmlWriter writer(inFilename);
+	writer.setParameters(subject1);
+	writer.setOutputFilename(outFilename);
+	writer.write();
+	ceinms::setupSubject(subject2, outFilename);
+	std::stringstream ss1, ss2;
+	ss1 << subject1;
+	ss2 << subject2;
+	if (ss1.str() == ss2.str())
+		cout << "Subject XML re-read produce the same result" << endl;
+	else 
+		cout << "Subject XML re-read FAILED" << endl;
+	cout << subject1;
+
+
+}
+
 int main() {
 
     boost::filesystem::path dir = path(BASE_DIR) /= "TestData";
 
     testContactModels((dir / "contactModelKnee.xml").string());
     testExecutionXmlReader((dir / "executionHybrid.xml").string());
+	testSubjectXmlFile((dir / "subject.xml").string(), (dir / "outSubject.xml").string());
    
     return 0;
 }

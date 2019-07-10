@@ -63,7 +63,7 @@ namespace ceinms {
             double damping,
             double maxIsometricForce,
             double strengthCoefficient,
-            double maxContractionVelocity = 10.0);
+            double maxContractionVelocity);
 
         void setParametersToComputeActivation(double c1,
             double c2,
@@ -132,6 +132,8 @@ namespace ceinms {
 
         friend std::ostream& operator<< <> (std::ostream& output, const MTU& m);
 
+		template<typename T>
+		friend class SetupDataStructure;
     private:
         void updateFibreLength();
         void updateFibreLength_OFFLINE();

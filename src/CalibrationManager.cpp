@@ -68,7 +68,7 @@ using std::vector;
 #include "ceinms/queues/MultipleMomentArmsQueues.h"
 #include "ceinms/QueuesToTrialData.h"
 
-#include "XmlWriter.h"
+#include "ceinms/XmlWriter.h"
 #include "ceinms/FileUtils.h"
 
 namespace ceinms {

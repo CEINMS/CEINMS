@@ -50,6 +50,7 @@ using SubjectXsd::MTUNameSetType;
 using SubjectXsd::AngleInputType;
 using SubjectXsd::DoFSetType;
 using SubjectXsd::DoFType;
+using SubjectXsd::CurveType;
 
 
 
@@ -96,85 +97,97 @@ namespace ceinms {
                 y.push_back(currentY);
             }
 
-            if (curveName == "activeForceLength")  activeForceLengthCurve_.resetPointsWith(x, y);
-            if (curveName == "passiveForceLength") passiveForceLengthCurve_.resetPointsWith(x, y);
-            if (curveName == "forceVelocity")      forceVelocityCurve_.resetPointsWith(x, y);
-            if (curveName == "tendonForceStrain")      tendonForceStrain_.resetPointsWith(x, y);
+			if (curveName == "activeForceLength")  defaultActiveForceLengthCurve_.resetPointsWith(x, y);
+			if (curveName == "passiveForceLength") defaultPassiveForceLengthCurve_.resetPointsWith(x, y);
+			if (curveName == "forceVelocity")      defaultForceVelocityCurve_.resetPointsWith(x, y);
+			if (curveName == "tendonForceStrain")  defaultTendonForceStrain_.resetPointsWith(x, y);
         }
 
     }
 
 
     template<typename NMSmodelT>
-    void SetupDataStructure<NMSmodelT>::createMuscles(NMSmodelT& mySubject) {
+    void SetupDataStructure<NMSmodelT>::createMuscles(NMSmodelT& mySubject) const {
 
+		SubjectType::mtuDefault_type& mtuDefault(subjectPointer_->mtuDefault());
+		SubjectType::mtuSet_type& mtuSet(subjectPointer_->mtuSet());
+		MTUSetType::mtu_sequence& mtuSequence(mtuSet.mtu());
+		for (auto& muscleIt : mtuSequence) {
 
-        SubjectType::mtuDefault_type& mtuDefault(subjectPointer_->mtuDefault());
-        SubjectType::mtuSet_type& mtuSet(subjectPointer_->mtuSet());
-        MTUSetType::mtu_sequence& mtuSequence(mtuSet.mtu());
-        MTUSetType::mtu_iterator i;
-        for (i = mtuSequence.begin(); i != mtuSequence.end(); ++i) {
-            string muscleName = (*i).name();
-            MTUT newMuscle(muscleName);
-            MTUType::emDelay_optional& emDelayOpt((*i).emDelay());
-            double emDelay;
-            if (emDelayOpt.present())
-                emDelay = (*i).emDelay().get();
-            else
-                emDelay = mtuDefault.emDelay();
-            double percentageChange = mtuDefault.percentageChange();
-            MTUType::damping_optional& dampingOpt((*i).damping());
-            double damping;
-            if (dampingOpt.present())
-                damping = (*i).damping().get();
-            else
-                damping = mtuDefault.damping();
-            double maxIsometricForce = (*i).maxIsometricForce();
-            double c1 = (*i).c1();
-            double c2 = (*i).c2();
-            double shapeFactor = (*i).shapeFactor();
+			CurveOffline forceVelocityCurve = defaultForceVelocityCurve_;
+			CurveOffline activeForceLengthCurve = defaultActiveForceLengthCurve_;
+			CurveOffline passiveForceLengthCurve = defaultPassiveForceLengthCurve_;
+			CurveOffline tendonForceStrain = defaultTendonForceStrain_;
+			string muscleName = muscleIt.name();
+			MTUT newMuscle(muscleName);
+			MTUType::emDelay_optional& emDelayOpt(muscleIt.emDelay());
+			double emDelay;
+			if (emDelayOpt.present())
+				emDelay = muscleIt.emDelay().get();
+			else
+				emDelay = mtuDefault.emDelay();
+			double percentageChange = mtuDefault.percentageChange();
+			MTUType::damping_optional& dampingOpt(muscleIt.damping());
+			double damping;
+			if (dampingOpt.present())
+				damping = muscleIt.damping().get();
+			else
+				damping = mtuDefault.damping();
+			double maxIsometricForce = muscleIt.maxIsometricForce();
+			double c1 = muscleIt.c1();
+			double c2 = muscleIt.c2();
+			double shapeFactor = muscleIt.shapeFactor();
+			double optimalFiberLength = muscleIt.optimalFibreLength();
 
-            double activationScale = 1;
-            MTUType::activationScale_optional& activationScaleOpt((*i).activationScale());
-            if (activationScaleOpt.present())
-                activationScale = (*i).activationScale().get();
+			MTUType::pennationAngle_type& xmlPennAngle(muscleIt.pennationAngle());
+			double pennationAngle = xmlPennAngle;
+			switch (xmlPennAngle.unit()) {
+			case AngleInputType::unit_type::deg:
+				cout << "Converted " << muscleName << " pennation angle from degrees to radians: " << pennationAngle << " -> ";
+				pennationAngle = radians(pennationAngle);
+				cout << pennationAngle << endl;
+				break;
+			default:
+				cout << "Assuming " << muscleName << " pennation angle in radians: " << pennationAngle << endl;
+				break;
+			}
+			double tendonSlackLength = muscleIt.tendonSlackLength();
+			double strengthCoefficient = muscleIt.strengthCoefficient();
+			double maxContractionVelocity = 10.; //default value
+			if (muscleIt.maxContractionVelocity().present())
+				maxContractionVelocity = muscleIt.maxContractionVelocity().get();
+			
+			MTUType::curve_sequence& curveSequence(muscleIt.curve());
+			for (auto curve : curveSequence) {
 
-            double optimalFiberLength = (*i).optimalFibreLength();
+				string curveName = curve.name();
+				cout << "Reading " << curveName << " of MTU " << muscleIt.name() << endl;
+				vector<double> x, y;
+				for (auto xValue : curve.xPoints()) {
+					x.push_back(xValue);
+				}
 
-            MTUType::pennationAngle_type& xmlPennAngle((*i).pennationAngle());
-            double pennationAngle = xmlPennAngle;
-            switch (xmlPennAngle.unit()) {
-            case AngleInputType::unit_type::deg:
-                cout << "Converted " << muscleName << " pennation angle from degrees to radians: " << pennationAngle << " -> ";
-                pennationAngle = radians(pennationAngle);
-                cout << pennationAngle << endl;
-                break;
-            default:
-                cout << "Assuming " << muscleName << " pennation angle in radians: " << pennationAngle << endl;
-                break;
-            }
-            double tendonSlackLength = (*i).tendonSlackLength();
-            double strengthCoefficient = (*i).strengthCoefficient();
-            newMuscle.setParametersToComputeActivation(c1, c2, shapeFactor, activationScale);
-            newMuscle.setCurves(activeForceLengthCurve_, passiveForceLengthCurve_, forceVelocityCurve_, tendonForceStrain_);
-            if ((*i).maxContractionVelocity().present())
-            {
-                double maxContractionVelocity = (*i).maxContractionVelocity().get();
-                newMuscle.setParametersToComputeForces(optimalFiberLength, pennationAngle,
-                    tendonSlackLength, percentageChange, damping, maxIsometricForce, strengthCoefficient, maxContractionVelocity);
-            }
-            else // let MTU use default value for maxContractionVelocity
-            {
-                newMuscle.setParametersToComputeForces(optimalFiberLength, pennationAngle,
-                    tendonSlackLength, percentageChange, damping, maxIsometricForce, strengthCoefficient);
-            }
-            newMuscle.setEmDelay(emDelay);
-            mySubject.addMuscle(newMuscle);
-        }
+				for (auto yValue : curve.yPoints()) {
+					y.push_back(yValue);
+				}
+				if (curveName == "activeForceLength")  activeForceLengthCurve.resetPointsWith(x, y);
+				if (curveName == "passiveForceLength") passiveForceLengthCurve.resetPointsWith(x, y);
+				if (curveName == "forceVelocity")      forceVelocityCurve.resetPointsWith(x, y);
+				if (curveName == "tendonForceStrain")  tendonForceStrain.resetPointsWith(x, y);
+			}
+
+			newMuscle.setParametersToComputeActivation(c1, c2, shapeFactor, 1);
+			newMuscle.setParametersToComputeForces(optimalFiberLength, pennationAngle,
+				tendonSlackLength, percentageChange, damping, maxIsometricForce, strengthCoefficient, maxContractionVelocity);
+			newMuscle.setCurves(activeForceLengthCurve, passiveForceLengthCurve, forceVelocityCurve, tendonForceStrain);
+
+			newMuscle.setEmDelay(emDelay);
+			mySubject.addMuscle(newMuscle);
+		}
     }
 
     template<typename NMSmodelT>
-    void SetupDataStructure<NMSmodelT>::setExtraInfo(NMSmodelT& mySubject) {
+    void SetupDataStructure<NMSmodelT>::setExtraInfo(NMSmodelT& mySubject) const {
 
         if (!osimModel_.empty()) {
             mySubject.setOpenSimModelFilename(osimModel_);
@@ -185,7 +198,7 @@ namespace ceinms {
     }
 
     template<typename NMSmodelT>
-    void SetupDataStructure<NMSmodelT>::createDoFs(NMSmodelT& mySubject) {
+    void SetupDataStructure<NMSmodelT>::createDoFs(NMSmodelT& mySubject) const {
 
         SubjectType::dofSet_type& dofSet(subjectPointer_->dofSet());
         DoFSetType::dof_sequence& dofSequence(dofSet.dof());
@@ -214,7 +227,7 @@ namespace ceinms {
         }
     }
 
-
+	/*
     template<typename NMSmodelT>
     void SetupDataStructure<NMSmodelT>::writeXMLCalibratedFile(NMSmodelT& mySubject, const string& XMLfilename) {
 
@@ -222,23 +235,28 @@ namespace ceinms {
         SubjectType::mtuSet_type& mtuSet(subjectPointer_->mtuSet());
         MTUSetType::mtu_sequence& mtuSequence(mtuSet.mtu());
 
-        for (MTUSetType::mtu_iterator i(mtuSequence.begin()); i != mtuSequence.end(); ++i) {
-            string muscleName = (*i).name();
+        for (auto& muscleIt : mtuSequence) {
+            string muscleName = muscleIt.name();
             MTUT currentMuscle;
             mySubject.getMuscle(currentMuscle, muscleName);
-            (*i).c1(currentMuscle.getC1());
-            (*i).c2(currentMuscle.getC2());
-            (*i).shapeFactor(currentMuscle.getShapeFactor());
-            (*i).optimalFibreLength(currentMuscle.getOptimalFiberLength());
-            (*i).pennationAngle(currentMuscle.getPennationAngle());
-            (*i).tendonSlackLength(currentMuscle.getTendonSlackLength());
+			muscleIt.c1(currentMuscle.getC1());
+			muscleIt.c2(currentMuscle.getC2());
+			muscleIt.shapeFactor(currentMuscle.getShapeFactor());
+			muscleIt.optimalFibreLength(currentMuscle.getOptimalFiberLength());
+			muscleIt.pennationAngle(currentMuscle.getPennationAngle());
+			muscleIt.tendonSlackLength(currentMuscle.getTendonSlackLength());
             mtuDefault.percentageChange(currentMuscle.getPercentageChange());
             mtuDefault.damping(currentMuscle.getDamping());
             mtuDefault.emDelay(currentMuscle.getEmDelay());
             //  (*i).emDelay(currentMuscle.getEmDelay());
             //NOTE: single emDelay not available yet
-            (*i).maxIsometricForce(currentMuscle.getMaxIsometricForce());
-            (*i).strengthCoefficient(currentMuscle.getStrengthCoefficient());
+			muscleIt.maxIsometricForce(currentMuscle.getMaxIsometricForce());
+			muscleIt.strengthCoefficient(currentMuscle.getStrengthCoefficient());
+			CurveType activeCurve;
+			activeCurve.name("activeForceLength");
+			activeCurve.xPoints(currentMuscle.activeForceLengthCurve_.getXNodes());
+			activeCurve.yPoints(currentMuscle.activeForceLengthCurve_.getYNodes());
+			muscleIt.curve().push_back(activeCurve);
         }
 
         xml_schema::namespace_infomap map;
@@ -249,4 +267,5 @@ namespace ceinms {
         subject(ofs, *subjectPointer_, map);
 
     }
+	*/
 }

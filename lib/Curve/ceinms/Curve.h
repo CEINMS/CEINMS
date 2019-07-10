@@ -76,6 +76,7 @@ namespace ceinms {
     class Curve {
 
     public:
+		typedef typename Select<mode, std::vector<double>, CircularVector<double, N> >::Result VectorType;
         Curve();
         // compute coefficients
         Curve(const std::vector<double>& x, const std::vector<double> &y);
@@ -105,6 +106,10 @@ namespace ceinms {
                 return x_.back();
             return 0;
         }
+
+		VectorType getXNodes() const { return x_; }
+		VectorType getYNodes() const { return y_; }
+
         friend std::ostream& operator<< <>(std::ostream& output, const Curve& c);
         bool empty() { return b_.empty(); }
         std::size_t getNoElements() const { return x_.size(); }
@@ -122,7 +127,7 @@ namespace ceinms {
         unsigned getAbscissaPoint(double xValue, Int2Type<CurveMode::Online>) const;
         unsigned getAbscissaPoint(double xValue, Int2Type<CurveMode::Offline>) const;
 
-        typedef typename Select<mode, std::vector<double>, CircularVector<double, N> >::Result VectorType;
+
         VectorType x_;
         VectorType y_;
         std::vector<double>    b_;

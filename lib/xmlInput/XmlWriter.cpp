@@ -36,7 +36,7 @@ using SubjectXsd::SubjectType;
 #include <fstream>
 #include <iostream>
 #include <list>
-//#include "XmlWriter.h"
+
 namespace ceinms {
     //TODO: it should re-parse all the info from the subject, instead of re-writing the oldXml
     XmlWriter::XmlWriter(const string& startXmlFile)

@@ -45,17 +45,17 @@ namespace ceinms {
         typedef Curve<CurveMode::Offline> CurveOffline;
         SetupDataStructure(const std::string& inputFile);
         void  createCurves();
-        void  createMuscles(NMSmodelT& mySubject);
-        void  createDoFs(NMSmodelT& mySubject);
-        void  setExtraInfo(NMSmodelT& mySubject);
-        void  writeXMLCalibratedFile(NMSmodelT& mySubject, const std::string& XMLfilename);
+        void  createMuscles(NMSmodelT& mySubject) const;
+        void  createDoFs(NMSmodelT& mySubject) const;
+        void  setExtraInfo(NMSmodelT& mySubject) const;
+  //      static void  writeXMLCalibratedFile(NMSmodelT& mySubject, const std::string& XMLfilename);
     private:
         // Create the body structure from the Input
         std::auto_ptr<SubjectXsd::SubjectType> subjectPointer_;
-        CurveOffline forceVelocityCurve_;
-        CurveOffline activeForceLengthCurve_;
-        CurveOffline passiveForceLengthCurve_;
-        CurveOffline tendonForceStrain_;
+        CurveOffline defaultForceVelocityCurve_;
+        CurveOffline defaultActiveForceLengthCurve_;
+        CurveOffline defaultPassiveForceLengthCurve_;
+        CurveOffline defaultTendonForceStrain_;
         std::string osimModel_;
     };
 

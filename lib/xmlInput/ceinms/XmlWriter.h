@@ -52,5 +52,4 @@ namespace ceinms {
     };
 }
 #include "XmlWriter.cpp"
-
 #endif

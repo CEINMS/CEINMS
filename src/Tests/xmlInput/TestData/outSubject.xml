@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<subject xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="subject.xsd">
+  <mtuDefault>
+    <emDelay>0.015</emDelay>
+    <percentageChange>0.15</percentageChange>
+    <damping>0.1</damping>
+    <curve>
+      <name>activeForceLength</name>
+      <xPoints>0.4035 0.52725 0.62875 0.71875 0.86125 1.045 1.2175 1.43875 1.61875</xPoints>
+      <yPoints>0 0.226667 0.636667 0.856667 0.95 0.993333 0.77 0.246667 0</yPoints>
+    </curve>
+    <curve>
+      <name>passiveForceLength</name>
+      <xPoints>1 1.1 1.2 1.3 1.4 1.5 1.6</xPoints>
+      <yPoints>0 0.035 0.12 0.26 0.55 1.17 2</yPoints>
+    </curve>
+    <curve>
+      <name>forceVelocity</name>
+      <xPoints>-1 -0.6 -0.3 -0.1 0 0.1 0.3 0.6 0.8</xPoints>
+      <yPoints>0 0.08 0.2 0.55 1 1.4 1.6 1.7 1.75</yPoints>
+    </curve>
+    <curve>
+      <name>tendonForceStrain</name>
+      <xPoints>0 1 2</xPoints>
+      <yPoints>0 1 2</yPoints>
+    </curve>
+  </mtuDefault>
+  <mtuSet>
+    <mtu>
+      <name>mtu1</name>
+      <c1>-0.5</c1>
+      <c2>-0.5</c2>
+      <shapeFactor>0.1</shapeFactor>
+      <activationScale>1</activationScale>
+      <optimalFibreLength>0.130058798507018</optimalFibreLength>
+      <pennationAngle unit="rad">0</pennationAngle>
+      <tendonSlackLength>0.361202265535749</tendonSlackLength>
+      <maxContractionVelocity>10</maxContractionVelocity>
+      <maxIsometricForce>896</maxIsometricForce>
+      <strengthCoefficient>1.5</strengthCoefficient>
+    </mtu>
+    <mtu>
+      <name>mtu2</name>
+      <c1>-0.5</c1>
+      <c2>-0.5</c2>
+      <shapeFactor>0.1</shapeFactor>
+      <activationScale>1</activationScale>
+      <optimalFibreLength>0.194487652477019</optimalFibreLength>
+      <pennationAngle unit="rad">0.40142573</pennationAngle>
+      <tendonSlackLength>0.100053758086102</tendonSlackLength>
+      <maxContractionVelocity>10</maxContractionVelocity>
+      <maxIsometricForce>804</maxIsometricForce>
+      <strengthCoefficient>1.5</strengthCoefficient>
+      <curve>
+        <name>tendonForceStrain</name>
+        <xPoints>3 4 5</xPoints>
+        <yPoints>3 4 5</yPoints>
+      </curve>
+    </mtu>
+    <mtu>
+      <name>mtu3</name>
+      <c1>-0.5</c1>
+      <c2>-0.5</c2>
+      <shapeFactor>0.1</shapeFactor>
+      <activationScale>1</activationScale>
+      <optimalFibreLength>0.103841062871676</optimalFibreLength>
+      <pennationAngle unit="rad">0.13962634</pennationAngle>
+      <tendonSlackLength>0.370594509721652</tendonSlackLength>
+      <maxContractionVelocity>10</maxContractionVelocity>
+      <maxIsometricForce>512</maxIsometricForce>
+      <strengthCoefficient>1.5</strengthCoefficient>
+    </mtu>
+  </mtuSet>
+  <dofSet>
+    <dof>
+      <name>dof1</name>
+      <mtuNameSet>mtu1 mtu2</mtuNameSet>
+    </dof>
+    <dof>
+      <name>dof2</name>
+      <mtuNameSet>mtu3</mtuNameSet>
+    </dof>
+  </dofSet>
+  <calibrationInfo>
+    <uncalibrated>
+      <subjectID>gID</subjectID>
+      <additionalInfo>test file</additionalInfo>
+    </uncalibrated>
+  </calibrationInfo>
+</subject>
