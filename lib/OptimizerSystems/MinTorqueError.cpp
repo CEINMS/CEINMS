@@ -90,10 +90,14 @@ namespace ceinms {
             for (auto& name : dofsToCalibrate_) {
                 auto i(std::distance(dofNamesFromTrial.begin(), (std::find(dofNamesFromTrial.begin(), dofNamesFromTrial.end(), name))));
                 trialVariance.at(i) = getVariance(trial.getTorqueData().getColumn(i));
-                if (trialVariance.at(i) < 1) trialVariance.at(i) = 1;   //don't penalize if the variance in low
-            }
+            //    if (trialVariance.at(i) < 1) trialVariance.at(i) = 1;   //don't penalize if the variance in low
+				trialVariance.at(i) = 1.;   //don't penalize if the variance in low
+
+			}
+//            torqueVariance_.emplace_back(trialVariance);
             torqueVariance_.emplace_back(trialVariance);
-        }
+
+		}
     }
 
     void MinTorqueError::calculate(const std::vector<Result>& results) {
@@ -125,8 +129,9 @@ namespace ceinms {
         }
         for (size_t trialIndex(0); trialIndex < trials_.size(); ++trialIndex) {
             for (auto& dofIdx : dofsToCalibrateIdx_.at(trialIndex))
-                f_ += (trialCosts_.at(trialIndex).torqueError.at(dofIdx) / torqueVariance_.at(trialIndex).at(dofIdx) +
-                trialCosts_.at(trialIndex).penalty) / results.at(trialIndex).torques.getNRows();
+                f_ += std::sqrt(trialCosts_.at(trialIndex).torqueError.at(dofIdx) / 
+					torqueVariance_.at(trialIndex).at(dofIdx)/ results.at(trialIndex).torques.getNRows()) +
+                trialCosts_.at(trialIndex).penalty / results.at(trialIndex).torques.getNRows();
         }
     }
 
@@ -140,6 +145,7 @@ namespace ceinms {
                             trials_.at(trialIndex).getTorqueData().getNRows());
                         std::cout << trials_.at(trialIndex).getDofNames().at(dofIdx)  << " " << val << " Nm" << std::endl;
             }
+			std::cout << "Penalties: " << trialCosts_.at(trialIndex).penalty << std::endl;
             std::cout << std::endl;
         }
         std::cout << "Fobj = " << getValue() << std::endl;

@@ -59,24 +59,26 @@ namespace ceinms {
             auto newLmtData = lmtData_.getCurrentData();
             time = lmtData_.getCurrentTime(); //lmt and momentArms times are equal, ALWAYS!
 
-            vector<double> selectedLmtData(musclesNames_.size());
-            for (int i = 0; i < musclesNames_.size(); ++i)
-                selectedLmtData.at(i) = newLmtData.at(musclePositionInLmtStorage_.at(i));
+			if (time >= startTime_ && time <= stopTime_) {
+				vector<double> selectedLmtData(musclesNames_.size());
+				for (int i = 0; i < musclesNames_.size(); ++i)
+					selectedLmtData.at(i) = newLmtData.at(musclePositionInLmtStorage_.at(i));
 
-            LmtMaFromX::updateLmt(selectedLmtData, time);
+				LmtMaFromX::updateLmt(selectedLmtData, time);
 
-            for (unsigned int currentDof = 0; currentDof < dofNames_.size(); ++currentDof)
-            {
+				for (unsigned int currentDof = 0; currentDof < dofNames_.size(); ++currentDof)
+				{
 
-                (*maDataStorageFiles_.at(currentDof)).readNextData();
-                auto newMaData = (*maDataStorageFiles_.at(currentDof)).getCurrentData();
+					(*maDataStorageFiles_.at(currentDof)).readNextData();
+					auto newMaData = (*maDataStorageFiles_.at(currentDof)).getCurrentData();
 
-                vector<double> selectedMaData(musclePositionsInMaStorages_.at(currentDof).size());
-                for (int i = 0; i < selectedMaData.size(); ++i)
-                    selectedMaData.at(i) = newMaData.at(musclePositionsInMaStorages_.at(currentDof).at(i));
+					vector<double> selectedMaData(musclePositionsInMaStorages_.at(currentDof).size());
+					for (int i = 0; i < selectedMaData.size(); ++i)
+						selectedMaData.at(i) = newMaData.at(musclePositionsInMaStorages_.at(currentDof).at(i));
 
-                LmtMaFromX::updateMomentArms(selectedMaData, time, currentDof);
-            }
+					LmtMaFromX::updateMomentArms(selectedMaData, time, currentDof);
+				}
+			}
         }
 
         LmtMaFromX::sendLmtEndOfData();

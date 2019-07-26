@@ -35,6 +35,7 @@
 #include <string>
 #include <vector>
 #include <memory>
+#include <limits>
 
 namespace ceinms {
     class LmtMaFromStorageFile :public LmtMaFromX {
@@ -49,6 +50,10 @@ namespace ceinms {
             const std::string& lmtDataFilename,
             const std::vector< std::string>& maDataFileName);
         void operator()();
+		void setStartStopTimes(double start, double stop) {
+			startTime_ = start;
+			stopTime_ = stop;
+		}
 
     private:
         std::string dataDirectory_;
@@ -56,6 +61,8 @@ namespace ceinms {
         std::vector< std::vector<size_t> > musclePositionsInMaStorages_;
         DataFromStorageFile lmtData_;
         std::vector< std::unique_ptr<DataFromStorageFile> > maDataStorageFiles_;
+		double startTime_;
+		double stopTime_;
     };
 
     template <typename NMSModelT>
@@ -68,7 +75,9 @@ namespace ceinms {
         const std::string& lmtDataFilename,
         const std::vector< std::string>& maDataFileName) :
         LmtMaFromX(outputLmtQueue, outputMomentArmsQueue, doneWithSubscriptions, doneWithExecution, subject),
-        lmtData_(lmtDataFilename) {
+        lmtData_(lmtDataFilename),
+		startTime_(std::numeric_limits<double>::lowest()),
+		stopTime_(std::numeric_limits<double>::max()) {
 
         // 1. Open the input files
         for (std::string it : maDataFileName)

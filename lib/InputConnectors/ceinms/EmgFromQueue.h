@@ -34,7 +34,8 @@ namespace ceinms {
 			const std::vector<std::string>& inputEmgNames,
 			const std::string& excitationsGeneratorFilename,
 			const NMSModelT& subject,
-			double fc);
+			double fc,
+			double fs);
 
         template<typename NMSModelT>
         EmgFromQueue(
@@ -46,7 +47,8 @@ namespace ceinms {
             const std::vector<double>& normalisationWeights,
             const std::string& excitationsGeneratorFilename,
             const NMSModelT& subject,
-            double fc);
+            double fc,
+			double fs);
 
         template<typename NMSModelT>
         EmgFromQueue(
@@ -57,8 +59,9 @@ namespace ceinms {
             const std::string& maxEmgFilename,
             const std::string& excitationsGeneratorFilename,
             const NMSModelT& subject,
-            double fc);
-        void operator()();
+            double fc,
+			double fs);
+        void operator()() override;
         std::vector<std::string> getOutputLabels() const { return excitationGenerator_.getExcitationsNames(); }
 
     private:
@@ -86,7 +89,8 @@ namespace ceinms {
 		const std::vector<std::string>& inputEmgNames,
 		const std::string& excitationsGeneratorFilename,
 		const NMSModelT& subject,
-		double fc) :
+		double fc,
+		double fs) :
 		EmgFromQueue::EmgFromQueue(
 			inputEmgQueue,
 			outputEmgQueue,
@@ -96,7 +100,7 @@ namespace ceinms {
 			std::vector<double>(inputEmgNames.size(), 1.),
 			excitationsGeneratorFilename,
 			subject,
-			fc)
+			fc, fs)
 	{
 		autoWeightCalculation_ = true;
 	}
@@ -113,7 +117,7 @@ namespace ceinms {
         const std::vector<double>& normalisationWeights,
         const std::string& excitationsGeneratorFilename,
         const NMSModelT& subject,
-        double fc) :
+        double fc, double fs) :
         ceinms::EmgFromX(outputEmgQueue, doneWithSubscriptions, doneWithExecution, subject),
         inputEmgQueue_(inputEmgQueue),
         inputEmgNames_(inputEmgNames),
@@ -146,7 +150,7 @@ namespace ceinms {
             0.76600660094326378
         };
 
-        rtb::Filter::TransferFunction<> hpTF(hpB, hpA, 1000);
+        rtb::Filter::TransferFunction<> hpTF(hpB, hpA, fs);
         for (auto& f : highPassfilters_)
             f.setTransferFunction(hpTF);
 
@@ -162,7 +166,8 @@ namespace ceinms {
         const std::string& maxEmgFilename,
         const std::string& excitationsGeneratorFilename,
         const NMSModelT& subject,
-        double fc) :
+        double fc,
+		double fs) :
         ceinms::EmgFromX(outputEmgQueue, doneWithSubscriptions, doneWithExecution, subject),
         inputEmgQueue_(inputEmgQueue),
         excitationGenerator_(excitationsGeneratorFilename),
@@ -195,7 +200,7 @@ namespace ceinms {
             0.76600660094326378
         };
 
-        rtb::Filter::TransferFunction<> hpTF(hpB, hpA, 1000);
+        rtb::Filter::TransferFunction<> hpTF(hpB, hpA, fs);
         for (auto& f : highPassfilters_)
             f.setTransferFunction(hpTF);
     }

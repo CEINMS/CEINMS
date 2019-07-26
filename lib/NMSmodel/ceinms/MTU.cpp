@@ -471,6 +471,12 @@ namespace ceinms {
         resetState();
     }
 
+	template<typename Activation, typename Tendon, CurveMode::Mode mode>
+	double MTU<Activation, Tendon, mode>::getNormTendonLength() const {
+		
+		return tendonDynamic_.getStrain(muscleForce_/(maxIsometricForce_*strengthCoefficient_));
+	}
+
 
     template<typename Activation, typename Tendon, CurveMode::Mode mode>
     double MTU<Activation, Tendon, mode>::getPenalty() const {
@@ -480,7 +486,7 @@ namespace ceinms {
         if (normalisedFibreRatio > 0.5)
             penalty += normalisedFibreRatio*normalisedFibreRatio * 100.;
 		if (getNormTendonLength() < 0.)
-			penalty += std::fabs(getNormTendonLength()) * 10000.; 
+			penalty += std::fabs(getNormTendonLength()) * 100.; 
         return penalty;
     }
 

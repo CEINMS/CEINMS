@@ -148,7 +148,7 @@ namespace ceinms {
         vector< string > maFilename;
         sortMaFilenames(dataLocations_.getMaFiles(), dofNames, maFilename);
         LmtMaFromStorageFile lmtMaProducer(lmtQueue, momentArmsQueues, doneWithSubscriptionsLatch, doneWithExecutionLatch, mySubject, dataLocations_.getLmtFile(), maFilename);
-
+		lmtMaProducer.setStartStopTimes(dataLocations_.getStartTime(), dataLocations_.getStopTime());
         string externalTorqueFilename(dataLocations_.getExternalTorqueFile());
         ExternalTorquesFromStorageFile externalTorquesProducer(externalTorqueQueue, doneWithSubscriptionsLatch, doneWithExecutionLatch, mySubject, externalTorqueFilename);
 
@@ -272,6 +272,7 @@ namespace ceinms {
         vector< string > maFilename;
         sortMaFilenames(dataLocations_.getMaFiles(), dofNames, maFilename);
         LmtMaFromStorageFile lmtMaProducer(lmtQueue, momentArmsQueues, doneWithSubscriptionsLatch, doneWithExecutionLatch, mySubject, dataLocations_.getLmtFile(), maFilename);
+		lmtMaProducer.setStartStopTimes(dataLocations_.getStartTime(), dataLocations_.getStopTime());
 
         string externalTorqueFilename(dataLocations_.getExternalTorqueFile());
         ExternalTorquesFromStorageFile externalTorquesProducer(externalTorqueQueue, doneWithSubscriptionsLatch, doneWithExecutionLatch, mySubject, externalTorqueFilename);
@@ -444,6 +445,7 @@ namespace ceinms {
         vector< string > maFilename;
         sortMaFilenames(dataLocations_.getMaFiles(), dofNames, maFilename);
         LmtMaFromStorageFile lmtMaProducer(lmtQueue, momentArmsQueues, doneWithSubscriptionsLatch, doneWithExecutionLatch, mySubject, dataLocations_.getLmtFile(), maFilename);
+		lmtMaProducer.setStartStopTimes(dataLocations_.getStartTime(), dataLocations_.getStopTime());
 
         string externalTorqueFilename(dataLocations_.getExternalTorqueFile());
         ExternalTorquesFromStorageFile externalTorquesProducer(externalTorqueQueue, doneWithSubscriptionsLatch, doneWithExecutionLatch, mySubject, externalTorqueFilename);
@@ -557,6 +559,7 @@ namespace ceinms {
         vector< string > maFilename;
         sortMaFilenames(dataLocations_.getMaFiles(), dofNames, maFilename);
         LmtMaFromStorageFile lmtMaProducer(lmtQueue, momentArmsQueues, doneWithSubscriptionsLatch, doneWithExecutionLatch, mySubject, dataLocations_.getLmtFile(), maFilename);
+		lmtMaProducer.setStartStopTimes(dataLocations_.getStartTime(), dataLocations_.getStopTime());
 
         string externalTorqueFilename(dataLocations_.getExternalTorqueFile());
         ExternalTorquesFromStorageFile externalTorquesProducer(externalTorqueQueue, doneWithSubscriptionsLatch, doneWithExecutionLatch, mySubject, externalTorqueFilename);
@@ -754,6 +757,7 @@ namespace ceinms {
         vector< string > maFilename;
         sortMaFilenames(dataLocations_.getMaFiles(), dofNames, maFilename);
         LmtMaFromStorageFile lmtMaProducer(lmtQueue, momentArmsQueues, doneWithSubscriptionsLatch, doneWithExecutionLatch, mySubject, dataLocations_.getLmtFile(), maFilename);
+		lmtMaProducer.setStartStopTimes(dataLocations_.getStartTime(), dataLocations_.getStopTime());
 
         string externalTorqueFilename(dataLocations_.getExternalTorqueFile());
         ExternalTorquesFromStorageFile externalTorquesProducer(externalTorqueQueue, doneWithSubscriptionsLatch, doneWithExecutionLatch, mySubject, externalTorqueFilename);

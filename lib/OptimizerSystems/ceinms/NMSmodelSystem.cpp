@@ -46,6 +46,7 @@ namespace ceinms {
         objectiveFunction_(objectiveFunction),
         parameterInterpreter_(subject, parameterSet, dofsToCalibrate),
         dofsToCalibrate_(dofsToCalibrate),
+		evaluationCounter_(0),
         f_(std::numeric_limits<double>::max()) {
 
         nParameters_ = parameterInterpreter_.getNoParameters();
@@ -101,6 +102,7 @@ namespace ceinms {
     template <typename NMSmodelT, typename ObjectiveFunctionT>
     void NMSmodelSystem<NMSmodelT, ObjectiveFunctionT>::evaluate() {
 
+		++evaluationCounter_;
         //subject has the parameters, model evaluator just runs it
         batchEvaluator_.evaluateParallel(subject_, mockSubjects_);
         //batchEvaluator_.evaluateParallel(subject_);
@@ -120,4 +122,17 @@ namespace ceinms {
         //this is necessary for stats/error control..
 
     }
+
+	template <typename NMSmodelT, typename ObjectiveFunctionT>
+	void NMSmodelSystem<NMSmodelT, ObjectiveFunctionT>::printCosts() const { 
+		
+		objectiveFunction_.printCosts(); 
+		auto results = batchEvaluator_.getResults();
+		for (int i = 0; i < results.size(); ++i) {
+			std::ofstream outF("trial" + std::to_string(i) +"_torques_eval" + std::to_string(evaluationCounter_) + ".sto");
+			outF << results.at(i).torques;
+		}
+		std::ofstream outF("subject_eval" + std::to_string(evaluationCounter_) + ".log");
+		outF << subject_;
+	}
 }

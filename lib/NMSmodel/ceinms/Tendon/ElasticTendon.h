@@ -149,6 +149,9 @@ namespace ceinms {
 
         void resetState();
         void setTolerance(double tolerance = 0.0){};
+		double getStrain(double force) const {
+			return tendonStrainForceCurve_.getValue(force);
+		}
 
     private:
         double getInitialFiberLength(double time);
@@ -170,6 +173,7 @@ namespace ceinms {
         CurveOffline passiveForceLengthCurve_;
         CurveOffline forceVelocityCurve_;
         CurveOffline tendonForceStrainCurve_;
+		CurveOffline tendonStrainForceCurve_;
         CurveT muscleTendonLengthTrace_;
         //**
 

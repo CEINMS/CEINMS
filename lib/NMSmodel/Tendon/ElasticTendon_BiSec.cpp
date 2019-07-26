@@ -107,6 +107,7 @@ namespace ceinms {
         passiveForceLengthCurve_(passiveForceLengthCurve),
         forceVelocityCurve_(forceVelocityCurve),
         tendonForceStrainCurve_(tendonForceStrainCurve),
+		tendonStrainForceCurve_(tendonForceStrainCurve.getYNodes(), tendonStrainForceCurve_.getXNodes()),
         maxContractionVelocity_(maxContractionVelocity),
         muscleTendonLength_(0.0),
         fibreLength_(optimalFibreLength_),
@@ -134,10 +135,11 @@ namespace ceinms {
         maxIsometricForce_ = orig.maxIsometricForce_;
         strengthCoefficient_ = orig.strengthCoefficient_;
         maxContractionVelocity_ = orig.maxContractionVelocity_,
-            activeForceLengthCurve_ = orig.activeForceLengthCurve_;
+		activeForceLengthCurve_ = orig.activeForceLengthCurve_;
         passiveForceLengthCurve_ = orig.passiveForceLengthCurve_;
         forceVelocityCurve_ = orig.forceVelocityCurve_;
         tendonForceStrainCurve_ = orig.tendonForceStrainCurve_;
+		tendonStrainForceCurve_ = orig.tendonStrainForceCurve_;
 
         muscleTendonLength_ = orig.muscleTendonLength_;
         fibreLength_ = orig.fibreLength_;
@@ -214,6 +216,7 @@ namespace ceinms {
         passiveForceLengthCurve_ = passiveForceLengthCurve;
         forceVelocityCurve_ = forceVelocityCurve;
         tendonForceStrainCurve_ = tendonForceStrainCurve;
+		tendonStrainForceCurve_.resetPointsWith(tendonForceStrainCurve_.getYNodes(), tendonForceStrainCurve_.getXNodes());
     }
 
     void ElasticTendon_BiSec::setTolerance(double tolerance){

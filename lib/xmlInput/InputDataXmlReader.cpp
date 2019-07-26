@@ -34,6 +34,7 @@ using std::map;
 #include <iostream>
 using std::cout;
 using std::endl;
+#include <limits>
 #include "inputData-schema.hxx"
 
 #include "validation.h"
@@ -182,13 +183,13 @@ namespace ceinms {
 
         if (inputDataPointer_->startStopTime().size() > 0) 
             return inputDataPointer_->startStopTime().begin()->at(0);
-        return -1;
+        return std::numeric_limits<double>::lowest();
     }
 
     double  InputDataXmlReader::getStopTime() const {
 
         if (inputDataPointer_->startStopTime().size() > 0)
             return inputDataPointer_->startStopTime().begin()->at(1);
-        return -1;
+        return std::numeric_limits<double>::max();
     }
 }

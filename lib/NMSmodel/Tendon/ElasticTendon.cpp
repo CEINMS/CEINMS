@@ -596,6 +596,7 @@ namespace ceinms {
         passiveForceLengthCurve_(passiveForceLengthCurve),
         forceVelocityCurve_(forceVelocityCurve),
         tendonForceStrainCurve_(tendonForceStrainCurve),
+		tendonStrainForceCurve_(tendonForceStrainCurve.getYNodes(), tendonStrainForceCurve_.getXNodes()),
         muscleTendonLength_(0.0),
         muscleTendonLengthT1_(0.0),
         muscleTendonVelocity_(0.0),
@@ -639,6 +640,7 @@ namespace ceinms {
         passiveForceLengthCurve_ = orig.passiveForceLengthCurve_;
         forceVelocityCurve_ = orig.forceVelocityCurve_;
         tendonForceStrainCurve_ = orig.tendonForceStrainCurve_;
+		tendonStrainForceCurve_ = orig.tendonStrainForceCurve_;
 
         muscleTendonLength_ = orig.muscleTendonLength_;
         muscleTendonLengthT1_ = orig.muscleTendonLengthT1_;
@@ -691,6 +693,7 @@ namespace ceinms {
         passiveForceLengthCurve_ = passiveForceLengthCurve;
         forceVelocityCurve_ = forceVelocityCurve;
         tendonForceStrainCurve_ = tendonForceStrainCurve;
+		tendonStrainForceCurve_.resetPointsWith(tendonForceStrainCurve_.getYNodes(), tendonForceStrainCurve_.getXNodes());
     };
 
 

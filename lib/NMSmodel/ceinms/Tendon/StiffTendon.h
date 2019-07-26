@@ -83,7 +83,7 @@ namespace ceinms {
         void setDamping(double damping)  {/*empty*/ };
         void pushState() {};
         void resetState();
-
+		double getStrain(double force) const { return 0.; }
         void setTolerance(double tolerance = 0.0){};
 
     private:

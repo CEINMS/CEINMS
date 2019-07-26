@@ -215,7 +215,10 @@ namespace ceinms {
 
             optimizerSystem_.setParameters(xOpt_);
             optimizerSystem_.evaluate();
-            //            cout << "total evaluations:" << noEval << endl;
+			cout << "\nCalibration finished.\nBest solution found:\n";
+			cout << "fOpt_ = " << fOpt_ << endl;
+			optimizerSystem_.printCosts();
+            cout << "total number of evaluations:" << noEval << endl;
             return 0;
         }
 

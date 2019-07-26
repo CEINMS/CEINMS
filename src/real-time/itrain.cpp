@@ -58,6 +58,23 @@ void printCSV(const SimTK::MatrixView m, const std::string& outputFilename);
 void printCSV(const std::list<std::vector<double>> m, const std::string& outputFilename);
 void sortMaFilenames(const std::map<std::string, std::string>& maMap, const std::vector< std::string >& dofNames, std::vector< std::string >& maDataFilenames);
 
+struct  ItrainExecutionSetup {
+	string osimModelFilename;
+	string ceinmsSubject;
+	string ikTaskFilename;
+	string mcbsDir;
+	string plsrDir;
+	bool usePlsr;
+	string hostname;
+	double fc;
+	unsigned nThreads;
+	double solverAccuracy;
+	string resultDir;
+	bool showVisualiser;
+	string maxEmgFile;
+	bool useMaxEmgFile;
+	string emgGeneratorFile;
+};
 //introduces a time delay in the pipeline
 
 template<typename T>
@@ -246,6 +263,23 @@ private:
 
 };
 
+
+class GeneralisedCoordinatesReducer {
+private:
+	ceinms::Mapper reducer_;
+public:
+	GeneralisedCoordinatesReducer(vector<string> dofNamesfromOsim, vector<string> dofNamesfromSubject) :
+		reducer_(dofNamesfromOsim, dofNamesfromSubject) {}
+	ceinms::GeneralisedCoordinatesFrame operator()(const rtosim::GeneralisedCoordinatesFrame& frame) {
+
+		auto reducedQ(reducer_.map(frame.data.getQ()));
+		rtosim::GeneralisedCoordinatesData reducedData(reducer_.getOutSize());
+		reducedData.setQ(reducedQ);
+		return{ frame.time, reducedData };
+	}
+};
+
+
 int run_from_file() {
 	string baseDir = "C:\\Data\\ABC11\\";
     string subjectFile = baseDir + "TestData\\20151214\\ceinms\\subjects\\calibrated\\calibrated0.xml";
@@ -291,16 +325,18 @@ int run_from_file() {
     string externalTorqueFilename(dataLocations.getExternalTorqueFile());
     ExternalTorquesFromStorageFile externalTorquesProducer(externalTorqueQueue, doneWithSubscriptionsLatch, doneWithExecutionLatch, mySubject, externalTorqueFilename);
 
-    vector<string> dataToLog = { 
-        "Activations",
-        "FibreLengths",
-        "NormFibreLengths",
-        "FibreVelocities",
-        "NormFibreVelocities",
-        "PennationAngles",
-        "MuscleForces",
-        "Torques",
-        "MusclesContribution" };
+	vector<string> dataToLog = {
+		"Activations",
+		"FibreLengths",
+		"NormFibreLengths",
+		"FibreVelocities",
+		"NormFibreVelocities",
+		"PennationAngles",
+		"MuscleForces",
+		"Torques",
+		"TendonLengths",
+		"NormTendonLengths",
+		"MusclesContribution" };
     // 2b. define the thread consuming the output sources
     vector<string> valuesToWrite = dataToLog;
     QueuesToStorageFiles queuesToStorageFiles(logQueue, doneWithSubscriptionsLatch, doneWithExecutionLatch, mySubject, valuesToWrite, outputDirectory);
@@ -353,8 +389,7 @@ int run_from_file() {
             strainQueue,
             l1,
             l2);
-	ceinms::QueuesToWebsocket queueToWebsocket(strainQueue, { "nodes_x","nodes_y","nodes_z","nodes_w" });
-
+	ceinms::QueuesToWebsocket queueToWebsocket(strainQueue, { "nodes_x","nodes_y","nodes_z","nodes_w" }, "132.234.133.234", "8080");
     doneWithSubscriptionsLatch.setCount(6);
     doneWithExecutionLatch.setCount(5);
 
@@ -393,22 +428,19 @@ int run_from_file() {
 
 
 
-int run_from_nexus() {
-	string baseDir = "C:\\Data\\ABC11\\";
-	string subjectFile = baseDir + "TestData\\20151214\\ceinms\\subjects\\calibrated\\calibrated0.xml";
-	string trialFilename = baseDir + "TestData\\20151214\\ceinms\\trials\\baseline_walking.xml";
-	//string emgGeneratorFile = baseDir + "TestData\\20151214\\ceinms\\excitationGenerator\\excitationGenerator16to34-RIGHT.xml";
-	string emgGeneratorFile = baseDir + "TestData\\20151214\\ceinms\\excitationGenerator\\excitationGenerator16to34-RIGHT-NEXUS.xml";
-	string xFilename(baseDir + "analysis\\strainX.csv");
-	string yFilename(baseDir + "analysis\\strainY.csv");
-	string strainoutput(baseDir + "output\\strain.csv");
-	string outputDirectory(baseDir + "output");
-	string nodesFilename = "C:\\Users\\s2849511\\coding\\unversioned\\boostwebsockettest\\data\\nodes.csv";
-	string osimModelFilename = baseDir + "TestData\\20151214\\models\\2392_scaled_clusters.osim";
-	string mcbsDir = baseDir + "TestData\\20151214\\ceinms\\mcbs\\coefficients\\";
-	string ikTaskSet = baseDir + "TestData\\20151214\\inverseKinematics\\01\\baseline_walking\\Setup\\iktasksets.xml";
-	string maxEmgFile = baseDir + "TestData\\20151214\\maxemg.txt";
-	vector<string> emgChannelNames{
+int run_from_nexus(ItrainExecutionSetup itrainSetup) {
+	
+	string plsrXfile = itrainSetup.plsrDir + "";
+	string plsrYfile = itrainSetup.plsrDir + "";
+	string plsrNodefile = itrainSetup.plsrDir + "";
+	string subjectFile = itrainSetup.ceinmsSubject;
+	string osimModelFile = itrainSetup.osimModelFilename;
+	string ikTaskSetFile = itrainSetup.ikTaskFilename;
+	string mcbsDir = itrainSetup.mcbsDir;
+	string maxEmgFile = itrainSetup.maxEmgFile;
+	string emgGeneratorFile = itrainSetup.emgGeneratorFile;
+
+	/*vector<string> emgChannelNames{
 		"VasMed",
 		"VasLat",
 		"RecFem",
@@ -425,12 +457,11 @@ int run_from_nexus() {
 		"TFL",
 		"GlutMed",
 		"GlutMax"
-	};
-		
-	vector<string> dofNamesFromOsim, dofNamesFromSubject;
+	};*/
 
-	
-	InputDataXmlReader dataLocations(trialFilename);
+	ExcitationGeneratorFromXml emgGenerator(emgGeneratorFile);
+	vector<string> emgChannelNames{ emgGenerator.getInputSignalsNames() };
+	vector<string> dofNamesFromOsim, dofNamesFromSubject;
 
 	//Create queues for input data
 	rtosim::EmgQueue rawEmgQueue;
@@ -457,13 +488,13 @@ int run_from_nexus() {
 	// 2. define the thread connecting with the input sources
 	rtosim::MarkerSetQueue markerSetQueue;
 	rtosim::GeneralisedCoordinatesQueue generalisedCoordinatesQueue, reducedGeneralisedCoordinatesQueue, filteredGeneralisedCoordinatesQueue;
-	rtosim::DataFromNexus dataProducerFromNexus(markerSetQueue, rawEmgQueue, l1, l2, flowCondition, osimModelFilename, emgChannelNames);
+	rtosim::DataFromNexus dataProducerFromNexus(markerSetQueue, rawEmgQueue, l1, l2, flowCondition, osimModelFile, emgChannelNames);
 	dataProducerFromNexus.setLoopMode(true);
-	rtosim::QueueToInverseKinametics queueToInverseKinematics(markerSetQueue, generalisedCoordinatesQueue, l1, l2, osimModelFilename, 2, ikTaskSet, 1e-5, 10000);
+	rtosim::QueueToInverseKinametics queueToInverseKinematics(markerSetQueue, generalisedCoordinatesQueue, l1, l2, osimModelFile, 2, ikTaskSetFile, 1e-5, 10000);
 	
 	//define the filter
 	double fc = 8;
-	dofNamesFromOsim  = rtosim::getCoordinateNamesFromModel(osimModelFilename);
+	dofNamesFromOsim  = rtosim::getCoordinateNamesFromModel(osimModelFile);
 	rtosim::GeneralisedCoordinatesStateSpace gcFilt(fc, dofNamesFromOsim.size());
 	//read from generalisedCoordinatesQueue, filter using gcFilt,
 	//and save filtered data in filteredGeneralisedCoordinatesQueue
@@ -480,30 +511,13 @@ int run_from_nexus() {
 
 	//mcbs
 
-	class GCReducer {
-	private:
-		ceinms::Mapper reducer_;
-	public:
-		GCReducer(vector<string> dofNamesfromOsim, vector<string> dofNamesfromSubject) :
-			reducer_(dofNamesfromOsim, dofNamesfromSubject) {}
-		ceinms::GeneralisedCoordinatesFrame operator()(const rtosim::GeneralisedCoordinatesFrame& frame) {
-
-			auto reducedQ(reducer_.map(frame.data.getQ()));
-			rtosim::GeneralisedCoordinatesData reducedData(reducer_.getOutSize());
-			reducedData.setQ(reducedQ);
-			return{ frame.time, reducedData };
-		}
-	};
-
-
-	rtosim::QueueAdapter<rtosim::GeneralisedCoordinatesQueue, rtosim::GeneralisedCoordinatesQueue, GCReducer> gcReducer(
+	rtosim::QueueAdapter<rtosim::GeneralisedCoordinatesQueue, rtosim::GeneralisedCoordinatesQueue, GeneralisedCoordinatesReducer> gcReducer(
 		filteredGeneralisedCoordinatesQueue,
 		reducedGeneralisedCoordinatesQueue,
 		l1,
 		l2,
-		GCReducer(dofNamesFromOsim, dofNamesFromSubject));
-
-	   
+		GeneralisedCoordinatesReducer(dofNamesFromOsim, dofNamesFromSubject));
+		   
 	ceinms::LmtMaFromMcbs lmtMaFromMcbs(
 		reducedGeneralisedCoordinatesQueue,
 		lmtQueue,
@@ -512,7 +526,7 @@ int run_from_nexus() {
 		doneWithExecutionLatch,
 		mySubject,
 		mcbsDir,
-		osimModelFilename);
+		osimModelFile);
 
 
 	class FixMissingEmgData {
@@ -530,7 +544,6 @@ int run_from_nexus() {
 			for (auto &e : cFrame.data) {
 				if (e > threshold_)
 					e = 0.;
-		
 			}
 			return cFrame;
 		}
@@ -542,16 +555,20 @@ int run_from_nexus() {
 		l1,
 		l2,
 		FixMissingEmgData(1000.));
-
-	ceinms::EmgFromQueue emgFromQueue(
-		fixedRawEmgQueue, emgLinearEnvelopesQueue, 
-		doneWithSubscriptionsLatch, doneWithExecutionLatch, maxEmgFile, 
-		emgGeneratorFile, mySubject, 6.);
-
-	vector< string > dofNames;
-	mySubject.getDoFNames(dofNames);
-	vector< string > maFilename;
-
+	
+	std::unique_ptr<ceinms::EmgFromX> emgFromQueue;
+	if (itrainSetup.useMaxEmgFile) {
+		emgFromQueue = std::make_unique<ceinms::EmgFromQueue>(
+			ceinms::EmgFromQueue(fixedRawEmgQueue, emgLinearEnvelopesQueue,
+			doneWithSubscriptionsLatch, doneWithExecutionLatch, maxEmgFile,
+			emgGeneratorFile, mySubject, 6., 1500.));
+	}
+	else {
+		emgFromQueue = std::make_unique<ceinms::EmgFromQueue>(
+			ceinms::EmgFromQueue(fixedRawEmgQueue, emgLinearEnvelopesQueue,
+			doneWithSubscriptionsLatch, doneWithExecutionLatch, emgChannelNames,
+			emgGeneratorFile, mySubject, 6., 1500.));
+	}
 
 	vector<string> dataToLog = {
 		"Activations",
@@ -562,6 +579,8 @@ int run_from_nexus() {
 		"PennationAngles",
 		"MuscleForces",
 		"Torques",
+		"TendonLengths",
+		"NormTendonLengths",
 		"MusclesContribution" };
 	// 2b. define the thread consuming the output sources
 	vector<string> valuesToWrite = dataToLog;
@@ -578,22 +597,24 @@ int run_from_nexus() {
 		doneWithExecutionLatch,
 		mySubject,
 		valuesToLog);
+	QueuesToStorageFiles queuesToStorageFiles(logQueue, doneWithSubscriptionsLatch, doneWithExecutionLatch, mySubject, valuesToWrite, itrainSetup.resultDir);
 
 
-	SimTK::Matrix X(parseCSV(xFilename));
-	SimTK::Matrix Y(parseCSV(yFilename));
-	rtb::Plsr strainPlsr;
-	strainPlsr.train(X, Y, 0.001);
-	SimTK::Matrix nodes(parseCSV(nodesFilename));
 
-	AchillesTendonModel atModel(
-		*logQueue["MuscleForces"],
-		strainQueue,
-		doneWithSubscriptionsLatch,
-		doneWithExecutionLatch,
-		mySubject.getMuscleNames(),
-		strainPlsr,
-		nodes);
+	//SimTK::Matrix X(parseCSV(plsrXfile));
+	//SimTK::Matrix Y(parseCSV(plsrYfile));
+	//rtb::Plsr strainPlsr;
+	//strainPlsr.train(X, Y, 0.001);
+	//SimTK::Matrix nodes(parseCSV(plsrNodefile));
+
+	//AchillesTendonModel atModel(
+	//	*logQueue["MuscleForces"],
+	//	strainQueue,
+	//	doneWithSubscriptionsLatch,
+	//	doneWithExecutionLatch,
+	//	mySubject.getMuscleNames(),
+	//	strainPlsr,
+	//	nodes);
 
 	//    QueueToCSV strainLogger(
 	//        strainQueue, 
@@ -602,25 +623,32 @@ int run_from_nexus() {
 	//        strainoutput);
 
 
-	rtosim::TimeDifference<LmtQueue, ScalarVectorVectorQueue>
-		pipelineTimeDifference(
-			lmtQueue,
-			strainQueue,
-			l1,
-			l2);
-	ceinms::QueuesToWebsocket queueToWebsocket(strainQueue, { "nodes_x","nodes_y","nodes_z","nodes_w" });
+	//rtosim::TimeDifference<LmtQueue, ScalarVectorVectorQueue>
+	//	pipelineTimeDifference(
+	//		lmtQueue,
+	//		strainQueue,
+	//		l1,
+	//		l2);
+	//ceinms::QueuesToWebsocket queueToWebsocket(strainQueue, { "nodes_x","nodes_y","nodes_z","nodes_w" });
 
 	doneWithSubscriptionsLatch.setCount(5);
 	doneWithExecutionLatch.setCount(4);
 
-	rtosim::StateVisualiser visualizer(generalisedCoordinatesQueue, osimModelFilename);
+	rtosim::StateVisualiser visualizer(generalisedCoordinatesQueue, osimModelFile);
 	auto fixLatches([&]() {
 		doneWithSubscriptionsLatch.wait();
 		l1.wait(); 
 		auto eod = EndOfData::get<ExternalTorquesFrame>();
 		externalTorqueQueue.push(eod);
-	
 	});
+
+	auto trigger([&flowCondition]() {
+		std::string cmd;
+		bool run(true);
+		std::cin >> cmd;
+		flowCondition.setRunCondition(false);
+	});
+
 
 	// 4. start the threads
 	
@@ -628,41 +656,220 @@ int run_from_nexus() {
 	l2.setCount(5);
 
 	auto onScreenDisplay([&]() {
-		generalisedCoordinatesQueue.subscribe();
+		rawEmgQueue.subscribe();
 		bool  runcondition = true;
 		while (runcondition) {
-			auto f = generalisedCoordinatesQueue.pop();
+			auto f = rawEmgQueue.pop();
 			runcondition = !EndOfData::isEod(f);
 			std::cout << "." << std::flush;
 		}
 	});
+	if (itrainSetup.showVisualiser) {
+		rtosim::QueuesSync::launchThreads(
+			dataProducerFromNexus,
+			queueToInverseKinematics,
+			gcQueueAdaptor,
+			gcReducer,
+			lmtMaFromMcbs,
+			simulator,
+			emgFixer,
+			*emgFromQueue,
+			//atModel,
+			fixLatches,
+			//queueToWebsocket,
+	//		fixLatches,
+			visualizer,
+			onScreenDisplay,
+			queuesToStorageFiles,
+			trigger
+		);
+	}
+	else {
+		rtosim::QueuesSync::launchThreads(
+			dataProducerFromNexus,
+			queueToInverseKinematics,
+			gcQueueAdaptor,
+			gcReducer,
+			lmtMaFromMcbs,
+			simulator,
+			emgFixer,
+			*emgFromQueue,
+			//atModel,
+			fixLatches,
+			//queueToWebsocket,
+	//		fixLatches,
+			onScreenDisplay,
+			queuesToStorageFiles,
+			trigger
+		);
 
-	rtosim::QueuesSync::launchThreads(
-		dataProducerFromNexus,
-		queueToInverseKinematics,
-		gcQueueAdaptor,
-		gcReducer,
-		lmtMaFromMcbs,
-		simulator,
-		emgFixer,
-		emgFromQueue,
-		atModel,
-		fixLatches,
-		queueToWebsocket,
-//		fixLatches,
-	//	visualizer,
-		onScreenDisplay
-	);
+	}
 	
 //	pipelineTimeDifference.getWallClockDifference().print(outputDirectory + "/wallclock-time-lmtqueue-to-strainqueue.txt");
 //	pipelineTimeDifference.getCpuClockDifference().print(outputDirectory + "/cupclock-time-lmtqueue-to-strainqueue.txt");
 	return 0;
 }
 
+void test_visualiser(ItrainExecutionSetup setup) {
+
+	rtosim::GeneralisedCoordinatesQueue queue;
+	OpenSim::Model model(setup.osimModelFilename);
+	model.setUseVisualizer(true);
+	SimTK::State s(model.initSystem());
+	SimTK::Visualizer &viz = model.updVisualizer().updSimbodyVisualizer();
+
+	//     viz.setShowFrameRate(true);
+	  //   viz.setShutdownWhenDestructed(true);
+	 //    viz.setMode(SimTK::Visualizer::Mode::Sampling);
+	//     viz.setShutdownWhenDestructed(true);
+		// viz.setDesiredBufferLengthInSec(5);
+	   //  viz.setDesiredFrameRate(60);
+	auto start = std::chrono::steady_clock::now();
+	int frameCounter = 0;
+	model.getVisualizer().show(s);
+	getchar();
+}
+
+void printAuthors() {
+
+	cout << "Real-time Achilles tendon strain" << endl;
+	cout << "Authors: Claudio Pizzolato <c.pizzolato@griffith.edu.au>" << endl << endl;
+}
+
+void printHelp() {
+
+	printAuthors();
+
+	auto progName(SimTK::Pathname::getThisExecutablePath());
+	bool isAbsolute;
+	string dir, filename, ext;
+	SimTK::Pathname::deconstructPathname(progName, isAbsolute, dir, filename, ext);
+
+	cout << "Option                Argument         Action / Notes\n";
+	cout << "------                --------         --------------\n";
+	cout << "-h                                     Print the command-line options for " << filename << ".\n";
+	cout << "--model               ModelFilename    Specify the name of the osim model file for the investigation.\n";
+	cout << "--subject             CEINMS subject   Specify the name of the CEINMS subject file for the investigation.\n";
+	cout << "--task-set            TaskSetFilename  Specify the name of the XML TaskSet file containing the marker weights to be used.\n";
+	cout << "--plsr                PLSR directory   Specify the name of the directory containing the Achilles tendon PLSR files to be used.\n";
+	cout << "--mcbs                MCBS directory   Specify the name of the directory containing the MCBS coefficient files to be used.\n";
+	cout << "--maxemg              max EMG file     Specify the name of the file containing the max values for EMG envelopes.\n";
+	cout << "--gen                 EMG generator    Specify the name of the file for the EMG generator.\n";
+	cout << "--hostname            HostName         Specify IP address and port for Vicon Nexus.\n";
+	cout << "--fc                  CutoffFrequency  Specify the name of lowpass cutoff frequency to filter IK and GRF data.\n";
+	cout << "-j                    IK threads       Specify the number of IK threads to be used.\n";
+	cout << "-a                    Accuracy         Specify the IK solver accuracy.\n";
+	cout << "--output              OutputDir        Specify the output directory.\n";
+	cout << "-v                                     Show visualiser.\n";
+}
+
+int main_(int argc, char* argv[]) {
+
+	
+	ItrainExecutionSetup itrainSetup;
+
+	rtosim::ProgramOptionsParser po(argc, argv);
+	if (po.exists("-h") || po.empty()) {
+		printHelp();
+		exit(EXIT_SUCCESS);
+	}
+
+	if (po.exists("--model"))
+		itrainSetup.osimModelFilename = po.getParameter("--model");
+	else {
+		cout << "Please provide --model option\n";
+		printHelp();
+		exit(EXIT_SUCCESS);
+	}
+
+	if (po.exists("--task-set"))
+		itrainSetup.ikTaskFilename = po.getParameter("--task-set");
+	else {
+		cout << "Please provide --task-set option\n";
+		printHelp();
+		exit(EXIT_SUCCESS);
+	}
+
+	if (po.exists("--subject"))
+		itrainSetup.ceinmsSubject = po.getParameter("--subject");
+	else {
+		cout << "Please provide --subject option\n";
+		printHelp();
+		exit(EXIT_SUCCESS);
+	}
+
+	if (po.exists("--mcbs"))
+		itrainSetup.mcbsDir = po.getParameter("--mcbs");
+	else {
+		cout << "Please provide --mcbs option\n";
+		printHelp();
+		exit(EXIT_SUCCESS);
+	}
+
+	if (po.exists("--gen"))
+		itrainSetup.emgGeneratorFile = po.getParameter("--gen");
+	else {
+		cout << "Please provide --gen option\n";
+		printHelp();
+		exit(EXIT_SUCCESS);
+	}
+	
+	string plsrDir("");
+	if (po.exists("--plsr")) {
+		itrainSetup.plsrDir = po.getParameter("--plsr");
+		itrainSetup.usePlsr = true;
+	}
+	else {
+		itrainSetup.usePlsr = false;
+	}
+	
+	itrainSetup.hostname = "127.0.0.1:801";
+	if (po.exists("--hostname"))
+		itrainSetup.hostname = po.getParameter("--hostname");
+
+	itrainSetup.fc = 8;
+	if (po.exists("--fc"))
+		itrainSetup.fc = po.getParameter<double>("--fc");
+
+	itrainSetup.nThreads = 1;
+	if (po.exists("-j"))
+		itrainSetup.nThreads = po.getParameter<unsigned>("-j");
+
+	itrainSetup.solverAccuracy = 1e-5;
+	if (po.exists("-a"))
+		itrainSetup.solverAccuracy = po.getParameter<double>("-a");
+
+	itrainSetup.resultDir = "Output";
+	if (po.exists("--output"))
+		itrainSetup.resultDir = po.getParameter("--output");
+
+	itrainSetup.showVisualiser = po.exists("-v");
+
+	if (po.exists("--maxemg"))
+		itrainSetup.maxEmgFile = po.getParameter("--maxemg");
+	/*string baseDir = "C:\\Data\\ABC11\\";
+	string subjectFile = baseDir + "TestData\\20151214\\ceinms\\subjects\\calibrated\\calibrated0.xml";
+	//string emgGeneratorFile = baseDir + "TestData\\20151214\\ceinms\\excitationGenerator\\excitationGenerator16to34-RIGHT.xml";
+	string emgGeneratorFile = baseDir + "TestData\\20151214\\ceinms\\excitationGenerator\\excitationGenerator16to34-RIGHT-NEXUS.xml";
+	string xFilename(baseDir + "analysis\\strainX.csv");
+	string yFilename(baseDir + "analysis\\strainY.csv");
+	string strainoutput(baseDir + "output\\strain.csv");
+	string outputDirectory(baseDir + "output");
+	string nodesFilename = "C:\\Users\\s2849511\\coding\\unversioned\\boostwebsockettest\\data\\nodes.csv";
+	string osimModelFilename = baseDir + "TestData\\20151214\\models\\2392_scaled_clusters.osim";
+	string mcbsDir = baseDir + "TestData\\20151214\\ceinms\\mcbs\\coefficients\\";
+	string ikTaskSet = baseDir + "TestData\\20151214\\inverseKinematics\\01\\baseline_walking\\Setup\\iktasksets.xml";
+	string maxEmgFile = baseDir + "TestData\\20151214\\maxemg.txt";
+	*/
+//	test_visualiser(itrainSetup);
+	run_from_nexus(itrainSetup);
+}
 
 int main() {
-	run_from_nexus();
-//	run_from_file();
+
+
+	//run_from_nexus();
+	run_from_file();
 	return 0;
 }
 
