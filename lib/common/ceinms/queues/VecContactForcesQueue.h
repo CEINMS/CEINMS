@@ -42,7 +42,7 @@ namespace ceinms {
 
     using VecContactForcesData = std::vector < SimTK::Vec3 > ;
     using VecContactForcesFrame = QueueData < VecContactForcesData > ;
-    using VecContactForcesQueue = Concurrency::Queue < VecContactForcesFrame > ;
+    using VecContactForcesQueue = rtb::Concurrency::Queue < VecContactForcesFrame > ;
 }
 
 #endif

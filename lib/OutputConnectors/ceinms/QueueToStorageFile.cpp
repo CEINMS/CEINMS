@@ -27,6 +27,7 @@
 * -------------------------------------------------------------------------- */
 //#include "ceinms/QueueToStorageFile.h"
 #include "ceinms/QueuesSync.h"
+#include "rtb/concurrency/Concurrency.h"
 #include <iostream>
 #include <vector>
 #include <SimTKcommon.h>
@@ -36,8 +37,8 @@ namespace ceinms{
     template<typename DataType>
     QueueToFileLogger<DataType>::QueueToFileLogger(
         QueueType& inputQueue,
-        Concurrency::Latch& subscriptionLatch,
-        Concurrency::Latch& readyToWriteLatch,
+        rtb::Concurrency::Latch& subscriptionLatch,
+        rtb::Concurrency::Latch& readyToWriteLatch,
         const std::vector<std::string>& columnLabels,
         const std::string& valueName,
         const std::string& outputDir,

@@ -44,8 +44,8 @@ namespace ceinms {
         LmtMaFromStorageFile(
             LmtQueue& outputLmtQueue,
             MultipleMomentArmsQueues& outputMomentArmsQueue,
-            Concurrency::Latch& doneWithSubscriptions,
-            Concurrency::Latch& doneWithExecution,
+            rtb::Concurrency::Latch& doneWithSubscriptions,
+			rtb::Concurrency::Latch& doneWithExecution,
             const NMSModelT& subject,
             const std::string& lmtDataFilename,
             const std::vector< std::string>& maDataFileName);
@@ -69,8 +69,8 @@ namespace ceinms {
     LmtMaFromStorageFile::LmtMaFromStorageFile(
         LmtQueue& outputLmtQueue,
         MultipleMomentArmsQueues& outputMomentArmsQueue,
-        Concurrency::Latch& doneWithSubscriptions,
-        Concurrency::Latch& doneWithExecution,
+		rtb::Concurrency::Latch& doneWithSubscriptions,
+		rtb::Concurrency::Latch& doneWithExecution,
         const NMSModelT& subject,
         const std::string& lmtDataFilename,
         const std::vector< std::string>& maDataFileName) :

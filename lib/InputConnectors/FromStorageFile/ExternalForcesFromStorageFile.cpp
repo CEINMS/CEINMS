@@ -28,8 +28,7 @@
 
 #include "ceinms/ExternalForcesFromStorageFile.h"
 #include "ceinms/queues/MultipleExternalForcesQueue.h"
-#include "ceinms/concurrency/Latch.h"
-#include "ceinms/concurrency/Queue.h"
+#include "rtb/concurrency/Concurrency.h"
 #include "ceinms/ArrayConverter.h"
 
 #include <OpenSim/OpenSim.h>
@@ -44,8 +43,8 @@ namespace ceinms {
 
     ExternalForcesFromStorageFile::ExternalForcesFromStorageFile(
         MultipleExternalForcesQueue& outputMultipleExternalForcesQueue,
-        Concurrency::Latch& doneWithSubscriptions,
-        Concurrency::Latch& doneWithExecution,
+		rtb::Concurrency::Latch& doneWithSubscriptions,
+		rtb::Concurrency::Latch& doneWithExecution,
         const std::string& externalLoadsXmlFilename) :
         ExternalForcesFromX(outputMultipleExternalForcesQueue, doneWithSubscriptions, doneWithExecution),
         externalLoadProperties_(externalLoadsXmlFilename),
@@ -54,8 +53,8 @@ namespace ceinms {
 
     ExternalForcesFromStorageFile::ExternalForcesFromStorageFile(
         MultipleExternalForcesQueue& outputMultipleExternalForcesQueue,
-        Concurrency::Latch& doneWithSubscriptions,
-        Concurrency::Latch& doneWithExecution,
+		rtb::Concurrency::Latch& doneWithSubscriptions,
+		rtb::Concurrency::Latch& doneWithExecution,
         const std::string& externalLoadsXmlFilename,
         const std::string& grfFilename) :
         ExternalForcesFromX(outputMultipleExternalForcesQueue, doneWithSubscriptions, doneWithExecution),

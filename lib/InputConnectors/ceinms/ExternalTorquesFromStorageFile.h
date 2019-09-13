@@ -43,8 +43,8 @@ namespace ceinms {
         template <typename NMSModelT>
         ExternalTorquesFromStorageFile(
             ExternalTorquesQueue& outputExternalTorques,
-            Concurrency::Latch& doneWithSubscriptions,
-            Concurrency::Latch& doneWithExecution,
+			rtb::Concurrency::Latch& doneWithSubscriptions,
+			rtb::Concurrency::Latch& doneWithExecution,
             const NMSModelT& subject,
             const std::string& dataDirectory);
         void operator()();
@@ -60,8 +60,8 @@ namespace ceinms {
     template <typename NMSModelT>
     ExternalTorquesFromStorageFile::ExternalTorquesFromStorageFile(
         ExternalTorquesQueue& outputExternalTorques,
-        Concurrency::Latch& doneWithSubscriptions,
-        Concurrency::Latch& doneWithExecution,
+		rtb::Concurrency::Latch& doneWithSubscriptions,
+		rtb::Concurrency::Latch& doneWithExecution,
         const NMSModelT& subject,
         const std::string& externalTorqueFilename)
         :ExternalTorquesFromX(outputExternalTorques, doneWithSubscriptions, doneWithExecution, subject),

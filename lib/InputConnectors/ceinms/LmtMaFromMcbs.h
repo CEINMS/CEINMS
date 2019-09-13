@@ -38,11 +38,10 @@
 #include <vector>
 #include <string>
 #include "ceinms/LmtMaFromX.h"
-#include "ceinms/concurrency/Queue.h"
+#include "rtb/concurrency/Concurrency.h"
 #include "ceinms/queues/GeneralisedCoordinatesQueue.h"
 #include "ceinms/queues/LmtQueue.h"
 #include "ceinms/queues/MultipleMomentArmsQueues.h"
-#include "ceinms/concurrency/Latch.h"
 #include <map>
 #include "ceinms/Mapper.h"
 #include <OpenSim/OpenSim.h>
@@ -58,8 +57,8 @@ namespace ceinms {
             GeneralisedCoordinatesQueue& inputCoordinateQueue,
             LmtQueue& outputLmtQueue,
             MultipleMomentArmsQueues& outputMomentArmsQueue,
-            Concurrency::Latch& doneWithSubscriptions,
-            Concurrency::Latch& doneWithExecution,
+			rtb::Concurrency::Latch& doneWithSubscriptions,
+			rtb::Concurrency::Latch& doneWithExecution,
             const NMSModelT& subject,
             const std::string& coeffDir);
 
@@ -68,8 +67,8 @@ namespace ceinms {
             GeneralisedCoordinatesQueue& inputCoordinateQueue,
             LmtQueue& outputLmtQueue,
             MultipleMomentArmsQueues& outputMomentArmsQueue,
-            Concurrency::Latch& doneWithSubscriptions,
-            Concurrency::Latch& doneWithExecution,
+			rtb::Concurrency::Latch& doneWithSubscriptions,
+			rtb::Concurrency::Latch& doneWithExecution,
             const NMSModelT& subject,
             const std::string& coeffDir,
             const std::string& osimModelFilename);
@@ -92,8 +91,8 @@ namespace ceinms {
         GeneralisedCoordinatesQueue& inputCoordinateQueue,
 		LmtQueue& outputLmtQueue,
         MultipleMomentArmsQueues& outputMomentArmsQueue,
-        Concurrency::Latch& doneWithSubscriptions,
-        Concurrency::Latch& doneWithExecution,
+		rtb::Concurrency::Latch& doneWithSubscriptions,
+		rtb::Concurrency::Latch& doneWithExecution,
         const NMSModelT& subject,
         const std::string& coeffDir) :
         LmtMaFromX(outputLmtQueue, outputMomentArmsQueue, doneWithSubscriptions, doneWithExecution, subject),
@@ -125,8 +124,8 @@ namespace ceinms {
         GeneralisedCoordinatesQueue& inputCoordinateQueue,
 		LmtQueue& outputLmtQueue,
         MultipleMomentArmsQueues& outputMomentArmsQueue,
-        Concurrency::Latch& doneWithSubscriptions,
-        Concurrency::Latch& doneWithExecution,
+		rtb::Concurrency::Latch& doneWithSubscriptions,
+		rtb::Concurrency::Latch& doneWithExecution,
         const NMSModelT& subject,
         const std::string& coeffDir,
         const std::string& osimModelFilename) :

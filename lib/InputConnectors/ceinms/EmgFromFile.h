@@ -47,8 +47,8 @@ namespace ceinms {
         template <typename NMSModelT>
         EmgFromFile(
             EmgQueue& outputEmgQueue,
-            Concurrency::Latch& doneWithSubscriptions,
-            Concurrency::Latch& doneWithExecution,
+            rtb::Concurrency::Latch& doneWithSubscriptions,
+            rtb::Concurrency::Latch& doneWithExecution,
             const NMSModelT& subject,
             const std::string& emgFilename,
             const std::string& emgGeneratorFilename);
@@ -63,8 +63,8 @@ namespace ceinms {
     template <typename NMSModelT>
     EmgFromFile::EmgFromFile(
         EmgQueue& outputEmgQueue,
-        Concurrency::Latch& doneWithSubscriptions,
-        Concurrency::Latch& doneWithExecution,
+        rtb::Concurrency::Latch& doneWithSubscriptions,
+        rtb::Concurrency::Latch& doneWithExecution,
         const NMSModelT& subject,
         const std::string& emgFilename,
         const std::string& emgGeneratorFilename) :

@@ -13,7 +13,7 @@
  * CEINMS Contributors: C. Pizzolato, M. Reggiani, M. Sartori,                *
  *                      E. Ceseracciu, and D.G. Lloyd                         *
  *                                                                            *
- * Author(s): M. Reggiani                                                     *
+ * Author(s): C. Pizzolato				                                      *
  *                                                                            *
  * CEINMS is licensed under the Apache License, Version 2.0 (the "License").  *
  * You may not use this file except in compliance with the License. You may   *
@@ -26,46 +26,34 @@
  * limitations under the License.                                             *
  * -------------------------------------------------------------------------- */
 
+#ifndef ceinms_RawEmgFromFile_h
+#define ceinms_RawEmgFromFile_h
+
+#include <string>
+#include <vector>
 #include <iostream>
-#include <algorithm>
-#include "ceinms/concurrency/Latch.h"
 
-namespace ceinms{
-    namespace Concurrency{
+#include "ceinms/EmgFromX.h"
+#include "ceinms/ExcitationGeneratorFromXml.h"
+#include "ceinms/Mapper.h"
+#include "ceinms/DataFromStorageFile.h"
 
-        Latch::Latch()
-            :count_(0)
-        { }
-
-
-        Latch::Latch(int count)
-            : count_(count)
-        { }
-
-
-        void Latch::setCount(int count)
-        {
-            if (count_ != 0) {
-                std::cout << "You are not allowed to reset a Latch\n";
-                exit(EXIT_FAILURE);
-            }
-            else
-                count_ = count;
-        }
-
-
-        void Latch::wait() {
-            std::unique_lock<std::mutex> mlock(mutex_);
-            if (count_ == 0) {
-                throw std::logic_error("internal count == 0");
-            }
-            if (--count_ == 0)
-                condition_.notify_all();
-            else {
-                while (count_ > 0)
-                    condition_.wait(mlock);
-            }
-            mlock.unlock();
-        }
-    }
+namespace ceinms {
+    class RawEmgFromFile :public EmgFromX
+    {
+    public:
+		RawEmgFromFile(
+            EmgQueue& outputRawEmgQueue,
+            rtb::Concurrency::Latch& doneWithSubscriptions,
+            rtb::Concurrency::Latch& doneWithExecution,
+			const std::string& rawEmgFilename,
+            const std::vector<std::string>& desiredEmgNames);
+        void operator()();
+        virtual ~RawEmgFromFile();
+    private:
+        Mapper emgMapper_;
+        DataFromStorageFile emgData_;
+    };
 }
+
+#endif

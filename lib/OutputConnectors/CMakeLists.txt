@@ -77,7 +77,6 @@ target_include_directories(OutputConnectors
                                 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}
                                         ${ceinms_common_INCLUDE_DIRS}
                                         ${InputConnectors_INCLUDE_DIRS}
-                                        ${Concurrency_INCLUDE_DIRS}
                                         ${TrialData_INCLUDE_DIRS}
 										${JointContactModels_INCLUDE_DIRS}
 										${FileIO_INCLUDE_DIRS}

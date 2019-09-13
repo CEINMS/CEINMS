@@ -31,8 +31,7 @@
 
 #include <vector>
 #include <string>
-#include "ceinms/concurrency/Queue.h"
-#include "ceinms/concurrency/Latch.h"
+#include "rtb/concurrency/Concurrency.h"
 #include "ceinms/queues/ExternalTorquesQueue.h"
 
 namespace ceinms {
@@ -42,8 +41,8 @@ namespace ceinms {
         template <typename NMSModelT>
         ExternalTorquesFromX(
             ExternalTorquesQueue& outputExternalTorquesQueue,
-            Concurrency::Latch& doneWithSubscriptions,
-            Concurrency::Latch& doneWithExecution,
+            rtb::Concurrency::Latch& doneWithSubscriptions,
+            rtb::Concurrency::Latch& doneWithExecution,
             const NMSModelT& subject);
 
         virtual ~ExternalTorquesFromX();
@@ -57,15 +56,15 @@ namespace ceinms {
         std::vector< std::string > dofNames_;
     private:
         ExternalTorquesQueue& outputExternalTorquesQueue_;
-        Concurrency::Latch& doneWithSubscriptions_;
-        Concurrency::Latch& doneWithExecution_;
+        rtb::Concurrency::Latch& doneWithSubscriptions_;
+        rtb::Concurrency::Latch& doneWithExecution_;
     };
 
     template <typename NMSModelT>
     ExternalTorquesFromX::ExternalTorquesFromX(
         ExternalTorquesQueue& outputExternalTorquesQueue,
-        Concurrency::Latch& doneWithSubscriptions,
-        Concurrency::Latch& doneWithExecution,
+        rtb::Concurrency::Latch& doneWithSubscriptions,
+        rtb::Concurrency::Latch& doneWithExecution,
         const NMSModelT& subject) :
         outputExternalTorquesQueue_(outputExternalTorquesQueue),
         doneWithSubscriptions_(doneWithSubscriptions),

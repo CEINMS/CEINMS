@@ -32,8 +32,7 @@
 #include <vector>
 #include <string>
 #include <memory>
-#include "ceinms/concurrency/Queue.h"
-#include "ceinms/concurrency/Latch.h"
+#include "rtb/concurrency/Concurrency.h"
 #include "ceinms/queues/LmtQueue.h"
 #include "ceinms/queues/MultipleMomentArmsQueues.h"
 
@@ -45,8 +44,8 @@ namespace ceinms {
         LmtMaFromX(
             LmtQueue& outputLmtQueue,
             MultipleMomentArmsQueues& outputMomentArmsQueue,
-            Concurrency::Latch& doneWithSubscriptions,
-            Concurrency::Latch& doneWithExecution,
+			rtb::Concurrency::Latch& doneWithSubscriptions,
+			rtb::Concurrency::Latch& doneWithExecution,
             const NMSModelT& subject);
         virtual ~LmtMaFromX();
         virtual void operator()() = 0;
@@ -65,16 +64,16 @@ namespace ceinms {
         void initialiseMomentArmsQueue();
         LmtQueue& outputLmtQueue_;
         MultipleMomentArmsQueues& outputMomentArmsQueue_;
-        Concurrency::Latch& doneWithSubscriptions_;
-        Concurrency::Latch& doneWithExecution_;
+        rtb::Concurrency::Latch& doneWithSubscriptions_;
+        rtb::Concurrency::Latch& doneWithExecution_;
     };
 
     template <typename NMSModelT>
     LmtMaFromX::LmtMaFromX(
         LmtQueue& outputLmtQueue,
         MultipleMomentArmsQueues& outputMomentArmsQueue,
-        Concurrency::Latch& doneWithSubscriptions,
-        Concurrency::Latch& doneWithExecution,
+        rtb::Concurrency::Latch& doneWithSubscriptions,
+        rtb::Concurrency::Latch& doneWithExecution,
         const NMSModelT& subject) :
         outputLmtQueue_(outputLmtQueue),
         outputMomentArmsQueue_(outputMomentArmsQueue),

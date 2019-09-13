@@ -1,7 +1,6 @@
 #ifndef ceinms_QueuesToWebsocket_h
 #define ceinms_QueuesToWebsocket_h
-#include "ceinms/concurrency/Queue.h"
-#include "ceinms/concurrency/Latch.h"
+#include "rtb/concurrency/Concurrency.h"
 #include "ceinms/queues/ScalarVectorVectorQueue.h"
 #include <string>
 #include <vector>

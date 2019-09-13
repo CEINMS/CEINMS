@@ -36,8 +36,8 @@ namespace ceinms {
 
     GeneralisedCoordinatesFromX::GeneralisedCoordinatesFromX(
         GeneralisedCoordinatesQueue& outputGeneralisedCoordinatesQueue,
-        Concurrency::Latch& doneWithSubscriptions,
-        Concurrency::Latch& doneWithExecution) :
+		rtb::Concurrency::Latch& doneWithSubscriptions,
+		rtb::Concurrency::Latch& doneWithExecution) :
         outputGeneralisedCoordinatesQueue_(outputGeneralisedCoordinatesQueue),
         doneWithSubscriptions_(doneWithSubscriptions),
         doneWithExecution_(doneWithExecution)

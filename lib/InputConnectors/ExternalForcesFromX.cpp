@@ -35,8 +35,8 @@ namespace ceinms {
 
     ExternalForcesFromX::ExternalForcesFromX(
         MultipleExternalForcesQueue& outputMultipleExternalForcesQueue,
-        Concurrency::Latch& doneWithSubscriptions,
-        Concurrency::Latch& doneWithExecution) :
+        rtb::Concurrency::Latch& doneWithSubscriptions,
+		rtb::Concurrency::Latch& doneWithExecution) :
         outputMultipleExternalForcesQueue_(outputMultipleExternalForcesQueue),
         doneWithSubscriptions_(doneWithSubscriptions),
         doneWithExecution_(doneWithExecution)

@@ -50,8 +50,7 @@ using ceinms::TrialData;
 #include "ceinms/Tendon/ElasticTendon.h"
 #include "ceinms/Tendon/ElasticTendon_BiSec.h"
 #include "ceinms/SetupDataStructure.h"
-#include "ceinms/concurrency/Latch.h"
-#include "ceinms/concurrency/Queue.h"
+#include "rtb/concurrency/Concurrency.h"
 #include "ceinms/queues/EmgQueue.h"
 #include "ceinms/queues/LmtQueue.h"
 #include "ceinms/queues/ExternalTorquesQueue.h"
@@ -114,8 +113,8 @@ ceinms::TrialData readTrialData(std::string inputDataFilename, NMSmodelT& mySubj
     ExternalTorquesQueue externalTorqueQueue;
     MultipleMomentArmsQueues momentArmsQueues;
 
-    ceinms::Concurrency::Latch doneWithSubscription;
-    ceinms::Concurrency::Latch doneWithExecution;
+    rtb::Concurrency::Latch doneWithSubscription;
+    rtb::Concurrency::Latch doneWithExecution;
 
     string emgFilename(dataLocations.getExcitationsFile());
     EmgFromFile emgProducer(emgQueue, doneWithSubscription, doneWithExecution, mySubject, emgFilename, emgGeneratorFile);

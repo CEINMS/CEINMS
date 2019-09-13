@@ -29,8 +29,7 @@
 #ifndef ceinms_QueuesToKneeBalanceContactForces_h
 #define ceinms_QueuesToKneeBalanceContactForces_h
 
-#include "ceinms/concurrency/Latch.h"
-#include "ceinms/concurrency/Queue.h"
+#include "rtb/concurrency/Concurrency.h"
 #include "ceinms/ContactModelKneeBalanceSetup.h"
 #include "ceinms/queues/EstimatedTorquesQueue.h"
 #include "ceinms/queues/ExternalTorquesQueue.h"
@@ -50,8 +49,8 @@ namespace ceinms {
             EstimatedTorquesQueue& inputEstimatedTorquesQueue,
             ExternalTorquesQueue& inputExternalTorquesQueue,
             ScalarContactForcesQueue& outputContactForcesQueue,
-            Concurrency::Latch& doneWithSubscription,
-            Concurrency::Latch& doneWithExecution,
+			rtb::Concurrency::Latch& doneWithSubscription,
+			rtb::Concurrency::Latch& doneWithExecution,
             const ContactModelKneeBalanceSetup& contactModelSetup,
             const NMSmodelT& subject);
         void operator()();
@@ -61,8 +60,8 @@ namespace ceinms {
         EstimatedTorquesQueue& inputEstimatedTorquesQueue_;
         ExternalTorquesQueue& inputExternalTorquesQueue_;
         ScalarContactForcesQueue& outputContactForcesQueue_;
-        Concurrency::Latch& doneWithSubscription_;
-        Concurrency::Latch& doneWithExecution_;
+		rtb::Concurrency::Latch& doneWithSubscription_;
+		rtb::Concurrency::Latch& doneWithExecution_;
         ContactModelKneeBalance kneeContactModel_;
     };
 
@@ -71,8 +70,8 @@ namespace ceinms {
         EstimatedTorquesQueue& inputEstimatedTorquesQueue,
         ExternalTorquesQueue& inputExternalTorquesQueue,
         ScalarContactForcesQueue& outputContactForcesQueue,
-        Concurrency::Latch& doneWithSubscription,
-        Concurrency::Latch& doneWithExecution,
+		rtb::Concurrency::Latch& doneWithSubscription,
+		rtb::Concurrency::Latch& doneWithExecution,
         const ContactModelKneeBalanceSetup& contactModelSetup,
         const NMSmodelT& subject) :
         inputEstimatedTorquesQueue_(inputEstimatedTorquesQueue),

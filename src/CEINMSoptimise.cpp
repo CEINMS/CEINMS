@@ -65,8 +65,7 @@
 #include "ceinms/QueuesToInverseDynamics.h"
 #include "ceinms/QueuesToKneeBalanceContactForces.h"
 
-#include "ceinms/concurrency/Latch.h"
-#include "ceinms/concurrency/Queue.h"
+#include "rtb/concurrency/Concurrency.h"
 #include "ceinms/queues/VecContactForcesQueue.h"
 #include "ceinms/queues/ScalarContactForcesQueue.h"
 #include "ceinms/queues/EmgQueue.h"
@@ -173,8 +172,8 @@ ceinms::TrialData readTrialData(const string& inputDataFilename, NMSmodelT& mySu
     ceinms::ExternalTorquesQueue externalTorqueQueue;
     ceinms::MultipleMomentArmsQueues momentArmsQueues;
 
-    ceinms::Concurrency::Latch doneWithSubscription;
-    ceinms::Concurrency::Latch doneWithExecution;
+    rtb::Concurrency::Latch doneWithSubscription;
+    rtb::Concurrency::Latch doneWithExecution;
 
     string emgFilename(dataLocations.getExcitationsFile());
     ceinms::EmgFromFile emgProducer(emgQueue, doneWithSubscription, doneWithExecution, mySubject, emgFilename, emgGeneratorFile);

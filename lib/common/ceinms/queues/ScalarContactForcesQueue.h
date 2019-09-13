@@ -41,7 +41,7 @@ namespace Concurrency {
 namespace ceinms {
 
     using ScalarContactForcesFrame = ScalarVectorFrame;
-    using ScalarContactForcesQueue = Concurrency::Queue < ScalarContactForcesFrame > ;
+    using ScalarContactForcesQueue = rtb::Concurrency::Queue < ScalarContactForcesFrame > ;
 }
 
 #endif

@@ -39,8 +39,8 @@ namespace ceinms {
         ExternalTorquesQueue& inputExternalTorqueQueue,
         MultipleMomentArmsQueues& inputMomentArmsQueues,
         ScalarLogQueue& outputLogQueue,
-        Concurrency::Latch& doneWithSubscriptions,
-        Concurrency::Latch& doneWithExecution,
+        rtb::Concurrency::Latch& doneWithSubscriptions,
+        rtb::Concurrency::Latch& doneWithExecution,
         const std::vector<std::string>& valuesToLog,
         bool showLog) :
 
@@ -60,8 +60,7 @@ namespace ceinms {
         inputEmgQueue_.subscribe();
         inputLmtQueue_.subscribe();
         inputExternalTorqueQueue_.subscribe();
-        for (auto& it : inputMomentArmsQueues_)
-            (*it).subscribe();
+
     }
 
     template <typename Logger>
@@ -69,6 +68,8 @@ namespace ceinms {
 
         subscribeToQueues();
         doneWithSubscriptions_.wait();
+		for (auto& it : inputMomentArmsQueues_)
+			(*it).subscribe();
     }
 
     template <typename Logger>

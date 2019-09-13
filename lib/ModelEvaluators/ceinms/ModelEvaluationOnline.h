@@ -45,8 +45,8 @@ namespace ceinms {
             ExternalTorquesQueue& inputExternalTorqueQueue,
             MultipleMomentArmsQueues& inputMomentArmsQueues,
             ScalarLogQueue& outputLogQueue,
-            Concurrency::Latch& doneWithSubscriptions,
-            Concurrency::Latch& doneWithExecution,
+			rtb::Concurrency::Latch& doneWithSubscriptions,
+			rtb::Concurrency::Latch& doneWithExecution,
             NMSmodelT& subject,
             const std::vector< std::string >& valuesToLog,
             bool showLog = true); // const std::string& outputDir = "./Output");

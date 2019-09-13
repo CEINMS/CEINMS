@@ -26,8 +26,7 @@
 * limitations under the License.                                             *
 * -------------------------------------------------------------------------- */
 
-#include "ceinms/concurrency/Queue.h"
-#include "ceinms/concurrency/Latch.h"
+#include "rtb/concurrency/Concurrency.h"
 #include "ceinms/queues/GeneralisedCoordinatesQueue.h"
 #include "ceinms/queues/MultipleExternalForcesQueue.h"
 #include "ceinms/queues/ExternalTorquesQueue.h"
@@ -124,7 +123,7 @@ int main() {
     MultipleExternalForcesQueue multipleExternalForcesQueue;
     ExternalTorquesQueue externalTorquesQueue;
 
-    ceinms::Concurrency::Latch doneWithSubscriptions(4), doneWithExecution(4);
+    rtb::Concurrency::Latch doneWithSubscriptions(4), doneWithExecution(4);
 
     GeneralisedCoordinatesFromStorageFile generalisedCoordinatesFromStorageFile(
         generalisedCoordinateQueue,

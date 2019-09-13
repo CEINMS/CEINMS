@@ -53,7 +53,8 @@ TARGET_LINK_LIBRARIES( CEINMS
       OutputConnectors
 	  JointContactModels
       OptimizationSystems
-      #${CMAKE_THREAD_LIBS_INIT}
+	  ceinms_common
+	  #${CMAKE_THREAD_LIBS_INIT}
       ${Boost_PROGRAM_OPTIONS_LIBRARY}
       ${Boost_FILESYSTEM_LIBRARY}
 )
@@ -74,6 +75,7 @@ target_link_libraries( CEINMScalibrate
       OptimizationSystems
 	#  Optimizers
 	  TrialData
+	  rtb::Concurrency
       ${Boost_PROGRAM_OPTIONS_LIBRARY}
 )
 
@@ -94,6 +96,7 @@ target_link_libraries( CEINMSoptimise
 	  JointContactModels
       OptimizationSystems
       TrialData
+	  rtb::Concurrency
       #${CMAKE_THREAD_LIBS_INIT}
       ${Boost_PROGRAM_OPTIONS_LIBRARY}
       ${Boost_FILESYSTEM_LIBRARY}

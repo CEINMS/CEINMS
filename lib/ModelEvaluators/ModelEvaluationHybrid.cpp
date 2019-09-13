@@ -49,8 +49,8 @@ namespace ceinms {
         ExternalTorquesQueue& inputExternalTorqueQueue,
         MultipleMomentArmsQueues& inputMomentArmsQueues,
         ScalarLogQueue& outputLogQueue,
-        Concurrency::Latch& doneWithSubscriptions,
-        Concurrency::Latch& doneWithExecution,
+        rtb::Concurrency::Latch& doneWithSubscriptions,
+        rtb::Concurrency::Latch& doneWithExecution,
         NMSmodelT& subject,
         ErrorMinimizerT& torqueErrorMinimizer,
         const vector<string>& valuesToLog

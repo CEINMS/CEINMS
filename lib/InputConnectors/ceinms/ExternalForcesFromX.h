@@ -32,8 +32,7 @@
 #include <string>
 #include <vector>
 #include "ceinms/ExternalForceData.h"
-#include "ceinms/concurrency/Queue.h"
-#include "ceinms/concurrency/Latch.h"
+#include "rtb/concurrency/Concurrency.h"
 #include "ceinms/queues/MultipleExternalForcesQueue.h"
 
 namespace ceinms {
@@ -43,8 +42,8 @@ namespace ceinms {
 
         ExternalForcesFromX(
             MultipleExternalForcesQueue& outputMultipleExternalForcesQueue,
-            Concurrency::Latch& doneWithSubscriptions,
-            Concurrency::Latch& doneWithExecution);
+            rtb::Concurrency::Latch& doneWithSubscriptions,
+            rtb::Concurrency::Latch& doneWithExecution);
         virtual ~ExternalForcesFromX() {};
         virtual void operator()() = 0;
         void updateExternalForces(const MultipleExternalForcesData& currentExternalForceData, double currentTime);
@@ -53,8 +52,8 @@ namespace ceinms {
         void doneWithExecution();
     private:
         MultipleExternalForcesQueue& outputMultipleExternalForcesQueue_;
-        Concurrency::Latch& doneWithSubscriptions_;
-        Concurrency::Latch& doneWithExecution_;
+        rtb::Concurrency::Latch& doneWithSubscriptions_;
+        rtb::Concurrency::Latch& doneWithExecution_;
     };
 
 }

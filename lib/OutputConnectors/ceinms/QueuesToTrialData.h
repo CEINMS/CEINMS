@@ -33,8 +33,8 @@
 #include <fstream>
 #include <boost/filesystem.hpp>
 #include "ceinms/TrialData.h"
-#include "ceinms/concurrency/Queue.h"
-#include "ceinms/concurrency/Latch.h"
+#include "rtb/concurrency/Queue.h"
+#include "rtb/concurrency/Latch.h"
 #include "ceinms/queues/EmgQueue.h"
 #include "ceinms/queues/LmtQueue.h"
 #include "ceinms/queues/ExternalTorquesQueue.h"
@@ -53,8 +53,8 @@ namespace ceinms {
             LmtQueue& inputLmtQueue,
             ExternalTorquesQueue& inputExternalTorqueQueue,
             MultipleMomentArmsQueues& inputMomentArmsQueues,
-            Concurrency::Latch& doneWithSubscriptions,
-            Concurrency::Latch& doneWithExecution,
+			rtb::Concurrency::Latch& doneWithSubscriptions,
+			rtb::Concurrency::Latch& doneWithExecution,
             NMSmodel& subject,
             std::string id) :
             inputEmgQueue_(inputEmgQueue),
@@ -80,8 +80,8 @@ namespace ceinms {
         LmtQueue& inputLmtQueue_;
         ExternalTorquesQueue& inputExternalTorqueQueue_;
         MultipleMomentArmsQueues& inputMomentArmsQueues_;
-        Concurrency::Latch& doneWithSubscriptions_;
-        Concurrency::Latch& doneWithExecution_;
+		rtb::Concurrency::Latch& doneWithSubscriptions_;
+		rtb::Concurrency::Latch& doneWithExecution_;
         std::vector<std::string> muscleNames_, dofNames_;
         std::vector<std::vector<std::string>> maMuscleNames_;
     };

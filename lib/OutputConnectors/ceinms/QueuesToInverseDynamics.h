@@ -32,8 +32,7 @@
 #include "ceinms/QueuesToXForces.h"
 #include "ceinms/GeneralisedCoordinatesData.h"
 
-#include "ceinms/concurrency/Queue.h"
-#include "ceinms/concurrency/Latch.h"
+#include "rtb/concurrency/Concurrency.h"
 #include "ceinms/queues/GeneralisedCoordinatesQueue.h"
 #include "ceinms/queues/MultipleExternalForcesQueue.h"
 #include "ceinms/queues/ExternalTorquesQueue.h"
@@ -49,8 +48,8 @@ namespace ceinms{
             GeneralisedCoordinatesQueue& inputGeneralisedCoordinatesQueue,
             MultipleExternalForcesQueue& inputExternalForcesQueue,
             ExternalTorquesQueue& outputExternalTorquesQueue,
-            Concurrency::Latch& doneWithSubscriptions,
-            Concurrency::Latch& doneWithExecution,
+			rtb::Concurrency::Latch& doneWithSubscriptions,
+			rtb::Concurrency::Latch& doneWithExecution,
             const NMSmodelT& subject,
             const std::string& osimModelFilename,
             const std::string& externalLoadsXmlFilename,
@@ -61,8 +60,8 @@ namespace ceinms{
             GeneralisedCoordinatesQueue& inputGeneralisedCoordinatesQueue,
             MultipleExternalForcesQueue& inputExternalForcesQueue,
             ExternalTorquesQueue& outputExternalTorquesQueue,
-            Concurrency::Latch& doneWithSubscriptions,
-            Concurrency::Latch& doneWithExecution,
+			rtb::Concurrency::Latch& doneWithSubscriptions,
+			rtb::Concurrency::Latch& doneWithExecution,
             const NMSmodelT& subject,
             const std::string& osimModelFilename,
             const std::vector<ExternalForceDataSetup>& externalForceDataSetups,
@@ -83,8 +82,8 @@ namespace ceinms{
         GeneralisedCoordinatesQueue& inputGeneralisedCoordinatesQueue,
         MultipleExternalForcesQueue& inputExternalForcesQueue,
         ExternalTorquesQueue& outputExternalTorquesQueue,
-        Concurrency::Latch& doneWithSubscriptions,
-        Concurrency::Latch& doneWithExecution,
+        rtb::Concurrency::Latch& doneWithSubscriptions,
+        rtb::Concurrency::Latch& doneWithExecution,
         const NMSmodelT& subject,
         const std::string& osimModelFilename,
         const std::string& externalLoadsXmlFilename,
@@ -105,8 +104,8 @@ namespace ceinms{
         GeneralisedCoordinatesQueue& inputGeneralisedCoordinatesQueue,
         MultipleExternalForcesQueue& inputExternalForcesQueue,
         ExternalTorquesQueue& outputExternalTorquesQueue,
-        Concurrency::Latch& doneWithSubscriptions,
-        Concurrency::Latch& doneWithExecution,
+        rtb::Concurrency::Latch& doneWithSubscriptions,
+        rtb::Concurrency::Latch& doneWithExecution,
         const NMSmodelT& subject,
         const std::string& osimModelFilename,
         const std::vector<ExternalForceDataSetup>& externalForceDataSetups,

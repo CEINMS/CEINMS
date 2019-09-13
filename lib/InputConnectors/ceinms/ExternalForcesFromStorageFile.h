@@ -31,8 +31,7 @@
 
 #include "ceinms/ExternalForcesFromX.h"
 #include "ceinms/queues/MultipleExternalForcesQueue.h"
-#include "ceinms/concurrency/Latch.h"
-#include "ceinms/concurrency/Queue.h"
+#include "rtb/concurrency/Concurrency.h"
 #include "ceinms/ExternalLoadProperties.h"
 #include <OpenSim/OpenSim.h>
 #include <string>
@@ -44,15 +43,15 @@ namespace ceinms {
         //to parse the external forces easily, I need an opensim model.. otherwise I have to read manually from the storage
         ExternalForcesFromStorageFile(
             MultipleExternalForcesQueue& outputMultipleExternalForcesQueue,
-            Concurrency::Latch& doneWithSubscriptions,
-            Concurrency::Latch& doneWithExecution,
+			rtb::Concurrency::Latch& doneWithSubscriptions,
+			rtb::Concurrency::Latch& doneWithExecution,
             const std::string& externalLoadsXmlFilename);
 
         //using this constructor, grfFilename replace the grf in externalLoadsXml
         ExternalForcesFromStorageFile(
             MultipleExternalForcesQueue& outputMultipleExternalForcesQueue,
-            Concurrency::Latch& doneWithSubscriptions,
-            Concurrency::Latch& doneWithExecution,
+			rtb::Concurrency::Latch& doneWithSubscriptions,
+			rtb::Concurrency::Latch& doneWithExecution,
             const std::string& externalLoadsXmlFilename,
             const std::string& grfFilename);
 

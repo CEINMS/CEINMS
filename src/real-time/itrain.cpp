@@ -1,6 +1,5 @@
 #include "OpenSim/OpenSim.h"
-#include "ceinms/concurrency/Queue.h"
-#include "ceinms/concurrency/Latch.h"
+#include "rtb/concurrency/Concurrency.h"
 #include "mcbs/Spline.h"
 #include "rtb/Filter/Filter.h"
 #include "rtb/plsr/plsr.h"
@@ -19,6 +18,7 @@
 
 #include "ceinms/EmgFromFile.h"
 #include "ceinms/EmgFromQueue.h"
+#include "ceinms/RawEmgFromFile.h"
 #include "ceinms/LmtMaFromStorageFile.h"
 #include "ceinms/ExternalTorquesFromStorageFile.h"
 #include "ceinms/GeneralisedCoordinatesFromStorageFile.h"
@@ -48,11 +48,12 @@
 #include <vector>
 #include <list>
 #include <chrono>
+#include <functional>
 using namespace ceinms;
-using ceinms::Concurrency::Latch;
-using ceinms::Concurrency::Queue;
+using rtb::Concurrency::Latch;
+using rtb::Concurrency::Queue;
 
-using NMSmodelT = NMSmodel<ExponentialActivation, ElasticTendon_BiSec, CurveMode::Online>;
+using NMSmodelType = NMSmodel<ExponentialActivation, ElasticTendon_BiSec, CurveMode::Online>;
 SimTK::Matrix parseCSV(const std::string& filename);
 void printCSV(const SimTK::MatrixView m, const std::string& outputFilename);
 void printCSV(const std::list<std::vector<double>> m, const std::string& outputFilename);
@@ -63,9 +64,13 @@ struct  ItrainExecutionSetup {
 	string ceinmsSubject;
 	string ikTaskFilename;
 	string mcbsDir;
-	string plsrDir;
 	bool usePlsr;
+	string plsrDir;
+	bool runFromDevice;
 	string hostname;
+	bool runFromFile;
+	string trcFilename;
+	string emgFilename;
 	double fc;
 	unsigned nThreads;
 	double solverAccuracy;
@@ -279,8 +284,349 @@ public:
 	}
 };
 
+template<typename TIn, typename TOut>
+class FixMissingEmgData {
+	/* Noraxon sets missing emgs to 10000uV to be easily identifiable. If any emg value at any time is greater than `threshold` we set it to zero,
+	otherwise it messes up the filtering*/
+private:
+	double threshold_;
+public:
+	FixMissingEmgData(double threshold = 1000) :
+		threshold_(threshold) {}
+	TOut operator()(const TIn& frame) {
+		TOut cFrame;
+		cFrame.data = frame.data;
+		cFrame.time = frame.time;
+		for (auto &e : cFrame.data) {
+			if (e > threshold_)
+				e = 0.;
+		}
+		return cFrame;
+	}
+};
 
-int run_from_file() {
+//2 latches
+void deviceProducer(
+	ceinms::EmgQueue& outputRawEmgQueue,
+	rtosim::MarkerSetQueue& outputMarkerQueue,
+	rtb::Concurrency::Latch& subscriptionLatch,
+	rtb::Concurrency::Latch& endLatch,
+	ItrainExecutionSetup itrainSetup) {
+
+	//used to stop the data producers
+	rtosim::FlowControl flowCondition(true);
+	rtosim::EmgQueue localRawEmgQueue;
+	ExcitationGeneratorFromXml emgGenerator(itrainSetup.emgGeneratorFile);
+	vector<string> emgChannelNames{ emgGenerator.getInputSignalsNames() };
+
+	rtosim::DataFromNexus dataProducerFromNexus(outputMarkerQueue, localRawEmgQueue, subscriptionLatch, endLatch, flowCondition, itrainSetup.osimModelFilename, emgChannelNames);
+	dataProducerFromNexus.setLoopMode(true);
+	rtosim::QueueAdapter<
+		rtosim::EmgQueue,
+		ceinms::EmgQueue,
+		FixMissingEmgData<rtosim::EmgQueue::type, ceinms::EmgQueue::type>
+	> emgFixer(
+			localRawEmgQueue,
+			outputRawEmgQueue,
+		subscriptionLatch,
+		endLatch,
+			FixMissingEmgData<rtosim::EmgQueue::type, ceinms::EmgQueue::type >(1000.));
+
+	auto trigger([&flowCondition]() {
+		std::string cmd;
+		bool run(true);
+		std::cin >> cmd;
+		flowCondition.setRunCondition(false);
+	});
+
+
+	std::thread dataProducerThread(std::ref(dataProducerFromNexus));
+	std::thread emgFixerThread(std::ref(emgFixer));
+	std::thread triggerThread(std::ref(trigger));
+	
+	subscriptionLatch.wait();
+	endLatch.wait();
+
+	dataProducerThread.join();
+	emgFixerThread.join();
+	triggerThread.join();
+}
+
+//3 latches
+template<typename NMSmodelT>
+void fileProducer(
+	ceinms::EmgQueue& outputRawEmgQueue,
+	rtosim::MarkerSetQueue& outputMarkerQueue,
+	rtb::Concurrency::Latch& subscriptionLatch,
+	rtb::Concurrency::Latch& endLatch,
+	NMSmodelT& subject,
+	ItrainExecutionSetup itrainSetup) {
+
+	ceinms::EmgQueue localRawEmgQueue;
+	rtosim::MarkersFromTrc markersFromTrc(outputMarkerQueue, subscriptionLatch, endLatch, itrainSetup.osimModelFilename, itrainSetup.trcFilename, false);
+//	markersFromTrc.setOutputFrequency(200);
+
+	ExcitationGeneratorFromXml emgGenerator(itrainSetup.emgGeneratorFile);
+	vector<string> desiredEmgChannelNames{ emgGenerator.getInputSignalsNames() };
+	ceinms::RawEmgFromFile emgFromFile(localRawEmgQueue, subscriptionLatch, endLatch, itrainSetup.emgFilename, desiredEmgChannelNames);
+	rtosim::QueueAdapter<
+		ceinms::EmgQueue,
+		ceinms::EmgQueue,
+		FixMissingEmgData<ceinms::EmgQueue::type, ceinms::EmgQueue::type>> emgFixer(
+			localRawEmgQueue,
+			outputRawEmgQueue,
+			subscriptionLatch,
+			endLatch,
+			FixMissingEmgData<ceinms::EmgQueue::type, ceinms::EmgQueue::type >(1000.));
+
+	std::thread markerProducerThread(std::ref(markersFromTrc));
+	std::thread emgProducerThread(std::ref(emgFromFile));
+	std::thread emgFixerThread(std::ref(emgFixer));
+
+
+	markerProducerThread.join();
+	emgProducerThread.join();
+	emgFixerThread.join();
+
+}
+
+//7 latches
+template<typename NMSmodelT>
+void dataConditioning(
+	ceinms::EmgQueue& inputRawEmgQueue,
+	rtosim::MarkerSetQueue& inputMarkerQueue,
+	ceinms::EmgQueue& outputExcitationsQueue,
+	ceinms::LmtQueue& outputLmtQueue,
+	ceinms::MultipleMomentArmsQueues& outputMomentArmsQueue,
+	ceinms::ExternalTorquesQueue& outputTorquesQueue,
+	rtb::Concurrency::Latch& subscriptionLatch,
+	rtb::Concurrency::Latch& endLatch,
+	NMSmodelT& subject,
+	ItrainExecutionSetup itrainSetup) {
+
+	ExcitationGeneratorFromXml emgGenerator(itrainSetup.emgGeneratorFile);
+	vector<string> emgChannelNames{ emgGenerator.getInputSignalsNames() };
+	vector<string> dofNamesFromOsim{ rtosim::getCoordinateNamesFromModel(itrainSetup.osimModelFilename)};
+	vector<string> dofNamesFromSubject;
+	subject.getDoFNames(dofNamesFromSubject);
+
+	std::unique_ptr<ceinms::EmgFromX> emgFromQueue;
+	if (itrainSetup.useMaxEmgFile) {
+		emgFromQueue = std::make_unique<ceinms::EmgFromQueue>(
+			ceinms::EmgFromQueue(inputRawEmgQueue, outputExcitationsQueue,
+				subscriptionLatch, endLatch, itrainSetup.maxEmgFile,
+				itrainSetup.emgGeneratorFile, subject, 6., 1500.));
+	}
+	else {
+		emgFromQueue = std::make_unique<ceinms::EmgFromQueue>(
+			ceinms::EmgFromQueue(inputRawEmgQueue, outputExcitationsQueue,
+				subscriptionLatch, endLatch, emgChannelNames,
+				itrainSetup.emgGeneratorFile, subject, 6., 1500.));
+	}
+
+	rtosim::GeneralisedCoordinatesQueue generalisedCoordinatesQueue;
+	rtosim::QueueToInverseKinametics queueToInverseKinematics(
+		inputMarkerQueue, 
+		generalisedCoordinatesQueue, 
+		subscriptionLatch, endLatch,
+		itrainSetup.osimModelFilename, 
+		itrainSetup.nThreads, 
+		itrainSetup.ikTaskFilename, 1e-5, 10000);
+
+	//Filter generalised coordinated form IK
+	rtosim::GeneralisedCoordinatesQueue reducedGeneralisedCoordinatesQueue, filteredGeneralisedCoordinatesQueue;
+	rtosim::GeneralisedCoordinatesStateSpace gcFilt(itrainSetup.fc, dofNamesFromOsim.size());
+	rtosim::QueueAdapter <
+		rtosim::GeneralisedCoordinatesQueue,
+		rtosim::GeneralisedCoordinatesQueue,
+		rtosim::GeneralisedCoordinatesStateSpace
+	> gcQueueAdaptor(
+		generalisedCoordinatesQueue,
+		filteredGeneralisedCoordinatesQueue,
+		subscriptionLatch,
+		endLatch,
+		gcFilt);
+	//extract a subset of coordinates to be used with MCBS
+	rtosim::QueueAdapter<rtosim::GeneralisedCoordinatesQueue, rtosim::GeneralisedCoordinatesQueue, GeneralisedCoordinatesReducer> gcReducer(
+		filteredGeneralisedCoordinatesQueue,
+		reducedGeneralisedCoordinatesQueue,
+		subscriptionLatch,
+		endLatch,
+		GeneralisedCoordinatesReducer(dofNamesFromOsim, dofNamesFromSubject));
+
+	ceinms::LmtMaFromMcbs lmtMaFromMcbs(
+		reducedGeneralisedCoordinatesQueue,
+		outputLmtQueue,
+		outputMomentArmsQueue,
+		subscriptionLatch,
+		endLatch,
+		subject,
+		itrainSetup.mcbsDir,
+		itrainSetup.osimModelFilename);
+
+	rtosim::QueueToFileLogger<rtosim::GeneralisedCoordinatesData> filteredIkLogger(
+		filteredGeneralisedCoordinatesQueue,
+		subscriptionLatch,
+		endLatch,
+		dofNamesFromOsim,
+		itrainSetup.resultDir, "filtered_ik", ".sto");
+
+	rtosim::StateVisualiser visualizer(generalisedCoordinatesQueue, itrainSetup.osimModelFilename);
+	
+	if (itrainSetup.showVisualiser) {
+		std::thread t(std::ref(visualizer));
+		t.detach();
+	}
+	std::thread emgFromQueueThread(std::ref(*emgFromQueue));
+	std::thread inverseKinematicsThread(std::ref(queueToInverseKinematics));
+	std::thread gcFiltThread(std::ref(gcQueueAdaptor));
+	std::thread gcReducerThread(std::ref(gcReducer));
+	std::thread lmtMaFromMcbsThread(std::ref(lmtMaFromMcbs));
+	std::thread filteredIkLoggerThread(std::ref(filteredIkLogger));
+
+	subscriptionLatch.wait();
+
+	//signal to all consumers of torque data that there is no torque data
+	//so they don't hang waiting for it. If we had a torque producer of some sort, 
+	//such as a direct measurement from and exoskeleton, or the output of the inverse dynamics,
+	//then we would have thread sending data to the TorquesQueue.
+	auto eod = EndOfData::get<ExternalTorquesFrame>();
+	outputTorquesQueue.push(eod);
+
+	endLatch.wait();
+
+	emgFromQueueThread.join();
+	inverseKinematicsThread.join();
+	gcFiltThread.join();
+	gcReducerThread.join();
+	lmtMaFromMcbsThread.join();
+	filteredIkLoggerThread.join();
+}
+
+// 2 latches
+template<typename NMSmodelT>
+void ceinmsProcessing(
+	ceinms::EmgQueue& inputExcitationQueue,
+	ceinms::LmtQueue& inputLmtQueue,
+	ceinms::MultipleMomentArmsQueues& inputMomentArmsQueue,
+	ceinms::ExternalTorquesQueue& inputExternalTorquesQueue,
+	ceinms::ScalarLogQueue outputDataQueue,
+	rtb::Concurrency::Latch& doneWithSubscriptionsLatch,
+	rtb::Concurrency::Latch& doneWithExecutionLatch,
+	NMSmodelT& subject,
+	ItrainExecutionSetup itrainSetup) {
+		
+	vector<string> dataToLog = {
+		"Activations",
+		"FibreLengths",
+		"NormFibreLengths",
+		"FibreVelocities",
+		"NormFibreVelocities",
+		"PennationAngles",
+		"MuscleForces",
+		"Torques",
+		"TendonLengths",
+		"NormTendonLengths",
+		"MusclesContribution" };
+	// 2b. define the thread consuming the output sources
+	vector<string> valuesToWrite = dataToLog;
+
+	// 3. define the model simulator
+	vector<string> valuesToLog = dataToLog;
+	ModelEvaluationOnline<NMSmodelT, LoggerOnQueues>  simulator(
+		inputExcitationQueue,
+		inputLmtQueue,
+		inputExternalTorquesQueue,
+		inputMomentArmsQueue,
+		outputDataQueue,
+		doneWithSubscriptionsLatch,
+		doneWithExecutionLatch,
+		subject,
+		valuesToLog);
+
+	QueuesToStorageFiles queuesToStorageFiles(
+		outputDataQueue,
+		doneWithSubscriptionsLatch, 
+		doneWithExecutionLatch, 
+		subject,
+		valuesToWrite, 
+		itrainSetup.resultDir);
+
+
+	std::thread simulatorThread(std::ref(simulator));
+	std::thread loggingThread(std::ref(queuesToStorageFiles));
+	
+	simulatorThread.join();
+	loggingThread.join();
+}
+
+
+//3 latches
+template<typename NMSmodelT>
+void surrogateModelProcessing(
+	ceinms::ScalarLogQueue& inputDataQueue, 
+	ceinms::ScalarVectorVectorQueue& outputstrainQueue, 
+	rtb::Concurrency::Latch& subscriptionLatch,
+	rtb::Concurrency::Latch& endLatch, 
+	NMSmodelT& subject, ItrainExecutionSetup itrainSetup) {
+
+
+	string plsrXfile{ itrainSetup.plsrDir + "/xvalues.csv" };
+	string plsrYfile{ itrainSetup.plsrDir + "/yvalues.csv" };
+	string plsrNodeFile{ itrainSetup.plsrDir + "/nodes.csv" };
+	SimTK::Matrix X(parseCSV(plsrXfile));
+	SimTK::Matrix Y(parseCSV(plsrYfile));
+	rtb::Plsr strainPlsr;
+	strainPlsr.train(X, Y, 0.001);
+	SimTK::Matrix nodes(parseCSV(plsrNodeFile));
+
+	ScalarVectorVectorQueue strainQueue;
+	AchillesTendonModel atModel(
+		*inputDataQueue["MuscleForces"],
+		strainQueue,
+		subscriptionLatch,
+		endLatch,
+		subject.getMuscleNames(),
+		strainPlsr,
+		nodes);
+
+	ceinms::ScalarVectorQueue reducedStrainQueue;
+	rtosim::QueueAdapter<
+		ScalarVectorVectorQueue, 
+		ScalarVectorQueue, 
+		std::function<ScalarVectorFrame(const ScalarVectorVectorFrame&)>> strainReducerAdapter(
+			strainQueue,
+			reducedStrainQueue,
+			subscriptionLatch,
+			endLatch,
+			[](const ScalarVectorVectorFrame& frame) {
+		//Strain values are stored in the last columns
+		ScalarVectorFrame strainFrame{ frame.time, frame.data.at(3) };
+		return strainFrame;
+		}
+	);
+
+	string strainOutput(itrainSetup.resultDir + "strain_fe.csv");
+	QueueToCSV strainLogger(
+		reducedStrainQueue,
+		subscriptionLatch,
+		endLatch,
+		strainOutput);
+
+	ceinms::QueuesToWebsocket queueToWebsocket(strainQueue, { "nodes_x","nodes_y","nodes_z","nodes_w" });
+
+	std::thread atModelThread(std::ref(atModel));
+	std::thread queueToWebsocketThread(std::ref(queueToWebsocket));
+	std::thread strainLoggerThread(std::ref(strainLogger));
+	
+	atModelThread.join();
+	queueToWebsocketThread.join();
+	strainLoggerThread.join();
+}
+
+int run_from_file(ItrainExecutionSetup itrainSetup) {
+
+
 	string baseDir = "C:\\Data\\ABC11\\";
     string subjectFile = baseDir + "TestData\\20151214\\ceinms\\subjects\\calibrated\\calibrated0.xml";
     string trialFilename = baseDir + "TestData\\20151214\\ceinms\\trials\\baseline_walking.xml";
@@ -308,7 +654,7 @@ int run_from_file() {
     Latch doneWithSubscriptionsLatch;
     Latch doneWithExecutionLatch;
     
-    NMSmodelT mySubject;
+    NMSmodelType mySubject;
     setupSubject(mySubject, subjectFile);
 
     // 2. define the thread connecting with the input sources
@@ -343,7 +689,7 @@ int run_from_file() {
 
     // 3. define the model simulator
     vector<string> valuesToLog = dataToLog;
-    ModelEvaluationOnline<NMSmodelT, LoggerOnQueues>  simulator(
+    ModelEvaluationOnline<NMSmodelType, LoggerOnQueues>  simulator(
         emgQueue,
 		delayedLmtQueue,
         externalTorqueQueue,
@@ -427,284 +773,116 @@ int run_from_file() {
 }
 
 
-
-int run_from_nexus(ItrainExecutionSetup itrainSetup) {
+int run(ItrainExecutionSetup itrainSetup) {
 	
-	string plsrXfile = itrainSetup.plsrDir + "";
-	string plsrYfile = itrainSetup.plsrDir + "";
-	string plsrNodefile = itrainSetup.plsrDir + "";
-	string subjectFile = itrainSetup.ceinmsSubject;
-	string osimModelFile = itrainSetup.osimModelFilename;
-	string ikTaskSetFile = itrainSetup.ikTaskFilename;
-	string mcbsDir = itrainSetup.mcbsDir;
-	string maxEmgFile = itrainSetup.maxEmgFile;
-	string emgGeneratorFile = itrainSetup.emgGeneratorFile;
-
-	/*vector<string> emgChannelNames{
-		"VasMed",
-		"VasLat",
-		"RecFem",
-		"Gra",
-		"Sar",
-		"TibAnt",
-		"PerLong",
-		"AddGroup",
-		"SemTen",
-		"BicFem",
-		"MedGas",
-		"LatGas",
-		"Sol",
-		"TFL",
-		"GlutMed",
-		"GlutMax"
-	};*/
-
-	ExcitationGeneratorFromXml emgGenerator(emgGeneratorFile);
-	vector<string> emgChannelNames{ emgGenerator.getInputSignalsNames() };
-	vector<string> dofNamesFromOsim, dofNamesFromSubject;
-
-	//Create queues for input data
-	rtosim::EmgQueue rawEmgQueue;
-	ceinms::EmgQueue fixedRawEmgQueue, emgLinearEnvelopesQueue;
-	LmtQueue lmtQueue;
-	ExternalTorquesQueue externalTorqueQueue;
-	MultipleMomentArmsQueues momentArmsQueues;
-
-	//Creates queues for output data
-	ScalarLogQueue logQueue;
-	ScalarVectorVectorQueue strainQueue;
-
+	
 	//Creates latches to sync threads
 	Latch doneWithSubscriptionsLatch;
 	Latch doneWithExecutionLatch;
 
-	NMSmodelT mySubject;
-	setupSubject(mySubject, subjectFile);
+	NMSmodelType mySubject;
+	setupSubject(mySubject, itrainSetup.ceinmsSubject);
+	vector<string> dofNamesFromOsim, dofNamesFromSubject;
 	mySubject.getDoFNames(dofNamesFromSubject);
-	//MEGA HACK
-	rtb::Concurrency::Latch l1;
-	rtb::Concurrency::Latch l2;
-	rtosim::FlowControl flowCondition(true);
-	// 2. define the thread connecting with the input sources
+
+	//Create data queues 
+	ceinms::EmgQueue rawEmgQueue, excitationsQueue;
 	rtosim::MarkerSetQueue markerSetQueue;
-	rtosim::GeneralisedCoordinatesQueue generalisedCoordinatesQueue, reducedGeneralisedCoordinatesQueue, filteredGeneralisedCoordinatesQueue;
-	rtosim::DataFromNexus dataProducerFromNexus(markerSetQueue, rawEmgQueue, l1, l2, flowCondition, osimModelFile, emgChannelNames);
-	dataProducerFromNexus.setLoopMode(true);
-	rtosim::QueueToInverseKinametics queueToInverseKinematics(markerSetQueue, generalisedCoordinatesQueue, l1, l2, osimModelFile, 2, ikTaskSetFile, 1e-5, 10000);
+	ceinms::LmtQueue lmtQueue;
+	ceinms::ExternalTorquesQueue externalTorqueQueue;
+	ceinms::MultipleMomentArmsQueues momentArmsQueues;
+
+	//Creates queues for output data
+	ceinms::ScalarLogQueue ceinmsOutputQueue;
+	ceinms::ScalarVectorVectorQueue strainQueue;
+		
+
+	rtosim::TimeDifference<LmtQueue, ScalarVectorVectorQueue> pipelineTimeDifference(
+			lmtQueue,
+			strainQueue,
+			doneWithSubscriptionsLatch,
+			doneWithExecutionLatch);
+
+	doneWithSubscriptionsLatch.setCount(13);
+	doneWithExecutionLatch.setCount(12);
 	
-	//define the filter
-	double fc = 8;
-	dofNamesFromOsim  = rtosim::getCoordinateNamesFromModel(osimModelFile);
-	rtosim::GeneralisedCoordinatesStateSpace gcFilt(fc, dofNamesFromOsim.size());
-	//read from generalisedCoordinatesQueue, filter using gcFilt,
-	//and save filtered data in filteredGeneralisedCoordinatesQueue
-	rtosim::QueueAdapter <
-			rtosim::GeneralisedCoordinatesQueue,
-			rtosim::GeneralisedCoordinatesQueue,
-			rtosim::GeneralisedCoordinatesStateSpace
-		> gcQueueAdaptor(
-			generalisedCoordinatesQueue,
-			filteredGeneralisedCoordinatesQueue,
-			l1,
-			l2,
-			gcFilt);
-
-	//mcbs
-
-	rtosim::QueueAdapter<rtosim::GeneralisedCoordinatesQueue, rtosim::GeneralisedCoordinatesQueue, GeneralisedCoordinatesReducer> gcReducer(
-		filteredGeneralisedCoordinatesQueue,
-		reducedGeneralisedCoordinatesQueue,
-		l1,
-		l2,
-		GeneralisedCoordinatesReducer(dofNamesFromOsim, dofNamesFromSubject));
-		   
-	ceinms::LmtMaFromMcbs lmtMaFromMcbs(
-		reducedGeneralisedCoordinatesQueue,
-		lmtQueue,
-		momentArmsQueues,
-		doneWithSubscriptionsLatch,
-		doneWithExecutionLatch,
-		mySubject,
-		mcbsDir,
-		osimModelFile);
-
-
-	class FixMissingEmgData {
-		/* Noraxon sets missing emgs to 10000uV to be easily identifiable. If any emg value at any time is greater than `threshold` we set it to zero,
-		otherwise it messes up the filtering*/
-	private:
-		double threshold_;
-	public:
-		FixMissingEmgData(double threshold = 1000) :
-			threshold_(threshold) {}
-		ceinms::EmgFrame operator()(const rtosim::EmgFrame& frame) {
-			ceinms::EmgFrame cFrame;
-			cFrame.data = frame.data;
-			cFrame.time = frame.time;
-			for (auto &e : cFrame.data) {
-				if (e > threshold_)
-					e = 0.;
-			}
-			return cFrame;
-		}
-	};
-
-	rtosim::QueueAdapter<rtosim::EmgQueue, ceinms::EmgQueue, FixMissingEmgData> emgFixer(
-		rawEmgQueue,
-		fixedRawEmgQueue,
-		l1,
-		l2,
-		FixMissingEmgData(1000.));
-	
-	std::unique_ptr<ceinms::EmgFromX> emgFromQueue;
-	if (itrainSetup.useMaxEmgFile) {
-		emgFromQueue = std::make_unique<ceinms::EmgFromQueue>(
-			ceinms::EmgFromQueue(fixedRawEmgQueue, emgLinearEnvelopesQueue,
-			doneWithSubscriptionsLatch, doneWithExecutionLatch, maxEmgFile,
-			emgGeneratorFile, mySubject, 6., 1500.));
-	}
-	else {
-		emgFromQueue = std::make_unique<ceinms::EmgFromQueue>(
-			ceinms::EmgFromQueue(fixedRawEmgQueue, emgLinearEnvelopesQueue,
-			doneWithSubscriptionsLatch, doneWithExecutionLatch, emgChannelNames,
-			emgGeneratorFile, mySubject, 6., 1500.));
-	}
-
-	vector<string> dataToLog = {
-		"Activations",
-		"FibreLengths",
-		"NormFibreLengths",
-		"FibreVelocities",
-		"NormFibreVelocities",
-		"PennationAngles",
-		"MuscleForces",
-		"Torques",
-		"TendonLengths",
-		"NormTendonLengths",
-		"MusclesContribution" };
-	// 2b. define the thread consuming the output sources
-	vector<string> valuesToWrite = dataToLog;
-
-	// 3. define the model simulator
-	vector<string> valuesToLog = dataToLog;
-	ModelEvaluationOnline<NMSmodelT, LoggerOnQueues>  simulator(
-		emgLinearEnvelopesQueue,
-		lmtQueue,
-		externalTorqueQueue,
-		momentArmsQueues,
-		logQueue,
-		doneWithSubscriptionsLatch,
-		doneWithExecutionLatch,
-		mySubject,
-		valuesToLog);
-	QueuesToStorageFiles queuesToStorageFiles(logQueue, doneWithSubscriptionsLatch, doneWithExecutionLatch, mySubject, valuesToWrite, itrainSetup.resultDir);
-
-
-
-	//SimTK::Matrix X(parseCSV(plsrXfile));
-	//SimTK::Matrix Y(parseCSV(plsrYfile));
-	//rtb::Plsr strainPlsr;
-	//strainPlsr.train(X, Y, 0.001);
-	//SimTK::Matrix nodes(parseCSV(plsrNodefile));
-
-	//AchillesTendonModel atModel(
-	//	*logQueue["MuscleForces"],
-	//	strainQueue,
-	//	doneWithSubscriptionsLatch,
-	//	doneWithExecutionLatch,
-	//	mySubject.getMuscleNames(),
-	//	strainPlsr,
-	//	nodes);
-
-	//    QueueToCSV strainLogger(
-	//        strainQueue, 
-	//        doneWithSubscriptionsLatch,
-	//        doneWithExecutionLatch, 
-	//        strainoutput);
-
-
-	//rtosim::TimeDifference<LmtQueue, ScalarVectorVectorQueue>
-	//	pipelineTimeDifference(
-	//		lmtQueue,
-	//		strainQueue,
-	//		l1,
-	//		l2);
-	//ceinms::QueuesToWebsocket queueToWebsocket(strainQueue, { "nodes_x","nodes_y","nodes_z","nodes_w" });
-
-	doneWithSubscriptionsLatch.setCount(5);
-	doneWithExecutionLatch.setCount(4);
-
-	rtosim::StateVisualiser visualizer(generalisedCoordinatesQueue, osimModelFile);
-	auto fixLatches([&]() {
-		doneWithSubscriptionsLatch.wait();
-		l1.wait(); 
-		auto eod = EndOfData::get<ExternalTorquesFrame>();
-		externalTorqueQueue.push(eod);
-	});
-
-	auto trigger([&flowCondition]() {
-		std::string cmd;
-		bool run(true);
-		std::cin >> cmd;
-		flowCondition.setRunCondition(false);
-	});
-
-
-	// 4. start the threads
-	
-	l1.setCount(6);
-	l2.setCount(5);
-
 	auto onScreenDisplay([&]() {
-		rawEmgQueue.subscribe();
+		doneWithSubscriptionsLatch.wait();
+		momentArmsQueues[0]->subscribe();
 		bool  runcondition = true;
 		while (runcondition) {
-			auto f = rawEmgQueue.pop();
+			auto f = momentArmsQueues[0]->pop();
 			runcondition = !EndOfData::isEod(f);
 			std::cout << "." << std::flush;
 		}
 	});
-	if (itrainSetup.showVisualiser) {
-		rtosim::QueuesSync::launchThreads(
-			dataProducerFromNexus,
-			queueToInverseKinematics,
-			gcQueueAdaptor,
-			gcReducer,
-			lmtMaFromMcbs,
-			simulator,
-			emgFixer,
-			*emgFromQueue,
-			//atModel,
-			fixLatches,
-			//queueToWebsocket,
-	//		fixLatches,
-			visualizer,
-			onScreenDisplay,
-			queuesToStorageFiles,
-			trigger
-		);
-	}
-	else {
-		rtosim::QueuesSync::launchThreads(
-			dataProducerFromNexus,
-			queueToInverseKinematics,
-			gcQueueAdaptor,
-			gcReducer,
-			lmtMaFromMcbs,
-			simulator,
-			emgFixer,
-			*emgFromQueue,
-			//atModel,
-			fixLatches,
-			//queueToWebsocket,
-	//		fixLatches,
-			onScreenDisplay,
-			queuesToStorageFiles,
-			trigger
-		);
 
+	
+	std::thread onScreenDisplayThread(std::ref(onScreenDisplay));
+	std::thread producerThread;
+
+	if (itrainSetup.runFromDevice) {
+		producerThread = std::thread(
+			deviceProducer,
+			std::ref(rawEmgQueue),
+			std::ref(markerSetQueue),
+			std::ref(doneWithSubscriptionsLatch),
+			std::ref(doneWithExecutionLatch),
+			itrainSetup);
+	}
+	else
+	{
+		producerThread = std::thread(
+			fileProducer<NMSmodelType>,
+			std::ref(rawEmgQueue),
+			std::ref(markerSetQueue),
+			std::ref(doneWithSubscriptionsLatch),
+			std::ref(doneWithExecutionLatch),
+			std::ref(mySubject),
+			itrainSetup);
 	}
 	
+	std::thread dataConditioningThread(
+		dataConditioning<NMSmodelType>,
+		std::ref(rawEmgQueue),
+		std::ref(markerSetQueue),
+		std::ref(excitationsQueue),
+		std::ref(lmtQueue),
+		std::ref(momentArmsQueues),
+		std::ref(externalTorqueQueue),
+		std::ref(doneWithSubscriptionsLatch),
+		std::ref(doneWithExecutionLatch),
+		std::ref(mySubject),
+		itrainSetup);
+	
+
+	std::thread ceinmsProcessingThread(
+		ceinmsProcessing<NMSmodelType>,
+		std::ref(excitationsQueue),
+		std::ref(lmtQueue),
+		std::ref(momentArmsQueues),
+		std::ref(externalTorqueQueue),
+		std::ref(ceinmsOutputQueue),
+		std::ref(doneWithSubscriptionsLatch),
+		std::ref(doneWithExecutionLatch),
+		std::ref(mySubject),
+		itrainSetup);
+/*	std::thread surrogateModelProcessingThread(
+		surrogateModelProcessing<NMSmodelType>,
+		std::ref(ceinmsOutputQueue),
+		std::ref(strainQueue),
+		std::ref(doneWithSubscriptionsLatch),
+		std::ref(doneWithExecutionLatch),
+		mySubject,
+		itrainSetup);
+	*/	
+	onScreenDisplayThread.join();
+
+	producerThread.join();
+	dataConditioningThread.join();
+	ceinmsProcessingThread.join();
+//	surrogateModelProcessingThread.join();
+
 //	pipelineTimeDifference.getWallClockDifference().print(outputDirectory + "/wallclock-time-lmtqueue-to-strainqueue.txt");
 //	pipelineTimeDifference.getCpuClockDifference().print(outputDirectory + "/cupclock-time-lmtqueue-to-strainqueue.txt");
 	return 0;
@@ -736,7 +914,7 @@ void printAuthors() {
 	cout << "Authors: Claudio Pizzolato <c.pizzolato@griffith.edu.au>" << endl << endl;
 }
 
-void printHelp() {
+void printHelp(ItrainExecutionSetup itrainSetup) {
 
 	printAuthors();
 
@@ -745,40 +923,83 @@ void printHelp() {
 	string dir, filename, ext;
 	SimTK::Pathname::deconstructPathname(progName, isAbsolute, dir, filename, ext);
 
-	cout << "Option                Argument         Action / Notes\n";
-	cout << "------                --------         --------------\n";
-	cout << "-h                                     Print the command-line options for " << filename << ".\n";
-	cout << "--model               ModelFilename    Specify the name of the osim model file for the investigation.\n";
-	cout << "--subject             CEINMS subject   Specify the name of the CEINMS subject file for the investigation.\n";
-	cout << "--task-set            TaskSetFilename  Specify the name of the XML TaskSet file containing the marker weights to be used.\n";
-	cout << "--plsr                PLSR directory   Specify the name of the directory containing the Achilles tendon PLSR files to be used.\n";
-	cout << "--mcbs                MCBS directory   Specify the name of the directory containing the MCBS coefficient files to be used.\n";
-	cout << "--maxemg              max EMG file     Specify the name of the file containing the max values for EMG envelopes.\n";
-	cout << "--gen                 EMG generator    Specify the name of the file for the EMG generator.\n";
-	cout << "--hostname            HostName         Specify IP address and port for Vicon Nexus.\n";
-	cout << "--fc                  CutoffFrequency  Specify the name of lowpass cutoff frequency to filter IK and GRF data.\n";
-	cout << "-j                    IK threads       Specify the number of IK threads to be used.\n";
-	cout << "-a                    Accuracy         Specify the IK solver accuracy.\n";
-	cout << "--output              OutputDir        Specify the output directory.\n";
-	cout << "-v                                     Show visualiser.\n";
+	if (!(itrainSetup.runFromFile || itrainSetup.runFromDevice)) {
+		cout << "To run from a connected device use: " << filename << " --device [OPTIONS]\n" 
+			"| To run from file use: " << filename << " --file [OPTIONS]\n";
+	}
+	else {
+		if (itrainSetup.runFromDevice) {
+			cout << "Option                Argument         Action / Notes\n";
+			cout << "------                --------         --------------\n";
+			cout << "-h                                     Print the command-line options for " << filename << ".\n";
+			cout << "--model               ModelFilename    Specify the name of the osim model file for the investigation.\n";
+			cout << "--subject             CEINMS subject   Specify the name of the CEINMS subject file for the investigation.\n";
+			cout << "--task-set            TaskSetFilename  Specify the name of the XML TaskSet file containing the marker weights to be used.\n";
+			cout << "--plsr                PLSR directory   Specify the name of the directory containing the Achilles tendon PLSR files to be used.\n";
+			cout << "--mcbs                MCBS directory   Specify the name of the directory containing the MCBS coefficient files to be used.\n";
+			cout << "--maxemg              max EMG file     Specify the name of the file containing the max values for EMG envelopes.\n";
+			cout << "--gen                 EMG generator    Specify the name of the file for the EMG generator.\n";
+			cout << "--hostname            HostName         Specify IP address and port for Vicon Nexus.\n";
+			cout << "--fc                  CutoffFrequency  Specify the name of lowpass cutoff frequency to filter IK and GRF data.\n";
+			cout << "-j                    IK threads       Specify the number of IK threads to be used.\n";
+			cout << "-a                    Accuracy         Specify the IK solver accuracy.\n";
+			cout << "--output              OutputDir        Specify the output directory.\n";
+			cout << "-v                                     Show visualiser.\n";
+		} if (itrainSetup.runFromFile) {
+			cout << "Option                Argument         Action / Notes\n";
+			cout << "------                --------         --------------\n";
+			cout << "-h                                     Print the command-line options for " << filename << ".\n";
+			cout << "--model               ModelFilename    Specify the name of the osim model file for the investigation.\n";
+			cout << "--subject             CEINMS subject   Specify the name of the CEINMS subject file for the investigation.\n";
+			cout << "--task-set            TaskSetFilename  Specify the name of the XML TaskSet file containing the marker weights to be used.\n";
+			cout << "--plsr                PLSR directory   Specify the name of the directory containing the Achilles tendon PLSR files to be used.\n";
+			cout << "--mcbs                MCBS directory   Specify the name of the directory containing the MCBS coefficient files to be used.\n";
+			cout << "--maxemg              max EMG file     Specify the name of the file containing the max values for EMG envelopes.\n";
+			cout << "--emg                 EMG file         Specify the name of the file containing the raw EMG data.\n";
+			cout << "--gen                 EMG generator    Specify the name of the file for the EMG generator.\n";
+			cout << "--trc                 Trc filename     Specify the name of the file containing the marker data.\n";
+			cout << "--fc                  CutoffFrequency  Specify the name of lowpass cutoff frequency to filter IK and GRF data.\n";
+			cout << "-j                    IK threads       Specify the number of IK threads to be used.\n";
+			cout << "-a                    Accuracy         Specify the IK solver accuracy.\n";
+			cout << "--output              OutputDir        Specify the output directory.\n";
+			cout << "-v                                     Show visualiser.\n";
+
+		}
+	}
+		bool runFromDevice;
+	string trialXmlFilename;
+	bool runFromFile;
 }
 
-int main_(int argc, char* argv[]) {
+int main(int argc, char* argv[]) {
 
 	
 	ItrainExecutionSetup itrainSetup;
 
 	rtosim::ProgramOptionsParser po(argc, argv);
 	if (po.exists("-h") || po.empty()) {
-		printHelp();
+		printHelp(itrainSetup);
 		exit(EXIT_SUCCESS);
 	}
-
+	
+	if (po.exists("--file")) {
+		itrainSetup.runFromFile = true;
+		itrainSetup.runFromDevice = false;
+	}
+	else if (po.exists("--device")) {
+		itrainSetup.runFromFile = false;
+		itrainSetup.runFromDevice = true;
+	}
+	else {
+		printHelp(itrainSetup);
+		exit(EXIT_SUCCESS);
+	}
+	
 	if (po.exists("--model"))
 		itrainSetup.osimModelFilename = po.getParameter("--model");
 	else {
 		cout << "Please provide --model option\n";
-		printHelp();
+		printHelp(itrainSetup);
 		exit(EXIT_SUCCESS);
 	}
 
@@ -786,7 +1007,7 @@ int main_(int argc, char* argv[]) {
 		itrainSetup.ikTaskFilename = po.getParameter("--task-set");
 	else {
 		cout << "Please provide --task-set option\n";
-		printHelp();
+		printHelp(itrainSetup);
 		exit(EXIT_SUCCESS);
 	}
 
@@ -794,7 +1015,7 @@ int main_(int argc, char* argv[]) {
 		itrainSetup.ceinmsSubject = po.getParameter("--subject");
 	else {
 		cout << "Please provide --subject option\n";
-		printHelp();
+		printHelp(itrainSetup);
 		exit(EXIT_SUCCESS);
 	}
 
@@ -802,7 +1023,7 @@ int main_(int argc, char* argv[]) {
 		itrainSetup.mcbsDir = po.getParameter("--mcbs");
 	else {
 		cout << "Please provide --mcbs option\n";
-		printHelp();
+		printHelp(itrainSetup);
 		exit(EXIT_SUCCESS);
 	}
 
@@ -810,7 +1031,7 @@ int main_(int argc, char* argv[]) {
 		itrainSetup.emgGeneratorFile = po.getParameter("--gen");
 	else {
 		cout << "Please provide --gen option\n";
-		printHelp();
+		printHelp(itrainSetup);
 		exit(EXIT_SUCCESS);
 	}
 	
@@ -847,6 +1068,14 @@ int main_(int argc, char* argv[]) {
 
 	if (po.exists("--maxemg"))
 		itrainSetup.maxEmgFile = po.getParameter("--maxemg");
+
+	if (po.exists("--emg"))
+		itrainSetup.emgFilename = po.getParameter("--emg");
+
+	if (po.exists("--trc"))
+		itrainSetup.trcFilename = po.getParameter("--trc");
+
+
 	/*string baseDir = "C:\\Data\\ABC11\\";
 	string subjectFile = baseDir + "TestData\\20151214\\ceinms\\subjects\\calibrated\\calibrated0.xml";
 	//string emgGeneratorFile = baseDir + "TestData\\20151214\\ceinms\\excitationGenerator\\excitationGenerator16to34-RIGHT.xml";
@@ -862,14 +1091,16 @@ int main_(int argc, char* argv[]) {
 	string maxEmgFile = baseDir + "TestData\\20151214\\maxemg.txt";
 	*/
 //	test_visualiser(itrainSetup);
-	run_from_nexus(itrainSetup);
+
+	run(itrainSetup);
+	return 0;
 }
 
-int main() {
+int main_() {
 
 
 	//run_from_nexus();
-	run_from_file();
+	//run_from_file();
 	return 0;
 }
 

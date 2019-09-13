@@ -40,7 +40,7 @@ namespace Concurrency {
 namespace ceinms {
 
     using MuscleForcesFrame = QueueData < std::vector<double> >;
-    using MuscleForcesQueue = Concurrency::Queue < MuscleForcesFrame >;
+    using MuscleForcesQueue = rtb::Concurrency::Queue < MuscleForcesFrame >;
 
 }
 

@@ -32,8 +32,7 @@
 #include <string>
 #include <vector>
 
-#include "ceinms/concurrency/Latch.h"
-#include "ceinms/concurrency/Queue.h"
+#include "rtb/concurrency/Concurrency.h"
 #include "ceinms/queues/EmgQueue.h"
 
 namespace ceinms {
@@ -41,8 +40,8 @@ namespace ceinms {
     {
     public:
         template <typename NMSModelT>
-        EmgFromX(EmgQueue& outputEmgQueue, Concurrency::Latch& doneWithSubscriptions, Concurrency::Latch& doneWithExecution, const NMSModelT& subject);
-        EmgFromX(EmgQueue& outputEmgQueue, Concurrency::Latch& doneWithSubscriptions, Concurrency::Latch& doneWithExecution, const std::vector<std::string>& muscleNames);
+        EmgFromX(EmgQueue& outputEmgQueue, rtb::Concurrency::Latch& doneWithSubscriptions, rtb::Concurrency::Latch& doneWithExecution, const NMSModelT& subject);
+        EmgFromX(EmgQueue& outputEmgQueue, rtb::Concurrency::Latch& doneWithSubscriptions, rtb::Concurrency::Latch& doneWithExecution, const std::vector<std::string>& muscleNames);
         virtual ~EmgFromX();
         virtual void operator()() {};
         void updateEmg(const EmgData& currentEmgData, double currentTime);
@@ -53,12 +52,12 @@ namespace ceinms {
         std::vector< std::string > musclesNames_;
     private:
         EmgQueue& outputEmgQueue_;
-        Concurrency::Latch& doneWithSubscriptions_;
-        Concurrency::Latch& doneWithExecution_;
+        rtb::Concurrency::Latch& doneWithSubscriptions_;
+        rtb::Concurrency::Latch& doneWithExecution_;
     };
 
     template <typename NMSModelT>
-    EmgFromX::EmgFromX(EmgQueue& outputEmgQueue, Concurrency::Latch& doneWithSubscriptions, Concurrency::Latch& doneWithExecution, const NMSModelT& subject) :
+    EmgFromX::EmgFromX(EmgQueue& outputEmgQueue, rtb::Concurrency::Latch& doneWithSubscriptions, rtb::Concurrency::Latch& doneWithExecution, const NMSModelT& subject) :
         outputEmgQueue_(outputEmgQueue),
         doneWithSubscriptions_(doneWithSubscriptions),
         doneWithExecution_(doneWithExecution)

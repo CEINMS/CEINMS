@@ -31,8 +31,7 @@
 
 #include <string>
 #include <vector>
-#include "ceinms/concurrency/Queue.h"
-#include "ceinms/concurrency/Latch.h"
+#include "rtb/concurrency/Concurrency.h"
 #include "ceinms/GeneralisedCoordinatesData.h"
 #include "ceinms/queues/GeneralisedCoordinatesQueue.h"
 
@@ -42,8 +41,8 @@ namespace ceinms {
     public:
         GeneralisedCoordinatesFromX(
             GeneralisedCoordinatesQueue& outputGeneralisedCoordinatesQueue,
-            Concurrency::Latch& doneWithSubscriptions,
-            Concurrency::Latch& doneWithExecution);
+            rtb::Concurrency::Latch& doneWithSubscriptions,
+            rtb::Concurrency::Latch& doneWithExecution);
         virtual ~GeneralisedCoordinatesFromX() {};
         virtual void operator()() = 0;
         void updateGeneralisedCoordinates(const GeneralisedCoordinatesData& currentExternalForceData, double currentTime);
@@ -52,8 +51,8 @@ namespace ceinms {
         void sendEndOfData();
     private:
         GeneralisedCoordinatesQueue& outputGeneralisedCoordinatesQueue_;
-        Concurrency::Latch& doneWithSubscriptions_;
-        Concurrency::Latch& doneWithExecution_;
+        rtb::Concurrency::Latch& doneWithSubscriptions_;
+        rtb::Concurrency::Latch& doneWithExecution_;
     };
 }
 #endif

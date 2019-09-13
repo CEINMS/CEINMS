@@ -59,8 +59,7 @@
 #include "ceinms/QueuesToInverseDynamics.h"
 #include "ceinms/QueuesToKneeBalanceContactForces.h"
 
-#include "ceinms/concurrency/Latch.h"
-#include "ceinms/concurrency/Queue.h"
+#include "rtb/concurrency/Concurrency.h"
 #include "ceinms/queues/VecContactForcesQueue.h"
 #include "ceinms/queues/ScalarContactForcesQueue.h"
 #include "ceinms/queues/EmgQueue.h"
@@ -133,8 +132,8 @@ namespace ceinms {
         ScalarContactForcesQueue contactForcesQueue;
 
         //Creates latches to sync threads
-        Concurrency::Latch doneWithSubscriptionsLatch;
-        Concurrency::Latch doneWithExecutionLatch;
+        rtb::Concurrency::Latch doneWithSubscriptionsLatch;
+		rtb::Concurrency::Latch doneWithExecutionLatch;
 
         NMSmodelT mySubject;
         setupSubject(mySubject, subjectFile_, executionCfg_.getTolerance());
@@ -246,8 +245,8 @@ namespace ceinms {
         VecContactForcesQueue contactForcesQueue;
         VecContactForcesQueue intersegmentalForcesQueue;
         //Creates latches to sync threads
-        Concurrency::Latch doneWithSubscriptionsLatch;
-        Concurrency::Latch doneWithExecutionLatch;
+		rtb::Concurrency::Latch doneWithSubscriptionsLatch;
+		rtb::Concurrency::Latch doneWithExecutionLatch;
 
         NMSmodelT mySubject;
         setupSubject(mySubject, subjectFile_, executionCfg_.getTolerance());
@@ -430,8 +429,8 @@ namespace ceinms {
         ScalarLogQueue logQueue;
 
         //Creates latches to sync threads
-        Concurrency::Latch doneWithSubscriptionsLatch;
-        Concurrency::Latch doneWithExecutionLatch;
+		rtb::Concurrency::Latch doneWithSubscriptionsLatch;
+		rtb::Concurrency::Latch doneWithExecutionLatch;
 
         NMSmodelT mySubject;
         setupSubject(mySubject, subjectFile_, executionCfg_.getTolerance());
@@ -533,8 +532,8 @@ namespace ceinms {
         VecContactForcesQueue contactForcesQueue;
 
         //Creates latches to sync threads
-        Concurrency::Latch doneWithSubscriptionsLatch;
-        Concurrency::Latch doneWithExecutionLatch;
+		rtb::Concurrency::Latch doneWithSubscriptionsLatch;
+		rtb::Concurrency::Latch doneWithExecutionLatch;
 
         NMSmodelT mySubject;
         setupSubject(mySubject, subjectFile_, executionCfg_.getTolerance());
@@ -742,8 +741,8 @@ namespace ceinms {
         ScalarLogQueue logQueue;
 
         //Creates latches to sync threads
-        Concurrency::Latch doneWithSubscriptionsLatch;
-        Concurrency::Latch doneWithExecutionLatch;
+		rtb::Concurrency::Latch doneWithSubscriptionsLatch;
+		rtb::Concurrency::Latch doneWithExecutionLatch;
 
         NMSmodelT mySubject;
         setupSubject(mySubject, subjectFile_, executionCfg_.getTolerance());

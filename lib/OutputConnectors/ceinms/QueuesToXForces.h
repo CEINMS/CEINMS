@@ -35,8 +35,7 @@
 #include <algorithm>
 #include <OpenSim/OpenSim.h>
 #include "ceinms/JointContactFromOpensim.h"
-#include "ceinms/concurrency/Queue.h"
-#include "ceinms/concurrency/Latch.h"
+#include "rtb/concurrency/Concurrency.h"
 #include "ceinms/QueueData.h"
 #include "ceinms/ExternalForceData.h"
 #include "ceinms/queues/MultipleExternalForcesQueue.h"
@@ -90,8 +89,8 @@ namespace ceinms {
         template<typename NMSmodelT>
         QueuesToXForces(
             MultipleExternalForcesQueue& inputExternalForcesQueue,
-            Concurrency::Latch& doneWithSubscriptions,
-            Concurrency::Latch& doneWithExecution,
+			rtb::Concurrency::Latch& doneWithSubscriptions,
+			rtb::Concurrency::Latch& doneWithExecution,
             const NMSmodelT& subject,
             const std::string& osimModelFilename,
             const std::string& externalLoadsXmlFilename,
@@ -100,8 +99,8 @@ namespace ceinms {
         template<typename NMSmodelT>
         QueuesToXForces(
             MultipleExternalForcesQueue& inputExternalForcesQueue,
-            Concurrency::Latch& doneWithSubscriptions,
-            Concurrency::Latch& doneWithExecution,
+			rtb::Concurrency::Latch& doneWithSubscriptions,
+			rtb::Concurrency::Latch& doneWithExecution,
             const NMSmodelT& subject,
             const std::string& osimModelFilename,
             const std::vector<ExternalForceDataSetup>& externalForceDataSetups,
@@ -134,9 +133,9 @@ namespace ceinms {
         void checkJointsToLogsExistInOpenSim();
         void initialiseExternalForces();
         MultipleExternalForcesQueue& inputExternalForcesQueue_;
-        Concurrency::Latch splitForcesLatch_;
-        Concurrency::Latch& externalDoneWithSubscriptionsLatch_;
-        Concurrency::Latch& externalDoneWithExecutionLatch_;
+		rtb::Concurrency::Latch splitForcesLatch_;
+		rtb::Concurrency::Latch& externalDoneWithSubscriptionsLatch_;
+		rtb::Concurrency::Latch& externalDoneWithExecutionLatch_;
         std::future<void> splitForcesThread_;
         std::vector<OpenSim::Force*> extForces_;
         std::vector<SingleExternalForceQueue*> singleExternalForceQueues_;
@@ -150,8 +149,8 @@ namespace ceinms {
     template<typename NMSmodelT>
     QueuesToXForces::QueuesToXForces(
         MultipleExternalForcesQueue& inputExternalForcesQueue,
-        Concurrency::Latch& doneWithSubscriptions,
-        Concurrency::Latch& doneWithExecution,
+		rtb::Concurrency::Latch& doneWithSubscriptions,
+		rtb::Concurrency::Latch& doneWithExecution,
         const NMSmodelT& subject,
         const std::string& osimModelFilename,
         const std::string& externalLoadsXmlFilename,
@@ -172,8 +171,8 @@ namespace ceinms {
     template<typename NMSmodelT>
     QueuesToXForces::QueuesToXForces(
         MultipleExternalForcesQueue& inputExternalForcesQueue,
-        Concurrency::Latch& doneWithSubscriptions,
-        Concurrency::Latch& doneWithExecution,
+		rtb::Concurrency::Latch& doneWithSubscriptions,
+		rtb::Concurrency::Latch& doneWithExecution,
         const NMSmodelT& subject,
         const std::string& osimModelFilename,
         const std::vector<ExternalForceDataSetup>& externalForceDataSetups,

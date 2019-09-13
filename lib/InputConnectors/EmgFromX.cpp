@@ -37,7 +37,7 @@ using std::vector;
 
 namespace ceinms {
 
-    EmgFromX::EmgFromX(EmgQueue& outputEmgQueue, Concurrency::Latch& doneWithSubscriptions, Concurrency::Latch& doneWithExecution, const std::vector<std::string>& muscleNames) :
+    EmgFromX::EmgFromX(EmgQueue& outputEmgQueue, rtb::Concurrency::Latch& doneWithSubscriptions, rtb::Concurrency::Latch& doneWithExecution, const std::vector<std::string>& muscleNames) :
         outputEmgQueue_(outputEmgQueue),
         doneWithSubscriptions_(doneWithSubscriptions),
         doneWithExecution_(doneWithExecution),

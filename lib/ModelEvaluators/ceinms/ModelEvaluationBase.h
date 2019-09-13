@@ -31,8 +31,7 @@
 
 #include <vector>
 #include <string>
-#include "ceinms/concurrency/Queue.h"
-#include "ceinms/concurrency/Latch.h"
+#include "rtb/concurrency/Concurrency.h"
 #include "ceinms/queues/EmgQueue.h"
 #include "ceinms/queues/LmtQueue.h"
 #include "ceinms/queues/MultipleMomentArmsQueues.h"
@@ -51,8 +50,8 @@ namespace ceinms {
             ExternalTorquesQueue& inputExternalTorqueQueue,
             MultipleMomentArmsQueues& inputMomentArmsQueues,
             ScalarLogQueue& outputLogQueue,
-            Concurrency::Latch& doneWithSubscriptions,
-            Concurrency::Latch& doneWithExecution,
+            rtb::Concurrency::Latch& doneWithSubscriptions,
+            rtb::Concurrency::Latch& doneWithExecution,
             const std::vector<std::string>& valuesToLog,
             bool showLog = true);
         virtual ~ModelEvaluationBase();
@@ -81,8 +80,8 @@ namespace ceinms {
         LmtQueue& inputLmtQueue_;
         ExternalTorquesQueue& inputExternalTorqueQueue_;
         MultipleMomentArmsQueues& inputMomentArmsQueues_;
-        Concurrency::Latch& doneWithSubscriptions_;
-        Concurrency::Latch& doneWithExecution_;
+        rtb::Concurrency::Latch& doneWithSubscriptions_;
+        rtb::Concurrency::Latch& doneWithExecution_;
     };
 }
 

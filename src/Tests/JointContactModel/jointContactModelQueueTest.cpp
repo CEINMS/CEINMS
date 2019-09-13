@@ -28,11 +28,10 @@
 
 #include "ceinms/QueuesToIntersegmentalForces.h"
 #include "ceinms/QueuesToJointReactionForces.h"
-#include "ceinms/concurrency/Queue.h"
-#include "ceinms/concurrency/Latch.h"
+#include "rtb/concurrency/Concurrency.h"
 using namespace ceinms;
-using ceinms::Concurrency::Queue;
-using ceinms::Concurrency::Latch;
+using rtb::Concurrency::Queue;
+using rtb::Concurrency::Latch;
 #include "ceinms/FileUtils.h"
 #include "ceinms/NMSmodel.h"
 #include "ceinms/Activation/ExponentialActivation.h"
@@ -106,7 +105,7 @@ void calculateIntersegmentaForcesWithCEINMS(std::string osimModelFilename, std::
     MultipleExternalForcesQueue multipleExternalForcesQueue;
     VecContactForcesQueue contactForcesQueue;
     NMSmodel<ExponentialActivation, ElasticTendon_BiSec, CurveMode::Online> subject;
-    ceinms::Concurrency::Latch doneWithSubscriptions(4), doneWithExecution(4);
+    Latch doneWithSubscriptions(4), doneWithExecution(4);
 
     OpenSim::Model model(osimModelFilename);
     OpenSim::Array<string> jointNamesOS;

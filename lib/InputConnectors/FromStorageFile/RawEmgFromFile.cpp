@@ -13,7 +13,7 @@
  * CEINMS Contributors: C. Pizzolato, M. Reggiani, M. Sartori,                *
  *                      E. Ceseracciu, and D.G. Lloyd                         *
  *                                                                            *
- * Author(s): M. Reggiani                                                     *
+ * Author(s): C. Pizzolato, M. Reggiani                                       *
  *                                                                            *
  * CEINMS is licensed under the Apache License, Version 2.0 (the "License").  *
  * You may not use this file except in compliance with the License. You may   *
@@ -26,31 +26,55 @@
  * limitations under the License.                                             *
  * -------------------------------------------------------------------------- */
 
-#ifndef ceinms_Latch_h
-#define ceinms_Latch_h
+#include "ceinms/RawEmgFromFile.h"
 
-#include <thread>
-#include <mutex>
-#include <condition_variable>
+#include <string>
+using std::string;
+#include <vector>
+using std::vector;
+#include <iostream>
+using std::cout;
+using std::endl;
 
-namespace ceinms{
-    namespace Concurrency{
-        class Latch {
-        public:
-            Latch();
-            Latch(int count);
-            void setCount(int count);
-            void wait();
-            Latch(const Latch&) = delete;
-            Latch& operator=(const Latch&) = delete;
-        private:
-            int count_;
-            std::condition_variable condition_;
-            std::mutex mutex_;
 
-        };
+namespace ceinms {  
+
+	RawEmgFromFile::RawEmgFromFile(
+		EmgQueue& outputRawEmgQueue,
+		rtb::Concurrency::Latch& doneWithSubscriptions,
+		rtb::Concurrency::Latch& doneWithExecution,
+		const std::string& rawEmgFilename,
+		const std::vector<std::string>& desiredEmgNames) :
+		EmgFromX(outputRawEmgQueue, doneWithSubscriptions, doneWithExecution, {}),
+		emgData_(rawEmgFilename)
+
+	{
+		std::vector<std::string> emgMusclesNamesFromFile{emgData_.getColumnNames()};
+		emgMapper_.setNames(emgMusclesNamesFromFile, desiredEmgNames);
+		auto mappedEmgNames(emgMapper_.map(desiredEmgNames, std::string("None")));
+		std::cout << "EMG from files to desired EMG:\n";
+		for (int i(0); i < mappedEmgNames.size(); ++i) {
+			std::cout << mappedEmgNames.at(i) << " -> " << desiredEmgNames.at(i);
+			if (mappedEmgNames.at(i) != desiredEmgNames.at(i))
+				std::cout << " WARNING. Mapping may be incorrect!";
+			std::cout << std::endl;
+		}
+	}
+	
+	void RawEmgFromFile::operator()()
+    {
+        EmgFromX::doneWithSubscriptions();
+
+        while (emgData_.areStillData())
+        {
+            emgData_.readNextData();
+            EmgFromX::updateEmg(emgMapper_.map(emgData_.getCurrentData()), emgData_.getCurrentTime());
+        }
+        EmgFromX::sendEndOfData();
+        EmgFromX::doneWithExecution();
     }
+
+
+
+    RawEmgFromFile::~RawEmgFromFile(){}
 }
-
-
-#endif

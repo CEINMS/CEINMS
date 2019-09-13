@@ -18,5 +18,5 @@ add_definitions(/DBASE_DIR="${CMAKE_CURRENT_LIST_DIR}")
 
 
 add_executable(Test_JointContactModelQueues jointContactModelQueueTest.cpp)
-target_link_libraries(Test_JointContactModelQueues  JointContactModels OutputConnectors InputConnectors xmlInput Concurrency NMSmodel optimized ${OPENSIM_LIBRARIES})
-target_link_libraries(Test_JointContactModelQueues  JointContactModels OutputConnectors InputConnectors xmlInput Concurrency NMSmodel debug ${OPENSIM_LIBRARIES_DEBUG})
+target_link_libraries(Test_JointContactModelQueues  JointContactModels OutputConnectors InputConnectors xmlInput NMSmodel optimized ${OPENSIM_LIBRARIES})
+target_link_libraries(Test_JointContactModelQueues  JointContactModels OutputConnectors InputConnectors xmlInput NMSmodel debug ${OPENSIM_LIBRARIES_DEBUG})

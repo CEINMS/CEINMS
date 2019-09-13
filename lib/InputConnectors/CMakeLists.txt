@@ -3,6 +3,7 @@
 # List source files
 set(FromStorageFile_SOURCES
   FromStorageFile/EmgFromFile.cpp
+  FromStorageFile/RawEmgFromFile.cpp
   FromStorageFile/ExternalTorquesFromStorageFile.cpp
   FromStorageFile/LmtMaFromStorageFile.cpp
   FromStorageFile/Utilities.cpp
@@ -11,6 +12,7 @@ set(FromStorageFile_SOURCES
 )
 set(FromStorageFile_HEADERS
   ceinms/EmgFromFile.h
+  ceinms/RawEmgFromFile.h
   ceinms/ExternalTorquesFromStorageFile.h
   ceinms/LmtMaFromStorageFile.h
   ceinms/Utilities.h
@@ -53,7 +55,7 @@ add_library(InputConnectors STATIC
   ${FromStorageFile_HEADERS}
   ${InputConnectors_TEMPLATE_IMPLEMENTATIONS}
 )
-target_link_libraries(InputConnectors FileIO Concurrency ${Boost_FILESYSTEM_LIBRARY} optimized ${OPENSIM_LIBRARIES} rtb::Filter)
+target_link_libraries(InputConnectors FileIO ${Boost_FILESYSTEM_LIBRARY} optimized ${OPENSIM_LIBRARIES} rtb::Filter)
 #target_link_libraries(InputConnectors FileIO Concurrency ${Boost_FILESYSTEM_LIBRARY} debug ${OPENSIM_LIBRARIES_DEBUG})
 
 

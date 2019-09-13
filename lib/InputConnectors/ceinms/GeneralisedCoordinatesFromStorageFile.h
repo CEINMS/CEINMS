@@ -37,15 +37,15 @@ namespace ceinms {
     public:
         GeneralisedCoordinatesFromStorageFile(
             GeneralisedCoordinatesQueue& outputGeneralisedCoordinatesQueue,
-            Concurrency::Latch& doneWithSubscriptions,
-            Concurrency::Latch& doneWithExecution,
+            rtb::Concurrency::Latch& doneWithSubscriptions,
+            rtb::Concurrency::Latch& doneWithExecution,
             const std::string& osimModelFilename,
             const std::string& kinematicsStorageFilename,
             double fc);
         GeneralisedCoordinatesFromStorageFile(
             GeneralisedCoordinatesQueue& outputGeneralisedCoordinatesQueue,
-            Concurrency::Latch& doneWithSubscriptions,
-            Concurrency::Latch& doneWithExecution,
+            rtb::Concurrency::Latch& doneWithSubscriptions,
+            rtb::Concurrency::Latch& doneWithExecution,
             const std::string& osimModelFilename,
             const std::string& kinematicsStorageFilename,
             double fc,

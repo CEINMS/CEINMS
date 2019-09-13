@@ -60,8 +60,7 @@ using std::vector;
 #include "ceinms/LmtMaFromStorageFile.h"
 #include "ceinms/ObjectiveFunctionSetup.h"
 
-#include "ceinms/concurrency/Queue.h"
-#include "ceinms/concurrency/Latch.h"
+#include "rtb/concurrency/Concurrency.h"
 #include "ceinms/queues/EmgQueue.h"
 #include "ceinms/queues/LmtQueue.h"
 #include "ceinms/queues/ExternalTorquesQueue.h"
@@ -259,8 +258,8 @@ namespace ceinms {
         ExternalTorquesQueue externalTorqueQueue;
         MultipleMomentArmsQueues momentArmsQueues;
 
-        Concurrency::Latch doneWithSubscription;
-        Concurrency::Latch doneWithExecution;
+        rtb::Concurrency::Latch doneWithSubscription;
+		rtb::Concurrency::Latch doneWithExecution;
 
         string emgFilename(dataLocations.getExcitationsFile());
         EmgFromFile emgProducer(emgQueue, doneWithSubscription, doneWithExecution, mySubject, emgFilename, emgGeneratorFile);

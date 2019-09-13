@@ -41,7 +41,7 @@ namespace ceinms {
 
     class ExternalForceData;
     using SingleExternalForceFrame = QueueData < ExternalForceData>;
-    using SingleExternalForceQueue = Concurrency::Queue < SingleExternalForceFrame >;
+    using SingleExternalForceQueue = rtb::Concurrency::Queue < SingleExternalForceFrame >;
 
 }
 

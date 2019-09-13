@@ -29,8 +29,7 @@
 #ifndef ceinms_QueueToStorageFile_h
 #define ceinms_QueueToStorageFile_h
 
-#include "ceinms/concurrency/Latch.h"
-#include "ceinms/concurrency/Queue.h"
+#include "rtb/concurrency/Concurrency.h"
 #include "ceinms/QueueData.h"
 #include "ceinms/FileLogger.h"
 
@@ -40,15 +39,15 @@ namespace ceinms {
     class QueueToFileLogger {
     public:
         using FrameType = QueueData < DataType > ;
-        using QueueType = Concurrency::Queue < FrameType > ;
+        using QueueType = rtb::Concurrency::Queue < FrameType > ;
         QueueToFileLogger() = delete;
         QueueToFileLogger(const QueueToFileLogger&) = delete;
         QueueToFileLogger& operator=(const QueueToFileLogger&) = delete;
 
         QueueToFileLogger(
             QueueType& inputQueue,
-            Concurrency::Latch& subscriptionLatch,
-            Concurrency::Latch& readyToWriteLatch,
+			rtb::Concurrency::Latch& subscriptionLatch,
+			rtb::Concurrency::Latch& readyToWriteLatch,
             const std::vector<std::string>& columnLabels,
             const std::string& valueName,
             const std::string& outputDir = "./Output/",
@@ -58,8 +57,8 @@ namespace ceinms {
 
     private:
         QueueType& inputQueue_;
-        Concurrency::Latch& subscriptionLatch_;
-        Concurrency::Latch& readyToWriteLatch_;
+        rtb::Concurrency::Latch& subscriptionLatch_;
+		rtb::Concurrency::Latch& readyToWriteLatch_;
         FileLogger<DataType> logger_;
     };
 

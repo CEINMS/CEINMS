@@ -31,7 +31,7 @@
 
 #include <vector>
 #include <string>
-#include "ceinms/concurrency/Queue.h"
+#include "rtb/concurrency/Queue.h"
 #include "ceinms/queues/LogQueue.h"
 
 namespace ceinms {

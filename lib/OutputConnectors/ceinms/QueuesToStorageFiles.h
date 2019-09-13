@@ -33,8 +33,7 @@
 #include <fstream>
 #include <map>
 #include <boost/filesystem.hpp>
-#include "ceinms/concurrency/Latch.h"
-#include "ceinms/concurrency/Queue.h"
+#include "rtb/concurrency/Concurrency.h"
 #include "ceinms/queues/LogQueue.h"
 
 namespace ceinms {
@@ -47,8 +46,8 @@ namespace ceinms {
         template <typename NMSmodelT>
         QueuesToStorageFiles(
             ScalarLogQueue& inputLogQueue,
-            Concurrency::Latch& doneWithSubscriptions,
-            Concurrency::Latch& readyToWrite,
+			rtb::Concurrency::Latch& doneWithSubscriptions,
+			rtb::Concurrency::Latch& readyToWrite,
             const NMSmodelT& subject,
             const std::vector< std::string >& valuesToWrite,
             const std::string& outputDir = "./Output/");
@@ -60,8 +59,8 @@ namespace ceinms {
         void initFile(const std::string& valueName, const std::vector< ScalarVectorFrame >& dataToWrite);
         void addLog(std::string valueName);
         ScalarLogQueue& inputLogQueue_;
-        Concurrency::Latch& doneWithSubscriptions_;
-        Concurrency::Latch& readyToWrite_;
+		rtb::Concurrency::Latch& doneWithSubscriptions_;
+		rtb::Concurrency::Latch& readyToWrite_;
         std::vector<std::string> valuesToWrite_;
         std::vector<std::string> torqueNames_;
         std::vector<std::string> muscleNames_;
@@ -74,8 +73,8 @@ namespace ceinms {
     template <typename NMSmodelT>
     QueuesToStorageFiles::QueuesToStorageFiles(
         ScalarLogQueue& inputLogQueue,
-        Concurrency::Latch& doneWithSubscriptions,
-        Concurrency::Latch& readyToWrite,
+		rtb::Concurrency::Latch& doneWithSubscriptions,
+		rtb::Concurrency::Latch& readyToWrite,
         const NMSmodelT& subject,
         const std::vector< std::string >& valuesToWrite,
         const std::string& outputDir) :

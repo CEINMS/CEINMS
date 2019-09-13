@@ -41,7 +41,7 @@ namespace ceinms {
 
     using ScalarVectorData = std::vector < double > ;
     using ScalarVectorFrame = QueueData < ScalarVectorData > ;
-    using ScalarVectorQueue = Concurrency::Queue < ScalarVectorFrame > ;
+    using ScalarVectorQueue = rtb::Concurrency::Queue < ScalarVectorFrame > ;
 }
 
 #endif

@@ -50,8 +50,7 @@ using ceinms::TrialData;
 #include "ceinms/Tendon/ElasticTendon_BiSec.h"
 #include "ceinms/SetupDataStructure.h"
 
-#include "ceinms/concurrency/Queue.h"
-#include "ceinms/concurrency/Latch.h"
+#include "rtb/concurrency/Concurrency.h"
 #include "ceinms/queues/EmgQueue.h"
 #include "ceinms/queues/LmtQueue.h"
 #include "ceinms/queues/ExternalTorquesQueue.h"
@@ -71,8 +70,8 @@ using std::list;
 #include <chrono>
 #include "ceinms/Utilities.h"
 using namespace ceinms;
-using ceinms::Concurrency::Queue;
-using ceinms::Concurrency::Latch;
+using rtb::Concurrency::Queue;
+using rtb::Concurrency::Latch;
 
 void setLmtMaFilenames(const string& directory, const vector< string > dofNames, string& lmtDataFilename, vector< string >& maDataFilenames)
 {
@@ -115,8 +114,8 @@ TrialData readTrialData(std::string inputDataFilename, NMSmodelT& mySubject, std
     ExternalTorquesQueue externalTorqueQueue;
     MultipleMomentArmsQueues momentArmsQueues;
 
-    ceinms::Concurrency::Latch doneWithSubscription;
-    ceinms::Concurrency::Latch doneWithExecution;
+    rtb::Concurrency::Latch doneWithSubscription;
+    rtb::Concurrency::Latch doneWithExecution;
 
     string emgFilename(dataLocations.getExcitationsFile());
     EmgFromFile emgProducer(emgQueue, doneWithSubscription, doneWithExecution, mySubject, emgFilename, emgGeneratorFile);
