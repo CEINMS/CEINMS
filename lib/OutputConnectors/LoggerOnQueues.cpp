@@ -33,12 +33,9 @@
 #include <map>
 
 namespace ceinms{
-    LoggerOnQueues::LoggerOnQueues(ScalarLogQueue& outputLogQueue, const std::vector< std::string >& valuesToLog) :
-        outputLogQueue_(outputLogQueue) {
-
-        for (auto& it : valuesToLog)
-            outputLogQueue_.insert(std::make_pair(it, std::make_shared<ScalarVectorQueue>()));
-    }
+	LoggerOnQueues::LoggerOnQueues(ScalarLogQueue& outputLogQueue, const std::vector< std::string >& valuesToLog) :
+		outputLogQueue_(outputLogQueue) {
+	}
 
     void LoggerOnQueues::log(double time, const ScalarVectorData& dataToLog, const std::string& valueToLog) {
 

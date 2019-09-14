@@ -45,9 +45,11 @@ namespace ceinms {
 
     template<typename T>
     using GenericLogQueue = std::map < std::string, std::shared_ptr<T> > ;
-   
     using ScalarLogQueue = GenericLogQueue < ScalarVectorQueue > ;
-
+	inline void initialiseQueue(ScalarLogQueue& scalarLogQueue, const std::vector<std::string>& valuesToLog) {
+		for (auto& it : valuesToLog)
+			scalarLogQueue.insert(std::make_pair(it, std::make_shared<ScalarVectorQueue>()));
+	}
 }
 
 

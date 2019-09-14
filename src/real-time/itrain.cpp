@@ -79,6 +79,7 @@ struct  ItrainExecutionSetup {
 	string maxEmgFile;
 	bool useMaxEmgFile;
 	string emgGeneratorFile;
+	double pushFrequency;
 };
 //introduces a time delay in the pipeline
 
@@ -175,6 +176,10 @@ public:
 
         const vector<string> atMuscleNames = { "lat_gas_r",	"med_gas_r", "soleus_r" };
         Mapper muscleMapper(allMuscleNames_, atMuscleNames);
+		while (&inputMuscleForcesQueue_ == nullptr) {
+			//wait to connect to the queue
+			std::this_thread::sleep_for(std::chrono::milliseconds(10));
+		}
         inputMuscleForcesQueue_.subscribe();
         doneWithSubscriptions_.wait();
 
@@ -364,7 +369,8 @@ void fileProducer(
 
 	ceinms::EmgQueue localRawEmgQueue;
 	rtosim::MarkersFromTrc markersFromTrc(outputMarkerQueue, subscriptionLatch, endLatch, itrainSetup.osimModelFilename, itrainSetup.trcFilename, false);
-//	markersFromTrc.setOutputFrequency(200);
+	if(itrainSetup.pushFrequency > 0)
+		markersFromTrc.setOutputFrequency(itrainSetup.pushFrequency);
 
 	ExcitationGeneratorFromXml emgGenerator(itrainSetup.emgGeneratorFile);
 	vector<string> desiredEmgChannelNames{ emgGenerator.getInputSignalsNames() };
@@ -510,7 +516,7 @@ void ceinmsProcessing(
 	ceinms::LmtQueue& inputLmtQueue,
 	ceinms::MultipleMomentArmsQueues& inputMomentArmsQueue,
 	ceinms::ExternalTorquesQueue& inputExternalTorquesQueue,
-	ceinms::ScalarLogQueue outputDataQueue,
+	ceinms::ScalarLogQueue& outputDataQueue,
 	rtb::Concurrency::Latch& doneWithSubscriptionsLatch,
 	rtb::Concurrency::Latch& doneWithExecutionLatch,
 	NMSmodelT& subject,
@@ -530,7 +536,7 @@ void ceinmsProcessing(
 		"MusclesContribution" };
 	// 2b. define the thread consuming the output sources
 	vector<string> valuesToWrite = dataToLog;
-
+	ceinms::initialiseQueue(outputDataQueue, valuesToWrite);
 	// 3. define the model simulator
 	vector<string> valuesToLog = dataToLog;
 	ModelEvaluationOnline<NMSmodelT, LoggerOnQueues>  simulator(
@@ -571,6 +577,7 @@ void surrogateModelProcessing(
 	NMSmodelT& subject, ItrainExecutionSetup itrainSetup) {
 
 
+
 	string plsrXfile{ itrainSetup.plsrDir + "/xvalues.csv" };
 	string plsrYfile{ itrainSetup.plsrDir + "/yvalues.csv" };
 	string plsrNodeFile{ itrainSetup.plsrDir + "/nodes.csv" };
@@ -580,10 +587,9 @@ void surrogateModelProcessing(
 	strainPlsr.train(X, Y, 0.001);
 	SimTK::Matrix nodes(parseCSV(plsrNodeFile));
 
-	ScalarVectorVectorQueue strainQueue;
 	AchillesTendonModel atModel(
 		*inputDataQueue["MuscleForces"],
-		strainQueue,
+		outputstrainQueue,
 		subscriptionLatch,
 		endLatch,
 		subject.getMuscleNames(),
@@ -595,7 +601,7 @@ void surrogateModelProcessing(
 		ScalarVectorVectorQueue, 
 		ScalarVectorQueue, 
 		std::function<ScalarVectorFrame(const ScalarVectorVectorFrame&)>> strainReducerAdapter(
-			strainQueue,
+			outputstrainQueue,
 			reducedStrainQueue,
 			subscriptionLatch,
 			endLatch,
@@ -606,22 +612,24 @@ void surrogateModelProcessing(
 		}
 	);
 
-	string strainOutput(itrainSetup.resultDir + "strain_fe.csv");
+	string strainOutput(itrainSetup.resultDir + "/strain_fe.csv");
 	QueueToCSV strainLogger(
 		reducedStrainQueue,
 		subscriptionLatch,
 		endLatch,
 		strainOutput);
 
-	ceinms::QueuesToWebsocket queueToWebsocket(strainQueue, { "nodes_x","nodes_y","nodes_z","nodes_w" });
+	ceinms::QueuesToWebsocket queueToWebsocket(outputstrainQueue, { "nodes_x","nodes_y","nodes_z","nodes_w" });
 
 	std::thread atModelThread(std::ref(atModel));
 	std::thread queueToWebsocketThread(std::ref(queueToWebsocket));
 	std::thread strainLoggerThread(std::ref(strainLogger));
+	std::thread strainReducerAdapterThread(std::ref(strainReducerAdapter));
 	
+	queueToWebsocketThread.detach();
 	atModelThread.join();
-	queueToWebsocketThread.join();
 	strainLoggerThread.join();
+	strainReducerAdapterThread.join();
 }
 
 int run_from_file(ItrainExecutionSetup itrainSetup) {
@@ -777,8 +785,8 @@ int run(ItrainExecutionSetup itrainSetup) {
 	
 	
 	//Creates latches to sync threads
-	Latch doneWithSubscriptionsLatch;
-	Latch doneWithExecutionLatch;
+	Latch doneWithSubscriptionsLatch(17);
+	Latch doneWithExecutionLatch(15);
 
 	NMSmodelType mySubject;
 	setupSubject(mySubject, itrainSetup.ceinmsSubject);
@@ -796,15 +804,6 @@ int run(ItrainExecutionSetup itrainSetup) {
 	ceinms::ScalarLogQueue ceinmsOutputQueue;
 	ceinms::ScalarVectorVectorQueue strainQueue;
 		
-
-	rtosim::TimeDifference<LmtQueue, ScalarVectorVectorQueue> pipelineTimeDifference(
-			lmtQueue,
-			strainQueue,
-			doneWithSubscriptionsLatch,
-			doneWithExecutionLatch);
-
-	doneWithSubscriptionsLatch.setCount(13);
-	doneWithExecutionLatch.setCount(12);
 	
 	auto onScreenDisplay([&]() {
 		doneWithSubscriptionsLatch.wait();
@@ -816,8 +815,7 @@ int run(ItrainExecutionSetup itrainSetup) {
 			std::cout << "." << std::flush;
 		}
 	});
-
-	
+		
 	std::thread onScreenDisplayThread(std::ref(onScreenDisplay));
 	std::thread producerThread;
 
@@ -832,6 +830,8 @@ int run(ItrainExecutionSetup itrainSetup) {
 	}
 	else
 	{
+		doneWithSubscriptionsLatch.increaseCount(1);
+		doneWithExecutionLatch.increaseCount(1);
 		producerThread = std::thread(
 			fileProducer<NMSmodelType>,
 			std::ref(rawEmgQueue),
@@ -855,7 +855,6 @@ int run(ItrainExecutionSetup itrainSetup) {
 		std::ref(mySubject),
 		itrainSetup);
 	
-
 	std::thread ceinmsProcessingThread(
 		ceinmsProcessing<NMSmodelType>,
 		std::ref(excitationsQueue),
@@ -867,7 +866,8 @@ int run(ItrainExecutionSetup itrainSetup) {
 		std::ref(doneWithExecutionLatch),
 		std::ref(mySubject),
 		itrainSetup);
-/*	std::thread surrogateModelProcessingThread(
+
+	std::thread surrogateModelProcessingThread(
 		surrogateModelProcessing<NMSmodelType>,
 		std::ref(ceinmsOutputQueue),
 		std::ref(strainQueue),
@@ -875,16 +875,30 @@ int run(ItrainExecutionSetup itrainSetup) {
 		std::ref(doneWithExecutionLatch),
 		mySubject,
 		itrainSetup);
-	*/	
-	onScreenDisplayThread.join();
+		
+	rtosim::TimeDifference<rtosim::MarkerSetQueue, ceinms::ScalarVectorVectorQueue>
+		pipelineTimeDifference(markerSetQueue, strainQueue, doneWithSubscriptionsLatch, doneWithExecutionLatch);
+	rtosim::TimeProbe< ceinms::ScalarVectorVectorQueue> timeProbe(strainQueue, doneWithSubscriptionsLatch);
 
+
+	std::thread timeDifferenceThread(std::ref(pipelineTimeDifference));
+	std::thread timeProbeThread(std::ref(timeProbe));
+	onScreenDisplayThread.join();
 	producerThread.join();
 	dataConditioningThread.join();
 	ceinmsProcessingThread.join();
-//	surrogateModelProcessingThread.join();
+	surrogateModelProcessingThread.join();
+	timeDifferenceThread.join();
+	timeProbeThread.join();
 
-//	pipelineTimeDifference.getWallClockDifference().print(outputDirectory + "/wallclock-time-lmtqueue-to-strainqueue.txt");
-//	pipelineTimeDifference.getCpuClockDifference().print(outputDirectory + "/cupclock-time-lmtqueue-to-strainqueue.txt");
+	pipelineTimeDifference.getWallClockDifference().print(itrainSetup.resultDir + "/wallclock-time-markerqueue-to-strainqueue.txt");
+	pipelineTimeDifference.getCpuClockDifference().print(itrainSetup.resultDir + "/cupclock-time-markerqueue-to-strainqueue.txt");
+	auto times = pipelineTimeDifference.getWallClockDifference().getTimes();
+	std::ofstream outF(itrainSetup.resultDir + "/wallclock-times.txt");
+	for (auto& e : times)
+		outF << e << '\n';
+	std::cout << "Total execution time: " << timeProbe.getWallClockTimes().getMax() - timeProbe.getWallClockTimes().getMin() << std::endl;
+	std::cout << "Number of frames:     " << timeProbe.getWallClockTimes().getTimes().size() << std::endl;
 	return 0;
 }
 
@@ -961,6 +975,7 @@ void printHelp(ItrainExecutionSetup itrainSetup) {
 			cout << "--fc                  CutoffFrequency  Specify the name of lowpass cutoff frequency to filter IK and GRF data.\n";
 			cout << "-j                    IK threads       Specify the number of IK threads to be used.\n";
 			cout << "-a                    Accuracy         Specify the IK solver accuracy.\n";
+			cout << "--push-frequency      Frequency        Specify at what frequency the file data should be produced\n";
 			cout << "--output              OutputDir        Specify the output directory.\n";
 			cout << "-v                                     Show visualiser.\n";
 
@@ -1075,6 +1090,9 @@ int main(int argc, char* argv[]) {
 	if (po.exists("--trc"))
 		itrainSetup.trcFilename = po.getParameter("--trc");
 
+	itrainSetup.pushFrequency = -1;
+	if (po.exists("--push-frequency"))
+		itrainSetup.pushFrequency = po.getParameter<double>("--push-frequency");
 
 	/*string baseDir = "C:\\Data\\ABC11\\";
 	string subjectFile = baseDir + "TestData\\20151214\\ceinms\\subjects\\calibrated\\calibrated0.xml";
