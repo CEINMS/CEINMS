@@ -80,6 +80,8 @@ struct  ItrainExecutionSetup {
 	bool useMaxEmgFile;
 	string emgGeneratorFile;
 	double pushFrequency;
+	double startTime;
+	double stopTime;
 };
 //introduces a time delay in the pipeline
 
@@ -371,6 +373,11 @@ void fileProducer(
 	rtosim::MarkersFromTrc markersFromTrc(outputMarkerQueue, subscriptionLatch, endLatch, itrainSetup.osimModelFilename, itrainSetup.trcFilename, false);
 	if(itrainSetup.pushFrequency > 0)
 		markersFromTrc.setOutputFrequency(itrainSetup.pushFrequency);
+	if (itrainSetup.startTime > 0)
+		markersFromTrc.setStartTime(itrainSetup.startTime);
+	if (itrainSetup.stopTime > 0)
+		markersFromTrc.setStopTime(itrainSetup.stopTime);
+
 
 	ExcitationGeneratorFromXml emgGenerator(itrainSetup.emgGeneratorFile);
 	vector<string> desiredEmgChannelNames{ emgGenerator.getInputSignalsNames() };
@@ -383,7 +390,7 @@ void fileProducer(
 			outputRawEmgQueue,
 			subscriptionLatch,
 			endLatch,
-			FixMissingEmgData<ceinms::EmgQueue::type, ceinms::EmgQueue::type >(1000.));
+			FixMissingEmgData<ceinms::EmgQueue::type, ceinms::EmgQueue::type >(0.009));
 
 	std::thread markerProducerThread(std::ref(markersFromTrc));
 	std::thread emgProducerThread(std::ref(emgFromFile));
@@ -809,10 +816,14 @@ int run(ItrainExecutionSetup itrainSetup) {
 		doneWithSubscriptionsLatch.wait();
 		momentArmsQueues[0]->subscribe();
 		bool  runcondition = true;
+		int counter{ 100 };
 		while (runcondition) {
 			auto f = momentArmsQueues[0]->pop();
 			runcondition = !EndOfData::isEod(f);
-			std::cout << "." << std::flush;
+			if (--counter < 0) {
+				counter = 100;
+				std::cout << "." << std::flush;
+			}
 		}
 	});
 		
@@ -975,7 +986,9 @@ void printHelp(ItrainExecutionSetup itrainSetup) {
 			cout << "--fc                  CutoffFrequency  Specify the name of lowpass cutoff frequency to filter IK and GRF data.\n";
 			cout << "-j                    IK threads       Specify the number of IK threads to be used.\n";
 			cout << "-a                    Accuracy         Specify the IK solver accuracy.\n";
-			cout << "--push-frequency      Frequency        Specify at what frequency the file data should be produced\n";
+			cout << "--push-frequency      Frequency        Specify at what frequency the file data should be produced.\n";
+			cout << "--start               Time             Specify start time for the data streaming.\n";
+			cout << "--stop                Time             Specify stop time for the data streaming.\n";
 			cout << "--output              OutputDir        Specify the output directory.\n";
 			cout << "-v                                     Show visualiser.\n";
 
@@ -1093,6 +1106,13 @@ int main(int argc, char* argv[]) {
 	itrainSetup.pushFrequency = -1;
 	if (po.exists("--push-frequency"))
 		itrainSetup.pushFrequency = po.getParameter<double>("--push-frequency");
+
+	itrainSetup.startTime = -1;
+	if (po.exists("--start"))
+		itrainSetup.startTime = po.getParameter<double>("--start");
+	itrainSetup.stopTime= -1;
+	if (po.exists("--stop"))
+		itrainSetup.stopTime = po.getParameter<double>("--stop");
 
 	/*string baseDir = "C:\\Data\\ABC11\\";
 	string subjectFile = baseDir + "TestData\\20151214\\ceinms\\subjects\\calibrated\\calibrated0.xml";

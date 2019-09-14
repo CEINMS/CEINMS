@@ -197,8 +197,10 @@ namespace ceinms {
     template<typename Activation, typename Tendon, CurveMode::Mode mode>
     void MTU<Activation, Tendon, mode>::setEmg(double emg) {
 
-        if (!activationDynamic_.setEmg(emg))
-            std::cout << "WARNING! Wrong excitation data provided for muscle " << getMuscleName() << ", it should be between 0 and 1" << std::endl;
+		if (!activationDynamic_.setEmg(emg)) {
+			std::cout << "WARNING! Wrong excitation data provided for muscle " << getMuscleName() << 
+				", it should be between 0 and 1, but it is " << emg << std::endl;
+		}
     }
 
 
