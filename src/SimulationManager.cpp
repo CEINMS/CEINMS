@@ -164,6 +164,7 @@ namespace ceinms {
             "MusclesContribution" };
 
         vector<string> valuesToWrite = dataToLog;
+		ceinms::initialiseQueue(logQueue, valuesToWrite);
         QueuesToStorageFiles queuesToStorageFiles(logQueue, doneWithSubscriptionsLatch, doneWithExecutionLatch, mySubject, valuesToWrite, outputDirectory_);
 
         // 3. define the model simulator
@@ -291,6 +292,7 @@ namespace ceinms {
         // 2b. define the thread consuming the output sources
         cout << "-- define the thread consuming the output sources" << endl;
         vector<string> valuesToWrite = dataToLog;
+		ceinms::initialiseQueue(logQueue, valuesToWrite);
         QueuesToStorageFiles queuesToStorageFiles(logQueue, doneWithSubscriptionsLatch, doneWithExecutionLatch, mySubject, valuesToWrite, outputDirectory_);
 
         // 3. define the model simulator
@@ -462,6 +464,7 @@ namespace ceinms {
             "MusclesContribution" };
         // 2b. define the thread consuming the output sources
         vector<string> valuesToWrite = dataToLog;
+		ceinms::initialiseQueue(logQueue, valuesToWrite);
         QueuesToStorageFiles queuesToStorageFiles(logQueue, doneWithSubscriptionsLatch, doneWithExecutionLatch, mySubject, valuesToWrite, outputDirectory_);
 
         // 3. define the model simulator
@@ -577,7 +580,7 @@ namespace ceinms {
         // 2b. define the thread consuming the output sources
         vector<string> valuesToWrite = dataToLog;
 			
-
+		ceinms::initialiseQueue(logQueue, valuesToWrite);
         QueuesToStorageFiles queuesToStorageFiles(logQueue, doneWithSubscriptionsLatch, doneWithExecutionLatch, mySubject, valuesToWrite, outputDirectory_);
 
         // 3. define the model simulator
@@ -774,6 +777,7 @@ namespace ceinms {
             "MusclesContribution"};
         // 2b. define the thread consuming the output sources
         vector<string> valuesToWrite = dataToLog;
+		ceinms::initialiseQueue(logQueue, valuesToWrite);
         QueuesToStorageFiles queuesToStorageFiles(logQueue, doneWithSubscriptionsLatch, doneWithExecutionLatch, mySubject, valuesToWrite, outputDirectory_);
 
 
