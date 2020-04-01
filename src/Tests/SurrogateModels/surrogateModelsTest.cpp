@@ -9,6 +9,21 @@ using std::ifstream;
 #include <iostream>
 using std::cout;
 using std::endl;
+#include <typeinfo>
+
+
+template<typename T>
+T getSurrogate(const SimTK::Matrix& X, const SimTK::Matrix& Y) {
+	T surrogate(X, Y);
+	return surrogate;
+}
+
+template<>
+rtb::Plsr getSurrogate<rtb::Plsr>(const SimTK::Matrix& X, const SimTK::Matrix& Y) {
+	rtb::Plsr surrogate;
+	surrogate.train(X, Y, 0.001);
+	return surrogate;
+}
 
 SimTK::Matrix parseCSV(const std::string& filename) {
 
@@ -137,7 +152,7 @@ public:
 		vector<double> xvals = convertToStd(X.col(0));
 		a_ = xvals.front();
 		b_ = xvals.back();
-		n_ = xvals.size();
+		n_ = xvals.size()-1;
 		for (int i(0); i < nNodes_; ++i) {
 			mcbs::Spline<1> spline(a_, b_, n_);
 			vector<double> yvals = convertToStd(Y.col(i));
@@ -171,21 +186,18 @@ private:
 };
 
 
-
-void testNodes(const SimTK::Matrix& X, const SimTK::Matrix& Y) {
-	rtb::Plsr plsr;
-	plsr.train(X, Y, 0.001);
-	CubicSplineSurrogate cubic(X, Y);
-	SimTK::Matrix YP_plsr = plsr.project(X.getAsMatrixView());
-	SimTK::Matrix YP_cubic = cubic.project(X);
-	printCSV(YP_plsr, string(BASE_DIR) + "/data/node_prediction_YP_plsr.csv");
-	printCSV(YP_cubic, string(BASE_DIR) + "/data/node_prediction_YP_cubic.csv");
+template<typename Surrogate>
+void testNodes(const SimTK::Matrix& X, const SimTK::Matrix& Y, const string& name) {
+	
+	Surrogate surrogate(getSurrogate<Surrogate>(X, Y));
+	SimTK::Matrix YP = surrogate.project(X.getAsMatrixView());
+	printCSV(YP, string(BASE_DIR) + "/data/node_prediction_YP_" + name + ".csv");
+	
 }
 
-void testFullRange(const SimTK::Matrix& X, const SimTK::Matrix& Y) {
-	rtb::Plsr plsr;
-	plsr.train(X, Y, 0.001);
-	CubicSplineSurrogate cubic(X, Y);
+template<typename Surrogate>
+void testFullRange(const SimTK::Matrix& X, const SimTK::Matrix& Y, const string& name) {
+	Surrogate surrogate(getSurrogate<Surrogate>(X, Y)); 
 	int n = 101;
 	SimTK::Matrix xnew(n, 1);
 	double xmin = 0;
@@ -194,18 +206,16 @@ void testFullRange(const SimTK::Matrix& X, const SimTK::Matrix& Y) {
 		xnew(i, 0) = xmin + (xmax - xmin) / n * i;
 	}
 
-	SimTK::Matrix YP_plsr = plsr.project(xnew.getAsMatrixView());
-	SimTK::Matrix YP_cubic = cubic.project(xnew);
-	printCSV(YP_plsr, string(BASE_DIR) + "/data/full_prediction_YP_plsr.csv");
-	printCSV(YP_cubic, string(BASE_DIR) + "/data/full_prediction_YP_cubic.csv");
+	SimTK::Matrix YP = surrogate.project(xnew.getAsMatrixView());
+	printCSV(YP, string(BASE_DIR) + "/data/full_prediction_YP_" + name + ".csv");
 }
 
-
-
-void leaveOneOut(const SimTK::Matrix& X, const SimTK::Matrix& Y) {
+template<typename Surrogate>
+void leaveOneOut(const SimTK::Matrix& X, const SimTK::Matrix& Y, const string& name) {
 	SimTK::Matrix X_reduced(X.nrow() - 1, X.ncol());
 	SimTK::Matrix Y_reduced(Y.nrow() - 1, Y.ncol());
-	SimTK::Matrix YP_plsr(Y.nrow(), Y.ncol()), YP_cubic(Y.nrow(), Y.ncol());
+	SimTK::Matrix YP(Y.nrow(), Y.ncol());
+
 	for (unsigned toSkip(0); toSkip < X.nrow(); ++toSkip) {
 		unsigned k(0);
 		for (unsigned i(0); i < X.nrow(); ++i) {
@@ -219,22 +229,17 @@ void leaveOneOut(const SimTK::Matrix& X, const SimTK::Matrix& Y) {
 				++k;
 			}
 		}
-		std::cout << "LOO: " << toSkip << endl;
-		rtb::Plsr plsr;
-
-		plsr.train(X_reduced, Y_reduced, 0.001);
-		CubicSplineSurrogate cubic(X_reduced, Y_reduced);
+		Surrogate surrogate(getSurrogate<Surrogate>(X_reduced, Y_reduced));
+		
 		SimTK::Matrix toEval(1, 1);
 		toEval(0, 0) = X.get(toSkip, 0);
-		SimTK::Matrix yy_plsr = plsr.project(toEval.getAsMatrixView());
-		SimTK::Matrix yy_cubic = cubic.project(toEval.getAsMatrixView());
-		for (int l(0); l < yy_plsr.ncol(); ++l) {
-			YP_plsr(toSkip, l) = yy_plsr(0, l);
-			YP_cubic(toSkip, l) = yy_cubic(0, l);
+		SimTK::Matrix yy = surrogate.project(toEval.getAsMatrixView());
+		for (int l(0); l < yy.ncol(); ++l) {
+			YP(toSkip, l) = yy(0, l);
 		}
 	}
-	printCSV(YP_plsr, string(BASE_DIR) + "/data/leave1out_prediction_YP_plsr.csv");
-	printCSV(YP_cubic, string(BASE_DIR) + "/data/leave1out_prediction_YP_cubic.csv");
+
+	printCSV(YP, string(BASE_DIR) + "/data/leave1out_prediction_YP_" + name + ".csv");
 }
 
 int main() {
@@ -243,8 +248,18 @@ int main() {
 	string dataYfile{ dataDir + "/yvalues.csv" };
 	SimTK::Matrix X(parseCSV(dataXfile));
 	SimTK::Matrix Y(parseCSV(dataYfile));
-	testNodes(X, Y);
-	leaveOneOut(X, Y);
-	testFullRange(X, Y);
+
+	testNodes<rtb::Plsr>(X, Y, "plsr");
+	testNodes<CubicSplineSurrogate>(X, Y, "cubic");
+	testNodes<BasisSplineSurrogate>(X, Y, "basis");
+
+	leaveOneOut<rtb::Plsr>(X, Y, "plsr");
+	leaveOneOut<CubicSplineSurrogate>(X, Y, "cubic");
+	leaveOneOut<BasisSplineSurrogate>(X, Y, "basis");
+
+	testFullRange<rtb::Plsr>(X, Y, "plsr");
+	testFullRange<CubicSplineSurrogate>(X, Y, "cubic");
+	testFullRange<BasisSplineSurrogate>(X, Y, "basis");
+
 	return 0;
 }
