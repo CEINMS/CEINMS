@@ -101,6 +101,130 @@ private:
 
 };
 
+class CubicSplineSurrogate {
+public:
+	CubicSplineSurrogate(SimTK::Matrix X, SimTK::Matrix Y) {
+
+		if (X.ncol() != 1) {
+			std::cout << "CubicSplineSurrogate: only 1 independent variable allowed, but " << X.ncol() << " provided" << std::endl;
+			std::exit(EXIT_FAILURE);
+		}
+
+		if (X.nrow() != Y.nrow()) {
+			std::cout << "CubicSplineSurrogate: number or rows of X matrix (" << X.nrow() << ") is"
+				"different than number of rows of Y matrix (" << Y.nrow() << std::endl;
+			std::exit(EXIT_FAILURE);
+		}
+
+		auto convertToStd([](SimTK::Vector vec) {
+			vector<double> outV;
+			//Currently, the data from the FE model does not have a zero strain,
+			//so we add a zero to get the spline to start from 0
+			outV.emplace_back(0);
+			for (auto e : vec) {
+				outV.emplace_back(e);
+			}
+			return outV;
+		});
+
+		nDataPoints_ = Y.nrow()+1;
+		nNodes_ = Y.ncol();
+		vector<double> xvals = convertToStd(X.col(0));
+		splines_.resize(nNodes_);
+		for (int i(0); i < nNodes_; ++i) {
+			vector<double> yvals = convertToStd(Y.col(i));
+			splines_.at(i).resetPointsWith(xvals, yvals);
+		}
+	}
+
+
+	SimTK::Matrix project(const SimTK::Matrix& X) const {
+		double xval = X(0, 0);
+		SimTK::Matrix out(1, nNodes_);
+		for (unsigned i(0); i < nNodes_; ++i)
+			out(0, i) = splines_.at(i).getValue(xval);
+		return out;
+	}
+
+private:
+	unsigned nDataPoints_, nNodes_;
+	std::vector<Curve<CurveMode::Offline>> splines_;
+};
+
+
+template<typename SurrogateT>
+class AchillesTendonModel_ {
+
+public:
+	AchillesTendonModel_(
+		MuscleForcesQueue& inputMuscleForcesQueue,
+		ScalarVectorVectorQueue& outputStrainQueue,
+		Latch& doneWithSubscriptions,
+		Latch& doneWithExecution,
+		const std::vector<std::string>& allMuscleNames,
+		SurrogateT surrogateModel,
+		const SimTK::Matrix& nodes) :
+		inputMuscleForcesQueue_(inputMuscleForcesQueue),
+		outputStrainQueue_(outputStrainQueue),
+		doneWithSubscriptions_(doneWithSubscriptions),
+		doneWithExecution_(doneWithExecution),
+		allMuscleNames_(allMuscleNames),
+		surrogateModel_(surrogateModel),
+		nodes_(nodes)
+	{
+
+	}
+
+	void operator()() {
+
+		const vector<string> atMuscleNames = { "lat_gas_r",	"med_gas_r", "soleus_r" };
+		Mapper muscleMapper(allMuscleNames_, atMuscleNames);
+		SimTK::Matrix atForce(1, 1);
+		inputMuscleForcesQueue_.subscribe();
+		doneWithSubscriptions_.wait();
+		bool runCondition(true);
+		while (runCondition) {
+			MuscleForcesFrame muscleForcesFrame = inputMuscleForcesQueue_.pop();
+			if (EndOfData::isEod(muscleForcesFrame)) {
+				runCondition = false;
+			}
+			if (runCondition) {
+				vector<double> atMuscleForces = muscleMapper.map(muscleForcesFrame.data);
+				atForce(0, 0) = std::accumulate(atMuscleForces.begin(), atMuscleForces.end(), 0.);
+				SimTK::Matrix strains(surrogateModel_.project(atForce));
+				ScalarVectorVectorFrame outputStrains;
+				outputStrains.time = muscleForcesFrame.time;
+				outputStrains.data.resize(4);
+				for (auto& v : outputStrains.data)
+					v.resize(strains.ncol());
+				for (size_t c(0); c < nodes_.ncol(); ++c) {
+					for (size_t r(0); r < nodes_.nrow(); ++r) {
+						outputStrains.data[c][r] = nodes_(r, c);
+					}
+				}
+				for (size_t i(0); i < strains.ncol(); ++i) {
+					outputStrains.data.at(3).at(i) = strains(0, i);
+				}
+				outputStrainQueue_.push(outputStrains);
+			}
+			else {
+				outputStrainQueue_.push(EndOfData::get<ScalarVectorVectorFrame>());
+			}
+		}
+		doneWithExecution_.wait();
+
+	}
+
+private:
+	MuscleForcesQueue& inputMuscleForcesQueue_;
+	ScalarVectorVectorQueue& outputStrainQueue_;
+	Latch& doneWithSubscriptions_;
+	Latch& doneWithExecution_;
+	std::vector<std::string> allMuscleNames_;
+	SurrogateT surrogateModel_;
+	SimTK::Matrix nodes_;
+
+};
 
 class AchillesTendonModel {
 
@@ -326,7 +450,7 @@ void deviceProducer(
 	ExcitationGeneratorFromXml emgGenerator(itrainSetup.emgGeneratorFile);
 	vector<string> emgChannelNames{ emgGenerator.getInputSignalsNames() };
 
-	rtosim::DataFromNexus dataProducerFromNexus(outputMarkerQueue, localRawEmgQueue, subscriptionLatch, endLatch, flowCondition, itrainSetup.osimModelFilename, emgChannelNames);
+	rtosim::DataFromNexus dataProducerFromNexus(outputMarkerQueue, localRawEmgQueue, subscriptionLatch, endLatch, flowCondition, itrainSetup.osimModelFilename, emgChannelNames, itrainSetup.hostname);
 	dataProducerFromNexus.setLoopMode(true);
 	rtosim::QueueAdapter<
 		rtosim::EmgQueue,
@@ -590,17 +714,18 @@ void surrogateModelProcessing(
 	string plsrNodeFile{ itrainSetup.plsrDir + "/nodes.csv" };
 	SimTK::Matrix X(parseCSV(plsrXfile));
 	SimTK::Matrix Y(parseCSV(plsrYfile));
-	rtb::Plsr strainPlsr;
-	strainPlsr.train(X, Y, 0.001);
+	CubicSplineSurrogate surrogateSpline(X, Y);
+	//rtb::Plsr strainPlsr;
+	//strainPlsr.train(X, Y, 0.001);
 	SimTK::Matrix nodes(parseCSV(plsrNodeFile));
 
-	AchillesTendonModel atModel(
+	AchillesTendonModel_<CubicSplineSurrogate> atModel(
 		*inputDataQueue["MuscleForces"],
 		outputstrainQueue,
 		subscriptionLatch,
 		endLatch,
 		subject.getMuscleNames(),
-		strainPlsr,
+		surrogateSpline,
 		nodes);
 
 	ceinms::ScalarVectorQueue reducedStrainQueue;
@@ -638,7 +763,7 @@ void surrogateModelProcessing(
 	strainLoggerThread.join();
 	strainReducerAdapterThread.join();
 }
-
+/*
 int run_from_file(ItrainExecutionSetup itrainSetup) {
 
 
@@ -731,45 +856,42 @@ int run_from_file(ItrainExecutionSetup itrainSetup) {
         strainPlsr,
 		nodes);
     
-//    QueueToCSV strainLogger(
-//        strainQueue, 
-//        doneWithSubscriptionsLatch,
-//        doneWithExecutionLatch, 
-//        strainoutput);
+    QueueToCSV strainLogger(
+        strainQueue, 
+        doneWithSubscriptionsLatch,
+        doneWithExecutionLatch, 
+        strainoutput);
 
     //MEGA HACK
-    rtb::Concurrency::Latch l1(3);
-    rtb::Concurrency::Latch l2(2);
+//    rtb::Concurrency::Latch l1(3);
+//    rtb::Concurrency::Latch l2(2);
     
 	Ticker<LmtQueue::type> ticker(5);
-	rtosim::QueueAdapter< LmtQueue, LmtQueue, Ticker<LmtQueue::type>> delayer(lmtQueue, delayedLmtQueue,l1, l2, ticker);
+	rtosim::QueueAdapter< LmtQueue, LmtQueue, Ticker<LmtQueue::type>> delayer(
+		lmtQueue, delayedLmtQueue, doneWithSubscriptionsLatch, doneWithExecutionLatch, ticker);
 
     rtosim::TimeDifference<LmtQueue, ScalarVectorVectorQueue> 
         pipelineTimeDifference(
             lmtQueue,
             strainQueue,
-            l1,
-            l2);
+            doneWithSubscriptionsLatch,
+            doneWithExecutionLatch);
 	ceinms::QueuesToWebsocket queueToWebsocket(strainQueue, { "nodes_x","nodes_y","nodes_z","nodes_w" }, "132.234.133.234", "8080");
-    doneWithSubscriptionsLatch.setCount(6);
-    doneWithExecutionLatch.setCount(5);
+    doneWithSubscriptionsLatch.setCount(8);
+    doneWithExecutionLatch.setCount(7);
 
-    auto fixLatches([&]() {
-        doneWithSubscriptionsLatch.wait();
-        l1.wait(); });
 
     // 4. start the threads
     std::thread emgProdThread(std::ref(emgProducer));
     std::thread externalTorquesProdThread(std::ref(externalTorquesProducer));
     std::thread lmtMaProdThread(std::ref(lmtMaProducer));
     std::thread simulatorThread(std::ref(simulator));
- //   std::thread queuesToStorageFilesThread(std::ref(queuesToStorageFiles));
+    std::thread queuesToStorageFilesThread(std::ref(queuesToStorageFiles));
     std::thread atModelThread(std::ref(atModel));
- //   std::thread strainLoggerThread(std::ref(strainLogger));
+    std::thread strainLoggerThread(std::ref(strainLogger));
 	std::thread delayerThread(std::ref(delayer));
     std::thread timeMeasureThread(std::ref(pipelineTimeDifference));
 	std::thread queueToWebsocketThread(std::ref(queueToWebsocket));
-    fixLatches();
     std::cout << "release latches\n";
 
     emgProdThread.join();
@@ -786,7 +908,7 @@ int run_from_file(ItrainExecutionSetup itrainSetup) {
     pipelineTimeDifference.getCpuClockDifference().print(outputDirectory + "/cupclock-time-lmtqueue-to-strainqueue.txt");
     return 0;
 }
-
+*/
 
 int run(ItrainExecutionSetup itrainSetup) {
 	
@@ -1003,7 +1125,8 @@ int main(int argc, char* argv[]) {
 
 	
 	ItrainExecutionSetup itrainSetup;
-
+	itrainSetup.runFromFile = false;
+	itrainSetup.runFromDevice = false;
 	rtosim::ProgramOptionsParser po(argc, argv);
 	if (po.exists("-h") || po.empty()) {
 		printHelp(itrainSetup);
@@ -1094,9 +1217,11 @@ int main(int argc, char* argv[]) {
 
 	itrainSetup.showVisualiser = po.exists("-v");
 
-	if (po.exists("--maxemg"))
+	itrainSetup.useMaxEmgFile = false;
+	if (po.exists("--maxemg")) {
 		itrainSetup.maxEmgFile = po.getParameter("--maxemg");
-
+		itrainSetup.useMaxEmgFile = true;
+	}
 	if (po.exists("--emg"))
 		itrainSetup.emgFilename = po.getParameter("--emg");
 
