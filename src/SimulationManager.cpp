@@ -578,14 +578,12 @@ namespace ceinms {
             "AdjustedEmgs",
             "MusclesContribution" };
         // 2b. define the thread consuming the output sources
+		dataToLog.push_back("ObjectiveFunctionComponentsAndWeightings");
         vector<string> valuesToWrite = dataToLog;
-			
 		ceinms::initialiseQueue(logQueue, valuesToWrite);
+			
         QueuesToStorageFiles queuesToStorageFiles(logQueue, doneWithSubscriptionsLatch, doneWithExecutionLatch, mySubject, valuesToWrite, outputDirectory_);
 
-        // 3. define the model simulator
-        vector<string> valuesToLog = dataToLog;
-		valuesToLog.push_back("ObjectiveFunctionComponentsAndWeightings");
 
 
         // 4. define the optimiser
@@ -606,7 +604,7 @@ namespace ceinms {
             doneWithExecutionLatch,
             mySubject,
             errorMinimizer,
-            valuesToLog);
+            valuesToWrite);
 
 
         // 4. start contact model stuff
