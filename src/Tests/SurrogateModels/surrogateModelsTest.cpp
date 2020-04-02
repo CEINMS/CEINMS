@@ -9,8 +9,7 @@ using std::ifstream;
 #include <iostream>
 using std::cout;
 using std::endl;
-#include <typeinfo>
-
+#include <chrono>
 
 template<typename T>
 T getSurrogate(const SimTK::Matrix& X, const SimTK::Matrix& Y) {
@@ -196,6 +195,21 @@ void testNodes(const SimTK::Matrix& X, const SimTK::Matrix& Y, const string& nam
 }
 
 template<typename Surrogate>
+void testProcessingTime(const SimTK::Matrix& X, const SimTK::Matrix& Y, const string& name) {
+	unsigned n = 1000;
+	Surrogate surrogate(getSurrogate<Surrogate>(X, Y));
+	auto start = std::chrono::system_clock::now();
+	for(unsigned i(0); i < n; ++i)
+		surrogate.project(X.getAsMatrixView());
+	auto end = std::chrono::system_clock::now();
+	double elapsedTime = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
+	cout << "Speed test for " << name << endl;
+	cout << "Evaluated " << n << " frames in " << elapsedTime << " ms\n"
+		"Average time per iteration " << elapsedTime / n << " ms\n" << endl;
+}
+
+
+template<typename Surrogate>
 void testFullRange(const SimTK::Matrix& X, const SimTK::Matrix& Y, const string& name) {
 	Surrogate surrogate(getSurrogate<Surrogate>(X, Y)); 
 	int n = 101;
@@ -260,6 +274,9 @@ int main() {
 	testFullRange<rtb::Plsr>(X, Y, "plsr");
 	testFullRange<CubicSplineSurrogate>(X, Y, "cubic");
 	testFullRange<BasisSplineSurrogate>(X, Y, "basis");
-
+		
+	testProcessingTime<rtb::Plsr>(X, Y, "plsr");
+	testProcessingTime<CubicSplineSurrogate>(X, Y, "cubic");
+	testProcessingTime<BasisSplineSurrogate>(X, Y, "basis");
 	return 0;
 }

@@ -8,48 +8,66 @@ fs = 7
 
 def plotComparison(ax, Y, YP):
     ax.scatter(Y.flatten(), YP.flatten(), s=0.1, color='k', alpha=0.05)
-   # slope, intercept, r_value, p_value, std_err = scipy.stats.linregress(Y.flatten(),YP.flatten())
    # ax.plot([0, 1], [intercept, slope+intercept], color='k', linewidth=1)
    # regText = "R = {:.2f}\nRMSE = {:.4f} ".format(r_value, RMSE)
    # print(regText)
    # ax.annotate(s=regText, xy=(0.8,0.1), fontsize=fs, xycoords='axes fraction')
    # ax.axis('equal') 
+    diffY = Y.flatten() - YP.flatten()
+    rmse = np.sqrt((diffY**2.0).mean())
+    slope, intercept, r_value, p_value, std_err = scipy.stats.linregress(Y.flatten(),YP.flatten())
+    regText = "R = {:.2f}\nRMSE = {:.4f} ".format(r_value, rmse)
+    print(regText)
+    ax.annotate(s=regText, xy=(0.5,0.1), fontsize=fs, xycoords='axes fraction')
     ax.set_xlim([0,0.2])
     ax.set_ylim([0,0.2])
     ax.set_xlabel("Finite element model strain", fontsize=fs)
     ax.tick_params(axis='both', which='major', labelsize=fs)
 
 def plotFullRange(ax, YP):
-    x = range(YP.shape[0])
-    ax.plot(YP[:,::20], x, linewidth=0.3, color='k', alpha=0.9)
+    x = np.array(range(YP.shape[0]))
+    x = x/x.max()*2.0
+    ax.plot(YP[:,::3], x, linewidth=0.1, color='k', alpha=0.1)
+    ax.tick_params(axis='both', which='major', labelsize=fs)
 
-Y = np.array(pd.read_csv('data/yvalues.csv', header=None))
-YP_plsr = np.array(pd.read_csv('data/leave1out_prediction_YP_plsr.csv', header=None))
-YP_cubic = np.array(pd.read_csv('data/leave1out_prediction_YP_cubic.csv', header=None))
-YP_basis = np.array(pd.read_csv('data/leave1out_prediction_YP_basis.csv', header=None))
+def runLeaveOneOutAnalysis():
+    Y = np.array(pd.read_csv('data/yvalues.csv', header=None))
+    YP_plsr = np.array(pd.read_csv('data/leave1out_prediction_YP_plsr.csv', header=None))
+    YP_cubic = np.array(pd.read_csv('data/leave1out_prediction_YP_cubic.csv', header=None))
+    YP_basis = np.array(pd.read_csv('data/leave1out_prediction_YP_basis.csv', header=None))
 
-fig = plt.figure()
-ax1 = fig.add_subplot(131)
-ax2 = fig.add_subplot(132)
-ax3 = fig.add_subplot(133)
+    
+    fig, ax = plt.subplots(1,3,sharex=True, sharey=True, figsize=(8,3))
 
-plotComparison(ax1, Y, YP_plsr)
-ax1.set_ylabel("PLS predicted strain", fontsize=fs)
-plotComparison(ax2, Y, YP_cubic)
-ax2.set_ylabel("Cubic spline predicted strain", fontsize=fs)  
-plotComparison(ax3, Y, YP_basis)
-ax3.set_ylabel("Basis predicted strain", fontsize=fs)
-  
-'''
-YP_full_plsr = np.array(pd.read_csv('data/full_prediction_YP_plsr.csv', header=None))
-YP_full_cubic = np.array(pd.read_csv('data/full_prediction_YP_cubic.csv', header=None))
-YP_full_basis = np.array(pd.read_csv('data/full_prediction_YP_basis.csv', header=None))
+    plotComparison(ax[0], Y, YP_plsr)
+    ax[0].set_ylabel("PLS predicted strain", fontsize=fs)
+    plotComparison(ax[1], Y, YP_cubic)
+    ax[1].set_ylabel("Cubic spline predicted strain", fontsize=fs)  
+    plotComparison(ax[2], Y, YP_basis)
+    ax[2].set_ylabel("Basis predicted strain", fontsize=fs)
+    fig.suptitle("Leave one out fitting", fontsize=fs)
+    plt.show()
 
-figg = plt.figure(figsize=(3,6))
-axx1 = figg.add_subplot(211)
-axx2 = figg.add_subplot(212)
-plotFullRange(axx1, YP_full_plsr)
-plotFullRange(axx2, YP_full_cubic)
-'''
-#fig.savefig('Figure_PLS.tif', format='tif', dpi=1200)
-plt.show()
+def runFullRangeAnalysis():
+    YP_plsr = np.array(pd.read_csv('data/full_prediction_YP_plsr.csv', header=None))
+    YP_cubic = np.array(pd.read_csv('data/full_prediction_YP_cubic.csv', header=None))
+    YP_basis = np.array(pd.read_csv('data/full_prediction_YP_basis.csv', header=None))
+
+    fig, ax = plt.subplots(1,3,sharex=True, sharey=True, figsize=(8,3))
+    plotFullRange(ax[0], YP_plsr)
+    plotFullRange(ax[1], YP_cubic)
+    plotFullRange(ax[2], YP_basis)
+    ax[0].set_ylabel("tendon force MVC normalised", fontsize=fs)
+    ax[0].set_xlabel("Principal component strain", fontsize=fs)
+    ax[0].set_title("PLS", fontsize=fs)
+    ax[1].set_xlabel("Principal component strain", fontsize=fs)
+    ax[1].set_title("Cubic Spline", fontsize=fs)
+    ax[2].set_xlabel("Principal component strain", fontsize=fs)
+    ax[2].set_title("Basis Spline", fontsize=fs)
+    ax[0].set_xlim([0,0.2])
+ 
+    fig.suptitle("Force strain relationship for each Gauss point in the model", fontsize=fs)
+    plt.show()
+
+runFullRangeAnalysis()
+runLeaveOneOutAnalysis()
