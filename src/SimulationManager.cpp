@@ -774,8 +774,10 @@ namespace ceinms {
             "AdjustedEmgs",
             "MusclesContribution"};
         // 2b. define the thread consuming the output sources
-        vector<string> valuesToWrite = dataToLog;
+		dataToLog.push_back("ObjectiveFunctionComponentsAndWeightings");
+		vector<string> valuesToWrite = dataToLog;
 		ceinms::initialiseQueue(logQueue, valuesToWrite);
+
         QueuesToStorageFiles queuesToStorageFiles(logQueue, doneWithSubscriptionsLatch, doneWithExecutionLatch, mySubject, valuesToWrite, outputDirectory_);
 
 
@@ -804,10 +806,6 @@ namespace ceinms {
         errorMinimizer.setAnnealingParameters(nt, ns, rt, t, maxNoEval, epsilon, noEpsilon);
         */
 
-        // 3. define the model simulator
-        vector<string> valuesToLog = dataToLog;
-        //save the hybrid values in a semarate file
-        valuesToLog.push_back("ObjectiveFunctionComponentsAndWeightings");
 
         ModelEvaluationHybrid<NMSmodelT, NMSmodelFrameOptimisation<NMSmodelT>, LoggerOnQueues> simulator(
             emgQueue,
@@ -819,7 +817,7 @@ namespace ceinms {
             doneWithExecutionLatch,
             mySubject,
             errorMinimizer,
-            valuesToLog);
+			dataToLog);
 
         QueueToStorageFile<ScalarVectorData> hybridErrorLogger(
             *(logQueue["ObjectiveFunctionComponentsAndWeightings"]),

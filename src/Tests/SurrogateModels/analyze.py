@@ -7,7 +7,7 @@ import numpy as np
 fs = 7
 
 def plotComparison(ax, Y, YP):
-    ax.scatter(Y.flatten(), YP.flatten(), s=0.1, color='k', alpha=0.05)
+    ax.scatter(Y.flatten(), YP.flatten(), s=0.2, facecolors='k', edgecolors='none', alpha=0.1)
    # ax.plot([0, 1], [intercept, slope+intercept], color='k', linewidth=1)
    # regText = "R = {:.2f}\nRMSE = {:.4f} ".format(r_value, RMSE)
    # print(regText)
@@ -23,6 +23,7 @@ def plotComparison(ax, Y, YP):
     ax.set_ylim([0,0.2])
     ax.set_xlabel("Finite element model strain", fontsize=fs)
     ax.tick_params(axis='both', which='major', labelsize=fs)
+    sns.despine(fig=None, ax=ax, right=True, top=True)
 
 def plotFullRange(ax, YP):
     x = np.array(range(YP.shape[0]))
@@ -38,14 +39,18 @@ def runLeaveOneOutAnalysis():
 
     
     fig, ax = plt.subplots(1,3,sharex=True, sharey=True, figsize=(8,3))
-
     plotComparison(ax[0], Y, YP_plsr)
-    ax[0].set_ylabel("PLS predicted strain", fontsize=fs)
+    ax[0].set_ylabel("Surrogate model strain", fontsize=fs)
+    ax[0].set_title("Partial Least Square regression", fontsize=fs)
+
     plotComparison(ax[1], Y, YP_cubic)
-    ax[1].set_ylabel("Cubic spline predicted strain", fontsize=fs)  
+    ax[1].set_title("Cubic spline interpolation", fontsize=fs)
     plotComparison(ax[2], Y, YP_basis)
-    ax[2].set_ylabel("Basis predicted strain", fontsize=fs)
-    fig.suptitle("Leave one out fitting", fontsize=fs)
+    ax[2].set_title("Basis spline interpolation", fontsize=fs)
+   # fig.suptitle("Leave one out fitting", fontsize=fs)
+    fig.savefig('LeaveOneOut.tiff', format='tiff', dpi=1200, pil_kwargs={"compression": "tiff_lzw"})
+  #  fig.savefig('LeaveOneOut.tiff', format='tiff', dpi=1200)
+   
     plt.show()
 
 def runFullRangeAnalysis():
