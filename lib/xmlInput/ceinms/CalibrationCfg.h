@@ -32,26 +32,12 @@
 namespace ceinms {
     namespace CalibrationCfg{
 
-        //Objective Function
-        const unsigned MinimizeTorqueError = 100;
-        const unsigned SumKneeContactForces = 200;
-        const unsigned TorqueErrorAndSumKneeContactForces = 300;
-        const unsigned TorqueErrorAndSumGenericContactForces = 400;
         //Algorithm
         const unsigned Siman = 1;
         const unsigned Nop = 0;
 
         enum OptimizationAlgorithm {
             SimulatedAnnealing = 1
-        };
-
-        enum Step{
-            MinimizeTorqueErrorParameterSetDefault = 100,
-            SumKneeContactForcesParameterSetDefault = 200,
-            TorqueErrorAndSumKneeContactForcesParameterSetDefault = 300,
-            TorqueErrorAndSumGenericContactForcesParameterSetDefault = 400,
-            Empty = -1
-
         };
     }
 }

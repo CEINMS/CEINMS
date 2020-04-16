@@ -38,6 +38,8 @@ using std::endl;
 #include "ceinms/ArrayConverter.h"
 #include "ceinms/FileUtils.h"
 
+#include <OpenSim/Tools/DynamicsTool.h>
+
 namespace ceinms {
 
     JointContactFromOpensim::JointContactFromOpensim(const std::string& modelFilename, std::vector<OpenSim::Force*> externalForces) :
@@ -71,7 +73,7 @@ namespace ceinms {
             actuator->setCoordinate(&cs.get(i));
             string actuatorName(cs.get(i).getName() + "_actuator_ceinms");
             actuator->setName(actuatorName);
-            actuator->setOptimalForce(1);
+            actuator->setOptimalForce(10000);
             actuator->setMaxControl(100000);
             actuator->setMinControl(-100000);
             model_.addForce(actuator);
@@ -101,6 +103,8 @@ namespace ceinms {
 
         //not sure if the model take ownership of the extLoads or not...
         OpenSim::ExternalLoads* extLoads(new OpenSim::ExternalLoads(model_, externalLoadXmlFilename));
+       // OpenSim::ExternalLoads extLoads(model_, externalLoadXmlFilename);
+
         string baseDir(FileUtils::getFilePath(externalLoadXmlFilename));
         string extLoadModelKinematicsFilename = extLoads->getExternalLoadsModelKinematicsFileName();
         if (!FileUtils::isAbsolute(extLoadModelKinematicsFilename.c_str())) {
@@ -113,10 +117,13 @@ namespace ceinms {
             dataFilename = FileUtils::simplify(baseDir + '/' + dataFilename);
             extLoads->setDataFileName(dataFilename);
         }
-
         extLoads->setMemoryOwner(false);
         extLoads->invokeConnectToModel(model_);
-  
+        // Add external loads to the set of all model forces
+        for (int i = 0; i<extLoads->getSize(); ++i) {
+            model_.addForce(&extLoads->get(i));
+        }
+
      //   OpenSim::Array<string> muscleNames;
         model_.getMuscles().getNames(muscleActuatorNames_);
         for (unsigned i(0); i < nMuscles_; ++i)
@@ -128,7 +135,7 @@ namespace ceinms {
             actuator->setCoordinate(&cs.get(i));
             string actuatorName(cs.get(i).getName() + "_actuator_ceinms");
             actuator->setName(actuatorName);
-            actuator->setOptimalForce(1);
+            actuator->setOptimalForce(10000);
             actuator->setMaxControl(100000);
             actuator->setMinControl(-100000);
             model_.addForce(actuator);
@@ -141,7 +148,13 @@ namespace ceinms {
             c->overrideForce(state_, true);
         for (auto m : muscleActuators_)
             m->overrideForce(state_, true);
-    }
+
+        OpenSim::Array<string> names;
+        model_.getForceSet().getNames(names);
+        for (int i(0); i < names.size(); ++i)
+            std::cout << names[i] << endl;
+
+      }
 
     void JointContactFromOpensim::setTime(double time) {
 

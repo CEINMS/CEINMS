@@ -28,7 +28,11 @@
 
 #include <algorithm>
 #include <stdexcept>
-#include <algorithm>
+#include <functional>
+#include <iterator>
+#include <fstream>
+#include <iostream>
+#include "DataTable.h"
 
 namespace ceinms {
 
@@ -38,8 +42,7 @@ namespace ceinms {
 
     template <typename T>
     DataTable<T>::DataTable(size_t nRows, size_t nCols) :
-        nRows_(nRows), nCols_(nCols), data_(std::vector<std::vector<T>>(nRows, std::vector<T>(nCols, 0))), time_(nRows, 0) {
-
+        nRows_(nRows), nCols_(nCols), data_(std::vector<std::vector<T>>(nRows, std::vector<T>(nCols, T{ 0 }))), time_(nRows, 0) {
     }
 
     template <typename T>
@@ -49,10 +52,19 @@ namespace ceinms {
     }
 
     template <typename T>
+    void DataTable<T>::setTimeColumn(const std::vector<double>& timeColumn) {
+
+        if (timeColumn.size() != nRows_)
+            throw std::invalid_argument("pushRow: Wrong size of timeColumn");
+        time_ = timeColumn;
+    }
+
+
+    template <typename T>
     void DataTable<T>::setLabels(const std::vector<std::string>& labels) {
 
         if (!data_.empty() && labels.size() != nCols_)
-            throw std::invalid_argument("wrong number of labels.");
+            throw std::invalid_argument("setLabels: wrong number of labels.");
         labels_ = labels;
     }
 
@@ -61,6 +73,31 @@ namespace ceinms {
     void DataTable<T>::set(T value, size_t row, size_t col) {
 
         data_.at(row).at(col) = value;
+    }
+
+    template <typename T>
+    void DataTable<T>::setColumn(size_t col, const std::vector<T>& values) {
+
+        if (col > nCols_)
+            throw std::invalid_argument("setColumn: index out of bounds.");
+
+        if(values.size() != nRows_)
+            throw std::invalid_argument("setColumn: column size is different than number of rows in DataTable.");
+
+        for (std::size_t row(0); row < nRows_; ++row) {
+            set(values[row], row, col);
+        }
+    }
+
+
+    template <typename T>
+    void DataTable<T>::setColumn(const std::string& columnName, const std::vector<T>& values) {
+
+        auto it = std::find(labels_.begin(), labels_.end(), columnName);
+        if (it == labels_.end()) {
+            throw std::invalid_argument("setColumn: columnName does not exist.");
+        }
+        setColumn(std::distance(values.begin(), it), values);
     }
 
 
@@ -118,10 +155,20 @@ namespace ceinms {
     template <typename T>
     std::vector<T> DataTable<T>::getColumn(const std::string& columnName) const {
 
+        int idx(getColumnIndex(columnName));
+        if (idx != -1)
+            return getColumn(static_cast<size_t>(idx));
+        return std::vector<T>();
+    }
+
+    /* Return -1 if not found*/
+    template<typename T>
+    int DataTable<T>::getColumnIndex(const std::string & columnName) const
+    {
         auto it = std::find(labels_.cbegin(), labels_.cend(), columnName);
         if (it != labels_.cend())
-            return getColumn(std::distance(labels_.cbegin(), it));
-        return std::vector<T>();
+            return std::distance(labels_.cbegin(), it);
+        return -1;
     }
 
     template <typename T>
@@ -139,6 +186,17 @@ namespace ceinms {
         ans.labels_ = lhs.labels_;
         ans.time_.assign(lhs.time_.begin(), lhs.time_.begin() + ans.nRows_);
         return ans;
+    }
+
+    template <typename T>
+    std::vector<double> DataTable<T>::accumulateColumns() const {
+        std::vector<double> accum(nRows_, 0.);
+        for (std::size_t row(0); row < nRows_; ++row) {
+            for (std::size_t col(0); col < nCols_; ++col) {
+                accum[row] += at(row, col);
+            }
+        }
+        return accum;
     }
 
     template <typename T>
@@ -179,7 +237,7 @@ namespace ceinms {
     template <typename T>
     DataTable<T>  DataTable<T>::multiplyByScalar(const DataTable<T>& lhs, T scalar) {
 
-        DataTable<T> ans(lhs.getNRows());
+        DataTable<T> ans(lhs.getNRows(), lhs.getNColumns());
         for (size_t r(0); r < lhs.nRows_; ++r)
             for (size_t c(0); c < lhs.nCols_; ++c)
                 ans.at(r, c) = lhs.at(r, c)*scalar;
@@ -197,24 +255,40 @@ namespace ceinms {
             nRows_ == rhs.nRows_);
 
     }
+	
+	template<typename T>
+	void DataTable<T>::crop(double startTime, double finalTime) {
+		startTime = std::max(getStartTime(), startTime);
+		finalTime = std::min(getFinalTime(), finalTime);
+		auto tBegin = std::upper_bound(time_.begin(), time_.end(), startTime, std::less_equal<double>());
+		auto tEnd = std::upper_bound(time_.begin(), time_.end(), finalTime, std::less<double>());
+		auto dBegin = data_.begin();
+		auto dEnd = data_.end();
+
+		if (tBegin != time_.end()) {
+			auto d = std::distance(time_.begin(), tBegin);
+			dBegin = std::next(dBegin, d);
+		}
+
+		if (tEnd != time_.end() && std::next(tEnd, 1) != time_.end()) {
+			auto d = std::distance(time_.begin(), tEnd);
+			dEnd = std::next(data_.begin(), d);
+		}
+
+		time_.assign(tBegin, tEnd);
+		data_ = std::vector<std::vector<double>>(dBegin, dEnd);
+		nRows_ = time_.size();
+	}
 
     template<typename T>
-    void DataTable<T>::crop(double startTime, double stopTime) {
+    void DataTable<T>::print(const std::string& filename) {
 
-        auto timeStartIt = std::lower_bound(time_.begin(), time_.end(), startTime);
-        auto timeStopIt = std::upper_bound(time_.begin(), time_.end(), stopTime);
-        if (timeStartIt == time_.end() || timeStopIt == time_.end()) {
-            std::cout << "WARNING: Cannot crop DataTable\n";
-            return;
+        std::ofstream f(filename);
+        if (!f.is_open()) {
+            std::cout << "Cannot print DataTable to file " << filename << std::endl;
         }
-        auto startIdx = std::distance(time_.begin(), timeStartIt);
-        auto stopIdx = std::distance(time_.begin(), timeStopIt);
-        time_ = std::vector<double>(timeStartIt, timeStopIt);
-        auto dataStartIt = std::next(data_.begin(), startIdx);
-        auto dataStopIt = std::next(data_.begin(), stopIdx);
-        data_ = std::vector<std::vector<T>>(dataStartIt, dataStopIt);
-        nRows_ = data_.size();
-
+        f << *this;
+        f.close();
     }
 
     template<typename T>

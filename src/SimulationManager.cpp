@@ -71,12 +71,88 @@
 #include "ceinms/ArrayConverter.h"
 
 #include "ceinms/Hybrid/NMSmodelFrameOptimisation.h"
+#include "ceinms/TrialData.h"
+#include "ceinms/QueuesToTrialData.h"
+
+#include "ceinms/BatchEvaluator.h"
+#include "ceinms/FileUtils.h"
+
 #include <string>
 using std::string;
 
 #include <iostream>
 using std::cout;
 using std::endl;
+#include <algorithm>
+using std::end;
+using std::begin;
+
+
+
+double rmse(const std::vector<double>& v1, const std::vector<double>& v2) {
+
+    double sum = 0;
+    for (int i(0); i < v1.size(); ++i) {
+        sum += (v1[i] - v2[i])*(v1[i] - v2[i]);
+    }
+    sum /= v1.size();
+    return std::sqrt(sum);
+
+}
+
+template<typename NMSmodelT>
+ceinms::TrialData readTrialData(ceinms::InputDataXmlReader dataLocations, NMSmodelT& mySubject, const string& emgGeneratorFile) {
+
+    ceinms::EmgQueue emgQueue;
+    ceinms::LmtQueue lmtQueue;
+    ceinms::ExternalTorquesQueue externalTorqueQueue;
+    ceinms::MultipleMomentArmsQueues momentArmsQueues;
+
+    ceinms::Concurrency::Latch doneWithSubscription;
+    ceinms::Concurrency::Latch doneWithExecution;
+
+    string emgFilename(dataLocations.getExcitationsFile());
+    ceinms::EmgFromFile emgProducer(emgQueue, doneWithSubscription, doneWithExecution, mySubject, emgFilename, emgGeneratorFile);
+
+    vector< string > dofNames;
+    mySubject.getDoFNames(dofNames);
+    vector< string > maFilename;
+    ceinms::FileUtils::sortMaFilenames(dataLocations.getMaFiles(), dofNames, maFilename);
+    ceinms::LmtMaFromStorageFile lmtMaProducer(lmtQueue, momentArmsQueues, doneWithSubscription, doneWithExecution, mySubject, dataLocations.getLmtFile(), maFilename);
+
+    string externalTorqueFilename(dataLocations.getExternalTorqueFile());
+    ceinms::ExternalTorquesFromStorageFile externalTorquesProducer(externalTorqueQueue, doneWithSubscription, doneWithExecution, mySubject, externalTorqueFilename);
+
+    ceinms::QueuesToTrialData queuesToTrialData(emgQueue, lmtQueue, externalTorqueQueue, momentArmsQueues, doneWithSubscription, doneWithExecution, mySubject, "");
+
+    doneWithSubscription.setCount(4);
+    doneWithExecution.setCount(4);
+
+    // 4. start the threads
+    std::thread emgProdThread(std::ref(emgProducer));
+    std::thread externalTorquesProdThread(std::ref(externalTorquesProducer));
+    std::thread lmtMaProdThread(std::ref(lmtMaProducer));
+    std::thread queuesToTrialDataThread(std::ref(queuesToTrialData));
+
+    emgProdThread.join();
+    lmtMaProdThread.join();
+    externalTorquesProdThread.join();
+    queuesToTrialDataThread.join();
+
+    if (!queuesToTrialData.getTrialData().isConsistent())
+    {
+        std::cout << "ERROR: No data was read for trial " << std::endl;
+        exit(EXIT_FAILURE);
+    }
+
+    ceinms::TrialData trial(queuesToTrialData.getTrialData());
+    if (mySubject.hasOpenSimModel())
+        trial.setOpenSimData(mySubject.getOpenSimModelFilename(), dataLocations.getExternalLoadsFile(), dataLocations.getMotionFile());
+    return trial;
+}
+
+
+
 
 namespace ceinms {
 
@@ -145,7 +221,7 @@ namespace ceinms {
         vector< string > dofNames;
         mySubject.getDoFNames(dofNames);
         vector< string > maFilename;
-        sortMaFilenames(dataLocations_.getMaFiles(), dofNames, maFilename);
+        ceinms::FileUtils::sortMaFilenames(dataLocations_.getMaFiles(), dofNames, maFilename);
         LmtMaFromStorageFile lmtMaProducer(lmtQueue, momentArmsQueues, doneWithSubscriptionsLatch, doneWithExecutionLatch, mySubject, dataLocations_.getLmtFile(), maFilename);
 		lmtMaProducer.setStartStopTimes(dataLocations_.getStartTime(), dataLocations_.getStopTime());
         string externalTorqueFilename(dataLocations_.getExternalTorqueFile());
@@ -270,7 +346,7 @@ namespace ceinms {
         vector< string > dofNames;
         mySubject.getDoFNames(dofNames);
         vector< string > maFilename;
-        sortMaFilenames(dataLocations_.getMaFiles(), dofNames, maFilename);
+        ceinms::FileUtils::sortMaFilenames(dataLocations_.getMaFiles(), dofNames, maFilename);
         LmtMaFromStorageFile lmtMaProducer(lmtQueue, momentArmsQueues, doneWithSubscriptionsLatch, doneWithExecutionLatch, mySubject, dataLocations_.getLmtFile(), maFilename);
 		lmtMaProducer.setStartStopTimes(dataLocations_.getStartTime(), dataLocations_.getStopTime());
 
@@ -444,7 +520,7 @@ namespace ceinms {
         vector< string > dofNames;
         mySubject.getDoFNames(dofNames);
         vector< string > maFilename;
-        sortMaFilenames(dataLocations_.getMaFiles(), dofNames, maFilename);
+        ceinms::FileUtils::sortMaFilenames(dataLocations_.getMaFiles(), dofNames, maFilename);
         LmtMaFromStorageFile lmtMaProducer(lmtQueue, momentArmsQueues, doneWithSubscriptionsLatch, doneWithExecutionLatch, mySubject, dataLocations_.getLmtFile(), maFilename);
 		lmtMaProducer.setStartStopTimes(dataLocations_.getStartTime(), dataLocations_.getStopTime());
 
@@ -506,10 +582,10 @@ namespace ceinms {
         if (useContactForces) {
             switch (contactModelCfg_.getContactModelType()) {
             case ContactModelType::OpenSim:
-                runHybridWithGenericContactModel <NMSmodelT>();
+                runHybridWithGenericContactModel<NMSmodelT>();
                 break;
             case ContactModelType::KneeBalance:
-				runHybridWithKneeBalanceContactModel <NMSmodelT>();
+                runHybridWithKneeBalanceContactModel<NMSmodelT>();
                 break;
             }
         }
@@ -559,7 +635,7 @@ namespace ceinms {
         vector< string > dofNames;
         mySubject.getDoFNames(dofNames);
         vector< string > maFilename;
-        sortMaFilenames(dataLocations_.getMaFiles(), dofNames, maFilename);
+        ceinms::FileUtils::sortMaFilenames(dataLocations_.getMaFiles(), dofNames, maFilename);
         LmtMaFromStorageFile lmtMaProducer(lmtQueue, momentArmsQueues, doneWithSubscriptionsLatch, doneWithExecutionLatch, mySubject, dataLocations_.getLmtFile(), maFilename);
 		lmtMaProducer.setStartStopTimes(dataLocations_.getStartTime(), dataLocations_.getStopTime());
 
@@ -584,16 +660,17 @@ namespace ceinms {
 			
         QueuesToStorageFiles queuesToStorageFiles(logQueue, doneWithSubscriptionsLatch, doneWithExecutionLatch, mySubject, valuesToWrite, outputDirectory_);
 
-
-
-        // 4. define the optimiser
+		// 4. define the optimiser
         EmgInformedObjectiveFunctionSetup setup;
+
         executionCfg_.getMusclesToAdjust(setup.musclesToAdjust);
         executionCfg_.getMusclesToSynthesise(setup.musclesToSynthesise);
         executionCfg_.getHybridWeightings(setup.weightings.alpha, setup.weightings.beta, setup.weightings.gamma);
-        NMSmodelFrameOptimisation<NMSmodelT> errorMinimizer(mySubject, setup);
+        executionCfg_.getDofSet(setup.dofsToTrack);
+        if (setup.dofsToTrack.empty())
+            setup.dofsToTrack = mySubject.getDoFNames();
 
-   
+        NMSmodelFrameOptimisation<NMSmodelT> errorMinimizer(mySubject, setup); 
         ModelEvaluationHybrid<NMSmodelT, NMSmodelFrameOptimisation<NMSmodelT>, LoggerOnQueues> simulator(
             emgQueue,
             lmtQueue,
@@ -658,39 +735,11 @@ namespace ceinms {
             "ContactForces",
             outputDirectory_);
 
-        /*    QueueToStorageFile<VecContactForcesData> intersegmentalForcesLogger(
-        intersegmentalForcesQueue,
-        doneWithSubscriptionsLatch,
-        doneWithExecutionLatch,
-        contactModelSetup.joints,
-        "IntersegmentalForces",
-        outputDirectory_);
-        */
         OpenSim::Model osimModel(osimModelFilename);
         OpenSim::Array<std::string> osimCoordNames;
         osimModel.getCoordinateSet().getNames(osimCoordNames);
         std::vector<std::string> coordNames;
         ArrayConverter::toStdVector(osimCoordNames, coordNames);
-   /*     QueueToStorageFile<ExternalTorquesData> externalTorquesLogger(
-            torquesFromIDQueue,
-            doneWithSubscriptionsLatch,
-            doneWithExecutionLatch,
-            coordNames,
-            "ExternalTorques",
-            outputDirectory_);*/
-
-  /*      cout << "-- Initialise Inverse Dynamics" << endl;
-        QueuesToInverseDynamics inverseDynamicsSolver(
-            generalisedCoordinatesQueue,
-            externalForcesQueue,
-            torquesFromIDQueue,
-            doneWithSubscriptionsLatch,
-            doneWithExecutionLatch,
-            mySubject,
-            osimModelFilename,
-            dataLocations_.getExternalLoadsFile(),
-            false);
-*/
 
         doneWithSubscriptionsLatch.setCount(10);
         doneWithExecutionLatch.setCount(10);
@@ -707,8 +756,7 @@ namespace ceinms {
         std::thread externalForcesThread(std::ref(externalForcesFromStorageFile));
         std::thread contactForcesLoggerThread(std::ref(contactForcesLogger));
 		std::thread hybridErrorLoggerThread(std::ref(hybridErrorLogger));
-     //   std::thread inverseDynamicsSolverThread(std::ref(inverseDynamicsSolver));
-     //   std::thread externalTorquesLoggerThread(std::ref(externalTorquesLogger));
+
 
         emgProdThread.join();
         lmtMaProdThread.join();
@@ -720,9 +768,6 @@ namespace ceinms {
         externalForcesThread.join();
         contactForcesLoggerThread.join();
 		hybridErrorLoggerThread.join();
- //       inverseDynamicsSolverThread.join();
- //       externalTorquesLoggerThread.join();
-
 
         return 0;
 
@@ -755,7 +800,7 @@ namespace ceinms {
 		vector< string > dofNames;
 		mySubject.getDoFNames(dofNames);
 		vector< string > maFilename;
-		sortMaFilenames(dataLocations_.getMaFiles(), dofNames, maFilename);
+		ceinms::FileUtils::sortMaFilenames(dataLocations_.getMaFiles(), dofNames, maFilename);
 		LmtMaFromStorageFile lmtMaProducer(
 			lmtQueue,
 			momentArmsQueues,
@@ -798,6 +843,9 @@ namespace ceinms {
 		executionCfg_.getMusclesToAdjust(setup.musclesToAdjust);
 		executionCfg_.getMusclesToSynthesise(setup.musclesToSynthesise);
 		executionCfg_.getHybridWeightings(setup.weightings.alpha, setup.weightings.beta, setup.weightings.gamma);
+		executionCfg_.getDofSet(setup.dofsToTrack);
+		if (setup.dofsToTrack.empty())
+			setup.dofsToTrack = mySubject.getDoFNames();
 		NMSmodelFrameOptimisation<NMSmodelT> errorMinimizer(mySubject, setup);
 
 
@@ -869,7 +917,7 @@ namespace ceinms {
 
 		return 0;
 	}
-
+		
 
     template <typename NMSmodelT>
     bool SimulationManager::runHybrid() {
@@ -898,7 +946,7 @@ namespace ceinms {
         vector< string > dofNames;
         mySubject.getDoFNames(dofNames);
         vector< string > maFilename;
-        sortMaFilenames(dataLocations_.getMaFiles(), dofNames, maFilename);
+        ceinms::FileUtils::sortMaFilenames(dataLocations_.getMaFiles(), dofNames, maFilename);
         LmtMaFromStorageFile lmtMaProducer(lmtQueue, momentArmsQueues, doneWithSubscriptionsLatch, doneWithExecutionLatch, mySubject, dataLocations_.getLmtFile(), maFilename);
 		lmtMaProducer.setStartStopTimes(dataLocations_.getStartTime(), dataLocations_.getStopTime());
 
@@ -923,31 +971,18 @@ namespace ceinms {
 
         QueuesToStorageFiles queuesToStorageFiles(logQueue, doneWithSubscriptionsLatch, doneWithExecutionLatch, mySubject, valuesToWrite, outputDirectory_);
 
-
         // 4. define the optimiser
         EmgInformedObjectiveFunctionSetup setup;
+    
         executionCfg_.getMusclesToAdjust(setup.musclesToAdjust);
         executionCfg_.getMusclesToSynthesise(setup.musclesToSynthesise);
         executionCfg_.getHybridWeightings(setup.weightings.alpha, setup.weightings.beta, setup.weightings.gamma);
-        NMSmodelFrameOptimisation<NMSmodelT> errorMinimizer(mySubject, setup);
+        executionCfg_.getDofSet(setup.dofsToTrack);
+        if (setup.dofsToTrack.empty())
+            setup.dofsToTrack = mySubject.getDoFNames();
 
-        /*OLD*/
-        /*
-        typedef Hybrid::ErrorMinimizerAnnealing<NMSmodelT> MyErrorMinimizer;
-        MyErrorMinimizer errorMinimizer(mySubject);
-        HybridWeightings weightings;
-        
-        errorMinimizer.setWeightings(weightings);
-        vector<string> toSynth, toAdjust;
-        executionCfg_.getMusclesToSynthesise(toSynth);
-        executionCfg_.getMusclesToAdjust(toAdjust);
-        errorMinimizer.setMusclesNamesWithEmgToPredict(toSynth);
-        errorMinimizer.setMusclesNamesWithEmgToTrack(toAdjust);
-        double rt, t, epsilon;
-        unsigned noEpsilon, ns, nt, maxNoEval;
-        executionCfg_.getAnnealingParameters(nt, ns, rt, t, maxNoEval, epsilon, noEpsilon);
-        errorMinimizer.setAnnealingParameters(nt, ns, rt, t, maxNoEval, epsilon, noEpsilon);
-        */
+     
+        NMSmodelFrameOptimisation<NMSmodelT> errorMinimizer(mySubject, setup);
 
 
         ModelEvaluationHybrid<NMSmodelT, NMSmodelFrameOptimisation<NMSmodelT>, LoggerOnQueues> simulator(
@@ -1002,32 +1037,16 @@ namespace ceinms {
             exitFlag = runOpenLoop < NMSmodel<ExponentialActivation, StiffTendon, CurveMode::Online>, ModelEvaluationOnline, LoggerOnQueues >(hasContactModel_);
             break;
 
-        case NMSModelCfg::OpenLoopExponentialActivationStiffTendonOffline:
-            exitFlag = runOpenLoop < NMSmodel<ExponentialActivation, StiffTendon, CurveMode::Offline>, ModelEvaluationOffline, LoggerOnQueues >(hasContactModel_);
-            break;
-
         case NMSModelCfg::OpenLoopExponentialActivationElasticTendonBiSecOnline:
             exitFlag = runOpenLoop<NMSmodel<ExponentialActivation, ElasticTendon_BiSec, CurveMode::Online>, ModelEvaluationOnline, LoggerOnQueues>(hasContactModel_);
-            break;
-
-        case NMSModelCfg::OpenLoopExponentialActivationElasticTendonBiSecOffline:
-            exitFlag = runOpenLoop<NMSmodel<ExponentialActivation, ElasticTendon_BiSec, CurveMode::Offline>, ModelEvaluationOffline, LoggerOnQueues >(hasContactModel_);
             break;
 
         case NMSModelCfg::OpenLoopPiecewiseActivationStiffTendonOnline:
             exitFlag = runOpenLoop<NMSmodel<PiecewiseActivation, StiffTendon, CurveMode::Online>, ModelEvaluationOnline, LoggerOnQueues>(hasContactModel_);
             break;
 
-        case NMSModelCfg::OpenLoopPiecewiseActivationStiffTendonOffline:
-            exitFlag = runOpenLoop<NMSmodel<PiecewiseActivation, StiffTendon, CurveMode::Offline>, ModelEvaluationOffline, LoggerOnQueues >(hasContactModel_);
-            break;
-
         case NMSModelCfg::OpenLoopPiecewiseActivationElasticTendonBiSecOnline:
             exitFlag = runOpenLoop<NMSmodel<PiecewiseActivation, ElasticTendon_BiSec, CurveMode::Online>, ModelEvaluationOnline, LoggerOnQueues>(hasContactModel_);
-            break;
-
-        case NMSModelCfg::OpenLoopPiecewiseActivationElasticTendonBiSecOffline:
-            exitFlag = runOpenLoop<NMSmodel<PiecewiseActivation, ElasticTendon_BiSec, CurveMode::Offline>, ModelEvaluationOffline, LoggerOnQueues >(hasContactModel_);
             break;
 
         case NMSModelCfg::HybridExponentialActivationStiffTendonOnline:
@@ -1055,20 +1074,4 @@ namespace ceinms {
         return exitFlag;
     }
 
-    void SimulationManager::sortMaFilenames(const std::map<std::string, std::string>& maMap, const std::vector< std::string >& dofNames, std::vector< std::string >& maDataFilenames)
-    {
-        int currentDof = 0;
-        for (auto& it : dofNames)
-        {
-            try
-            {
-                maDataFilenames.push_back(maMap.at(it));
-            }
-            catch (std::out_of_range)
-            {
-                std::cerr << "Could not find moment arm file for " << it << " degree of freedom" << std::endl;
-                exit(EXIT_FAILURE);
-            }
-        }
-    }
 }

@@ -26,12 +26,13 @@ set(OutputConnectors_HEADERS
     ceinms/QueueToStorageFile.h
 	ceinms/websocket/QueuesToWebsocket.h
 	ceinms/websocket/communication.h
+    ceinms/QueueToDataTable.h
 )
 
 
 set(OutputConnectors_TEMPLATE_IMPLEMENTATION
     ceinms/QueueToStorageFile.cpp
-
+    ceinms/QueueToDataTable.cpp
 	)
   
 find_package(protobuf CONFIG REQUIRED)
@@ -82,8 +83,7 @@ target_include_directories(OutputConnectors
 										${FileIO_INCLUDE_DIRS}
 										${GeneratedProtobuf_INCLUDE_DIRS}
                                 PUBLIC  ${Boost_INCLUDE_DIRS}
-								        ${OPENSIM_INCLUDE_DIRS}
-                                        ${SIMTK_INCLUDE_DIRS})
+								        ${OPENSIMSIMBODY_INCLUDE_DIRS})
 
 # Save path to include directory for "internal" usage
 set(OutputConnectors_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}" CACHE INTERNAL "Include directories for OutputConnectors library")

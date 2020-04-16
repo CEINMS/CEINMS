@@ -53,52 +53,79 @@
       <xs:element name="activation" type="ActivationType"/>
     </xs:sequence>
   </xs:complexType>
+
+  <xs:simpleType name="TokenListType">
+    <xs:list itemType="xs:token"/>
+  </xs:simpleType>
+
   <xs:simpleType name="TrialSetType">
     <xs:list itemType="xs:string"/>
   </xs:simpleType>
-  
-  
-  <xs:complexType name="BarrierType" >
+
+  <xs:simpleType name="CalibrationTargetType">
+    <xs:restriction base="xs:token">
+      <xs:enumeration value="torque"/>
+      <xs:enumeration value="activation"/>
+      <xs:enumeration value="normalisedFibreLength"/>
+      <xs:enumeration value="normalisedFibreVelocity"/>
+      <xs:enumeration value="pennationAngle"/>
+      <xs:enumeration value="contactForce"/>
+      <xs:enumeration value="genericContactForce"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="TwoDoublesType">
+    <xs:list itemType="xs:double"/>
+  </xs:simpleType>
+
+  <xs:complexType name="RangeType">
     <xs:sequence>
-      <xs:element name="targetName" minOccurs="1" maxOccurs="1" type="xs:token"/>
-      <xs:element name="range"  minOccurs="1" maxOccurs="1" type="TwoDoublesType"/>
+      <xs:element name="range" type="TwoDoublesType"/>
     </xs:sequence>
-  <xs:attribute type="xs:double" name="weight" use="optional" default="1"/>
-  <xs:attribute type="xs:double" name="exponent" use="optional" default="2" />
   </xs:complexType>
-    
-  <xs:complexType name="ObjectiveFunctionElementType">
-   <xs:sequence>
-      <xs:element name="barrier" minOccurs="0" maxOccurs="unbounded" type="BarrierType"/>
-   </xs:sequence>
+
+  <xs:complexType name="DeprecatedObjectiveFunctionElementType">
     <xs:attribute type="xs:double" name="weight" use="optional" default="1"/>
     <xs:attribute type="xs:double" name="exponent" use="optional" default="1" />
+  </xs:complexType>
+
+      <xs:complexType name="TorqueErrorObjectiveFunctionElementType">
+    <xs:sequence>
+      <xs:element name="targets" minOccurs="1" maxOccurs="1" type="TokenListType"/>
+      <xs:element name="weight" minOccurs="0" maxOccurs="1" type="xs:double"  default="1"/>
+      <xs:element name="exponent" minOccurs="0" maxOccurs="1" type="xs:double"  default="1"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="GenericObjectiveFunctionElementType">
+   <xs:sequence>
+     <xs:element name="targets" minOccurs="1" maxOccurs="1" type="TokenListType"/>
+     <xs:element name="targetsType" minOccurs="1" maxOccurs="1" type="CalibrationTargetType"/>
+     <xs:element name="weight" minOccurs="0" maxOccurs="1" type="xs:double"  default="1"/>
+     <xs:element name="exponent" minOccurs="0" maxOccurs="1" type="xs:double"  default="1"/>
+   </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="PenaltyObjectiveFunctionElementType">
+    <xs:sequence>
+      <xs:element name="targets" minOccurs="1" maxOccurs="1" type="TokenListType"/>
+      <xs:element name="targetsType" minOccurs="1" maxOccurs="1" type="CalibrationTargetType"/>
+      <xs:element name="weight" minOccurs="0" maxOccurs="1" type="xs:double"  default="1"/>
+      <xs:element name="exponent" minOccurs="0" maxOccurs="1" type="xs:double"  default="1"/>
+      <xs:element name="range" minOccurs="1" maxOccurs="1" type="TwoDoublesType"/>
+    </xs:sequence>
   </xs:complexType>
   
   <xs:complexType name="GlobalParameterType"/>
 
-  <xs:simpleType name="SingleParameterType">
-    <xs:list itemType="xs:token"/>
-  </xs:simpleType>
-  
+ 
   <xs:complexType name="ObjectiveFunctionType">
-    <xs:choice>
-      <xs:element name="minimizeTorqueError" type="ObjectiveFunctionElementType"/>
-      <xs:element name="sumKneeContactForces" type="ObjectiveFunctionElementType"/>
-      <xs:element name="torqueErrorAndSumKneeContactForces" type="ObjectiveFunctionElementType"/>
-      <xs:element name="torqueErrorAndSumGenericContactForces" type="ObjectiveFunctionElementType"/>
-    </xs:choice>
-  </xs:complexType>
-  <xs:simpleType name="DoFsType">
-    <xs:list itemType="xs:token"/>
-  </xs:simpleType>
-  <xs:simpleType name="TwoDoublesType">
-    <xs:list itemType="xs:double"/>
-  </xs:simpleType>
-  
-  <xs:complexType name="RangeType">
     <xs:sequence>
-       <xs:element name="range" type="TwoDoublesType"/>
+      <!-- minimizeTorqueError is kept only for compatibility purposes-->
+      <xs:element name="minimizeTorqueError" minOccurs="0" maxOccurs="1" type="DeprecatedObjectiveFunctionElementType"/>
+      <xs:element name="torqueErrorNormalised" minOccurs="0" maxOccurs="unbounded" type="TorqueErrorObjectiveFunctionElementType"/>
+      <xs:element name="maxPeak" minOccurs="0" maxOccurs="unbounded" type="GenericObjectiveFunctionElementType"/>
+      <xs:element name="penalty" minOccurs="0" maxOccurs="unbounded" type="PenaltyObjectiveFunctionElementType"/>
     </xs:sequence>
   </xs:complexType>
 
@@ -120,13 +147,10 @@
       <xs:enumeration value="activationScale"/>
     </xs:restriction>
   </xs:simpleType>
-  
-  <xs:simpleType name="MuscleListType">
-    <xs:list itemType="xs:token"/>
-  </xs:simpleType>
+
   <xs:complexType name="MuscleGroupsType">
     <xs:sequence>
-      <xs:element minOccurs="1" maxOccurs="unbounded" name="muscles" type="MuscleListType"/>
+      <xs:element minOccurs="1" maxOccurs="unbounded" name="muscles" type="TokenListType"/>
     </xs:sequence>
   </xs:complexType>
   <xs:complexType name="ParameterType">
@@ -135,7 +159,7 @@
       <xs:choice>
         <xs:element name="muscleGroups" type="MuscleGroupsType"/>
         <xs:element name="global" type="GlobalParameterType"/>
-        <xs:element name="single" type="SingleParameterType"/>
+        <xs:element name="single" type="TokenListType"/>
       </xs:choice>
       <xs:choice>
         <xs:element name="absolute" type="RangeType"/>
@@ -150,7 +174,8 @@
   </xs:complexType>
   <xs:complexType name="StepType">
     <xs:sequence>
-      <xs:element name="dofs" type="DoFsType"/>
+      <!-- dofs are kept only for compatibility purposes-->
+      <xs:element name="dofs"  minOccurs="0" maxOccurs="1" type="TokenListType"/>
       <xs:element name="objectiveFunction" type="ObjectiveFunctionType"/>
       <xs:element name="parameterSet" type="parameterSetType"/>
     </xs:sequence>

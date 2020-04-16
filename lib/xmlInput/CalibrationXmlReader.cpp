@@ -39,6 +39,8 @@ using std::endl;
 #include "validation.h"
 #include <boost/algorithm/string.hpp>
 #include "ceinms/FileUtils.h"
+#include <vector>
+using std::vector;
 using namespace CalibrationXsd;
 
 namespace ceinms {
@@ -68,8 +70,7 @@ namespace ceinms {
 
 
     void CalibrationXmlReader::readXml() {
-
-
+        
         readNMSmodelCfg();
         readOptimizationAlgorithmCfg();
         readCalibrationStepsCfg();
@@ -154,90 +155,100 @@ namespace ceinms {
         CalibrationType::calibrationSteps_type::step_sequence& stepSequence(myCalibrationSteps.step());
         CalibrationType::calibrationSteps_type::step_iterator stepIt = stepSequence.begin();
         for (stepIt; stepIt != stepSequence.end(); ++stepIt) {
-            CalibrationStep calibrationStep;
-            readStep(*stepIt, calibrationStep);
+            CalibrationStep calibrationStep = readStep(*stepIt);
             calibrationSteps_.push_back(calibrationStep);
         }
-
     }
 
 
-    void CalibrationXmlReader::readStep(StepType& step, CalibrationStep& calibrationStep) {
+    CalibrationStep CalibrationXmlReader::readStep(const StepType& step) {
 
-        DoFsType& myDofs(step.dofs());
-        DoFsType::iterator dofIt = myDofs.begin();
-        for (dofIt; dofIt != myDofs.end(); ++dofIt)
-            calibrationStep.pushDofName(*dofIt);
-        ObjectiveFunctionType& myObjFuc(step.objectiveFunction());
-        
-        myObjFuc.minimizeTorqueError().present();
+        using TargetTypeMap = std::map<std::string, CalibrationTargetType>;
 
-       // ObjectiveFunctionElementType& myObjFuncMinTorqueError(myObjFuc.minimizeTorqueError());
+        TargetTypeMap targetType = {
+            { "activation", CalibrationTargetType::Activation},
+            { "genericContactForce", CalibrationTargetType::GenericContactForce },
+            { "normalisedFibreLength", CalibrationTargetType::NormalisedFibreLength},
+            { "normalisedFibreVelocity", CalibrationTargetType::NormalisedFibreVelocity},
+            { "pennationAngle", CalibrationTargetType::PennationAngle },
+            { "scalarContactForce", CalibrationTargetType::ScalarContactForce},
+            { "torque", CalibrationTargetType::Torque },
+            { "none", CalibrationTargetType::None }
+        };
+
+        CalibrationStep calibrationStep;
+        const ObjectiveFunctionType& myObjFuc(step.objectiveFunction());
 
         if (myObjFuc.minimizeTorqueError().present()){
-            calibrationStep.setObjectiveFunction(CalibrationCfg::MinimizeTorqueError, 
-                myObjFuc.minimizeTorqueError()->weight(), 
-                myObjFuc.minimizeTorqueError()->exponent());
-        }
-        else if (myObjFuc.sumKneeContactForces().present()) {
-            calibrationStep.setObjectiveFunction(CalibrationCfg::SumKneeContactForces,
-                myObjFuc.sumKneeContactForces()->weight(),
-                myObjFuc.sumKneeContactForces()->exponent());
-            calibrationStep.setBarrierList(readBarrierList(myObjFuc.sumKneeContactForces().get()));
-        }
-        else if (myObjFuc.torqueErrorAndSumKneeContactForces().present()) {
-            calibrationStep.setObjectiveFunction(CalibrationCfg::TorqueErrorAndSumKneeContactForces,
-                myObjFuc.torqueErrorAndSumKneeContactForces()->weight(),
-                myObjFuc.torqueErrorAndSumKneeContactForces()->exponent());
-            calibrationStep.setBarrierList(readBarrierList(myObjFuc.torqueErrorAndSumKneeContactForces().get()));
-
-        }
-        else if (myObjFuc.torqueErrorAndSumGenericContactForces().present()) {
-            calibrationStep.setObjectiveFunction(CalibrationCfg::TorqueErrorAndSumGenericContactForces,
-                myObjFuc.torqueErrorAndSumGenericContactForces()->weight(),
-                myObjFuc.torqueErrorAndSumGenericContactForces()->exponent());
-            calibrationStep.setBarrierList(readBarrierList(myObjFuc.torqueErrorAndSumGenericContactForces().get()));
+            const TokenListType& myDofs(step.dofs().get());
+            TokenListType::const_iterator dofIt = myDofs.begin();
+            vector<string> dofNames;
+            for (dofIt; dofIt != myDofs.end(); ++dofIt)
+                dofNames.push_back(*dofIt);
+            std::shared_ptr<ObjectiveFunctionSetup> obf(
+                new ObjectiveFunctionSetup(
+                    CalibrationObjectiveFunction::TorqueErrorNormalised,
+                    CalibrationTargetType::Torque,
+                    dofNames, 1, 1));
+            calibrationStep.objFunctionsSetup_.push_back(obf);
         }
 
-        StepType::parameterSet_type::parameter_sequence& parameterSequence = step.parameterSet().parameter();
-        StepType::parameterSet_type::parameter_iterator parIt = parameterSequence.begin();
-        for (parIt; parIt != parameterSequence.end(); ++parIt) {
-            Parameter parameter;
-            readParameter(*parIt, parameter);
-            calibrationStep.pushParameter(parameter);
+        for (auto& objElement : myObjFuc.torqueErrorNormalised()) {
+            vector<string> targets;
+            for (auto& t : objElement.targets())
+                targets.push_back(t);
+            std::shared_ptr<ObjectiveFunctionSetup> obf(
+                new ObjectiveFunctionSetup(
+                    CalibrationObjectiveFunction::TorqueErrorNormalised,
+                    CalibrationTargetType::Torque,
+                    targets, objElement.weight().get(), objElement.exponent().get()));
+            calibrationStep.objFunctionsSetup_.push_back(obf);
         }
+
+        for (auto& objElement : myObjFuc.maxPeak()) {
+            vector<string> targets;
+            for (auto& t : objElement.targets())
+                targets.push_back(t);
+
+            std::shared_ptr<ObjectiveFunctionSetup> obf(
+                new ObjectiveFunctionSetup(
+                    CalibrationObjectiveFunction::MaxPeak,
+                    targetType[objElement.targetsType()],
+                    targets, objElement.weight().get(), objElement.exponent().get()));
+            calibrationStep.objFunctionsSetup_.push_back(obf);
+        }
+
+        for (auto& objElement : myObjFuc.penalty()) {
+            vector<string> targets;
+            for (auto& t : objElement.targets())
+                targets.push_back(t);
+
+            std::shared_ptr<ObjectiveFunctionSetup> obf(
+                new PenaltyObjectiveFunctionSetup(
+                    targetType[objElement.targetsType()],
+                    targets, objElement.weight().get(), objElement.exponent().get(),
+                    *objElement.range().begin(), *(objElement.range().begin()+1)));
+            calibrationStep.objFunctionsSetup_.push_back(obf);
+        }
+        
+        const StepType::parameterSet_type::parameter_sequence& parameterSequence = step.parameterSet().parameter();
+        for (auto& par : parameterSequence) {
+            Parameter parameter =  readParameter(par);
+            calibrationStep.parameterSet_.push_back(parameter);
+        }
+        return calibrationStep;
     }
-    
-    BarrierListSetup CalibrationXmlReader::readBarrierList(CalibrationXsd::ObjectiveFunctionElementType& node) {
-
-        BarrierListSetup barrierListSetup;
-        auto it(std::begin(node.barrier()));
-        auto itE(std::end(node.barrier()));
-
-        for (it; it != itE; ++it) {
-            BarrierSetup barrierSetup;
-            barrierSetup.weight = it->weight();
-            barrierSetup.targetName = it->targetName();
-            barrierSetup.exponent = it->exponent();
-            auto xIt = it->range().begin();
-            barrierSetup.xL = *xIt;
-            barrierSetup.xR = *(xIt + 1);
-            barrierListSetup.barrierSetup.push_back(barrierSetup);
-        }
-        barrierListSetup.numOfBarriers = barrierListSetup.barrierSetup.size();
-        return barrierListSetup;
-    }
 
 
-    void CalibrationXmlReader::readParameter(ParameterType& parameterType, Parameter& parameter) {
+    Parameter CalibrationXmlReader::readParameter(const ParameterType& parameterType) {
 
+        Parameter parameter;
         parameter.setName(parameterType.name());
-        ParameterType::muscleGroups_optional& myMuscleGroupsOpt(parameterType.muscleGroups());
-        ParameterType::global_optional& myGlobaleParameterOpt(parameterType.global());
-        ParameterType::single_optional& mySingleParameterOpt(parameterType.single());
+        const ParameterType::muscleGroups_optional& myMuscleGroupsOpt(parameterType.muscleGroups());
+        const ParameterType::global_optional& myGlobaleParameterOpt(parameterType.global());
+        const ParameterType::single_optional& mySingleParameterOpt(parameterType.single());
         if (mySingleParameterOpt.present()) {
             parameter.setAssignment(Parameter::Single);
-
             auto it(parameterType.single()->begin());
             for (it; it != parameterType.single()->end(); ++it)
                 parameter.pushMuscleGroup(Parameter::MuscleNames{ *it });
@@ -247,32 +258,31 @@ namespace ceinms {
             parameter.setAssignment(Parameter::Global);
         else if (myMuscleGroupsOpt.present()) {
             parameter.setAssignment(Parameter::Grouped);
-            MuscleGroupsType::muscles_sequence& musclesSequence(parameterType.muscleGroups()->muscles());
-            MuscleGroupsType::muscles_iterator mgIt = musclesSequence.begin();
-
-            for (mgIt; mgIt != musclesSequence.end(); ++mgIt) {
-                Parameter::MuscleNames muscleNames;
-                for (MuscleListType::iterator it = mgIt->begin(); it != mgIt->end(); ++it)
-                    muscleNames.push_back(*it);
+            const MuscleGroupsType::muscles_sequence& musclesSequence(parameterType.muscleGroups()->muscles());
+            for (auto& ms : musclesSequence) {
+                std::list<string> muscleNames;
+                for (auto& name : ms)
+                    muscleNames.push_back(name);
                 parameter.pushMuscleGroup(muscleNames);
             }
         }
 
         ParameterType::absolute_optional myAbsoluteRangeOpt(parameterType.absolute());
-        ParameterType::relativeToSubjectValue_optional& myRelativeRangeOpt(parameterType.relativeToSubjectValue());
-        TwoDoublesType::iterator it;
+        const ParameterType::relativeToSubjectValue_optional& myRelativeRangeOpt(parameterType.relativeToSubjectValue());
+        TwoDoublesType::const_iterator it;
         if (myAbsoluteRangeOpt.present()) {
             parameter.setBoundariesType(Parameter::Absolute);
-            ParameterType::absolute_type::range_type& absoluteRange(parameterType.absolute()->range());
+            const ParameterType::absolute_type::range_type& absoluteRange(parameterType.absolute()->range());
             it = absoluteRange.begin();
         }
         else if (myRelativeRangeOpt.present()) {
             parameter.setBoundariesType(Parameter::RelativeToSubjectValue);
-            ParameterType::relativeToSubjectValue_type::range_type& relativeRange(parameterType.relativeToSubjectValue()->range());
+            const ParameterType::relativeToSubjectValue_type::range_type& relativeRange(parameterType.relativeToSubjectValue()->range());
             it = relativeRange.begin();
         }
 
         parameter.setLowerAndUpperLimits(*it, *(it + 1));
+        return parameter;
     }
 
 
@@ -329,63 +339,6 @@ namespace ceinms {
     }
 
 
-
-    void CalibrationStep::setObjectiveFunction(unsigned int objectiveFunction, double weight, double exponent) {
-
-        objectiveFunctionSetup_.objectiveFunctionId = objectiveFunction;
-        objectiveFunctionSetup_.weight = weight;
-        objectiveFunctionSetup_.exponent = exponent;
-
-    }
-
-    void CalibrationStep::setBarrierList(const BarrierListSetup& barrierListSetup) {
-
-        objectiveFunctionSetup_.barrierListSetup = barrierListSetup;
-    }
-
-    
-    CalibrationCfg::Step CalibrationStep::getStepCfg() const {
-
-        return static_cast<CalibrationCfg::Step>(objectiveFunctionSetup_.objectiveFunctionId);
-    }
-    
-
-    ObjectiveFunctionSetup CalibrationStep::getObjectiveFunctionSetup() const {
-
-        return objectiveFunctionSetup_;
-    }
-
-    void CalibrationStep::getDofNames(std::list< string >& dofNames) const {
-
-        dofNames = dofNames_;
-    }
-
-
-    void CalibrationStep::getDofNames(std::vector< string >& dofNames) const {
-
-        dofNames.assign(dofNames_.begin(), dofNames_.end());
-    }
-
-
-
-    void CalibrationStep::getParameterSet(ParameterSet& parameterSet) const {
-
-        parameterSet = parameterSet_;
-    }
-
-
-    void CalibrationStep::pushParameter(const Parameter& parameter) {
-
-        parameterSet_.push_back(parameter);
-    }
-
-
-    void CalibrationStep::pushDofName(string& dofName) {
-
-        dofNames_.push_back(dofName);
-    }
-
-
     std::ostream& operator<< (std::ostream& output, const CalibrationXmlReader& rhs) {
 
         output << "Calibration configuration\n";
@@ -407,33 +360,15 @@ namespace ceinms {
         output << " - NMSmodel\n";
         output << " - CalibrationSteps\n";
         std::list<CalibrationStep>::const_iterator csIt = rhs.calibrationSteps_.begin();
-        for (csIt; csIt != rhs.calibrationSteps_.end(); ++csIt)
-            output << " -- Step\n" << *(csIt);
+        for (csIt; csIt != rhs.calibrationSteps_.end(); ++csIt) {
+            output << " -- Step\n"; 
+            for (auto& objfElement : csIt->objFunctionsSetup_)
+                output << *objfElement;
+        }
         output << " - Trials\n";
         for (std::list<std::string>::const_iterator tIt = rhs.calibrationTrials_.begin(); tIt != rhs.calibrationTrials_.end(); ++tIt)
             output << " -- " << *tIt << std::endl;
         output << std::endl;
-        return output;
-    }
-
-
-    std::ostream& operator<< (std::ostream& output, const CalibrationStep& rhs) {
-
-        output << " --- DoFs: ";
-        std::list<std::string>::const_iterator dIt = rhs.dofNames_.begin();
-        for (dIt; dIt != rhs.dofNames_.end(); ++dIt)
-            output << *dIt << " ";
-        output << std::endl;
-        output << " --- Objective Function: ";
-        switch (rhs.objectiveFunctionSetup_.objectiveFunctionId) {
-        case (CalibrationCfg::MinimizeTorqueError) :
-            output << "Minimize Torque Error\n";
-            break;
-        default:
-            output << "Not Found\n";
-            break;
-        }
-
         return output;
     }
 }

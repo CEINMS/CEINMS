@@ -64,9 +64,6 @@ namespace ceinms {
         template <typename T>
         bool runHybrid();
 
-
-        static void sortMaFilenames(const std::map<std::string, std::string>& maMap, const std::vector< std::string >& dofNames, std::vector< std::string >& maDataFilenames);
-
         CeinmsSetupXmlReader ceinmsSetup_;
         InputDataXmlReader dataLocations_;
         ExecutionXmlReader executionCfg_;

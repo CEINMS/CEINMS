@@ -21,7 +21,7 @@ source_group("Source Files" FILES ${TrialData_TEMPLATE_IMPLEMENTATION} ${TrialDa
 add_library(TrialData ${TrialData_HEADERS} ${TrialData_TEMPLATE_IMPLEMENTATION} ${TrialData_SOURCE})
 target_include_directories( TrialData
                             PRIVATE 
-                                   ${OPENSIM_INCLUDE_DIRS}       
+                                   ${OPENSIMSIMBODY_INCLUDE_DIRS}       
                                    ${SIMTK_INCLUDE_DIRS}
                             #       ${NMSmodel_INCLUDE_DIRS}
                              #      ${Curve_INCLUDE_DIRS}

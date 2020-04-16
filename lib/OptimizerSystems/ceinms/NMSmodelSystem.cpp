@@ -37,23 +37,24 @@ namespace ceinms {
         NMSmodelSystem(NMSmodelT& subject,
         const std::vector<TrialData>& trials,
         const ObjectiveFunctionT& objectiveFunction,
-        const Parameter::Set& parameterSet,
-        const std::vector<std::string>& dofsToCalibrate) :
+        const Parameter::Set& parameterSet) :
         subject_(subject),
         batchEvaluator_(trials),
         batchOpenSimEvaluator_(nullptr),
         hasOpenSimData_(true),
+        hasContactModel_(false),
         objectiveFunction_(objectiveFunction),
-        parameterInterpreter_(subject, parameterSet, dofsToCalibrate),
-        dofsToCalibrate_(dofsToCalibrate),
-		evaluationCounter_(0),
-        f_(std::numeric_limits<double>::max()) {
+        parameterInterpreter_(subject, parameterSet, subject.getDoFNames()),
+        dofsFromSubject_(subject.getDoFNames()),
+        trialData_(trials),
+        f_(std::numeric_limits<double>::max()),
+		evaluationCounter_(0) {
 
         nParameters_ = parameterInterpreter_.getNoParameters();
         //all dofs in the subject by default
         //subject_.getDoFNames(dofsToCalibrate_);
         //parameterInterpreter_.setDofsToCalibrate(dofsToCalibrate_);
-        objectiveFunction_.setDofsToCalibrate(dofsToCalibrate_);
+
         objectiveFunction_.setTrials(trials);
 
         //the following is the trick for the parallel evaluation
@@ -67,19 +68,24 @@ namespace ceinms {
         }
         hasOpenSimData_ &= objectiveFunction_.calculateOpenSimData();
         if (hasOpenSimData_ ) {
-            batchOpenSimEvaluator_.reset(new BatchOpenSimEvaluator(trials));
+			try {
+				batchOpenSimEvaluator_.reset(new BatchOpenSimEvaluator(trials));
+			}
+			catch (OpenSim::Exception& e) {
+				e.print(std::cout);
+				exit(EXIT_FAILURE);
+
+			}
         }
     }
 
-    //NOTE: when using global o single parameters, only the calibrating dofs are considered
-    /*   template <typename NMSmodelT, typename ObjectiveFunctionT>
-       void NMSmodelSystem<NMSmodelT, ObjectiveFunctionT>::setDofsToCalibrate(const std::vector<std::string>& dofsToCalibrate) {
+    template <typename NMSmodelT, typename ObjectiveFunctionT>
+    void NMSmodelSystem<NMSmodelT, ObjectiveFunctionT>::setContactModelSetup(const ContactModelKneeBalanceSetup& setup) {
 
-       dofsToCalibrate_ = dofsToCalibrate;
-       parameterInterpreter_.setDofsToCalibrate(dofsToCalibrate_);
-       objectiveFunction_.setDofsToCalibrate(dofsToCalibrate_);
-       }
-       */
+        batchContactModelEvaluator_.initialize(trialData_, setup, dofsFromSubject_);
+        hasContactModel_ = true;
+    }
+
     template <typename NMSmodelT, typename ObjectiveFunctionT>
     void NMSmodelSystem<NMSmodelT, ObjectiveFunctionT>::getUpperLowerBounds(std::vector<double>& upperBounds, std::vector<double>& lowerBounds) const {
 
@@ -114,6 +120,11 @@ namespace ceinms {
             results = batchOpenSimEvaluator_->getResults();
         }
         
+        if (hasContactModel_) {
+
+            batchContactModelEvaluator_.evaluate(results);
+            batchContactModelEvaluator_.updateResults(results);
+        }
         objectiveFunction_.calculate(results);
         f_ = objectiveFunction_.getValue();
         //      std::cout << "f = " << f_ << endl;
@@ -122,17 +133,4 @@ namespace ceinms {
         //this is necessary for stats/error control..
 
     }
-
-	template <typename NMSmodelT, typename ObjectiveFunctionT>
-	void NMSmodelSystem<NMSmodelT, ObjectiveFunctionT>::printCosts() const { 
-		
-		objectiveFunction_.printCosts(); 
-		auto results = batchEvaluator_.getResults();
-		for (int i = 0; i < results.size(); ++i) {
-			std::ofstream outF("trial" + std::to_string(i) +"_torques_eval" + std::to_string(evaluationCounter_) + ".sto");
-			outF << results.at(i).torques;
-		}
-		std::ofstream outF("subject_eval" + std::to_string(evaluationCounter_) + ".log");
-		outF << subject_;
-	}
 }

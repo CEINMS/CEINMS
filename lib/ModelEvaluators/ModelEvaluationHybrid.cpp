@@ -173,7 +173,7 @@ namespace ceinms {
 				subject_.getNormTendonLengths(data);
 				ModelEvaluationBase<Logger>::logger.log(lmtMaTime, data, "NormTendonLengths");
                 subject_.getEmgs(data);
-                ModelEvaluationBase<Logger>::logger.log(emgTime, data, "AdjustedEmgs");
+                ModelEvaluationBase<Logger>::logger.log(emgTime-globalEmDelay_, data, "AdjustedEmgs");
                 data.clear();
                 for (unsigned i = 0; i < noDof_; ++i) {
                     vector<double> contribution;

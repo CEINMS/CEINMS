@@ -32,9 +32,9 @@
 #include <limits>
 #include "ceinms/TrialData.h"
 #include "Result.h"
-#include "MinTorqueError.h"
-#include "SumKneeContactForces.h"
-#include "Barrier.h"
+#include "TorqueErrorNormalisedObjectiveFunction.h"
+#include "PeakObjectiveFunction.h"
+#include "PenaltyObjectiveFunction.h"
 #include <cmath>
 #include "ceinms/ObjectiveFunctionBase.h"
 
@@ -45,7 +45,7 @@ namespace ceinms {
     public:
         MinTorqueErrorAndContactForces(const MinTorqueError& torqueErrorFun, const SumKneeContactForces& sumKneeContactFun);
         //     MinTorqueErrorAndContactForces();
-        void setDofsToCalibrate(const std::vector<std::string>& dofsToCalibrate) override;
+//        void setDofsToCalibrate(const std::vector<std::string>& dofsToCalibrate) override;
         void setTrials(const std::vector<TrialData>& trials) override;
         void calculate(const std::vector<Result>& results) override;
         double getValue() const override { return f_; }

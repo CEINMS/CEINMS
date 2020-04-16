@@ -26,42 +26,37 @@
 * limitations under the License.                                             *
 * -------------------------------------------------------------------------- */
 
-#ifndef ceinms_SumKneeContactForces_h
-#define ceinms_SumKneeContactForces_h
+#ifndef ceinms_MaxPeakObjectiveFunction_h
+#define ceinms_MaxPeakObjectiveFunction_h
 #include <vector>
 #include <string>
 #include "ceinms/TrialData.h"
 #include "Result.h"
-#include "ceinms/ContactModelKneeBalanceSetup.h"
-#include "ceinms/ContactModelKneeBalance.h"
-#include "ceinms/BarrierFunction.h"
-#include "ceinms/Mapper.h"
 #include "ceinms/ObjectiveFunctionSetup.h"
 #include "ceinms/ObjectiveFunctionBase.h"
 
 namespace ceinms {
 
-
-    class SumKneeContactForces : public ObjectiveFunctionBase {
+    // For each target name and each results, finds the max peak. 
+    // Peaks are elevated to the exponent specified in the setup
+    // and the summed. This value is then averaged by the number of 
+    // total peaks found and multiplied by the weight
+    class MaxPeakObjectiveFunction : public ObjectiveFunctionBase {
     public:
-        SumKneeContactForces(const ObjectiveFunctionSetup& setup);
-        SumKneeContactForces() : f_(std::numeric_limits<double>::max()) {}
-        void setDofsToCalibrate(const std::vector<std::string>& dofsToCalibrate) override {};
-        void setTrials(const std::vector<TrialData>& trials) override;
+        MaxPeakObjectiveFunction(const ObjectiveFunctionSetup& setup);
+        MaxPeakObjectiveFunction() : f_(std::numeric_limits<double>::max()) {}
+        void setSetup(const ObjectiveFunctionSetup& setup);
+        void setTrials(const std::vector<TrialData>& trials) override { /* blank */}
         void calculate(const std::vector<Result>& results) override;
         double getValue() const override { return f_; }
-        void setSetup(const ObjectiveFunctionSetup& setup);
-        void setContactModelSetup(const ContactModelKneeBalanceSetup& setup);
-        void setBarrierParameters(double xL, double xR, double weight, double exponent);
         void printCosts() const override;
-        bool calculateOpenSimData() const override { return false; }
+		bool calculateOpenSimData() const override;
     private:
-        double f_, weight_, exponent_;
-        std::vector<TrialData> trials_;
-        ContactModelKneeBalance kneeContactModel_;
-        ContactModelKneeBalanceSetup kneeContactModelSetup_;
-        BarrierFunction barrierFunc_;
-        std::vector<std::vector<std::vector<double>>> contactForces_;  //trial, row, med/lat
+        std::vector<double> calculate(const DataTable<double>& result) const;
+        std::vector<double> calculate(const DataTable<SimTK::Vec3>& result) const;
+        ObjectiveFunctionSetup setup_;
+        double f_;
+        std::vector<std::vector<double>> currentMax_; //trial, max contact force value
     };
 }
 

@@ -1,5 +1,5 @@
 include_directories( 
-	${OPENSIM_INCLUDE_DIRS}
+	${OPENSIMSIMBODY_INCLUDE_DIRS}
 	${NMSmodel_INCLUDE_DIRS}
 	${OptimizationSystems_INCLUDE_DIRS} 
 	${Optimizers_INCLUDE_DIRS}

@@ -31,11 +31,8 @@
 
 #include <vector>
 #include "ceinms/QueueData.h"
+#include "rtb/concurrency/Queue.h"
 
-namespace Concurrency {
-    template<typename>
-    class Queue;
-}
 
 namespace ceinms {
 

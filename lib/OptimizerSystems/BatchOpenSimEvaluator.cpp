@@ -6,11 +6,16 @@ using std::vector;
 
 namespace ceinms {
 
+    BatchOpenSimEvaluator::BatchOpenSimEvaluator() {}
+
     BatchOpenSimEvaluator::BatchOpenSimEvaluator(
-        const std::vector<TrialData>& osimTrialData) :
-        osimTrialData_(osimTrialData)
-        {
-    
+        const std::vector<TrialData>& osimTrialData) {
+        setOpenSimTrialData(osimTrialData);
+    }
+
+    void BatchOpenSimEvaluator::setOpenSimTrialData(const std::vector<TrialData>& osimTrialData) {
+
+        osimTrialData_ = osimTrialData;
         for (auto& e : osimTrialData) {
             std::cout << e.getExternalLoadFile() << std::endl << std::flush;
             std::cout << e.getOpenSimModelFile() << std::endl << std::flush;
@@ -30,11 +35,11 @@ namespace ceinms {
     DataTable<SimTK::Vec3> BatchOpenSimEvaluator::evaluate(std::unique_ptr<JointContactFromOpensim>& jointContactModel, const Result& resultFromCeinms, const TrialData& osimTrialData) {
         //map muscles and torques from resultsFromCeinms to a mapper.. so it's possible to put them in the correct order
        
-        vector<string> inputMuscleNames(resultFromCeinms.forces.getLabels());
+       vector<string> inputMuscleNames(resultFromCeinms.forces.getLabels());
        vector<string> outputMuslceNames;
        jointContactModel->getMuscleNamesFromOsimModel(outputMuslceNames);
        
-         Mapper muscleMapper(inputMuscleNames, outputMuslceNames);
+       Mapper muscleMapper(inputMuscleNames, outputMuslceNames);
        
        vector<string> inputDofNames(resultFromCeinms.torques.getLabels());
        vector<string> outputDofNames;

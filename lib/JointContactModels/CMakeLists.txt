@@ -25,7 +25,7 @@ source_group("Source Files" FILES ${JointContactModels_TEMPLATE_IMPLEMENTATION} 
 add_library(JointContactModels STATIC ${JointContactModels_HEADERS} ${JointContactModels_TEMPLATE_IMPLEMENTATION} ${JointContactModels_SOURCES})
 target_include_directories( JointContactModels
                             PRIVATE 
-                                   ${OPENSIM_INCLUDE_DIRS}       
+                                   ${OPENSIMSIMBODY_INCLUDE_DIRS}      
                                    ${SIMTK_INCLUDE_DIRS}
                             #       ${NMSmodel_INCLUDE_DIRS}
                              #      ${Curve_INCLUDE_DIRS}

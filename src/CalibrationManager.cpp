@@ -45,11 +45,7 @@ using std::vector;
 #include "ceinms/Tendon/ElasticTendon_BiSec.h"
 #include "ceinms/Activation/ExponentialActivation.h"
 #include "ceinms/Activation/PiecewiseActivation.h"
-#include "ceinms/MinTorqueError.h"
-#include "ceinms/SumKneeContactForces.h"
-#include "ceinms/SumGenericContactForces.h"
-#include "ceinms/MinTorqueErrorAndContactForces.h"
-#include "ceinms/ComposedObjectiveFunction.h"
+#include "ceinms/CompositeObjectiveFunction.h"
 
 #include "ceinms/SimulatedAnnealing.h"
 #include "ceinms/NMSmodelSystem.h"
@@ -91,7 +87,7 @@ namespace ceinms {
             cout << " not found" << endl;
 
         calibrationXmlReader_.getCalibrationTrials(calibrationTrialIDs_);
-
+        cout << calibrationXmlReader_ << endl;
     }
 
     template <typename NMSmodelT>
@@ -99,7 +95,6 @@ namespace ceinms {
         bool exitflag(false);
         NMSmodelT mySubject;
         setupSubject(mySubject, uncalibratedSubjectFile_, calibrationXmlReader_.getTolerance());
-
         vector<TrialData> trials;
         for (list<string>::iterator trialIt = calibrationTrialIDs_.begin(); trialIt != calibrationTrialIDs_.end(); ++trialIt) {
             trials.push_back(readTrialData(*trialIt, mySubject, *trialIt, emgGeneratorFile_));
@@ -107,74 +102,20 @@ namespace ceinms {
 
         CalibrationStep currentCalibrationStep;
         while (calibrationXmlReader_.popNextCalibrationStep(currentCalibrationStep)) {
-            std::cout << "CalibrationStepCfg " << currentCalibrationStep.getStepCfg() << std::endl;
-            switch (currentCalibrationStep.getStepCfg()) {
-            case CalibrationCfg::MinimizeTorqueErrorParameterSetDefault: {
+			updateTargetsFromModel(currentCalibrationStep.objFunctionsSetup_, mySubject);
+            CompositeObjectiveFunction objectiveFunction =
+                CompositeObjectiveFunction::makeComposite(currentCalibrationStep.objFunctionsSetup_);
+            using MySystem = NMSmodelSystem < NMSmodelT, CompositeObjectiveFunction >;
+            MySystem system(mySubject, trials, objectiveFunction, currentCalibrationStep.parameterSet_);
+            if (hasContactModel_) {
+                if (contactModelCfg_.getContactModelType() == ContactModelType::KneeBalance)
+                    system.setContactModelSetup(contactModelCfg_.getContactModelSetupKneeBalance());
+            }
+            SimulatedAnnealingParameters simanParameters;
+            calibrationXmlReader_.getOptimizationAlgorithmParameters(simanParameters);
+            Optimizers::SimulatedAnnealing<MySystem> optimizer(system, simanParameters);
+            exitflag = optimizer.optimize();
 
-                cout << currentCalibrationStep << endl;
-                vector<string> dofsToCalibrate;
-                currentCalibrationStep.getDofNames(dofsToCalibrate);
-                ParameterSet parameterSet;
-                currentCalibrationStep.getParameterSet(parameterSet);
-                for (auto p : parameterSet)
-                    cout << p << endl;
-                ObjectiveFunctionSetup objectiveFunctionSetup = currentCalibrationStep.getObjectiveFunctionSetup();
-                MinTorqueError minTorqueError;
-                using MySystem = NMSmodelSystem < NMSmodelT, MinTorqueError > ;
-                MySystem system(mySubject, trials, minTorqueError, parameterSet, dofsToCalibrate);
-
-                SimulatedAnnealingParameters simanParameters;
-                calibrationXmlReader_.getOptimizationAlgorithmParameters(simanParameters);
-                Optimizers::SimulatedAnnealing<MySystem> optimizer(system, simanParameters);
-                exitflag = optimizer.optimize();
-
-            }   break;
-
-            case CalibrationCfg::TorqueErrorAndSumKneeContactForcesParameterSetDefault: {
-
-                vector<string> dofsToCalibrate;
-                currentCalibrationStep.getDofNames(dofsToCalibrate);
-                ParameterSet parameterSet;
-                currentCalibrationStep.getParameterSet(parameterSet);
-                ObjectiveFunctionSetup objectiveFunctionSetup = currentCalibrationStep.getObjectiveFunctionSetup();
-
-                SumKneeContactForces sumKneeContacts(objectiveFunctionSetup);
-                sumKneeContacts.setContactModelSetup(contactModelCfg_.getContactModelSetupKneeBalance());
-                MinTorqueError minTorqueError;
-                MinTorqueErrorAndContactForces minTorqueErrorAndContactForces(minTorqueError, sumKneeContacts);
-
-                using MySystem = NMSmodelSystem < NMSmodelT, MinTorqueErrorAndContactForces > ;
-                MySystem system(mySubject, trials, minTorqueErrorAndContactForces, parameterSet, dofsToCalibrate);
-
-                SimulatedAnnealingParameters simanParameters;
-                calibrationXmlReader_.getOptimizationAlgorithmParameters(simanParameters);
-                Optimizers::SimulatedAnnealing<MySystem> optimizer(system, simanParameters);
-                exitflag = optimizer.optimize();
-            }   break;
-
-            case CalibrationCfg::TorqueErrorAndSumGenericContactForcesParameterSetDefault: {
-
-                vector<string> dofsToCalibrate;
-                currentCalibrationStep.getDofNames(dofsToCalibrate);
-                ParameterSet parameterSet;
-                currentCalibrationStep.getParameterSet(parameterSet);
-                ObjectiveFunctionSetup objectiveFunctionSetup = currentCalibrationStep.getObjectiveFunctionSetup();
-
-                std::shared_ptr<SumGenericContactForces> sumGenericContacts(new SumGenericContactForces(objectiveFunctionSetup));
-                sumGenericContacts->setJointContactForcesNames(contactModelCfg_.getContactModelSetupOsim().joints);
-                std::shared_ptr<MinTorqueError> minTorqueError(new MinTorqueError());
-
-                ComposedObjectiveFunction objFunction({ minTorqueError, sumGenericContacts });
-
-                using MySystem = NMSmodelSystem < NMSmodelT, ComposedObjectiveFunction >;
-                MySystem system(mySubject, trials, objFunction, parameterSet, dofsToCalibrate);
-
-                SimulatedAnnealingParameters simanParameters;
-                calibrationXmlReader_.getOptimizationAlgorithmParameters(simanParameters);
-                Optimizers::SimulatedAnnealing<MySystem> optimizer(system, simanParameters);
-                exitflag = optimizer.optimize();
-            }   break;
-            } //end switch
         }//end while
         writeXml(mySubject, uncalibratedSubjectFile_, calibrationFile_, calibratedSubjectFile_);
         return exitflag;
@@ -182,7 +123,7 @@ namespace ceinms {
 
     template <typename NMSmodelT>
     bool  CalibrationManager::runHybrid() {
-        cout << "Implementation not available in calibration yet. Verify you XML configuration file" << endl;
+        cout << "Cannot calibrate in hybrid mode. Verify you XML configuration file" << endl;
         return 1;
     }
 
@@ -192,52 +133,21 @@ namespace ceinms {
 
         NMSModelCfg::RunMode runMode = calibrationXmlReader_.getNMSmodelRunMode();
         switch (runMode) {
-        case NMSModelCfg::OpenLoopExponentialActivationStiffTendonOnline:
-            exitFlag = runOpenLoop < NMSmodel<ExponentialActivation, StiffTendon, CurveMode::Online>>();
-            break;
 
         case NMSModelCfg::OpenLoopExponentialActivationStiffTendonOffline:
             exitFlag = runOpenLoop < NMSmodel<ExponentialActivation, StiffTendon, CurveMode::Offline>>();
-            break;
-
-        case NMSModelCfg::OpenLoopExponentialActivationElasticTendonBiSecOnline:
-            exitFlag = runOpenLoop<NMSmodel<ExponentialActivation, ElasticTendon_BiSec, CurveMode::Online>>();
             break;
 
         case NMSModelCfg::OpenLoopExponentialActivationElasticTendonBiSecOffline:
             exitFlag = runOpenLoop<NMSmodel<ExponentialActivation, ElasticTendon_BiSec, CurveMode::Offline>>();
             break;
 
-        case NMSModelCfg::OpenLoopPiecewiseActivationStiffTendonOnline:
-            exitFlag = runOpenLoop<NMSmodel<PiecewiseActivation, StiffTendon, CurveMode::Online>>();
-            break;
-
         case NMSModelCfg::OpenLoopPiecewiseActivationStiffTendonOffline:
             exitFlag = runOpenLoop<NMSmodel<PiecewiseActivation, StiffTendon, CurveMode::Offline>>();
             break;
 
-        case NMSModelCfg::OpenLoopPiecewiseActivationElasticTendonBiSecOnline:
-            exitFlag = runOpenLoop<NMSmodel<PiecewiseActivation, ElasticTendon_BiSec, CurveMode::Online>>();
-            break;
-
         case NMSModelCfg::OpenLoopPiecewiseActivationElasticTendonBiSecOffline:
             exitFlag = runOpenLoop<NMSmodel<PiecewiseActivation, ElasticTendon_BiSec, CurveMode::Offline>>();
-            break;
-
-        case NMSModelCfg::HybridExponentialActivationStiffTendonOnline:
-            exitFlag = runHybrid<NMSmodel<ExponentialActivation, StiffTendon, CurveMode::Online>>();
-            break;
-
-        case NMSModelCfg::HybridExponentialActivationElasticTendonBiSecOnline:
-            exitFlag = runHybrid<NMSmodel<ExponentialActivation, ElasticTendon_BiSec, CurveMode::Online>>();
-            break;
-
-        case NMSModelCfg::HybridPiecewiseActivationStiffTendonOnline:
-            exitFlag = runHybrid<NMSmodel<PiecewiseActivation, StiffTendon, CurveMode::Online>>();
-            break;
-
-        case NMSModelCfg::HybridPiecewiseActivationElasticTendonBiSecOnline:
-            exitFlag = runHybrid<NMSmodel<PiecewiseActivation, ElasticTendon_BiSec, CurveMode::Online>>();
             break;
 
         default:

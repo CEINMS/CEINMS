@@ -26,13 +26,14 @@
  * limitations under the License.                                             *
  * -------------------------------------------------------------------------- */
 
-#ifndef ceinms_MinTorqueError_h
-#define ceinms_MinTorqueError_h
+#ifndef ceinms_TorqueErrorNormalisedObjectiveFunction_h
+#define ceinms_TorqueErrorNormalisedObjectiveFunction_h
 #include <vector>
 #include <limits>
 #include "ceinms/TrialData.h"
 #include "Result.h"
 #include "ceinms/ObjectiveFunctionBase.h"
+#include "ceinms/ObjectiveFunctionSetup.h"
 
 namespace ceinms {
 
@@ -45,18 +46,20 @@ namespace ceinms {
             penalty(0.) {}
     };
 
-    class MinTorqueError : public ObjectiveFunctionBase {
+    class TorqueErrorNormalisedObjectiveFunction : public ObjectiveFunctionBase {
     public:
-        MinTorqueError() : f_(std::numeric_limits<double>::max()) {}
-        void setDofsToCalibrate(const std::vector<std::string>& dofsToCalibrate) override;
+        /* exponent and weight not enables yet*/
+        TorqueErrorNormalisedObjectiveFunction() : f_(std::numeric_limits<double>::max()) {}
+        TorqueErrorNormalisedObjectiveFunction(const ObjectiveFunctionSetup& setup);
+        void setSetup(const ObjectiveFunctionSetup& setup);
         void setTrials(const std::vector<TrialData>& trials) override;
         void calculate(const std::vector<Result>& results) override;
         double getValue() const override{ return f_; }
         void printCosts() const override;
-        bool calculateOpenSimData() const override { return false; }
     private:
         void computeVariance();
         void updDofsToCalibrateIdx();
+        ObjectiveFunctionSetup setup_;
         double f_;
         std::vector<TrialData> trials_;
         std::vector<std::vector<double>> torqueVariance_;

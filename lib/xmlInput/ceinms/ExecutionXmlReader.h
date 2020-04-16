@@ -46,7 +46,6 @@ namespace ceinms {
         void getHybridWeightings(double& alpha, double& beta, double& gamma) const;
         void setHybridWeightings(double alpha, double beta, double gamma);
         void getDofSet(std::vector<std::string>& dofs) const;
-        void getAnnealingParameters(unsigned& nt, unsigned& ns, double& rt, double& t, unsigned& maxNoEval, double& epsilon, unsigned& noEpsilon) const;
         void print(const std::string& filename);
         bool isHybrid() const;
     private:

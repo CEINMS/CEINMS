@@ -140,7 +140,7 @@ int main(int argc, char** argv){
     auto timeBegin = std::chrono::high_resolution_clock::now();
     bool exitflag = calibrationManager.run();
     auto timeEnd = std::chrono::high_resolution_clock::now();
-    std::cout << "Calibration time: " << std::chrono::duration_cast<std::chrono::milliseconds>(timeEnd - timeBegin).count() << "ms" << std::endl;
+    std::cout << "Calibration time: " << std::chrono::duration_cast<std::chrono::minutes>(timeEnd - timeBegin).count() << "minutes" << std::endl;
 
     std::exit(exitflag);
 }

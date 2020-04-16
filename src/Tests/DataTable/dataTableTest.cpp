@@ -76,15 +76,27 @@ int main() {
     cout << "Table 2 minus Table 1:" << endl;
     cout << t2 - t1;
 
-    // Test cropping gata table
-    cout << "Testing table cropping" << endl;
-    DataTable<double> t4;
-    for (int i(0); i < 1000; ++i) {
-        t4.pushRow(i*0.1, { i * 10., i * 20. });
-    }
-    t4.crop(10.01, 13.07);
-    cout << t4;
+    DataTable<double> t3;
+    for(int i(0); i < 100; ++i)
+        t3.pushRow(static_cast<double>(i), { 4, 2, 4 });
 
+    t3.crop(10, 80);
+    t3.crop(11, 120);
+    t3.crop(-1, 120);
+
+    auto it = t3.begin();
+    std::cout << it->size() << endl;
+    std::cout << t3.getRow(0).size() << endl;
+
+
+		// Test cropping gata table
+		cout << "Testing table cropping" << endl;
+	DataTable<double> t4;
+	for (int i(0); i < 1000; ++i) {
+		t4.pushRow(i*0.1, { i * 10., i * 20. });
+	}
+	t4.crop(10.01, 13.07);
+	cout << t4;
 
     return 0;
 }

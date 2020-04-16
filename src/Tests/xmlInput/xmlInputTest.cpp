@@ -33,7 +33,7 @@
 #include "ceinms/ContactModelXmlReader.h"
 #include "ceinms/ExecutionXmlReader.h"
 #include "ceinms/XmlWriter.h"
-
+#include "ceinms/CalibrationXmlReader.h"
 #include <sstream>
 #include <iostream>
 using std::cout;
@@ -103,20 +103,24 @@ void testSubjectXmlFile(std::string inFilename, string outFilename) {
 	ss2 << subject2;
 	if (ss1.str() == ss2.str())
 		cout << "Subject XML re-read produce the same result" << endl;
-	else 
+	else
 		cout << "Subject XML re-read FAILED" << endl;
 	cout << subject1;
+}
 
+void testCalibrationXmlReader(std::string filename) {
 
+    ceinms::CalibrationXmlReader reader(filename);
+    cout << reader;
 }
 
 int main() {
-
     boost::filesystem::path dir = path(BASE_DIR) /= "TestData";
-
     testContactModels((dir / "contactModelKnee.xml").string());
     testExecutionXmlReader((dir / "executionHybrid.xml").string());
 	testSubjectXmlFile((dir / "subject.xml").string(), (dir / "outSubject.xml").string());
-   
+    testCalibrationXmlReader((dir / "deprecatedCalibrationCfg.xml").string());
+    testCalibrationXmlReader((dir / "calibrationCfg1.xml").string());
+    testCalibrationXmlReader((dir / "calibrationCfg2.xml").string());
     return 0;
 }

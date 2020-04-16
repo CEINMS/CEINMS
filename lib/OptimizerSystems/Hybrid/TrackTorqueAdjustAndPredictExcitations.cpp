@@ -16,32 +16,34 @@ namespace ceinms {
 
     void TrackTorqueAdjustAndPredictExcitations::calculate(const std::vector<double>& predictedTorques, const std::vector<double>& predictedExcitations){
 
+
         torqueError_ = 0.;
         for (auto i : indexesOfTorquesToMinimise_) {
             double diff(predictedTorques.at(i) - externalTorques_.at(i));
             torqueError_ += diff*diff;
         }
 
-        //I have to do the sum of all the excitations squared that undergo optimisation
         excitationTrackingError_ = 0.;
         excitationSum_ = 0.;
-
         for (auto i : indexesOfMusclesWithExcitationsToAdjust_) {
             double diff(predictedExcitations.at(i) - measuredExcitations_.at(i));
             excitationTrackingError_ += diff*diff;
             excitationSum_ += predictedExcitations.at(i)*predictedExcitations.at(i);
         }
+
         for (auto i : indexesOfMusclesWithExcitationsToPredict_) {
             excitationSum_ += predictedExcitations.at(i)*predictedExcitations.at(i);
         }
 
-        f_ = weightings_.alpha*torqueError_ + weightings_.beta*excitationSum_ + weightings_.gamma*excitationTrackingError_;
-       
-        //std::cout << std::endl;
-        //std::cout << "sum torque error squared: " << torqueError << std::endl;
-        //std::cout << "sum excitations squared : " << excitationSum << std::endl;
-        //std::cout << "sum tracking error squared: " << excitationTrackingError << std::endl;
-        
+        // Normalise by the number of dofs and muscles is disables
+//        torqueError_ /= nDofs_;
+//        excitationSum_ /= nSynth_;
+//        excitationTrackingError_ /= nAdj_;
+        f_ = 
+            weightings_.alpha*torqueError_ + 
+            weightings_.beta*excitationSum_ + 
+            weightings_.gamma*excitationTrackingError_;
+            
     }
 
     double TrackTorqueAdjustAndPredictExcitations::getValue() const {

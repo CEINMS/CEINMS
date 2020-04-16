@@ -161,6 +161,13 @@ namespace ceinms {
         qdd_.setLabels(coordinateNames);
 
         vector<double> timeColumn(lmtData_.getTimeColumn());
+        if (timeColumn.empty()) {
+            //Opena new storage, because filtering and padding would have changed the time column
+            OpenSim::Storage originalKinematics(motionFile);
+            OpenSim::Array<double> tempTimeCol;
+            originalKinematics.getTimeColumn(tempTimeCol);
+            timeColumn = ArrayConverter::toStdVector(tempTimeCol);
+        }
         for (auto& t : timeColumn) {
             OpenSim::Array<double> currentQ, currentQd, currentQdd;
             kinematicsSplines.evaluate(currentQ, 0, t);

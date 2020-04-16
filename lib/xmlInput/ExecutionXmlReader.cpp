@@ -40,7 +40,6 @@ using ExecutionXsd::HybridType;
 namespace ceinms {
     ExecutionXmlReader::ExecutionXmlReader(const string& filename)
         :runMode_(0), tolerance_(1e-6) {
-
         try {
             std::auto_ptr<ExecutionType> executionPointer(parseAndValidate<ExecutionType>(filename, execution_schema, sizeof(execution_schema)));
             executionPointer_ = executionPointer;
@@ -100,53 +99,14 @@ namespace ceinms {
                 cout << "invalid XML: Hybrid/OpenLoop Type not found\n";
                 exit(EXIT_FAILURE);
             }
-
-            ExecutionType::online_optional& myOnlineOpt(executionPointer_->online());
-            ExecutionType::offline_optional& myOfflineOpt(executionPointer_->offline());
-            if (myOnlineOpt.present())
-                runMode_ += NMSModelCfg::Online;
-            else if (myOfflineOpt.present())
-                runMode_ += NMSModelCfg::Offline;
-            else {
-                cout << "invalid XML: Online/Offline Type not found\n";
-                exit(EXIT_FAILURE);
-            }
-
-
-            //ANCORA DA IMPLEMENTARE
-            /*
-                   ExecutionType::samplingFrequency_optional& myFreqOpt(executionPointer->samplingFrequency());
-                   if(myFreqOpt.present())
-                   myExecutionCfg.frequency_ = ExecutionCfg::Enabled;
-                   else
-                   myExecutionCfg.frequency_ = ExecutionCfg::Disabled;
-
-                   ExecutionType::logging_type::txt_optional& myTxtOpt(executionPointer->logging().txt());
-                   ExecutionType::logging_type::csv_optional& myCsvOpt(executionPointer->logging().csv());
-                   ExecutionType::logging_type::mot_optional& myMotOpt(executionPointer->logging().mot());
-                   if(myTxtOpt.present())
-                   myExecutionCfg.logging_ = ExecutionCfg::txt;
-                   else if(myCsvOpt.present())
-                   myExecutionCfg.logging_ = ExecutionCfg::csv;
-                   else if(myMotOpt.present())
-                   myExecutionCfg.logging_ = ExecutionCfg::mot;
-                   else {
-                   cout << "invalid XML: Logging Type not found\n";
-                   exit(EXIT_FAILURE);
-                   }
-                   */
+           runMode_ += NMSModelCfg::Online;
         }
         catch (const xml_schema::exception& e) {
             cout << e << endl;
             exit(EXIT_FAILURE);
         }
-
-
     }
-
-
-
-
+		   
     void ExecutionXmlReader::getMusclesToSynthesise(std::vector<std::string>& musclesToSynthesise) const {
 
         ExecutionType::NMSmodel_type& myModel(executionPointer_->NMSmodel());
@@ -190,19 +150,10 @@ namespace ceinms {
         }
         alpha = 1; beta = 1; gamma = 1;
 
-        if (myHybOpt->alpha().present())
-            alpha = myHybOpt->alpha().get();
+        alpha = myHybOpt->alpha();
+		beta = myHybOpt->beta();
+        gamma = myHybOpt->gamma();
         
-        if (myHybOpt->beta().present())
-            beta = myHybOpt->beta().get();
-        else if (myHybOpt->synthMTUs().weight().present())
-            beta = myHybOpt->synthMTUs().weight().get();
-
-        if (myHybOpt->gamma().present())
-            gamma = myHybOpt->gamma().get();
-        else if (myHybOpt->adjustMTUs().weight().present())
-            gamma = myHybOpt->adjustMTUs().weight().get();
-
     }
 
     void ExecutionXmlReader::setHybridWeightings(double alpha, double beta, double gamma) {
@@ -213,8 +164,6 @@ namespace ceinms {
         myHybOpt->beta() = beta;
         myHybOpt->gamma() = gamma;
 
-        myHybOpt->synthMTUs().weight().reset();
-        myHybOpt->adjustMTUs().weight().reset();
     }
 
     void ExecutionXmlReader::getDofSet(std::vector<std::string>& dofs) const {
@@ -226,12 +175,8 @@ namespace ceinms {
             cout << "Cannot get hybrid parameters, hybrid option not selected\n";
             exit(EXIT_FAILURE);
         }
-   
-        if (myHybOpt->dofSet().present()) {
-            HybridType::dofSet_optional& dofSet(myHybOpt->dofSet());
-            for (auto& e : *dofSet)
-                dofs.push_back(e);
-        }
+        for (auto& e : myHybOpt->dofSet())
+            dofs.push_back(e);
     }
 
     bool ExecutionXmlReader::isHybrid() const {
@@ -239,28 +184,6 @@ namespace ceinms {
         ExecutionType::NMSmodel_type::type_type& myType(myModel.type());
         ExecutionType::NMSmodel_type::type_type::hybrid_optional& myHybOpt(myType.hybrid());
         return myHybOpt.present();
-    }
-
-    void ExecutionXmlReader::getAnnealingParameters(unsigned& nt, unsigned& ns, double& rt, double& t, unsigned& maxNoEval, double& epsilon, unsigned& noEpsilon) const {
-        /*
-        ExecutionType::NMSmodel_type& myModel(executionPointer_->NMSmodel());
-        ExecutionType::NMSmodel_type::type_type& myType(myModel.type());
-        ExecutionType::NMSmodel_type::type_type::hybrid_optional& myHybOpt(myType.hybrid());
-        if (!myHybOpt.present()) {
-            cout << "Cannot get Simulated Annealing parameters, hybrid option not selected\n";
-            exit(EXIT_FAILURE);
-        }
-
-        ExecutionType::NMSmodel_type::type_type::hybrid_type::algorithm_type& myAlgorithmType(myType.hybrid()->algorithm());
-        ExecutionType::NMSmodel_type::type_type::hybrid_type::algorithm_type::simulatedAnnealing_type& mySimanType(myAlgorithmType.simulatedAnnealing());
-        nt = mySimanType.NT();
-        ns = mySimanType.NS();
-        rt = mySimanType.rt();
-        t = mySimanType.T();
-        maxNoEval = mySimanType.maxNoEval();
-        epsilon = mySimanType.epsilon();
-        noEpsilon = mySimanType.noEpsilon();
-        */
     }
 
 

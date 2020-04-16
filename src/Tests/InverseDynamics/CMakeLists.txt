@@ -1,7 +1,6 @@
 include_directories( 
 	${JointContactModels_INCLUDE_DIRS}
-	${OPENSIM_INCLUDE_DIRS}       
-    ${SIMTK_INCLUDE_DIRS}
+	${OPENSIMSIMBODY_INCLUDE_DIRS}
     ${ceinms_common_INCLUDE_DIRS}      
 	${xmlInput_INCLUDE_DIRS}
 	${OutputConnectors_INCLUDE_DIRS}
@@ -19,6 +18,5 @@ include_directories(
 add_definitions(/DBASE_DIR="${CMAKE_CURRENT_LIST_DIR}")
 
 add_executable(Test_InverseDynamics inverseDynamicsTest.cpp)
-
-target_link_libraries(Test_InverseDynamics  JointContactModels OutputConnectors InputConnectors xmlInput NMSmodel optimized ${OPENSIM_LIBRARIES})
+target_link_libraries(Test_InverseDynamics  JointContactModels OutputConnectors InputConnectors xmlInput rtb::Concurrency NMSmodel optimized ${OPENSIMSIMBODY_LIBRARIES})
 #target_link_libraries(Test_InverseDynamics  JointContactModels OutputConnectors InputConnectors xmlInput Concurrency NMSmodel debug ${OPENSIM_LIBRARIES_DEBUG})

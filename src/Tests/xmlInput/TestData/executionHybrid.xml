@@ -3,25 +3,19 @@
   <NMSmodel>
      <type>
         <hybrid>
+			<alpha>1</alpha>
+			<beta>2</beta>
+			<gamma>3</gamma>
             <dofSet>dof1 dof2 dof3</dofSet>
-            <synthMTUs weight="1">mtu1 mtu2 mtu3</synthMTUs>
-            <adjustMTUs weight="1">bifemlh_r bifemsh_r grac_r lat_gas_r med_gas_r rect_fem_r sar_r semimem_r semiten_r vas_int_r vas_lat_r vas_med_r</adjustMTUs>
+            <synthMTUs>mtu1 mtu2 mtu3</synthMTUs>
+            <adjustMTUs>bifemlh_r bifemsh_r grac_r lat_gas_r med_gas_r rect_fem_r sar_r semimem_r semiten_r vas_int_r vas_lat_r vas_med_r</adjustMTUs>
          </hybrid>
      </type>
-
      <tendon>
           <equilibriumElastic/>
      </tendon>
-
      <activation>
           <exponential/>
      </activation>
   </NMSmodel>
-
-  <online/>
-
-
-  <elaboratedDoFs>
-  </elaboratedDoFs>
-
 </execution>

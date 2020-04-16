@@ -79,6 +79,9 @@
 #include "ceinms/Hybrid/NMSmodelFrameOptimisation.h"
 #include "ceinms/BatchEvaluator.h"
 #include "SimulationManager.h"
+#include "ceinms/SimulatedAnnealing.h"
+#include "ceinms/FileUtils.h"
+
 #include <numeric>
 #include <algorithm>
 #include <string>
@@ -100,7 +103,9 @@ using std::vector;
 #include <map>
 using std::map;
 #include <stdlib.h>
+#include <algorithm>
 
+#include <future>
 
 void printHeader() {
 
@@ -146,23 +151,6 @@ void PrintUsage()
 }
 
 
-void sortMaFilenames(const std::map<std::string, std::string>& maMap, const std::vector< std::string >& dofNames, std::vector< std::string >& maDataFilenames)
-{
-    int currentDof = 0;
-    for (auto& it : dofNames)
-    {
-        try
-        {
-            maDataFilenames.push_back(maMap.at(it));
-        }
-        catch (std::out_of_range)
-        {
-            std::cerr << "Could not find moment arm file for " << it << " degree of freedom" << std::endl;
-            exit(EXIT_FAILURE);
-        }
-    }
-}
-
 template<typename NMSmodelT>
 ceinms::TrialData readTrialData(const string& inputDataFilename, NMSmodelT& mySubject, const string& emgGeneratorFile) {
 
@@ -181,7 +169,7 @@ ceinms::TrialData readTrialData(const string& inputDataFilename, NMSmodelT& mySu
     vector< string > dofNames;
     mySubject.getDoFNames(dofNames);
     vector< string > maFilename;
-    sortMaFilenames(dataLocations.getMaFiles(), dofNames, maFilename);
+    ceinms::FileUtils::sortMaFilenames(dataLocations.getMaFiles(), dofNames, maFilename);
     ceinms::LmtMaFromStorageFile lmtMaProducer(lmtQueue, momentArmsQueues, doneWithSubscription, doneWithExecution, mySubject, dataLocations.getLmtFile(), maFilename);
 
     string externalTorqueFilename(dataLocations.getExternalTorqueFile());
@@ -238,75 +226,155 @@ public:
         return true;
     }
 private:
+    struct HybridErrors {
+        double beta, gamma;
+        double trackError, torqueError;
+    };
+
     bool runOpenLoop() {
         ceinms::SimulationManager simulationManager(setupFilename_);
         return simulationManager.run();
     }
 
     bool runWeightingOptimisation() {
-        struct HybridErrors{
-            int beta, gamma;
-            double trackError, torqueError;
-        };
-        
-        int betaIdx, alphaIdx, gammaIdx;
-        std::vector<HybridErrors> allErrors;
 
-        ceinms::NMSmodel<ceinms::ExponentialActivation, ceinms::ElasticTendon_BiSec, ceinms::CurveMode::Online> subject;
+        using NMSmodelT = ceinms::NMSmodel<ceinms::ExponentialActivation, ceinms::ElasticTendon_BiSec, ceinms::CurveMode::Online>;
+        NMSmodelT subject;
         setupSubject(subject, subjectFile_, executionCfg_.getTolerance());
         ceinms::TrialData trial(readTrialData(ceinmsSetup_.getInputDataFile(), subject, emgGeneratorFile_));
-        ceinms::EmgInformedObjectiveFunctionSetup setup;
-        executionCfg_.getMusclesToAdjust(setup.musclesToAdjust);
-        executionCfg_.getMusclesToSynthesise(setup.musclesToSynthesise);
-        executionCfg_.getHybridWeightings(setup.weightings.alpha, setup.weightings.beta, setup.weightings.gamma);
-        vector<unsigned> musclesToUpdate;
-        subject.getMusclesIndexFromMusclesList(musclesToUpdate, subject.getMuscleNames());
-        int nMtu = subject.getNoMuscles();
-        int nDofs = subject.getNoDoF();
-        for (betaIdx = 1; betaIdx < 31; ++betaIdx) {
-            for (gammaIdx = 1; gammaIdx < 301; ++gammaIdx) {
-                setup.weightings.beta = static_cast<double>(betaIdx);
-                setup.weightings.gamma = static_cast<double>(gammaIdx);
-                ceinms::Result results(nMtu, nDofs, trial.getEmgData().getNRows(), trial.getLmtData().getNRows());
-                ceinms::HybridEvaluator::evaluate(subject, trial, setup, musclesToUpdate, results);
-                HybridErrors simulationError;
-                simulationError.beta = betaIdx;
-                simulationError.gamma = gammaIdx;
-                std::vector<double> torqueErrors(results.errors.getColumn("TorqueError"));
-                simulationError.torqueError = std::accumulate(torqueErrors.begin(), torqueErrors.end(), 0.) / torqueErrors.size();
-                std::vector<double> trackingError(results.errors.getColumn("ExcitationTrackingError"));
-                simulationError.trackError = std::accumulate(trackingError.begin(), trackingError.end(), 0.)/ trackingError.size();
-                allErrors.push_back(simulationError);
+        
+        auto f([=](double beta, double gamma, NMSmodelT subject, ceinms::TrialData trial) {
+            int nMtu = subject.getNoMuscles();
+            int nDofs = subject.getNoDoF();
+            ceinms::Result results(nMtu, nDofs, trial.getEmgData().getNRows(), trial.getLmtData().getNRows());
+            vector<unsigned> musclesToUpdate;
+            subject.getMusclesIndexFromMusclesList(musclesToUpdate, subject.getMuscleNames());
+            ceinms::EmgInformedObjectiveFunctionSetup setup;
+            executionCfg_.getMusclesToAdjust(setup.musclesToAdjust);
+            executionCfg_.getMusclesToSynthesise(setup.musclesToSynthesise);
+            executionCfg_.getHybridWeightings(setup.weightings.alpha, setup.weightings.beta, setup.weightings.gamma);
+            executionCfg_.getDofSet(setup.dofsToTrack);
+            if (setup.dofsToTrack.empty())
+                setup.dofsToTrack = subject.getDoFNames();
+            for (const auto& m : setup.musclesToAdjust) {
+                auto col = trial.getEmgData().getColumn(m);
+                setup.musclesToAdjustMaxExcitations.push_back(*std::max_element(col.begin(), col.end())); 
             }
-        }
-    
-        //find max errors
-        double maxTorqueErr = std::max_element(allErrors.begin(), allErrors.end(), [](auto& first, auto& second) {
-            return first.torqueError < second.torqueError;
+            
+            for (const auto& m : setup.dofsToTrack) {
+                auto col = trial.getTorqueData().getColumn(m);
+                setup.dofsToTrackMaxTorque.push_back(*std::max_element(col.begin(), col.end(), [](auto e1, auto e2) {
+                    return std::abs(e1) < std::abs(e2);
+                }));
+             }
+            
+            setup.weightings.beta = beta;
+            setup.weightings.gamma = gamma;
+            ceinms::HybridEvaluator::evaluate(subject, trial, setup, musclesToUpdate, results);
+            std::vector<double> torqueErrors(results.errors.getColumn("TorqueError"));
+            double torqueError = std::accumulate(torqueErrors.begin(), torqueErrors.end(), 0.) / torqueErrors.size();
+            std::vector<double> trackingError(results.errors.getColumn("ExcitationTrackingError"));
+            double trackError = std::accumulate(trackingError.begin(), trackingError.end(), 0.) / trackingError.size();
+            HybridErrors errs;
+            errs.beta = beta;
+            errs.gamma = gamma;
+            errs.torqueError = torqueError;
+            errs.trackError = trackError;
+            return errs;
+        });
+
+        auto runGrid([&](vector<double> betas, vector<double> gammas) {
+            std::vector<HybridErrors> values;
+            for (auto beta : betas)
+                for (auto gamma : gammas) {
+                        values.emplace_back(f(beta, gamma, subject, trial));
+                 }
+            return values;
+        });
+
+        auto runGridParallel([&](vector<double> betas, vector<double> gammas) {
+            int threadCount = 0;
+            std::vector<std::future<HybridErrors>> futures;
+            for (auto beta : betas)
+                for (auto gamma : gammas) {
+                    auto fut(std::async(std::launch::async, [=]() {
+                        return f(beta, gamma, subject, trial); }
+                    ));
+                    futures.emplace_back(std::move(fut));
+                    std::cout << "Creating thread " << ++threadCount << "/" << gammas.size()*betas.size() << std::endl;
+                }
+
+            std::vector<HybridErrors> values;
+            for (auto& f : futures) {
+                f.wait();
+                std::cout << "Joining thread " << --threadCount << "/" << gammas.size()*betas.size() << std::endl;
+                values.emplace_back(f.get());
+            }
+            return values;
+        });
+
+
+        auto getVec([](double min, double max, double interval) {
+            vector<double> v;
+            int nsteps = round((max - min) / interval);
+            for (int i(0); i < nsteps; ++i) {
+                v.push_back(min+i*interval);
+            }
+            return v;
+        });
+       
+        double bmin = 1, bmax = 2, bdelta=1, gmin = 1, gmax = 5, gdelta=5;
+        std::vector<HybridErrors> values;
+        vector<double> betas = getVec(bmin, bmax,bdelta);
+        vector<double> gammas = getVec(gmin, gmax,gdelta);
+        values = runGridParallel(betas, gammas);
+        double maxTorque = std::max_element(values.begin(), values.end(), [](auto e1, auto e2) {
+            return e1.torqueError < e2.torqueError;
         })->torqueError;
-        std::cout << "Found max torque error = " << maxTorqueErr << "Nm\n";
-        double maxTrackErr = std::max_element(allErrors.begin(), allErrors.end(), [](auto& first, auto& second) {
-            return first.trackError < second.trackError;
+        double maxTrack = std::max_element(values.begin(), values.end(), [](auto e1, auto e2) {
+            return e1.trackError < e2.trackError;
         })->trackError;
-        std::cout << "Found max emg tracking error = " << maxTrackErr << "\n";
-        vector<double> errorDistance;
-        for (auto& e : allErrors) {
-            errorDistance.push_back(
-                std::pow(e.torqueError / maxTorqueErr, 2) +
-                std::pow(e.trackError / maxTrackErr, 2));
-        }
-        size_t index = std::distance(errorDistance.begin(),std::min_element(errorDistance.begin(), errorDistance.end()));
+        HybridErrors lowest = *std::min_element(values.begin(), values.end(), [maxTorque, maxTrack](auto e1, auto e2) {
+            double v1 = std::pow(e1.torqueError / maxTorque, 2) + std::pow(e1.trackError / maxTrack, 2);
+            double v2 = std::pow(e2.torqueError / maxTorque, 2) + std::pow(e2.trackError / maxTrack, 2);
+            return v1 < v2;
+        });
+          
+
+        cout << "bmin = " << bmin << "\n"
+            << "bmax = " << bmax << "\n"
+            << "gmin = " << gmin << "\n"
+            << "gmax = " << gmax << "\n";
+
+        bmin = std::max((lowest.beta - bdelta),bmin);
+        bmax = std::min((lowest.beta + bdelta), bmax);
+        gmin = std::max((lowest.gamma - gdelta), gmin);
+        gmax = std::min((lowest.gamma + gdelta), gmax);
+        
+        betas = getVec(bmin, bmax, 1);
+        gammas = getVec(gmin, gmax, 1);
+
+        values = runGridParallel(betas, gammas);
+        lowest = *std::min_element(values.begin(), values.end(), [maxTorque, maxTrack](auto e1, auto e2) {
+            double v1 = std::pow(e1.torqueError / maxTorque, 2) + std::pow(e1.trackError / maxTrack, 2);
+            double v2 = std::pow(e2.torqueError / maxTorque, 2) + std::pow(e2.trackError / maxTrack, 2);
+            return v1 < v2;
+        });
+
+        cout << "lowest\nbeta = " << lowest.beta << "\ngamma = " << lowest.gamma << endl;
+        cout << "f = " << std::pow(lowest.torqueError / maxTorque, 2) + std::pow(lowest.trackError / maxTrack, 2) << endl;
+        
         std::cout << "Optimal values:\n"
             "alpha = " << 1 << "\n"
-            "beta  = " << allErrors[index].beta << "\n"
-            "gamma  = " << allErrors[index].gamma << "\n";
+            "beta  = " << lowest.beta << "\n"
+            "gamma  = " << lowest.gamma << "\n";
         
-        executionCfg_.setHybridWeightings(1, allErrors[index].beta, allErrors[index].gamma);
+        executionCfg_.setHybridWeightings(1, lowest.beta, lowest.gamma);
         std::string trialId(ceinmsSetup_.getInputDataFile(false));
         size_t endpos = trialId.find(".xml");
         size_t startpos = trialId.rfind("/") + 1;
         trialId = trialId.substr(startpos, endpos - startpos);
-        std::string newExecutionFilename(ceinmsSetup_.getExecutionFile(true));
+        std::string newExecutionFilename(ceinmsSetup_.getExecutionFile(false));
         std::size_t pos = newExecutionFilename.find(".xml");
         if (pos != std::string::npos) {
             newExecutionFilename.insert(pos, "-optimised-"+trialId);
@@ -323,6 +391,7 @@ private:
         std::cout << "Running best solution\n";
         ceinms::SimulationManager simulationManager(newSetupFilename);
         return simulationManager.run();
+      
     }
 
     ceinms::CeinmsSetupXmlReader ceinmsSetup_;

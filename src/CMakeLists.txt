@@ -52,6 +52,7 @@ TARGET_LINK_LIBRARIES( CEINMS
       InputConnectors
       OutputConnectors
 	  JointContactModels
+      TrialData
       OptimizationSystems
 	  ceinms_common
 	  #${CMAKE_THREAD_LIBS_INIT}

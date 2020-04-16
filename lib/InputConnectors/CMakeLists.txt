@@ -55,7 +55,7 @@ add_library(InputConnectors STATIC
   ${FromStorageFile_HEADERS}
   ${InputConnectors_TEMPLATE_IMPLEMENTATIONS}
 )
-target_link_libraries(InputConnectors FileIO ${Boost_FILESYSTEM_LIBRARY} optimized ${OPENSIM_LIBRARIES} rtb::Filter)
+target_link_libraries(InputConnectors FileIO ${Boost_FILESYSTEM_LIBRARY} optimized ${OPENSIM_LIBRARIES} rtb::Filter rtb::Concurrency)
 #target_link_libraries(InputConnectors FileIO Concurrency ${Boost_FILESYSTEM_LIBRARY} debug ${OPENSIM_LIBRARIES_DEBUG})
 
 
@@ -67,8 +67,7 @@ target_include_directories(InputConnectors
                                             ${Boost_INCLUDE_DIRS}
 											${RTOSIM_INCLUDE_DIRS}
 								PUBLIC
-											${OPENSIM_INCLUDE_DIRS}
-											${SIMTK_INCLUDE_DIRS}
+											${OPENSIMSIMBODY_INCLUDE_DIRS}
 											${mcbs_INCLUDE_DIRS}
 											${osimSpliner_INCLUDE_DIRS})
 

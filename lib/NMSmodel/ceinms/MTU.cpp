@@ -484,11 +484,15 @@ namespace ceinms {
     double MTU<Activation, Tendon, mode>::getPenalty() const {
 
         double penalty(tendonDynamic_.getPenalty());
-        double const normalisedFibreRatio(fabs(fibreLength_ / optimalFibreLength_ - 1.0));
-        if (normalisedFibreRatio > 0.5)
-            penalty += normalisedFibreRatio*normalisedFibreRatio * 100.;
-		if (getNormTendonLength() < 0.)
-			penalty += std::fabs(getNormTendonLength()) * 100.; 
+     //   double const normalisedFibreRatio(fabs(fibreLength_ / optimalFibreLength_ - 1.0));
+     //   if (normalisedFibreRatio > 0.5)
+     //       penalty += normalisedFibreRatio*normalisedFibreRatio * 100.;
+	//	if (getNormTendonLength() < 0.)
+	//		penalty += std::fabs(getNormTendonLength()) * 100.; 
+     //   double const normalisedFibreRatio(fabs(fibreLength_ / optimalFibreLength_ - 1.0));
+     //   if (normalisedFibreRatio > 0.5)
+     //       penalty += normalisedFibreRatio*normalisedFibreRatio * 100;
+
         return penalty;
     }
 
@@ -525,8 +529,6 @@ namespace ceinms {
         output << "damping: " << m.damping_ << endl;
         output << "maxIsometricForce: " << m.maxIsometricForce_ << endl;
         output << "strengthCoefficient: " << m.strengthCoefficient_ << endl;
-        // :TODO: valli a mettere anche nel costruttore di copia
-
         return output;
     }
 
