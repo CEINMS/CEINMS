@@ -69,7 +69,7 @@
       <xs:enumeration value="normalisedFibreLength"/>
       <xs:enumeration value="normalisedFibreVelocity"/>
       <xs:enumeration value="pennationAngle"/>
-      <xs:enumeration value="contactForce"/>
+      <xs:enumeration value="scalarContactForce"/>
       <xs:enumeration value="genericContactForce"/>
     </xs:restriction>
   </xs:simpleType>

@@ -7,7 +7,7 @@ endif()
 cmake_minimum_required (VERSION 2.8.11) # "target_include_directories" command  and VS12 generator are missing in previous versions
 project(CEINMS)
 set(CEINMS_MAJOR_VERSION 0)
-set(CEINMS_MINOR_VERSION 20)
+set(CEINMS_MINOR_VERSION 21)
 set(CEINMS_PATCH_VERSION 0)
 
 add_definitions(/DCEINMS_MAJOR_VERSION="${CEINMS_MAJOR_VERSION}")
