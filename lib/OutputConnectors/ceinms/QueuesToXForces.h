@@ -64,7 +64,7 @@ namespace OpenSim {
         virtual void computeForce(const SimTK::State& state,
             SimTK::Vector_<SimTK::SpatialVec>& bodyForces,
             SimTK::Vector& generalizedForces) const override;
-        void connectToModel(Model& model) override;
+ //       void connectToModel(Model& model) override;
     private:
         bool isSubscribed;
         ceinms::ExternalForceData getExternalForceDataFromPastValues(double time) const;

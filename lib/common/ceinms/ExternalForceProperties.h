@@ -1,7 +1,8 @@
 #ifndef ceinms_ExternalForceProperties_h
 #define ceinms_ExternalForceProperties_h
 #include <string>
-#include <Simbody.h>
+#include <OpenSim/Common/osimCommon.h>
+
 
 namespace ceinms {
     class ExternalForceProperties {

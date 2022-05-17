@@ -19,10 +19,10 @@ source_group("Header Files" FILES ${TrialData_HEADERS})
 source_group("Source Files" FILES ${TrialData_TEMPLATE_IMPLEMENTATION} ${TrialData_SOURCE})
 
 add_library(TrialData ${TrialData_HEADERS} ${TrialData_TEMPLATE_IMPLEMENTATION} ${TrialData_SOURCE})
+target_link_libraries(TrialData ${OpenSim_LIBRARIES})
 target_include_directories( TrialData
                             PRIVATE 
-                                   ${OPENSIMSIMBODY_INCLUDE_DIRS}       
-                                   ${SIMTK_INCLUDE_DIRS}
+            
                             #       ${NMSmodel_INCLUDE_DIRS}
                              #      ${Curve_INCLUDE_DIRS}
                               #     ${FileIO_INCLUDE_DIRS}

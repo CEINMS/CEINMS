@@ -15,6 +15,7 @@ set(OptimizationSystems_HEADERS ceinms/NMSmodelSystem.h
                                 ceinms/Barrier.h
                                 ceinms/PenaltyObjectiveFunction.h
                                 ceinms/MaxPeakObjectiveFunction.h
+                                ceinms/MaxSumPeakObjectiveFunction.h
                       #          ceinms/SumGenericContactForces.h
 								ceinms/CompositeObjectiveFunction.h
 								ceinms/ObjectiveFunctionBase.h
@@ -30,6 +31,7 @@ set(OptimizationSystems_SOURCES
     TorqueErrorNormalisedObjectiveFunction.cpp 
     Result.cpp 
     MaxPeakObjectiveFunction.cpp 
+    MaxSumPeakObjectiveFunction.cpp
 #    MinTorqueErrorAndContactForces.cpp
 #    SumGenericContactForces.cpp
     PenaltyObjectiveFunction.cpp

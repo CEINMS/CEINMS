@@ -84,9 +84,9 @@ namespace ceinms {
 
         state_ = model_.initSystem();
         for (auto c : coordinateActuators_)
-            c->overrideForce(state_, true);
+            c->setOverrideActuation(state_, true);
         for (auto m : muscleActuators_)
-            m->overrideForce(state_, true);
+            m->setOverrideActuation(state_, true);
 
     }
 

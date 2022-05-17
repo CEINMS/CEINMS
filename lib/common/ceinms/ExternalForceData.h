@@ -30,7 +30,7 @@
 #define ceinms_ExternalForceData_h
 #include <ostream>
 #include <utility>
-#include <SimTKcommon.h>
+#include <OpenSim/OpenSim.h>
 
 namespace ceinms {
     class ExternalForceData {

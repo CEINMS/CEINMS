@@ -2,13 +2,16 @@
 if(DEFINED ENV{VCPKG_ROOT} AND NOT DEFINED CMAKE_TOOLCHAIN_FILE)
   set(CMAKE_TOOLCHAIN_FILE $ENV{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake
       CACHE STRING "")
+	message(
+    "Using vcpkg."
+  )
 endif()
 
-cmake_minimum_required (VERSION 2.8.11) # "target_include_directories" command  and VS12 generator are missing in previous versions
+cmake_minimum_required (VERSION 2.8.12) # "target_include_directories" command  and VS12 generator are missing in previous versions
 project(CEINMS)
 set(CEINMS_MAJOR_VERSION 0)
 set(CEINMS_MINOR_VERSION 21)
-set(CEINMS_PATCH_VERSION 0)
+set(CEINMS_PATCH_VERSION 1)
 
 add_definitions(/DCEINMS_MAJOR_VERSION="${CEINMS_MAJOR_VERSION}")
 add_definitions(/DCEINMS_MINOR_VERSION="${CEINMS_MINOR_VERSION}")
@@ -43,12 +46,12 @@ find_package(Boost REQUIRED COMPONENTS filesystem system date_time)
 find_package(XSD REQUIRED)
 find_package(XERCES REQUIRED)
 find_package(OpenSim REQUIRED)
-find_package(mcbs REQUIRED)
+#find_package(mcbs REQUIRED)
 find_package(Filter REQUIRED)
-find_package(MR3tools REQUIRED)
-find_package(IKExtended REQUIRED)
-find_package(RTOSIM REQUIRED)
-find_package(Plsr REQUIRED)
+#find_package(MR3tools REQUIRED)
+#find_package(IKExtended REQUIRED)
+#find_package(RTOSIM REQUIRED)
+#find_package(Plsr REQUIRED)
 find_package(Concurrency REQUIRED)
 #find_package(osimSpliner REQUIRED)
 

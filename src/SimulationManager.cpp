@@ -54,9 +54,9 @@
 #include "ceinms/LoggerOnQueues.h"
 #include "ceinms/QueueToStorageFile.h"
 #include "ceinms/QueuesToStorageFiles.h"
-#include "ceinms/QueuesToJointReactionForces.h"
-#include "ceinms/QueuesToIntersegmentalAndJointReactionForces.h"
-#include "ceinms/QueuesToInverseDynamics.h"
+//#include "ceinms/QueuesToJointReactionForces.h"
+//#include "ceinms/QueuesToIntersegmentalAndJointReactionForces.h"
+//#include "ceinms/QueuesToInverseDynamics.h"
 #include "ceinms/QueuesToKneeBalanceContactForces.h"
 
 #include "rtb/concurrency/Concurrency.h"
@@ -182,7 +182,7 @@ namespace ceinms {
         if (useContactForces) {
             switch (contactModelCfg_.getContactModelType()) {
             case ContactModelType::OpenSim:
-                runOpenLoopWithGenericContactModel < NMSmodelT, ModelEvaluatorT, LoggerT >();
+             //   runOpenLoopWithGenericContactModel < NMSmodelT, ModelEvaluatorT, LoggerT >();
                 break;
             case ContactModelType::KneeBalance:
                 runOpenLoopWithKneeBalanceContactModel < NMSmodelT, ModelEvaluatorT, LoggerT >();
@@ -305,194 +305,194 @@ namespace ceinms {
         return 0;
     }
 
-    template <typename NMSmodelT, template <typename, typename> class ModelEvaluatorT, typename LoggerT>
-    bool SimulationManager::runOpenLoopWithGenericContactModel() {
-        std::cout << "runOpenLoopWithGenericContactModel" << endl;
-        //Create queues for input data
-        EmgQueue emgQueue;
-        LmtQueue lmtQueue;
-        ExternalTorquesQueue externalTorqueQueue;
-        MultipleMomentArmsQueues momentArmsQueues;
-        GeneralisedCoordinatesQueue generalisedCoordinatesQueue;
-        MultipleExternalForcesQueue externalForcesQueue;
-   //     ExternalTorquesQueue torquesFromIDQueue;
-
-        //Creates queues for output data
-        ScalarLogQueue logQueue;
-        VecContactForcesQueue contactForcesQueue;
-        VecContactForcesQueue intersegmentalForcesQueue;
-        //Creates latches to sync threads
-		rtb::Concurrency::Latch doneWithSubscriptionsLatch;
-		rtb::Concurrency::Latch doneWithExecutionLatch;
-
-        NMSmodelT mySubject;
-        setupSubject(mySubject, subjectFile_, executionCfg_.getTolerance());
-        std::string osimModelFilename = mySubject.getOpenSimModelFilename();
-        try {
-            OpenSim::Model testModel(osimModelFilename);
-            std::cout << "Found valid OpenSim model: " << osimModelFilename << std::endl;
-        }
-        catch (...)
-        {
-            std::cout << "OpenSim model not valid: " << osimModelFilename << std::endl;
-            exit(EXIT_FAILURE);
-
-        }
-        // 2. define the thread connecting with the input sources
-        std::cout << "-- define the threads connecting with the input sources" << endl;
-        string emgFilename(dataLocations_.getExcitationsFile());
-        EmgFromFile emgProducer(emgQueue, doneWithSubscriptionsLatch, doneWithExecutionLatch, mySubject, emgFilename, emgGeneratorFile_);
-
-        vector< string > dofNames;
-        mySubject.getDoFNames(dofNames);
-        vector< string > maFilename;
-        ceinms::FileUtils::sortMaFilenames(dataLocations_.getMaFiles(), dofNames, maFilename);
-        LmtMaFromStorageFile lmtMaProducer(lmtQueue, momentArmsQueues, doneWithSubscriptionsLatch, doneWithExecutionLatch, mySubject, dataLocations_.getLmtFile(), maFilename);
-		lmtMaProducer.setStartStopTimes(dataLocations_.getStartTime(), dataLocations_.getStopTime());
-
-        string externalTorqueFilename(dataLocations_.getExternalTorqueFile());
-        ExternalTorquesFromStorageFile externalTorquesProducer(externalTorqueQueue, doneWithSubscriptionsLatch, doneWithExecutionLatch, mySubject, externalTorqueFilename);
-
-        vector<string> dataToLog = { "Activations",
-            "FibreLengths",
-            "NormFibreLengths",
-            "FibreVelocities",
-            "NormFibreVelocities",
-            "PennationAngles",
-            "MuscleForces",
-            "Torques",
-			"TendonLengths",
-			"NormTendonLengths",
-            "MusclesContribution" };
-
-        // 2b. define the thread consuming the output sources
-        cout << "-- define the thread consuming the output sources" << endl;
-        vector<string> valuesToWrite = dataToLog;
-		ceinms::initialiseQueue(logQueue, valuesToWrite);
-        QueuesToStorageFiles queuesToStorageFiles(logQueue, doneWithSubscriptionsLatch, doneWithExecutionLatch, mySubject, valuesToWrite, outputDirectory_);
-
-        // 3. define the model simulator
-        cout << "-- define the model simulator" << endl;
-        vector<string> valuesToLog = dataToLog;
-        ModelEvaluatorT<NMSmodelT, LoggerT>  simulator(
-            emgQueue,
-            lmtQueue,
-            externalTorqueQueue,
-            momentArmsQueues,
-            logQueue,
-            doneWithSubscriptionsLatch,
-            doneWithExecutionLatch,
-            mySubject,
-            valuesToLog);
-
-        // 4. start contact model stuff
-        cout << "-- initialise contact model" << endl;
-        auto contactModelSetup(contactModelCfg_.getContactModelSetupOsim());
-        
-        QueuesToJointReactionForces jointReactionForcesEstimator(
-            generalisedCoordinatesQueue,
-            externalForcesQueue,
-            *logQueue["MuscleForces"],
-            *logQueue["Torques"],
-            contactForcesQueue,
-            doneWithSubscriptionsLatch,
-            doneWithExecutionLatch,
-            mySubject,
-            osimModelFilename,
-            dataLocations_.getExternalLoadsFile(),
-            contactModelSetup.joints);
-
-        GeneralisedCoordinatesFromStorageFile generalisedCoordinateFromStorageFile(
-            generalisedCoordinatesQueue,
-            doneWithSubscriptionsLatch,
-            doneWithExecutionLatch,
-            osimModelFilename,
-            dataLocations_.getMotionFile(),
-            8);
-        //2 create external forces produces
-        cout << "-- Initialise external forces produces" << endl;
-        ExternalForcesFromStorageFile externalForcesFromStorageFile(
-            externalForcesQueue,
-            doneWithSubscriptionsLatch,
-            doneWithExecutionLatch,
-            dataLocations_.getExternalLoadsFile());
-
-        //3 create and launch log
-        cout << "-- Initialise loggers" << endl;
-        QueueToStorageFile<VecContactForcesData> contactForcesLogger(
-            contactForcesQueue,
-            doneWithSubscriptionsLatch,
-            doneWithExecutionLatch,
-            contactModelSetup.joints,
-            "ContactForces",
-            outputDirectory_);
-
-        /*    QueueToStorageFile<VecContactForcesData> intersegmentalForcesLogger(
-                intersegmentalForcesQueue,
-                doneWithSubscriptionsLatch,
-                doneWithExecutionLatch,
-                contactModelSetup.joints,
-                "IntersegmentalForces",
-                outputDirectory_);
-                */
-        OpenSim::Model osimModel(osimModelFilename);
-        OpenSim::Array<std::string> osimCoordNames;
-        osimModel.getCoordinateSet().getNames(osimCoordNames);
-        std::vector<std::string> coordNames;
-        ArrayConverter::toStdVector(osimCoordNames, coordNames);
-        //QueueToStorageFile<ExternalTorquesData> externalTorquesLogger(
-        //    torquesFromIDQueue,
-        //    doneWithSubscriptionsLatch,
-        //    doneWithExecutionLatch,
-        //    coordNames,
-        //    "ExternalTorques",
-        //    outputDirectory_);
-
-        //cout << "-- Initialise Inverse Dynamics" << endl;
-        //QueuesToInverseDynamics inverseDynamicsSolver(
-        //    generalisedCoordinatesQueue,
-        //    externalForcesQueue,
-        //    torquesFromIDQueue,
-        //    doneWithSubscriptionsLatch,
-        //    doneWithExecutionLatch,
-        //    mySubject,
-        //    osimModelFilename,
-        //    dataLocations_.getExternalLoadsFile(),
-        //    false);
-
-        doneWithSubscriptionsLatch.setCount(9);
-        doneWithExecutionLatch.setCount(9);
-
-        cout << "-- Launch threads" << endl;
-        std::thread contactForcesEstimatorThread(std::ref(jointReactionForcesEstimator));
-        std::thread generalisedCoordinateThread(std::ref(generalisedCoordinateFromStorageFile));
-        std::thread externalForcesThread(std::ref(externalForcesFromStorageFile));
-
-        std::thread emgProdThread(std::ref(emgProducer));
-        std::thread externalTorquesProdThread(std::ref(externalTorquesProducer));
-        std::thread lmtMaProdThread(std::ref(lmtMaProducer));
-        std::thread simulatorThread(std::ref(simulator));
-        std::thread queuesToStorageFilesThread(std::ref(queuesToStorageFiles));
-        std::thread contactForcesLoggerThread(std::ref(contactForcesLogger));
-        //      std::thread intersegmentalForcesLoggerThread(std::ref(intersegmentalForcesLogger));
-   //     std::thread inverseDynamicsSolverThread(std::ref(inverseDynamicsSolver));
-    //    std::thread externalTorquesLoggerThread(std::ref(externalTorquesLogger));
-
-        emgProdThread.join();
-        lmtMaProdThread.join();
-        externalTorquesProdThread.join();
-        simulatorThread.join();
-        queuesToStorageFilesThread.join();
-        contactForcesEstimatorThread.join();
-        generalisedCoordinateThread.join();
-        externalForcesThread.join();
-        contactForcesLoggerThread.join();
-        //     intersegmentalForcesLoggerThread.join();
-   //     inverseDynamicsSolverThread.join();
-//        externalTorquesLoggerThread.join();
-        cout << "-- Closing" << endl;
-        return 0;
-    }
+//    template <typename NMSmodelT, template <typename, typename> class ModelEvaluatorT, typename LoggerT>
+//    bool SimulationManager::runOpenLoopWithGenericContactModel() {
+//        std::cout << "runOpenLoopWithGenericContactModel" << endl;
+//        //Create queues for input data
+//        EmgQueue emgQueue;
+//        LmtQueue lmtQueue;
+//        ExternalTorquesQueue externalTorqueQueue;
+//        MultipleMomentArmsQueues momentArmsQueues;
+//        GeneralisedCoordinatesQueue generalisedCoordinatesQueue;
+//        MultipleExternalForcesQueue externalForcesQueue;
+//   //     ExternalTorquesQueue torquesFromIDQueue;
+//
+//        //Creates queues for output data
+//        ScalarLogQueue logQueue;
+//        VecContactForcesQueue contactForcesQueue;
+//        VecContactForcesQueue intersegmentalForcesQueue;
+//        //Creates latches to sync threads
+//		rtb::Concurrency::Latch doneWithSubscriptionsLatch;
+//		rtb::Concurrency::Latch doneWithExecutionLatch;
+//
+//        NMSmodelT mySubject;
+//        setupSubject(mySubject, subjectFile_, executionCfg_.getTolerance());
+//        std::string osimModelFilename = mySubject.getOpenSimModelFilename();
+//        try {
+//            OpenSim::Model testModel(osimModelFilename);
+//            std::cout << "Found valid OpenSim model: " << osimModelFilename << std::endl;
+//        }
+//        catch (...)
+//        {
+//            std::cout << "OpenSim model not valid: " << osimModelFilename << std::endl;
+//            exit(EXIT_FAILURE);
+//
+//        }
+//        // 2. define the thread connecting with the input sources
+//        std::cout << "-- define the threads connecting with the input sources" << endl;
+//        string emgFilename(dataLocations_.getExcitationsFile());
+//        EmgFromFile emgProducer(emgQueue, doneWithSubscriptionsLatch, doneWithExecutionLatch, mySubject, emgFilename, emgGeneratorFile_);
+//
+//        vector< string > dofNames;
+//        mySubject.getDoFNames(dofNames);
+//        vector< string > maFilename;
+//        ceinms::FileUtils::sortMaFilenames(dataLocations_.getMaFiles(), dofNames, maFilename);
+//        LmtMaFromStorageFile lmtMaProducer(lmtQueue, momentArmsQueues, doneWithSubscriptionsLatch, doneWithExecutionLatch, mySubject, dataLocations_.getLmtFile(), maFilename);
+//		lmtMaProducer.setStartStopTimes(dataLocations_.getStartTime(), dataLocations_.getStopTime());
+//
+//        string externalTorqueFilename(dataLocations_.getExternalTorqueFile());
+//        ExternalTorquesFromStorageFile externalTorquesProducer(externalTorqueQueue, doneWithSubscriptionsLatch, doneWithExecutionLatch, mySubject, externalTorqueFilename);
+//
+//        vector<string> dataToLog = { "Activations",
+//            "FibreLengths",
+//            "NormFibreLengths",
+//            "FibreVelocities",
+//            "NormFibreVelocities",
+//            "PennationAngles",
+//            "MuscleForces",
+//            "Torques",
+//			"TendonLengths",
+//			"NormTendonLengths",
+//            "MusclesContribution" };
+//
+//        // 2b. define the thread consuming the output sources
+//        cout << "-- define the thread consuming the output sources" << endl;
+//        vector<string> valuesToWrite = dataToLog;
+//		ceinms::initialiseQueue(logQueue, valuesToWrite);
+//        QueuesToStorageFiles queuesToStorageFiles(logQueue, doneWithSubscriptionsLatch, doneWithExecutionLatch, mySubject, valuesToWrite, outputDirectory_);
+//
+//        // 3. define the model simulator
+//        cout << "-- define the model simulator" << endl;
+//        vector<string> valuesToLog = dataToLog;
+//        ModelEvaluatorT<NMSmodelT, LoggerT>  simulator(
+//            emgQueue,
+//            lmtQueue,
+//            externalTorqueQueue,
+//            momentArmsQueues,
+//            logQueue,
+//            doneWithSubscriptionsLatch,
+//            doneWithExecutionLatch,
+//            mySubject,
+//            valuesToLog);
+//
+//        // 4. start contact model stuff
+//        cout << "-- initialise contact model" << endl;
+//        auto contactModelSetup(contactModelCfg_.getContactModelSetupOsim());
+//        
+//        QueuesToJointReactionForces jointReactionForcesEstimator(
+//            generalisedCoordinatesQueue,
+//            externalForcesQueue,
+//            *logQueue["MuscleForces"],
+//            *logQueue["Torques"],
+//            contactForcesQueue,
+//            doneWithSubscriptionsLatch,
+//            doneWithExecutionLatch,
+//            mySubject,
+//            osimModelFilename,
+//            dataLocations_.getExternalLoadsFile(),
+//            contactModelSetup.joints);
+//
+//        GeneralisedCoordinatesFromStorageFile generalisedCoordinateFromStorageFile(
+//            generalisedCoordinatesQueue,
+//            doneWithSubscriptionsLatch,
+//            doneWithExecutionLatch,
+//            osimModelFilename,
+//            dataLocations_.getMotionFile(),
+//            8);
+//        //2 create external forces produces
+//        cout << "-- Initialise external forces produces" << endl;
+//        ExternalForcesFromStorageFile externalForcesFromStorageFile(
+//            externalForcesQueue,
+//            doneWithSubscriptionsLatch,
+//            doneWithExecutionLatch,
+//            dataLocations_.getExternalLoadsFile());
+//
+//        //3 create and launch log
+//        cout << "-- Initialise loggers" << endl;
+//        QueueToStorageFile<VecContactForcesData> contactForcesLogger(
+//            contactForcesQueue,
+//            doneWithSubscriptionsLatch,
+//            doneWithExecutionLatch,
+//            contactModelSetup.joints,
+//            "ContactForces",
+//            outputDirectory_);
+//
+//        /*    QueueToStorageFile<VecContactForcesData> intersegmentalForcesLogger(
+//                intersegmentalForcesQueue,
+//                doneWithSubscriptionsLatch,
+//                doneWithExecutionLatch,
+//                contactModelSetup.joints,
+//                "IntersegmentalForces",
+//                outputDirectory_);
+//                */
+//        OpenSim::Model osimModel(osimModelFilename);
+//        OpenSim::Array<std::string> osimCoordNames;
+//        osimModel.getCoordinateSet().getNames(osimCoordNames);
+//        std::vector<std::string> coordNames;
+//        ArrayConverter::toStdVector(osimCoordNames, coordNames);
+//        //QueueToStorageFile<ExternalTorquesData> externalTorquesLogger(
+//        //    torquesFromIDQueue,
+//        //    doneWithSubscriptionsLatch,
+//        //    doneWithExecutionLatch,
+//        //    coordNames,
+//        //    "ExternalTorques",
+//        //    outputDirectory_);
+//
+//        //cout << "-- Initialise Inverse Dynamics" << endl;
+//        //QueuesToInverseDynamics inverseDynamicsSolver(
+//        //    generalisedCoordinatesQueue,
+//        //    externalForcesQueue,
+//        //    torquesFromIDQueue,
+//        //    doneWithSubscriptionsLatch,
+//        //    doneWithExecutionLatch,
+//        //    mySubject,
+//        //    osimModelFilename,
+//        //    dataLocations_.getExternalLoadsFile(),
+//        //    false);
+//
+//        doneWithSubscriptionsLatch.setCount(9);
+//        doneWithExecutionLatch.setCount(9);
+//
+//        cout << "-- Launch threads" << endl;
+//        std::thread contactForcesEstimatorThread(std::ref(jointReactionForcesEstimator));
+//        std::thread generalisedCoordinateThread(std::ref(generalisedCoordinateFromStorageFile));
+//        std::thread externalForcesThread(std::ref(externalForcesFromStorageFile));
+//
+//        std::thread emgProdThread(std::ref(emgProducer));
+//        std::thread externalTorquesProdThread(std::ref(externalTorquesProducer));
+//        std::thread lmtMaProdThread(std::ref(lmtMaProducer));
+//        std::thread simulatorThread(std::ref(simulator));
+//        std::thread queuesToStorageFilesThread(std::ref(queuesToStorageFiles));
+//        std::thread contactForcesLoggerThread(std::ref(contactForcesLogger));
+//        //      std::thread intersegmentalForcesLoggerThread(std::ref(intersegmentalForcesLogger));
+//   //     std::thread inverseDynamicsSolverThread(std::ref(inverseDynamicsSolver));
+//    //    std::thread externalTorquesLoggerThread(std::ref(externalTorquesLogger));
+//
+//        emgProdThread.join();
+//        lmtMaProdThread.join();
+//        externalTorquesProdThread.join();
+//        simulatorThread.join();
+//        queuesToStorageFilesThread.join();
+//        contactForcesEstimatorThread.join();
+//        generalisedCoordinateThread.join();
+//        externalForcesThread.join();
+//        contactForcesLoggerThread.join();
+//        //     intersegmentalForcesLoggerThread.join();
+//   //     inverseDynamicsSolverThread.join();
+////        externalTorquesLoggerThread.join();
+//        cout << "-- Closing" << endl;
+//        return 0;
+//    }
 
     template <typename NMSmodelT, template <typename, typename> class ModelEvaluatorT, typename LoggerT>
     bool SimulationManager::runOpenLoop() {
@@ -582,7 +582,7 @@ namespace ceinms {
         if (useContactForces) {
             switch (contactModelCfg_.getContactModelType()) {
             case ContactModelType::OpenSim:
-                runHybridWithGenericContactModel<NMSmodelT>();
+            //    runHybridWithGenericContactModel<NMSmodelT>();
                 break;
             case ContactModelType::KneeBalance:
                 runHybridWithKneeBalanceContactModel<NMSmodelT>();
@@ -595,183 +595,183 @@ namespace ceinms {
     }
 
 
-    template <typename NMSmodelT>
-    bool SimulationManager::runHybridWithGenericContactModel() {
+  //  template <typename NMSmodelT>
+  //  bool SimulationManager::runHybridWithGenericContactModel() {
 
-        //Create queues for input data
-        EmgQueue emgQueue;
-        LmtQueue lmtQueue;
-        ExternalTorquesQueue externalTorqueQueue;// , torquesFromIDQueue;
-        MultipleMomentArmsQueues momentArmsQueues;
-        GeneralisedCoordinatesQueue generalisedCoordinatesQueue;
-        MultipleExternalForcesQueue externalForcesQueue;
-        
-        //Creates queues for output data
-        ScalarLogQueue logQueue;
-        VecContactForcesQueue contactForcesQueue;
+  //      //Create queues for input data
+  //      EmgQueue emgQueue;
+  //      LmtQueue lmtQueue;
+  //      ExternalTorquesQueue externalTorqueQueue;// , torquesFromIDQueue;
+  //      MultipleMomentArmsQueues momentArmsQueues;
+  //      GeneralisedCoordinatesQueue generalisedCoordinatesQueue;
+  //      MultipleExternalForcesQueue externalForcesQueue;
+  //      
+  //      //Creates queues for output data
+  //      ScalarLogQueue logQueue;
+  //      VecContactForcesQueue contactForcesQueue;
 
-        //Creates latches to sync threads
-		rtb::Concurrency::Latch doneWithSubscriptionsLatch;
-		rtb::Concurrency::Latch doneWithExecutionLatch;
+  //      //Creates latches to sync threads
+		//rtb::Concurrency::Latch doneWithSubscriptionsLatch;
+		//rtb::Concurrency::Latch doneWithExecutionLatch;
 
-        NMSmodelT mySubject;
-        setupSubject(mySubject, subjectFile_, executionCfg_.getTolerance());
-        
-        std::string osimModelFilename = mySubject.getOpenSimModelFilename();
-        try {
-            OpenSim::Model testModel(osimModelFilename);
-            std::cout << "Found valid OpenSim model: " << osimModelFilename << std::endl;
-        }
-        catch (...)
-        {
-            std::cout << "OpenSim model not valid: " << osimModelFilename << std::endl;
-            exit(EXIT_FAILURE);
+  //      NMSmodelT mySubject;
+  //      setupSubject(mySubject, subjectFile_, executionCfg_.getTolerance());
+  //      
+  //      std::string osimModelFilename = mySubject.getOpenSimModelFilename();
+  //      try {
+  //          OpenSim::Model testModel(osimModelFilename);
+  //          std::cout << "Found valid OpenSim model: " << osimModelFilename << std::endl;
+  //      }
+  //      catch (...)
+  //      {
+  //          std::cout << "OpenSim model not valid: " << osimModelFilename << std::endl;
+  //          exit(EXIT_FAILURE);
 
-        }
-        // 2. define the thread connecting with the input sources
-        string emgFilename(dataLocations_.getExcitationsFile());
-        EmgFromFile emgProducer(emgQueue, doneWithSubscriptionsLatch, doneWithExecutionLatch, mySubject, emgFilename, emgGeneratorFile_);
+  //      }
+  //      // 2. define the thread connecting with the input sources
+  //      string emgFilename(dataLocations_.getExcitationsFile());
+  //      EmgFromFile emgProducer(emgQueue, doneWithSubscriptionsLatch, doneWithExecutionLatch, mySubject, emgFilename, emgGeneratorFile_);
 
-        vector< string > dofNames;
-        mySubject.getDoFNames(dofNames);
-        vector< string > maFilename;
-        ceinms::FileUtils::sortMaFilenames(dataLocations_.getMaFiles(), dofNames, maFilename);
-        LmtMaFromStorageFile lmtMaProducer(lmtQueue, momentArmsQueues, doneWithSubscriptionsLatch, doneWithExecutionLatch, mySubject, dataLocations_.getLmtFile(), maFilename);
-		lmtMaProducer.setStartStopTimes(dataLocations_.getStartTime(), dataLocations_.getStopTime());
+  //      vector< string > dofNames;
+  //      mySubject.getDoFNames(dofNames);
+  //      vector< string > maFilename;
+  //      ceinms::FileUtils::sortMaFilenames(dataLocations_.getMaFiles(), dofNames, maFilename);
+  //      LmtMaFromStorageFile lmtMaProducer(lmtQueue, momentArmsQueues, doneWithSubscriptionsLatch, doneWithExecutionLatch, mySubject, dataLocations_.getLmtFile(), maFilename);
+		//lmtMaProducer.setStartStopTimes(dataLocations_.getStartTime(), dataLocations_.getStopTime());
 
-        string externalTorqueFilename(dataLocations_.getExternalTorqueFile());
-        ExternalTorquesFromStorageFile externalTorquesProducer(externalTorqueQueue, doneWithSubscriptionsLatch, doneWithExecutionLatch, mySubject, externalTorqueFilename);
-        vector<string> dataToLog = { "Activations",
-            "FibreLengths",
-            "NormFibreLengths",
-            "FibreVelocities",
-            "NormFibreVelocities",
-            "PennationAngles",
-            "MuscleForces",
-            "Torques",
-			"TendonLengths",
-			"NormTendonLengths",
-            "AdjustedEmgs",
-            "MusclesContribution" };
-        // 2b. define the thread consuming the output sources
-		dataToLog.push_back("ObjectiveFunctionComponentsAndWeightings");
-        vector<string> valuesToWrite = dataToLog;
-		ceinms::initialiseQueue(logQueue, valuesToWrite);
-			
-        QueuesToStorageFiles queuesToStorageFiles(logQueue, doneWithSubscriptionsLatch, doneWithExecutionLatch, mySubject, valuesToWrite, outputDirectory_);
+  //      string externalTorqueFilename(dataLocations_.getExternalTorqueFile());
+  //      ExternalTorquesFromStorageFile externalTorquesProducer(externalTorqueQueue, doneWithSubscriptionsLatch, doneWithExecutionLatch, mySubject, externalTorqueFilename);
+  //      vector<string> dataToLog = { "Activations",
+  //          "FibreLengths",
+  //          "NormFibreLengths",
+  //          "FibreVelocities",
+  //          "NormFibreVelocities",
+  //          "PennationAngles",
+  //          "MuscleForces",
+  //          "Torques",
+		//	"TendonLengths",
+		//	"NormTendonLengths",
+  //          "AdjustedEmgs",
+  //          "MusclesContribution" };
+  //      // 2b. define the thread consuming the output sources
+		//dataToLog.push_back("ObjectiveFunctionComponentsAndWeightings");
+  //      vector<string> valuesToWrite = dataToLog;
+		//ceinms::initialiseQueue(logQueue, valuesToWrite);
+		//	
+  //      QueuesToStorageFiles queuesToStorageFiles(logQueue, doneWithSubscriptionsLatch, doneWithExecutionLatch, mySubject, valuesToWrite, outputDirectory_);
 
-		// 4. define the optimiser
-        EmgInformedObjectiveFunctionSetup setup;
+		//// 4. define the optimiser
+  //      EmgInformedObjectiveFunctionSetup setup;
 
-        executionCfg_.getMusclesToAdjust(setup.musclesToAdjust);
-        executionCfg_.getMusclesToSynthesise(setup.musclesToSynthesise);
-        executionCfg_.getHybridWeightings(setup.weightings.alpha, setup.weightings.beta, setup.weightings.gamma);
-        executionCfg_.getDofSet(setup.dofsToTrack);
-        if (setup.dofsToTrack.empty())
-            setup.dofsToTrack = mySubject.getDoFNames();
+  //      executionCfg_.getMusclesToAdjust(setup.musclesToAdjust);
+  //      executionCfg_.getMusclesToSynthesise(setup.musclesToSynthesise);
+  //      executionCfg_.getHybridWeightings(setup.weightings.alpha, setup.weightings.beta, setup.weightings.gamma);
+  //      executionCfg_.getDofSet(setup.dofsToTrack);
+  //      if (setup.dofsToTrack.empty())
+  //          setup.dofsToTrack = mySubject.getDoFNames();
 
-        NMSmodelFrameOptimisation<NMSmodelT> errorMinimizer(mySubject, setup); 
-        ModelEvaluationHybrid<NMSmodelT, NMSmodelFrameOptimisation<NMSmodelT>, LoggerOnQueues> simulator(
-            emgQueue,
-            lmtQueue,
-            externalTorqueQueue,
-            momentArmsQueues,
-            logQueue,
-            doneWithSubscriptionsLatch,
-            doneWithExecutionLatch,
-            mySubject,
-            errorMinimizer,
-            valuesToWrite);
-
-
-        // 4. start contact model stuff
-        cout << "-- initialise contact model" << endl;
-        auto contactModelSetup(contactModelCfg_.getContactModelSetupOsim());
-
-        QueuesToJointReactionForces jointReactionForcesEstimator(
-            generalisedCoordinatesQueue,
-            externalForcesQueue,
-            *logQueue["MuscleForces"],
-            *logQueue["Torques"],
-            contactForcesQueue,
-            doneWithSubscriptionsLatch,
-            doneWithExecutionLatch,
-            mySubject,
-            osimModelFilename,
-            dataLocations_.getExternalLoadsFile(),
-            contactModelSetup.joints);
-
-        GeneralisedCoordinatesFromStorageFile generalisedCoordinateFromStorageFile(
-            generalisedCoordinatesQueue,
-            doneWithSubscriptionsLatch,
-            doneWithExecutionLatch,
-            osimModelFilename,
-            dataLocations_.getMotionFile(),
-            8);
-
-		QueueToStorageFile<ScalarVectorData> hybridErrorLogger(
-			*(logQueue["ObjectiveFunctionComponentsAndWeightings"]),
-			doneWithSubscriptionsLatch,
-			doneWithExecutionLatch,
-			{ "TorqueError", "SumExcitation", "ExcitationTrackingError", "alpha", "beta", "gamma" },
-			"ObjectiveFunctionComponentsAndWeightings",
-			outputDirectory_
-		);
-        //2 create external forces produces
-        cout << "-- Initialise external forces produces" << endl;
-        ExternalForcesFromStorageFile externalForcesFromStorageFile(
-            externalForcesQueue,
-            doneWithSubscriptionsLatch,
-            doneWithExecutionLatch,
-            dataLocations_.getExternalLoadsFile());
-
-        //3 create and launch log
-        cout << "-- Initialise loggers" << endl;
-        QueueToStorageFile<VecContactForcesData> contactForcesLogger(
-            contactForcesQueue,
-            doneWithSubscriptionsLatch,
-            doneWithExecutionLatch,
-            contactModelSetup.joints,
-            "ContactForces",
-            outputDirectory_);
-
-        OpenSim::Model osimModel(osimModelFilename);
-        OpenSim::Array<std::string> osimCoordNames;
-        osimModel.getCoordinateSet().getNames(osimCoordNames);
-        std::vector<std::string> coordNames;
-        ArrayConverter::toStdVector(osimCoordNames, coordNames);
-
-        doneWithSubscriptionsLatch.setCount(10);
-        doneWithExecutionLatch.setCount(10);
-
-        // 5. start the threads
-        std::thread emgProdThread(std::ref(emgProducer));
-        std::thread externalTorquesProdThread(std::ref(externalTorquesProducer));
-        std::thread lmtMaProdThread(std::ref(lmtMaProducer));
-        std::thread simulatorThread(std::ref(simulator));
-        std::thread queuesToStorageFilesThread(std::ref(queuesToStorageFiles));
-
-        std::thread contactForcesEstimatorThread(std::ref(jointReactionForcesEstimator));
-        std::thread generalisedCoordinateThread(std::ref(generalisedCoordinateFromStorageFile));
-        std::thread externalForcesThread(std::ref(externalForcesFromStorageFile));
-        std::thread contactForcesLoggerThread(std::ref(contactForcesLogger));
-		std::thread hybridErrorLoggerThread(std::ref(hybridErrorLogger));
+  //      NMSmodelFrameOptimisation<NMSmodelT> errorMinimizer(mySubject, setup); 
+  //      ModelEvaluationHybrid<NMSmodelT, NMSmodelFrameOptimisation<NMSmodelT>, LoggerOnQueues> simulator(
+  //          emgQueue,
+  //          lmtQueue,
+  //          externalTorqueQueue,
+  //          momentArmsQueues,
+  //          logQueue,
+  //          doneWithSubscriptionsLatch,
+  //          doneWithExecutionLatch,
+  //          mySubject,
+  //          errorMinimizer,
+  //          valuesToWrite);
 
 
-        emgProdThread.join();
-        lmtMaProdThread.join();
-        externalTorquesProdThread.join();
-        simulatorThread.join();
-        queuesToStorageFilesThread.join();
-        contactForcesEstimatorThread.join();
-        generalisedCoordinateThread.join();
-        externalForcesThread.join();
-        contactForcesLoggerThread.join();
-		hybridErrorLoggerThread.join();
+  //      // 4. start contact model stuff
+  //      cout << "-- initialise contact model" << endl;
+  //      auto contactModelSetup(contactModelCfg_.getContactModelSetupOsim());
 
-        return 0;
+  //      QueuesToJointReactionForces jointReactionForcesEstimator(
+  //          generalisedCoordinatesQueue,
+  //          externalForcesQueue,
+  //          *logQueue["MuscleForces"],
+  //          *logQueue["Torques"],
+  //          contactForcesQueue,
+  //          doneWithSubscriptionsLatch,
+  //          doneWithExecutionLatch,
+  //          mySubject,
+  //          osimModelFilename,
+  //          dataLocations_.getExternalLoadsFile(),
+  //          contactModelSetup.joints);
 
-    }
+  //      GeneralisedCoordinatesFromStorageFile generalisedCoordinateFromStorageFile(
+  //          generalisedCoordinatesQueue,
+  //          doneWithSubscriptionsLatch,
+  //          doneWithExecutionLatch,
+  //          osimModelFilename,
+  //          dataLocations_.getMotionFile(),
+  //          8);
+
+		//QueueToStorageFile<ScalarVectorData> hybridErrorLogger(
+		//	*(logQueue["ObjectiveFunctionComponentsAndWeightings"]),
+		//	doneWithSubscriptionsLatch,
+		//	doneWithExecutionLatch,
+		//	{ "TorqueError", "SumExcitation", "ExcitationTrackingError", "alpha", "beta", "gamma" },
+		//	"ObjectiveFunctionComponentsAndWeightings",
+		//	outputDirectory_
+		//);
+  //      //2 create external forces produces
+  //      cout << "-- Initialise external forces produces" << endl;
+  //      ExternalForcesFromStorageFile externalForcesFromStorageFile(
+  //          externalForcesQueue,
+  //          doneWithSubscriptionsLatch,
+  //          doneWithExecutionLatch,
+  //          dataLocations_.getExternalLoadsFile());
+
+  //      //3 create and launch log
+  //      cout << "-- Initialise loggers" << endl;
+  //      QueueToStorageFile<VecContactForcesData> contactForcesLogger(
+  //          contactForcesQueue,
+  //          doneWithSubscriptionsLatch,
+  //          doneWithExecutionLatch,
+  //          contactModelSetup.joints,
+  //          "ContactForces",
+  //          outputDirectory_);
+
+  //      OpenSim::Model osimModel(osimModelFilename);
+  //      OpenSim::Array<std::string> osimCoordNames;
+  //      osimModel.getCoordinateSet().getNames(osimCoordNames);
+  //      std::vector<std::string> coordNames;
+  //      ArrayConverter::toStdVector(osimCoordNames, coordNames);
+
+  //      doneWithSubscriptionsLatch.setCount(10);
+  //      doneWithExecutionLatch.setCount(10);
+
+  //      // 5. start the threads
+  //      std::thread emgProdThread(std::ref(emgProducer));
+  //      std::thread externalTorquesProdThread(std::ref(externalTorquesProducer));
+  //      std::thread lmtMaProdThread(std::ref(lmtMaProducer));
+  //      std::thread simulatorThread(std::ref(simulator));
+  //      std::thread queuesToStorageFilesThread(std::ref(queuesToStorageFiles));
+
+  //      std::thread contactForcesEstimatorThread(std::ref(jointReactionForcesEstimator));
+  //      std::thread generalisedCoordinateThread(std::ref(generalisedCoordinateFromStorageFile));
+  //      std::thread externalForcesThread(std::ref(externalForcesFromStorageFile));
+  //      std::thread contactForcesLoggerThread(std::ref(contactForcesLogger));
+		//std::thread hybridErrorLoggerThread(std::ref(hybridErrorLogger));
+
+
+  //      emgProdThread.join();
+  //      lmtMaProdThread.join();
+  //      externalTorquesProdThread.join();
+  //      simulatorThread.join();
+  //      queuesToStorageFilesThread.join();
+  //      contactForcesEstimatorThread.join();
+  //      generalisedCoordinateThread.join();
+  //      externalForcesThread.join();
+  //      contactForcesLoggerThread.join();
+		//hybridErrorLoggerThread.join();
+
+  //      return 0;
+
+  //  }
 
 	template <typename NMSmodelT>
 	bool SimulationManager::runHybridWithKneeBalanceContactModel() {

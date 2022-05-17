@@ -8,7 +8,7 @@ set(FromStorageFile_SOURCES
   FromStorageFile/LmtMaFromStorageFile.cpp
   FromStorageFile/Utilities.cpp
   FromStorageFile/ExternalForcesFromStorageFile.cpp
-  FromStorageFile/GeneralisedCoordinatesFromStorageFile.cpp
+  #FromStorageFile/GeneralisedCoordinatesFromStorageFile.cpp
 )
 set(FromStorageFile_HEADERS
   ceinms/EmgFromFile.h
@@ -17,7 +17,7 @@ set(FromStorageFile_HEADERS
   ceinms/LmtMaFromStorageFile.h
   ceinms/Utilities.h
   ceinms/ExternalForcesFromStorageFile.h
-  ceinms/GeneralisedCoordinatesFromStorageFile.h
+  #ceinms/GeneralisedCoordinatesFromStorageFile.h
   ceinms/EmgFromQueue.h
 )
 
@@ -26,9 +26,9 @@ set(InputConnectors_SOURCES
   ExternalTorquesFromX.cpp
   LmtMaFromX.cpp
   ExternalForcesFromX.cpp
-  GeneralisedCoordinatesFromX.cpp 
+  #GeneralisedCoordinatesFromX.cpp 
   EmgFromQueue.cpp
-  LmtMaFromMcbs.cpp
+  #LmtMaFromMcbs.cpp
 )
 
 set(InputConnectors_TEMPLATE_IMPLEMENTATIONS)
@@ -40,8 +40,8 @@ set(InputConnectors_HEADERS
   ceinms/ExternalTorquesFromX.h
   ceinms/LmtMaFromX.h
   ceinms/ExternalForcesFromX.h
-  ceinms/GeneralisedCoordinatesFromX.h
-  ceinms/LmtMaFromMcbs.h
+  #ceinms/GeneralisedCoordinatesFromX.h
+ # ceinms/LmtMaFromMcbs.h
 )
 
 source_group("Headers" FILES ${InputConnectors_HEADERS} ${FromStorageFile_HEADERS} )
@@ -55,7 +55,7 @@ add_library(InputConnectors STATIC
   ${FromStorageFile_HEADERS}
   ${InputConnectors_TEMPLATE_IMPLEMENTATIONS}
 )
-target_link_libraries(InputConnectors FileIO ${Boost_FILESYSTEM_LIBRARY} optimized ${OPENSIM_LIBRARIES} rtb::Filter rtb::Concurrency)
+target_link_libraries(InputConnectors FileIO ${Boost_FILESYSTEM_LIBRARY} ${OpenSim_LIBRARIES} rtb::Filter rtb::Concurrency)
 #target_link_libraries(InputConnectors FileIO Concurrency ${Boost_FILESYSTEM_LIBRARY} debug ${OPENSIM_LIBRARIES_DEBUG})
 
 
@@ -65,9 +65,8 @@ target_include_directories(InputConnectors
                                             ${FileIO_INCLUDE_DIRS}
                                             ${Concurrency_INCLUDE_DIRS}
                                             ${Boost_INCLUDE_DIRS}
-											${RTOSIM_INCLUDE_DIRS}
 								PUBLIC
-											${OPENSIMSIMBODY_INCLUDE_DIRS}
+											
 											${mcbs_INCLUDE_DIRS}
 											${osimSpliner_INCLUDE_DIRS})
 

@@ -47,6 +47,7 @@ namespace ceinms {
     };
 
     enum class CalibrationTargetType {
+        MuscleForce,
         Torque,
         Activation,
         NormalisedFibreLength,
@@ -144,6 +145,7 @@ namespace ceinms {
             using TargetTypeMap = std::map<CalibrationTargetType, std::string>;
 
             TargetTypeMap targetType = {
+                { CalibrationTargetType::MuscleForce,"MuscleForce" },
                 { CalibrationTargetType::Activation,"Activation" },
                 { CalibrationTargetType::GenericContactForce,"Generic Contact Force" },
                 { CalibrationTargetType::NormalisedFibreLength,"Normalised Fibre Length" },
@@ -183,6 +185,7 @@ namespace ceinms {
 			return false;
 
 		switch (objFunctionSetup.getCalibrationTargetType()) {
+        case CalibrationTargetType::MuscleForce:
 		case CalibrationTargetType::Activation:
 		case CalibrationTargetType::NormalisedFibreLength:
 		case CalibrationTargetType::NormalisedFibreVelocity:

@@ -166,6 +166,7 @@ namespace ceinms {
         using TargetTypeMap = std::map<std::string, CalibrationTargetType>;
 
         TargetTypeMap targetType = {
+            { "muscleForce", CalibrationTargetType::MuscleForce},
             { "activation", CalibrationTargetType::Activation},
             { "genericContactForce", CalibrationTargetType::GenericContactForce },
             { "normalisedFibreLength", CalibrationTargetType::NormalisedFibreLength},
