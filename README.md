@@ -26,9 +26,11 @@ Building from source
 -------
 Windows:
 1. Get the dependencies
+    * You can obtain them individually or run the included "install_dependencies" script on Windows
 2. Configure and generate the project files using CMake
     * Ensure CMake found all dependencies (e.g. if xerces_dll is not found it should still build but could have install error)
 3. Open project solution in Visual Studio, build and install
+4. Add install location to PATH
 
 Acknowledgments
 ---------------
