@@ -69,7 +69,7 @@ namespace ceinms {
         hasOpenSimData_ &= objectiveFunction_.calculateOpenSimData();
         if (hasOpenSimData_ ) {
 			try {
-				// batchOpenSimEvaluator_.reset(new BatchOpenSimEvaluator(trials));
+				//batchOpenSimEvaluator_.reset(new BatchOpenSimEvaluator(trials));
 			}
 			catch (OpenSim::Exception& e) {
 				e.print(std::cout);

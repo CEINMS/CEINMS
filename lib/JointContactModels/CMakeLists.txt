@@ -4,7 +4,7 @@ project(JointContactModels)
 
 # List source files
 set(JointContactModels_HEADERS 
-    #ceinms/JointContactFromOpensim.h                            
+    ceinms/JointContactFromOpensim.h                            
     ceinms/ContactModelKneeBalance.h
     )
 
@@ -13,7 +13,7 @@ set(JointContactModels_TEMPLATE_IMPLEMENTATION
 							)
                             
 set(JointContactModels_SOURCES 
-    #JointContactFromOpensim.cpp
+    JointContactFromOpensim.cpp
     ContactModelKneeBalance.cpp
 )
 
