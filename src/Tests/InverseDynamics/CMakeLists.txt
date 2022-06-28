@@ -8,15 +8,19 @@ include_directories(
 	${Concurrency_INCLUDE_DIRS}
 	${NMSmodel_INCLUDE_DIRS}
 	${Curve_INCLUDE_DIRS}
-	${FileIO_INCLUDE_DIRS})
+	${FileIO_INCLUDE_DIRS}
+)
 
-#add_executable(Test_JointContactModel jointContactModelTest.cpp)
-
-#target_link_libraries(Test_JointContactModel  JointContactModels xmlInput optimized ${OPENSIM_LIBRARIES})
-
-#target_link_libraries(Test_JointContactModel  JointContactModels xmlInput debug ${OPENSIM_LIBRARIES_DEBUG})
 add_definitions(/DBASE_DIR="${CMAKE_CURRENT_LIST_DIR}")
 
 add_executable(Test_InverseDynamics inverseDynamicsTest.cpp)
-target_link_libraries(Test_InverseDynamics  JointContactModels OutputConnectors InputConnectors xmlInput rtb::Concurrency NMSmodel optimized ${OPENSIMSIMBODY_LIBRARIES})
+target_link_libraries(Test_InverseDynamics
+	JointContactModels
+	OutputConnectors
+	InputConnectors
+	xmlInput
+	rtb::Concurrency
+	NMSmodel
+	${OPENSIMSIMBODY_LIBRARIES}
+)
 #target_link_libraries(Test_InverseDynamics  JointContactModels OutputConnectors InputConnectors xmlInput Concurrency NMSmodel debug ${OPENSIM_LIBRARIES_DEBUG})

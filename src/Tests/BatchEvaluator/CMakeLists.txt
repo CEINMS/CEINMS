@@ -8,14 +8,15 @@ include_directories(
 	${TrialData_INCLUDE_DIRS}
 	${FileIO_INCLUDE_DIRS}
 	${Curve_INCLUDE_DIRS}
-	${JointContactModels_INCLUDE_DIRS})
+	${JointContactModels_INCLUDE_DIRS}
+)
 
 add_executable(Test_BatchEvaluator batchEvaluatorTest.cpp)
 TARGET_LINK_LIBRARIES(Test_BatchEvaluator       
-	  xmlInput
-      NMSmodel
-      InputConnectors
-      OutputConnectors
-      OptimizationSystems
-	  TrialData)
-
+	xmlInput
+    NMSmodel
+    InputConnectors
+    OutputConnectors
+    OptimizationSystems
+	TrialData
+)

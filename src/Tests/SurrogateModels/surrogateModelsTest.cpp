@@ -1,6 +1,7 @@
 #include "ceinms/Curve.h"
-#include "rtb/plsr/plsr.h"
-#include "mcbs/Spline.h"
+// #include "rtb/plsr/plsr.h"
+// #include "mcbs/Spline.h"
+#include <OpenSim/OpenSim.h>
 #include <string>
 using std::string;
 using std::vector;

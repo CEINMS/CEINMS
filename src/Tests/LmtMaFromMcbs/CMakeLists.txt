@@ -11,14 +11,35 @@ include_directories(
 	${osimSpliner_INCLUDE_DIRS}
 	${mbcs_INCLUDE_DIRS}
 	${FileIO_INCLUDE_DIRS}
-					 )
+)
 
 add_definitions(/DBASE_DIR="${CMAKE_CURRENT_LIST_DIR}")
+
 add_executable(Test_LmtMaFromMcbs lmtMaFromMcbsTest.cpp)
-target_link_libraries(Test_LmtMaFromMcbs InputConnectors ceinms_common NMSmodel Concurrency xmlInput OutputConnectors SplineSetHelper mcbs::Spline optimized ${OPENSIM_LIBRARIES})
+target_link_libraries(Test_LmtMaFromMcbs
+	InputConnectors
+	ceinms_common
+	NMSmodel
+	Concurrency
+	xmlInput
+	OutputConnectors
+	SplineSetHelper
+	mcbs::Spline
+	${OPENSIM_LIBRARIES}
+)
 
 add_executable(Test_LmtMaFromMcbsAndOsim lmtMaFromMcbsAndOsimTest.cpp)
-target_link_libraries(Test_LmtMaFromMcbsAndOsim InputConnectors ceinms_common NMSmodel Concurrency xmlInput OutputConnectors SplineSetHelper mcbs::Spline optimized ${OPENSIM_LIBRARIES})
+target_link_libraries(Test_LmtMaFromMcbsAndOsim
+	InputConnectors
+	ceinms_common
+	NMSmodel
+	Concurrency
+	xmlInput
+	OutputConnectors
+	SplineSetHelper
+	mcbs::Spline
+	${OPENSIM_LIBRARIES}
+)
 #target_link_libraries(Test_LmtMaFromMcbs InputConnectors ceinms_common NMSmodel Concurrency xmlInput OutputConnectors SplineSetHelper mcbs::Spline debug ${OPENSIM_LIBRARIES_DEBUG})
 
 

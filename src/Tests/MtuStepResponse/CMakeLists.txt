@@ -3,12 +3,7 @@ include_directories(
     ${ceinms_common_INCLUDE_DIRS}
     ${NMSmodel_INCLUDE_DIRS}
     ${FileIO_INCLUDE_DIRS}
-    )
+)
 
 add_executable(Test_MtuStepResponse mtuStepResponseTest.cpp)
-
-TARGET_LINK_LIBRARIES(Test_MtuStepResponse       
-      NMSmodel)
-
-
-
+TARGET_LINK_LIBRARIES(Test_MtuStepResponse NMSmodel)

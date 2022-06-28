@@ -4,21 +4,21 @@
 #add_subdirectory(real-time)
 
 include_directories(
-  ${InputConnectors_INCLUDE_DIRS}
-  ${OutputConnectors_INCLUDE_DIRS}
-  ${NMSmodel_INCLUDE_DIRS}
-  ${Curve_INCLUDE_DIRS}
-  ${Concurrency_INCLUDE_DIRS}
-  ${xmlInput_INCLUDE_DIRS}
-  ${FileIO_INCLUDE_DIRS}
-  ${CMAKE_SOURCE_DIR}/lib/Hybrid
-  ${ceinms_common_INCLUDE_DIRS}
-  ${Optimizers_INCLUDE_DIRS}
-  ${OptimizationSystems_INCLUDE_DIRS}
-  ${TrialData_INCLUDE_DIRS}
-  ${JointContactModels_INCLUDE_DIRS}
-  ${ModelEvaluators_INCLUDE_DIRS}
-  ${Boost_INCLUDE_DIRS}
+      ${InputConnectors_INCLUDE_DIRS}
+      ${OutputConnectors_INCLUDE_DIRS}
+      ${NMSmodel_INCLUDE_DIRS}
+      ${Curve_INCLUDE_DIRS}
+      ${Concurrency_INCLUDE_DIRS}
+      ${xmlInput_INCLUDE_DIRS}
+      ${FileIO_INCLUDE_DIRS}
+      ${CMAKE_SOURCE_DIR}/lib/Hybrid
+      ${ceinms_common_INCLUDE_DIRS}
+      ${Optimizers_INCLUDE_DIRS}
+      ${OptimizationSystems_INCLUDE_DIRS}
+      ${TrialData_INCLUDE_DIRS}
+      ${JointContactModels_INCLUDE_DIRS}
+      ${ModelEvaluators_INCLUDE_DIRS}
+      ${Boost_INCLUDE_DIRS}
 )
 
 # CEINMS Execution
@@ -84,6 +84,7 @@ target_link_libraries(CEINMSoptimise
 
 # Install
 install(TARGETS CEINMS CEINMScalibrate CEINMSoptimise
-        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT Applications
-        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT Development
-        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT Development)
+      RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT Applications
+      LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT Development
+      ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT Development
+)
