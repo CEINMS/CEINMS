@@ -14,5 +14,3 @@ add_subdirectory(OutputConnectors)
 add_subdirectory(Optimizers)
 add_subdirectory(OptimizerSystems)
 add_subdirectory(ModelEvaluators)
-
-

@@ -119,7 +119,6 @@ namespace ceinms {
             extLoads->setDataFileName(dataFilename);
         }
         extLoads->setMemoryOwner(false);
-        // extLoads->invokeConnectToModel(model_);
         extLoads->extendConnectToModel(model_);
         // Add external loads to the set of all model forces
         for (int i = 0; i<extLoads->getSize(); ++i) {
@@ -147,10 +146,8 @@ namespace ceinms {
 
         state_ = model_.initSystem();
         for (auto c : coordinateActuators_)
-            // c->overrideForce(state_, true);
             c->overrideActuation(state_, true);
         for (auto m : muscleActuators_)
-            // m->overrideForce(state_, true);
             m->overrideActuation(state_, true);
 
         OpenSim::Array<string> names;
@@ -223,11 +220,9 @@ namespace ceinms {
         const OpenSim::Joint& joint(model_.getJointSet().get(jointName));
         unsigned idx(model_.getJointSet().getIndex(joint.getName()));
         model_.getSimbodyEngine().transform(state_,
-            // model_.getGroundBody(),
             model_.getGround(),
             rForcesInG.get(idx),
-            //joint.getBody(),
-            joint.getParentFrame(),     //need to check if getParentframe == getBody
+            joint.getChildFrame(),
             forceOnChildInChild);
     }
 
@@ -292,7 +287,6 @@ namespace ceinms {
     void JointContactFromOpensim::disableMuscleActuators() {
 
         for (int i(0); i < muscleActuators_.size(); ++i)
-            // muscleActuators_.at(i)->setDisabled(state_, true);
             muscleActuators_.at(i)->setAppliesForce(state_, false);
             
 //      for (auto& m : muscleActuators_)
@@ -309,8 +303,6 @@ namespace ceinms {
     void JointContactFromOpensim::setMuscleForcesToActuators(const SimTK::Vector& muscleForces) {
 
         for (size_t i(0); i < muscleActuators_.size(); ++i) {
-            // muscleActuators_.at(i)->setOverrideForce(state_, true);
-            // muscleActuators_.at(i)->setOverrideForce(state_, muscleForces[i]);
             muscleActuators_.at(i)->setOverrideActuation(state_, true);
             muscleActuators_.at(i)->setOverrideActuation(state_, muscleForces[i]);
         }
@@ -324,8 +316,6 @@ namespace ceinms {
     void JointContactFromOpensim::calculateReactions(const SimTK::Vector& residualMobilityForces) {
 
         for (unsigned i(0); i < nCoordinates_; ++i) {
-            // coordinateActuators_.at(i)->overrideForce(state_, true);
-            // coordinateActuators_.at(i)->setOverrideForce(state_, residualMobilityForces.get(i));
             coordinateActuators_.at(i)->overrideActuation(state_, true);
             coordinateActuators_.at(i)->setOverrideActuation(state_, residualMobilityForces.get(i));
         }
