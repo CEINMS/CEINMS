@@ -52,7 +52,7 @@ namespace ceinms {
         void readXml();
         double tolerance_;
         unsigned runMode_;
-        std::auto_ptr<ExecutionXsd::ExecutionType> executionPointer_;
+        std::unique_ptr<ExecutionXsd::ExecutionType> executionPointer_;
     };
 }
 

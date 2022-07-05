@@ -55,7 +55,7 @@ namespace ceinms {
         std::string getCompleteFilename(std::string filename) const;
         ContactModelFromOpenSimSetup setupOsim_;
         ContactModelKneeBalanceSetup setupKneeBalance_;
-        std::auto_ptr<ContactModelXsd::ContactModelType> contactModelPointer_;
+        std::unique_ptr<ContactModelXsd::ContactModelType> contactModelPointer_;
         ContactModelType contactModelType_;
         std::string filepath_;
         std::string filename_;

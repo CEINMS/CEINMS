@@ -33,9 +33,8 @@
 #include <fstream>
 #include <iostream>
 #include <algorithm>
-#include <boost/shared_ptr.hpp>
-#include <boost/make_shared.hpp>
-#include <boost/filesystem.hpp>
+#include <memory>
+#include <filesystem>
 #include <stdlib.h>
 #include "Logger.h"
 
@@ -59,7 +58,7 @@ namespace ceinms {
             double time_;
             std::string outputDir_;
             std::string separator_;
-            std::vector<boost::shared_ptr<std::ofstream> > outFiles_;
+            std::vector<std::shared_ptr<std::ofstream> > outFiles_;
             std::vector < std::vector<std::vector <double> > > dataToWrite_;
             std::vector<LogID> fileTypes_;
         };
@@ -70,9 +69,9 @@ namespace ceinms {
             :subject_(subject), outputDir_(outputDir), separator_("\t"){
 
             outputDir_ += "/";
-            boost::filesystem::path dir(outputDir_);
-            if (!boost::filesystem::exists(dir)) {
-                if (!boost::filesystem::create_directory(dir)) {
+            std::filesystem::path dir(outputDir_);
+            if (!std::filesystem::exists(dir)) {
+                if (!std::filesystem::create_directory(dir)) {
                     std::cout << "Error: Cannot create the output directory " + outputDir_ << std::endl;
                     exit(EXIT_FAILURE);
                 }
@@ -110,7 +109,7 @@ namespace ceinms {
                 break;
             }
             std::string outFilename = outputDir_ + filename;
-            boost::shared_ptr<std::ofstream> file_ptr(new std::ofstream(outFilename.c_str()));
+            std::shared_ptr<std::ofstream> file_ptr(new std::ofstream(outFilename.c_str()));
             outFiles_.push_back(file_ptr);
             dataToWrite_.push_back(std::vector< std::vector <double> >());
             if (!(outFiles_.back()->is_open())) {

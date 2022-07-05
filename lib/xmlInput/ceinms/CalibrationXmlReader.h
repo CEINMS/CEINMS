@@ -75,7 +75,7 @@ namespace ceinms {
         std::string trialsDirectory_;
         std::list<CalibrationStep> calibrationSteps_;
         std::list<std::string> calibrationTrials_;
-        std::auto_ptr<CalibrationXsd::CalibrationType> calibrationPointer_;
+        std::unique_ptr<CalibrationXsd::CalibrationType> calibrationPointer_;
         SimulatedAnnealingParameters simanParameters_;
         std::string filepath_;
         double tolerance_;

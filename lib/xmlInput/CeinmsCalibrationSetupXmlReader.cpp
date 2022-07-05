@@ -46,8 +46,8 @@ namespace ceinms {
     {
 
         try {
-            std::auto_ptr<CeinmsCalibrationType> ceinmsCalibrationDataPointer(parseAndValidate<CeinmsCalibrationType>(filename, ceinmsCalibrationSetup_schema, sizeof(ceinmsCalibrationSetup_schema)));
-            ceinmsCalibrationSetupPointer_ = ceinmsCalibrationDataPointer;
+            std::unique_ptr<CeinmsCalibrationType> ceinmsCalibrationDataPointer(parseAndValidate<CeinmsCalibrationType>(filename, ceinmsCalibrationSetup_schema, sizeof(ceinmsCalibrationSetup_schema)));
+            ceinmsCalibrationSetupPointer_ = std::move(ceinmsCalibrationDataPointer);
         }
         catch (const xml_schema::exception& e) {
             cout << e << endl;

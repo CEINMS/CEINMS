@@ -55,16 +55,13 @@ add_library(InputConnectors STATIC
   ${FromStorageFile_HEADERS}
   ${InputConnectors_TEMPLATE_IMPLEMENTATIONS}
 )
-target_link_libraries(InputConnectors FileIO ${Boost_FILESYSTEM_LIBRARY} ${OpenSim_LIBRARIES} rtb::Filter rtb::Concurrency)
-#target_link_libraries(InputConnectors FileIO Concurrency ${Boost_FILESYSTEM_LIBRARY} debug ${OPENSIM_LIBRARIES_DEBUG})
-
+target_link_libraries(InputConnectors FileIO ${OpenSim_LIBRARIES} rtb::Filter rtb::Concurrency)
 
 target_include_directories(InputConnectors
                                 PRIVATE     ${CMAKE_CURRENT_SOURCE_DIR}
                                             ${ceinms_common_INCLUDE_DIRS}
                                             ${FileIO_INCLUDE_DIRS}
                                             ${Concurrency_INCLUDE_DIRS}
-                                            ${Boost_INCLUDE_DIRS}
 								PUBLIC
 											
 											${mcbs_INCLUDE_DIRS}

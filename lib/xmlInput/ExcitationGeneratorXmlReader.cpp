@@ -49,8 +49,8 @@ namespace ceinms {
         }
     }
 
-    std::auto_ptr< excitationGenerator > ExcitationGeneratorXmlReader::getExcitationGenerator()
+    std::unique_ptr< excitationGenerator > ExcitationGeneratorXmlReader::getExcitationGenerator()
     {
-        return excitationGenPointer_;
+        return std::move(excitationGenPointer_);
     }
 }

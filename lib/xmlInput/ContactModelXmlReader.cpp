@@ -52,8 +52,8 @@ namespace ceinms {
     void  ContactModelXmlReader::init() {
 
         try {
-            std::auto_ptr<ContactModelXsd::ContactModelType> contactModelPointer(parseAndValidate<ContactModelXsd::ContactModelType>(filename_, contactModel_schema, sizeof(contactModel_schema)));
-            contactModelPointer_ = contactModelPointer;
+            std::unique_ptr<ContactModelXsd::ContactModelType> contactModelPointer(parseAndValidate<ContactModelXsd::ContactModelType>(filename_, contactModel_schema, sizeof(contactModel_schema)));
+            contactModelPointer_ = std::move(contactModelPointer);
         }
         catch (const xml_schema::exception& e) {
             cout << e << endl;

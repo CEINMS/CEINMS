@@ -61,7 +61,6 @@ target_include_directories(NMSmodel PRIVATE ${Curve_INCLUDE_DIRS}
                                             ${xmlInput_INCLUDE_DIRS}
                                             ${ceinms_common_INCLUDE_DIRS}
                                             ${FileIO_INCLUDE_DIRS}
-#                                    PUBLIC  ${Boost_INCLUDE_DIRS}
                                     )
 target_link_libraries(NMSmodel xmlInput)
 # Save path to include directory for "internal" usage

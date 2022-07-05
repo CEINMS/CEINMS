@@ -23,7 +23,7 @@ source_group("Sources" FILES ${FileIO_SOURCES})
 # Define target
 add_library(FileIO STATIC ${FileIO_SOURCES} ${FileIO_HEADERS})
 target_link_libraries(FileIO xmlInput ceinms_common)
-target_include_directories(FileIO PRIVATE ${xmlInput_INCLUDE_DIRS} ${CMAKE_CURRENT_SOURCE_DIR} PUBLIC ${Boost_INCLUDE_DIRS})
+target_include_directories(FileIO PRIVATE ${xmlInput_INCLUDE_DIRS} ${CMAKE_CURRENT_SOURCE_DIR})
 
 # Save path to include directory for "internal" usage
 set(FileIO_INCLUDE_DIRS ${ceinms_common_INCLUDE_DIRS} "${CMAKE_CURRENT_SOURCE_DIR}" ${xmlInput_INCLUDE_DIRS} CACHE INTERNAL "Include directories for FileIO library")

@@ -69,6 +69,7 @@ namespace ceinms {
         using Set = std::list < Parameter > ;
 
         void setName(const std::string& name);
+        bool iequals(const std::string& stringA, const std::string& stringB) const;
         std::string getName() const { return name_; }
         void setAssignment(Assignment assignment);
         Assignment getAssignment() const { return assignment_; }

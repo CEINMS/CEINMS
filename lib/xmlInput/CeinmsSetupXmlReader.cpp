@@ -46,8 +46,8 @@ namespace ceinms {
     {
 
         try {
-            std::auto_ptr<CeinmsType> ceinmsDataPointer(parseAndValidate<CeinmsType>(filename, ceinmsSetup_schema, sizeof(ceinmsSetup_schema)));
-            ceinmsSetupPointer_ = ceinmsDataPointer;
+            std::unique_ptr<CeinmsType> ceinmsDataPointer(parseAndValidate<CeinmsType>(filename, ceinmsSetup_schema, sizeof(ceinmsSetup_schema)));
+            ceinmsSetupPointer_ = std::move(ceinmsDataPointer);
         }
         catch (const xml_schema::exception& e) {
             cout << e << endl;

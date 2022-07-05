@@ -37,10 +37,10 @@ namespace ceinms {
 
     public:
         ExcitationGeneratorXmlReader(const std::string& filename);
-        std::auto_ptr<ExcitationGeneratorXsd::excitationGenerator> getExcitationGenerator();
+        std::unique_ptr<ExcitationGeneratorXsd::excitationGenerator> getExcitationGenerator();
         friend std::ostream& operator<< (std::ostream& output, const ExcitationGeneratorXmlReader& b);
     private:
-        std::auto_ptr<ExcitationGeneratorXsd::excitationGenerator> excitationGenPointer_;
+        std::unique_ptr<ExcitationGeneratorXsd::excitationGenerator> excitationGenPointer_;
     };
 }
 

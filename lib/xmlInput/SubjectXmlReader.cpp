@@ -60,9 +60,9 @@ namespace ceinms {
 
     }
 
-    std::auto_ptr<SubjectType> SubjectXmlReader::getSubject()
+    std::unique_ptr<SubjectType> SubjectXmlReader::getSubject()
     {
-        return subjectPointer_;
+        return std::move(subjectPointer_);
     }
 
     std::string SubjectXmlReader::getOpenSimModelFile() const {

@@ -48,7 +48,7 @@ namespace ceinms {
         std::string outFilename_;
         std::string startXmlFile_;
         //   SubjectType s_;
-        std::auto_ptr<SubjectXsd::SubjectType> subjectPointer_;
+        std::unique_ptr<SubjectXsd::SubjectType> subjectPointer_;
     };
 }
 #include "XmlWriter.cpp"

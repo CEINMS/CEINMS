@@ -51,7 +51,7 @@ namespace ceinms {
   //      static void  writeXMLCalibratedFile(NMSmodelT& mySubject, const std::string& XMLfilename);
     private:
         // Create the body structure from the Input
-        std::auto_ptr<SubjectXsd::SubjectType> subjectPointer_;
+        std::unique_ptr<SubjectXsd::SubjectType> subjectPointer_;
         CurveOffline defaultForceVelocityCurve_;
         CurveOffline defaultActiveForceLengthCurve_;
         CurveOffline defaultPassiveForceLengthCurve_;

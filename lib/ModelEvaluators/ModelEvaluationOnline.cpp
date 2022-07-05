@@ -32,7 +32,7 @@ using std::endl;
 #include <vector>
 using std::vector;
 #include <string>
-#include <boost/concept_check.hpp>
+//#include <boost/concept_check.hpp>
 using std::string;
 
 #include "ceinms/TimeCompare.h"

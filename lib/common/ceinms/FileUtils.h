@@ -35,8 +35,6 @@
 
 namespace ceinms {
 
-
-
     namespace FileUtils {
 
         std::string getFile(const std::string& aPath, const std::string& mask);
@@ -47,7 +45,7 @@ namespace ceinms {
         std::string getFilePath(const std::string& filename);
         std::string makeGeneric(const std::string& filename);
         void sortMaFilenames(const std::map<std::string, std::string>& maMap,
-            const std::vector< std::string >& dofNames, std::vector< std::string >& maDataFilenames);
+        const std::vector< std::string >& dofNames, std::vector< std::string >& maDataFilenames);
     }
 }
 

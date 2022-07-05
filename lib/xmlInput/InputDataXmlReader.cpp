@@ -46,8 +46,8 @@ namespace ceinms {
     {
 
         try {
-            std::auto_ptr<InputDataType> inputDataPointer(parseAndValidate<InputDataType>(filename, inputData_schema, sizeof(inputData_schema)));
-            inputDataPointer_ = inputDataPointer;
+            std::unique_ptr<InputDataType> inputDataPointer(parseAndValidate<InputDataType>(filename, inputData_schema, sizeof(inputData_schema)));
+            inputDataPointer_ = std::move(inputDataPointer);
         }
         catch (const xml_schema::exception& e) {
             cout << e << endl;

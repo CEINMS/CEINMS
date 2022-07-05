@@ -36,7 +36,7 @@ namespace ceinms {
     class SubjectXmlReader {
     public:
         SubjectXmlReader(const std::string& filename);
-        std::auto_ptr<SubjectXsd::SubjectType> getSubject();
+        std::unique_ptr<SubjectXsd::SubjectType> getSubject();
         friend std::ostream& operator<< (std::ostream& output, const SubjectXmlReader& b);
         std::string getContactModelFile() const;
         bool hasContactModel() const;
@@ -45,7 +45,7 @@ namespace ceinms {
 
     private:
         std::string filepath_;
-        std::auto_ptr<SubjectXsd::SubjectType> subjectPointer_;
+        std::unique_ptr<SubjectXsd::SubjectType> subjectPointer_;
     };
 }
 

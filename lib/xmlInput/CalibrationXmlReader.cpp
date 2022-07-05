@@ -37,7 +37,6 @@ using std::endl;
 #include "calibration.hxx"
 #include "calibration-schema.hxx"
 #include "validation.h"
-#include <boost/algorithm/string.hpp>
 #include "ceinms/FileUtils.h"
 #include <vector>
 using std::vector;
@@ -48,8 +47,8 @@ namespace ceinms {
         :runMode_(0), optimizationAlgorithm_(0), tolerance_(1e-6) {
 
         try {
-            std::auto_ptr<CalibrationType> calibrationPointer(parseAndValidate<CalibrationType>(filename, calibration_schema, sizeof(calibration_schema)));
-            calibrationPointer_ = calibrationPointer;
+            std::unique_ptr<CalibrationType> calibrationPointer(parseAndValidate<CalibrationType>(filename, calibration_schema, sizeof(calibration_schema)));
+            calibrationPointer_ = std::move(calibrationPointer);
         }
         catch (const xml_schema::exception& e) {
             cout << e << endl;

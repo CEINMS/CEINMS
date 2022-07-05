@@ -48,7 +48,7 @@ namespace ceinms {
     private:
         void readXml();
         std::string filepath_;
-        std::auto_ptr<InputDataXsd::InputDataType> inputDataPointer_;
+        std::unique_ptr<InputDataXsd::InputDataType> inputDataPointer_;
     };
 }
 

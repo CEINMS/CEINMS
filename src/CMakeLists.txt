@@ -18,7 +18,6 @@ include_directories(
       ${TrialData_INCLUDE_DIRS}
       ${JointContactModels_INCLUDE_DIRS}
       ${ModelEvaluators_INCLUDE_DIRS}
-      ${Boost_INCLUDE_DIRS}
 )
 
 # CEINMS Execution
@@ -43,8 +42,6 @@ target_link_libraries(CEINMS
       TrialData
       OptimizationSystems
 	ceinms_common
-      ${Boost_PROGRAM_OPTIONS_LIBRARY}
-      ${Boost_FILESYSTEM_LIBRARY}
 )
 
 # CEINMS Calibrate
@@ -63,7 +60,6 @@ target_link_libraries(CEINMScalibrate
       OptimizationSystems
 	TrialData
 	rtb::Concurrency
-      ${Boost_PROGRAM_OPTIONS_LIBRARY}
 )
 
 # CEINMS Optimise
@@ -78,8 +74,6 @@ target_link_libraries(CEINMSoptimise
       OptimizationSystems
       TrialData
 	rtb::Concurrency
-      ${Boost_PROGRAM_OPTIONS_LIBRARY}
-      ${Boost_FILESYSTEM_LIBRARY}
 )
 
 # Install

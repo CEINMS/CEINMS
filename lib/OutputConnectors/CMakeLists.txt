@@ -72,7 +72,9 @@ add_library(OutputConnectors STATIC
 )
 #target_link_libraries(OutputConnectors JointContactModels ceinms_common ${Boost_LIBRARIES}
 #	protobuf::libprotoc protobuf::libprotobuf protobuf::libprotobuf-lite optimized ${OPENSIM_LIBRARIES})
-target_link_libraries(OutputConnectors JointContactModels ceinms_common rtb::Concurrency ${Boost_FILESYSTEM_LIBRARY} ${OpenSim_LIBRARIES})
+# target_link_libraries(OutputConnectors JointContactModels ceinms_common rtb::Concurrency ${Boost_FILESYSTEM_LIBRARY} ${OpenSim_LIBRARIES})
+target_link_libraries(OutputConnectors JointContactModels ceinms_common rtb::Concurrency ${OpenSim_LIBRARIES})
+
 
 target_include_directories(OutputConnectors
                                 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}
@@ -82,7 +84,8 @@ target_include_directories(OutputConnectors
 										${JointContactModels_INCLUDE_DIRS}
 										${FileIO_INCLUDE_DIRS}
 										${GeneratedProtobuf_INCLUDE_DIRS}
-                                PUBLIC  ${Boost_INCLUDE_DIRS})
+                                # PUBLIC  ${Boost_INCLUDE_DIRS}
+)
 
 # Save path to include directory for "internal" usage
 set(OutputConnectors_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}" CACHE INTERNAL "Include directories for OutputConnectors library")

@@ -49,7 +49,7 @@ namespace ceinms {
     private:
         void readXml();
         std::string filepath_;
-        std::auto_ptr<CeinmsCalibrationSetupXsd::CeinmsCalibrationType> ceinmsCalibrationSetupPointer_;
+        std::unique_ptr<CeinmsCalibrationSetupXsd::CeinmsCalibrationType> ceinmsCalibrationSetupPointer_;
     };
 }
 

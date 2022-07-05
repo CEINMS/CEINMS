@@ -27,8 +27,7 @@
  * -------------------------------------------------------------------------- */
 
 #include <string>
-#include <boost/filesystem.hpp>
-#include <boost/algorithm/string.hpp>
+#include <filesystem>
 #include <iostream>
 #include "ceinms/FileUtils.h"
 #include<fstream>
@@ -59,10 +58,10 @@ namespace ceinms {
 
         std::string getFile(const std::string& aPath, const std::string& mask) {
 
-            boost::filesystem::path currentPath(aPath);
+            std::filesystem::path currentPath(aPath);
             currentPath /= mask;
             std::string foundFile;
-            if (boost::filesystem::exists(currentPath) && boost::filesystem::is_regular_file(currentPath))
+            if (std::filesystem::exists(currentPath) && std::filesystem::is_regular_file(currentPath))
                 foundFile = currentPath.string();
 
             if (foundFile.empty()) {
@@ -89,17 +88,17 @@ namespace ceinms {
 
         bool fileExists(const std::string& filename) {
 
-            return boost::filesystem::exists(filename);
+            return std::filesystem::exists(filename);
         }
 
 
         std::string simplify(const std::string& filename) {
             std::string fullpath = filename;
             try {
-                fullpath = boost::filesystem::canonical(filename).generic_string();
+                fullpath = std::filesystem::canonical(filename).generic_string();
 
                 // fix a problem with boost not replacing the separator correctly in windows
-                if (boost::filesystem::path::preferred_separator == L'\x5c') {
+                if (std::filesystem::path::preferred_separator == L'\x5c') {
                     std::replace(fullpath.begin(), fullpath.end(), '/', '\\');
                 }
             }
@@ -113,7 +112,7 @@ namespace ceinms {
         std::string makeGeneric(const std::string& filename) {
             std::string fullpath = filename;
             try {
-                fullpath = boost::filesystem::path(filename).generic_string();
+                fullpath = std::filesystem::path(filename).generic_string();
             }
             catch (std::exception& e) {
                 std::cout << e.what();
@@ -124,8 +123,9 @@ namespace ceinms {
 
         void trim(std::string& fileName)
         {
-            boost::trim(fileName);
-            boost::trim_if(fileName, boost::is_any_of("\""));
+            char* t = " \t\n\r\f\v/";
+            fileName.erase(0, fileName.find_first_not_of(t));
+            fileName.erase(fileName.find_last_not_of(t) + 1);
         }
 
         std::string getFilePath(const std::string& filename) {

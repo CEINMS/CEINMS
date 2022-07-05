@@ -9,7 +9,7 @@
 
 find_path(XERCES_INCLUDE_DIR /xercesc/util/XercesVersion.hpp
             PATHS   "${XERCES_DIR}"
-                    "C:/Program Files (x86)/CodeSynthesis XSD 3.3"
+                    "C:/Program Files (x86)/CodeSynthesis XSD 4.0"
                     "C:/Program Files (x86)/CodeSynthesis XSD 4.0"
 					"C:/xerces-c-3.1.3_32r"
                     $ENV{XERCES_ROOT}
@@ -34,8 +34,8 @@ if(CMAKE_SIZEOF_VOID_P EQUAL 8) #64bit compilation
     /usr/local/lib
     /usr/lib
     /usr/lib/x86_64-linux-gnu/
-    "C:/Program\ Files\ (x86)/CodeSynthesis\ XSD\ 3.3/bin64"
-    "C:/Program\ Files\ (x86)/CodeSynthesis\ XSD\ 3.3/lib64/vc-10.0"
+    "C:/Program\ Files\ (x86)/CodeSynthesis\ XSD\ 4.0/bin64"
+    "C:/Program\ Files\ (x86)/CodeSynthesis\ XSD\ 4.0/lib64/vc-10.0"
   )
 
   FIND_LIBRARY(XERCES_LIBRARY_DEBUG
@@ -50,8 +50,8 @@ if(CMAKE_SIZEOF_VOID_P EQUAL 8) #64bit compilation
     /usr/local/lib
     /usr/lib
     /usr/lib/x86_64-linux-gnu/
-    "C:/Program\ Files\ (x86)/CodeSynthesis\ XSD\ 3.3/bin64"
-    "C:/Program\ Files\ (x86)/CodeSynthesis\ XSD\ 3.3/lib64/vc-10.0"
+    "C:/Program\ Files\ (x86)/CodeSynthesis\ XSD\ 4.0/bin64"
+    "C:/Program\ Files\ (x86)/CodeSynthesis\ XSD\ 4.0/lib64/vc-10.0"
   )
 else()
     FIND_LIBRARY(XERCES_LIBRARY
@@ -66,8 +66,8 @@ else()
     /usr/local/lib
     /usr/lib
     /usr/lib/x86_64-linux-gnu/
-    "C:/Program\ Files\ (x86)/CodeSynthesis\ XSD\ 3.3/bin"
-    "C:/Program\ Files\ (x86)/CodeSynthesis\ XSD\ 3.3/lib/vc-10.0"
+    "C:/Program\ Files\ (x86)/CodeSynthesis\ XSD\ 4.0/bin"
+    "C:/Program\ Files\ (x86)/CodeSynthesis\ XSD\ 4.0/lib/vc-10.0"
 	"C:/xerces-c-3.1.3_32r/lib"
   )
 
@@ -83,8 +83,8 @@ else()
     /usr/local/lib
     /usr/lib
     /usr/lib/x86_64-linux-gnu/
-    "C:/Program\ Files\ (x86)/CodeSynthesis\ XSD\ 3.3/bin"
-    "C:/Program\ Files\ (x86)/CodeSynthesis\ XSD\ 3.3/lib/vc-10.0"
+    "C:/Program\ Files\ (x86)/CodeSynthesis\ XSD\ 4.0/bin"
+    "C:/Program\ Files\ (x86)/CodeSynthesis\ XSD\ 4.0/lib/vc-10.0"
 	"C:/xerces-c-3.1.3_32d/lib"
   )
 endif()

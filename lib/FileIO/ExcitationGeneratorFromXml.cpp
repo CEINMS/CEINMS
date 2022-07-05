@@ -49,7 +49,7 @@ namespace ceinms {
         try {
 
             ExcitationGeneratorXmlReader sxr(xmlFilename);
-            std::auto_ptr<excitationGenerator> generatorPtr = sxr.getExcitationGenerator();
+            std::unique_ptr<excitationGenerator> generatorPtr = sxr.getExcitationGenerator();
 
             excitationGenerator::inputSignals_type& inputSignals(generatorPtr->inputSignals());
             for (excitationGenerator::inputSignals_type::iterator it(inputSignals.begin()); it != inputSignals.end(); ++it)

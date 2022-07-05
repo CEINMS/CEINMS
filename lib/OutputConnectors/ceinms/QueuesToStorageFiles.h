@@ -32,7 +32,7 @@
 #include <iostream>
 #include <fstream>
 #include <map>
-#include <boost/filesystem.hpp>
+#include <filesystem>
 #include "rtb/concurrency/Concurrency.h"
 #include "ceinms/queues/LogQueue.h"
 
@@ -86,9 +86,9 @@ namespace ceinms {
         separator_("\t") {
 
         outputDir_ += "/";
-        boost::filesystem::path dir(outputDir_);
-        if (!boost::filesystem::exists(dir)) {
-            if (!boost::filesystem::create_directories(dir)) {
+        std::filesystem::path dir(outputDir_);
+        if (!std::filesystem::exists(dir)) {
+            if (!std::filesystem::create_directories(dir)) {
                 std::cout << "Error: Cannot create the output directory " + outputDir_ << std::endl;
                 exit(EXIT_FAILURE);
             }

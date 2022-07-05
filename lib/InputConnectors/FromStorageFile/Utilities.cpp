@@ -29,7 +29,7 @@
 #include "ceinms/Utilities.h"
 
 #include <iostream>
-#include <boost/filesystem.hpp>
+#include <filesystem>
 #include <vector>
 using std::vector;
 #include <string>
@@ -40,7 +40,7 @@ using std::endl;
 
 namespace ceinms {
     string findFile(const string& pattern, const string& directoryPath) {
-        namespace fs = boost::filesystem;
+        namespace fs = std::filesystem;
 
         if (!fs::exists(directoryPath)) {
             cout << "findFile: Directory: " << directoryPath << "  does not exist\n";

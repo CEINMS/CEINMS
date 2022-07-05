@@ -28,7 +28,7 @@
 
 #ifndef ceinms_FileLogger_h
 #define ceinms_FileLogger_h
-#include "boost/filesystem.hpp"
+#include <filesystem>
 #include <vector>
 #include <list>
 #include <memory>
@@ -148,15 +148,15 @@ namespace ceinms {
     bool FileLogger<DataType>::createFile() {
 
         bool success(true);
-        boost::filesystem::path dir(outputDir_);
-        if (!boost::filesystem::exists(dir)) {
-            if (!boost::filesystem::create_directories(dir)) {
+        std::filesystem::path dir(outputDir_);
+        if (!std::filesystem::exists(dir)) {
+            if (!std::filesystem::create_directories(dir)) {
                 std::cout << "Error: Cannot create the output directory " + outputDir_ << std::endl;
                 success = false;
             }
             std::cout << "Created output directory " + dir.string() << std::endl;
         }
-        else std::cout << "Using " + boost::filesystem::canonical(dir).string() + " as output directory\n";
+        else std::cout << "Using " + std::filesystem::canonical(dir).string() + " as output directory\n";
 
         std::string outFilename = (dir / filename_).string();
 

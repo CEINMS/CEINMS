@@ -10,7 +10,7 @@
 //
 
 #include <string>
-#include <memory>   // std::auto_ptr
+#include <memory>   // std::unique_ptr
 #include <cstddef>  // std::size_t
 #include <fstream>
 #include <iostream>
@@ -175,12 +175,12 @@ main (int argc, char* argv[])
   {
     MemoryManager* mm (XMLPlatformUtils::fgMemoryManager);
 
-    auto_ptr<XMLGrammarPool> gp (new XMLGrammarPoolImpl (mm));
+    unique_ptr<XMLGrammarPool> gp (new XMLGrammarPoolImpl (mm));
 
     // Load the schemas into grammar pool.
     //
     {
-      auto_ptr<SAX2XMLReader> parser (
+      unique_ptr<SAX2XMLReader> parser (
         XMLReaderFactory::createXMLReader (mm, gp.get ()));
 
       parser->setFeature (XMLUni::fgSAX2CoreNameSpaces, true);

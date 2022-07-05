@@ -52,7 +52,7 @@ namespace ceinms {
     private:
         void readXml();
         std::string filepath_;
-        std::auto_ptr<CeinmsSetupXsd::CeinmsType> ceinmsSetupPointer_;
+        std::unique_ptr<CeinmsSetupXsd::CeinmsType> ceinmsSetupPointer_;
     };
 }
 

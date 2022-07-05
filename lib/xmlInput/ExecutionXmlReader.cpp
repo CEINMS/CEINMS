@@ -41,8 +41,8 @@ namespace ceinms {
     ExecutionXmlReader::ExecutionXmlReader(const string& filename)
         :runMode_(0), tolerance_(1e-6) {
         try {
-            std::auto_ptr<ExecutionType> executionPointer(parseAndValidate<ExecutionType>(filename, execution_schema, sizeof(execution_schema)));
-            executionPointer_ = executionPointer;
+            std::unique_ptr<ExecutionType> executionPointer(parseAndValidate<ExecutionType>(filename, execution_schema, sizeof(execution_schema)));
+            executionPointer_ = std::move(executionPointer);
         }
         catch (const xml_schema::exception& e) {
             cout << e << endl;

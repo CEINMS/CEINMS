@@ -27,11 +27,10 @@
  * -------------------------------------------------------------------------- */
 
 #include "ceinms/Parameter.h"
+#include <algorithm>
 #include <iostream>
 #include <string>
 using std::string;
-
-#include <boost/algorithm/string.hpp>
 
 
 namespace ceinms {
@@ -41,22 +40,34 @@ namespace ceinms {
     }
 
 
+    bool Parameter::iequals(const std::string& stringA, const std::string& stringB) const {
+        return std::equal(stringA.begin(),
+            stringA.end(),
+            stringB.begin(),
+            stringB.end(),
+            [](char stringA, char stringB) {
+                return tolower(static_cast<unsigned char>(stringA)) == tolower(static_cast<unsigned char>(stringB));
+            }
+        );
+    }
+
+
     Parameter::ID Parameter::getID() const{
 
         ID id;
-        if (boost::iequals(name_, "c1"))                     id = C1;
-        else if (boost::iequals(name_, "c2"))                     id = C2;
-        else if (boost::iequals(name_, "shapeFactor"))            id = ShapeFactor;
-        else if (boost::iequals(name_, "activationScale"))        id = ActivationScale;
-        else if (boost::iequals(name_, "optimalFibreLength"))     id = OptimalFibreLength;
-        else if (boost::iequals(name_, "pennationAngle"))         id = PennationAngle;
-        else if (boost::iequals(name_, "tendonSlackLength"))      id = TendonSlackLength;
-        else if (boost::iequals(name_, "maxContractionVelocity")) id = MaxContractionVelocity;
-        else if (boost::iequals(name_, "maxIsometricForce"))      id = MaxIsometricForce;
-        else if (boost::iequals(name_, "strengthCoefficient"))    id = StrengthCoefficient;
-        else if (boost::iequals(name_, "emDelay"))                id = EmDelay;
-        else if (boost::iequals(name_, "damping"))                id = Damping;
-        else if (boost::iequals(name_, "percentageChange"))       id = PercentageChange;
+        if (Parameter::iequals(name_, "c1"))                     id = C1;
+        else if (Parameter::iequals(name_, "c2"))                     id = C2;
+        else if (Parameter::iequals(name_, "shapeFactor"))            id = ShapeFactor;
+        else if (Parameter::iequals(name_, "activationScale"))        id = ActivationScale;
+        else if (Parameter::iequals(name_, "optimalFibreLength"))     id = OptimalFibreLength;
+        else if (Parameter::iequals(name_, "pennationAngle"))         id = PennationAngle;
+        else if (Parameter::iequals(name_, "tendonSlackLength"))      id = TendonSlackLength;
+        else if (Parameter::iequals(name_, "maxContractionVelocity")) id = MaxContractionVelocity;
+        else if (Parameter::iequals(name_, "maxIsometricForce"))      id = MaxIsometricForce;
+        else if (Parameter::iequals(name_, "strengthCoefficient"))    id = StrengthCoefficient;
+        else if (Parameter::iequals(name_, "emDelay"))                id = EmDelay;
+        else if (Parameter::iequals(name_, "damping"))                id = Damping;
+        else if (Parameter::iequals(name_, "percentageChange"))       id = PercentageChange;
         else                                                     id = NotFound;
 
         return id;

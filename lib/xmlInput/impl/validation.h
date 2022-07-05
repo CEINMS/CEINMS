@@ -2,7 +2,7 @@
 // author    : Boris Kolpackov <boris@codesynthesis.com>
 // copyright : not copyrighted - public domain
 
-#include <memory>   // std::auto_ptr
+#include <memory>   // std::unique_ptr
 #include <string>
 #include <fstream>
 #include <iostream>
@@ -32,7 +32,7 @@
 
 //using namespace std;
 
-template <typename XSDfile> std::auto_ptr<XSDfile> parseAndValidate(const std::string& xmlFileName, const XMLByte* schemabin, std::size_t schemasize)
+template <typename XSDfile> std::unique_ptr<XSDfile> parseAndValidate(const std::string& xmlFileName, const XMLByte* schemabin, std::size_t schemasize)
 {
 
       // We need to initialize the Xerces-C++ runtime because we
@@ -49,7 +49,7 @@ template <typename XSDfile> std::auto_ptr<XSDfile> parseAndValidate(const std::s
     //
     xercesc::MemoryManager* mm (xercesc::XMLPlatformUtils::fgMemoryManager);
 
-    std::auto_ptr<xercesc::XMLGrammarPool> gp (new xercesc::XMLGrammarPoolImpl (mm));
+    std::unique_ptr<xercesc::XMLGrammarPool> gp (new xercesc::XMLGrammarPoolImpl (mm));
 
     try
     {
@@ -81,7 +81,7 @@ template <typename XSDfile> std::auto_ptr<XSDfile> parseAndValidate(const std::s
 
     // Xerces-C++ 3.0.0 and later.
     //
-    xml::dom::auto_ptr<xercesc::DOMLSParser> parser (
+    xml::dom::unique_ptr<xercesc::DOMLSParser> parser (
       impl->createLSParser (
         xercesc::DOMImplementationLS::MODE_SYNCHRONOUS, 0, mm, gp.get ()));
 
@@ -145,7 +145,7 @@ template <typename XSDfile> std::auto_ptr<XSDfile> parseAndValidate(const std::s
 
     // Same as above but for Xerces-C++ 2 series.
     //
-    xml::dom::auto_ptr<DOMBuilder> parser (
+    xml::dom::unique_ptr<DOMBuilder> parser (
       impl->createDOMBuilder(
         xercesc::DOMImplementationLS::MODE_SYNCHRONOUS, 0, mm, gp.get ()));
 
@@ -181,9 +181,9 @@ template <typename XSDfile> std::auto_ptr<XSDfile> parseAndValidate(const std::s
       // Parse XML to DOM.
       //
 #if _XERCES_VERSION >= 30000
-      xml_schema::dom::auto_ptr<xercesc::DOMDocument> doc (parser->parse (&wrap));
+      xml_schema::dom::unique_ptr<xercesc::DOMDocument> doc (parser->parse (&wrap));
 #else
-      xml_schema::dom::auto_ptr<xercesc::DOMDocument> doc (parser->parse (wrap));
+      xml_schema::dom::unique_ptr<xercesc::DOMDocument> doc (parser->parse (wrap));
 #endif
 
       eh.throw_if_failed<xml_schema::parsing> ();
@@ -191,8 +191,8 @@ template <typename XSDfile> std::auto_ptr<XSDfile> parseAndValidate(const std::s
       // Parse DOM to the object model.
       //
       const ::xercesc::DOMElement& e (*(doc->getDocumentElement ()));
-      //std::auto_ptr<XSDfile> c(new XSDfile(e));
-      std::auto_ptr<XSDfile> c(xsd::cxx::tree::traits< XSDfile, char >::create ( e, 0, 0));
+      //std::unique_ptr<XSDfile> c(new XSDfile(e));
+      std::unique_ptr<XSDfile> c(xsd::cxx::tree::traits< XSDfile, char >::create ( e, 0, 0));
 
       //xercesc::XMLPlatformUtils::Terminate ();
       return c;

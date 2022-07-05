@@ -170,42 +170,21 @@ foreach($job in $jobArray){
 }
 #Receive-Job $jobArray # this wasn't printing everything, maybe the above will...
 
-# Install Boost
-if (Test-Path ($DependenciesDir + "\boost_1_79_0") -PathType container) {
-      Write-Host "Boost found."
-} else {
-	Write-Host "Boost not found."
-	# Download and extract Boost
-	$BoostZipDir = $DependenciesDir + "\boost_1_79_0.7z"
-	Invoke-WebRequest "https://boostorg.jfrog.io/artifactory/main/release/1.79.0/source/boost_1_79_0.7z" -OutFile $BoostZipDir
-	7z x ($DependenciesDir + "\boost_1_79_0.7z") ("-o" + $DependenciesDir)
-	cd boost_1_79_0
-	# Build Boost c++ libraries
-      .\bootstrap
-      .\b2
-      # Add Boost to INCLUDE and LIB Windows Environment Variables
-	[Environment]::SetEnvironmentVariable("INCLUDE", ($DependenciesDir + "\boost_1_79_0"), [EnvironmentVariableTarget]::Machine)
-	[Environment]::SetEnvironmentVariable("LIB", ($DependenciesDir + "\boost_1_79_0\stage\lib"), [EnvironmentVariableTarget]::Machine)
-	# Return to dependencies folder and remove 7zip file
-	cd ..
-      Remove-Item boost_1_79_0.7z -force -Recurse
-}
-
 
 # Install CodeSynthesis XSD
-if (Test-Path ($DependenciesDir + "\CodeSynthesis XSD 3.3") -PathType container) {
+if (Test-Path ($DependenciesDir + "\CodeSynthesis XSD 4.0") -PathType container) {
       Write-Host "CodeSynthesis XSD found."
 } else {
-	if (Test-Path "C:\Program Files (x86)\CodeSynthesis XSD 3.3" -PathType container) {
+	if (Test-Path "C:\Program Files (x86)\CodeSynthesis XSD 4.0" -PathType container) {
 		Write-Host "CodeSynthesis XSD found [C:\Program Files (x86)]."
 	} else {
 		Write-Host "CodeSynthesis XSD not found."
 		# Download installer
-		$XSDDir = $DependenciesDir + "\xsd-3.3.msi"
-		Invoke-WebRequest "https://www.codesynthesis.com/download/xsd/3.3/windows/i686/xsd-3.3.msi" -OutFile $XSDDir
+		$XSDDir = $DependenciesDir + "\xsd-4.0.msi"
+		Invoke-WebRequest "https://www.codesynthesis.com/download/xsd/4.9/windows/i686/xsd-4.0.msi" -OutFile $XSDDir
 		# Run the installer
-		Start-Process .\xsd-3.3.msi -Wait
-		Remove-Item xsd-3.3.msi -force -Recurse
+		Start-Process .\xsd-4.0.msi -Wait
+		Remove-Item xsd-4.0.msi -force -Recurse
 	}
 }
 

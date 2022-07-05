@@ -15,8 +15,7 @@ Dependencies
 CEINMS depends on the following 
 * Cross-platform building: [CMake](http://www.cmake.org/) 2.8.12 or later
 * Compiler: [Visual Studio](http://www.visualstudio.com) 2016 or later (Windows only), [gcc](http://gcc.gnu.org/) 4.8.1 or later (typically on Linux), or [Clang](http://clang.llvm.org/) 3.4 or later (typically on Mac, possibly through Xcode)
-* File managment: [Boost libraries](http://www.boost.org/), or [Boost libraries binaries](http://sourceforge.net/projects/boost/files/boost-binaries) (Windows only)
-* XML parsing: [CodeSynthesis XSD](https://www.codesynthesis.com/products/xsd/) 3.3 or later
+* XML parsing: [CodeSynthesis XSD](https://www.codesynthesis.com/products/xsd/) 4.0 or later
 * Musculoskeletal modelling: [OpenSim](https://github.com/opensim-org/opensim-core) 4.0 or later
 * Signal filtering: [Filter](https://github.com/RealTimeBiomechanics/Filter)
 * Thread synchronisation: [Concurrency](https://github.com/RealTimeBiomechanics/Concurrency/tree/master)
