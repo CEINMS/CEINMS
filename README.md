@@ -6,15 +6,19 @@ CEINMS allows automatically identification of a number of parameters that determ
 
 Read more about CEINMS at the [CEINMS project page](https://simtk.org/home/ceinms)
 
+
 Quick Start
 -----------
 [Test data and examples](https://simtk.org/frs/download.php?file_id=4495)
 
+
 Dependencies
-------------
-CEINMS depends on the following 
+------------ 
 * Cross-platform building: [CMake](http://www.cmake.org/) 2.8.12 or later
-* Compiler: [Visual Studio](http://www.visualstudio.com) 2016 or later (Windows only), [gcc](http://gcc.gnu.org/) 4.8.1 or later (typically on Linux), or [Clang](http://clang.llvm.org/) 3.4 or later (typically on Mac, possibly through Xcode)
+* Compiler:
+    * [Visual Studio](http://www.visualstudio.com) 2016 or later (Windows only)
+    * [gcc](http://gcc.gnu.org/) 4.8.1 or later (typically on Linux)
+    * [Clang](http://clang.llvm.org/) 3.4 or later (typically on Mac, possibly through Xcode)
 * XML parsing: [CodeSynthesis XSD](https://www.codesynthesis.com/products/xsd/) 4.0 or later
 * Musculoskeletal modelling: [OpenSim](https://github.com/opensim-org/opensim-core) 4.0 or later
 * Signal filtering: [Filter](https://github.com/RealTimeBiomechanics/Filter)
@@ -23,13 +27,14 @@ CEINMS depends on the following
 
 Building from source
 -------
-Windows:
+### Windows:
 1. Get the dependencies
     * You can obtain them individually or run the included "install_dependencies" script on Windows
 2. Configure and generate the project files using CMake
     * Ensure CMake found all dependencies (e.g. if xerces_dll is not found it should still build but could have install error)
 3. Open project solution in Visual Studio, build and install
 4. Add install location to PATH
+
 
 Acknowledgments
 ---------------
