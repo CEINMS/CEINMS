@@ -133,7 +133,7 @@ namespace ceinms {
             std::cout << "Different names between excitation generator and subject" << std::endl;
             auto inputSignalsNames = excitationGenerator_.getInputSignalsNames();
 
-			auto center([](const string s, const int w) {
+			auto center([](const std::string s, const int w) {
 				std::stringstream ss, spaces;
 				int padding = w - s.size();                 // count excess room to pad
 				for (int i = 0; i < padding / 2; ++i)
@@ -207,7 +207,7 @@ namespace ceinms {
 			std::cout << "Different names between excitation generator and subject" << std::endl;
 			auto inputSignalsNames = excitationGenerator_.getInputSignalsNames();
 
-			auto center([](const string s, const int w) {
+			auto center([](const std::string s, const int w) {
 				std::stringstream ss, spaces;
 				int padding = w - s.size();                 // count excess room to pad
 				for (int i = 0; i < padding / 2; ++i)

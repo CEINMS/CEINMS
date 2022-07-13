@@ -108,8 +108,8 @@ ceinms::TrialData readTrialData(ceinms::InputDataXmlReader dataLocations, NMSmod
     ceinms::ExternalTorquesQueue externalTorqueQueue;
     ceinms::MultipleMomentArmsQueues momentArmsQueues;
 
-    ceinms::Concurrency::Latch doneWithSubscription;
-    ceinms::Concurrency::Latch doneWithExecution;
+    rtb::Concurrency::Latch doneWithSubscription;
+    rtb::Concurrency::Latch doneWithExecution;
 
     string emgFilename(dataLocations.getExcitationsFile());
     ceinms::EmgFromFile emgProducer(emgQueue, doneWithSubscription, doneWithExecution, mySubject, emgFilename, emgGeneratorFile);

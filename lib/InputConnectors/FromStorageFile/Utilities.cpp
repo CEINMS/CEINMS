@@ -28,6 +28,7 @@
 
 #include "ceinms/Utilities.h"
 
+#include <algorithm>
 #include <iostream>
 #include <filesystem>
 #include <vector>

@@ -30,8 +30,9 @@
 #include <filesystem>
 #include <iostream>
 #include "ceinms/FileUtils.h"
-#include<fstream>
-#include<sstream>
+#include <fstream>
+#include <sstream>
+#include <algorithm>
 
 namespace ceinms {
 	
