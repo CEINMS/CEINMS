@@ -13,23 +13,15 @@ Quick Start
 Dependencies
 ------------
 CEINMS depends on the following 
-* Cross-platform building: [CMake](http://www.cmake.org/) 2.8.12 or later
-* Compiler: [Visual Studio](http://www.visualstudio.com) 2016 or later (Windows only), [gcc](http://gcc.gnu.org/) 8 or later (typically on Linux), or [Clang](http://clang.llvm.org/) 5 or later (typically on Mac, possibly through Xcode)
-* XML parsing: [CodeSynthesis XSD](https://www.codesynthesis.com/products/xsd/) 4.0 or later
-* Musculoskeletal modelling: [OpenSim](https://github.com/opensim-org/opensim-core) 4.0 or later
-* Signal filtering: [Filter](https://github.com/RealTimeBiomechanics/Filter)
-* Thread synchronisation: [Concurrency](https://github.com/RealTimeBiomechanics/Concurrency/tree/master)
+* cross-platform building: [CMake](http://www.cmake.org/) 2.8.8 or later
+* compiler: [Visual Studio](http://www.visualstudio.com) 2013 or later (Windows only), [gcc](http://gcc.gnu.org/) 8 or later (typically on Linux), or [Clang](http://clang.llvm.org/) 5 or later (typically on Mac, possibly through Xcode)
+* file managment: [Boost libraries](http://www.boost.org/), or [Boost libraries binaries](http://sourceforge.net/projects/boost/files/boost-binaries) (Windows only)
+* XML parsing: [CodeSynthesis XSD 3.3](https://www.codesynthesis.com)
 
 
-Building from source
+Install
 -------
-Windows:
-1. Get the dependencies
-    * You can obtain them individually or run the included "install_dependencies" script on Windows
-2. Configure and generate the project files using CMake
-    * Ensure CMake found all dependencies (e.g. if xerces_dll is not found it should still build but could have install error)
-3. Open project solution in Visual Studio, build and install
-4. Add install location to PATH
+CEINMS 0.10.0 Win32 installer (Requires OpenSim 3.3 Win32 libraries).
 
 Acknowledgments
 ---------------
@@ -38,3 +30,20 @@ Acknowledgments
 * US National Institutes of Health Grant (R01EB009351)
 * Commission of the European Union Grant (IFP7-ICT-2013-10-611695)
 * European Research Council (ERC) Advanced Grant DEMOVE (267888)
+
+<!---
+Useful links:
+[OpenSim 3.2 VC12P x86](https://drive.google.com/file/d/0BzMAK5L0QV2PSEkxSUVxSXd3NzA/edit?usp=sharing)
+
+When compiling with OpenSim3.2 in Windows, the following errors may occur:
+```
+Error	1	error C3646: '__attribute__' : unknown override specifier	c:\opensim3.2\sdk\include\opensim\common\DebugUtilities.h	42	1	Calibration
+Error	2	error C2065: 'noreturn' : undeclared identifier	c:\opensim3.2\sdk\include\opensim\common\DebugUtilities.h	42	1	Calibration
+Error	3	error C2072: 'OpenSim::DebugUtilities::Fatal_Error' : initialization of a function	c:\opensim3.2\sdk\include\opensim\common\DebugUtilities.h	42	1	Calibration
+Error	4	error C2146: syntax error : missing ';' before identifier 'WINAPI'	c:\opensim3.2\sdk\include\opensim\common\LoadOpenSimLibrary.h	43	1	Calibration
+Error	5	error C4430: missing type specifier - int assumed. Note: C++ does not support default-int	c:\opensim3.2\sdk\include\opensim\common\LoadOpenSimLibrary.h	43	1	Calibration
+Error	6	error C2146: syntax error : missing ';' before identifier 'LoadOpenSimLibrary'	c:\opensim3.2\sdk\include\opensim\common\LoadOpenSimLibrary.h	43	1	Calibration
+```
+
+If so, be sure that _WIN32 is used instead of WIN32 in the define directives in OpenSim include files DebugUtilities.h, LoadOpenSimLibrary.h, osimCommonDLL.h (i.e. look where the errors are and change WIN32 in _WIN32 everywhere) 
+-->
