@@ -7,7 +7,7 @@ if(DEFINED ENV{VCPKG_ROOT} AND NOT DEFINED CMAKE_TOOLCHAIN_FILE)
   )
 endif()
 
-cmake_minimum_required (VERSION 2.8.12) # "target_include_directories" command  and VS12 generator are missing in previous versions
+cmake_minimum_required (VERSION 3.8) # "target_include_directories" command  and VS12 generator are missing in previous versions
 project(CEINMS)
 set(CEINMS_MAJOR_VERSION 0)
 set(CEINMS_MINOR_VERSION 21)
@@ -32,12 +32,12 @@ endif()
 
 if(UNIX)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread -std=c++1y -Wno-deprecated-declarations")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17")
 endif(UNIX)
 
 set(CMAKE_VERBOSE_MAKEFILE OFF)
 
 set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17")
 
 set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
 include(CeinmsPack)
