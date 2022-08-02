@@ -8,7 +8,7 @@ set(FromStorageFile_SOURCES
   FromStorageFile/LmtMaFromStorageFile.cpp
   FromStorageFile/Utilities.cpp
   FromStorageFile/ExternalForcesFromStorageFile.cpp
-  #FromStorageFile/GeneralisedCoordinatesFromStorageFile.cpp
+  FromStorageFile/GeneralisedCoordinatesFromStorageFile.cpp
 )
 set(FromStorageFile_HEADERS
   ceinms/EmgFromFile.h
@@ -17,7 +17,7 @@ set(FromStorageFile_HEADERS
   ceinms/LmtMaFromStorageFile.h
   ceinms/Utilities.h
   ceinms/ExternalForcesFromStorageFile.h
-  #ceinms/GeneralisedCoordinatesFromStorageFile.h
+  ceinms/GeneralisedCoordinatesFromStorageFile.h
   ceinms/EmgFromQueue.h
 )
 
@@ -26,7 +26,7 @@ set(InputConnectors_SOURCES
   ExternalTorquesFromX.cpp
   LmtMaFromX.cpp
   ExternalForcesFromX.cpp
-  #GeneralisedCoordinatesFromX.cpp 
+  GeneralisedCoordinatesFromX.cpp 
   EmgFromQueue.cpp
   #LmtMaFromMcbs.cpp
 )
@@ -40,7 +40,7 @@ set(InputConnectors_HEADERS
   ceinms/ExternalTorquesFromX.h
   ceinms/LmtMaFromX.h
   ceinms/ExternalForcesFromX.h
-  #ceinms/GeneralisedCoordinatesFromX.h
+  ceinms/GeneralisedCoordinatesFromX.h
  # ceinms/LmtMaFromMcbs.h
 )
 

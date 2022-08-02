@@ -4,24 +4,24 @@
 set(OutputConnectors_SOURCES
     LoggerOnQueues.cpp
     QueuesToTrialData.cpp
-   # QueuesToXForces.cpp
-   # QueuesToJointReactionForces.cpp
-    #QueuesToIntersegmentalForces.cpp
-    #QueuesToIntersegmentalAndJointReactionForces.cpp
+    QueuesToXForces.cpp
+    QueuesToJointReactionForces.cpp
+    QueuesToIntersegmentalForces.cpp
+    QueuesToIntersegmentalAndJointReactionForces.cpp
 	QueuesToKneeBalanceContactForces.cpp
-    #QueuesToInverseDynamics.cpp
+    QueuesToInverseDynamics.cpp
     QueuesToStorageFiles.cpp
 #	websocket/QueuesToWebsocket.cpp
 )
-set(OutputConnectors_HEADERS 
+set(OutputConnectors_HEADERS
     ceinms/LoggerOnQueues.h
     ceinms/QueuesToTrialData.h
-  #  ceinms/QueuesToXForces.h
-    #ceinms/QueuesToJointReactionForces.h
-    #ceinms/QueuesToIntersegmentalForces.h
-    #ceinms/QueuesToIntersegmentalAndJointReactionForces.h
+    ceinms/QueuesToXForces.h
+    ceinms/QueuesToJointReactionForces.h
+    ceinms/QueuesToIntersegmentalForces.h
+    ceinms/QueuesToIntersegmentalAndJointReactionForces.h
 	ceinms/QueuesToKneeBalanceContactForces.h
-    #ceinms/QueuesToInverseDynamics.h
+    ceinms/QueuesToInverseDynamics.h
     ceinms/QueuesToStorageFiles.h
     ceinms/QueueToStorageFile.h
 	#ceinms/websocket/QueuesToWebsocket.h
@@ -34,7 +34,7 @@ set(OutputConnectors_TEMPLATE_IMPLEMENTATION
     ceinms/QueueToStorageFile.cpp
     ceinms/QueueToDataTable.cpp
 	)
-  
+
 #find_package(protobuf CONFIG REQUIRED)
 #set(Protobuf_FILES websocket/protobuf/yabbi.proto)
 #set_source_files_properties(${Proto_SRC} ${Proto_HEADERS} PROPERTIES GENERATED TRUE)
@@ -52,7 +52,7 @@ set_source_files_properties( ${QueuesToStorageFiles_TEMPLATE_IMPLEMENTATION} PRO
 
 
 source_group("Header Files" FILES ${OutputConnectors_HEADERS} ${QueuesToStorageFiles_HEADERS} )
-source_group("Source Files" FILES ${OutputConnectors_TEMPLATE_IMPLEMENTATION} ${QueuesToStorageFiles_SOURCES} 
+source_group("Source Files" FILES ${OutputConnectors_TEMPLATE_IMPLEMENTATION} ${QueuesToStorageFiles_SOURCES}
 	${QueuesToStorageFiles_TEMPLATE_IMPLEMENTATION} )
 #source_group("Generated headers" FILES ${Proto_HEADERS})
 #source_group("Generated sources" FILES ${Proto_SRC})
@@ -72,7 +72,6 @@ add_library(OutputConnectors STATIC
 )
 #target_link_libraries(OutputConnectors JointContactModels ceinms_common ${Boost_LIBRARIES}
 #	protobuf::libprotoc protobuf::libprotobuf protobuf::libprotobuf-lite optimized ${OPENSIM_LIBRARIES})
-# target_link_libraries(OutputConnectors JointContactModels ceinms_common rtb::Concurrency ${Boost_FILESYSTEM_LIBRARY} ${OpenSim_LIBRARIES})
 target_link_libraries(OutputConnectors JointContactModels ceinms_common rtb::Concurrency ${OpenSim_LIBRARIES})
 
 

@@ -73,7 +73,8 @@ namespace OpenSim {
         isSubscribed(false),
         runCondition_(true)
     {
-        ExternalForce::updateFromXMLNode(node);
+        int versionNumber = 1;
+        ExternalForce::updateFromXMLNode(node, versionNumber);
     }
 
     ceinms::ExternalForceData ExternalForceFromQueue::getExternalForceDataFromPastValues(double time) const {
@@ -122,7 +123,7 @@ namespace OpenSim {
 
             const SimbodyEngine& engine = getModel().getSimbodyEngine();
             SimTK::Vec3 transformedForce, transformedPosition, transformedTorque;
-            engine.transform(state, *forceExpressedInBody_, forceData.getForce(), engine.getGroundBody(), transformedForce);
+            engine.transform(state, *forceExpressedInBody_, forceData.getForce(), getModel().getGround(), transformedForce);    //Using getModel.getGround() instead of engine.getGroundBody()
 
             if (forceData.getUseApplicationPoint()) {
                 //use COP + GRF + fre torque
@@ -131,18 +132,18 @@ namespace OpenSim {
             }
             else {
                 //apply the grf and moments from the force plate directly to the body
-                pointExpressedInBody_->getMassCenter(transformedPosition);
+                transformedPosition = pointExpressedInBody_->getMassCenter();
                 torquesToApply = forceData.getMoments();
             }
 
             ExternalForce::applyForceToPoint(state, *appliedToBody_, transformedPosition, transformedForce, bodyForces);
 
-            engine.transform(state, *forceExpressedInBody_, torquesToApply, engine.getGroundBody(), transformedTorque);
+            engine.transform(state, *forceExpressedInBody_, torquesToApply, getModel().getGround(), transformedTorque);    //Using getModel.getGround() instead of engine.getGroundBody()
             ExternalForce::applyTorque(state, *appliedToBody_, transformedTorque, bodyForces);
         }
     }
 
-    void ExternalForceFromQueue::connectToModel(Model& model) {
+    void ExternalForceFromQueue::extendConnectToModel(Model& model) {
 
         if (!isSubscribed) {
             externalForceQueue_->subscribe();

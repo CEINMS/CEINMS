@@ -17,7 +17,7 @@ set(Common_HEADERS  ceinms/ArrayConverter.h
 					ceinms/ObjectiveFunctionSetup.h
                     ceinms/EndOfData.h
                     ceinms/ExternalForceProperties.h
-         #           ceinms/ExternalLoadProperties.h
+                    ceinms/ExternalLoadProperties.h
 					ceinms/EmgInformedObjectiveFunctionSetup.h
 					ceinms/HybridWeightings.h
                     
@@ -45,7 +45,7 @@ set(Common_SOURCES  Parameter.cpp
 					Mapper.cpp
                     ExternalForceDataSetup.cpp
                     ExternalForceProperties.cpp
-#                    ExternalLoadProperties.cpp
+                    ExternalLoadProperties.cpp
 )
 
 set(Common_TEMPLATE_IMPLEMENTATION		)
@@ -57,7 +57,7 @@ source_group("Sources" FILES ${Common_SOURCES} ${Common_TEMPLATE_IMPLEMENTATION}
 
 # Define target
 add_library(ceinms_common STATIC ${Common_SOURCES} ${Common_HEADERS} ${Common_HEADERS_QUEUES} ${Common_TEMPLATE_IMPLEMENTATION})
-target_link_libraries(ceinms_common LINK_PRIVATE ${OpenSim_LIBRARIES})
+target_link_libraries(ceinms_common rtb::Concurrency ${OpenSim_LIBRARIES})
 target_include_directories(ceinms_common PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 
 # Save path to include directory for "internal" usage

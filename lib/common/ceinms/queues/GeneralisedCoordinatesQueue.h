@@ -30,7 +30,8 @@
 #define ceinms_GeneralisedCoordinatesQueue_h
 
 #include "ceinms/QueueData.h"
-//#include "rtosim/queue/GeneralisedCoordinatesQueue.h"
+#include "ceinms/GeneralisedCoordinatesData.h"
+#include <rtb/concurrency/Queue.h>
 
 namespace Concurrency {
     template<typename>
@@ -39,13 +40,9 @@ namespace Concurrency {
 
 namespace ceinms {
 
-  // using GeneralisedCoordinatesFrame = rtosim::GeneralisedCoordinatesFrame;
-  // using GeneralisedCoordinatesQueue = rtosim::GeneralisedCoordinatesQueue;
-
-   using GeneralisedCoordinatesFrame = QueueData < GeneralisedCoordinatesData >;
-    using GeneralisedCoordinatesQueue = Concurrency::Queue < GeneralisedCoordinatesFrame >;
+    using GeneralisedCoordinatesFrame = QueueData < GeneralisedCoordinatesData >;
+    using GeneralisedCoordinatesQueue = rtb::Concurrency::Queue < GeneralisedCoordinatesFrame >;
 
 }
-
 
 #endif

@@ -1,12 +1,12 @@
 #include "ceinms/ExternalLoadProperties.h"
-using SimTK::Xml;
+
 
 namespace ceinms {
 
     ExternalLoadProperties::ExternalLoadProperties(const std::string& xmlFilename) :
         xmlFilename_(xmlFilename){
 
-        SimTK::Xml extLoadXml(xmlFilename);
+        SimTK::Xml::Document extLoadXml(xmlFilename);   //SimTK::Xml -> SimTK::Xml::Document
         parseXml(extLoadXml.getRootElement());
 
         if (!SimTK::Pathname::fileExists(datafile_)) {
@@ -24,20 +24,20 @@ namespace ceinms {
         }
     }
 
-    void ExternalLoadProperties::parseXml(Xml::Element elt) {
+    void ExternalLoadProperties::parseXml(SimTK::Xml::Element elt) {
 
         SimTK::Xml::element_iterator eIt(elt.element_begin());
         if (eIt->getElementTag() == "ExternalLoads")
             parseExternalLoads(*eIt);
     }
 
-    void ExternalLoadProperties::parseExternalLoads(Xml::Element elt) {
+    void ExternalLoadProperties::parseExternalLoads(SimTK::Xml::Element elt) {
 
-        Xml::attribute_iterator ap = elt.attribute_begin();
+        SimTK::Xml::attribute_iterator ap = elt.attribute_begin();
         if (ap->getName() == "name")
             name_ = ap->getValue();
 
-        Xml::element_iterator eIt(elt.element_begin());
+        SimTK::Xml::element_iterator eIt(elt.element_begin());
         for (eIt; eIt != elt.element_end(); ++eIt) {
             if (eIt->getElementTag() == "objects") parseObjects(*eIt);
             if (eIt->getElementTag() == "datafile") datafile_ = eIt->getValue();
@@ -46,8 +46,8 @@ namespace ceinms {
         }
     }
 
-    void ExternalLoadProperties::parseObjects(Xml::Element elt) {
-        Xml::element_iterator eIt(elt.element_begin());
+    void ExternalLoadProperties::parseObjects(SimTK::Xml::Element elt) {
+        SimTK::Xml::element_iterator eIt(elt.element_begin());
         for (eIt; eIt != elt.element_end(); ++eIt) {
             if (eIt->getElementTag() == "ExternalForce") {
                 ExternalForceProperties extForce(*eIt);

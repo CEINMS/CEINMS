@@ -107,11 +107,12 @@ namespace ceinms {
        // OpenSim::ExternalLoads extLoads(model_, externalLoadXmlFilename);
 
         string baseDir(FileUtils::getFilePath(externalLoadXmlFilename));
-        string extLoadModelKinematicsFilename = extLoads->getExternalLoadsModelKinematicsFileName();
-        if (!FileUtils::isAbsolute(extLoadModelKinematicsFilename.c_str())) {
-            extLoadModelKinematicsFilename = FileUtils::simplify(baseDir + '/' + extLoadModelKinematicsFilename);
-            extLoads->setExternalLoadsModelKinematicsFileName(extLoadModelKinematicsFilename);
-        }
+        //I have commented out the following 5 lines to work in OpenSim 4.2+ (Dropped support for seperate Kinematics for applications of External Loads.)
+        //string extLoadModelKinematicsFilename = extLoads->getExternalLoadsModelKinematicsFileName();
+        //if (!FileUtils::isAbsolute(extLoadModelKinematicsFilename.c_str())) {
+        //    extLoadModelKinematicsFilename = FileUtils::simplify(baseDir + '/' + extLoadModelKinematicsFilename);
+        //    extLoads->setExternalLoadsModelKinematicsFileName(extLoadModelKinematicsFilename);
+        //}
 
         string dataFilename = extLoads->getDataFileName();
         if (!FileUtils::isAbsolute(dataFilename.c_str())) {
