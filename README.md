@@ -36,7 +36,7 @@ Building from source
             ```
             After installation, create a Windows environment variable names `Filter_DIR` which points at the installation directory.
         * [Concurrency](https://github.com/RealTimeBiomechanics/Concurrency/tree/master):
-            Download the code from the master branch (not develop) and from the directory run:
+            Download the code from the master branch (not develop which is the default branch) and from the directory run:
             ```bash
             mkdir build
             cd build
@@ -66,8 +66,14 @@ Building from source
         $ sudo apt-get install cmake-gui
         ```
     * [gcc](http://gcc.gnu.org/): Ensure version 8 or later
-    * [CodeSynthesis XSD](https://www.codesynthesis.com/products/xsd/download.xhtml): Download 64 bot .rpm file and extract it to obtain the precompiled files
+    * [CodeSynthesis XSD](https://www.codesynthesis.com/products/xsd/download.xhtml): Download 64 bit .rpm file and extract it to obtain the precompiled files
         * You will also need to obtain [Xerces](https://www.codesynthesis.com/products/xsd/download.xhtml) by downloading (e.g. xerces-c-3.1.1.tar.gz from https://archive.apache.org/dist/xerces/c/3/sources/), extracting and building following the provided instructions
+            ```bash
+            ./configure
+            make
+            make install
+            ```
+            Including sudo if required
     * [OpenSim](https://github.com/opensim-org/opensim-core): The instructions for building OpenSim from source are provided in the README on GitHub
     * [Filter](https://github.com/RealTimeBiomechanics/Filter):
         Download the code and from the directory run:
@@ -79,7 +85,7 @@ Building from source
         make install
         ```
     * [Concurrency](https://github.com/RealTimeBiomechanics/Concurrency/tree/master):
-        Download the code from the master branch (not develop) and from the directory run:
+        Download the code from the master branch (not develop which is the default branch) and from the directory run:
         ```bash
         mkdir build
         cd build
@@ -93,14 +99,14 @@ Building from source
     * In the field labelled "Where is the source code:" enter the directory where the CEINMS source code is located
     * In the field labelled "Where to build the binaries:" enter a directory where you want the code to be built
     * Click Configure, specify Unix Makefiles as the project generator and click finish
-    * After CMake has finished configuring you can set the install directory in the "CMAKE_INSTALL_PREFIX" field, the build type in the "CMAKE_BUILD_TYPE" field and check that the dependencies were successfully located. If a dependency is not found automatically then enter the correct directory where it was installed into the corresponding field
-    * Click Configure again, all fields should change from red back to white, then click generate
+    * After CMake has finished configuring you can set the install directory in the "CMAKE_INSTALL_PREFIX" field, the build type in the "CMAKE_BUILD_TYPE" field and check that the dependencies were successfully located. If a dependency is not found automatically then enter the correct directory where you installed it into the corresponding field
+    * Click Configure again, all fields should change from red back to white with no errors, then click generate
 4. Open a terminal in the build directory and run the following commands to build and install to the specified location:
         ```bash
         make -j8
         make install -j8
         ```
-    * If you have an error finding a library when runnign CEINMS from the install location, ensure the dependency library was correctly added to the path
+    * If you have an error finding a library when running CEINMS from the install location, ensure the dependency library was correctly added to the path
     * You can add the chosen install directory to the path if you wish to run CEINMS from the terminal outside of the install directory
         e.g.
         ```bash
