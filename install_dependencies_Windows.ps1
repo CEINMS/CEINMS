@@ -13,7 +13,6 @@ if (!(Test-Path $DependenciesDir -PathType container)) {
 }
 cd $DependenciesDir
 
-
 # Install Chocolately
 $pathChocolately = "C:\\ProgramData\\chocolatey"
 if (Test-Path $pathChocolately -PathType container) {
@@ -22,8 +21,6 @@ if (Test-Path $pathChocolately -PathType container) {
     Write-Host "Chocolately NOT found."
     Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
 }
-
-
 
 # Sometimes env vars are not reloaded between CI builds
 $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")
@@ -83,9 +80,9 @@ if( $LASTEXITCODE -eq 0 ) {
     refreshenv
           
     cd $DependenciesDir
-    mkdir opensim_4_2
-    cd opensim_4_2
-    git clone -q https://github.com/opensim-org/opensim-core
+    mkdir opensim_4_3
+    cd opensim_4_3
+    git clone -q https://github.com/opensim-org/opensim-core/tree/4.3 
     mkdir opensim_dependencies_build
     cd .\opensim_dependencies_build
     cmake ..\opensim-core\dependencies                               `
@@ -142,7 +139,7 @@ $installRTBConcurrency = {
     } else {
         Write-Host "RealTime Biomechanics - Concurrency NOT found."
         cd $DependenciesDir
-        git clone -b master https://github.com/RealTimeBiomechanics/Concurrency.git
+        git clone -q https://github.com/RealTimeBiomechanics/Concurrency
         cd Concurrency
         cmake -DCMAKE_INSTALL_PREFIX="..\RTB_Concurrency" .
         cmake --build .
@@ -169,7 +166,6 @@ foreach($job in $jobArray){
     Receive-Job -Name $job.Name
 }
 #Receive-Job $jobArray # this wasn't printing everything, maybe the above will...
-
 
 # Install CodeSynthesis XSD
 if (Test-Path ($DependenciesDir + "\CodeSynthesis XSD 4.0") -PathType container) {

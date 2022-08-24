@@ -44,7 +44,8 @@ Building from source
             cmake --build . --config Release --target install
             ```
             After installation, create a Windows environment variable named `Concurrency_DIR` which points at the installation directory. 
-    * Method 2: Run the included "install_dependencies" script on Windows to automatically search for the dependencies and install them if not found 
+    * Method 2: Run the included "install_dependencies_Windows" script on Windows to automatically search for the dependencies and install them if not found
+        * Please note that this method is still a work in progress
 2. Download the CEINMS code
 3. Configure and generate the project files using CMake
     * Open the CMake GUI
