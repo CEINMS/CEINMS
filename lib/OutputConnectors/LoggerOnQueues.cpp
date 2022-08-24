@@ -26,19 +26,19 @@
  * limitations under the License.                                             *
  * -------------------------------------------------------------------------- */
 
-#include "ceinms/LoggerOnQueues.h"
 #include <vector>
 #include <string>
 #include <iostream>
 #include <map>
 
-namespace ceinms{
+#include "ceinms/LoggerOnQueues.h"
+
+namespace ceinms {
+
 	LoggerOnQueues::LoggerOnQueues(ScalarLogQueue& outputLogQueue, const std::vector< std::string >& valuesToLog) :
-		outputLogQueue_(outputLogQueue) {
-	}
+		outputLogQueue_(outputLogQueue) { }
 
     void LoggerOnQueues::log(double time, const ScalarVectorData& dataToLog, const std::string& valueToLog) {
-
         ScalarVectorFrame frameToPush;
         frameToPush.data = dataToLog;
         frameToPush.time = time;
@@ -51,5 +51,18 @@ namespace ceinms{
         }
         else
             currentQueue->second->push(frameToPush);
+    }
+
+    void LoggerOnQueues::close(const std::vector<std::string> queueNames) {
+        // Closes all of the queues with the provided names. Using to replace sending a time of inifinity to signify the end of the queue 
+        for (unsigned i(0); i < queueNames.size(); i++) {
+            auto currentQueue = outputLogQueue_.find(queueNames[i]);
+            if (currentQueue == outputLogQueue_.end()) {
+                std::cout << "queue for " << queueNames[i] << " was not found\n";
+                exit(EXIT_FAILURE);
+            }
+            else
+                currentQueue->second->close();
+        }
     }
 }

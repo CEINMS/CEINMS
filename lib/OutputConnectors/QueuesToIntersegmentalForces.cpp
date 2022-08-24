@@ -27,47 +27,31 @@
 * -------------------------------------------------------------------------- */
 
 #include "ceinms/QueuesToIntersegmentalForces.h"
-#include "ceinms/EndOfData.h"
+
 namespace ceinms {
 
-
     void QueuesToIntersegmentalForces::operator()() {
-
         QueuesToXForces::initialiseContactModel();
 
         inputGeneralisedCoordinatesQueue_.subscribe();
         QueuesToXForces::doneWithSubscriptions();
 
-        bool runCondition(true);
-        while (runCondition) {
-            GeneralisedCoordinatesFrame generalisedCoordinatesFrame(inputGeneralisedCoordinatesQueue_.pop());
+        while (auto generalisedCoordinatesFrame{inputGeneralisedCoordinatesQueue_.pop()}) {
+            QueuesToXForces::setState(
+                            generalisedCoordinatesFrame.value().time,
+                            generalisedCoordinatesFrame.value().data.getQ(),
+                            generalisedCoordinatesFrame.value().data.getQd(),
+                            generalisedCoordinatesFrame.value().data.getQdd()
+                            );
 
-            if (EndOfData::isEod(generalisedCoordinatesFrame))
-                runCondition = false;
-            if (runCondition) {
-                QueuesToXForces::setState(
-                    generalisedCoordinatesFrame.time,
-                    generalisedCoordinatesFrame.data.getQ(),
-                    generalisedCoordinatesFrame.data.getQd(),
-                    generalisedCoordinatesFrame.data.getQdd()
-                    );
-
-                QueuesToXForces::calculateIntersegmentalForces();
-                VecContactForcesFrame contactForces;
-                contactForces.time = generalisedCoordinatesFrame.time;
-                QueuesToXForces::getIntersegmentalForcesInG(contactForces.data);
-                outputIntersegmentalForcesQueue_.push(contactForces);
-            }
+                        QueuesToXForces::calculateIntersegmentalForces();
+                        VecContactForcesFrame contactForces;
+                        contactForces.time = generalisedCoordinatesFrame.value().time;
+                        QueuesToXForces::getIntersegmentalForcesInG(contactForces.data);
+                        outputIntersegmentalForcesQueue_.push(contactForces);
         }
-      
-        sendEndOfData();
+        outputIntersegmentalForcesQueue_.close();
+
         QueuesToXForces::doneWithExecution();
-
-    }
-
-
-    void QueuesToIntersegmentalForces::sendEndOfData() {
-
-        outputIntersegmentalForcesQueue_.push(EndOfData::get<VecContactForcesFrame>());
     }
 }

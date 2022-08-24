@@ -29,18 +29,20 @@
 #ifndef ceinms_LmtMaFromStorageFile_h
 #define ceinms_LmtMaFromStorageFile_h
 
-#include "LmtMaFromX.h"
-#include "Utilities.h"
-#include "ceinms/DataFromStorageFile.h"
 #include <string>
 #include <vector>
 #include <memory>
 #include <limits>
 
+#include "LmtMaFromX.h"
+#include "Utilities.h"
+#include "ceinms/DataFromStorageFile.h"
+
 namespace ceinms {
+
     class LmtMaFromStorageFile :public LmtMaFromX {
     public:
-        template <typename NMSModelT>
+        template<typename NMSModelT>
         LmtMaFromStorageFile(
             LmtQueue& outputLmtQueue,
             MultipleMomentArmsQueues& outputMomentArmsQueue,
@@ -58,14 +60,14 @@ namespace ceinms {
     private:
         std::string dataDirectory_;
         std::vector<size_t> musclePositionInLmtStorage_;
-        std::vector< std::vector<size_t> > musclePositionsInMaStorages_;
+        std::vector<std::vector<size_t>> musclePositionsInMaStorages_;
         DataFromStorageFile lmtData_;
-        std::vector< std::unique_ptr<DataFromStorageFile> > maDataStorageFiles_;
+        std::vector<std::unique_ptr<DataFromStorageFile>> maDataStorageFiles_;
 		double startTime_;
 		double stopTime_;
     };
 
-    template <typename NMSModelT>
+    template<typename NMSModelT>
     LmtMaFromStorageFile::LmtMaFromStorageFile(
         LmtQueue& outputLmtQueue,
         MultipleMomentArmsQueues& outputMomentArmsQueue,

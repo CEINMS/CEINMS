@@ -30,22 +30,23 @@
 using std::shared_ptr;
 #include <string>
 using std::string;
-#include "ceinms/LmtMaFromMcbs.h"
 #include <vector>
 using std::vector;
 #include <algorithm>
-#include "ceinms/EndOfData.h"
 #include <chrono>
+
+#include "ceinms/LmtMaFromMcbs.h"
+#include "ceinms/EndOfData.h"
 #include <ceinms/ArrayConverter.h>
 
 namespace ceinms {
    
     void LmtMaFromMcbs::readDefaultMomentArmsFromOsim(
-        const std::string& osimModelFIlename) {
+        const string& osimModelFIlename) {
 
         OpenSim::Model model(osimModelFIlename);
 		SimTK::State s(model.initSystem());
-        OpenSim::Array<std::string> osimMuscleNames_;
+        OpenSim::Array<string> osimMuscleNames_;
         ArrayConverter::fromStdVector(osimMuscleNames_, musclesNames_);
 
         std::unique_ptr<OpenSim::MuscleAnalysis> muscleTendonLengthAnalysis(new OpenSim::MuscleAnalysis(&model));
@@ -60,10 +61,9 @@ namespace ceinms {
         size_t numCoordinates = momentArmStorage.getSize();
 
         for (size_t i(0); i < numCoordinates; ++i) {
-
-            std::string currentCoordinateName(momentArmStorage[i]->q->getName());
+            string currentCoordinateName(momentArmStorage[i]->q->getName());
             if (find(dofsNamesFromOsimModel_.begin(), dofsNamesFromOsimModel_.end(), currentCoordinateName) != dofsNamesFromOsimModel_.end()) {
-                std::vector<double> momentArmsOnDofs;
+                vector<double> momentArmsOnDofs;
                 for (auto muscleName : muscleNamesOnDofsMap_.at(currentCoordinateName)){
                     OpenSim::Array<double> col;
                     momentArmStorage[i]->momentArmStore->getDataColumn(muscleName, col);
@@ -75,7 +75,6 @@ namespace ceinms {
     }
 
     void LmtMaFromMcbs::operator()() {
-
         inputCoordinateQueue_.subscribe();
         LmtMaFromX::doneWithSubscriptions();
 

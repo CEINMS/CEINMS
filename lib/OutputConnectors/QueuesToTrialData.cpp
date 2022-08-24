@@ -27,11 +27,10 @@
  * -------------------------------------------------------------------------- */
 
 #include "ceinms/QueuesToTrialData.h"
-#include "ceinms/EndOfData.h"
 
 namespace ceinms {
-    void QueuesToTrialData::operator()() {
 
+    void QueuesToTrialData::operator()() {
         inputEmgQueue_.subscribe();
         inputLmtQueue_.subscribe();
         inputExternalTorqueQueue_.subscribe();
@@ -41,7 +40,6 @@ namespace ceinms {
         doneWithSubscriptions_.wait();
         doneWithExecution_.wait(); //wait until all the data has been produced and put in the queues
 
-        double externalTorqueTime = std::numeric_limits<double>::lowest();
         bool lmtRunning = true;
         bool torqueRunning = true;
         bool emgRunning = true;
@@ -57,15 +55,13 @@ namespace ceinms {
         torqueData.setLabels(dofNames_);
         
         do {  // while(runCondition)
-
             // 1. read lmt Data
             if (lmtRunning) {
-                ScalarVectorFrame lmtFrameFromQueue = inputLmtQueue_.pop();
-                if (!EndOfData::isEod(lmtFrameFromQueue)) {
-                    lmtData.pushRow(lmtFrameFromQueue.time, lmtFrameFromQueue.data);
+                if (auto lmtFrameFromQueue{inputLmtQueue_.pop()}) {
+                    lmtData.pushRow(lmtFrameFromQueue.value().time, lmtFrameFromQueue.value().data);
                     // 2. read moment arms data
                     for (unsigned int i = 0; i < inputMomentArmsQueues_.size(); ++i) {
-                        MomentArmsFrame momentArmsFrameFromQueue = (*inputMomentArmsQueues_.at(i)).pop();
+                        MomentArmsFrame momentArmsFrameFromQueue = (*inputMomentArmsQueues_.at(i)).pop().value();
                         maData.at(i).pushRow(momentArmsFrameFromQueue.time, momentArmsFrameFromQueue.data);
                     }
                 }
@@ -77,22 +73,21 @@ namespace ceinms {
             //in that case, we'll get the EOD here.. the result will be a
             // 3. read external Torque
             if (torqueRunning) {
-                ScalarVectorFrame externalTorquesFrameFromQueue = inputExternalTorqueQueue_.pop();
-                if (!EndOfData::isEod(externalTorquesFrameFromQueue)) {
-                    torqueData.pushRow(externalTorquesFrameFromQueue.time, externalTorquesFrameFromQueue.data);
+                if (auto externalTorquesFrameFromQueue{ inputExternalTorqueQueue_.pop() }) {
+                    torqueData.pushRow(externalTorquesFrameFromQueue.value().time, externalTorquesFrameFromQueue.value().data);
                 }
                 else
                     torqueRunning = false;
             }
 
             if (emgRunning) {
-                ScalarVectorFrame emgFrameFromQueue = inputEmgQueue_.pop();
-                if (!EndOfData::isEod(emgFrameFromQueue)) {
-                    emgData.pushRow(emgFrameFromQueue.time, emgFrameFromQueue.data);
+                if (auto emgFrameFromQueue{inputEmgQueue_.pop()}) {
+                    emgData.pushRow(emgFrameFromQueue.value().time, emgFrameFromQueue.value().data);
                 }
                 else
                     emgRunning = false;
             }
+
         } while (lmtRunning || emgRunning || torqueRunning);
 
         data_.setEmgData(emgData);
@@ -108,8 +103,7 @@ namespace ceinms {
         data_.setTorqueData(torqueData);
     }
 
-    TrialData QueuesToTrialData::getTrialData()
-    {
+    TrialData QueuesToTrialData::getTrialData() {
         return data_;
     }
 }

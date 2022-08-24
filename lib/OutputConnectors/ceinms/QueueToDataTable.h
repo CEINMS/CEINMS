@@ -26,46 +26,46 @@
 * limitations under the License.                                             *
 * -------------------------------------------------------------------------- */
 
-
 #ifndef ceinms_QueueToDataTable_h
 #define ceinms_QueueToDataTable_h
 
 #include "rtb/concurrency/Latch.h"
 #include "rtb/concurrency/Queue.h"
+
 #include "ceinms/QueueData.h"
 #include "ceinms/queues/ScalarVectorQueue.h"
 #include "ceinms/DataTable.h"
 #include "ceinms/FileLogger.h"
 
-
 namespace ceinms {
 
-template<typename DataType>
-class QueueToDataTable {
-public:
-    using ValueType = typename DataType::value_type;
-    using FrameType = QueueData < DataType >;
-    using QueueType = rtb::Concurrency::Queue < FrameType >;
-    QueueToDataTable() = delete;
-    QueueToDataTable(const QueueToDataTable&) = delete;
-    QueueToDataTable& operator=(const QueueToDataTable&) = delete;
+    template<typename DataType>
+    class QueueToDataTable {
+    public:
+        using ValueType = typename DataType::value_type;
+        using FrameType = QueueData < DataType >;
+        using QueueType = rtb::Concurrency::Queue < FrameType >;
+        QueueToDataTable() = delete;
+        QueueToDataTable(const QueueToDataTable&) = delete;
+        QueueToDataTable& operator=(const QueueToDataTable&) = delete;
 
-    QueueToDataTable(
-        QueueType& inputQueue,
-        rtb::Concurrency::Latch& doneWithSubscriptions,
-        rtb::Concurrency::Latch& doneWithExecution,
-        const std::vector<std::string>& columnLabels
-        );
-    ~QueueToDataTable() = default;
-    void operator()();
-    const DataTable<ValueType>& getDataTable() const;
-private:
-    QueueType& inputQueue_;
-    rtb::Concurrency::Latch& doneWithSubscription_;
-    rtb::Concurrency::Latch& doneWithExecution_;
-    DataTable<ValueType> dataTable_;
-};
+        QueueToDataTable(
+            QueueType& inputQueue,
+            rtb::Concurrency::Latch& doneWithSubscriptions,
+            rtb::Concurrency::Latch& doneWithExecution,
+            const std::vector<std::string>& columnLabels
+            );
+        ~QueueToDataTable() = default;
+        void operator()();
+        const DataTable<ValueType>& getDataTable() const;
 
+    private:
+        QueueType& inputQueue_;
+        rtb::Concurrency::Latch& doneWithSubscription_;
+        rtb::Concurrency::Latch& doneWithExecution_;
+        DataTable<ValueType> dataTable_;
+    };
 }
+
 #include "QueueToDataTable.cpp"
 #endif

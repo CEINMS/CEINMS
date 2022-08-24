@@ -32,15 +32,17 @@
 #include <vector>
 #include <string>
 #include <memory>
+
 #include "rtb/concurrency/Concurrency.h"
+
 #include "ceinms/queues/LmtQueue.h"
 #include "ceinms/queues/MultipleMomentArmsQueues.h"
 
 namespace ceinms {
-    class LmtMaFromX
-    {
+
+    class LmtMaFromX {
     public:
-        template <typename NMSModelT>
+        template<typename NMSModelT>
         LmtMaFromX(
             LmtQueue& outputLmtQueue,
             MultipleMomentArmsQueues& outputMomentArmsQueue,
@@ -57,9 +59,10 @@ namespace ceinms {
         void sendMaEndOfData();
 
     protected:
-        std::vector< std::string > musclesNames_;
-        std::vector< std::string > dofNames_;
-        std::vector< std::vector< std::string > > muscleNamesOnDofs_;
+        std::vector<std::string> musclesNames_;
+        std::vector<std::string> dofNames_;
+        std::vector<std::vector<std::string>> muscleNamesOnDofs_;
+
     private:
         void initialiseMomentArmsQueue();
         LmtQueue& outputLmtQueue_;
@@ -68,7 +71,7 @@ namespace ceinms {
         rtb::Concurrency::Latch& doneWithExecution_;
     };
 
-    template <typename NMSModelT>
+    template<typename NMSModelT>
     LmtMaFromX::LmtMaFromX(
         LmtQueue& outputLmtQueue,
         MultipleMomentArmsQueues& outputMomentArmsQueue,
@@ -78,13 +81,13 @@ namespace ceinms {
         outputLmtQueue_(outputLmtQueue),
         outputMomentArmsQueue_(outputMomentArmsQueue),
         doneWithSubscriptions_(doneWithSubscriptions),
-        doneWithExecution_(doneWithExecution)
+        doneWithExecution_(doneWithExecution) {
 
-    {
         subject.getMuscleNames(musclesNames_);
         subject.getDoFNames(dofNames_);
         subject.getMuscleNamesOnDofs(muscleNamesOnDofs_);
         initialiseMomentArmsQueue();
     }
 }
+
 #endif

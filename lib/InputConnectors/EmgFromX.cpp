@@ -26,52 +26,42 @@
  * limitations under the License.                                             *
  * -------------------------------------------------------------------------- */
 
-#include "ceinms/EmgFromX.h"
+
 #include <string>
 using std::string;
 #include <vector>
 using std::vector;
-#include "ceinms/QueueData.h"
 #include <cstdlib>
-#include "ceinms/EndOfData.h"
+
+#include "ceinms/EmgFromX.h"
+#include "ceinms/QueueData.h"
 
 namespace ceinms {
 
-    EmgFromX::EmgFromX(EmgQueue& outputEmgQueue, rtb::Concurrency::Latch& doneWithSubscriptions, rtb::Concurrency::Latch& doneWithExecution, const std::vector<std::string>& muscleNames) :
+    EmgFromX::EmgFromX(EmgQueue& outputEmgQueue, rtb::Concurrency::Latch& doneWithSubscriptions, rtb::Concurrency::Latch& doneWithExecution, const vector<string>& muscleNames) :
         outputEmgQueue_(outputEmgQueue),
         doneWithSubscriptions_(doneWithSubscriptions),
         doneWithExecution_(doneWithExecution),
-        musclesNames_(muscleNames)
-    {
-    }
+        musclesNames_(muscleNames) { }
 
-    void EmgFromX::updateEmg(const EmgData& currentEmgData, double currentTime)
-    {
-        QueueData< EmgData > emgDataToPush;
+    void EmgFromX::updateEmg(const EmgData& currentEmgData, double currentTime) {
+        QueueData<EmgData> emgDataToPush;
         emgDataToPush.data = currentEmgData;
         emgDataToPush.time = currentTime;
         outputEmgQueue_.push(emgDataToPush);
     }
 
-
     void EmgFromX::doneWithSubscriptions() {
-
         doneWithSubscriptions_.wait();
     }
 
-
     void EmgFromX::doneWithExecution() {
-        
         doneWithExecution_.wait();
     }
 
-
     void EmgFromX::sendEndOfData() {
-
-        outputEmgQueue_.push(EndOfData::get<ScalarVectorFrame>());
+        outputEmgQueue_.close();
     }
 
-
     EmgFromX::~EmgFromX() { }
-
 }

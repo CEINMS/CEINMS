@@ -29,16 +29,17 @@
 #ifndef ceinms_QueuesToKneeBalanceContactForces_h
 #define ceinms_QueuesToKneeBalanceContactForces_h
 
+#include <vector>
+#include <string>
+
 #include "rtb/concurrency/Concurrency.h"
+
 #include "ceinms/ContactModelKneeBalanceSetup.h"
 #include "ceinms/queues/EstimatedTorquesQueue.h"
 #include "ceinms/queues/ExternalTorquesQueue.h"
 #include "ceinms/queues/ScalarContactForcesQueue.h"
 #include "ceinms/Mapper.h"
 #include "ceinms/ContactModelKneeBalance.h"
-
-#include <vector>
-#include <string>
 
 namespace ceinms {
 
@@ -56,7 +57,6 @@ namespace ceinms {
         void operator()();
 
     private:
-        void sendEndOfData();
         EstimatedTorquesQueue& inputEstimatedTorquesQueue_;
         ExternalTorquesQueue& inputExternalTorquesQueue_;
         ScalarContactForcesQueue& outputContactForcesQueue_;
@@ -79,8 +79,7 @@ namespace ceinms {
         outputContactForcesQueue_(outputContactForcesQueue),
         doneWithSubscription_(doneWithSubscription),
         doneWithExecution_(doneWithExecution),
-        kneeContactModel_(contactModelSetup, subject)
-    {   }
+        kneeContactModel_(contactModelSetup, subject) { }
 }
 
 #endif

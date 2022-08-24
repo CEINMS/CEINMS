@@ -26,8 +26,6 @@
  * limitations under the License.                                             *
  * -------------------------------------------------------------------------- */
 
-#include "ceinms/RawEmgFromFile.h"
-
 #include <string>
 using std::string;
 #include <vector>
@@ -36,6 +34,7 @@ using std::vector;
 using std::cout;
 using std::endl;
 
+#include "ceinms/RawEmgFromFile.h"
 
 namespace ceinms {  
 
@@ -43,30 +42,27 @@ namespace ceinms {
 		EmgQueue& outputRawEmgQueue,
 		rtb::Concurrency::Latch& doneWithSubscriptions,
 		rtb::Concurrency::Latch& doneWithExecution,
-		const std::string& rawEmgFilename,
-		const std::vector<std::string>& desiredEmgNames) :
+		const string& rawEmgFilename,
+		const vector<string>& desiredEmgNames) :
 		EmgFromX(outputRawEmgQueue, doneWithSubscriptions, doneWithExecution, {}),
-		emgData_(rawEmgFilename)
+		emgData_(rawEmgFilename) {
 
-	{
-		std::vector<std::string> emgMusclesNamesFromFile{emgData_.getColumnNames()};
+		vector<string> emgMusclesNamesFromFile{emgData_.getColumnNames()};
 		emgMapper_.setNames(emgMusclesNamesFromFile, desiredEmgNames);
-		auto mappedEmgNames(emgMapper_.map(desiredEmgNames, std::string("None")));
-		std::cout << "EMG from files to desired EMG:\n";
+		auto mappedEmgNames(emgMapper_.map(desiredEmgNames, string("None")));
+		cout << "EMG from files to desired EMG:\n";
 		for (int i(0); i < mappedEmgNames.size(); ++i) {
-			std::cout << mappedEmgNames.at(i) << " -> " << desiredEmgNames.at(i);
+			cout << mappedEmgNames.at(i) << " -> " << desiredEmgNames.at(i);
 			if (mappedEmgNames.at(i) != desiredEmgNames.at(i))
-				std::cout << " WARNING. Mapping may be incorrect!";
-			std::cout << std::endl;
+				cout << " WARNING. Mapping may be incorrect!";
+			cout << endl;
 		}
 	}
 	
-	void RawEmgFromFile::operator()()
-    {
+	void RawEmgFromFile::operator()() {
         EmgFromX::doneWithSubscriptions();
 
-        while (emgData_.areStillData())
-        {
+        while (emgData_.areStillData()) {
             emgData_.readNextData();
             EmgFromX::updateEmg(emgMapper_.map(emgData_.getCurrentData()), emgData_.getCurrentTime());
         }
@@ -74,7 +70,5 @@ namespace ceinms {
         EmgFromX::doneWithExecution();
     }
 
-
-
-    RawEmgFromFile::~RawEmgFromFile(){}
+    RawEmgFromFile::~RawEmgFromFile() { }
 }

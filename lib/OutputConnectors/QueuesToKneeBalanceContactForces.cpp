@@ -26,16 +26,15 @@
 * limitations under the License.                                             *
 * -------------------------------------------------------------------------- */
 
-#include "ceinms/QueuesToKneeBalanceContactForces.h"
-#include "ceinms/QueuesSync.h"
-#include "ceinms/EndOfData.h"
 #include <tuple>
 #include <limits>
 
+#include "ceinms/QueuesToKneeBalanceContactForces.h"
+#include "ceinms/QueuesSync.h"
+
 namespace ceinms {
 
-    void QueuesToKneeBalanceContactForces::operator()(){
-
+    void QueuesToKneeBalanceContactForces::operator()() {
         inputExternalTorquesQueue_.subscribe();
         inputEstimatedTorquesQueue_.subscribe();
 
@@ -43,30 +42,23 @@ namespace ceinms {
 
         bool runCondition(true);
         while (runCondition) {
-
             auto frames(QueuesSync::sync(inputExternalTorquesQueue_, inputEstimatedTorquesQueue_));
-            ExternalTorquesFrame externalTorquesFrame;
-            EstimatedTorquesFrame estimatedTorquesFrame;
+            std::optional<ExternalTorquesFrame> externalTorquesFrame;
+            std::optional<EstimatedTorquesFrame> estimatedTorquesFrame;
             std::tie(externalTorquesFrame, estimatedTorquesFrame) = frames;
-            if (EndOfData::isEod(externalTorquesFrame) ||
-                EndOfData::isEod(estimatedTorquesFrame))
+            if (!externalTorquesFrame ||
+                !estimatedTorquesFrame)
                 runCondition = false;
             if (runCondition) {
-                kneeContactModel_.setTorques(externalTorquesFrame.data, estimatedTorquesFrame.data);
+                kneeContactModel_.setTorques(externalTorquesFrame.value().data, estimatedTorquesFrame.value().data);
                 ScalarContactForcesFrame contactForcesFrame;
-                contactForcesFrame.time = estimatedTorquesFrame.time;
+                contactForcesFrame.time = estimatedTorquesFrame.value().time;
                 kneeContactModel_.getContactForces(contactForcesFrame.data);
                 outputContactForcesQueue_.push(contactForcesFrame);
             }
         }
+        outputContactForcesQueue_.close();
 
-        sendEndOfData();
         doneWithExecution_.wait();
-    }
-
-
-    void QueuesToKneeBalanceContactForces::sendEndOfData() {
-
-        outputContactForcesQueue_.push(EndOfData::get<ScalarContactForcesFrame>());
     }
 }

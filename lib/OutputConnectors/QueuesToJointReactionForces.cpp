@@ -26,17 +26,16 @@
 * limitations under the License.                                             *
 * -------------------------------------------------------------------------- */
 
+#include <thread>
+#include <chrono>
+
 #include "ceinms/QueuesToJointReactionForces.h"
 #include "ceinms/GeneralisedCoordinatesData.h"
 #include "ceinms/QueuesSync.h"
-#include "ceinms/EndOfData.h"
-#include <thread>
-#include <chrono>
 
 namespace ceinms {
 
     void QueuesToJointReactionForces::operator()() {
-
         std::cout << "QueuesToJointReactionForces - initialising\n";
         QueuesToXForces::initialiseContactModel();
 
@@ -47,38 +46,33 @@ namespace ceinms {
         QueuesToXForces::doneWithSubscriptions();
         bool runCondition(true);
         while (runCondition) {
-
             auto frames(QueuesSync::sync(inputGeneralisedCoordinatesQueue_, inputMuscleForcesQueue_, inputEstimatedTorquesQueue_));
-            GeneralisedCoordinatesFrame generalisedCoordinatesFrame;
-            MuscleForcesFrame muscleForcesFrame;
-            EstimatedTorquesFrame estimatedTorquesFrame;
+            std::optional<GeneralisedCoordinatesFrame> generalisedCoordinatesFrame;
+            std::optional<MuscleForcesFrame> muscleForcesFrame;
+            std::optional<EstimatedTorquesFrame> estimatedTorquesFrame;
             std::tie(generalisedCoordinatesFrame, muscleForcesFrame, estimatedTorquesFrame) = frames;
 
-            if (EndOfData::isEod(generalisedCoordinatesFrame) ||
-                EndOfData::isEod(muscleForcesFrame) ||
-                EndOfData::isEod(estimatedTorquesFrame))
+            if (!generalisedCoordinatesFrame ||
+                !muscleForcesFrame ||
+                !estimatedTorquesFrame)
                 runCondition = false;
             if (runCondition) {
                 QueuesToXForces::setState(
-                    generalisedCoordinatesFrame.time,
-                    generalisedCoordinatesFrame.data.getQ(),
-                    generalisedCoordinatesFrame.data.getQd(),
-                    generalisedCoordinatesFrame.data.getQdd()
+                    generalisedCoordinatesFrame.value().time,
+                    generalisedCoordinatesFrame.value().data.getQ(),
+                    generalisedCoordinatesFrame.value().data.getQd(),
+                    generalisedCoordinatesFrame.value().data.getQdd()
                     );
 
-                QueuesToXForces::calculateJointReactionForces(muscleForcesFrame.data, estimatedTorquesFrame.data);
+                QueuesToXForces::calculateJointReactionForces(muscleForcesFrame.value().data, estimatedTorquesFrame.value().data);
                 VecContactForcesFrame contactForces;
-                contactForces.time = generalisedCoordinatesFrame.time;
+                contactForces.time = generalisedCoordinatesFrame.value().time;
                 QueuesToXForces::getJointReactionForcesInG(contactForces.data);
                 outputJointReactionForcesQueue_.push(contactForces);
             }
         }
-        sendEndOfData();
+        outputJointReactionForcesQueue_.close();
+
         QueuesToXForces::doneWithExecution();
-    }
-
-    void QueuesToJointReactionForces::sendEndOfData() {
-
-        outputJointReactionForcesQueue_.push(EndOfData::get<VecContactForcesFrame>());
     }
 }

@@ -31,13 +31,15 @@
 
 #include <string>
 #include <vector>
+
 #include "rtb/concurrency/Concurrency.h"
+
 #include "ceinms/GeneralisedCoordinatesData.h"
 #include "ceinms/queues/GeneralisedCoordinatesQueue.h"
 
 namespace ceinms {
-    class GeneralisedCoordinatesFromX {
 
+    class GeneralisedCoordinatesFromX {
     public:
         GeneralisedCoordinatesFromX(
             GeneralisedCoordinatesQueue& outputGeneralisedCoordinatesQueue,
@@ -49,10 +51,12 @@ namespace ceinms {
         void doneWithSubscriptions();
         void doneWithExecution();
         void sendEndOfData();
+
     private:
         GeneralisedCoordinatesQueue& outputGeneralisedCoordinatesQueue_;
         rtb::Concurrency::Latch& doneWithSubscriptions_;
         rtb::Concurrency::Latch& doneWithExecution_;
     };
 }
+
 #endif

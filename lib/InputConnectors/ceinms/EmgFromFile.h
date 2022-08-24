@@ -41,8 +41,8 @@
 #define LOG_EMGFromFile
 
 namespace ceinms {
-    class EmgFromFile :public EmgFromX
-    {
+
+    class EmgFromFile :public EmgFromX {
     public:
         template <typename NMSModelT>
         EmgFromFile(
@@ -54,6 +54,7 @@ namespace ceinms {
             const std::string& emgGeneratorFilename);
         void operator()();
         virtual ~EmgFromFile();
+
     private:
         Mapper excitationMapper_;
         std::string inputDir_;
@@ -68,8 +69,7 @@ namespace ceinms {
         const NMSModelT& subject,
         const std::string& emgFilename,
         const std::string& emgGeneratorFilename) :
-        EmgFromX(outputEmgQueue, doneWithSubscriptions, doneWithExecution, subject), emgData_(emgFilename, emgGeneratorFilename)
-    {
+        EmgFromX(outputEmgQueue, doneWithSubscriptions, doneWithExecution, subject), emgData_(emgFilename, emgGeneratorFilename) {
 
 #ifdef LOG_EMGFromFile
         std::cout << "\nEMG: Reading emg file..." << emgFilename << std::endl;
@@ -85,9 +85,7 @@ namespace ceinms {
             if (mappedExcitationNames.at(i) != musclesNames_.at(i))
                 std::cout << " WARNING. Mapping may be incorrect!";
             std::cout << std::endl;
-
         }
-
     }
 }
 

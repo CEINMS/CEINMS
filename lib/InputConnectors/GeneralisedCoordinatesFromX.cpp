@@ -26,11 +26,11 @@
 * limitations under the License.                                             *
 * -------------------------------------------------------------------------- */
 
-#include "ceinms/GeneralisedCoordinatesFromX.h"
-#include "ceinms/GeneralisedCoordinatesData.h"
-#include "ceinms/EndOfData.h"
 #include <vector>
 using std::vector;
+
+#include "ceinms/GeneralisedCoordinatesFromX.h"
+#include "ceinms/GeneralisedCoordinatesData.h"
 
 namespace ceinms {
 
@@ -40,28 +40,22 @@ namespace ceinms {
 		rtb::Concurrency::Latch& doneWithExecution) :
         outputGeneralisedCoordinatesQueue_(outputGeneralisedCoordinatesQueue),
         doneWithSubscriptions_(doneWithSubscriptions),
-        doneWithExecution_(doneWithExecution)
-
-    { }
+        doneWithExecution_(doneWithExecution) { }
 
     void GeneralisedCoordinatesFromX::updateGeneralisedCoordinates(const GeneralisedCoordinatesData& currentGeneralisedCoordinatesData, double currentTime) {
-
         GeneralisedCoordinatesFrame frame{ currentTime, currentGeneralisedCoordinatesData };
         outputGeneralisedCoordinatesQueue_.push(frame);
     }
 
     void GeneralisedCoordinatesFromX::doneWithSubscriptions() {
-
         doneWithSubscriptions_.wait();
     }
 
     void GeneralisedCoordinatesFromX::doneWithExecution() {
-
         doneWithExecution_.wait();
     }
 
     void GeneralisedCoordinatesFromX::sendEndOfData() {
-
-        outputGeneralisedCoordinatesQueue_.push(EndOfData::get<GeneralisedCoordinatesFrame>());
+        outputGeneralisedCoordinatesQueue_.close();
     }
 }

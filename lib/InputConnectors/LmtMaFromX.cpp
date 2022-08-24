@@ -26,8 +26,7 @@
  * limitations under the License.                                             *
  * -------------------------------------------------------------------------- */
 
-#include "ceinms/LmtMaFromX.h"
-#include "ceinms/EndOfData.h"
+#include <iostream>
 using std::cout;
 using std::endl;
 #include <string>
@@ -37,10 +36,11 @@ using std::vector;
 #include <cstdlib>
 #include <limits>
 
+#include "ceinms/LmtMaFromX.h"
+
 namespace ceinms {
 
     void LmtMaFromX::updateLmt(const LmtData& currentLmtData, double currentTime) {
-
         LmtFrame lmtFrameToPush;
         lmtFrameToPush.data = currentLmtData;
         lmtFrameToPush.time = currentTime;
@@ -48,7 +48,6 @@ namespace ceinms {
     }
 
     void LmtMaFromX::updateMomentArms(const MomentArmsData& currentMomentArmsData, double currentTime, unsigned int whichDof) {
-
         MomentArmsFrame momentArmsFrameToPush;
         momentArmsFrameToPush.data = currentMomentArmsData;
         momentArmsFrameToPush.time = currentTime;
@@ -56,28 +55,23 @@ namespace ceinms {
     }
 
     void LmtMaFromX::doneWithSubscriptions() {
-
         doneWithSubscriptions_.wait();
     }
 
     void LmtMaFromX::doneWithExecution() {
-
         doneWithExecution_.wait();
     }
 
     void LmtMaFromX::sendLmtEndOfData() {
-
-        outputLmtQueue_.push(EndOfData::get<LmtFrame>());
+        outputLmtQueue_.close();
     }
 
     void LmtMaFromX::sendMaEndOfData() {
-
         for (unsigned i(0); i < dofNames_.size(); ++i)
-            outputMomentArmsQueue_.at(i)->push(EndOfData::get<MomentArmsFrame>());
+            outputMomentArmsQueue_.at(i)->close();
     }
 
     void LmtMaFromX::initialiseMomentArmsQueue() {
-
         outputMomentArmsQueue_.clear();
         for (size_t i(0); i < dofNames_.size(); ++i)
             outputMomentArmsQueue_.emplace_back(new MomentArmsQueue());

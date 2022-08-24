@@ -26,10 +26,6 @@
  * limitations under the License.                                             *
  * -------------------------------------------------------------------------- */
 
-#include "ceinms/ExternalTorquesFromStorageFile.h"
-#include "ceinms/ExternalTorquesFromX.h"
-#include "ceinms/DataFromStorageFile.h"
-
 #include <iostream>
 using std::cout;
 using std::endl;
@@ -38,32 +34,30 @@ using std::string;
 #include <vector>
 using std::vector;
 #include <cstdlib>
+
+#include "ceinms/ExternalTorquesFromStorageFile.h"
+#include "ceinms/ExternalTorquesFromX.h"
+#include "ceinms/DataFromStorageFile.h"
 #include "ceinms/Utilities.h"
 
 #define LOG
 
 namespace ceinms  {
-    ExternalTorquesFromStorageFile::~ExternalTorquesFromStorageFile()
-    {
-    }
 
-    bool ExternalTorquesFromStorageFile::externalTorquesFileExist(const string& fileName)
-    {
+    ExternalTorquesFromStorageFile::~ExternalTorquesFromStorageFile() { }
+
+    bool ExternalTorquesFromStorageFile::externalTorquesFileExist(const string& fileName) {
         std::ifstream dataFile(fileName.c_str());
         bool exist = dataFile.is_open();
         dataFile.close();
         return exist;
     }
 
-    void ExternalTorquesFromStorageFile::operator()()
-    {
-
+    void ExternalTorquesFromStorageFile::operator()() {
         ExternalTorquesFromX::doneWithSubscriptions();
 
-        if (externalTorquesAvailable_)
-        {
-            while (externalTorquesDataFromFile_->areStillData())
-            {
+        if (externalTorquesAvailable_) {
+            while (externalTorquesDataFromFile_->areStillData()) {
                 externalTorquesDataFromFile_->readNextData();
                 auto newTorquesData = externalTorquesDataFromFile_->getCurrentData();
                 vector<double> selectedTorquesData(dofNames_.size());

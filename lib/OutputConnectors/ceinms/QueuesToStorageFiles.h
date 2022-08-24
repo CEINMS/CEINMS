@@ -33,17 +33,20 @@
 #include <fstream>
 #include <map>
 #include <filesystem>
+
 #include "rtb/concurrency/Concurrency.h"
+
 #include "ceinms/queues/LogQueue.h"
 
 namespace ceinms {
+
     class QueuesToStorageFiles {
     public:
         QueuesToStorageFiles() = delete;
         QueuesToStorageFiles(const QueuesToStorageFiles&) = delete;
         QueuesToStorageFiles& operator=(const QueuesToStorageFiles&) = delete;
 
-        template <typename NMSmodelT>
+        template<typename NMSmodelT>
         QueuesToStorageFiles(
             ScalarLogQueue& inputLogQueue,
 			rtb::Concurrency::Latch& doneWithSubscriptions,
@@ -55,7 +58,6 @@ namespace ceinms {
         void operator()();
 
     private:
-
         void initFile(const std::string& valueName, const std::vector< ScalarVectorFrame >& dataToWrite);
         void addLog(std::string valueName);
         ScalarLogQueue& inputLogQueue_;
@@ -70,7 +72,7 @@ namespace ceinms {
         std::map<std::string, std::vector<std::string>> muscleNamesOnDofs_;
     };
 
-    template <typename NMSmodelT>
+    template<typename NMSmodelT>
     QueuesToStorageFiles::QueuesToStorageFiles(
         ScalarLogQueue& inputLogQueue,
 		rtb::Concurrency::Latch& doneWithSubscriptions,
@@ -101,4 +103,5 @@ namespace ceinms {
         subject.getMuscleNamesOnDofs(muscleNamesOnDofs_);
     }
 }
+
 #endif

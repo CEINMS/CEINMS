@@ -31,12 +31,13 @@
 
 #include <vector>
 #include <string>
+
 #include "ModelEvaluationBase.h"
 
 namespace ceinms {
-    template <typename NMSmodelT, typename ErrorMinimizerT, typename Logger>
-    class ModelEvaluationHybrid : public ModelEvaluationBase < Logger > {
 
+    template<typename NMSmodelT, typename ErrorMinimizerT, typename Logger>
+    class ModelEvaluationHybrid : public ModelEvaluationBase<Logger> {
     public:
         ModelEvaluationHybrid(
             EmgQueue& inputEmgQueue,
@@ -49,7 +50,7 @@ namespace ceinms {
             NMSmodelT& subject,
             ErrorMinimizerT& torqueErrorMinimizer,
             const vector<string>& valuesToLog);
-        void setOutputDirectory(const std::string& outputDir);
+        //void setOutputDirectory(const std::string& outputDir);
         void operator()();
 
     private:

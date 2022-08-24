@@ -32,22 +32,21 @@
 #include <limits>
 
 namespace ceinms{
+
     namespace EndOfData {
     
         template<typename Frame>
         Frame get() {
-            
-            Frame f;
-            f.time = std::numeric_limits<double>::infinity();
-            return f;
+           Frame f;
+           f.time = std::numeric_limits<double>::infinity();
+           return f;
         }
 
         template<typename Frame>
         bool isEod(const Frame& f) {
-
-            return (f.time == std::numeric_limits<double>::infinity());
+           return (f.time == std::numeric_limits<double>::infinity());
         }
     }
-
 }
+
 #endif

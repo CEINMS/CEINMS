@@ -1,7 +1,9 @@
 #ifndef ceinms_communication_h
 #define ceinms_communication_h
-#include <boost/beast/core.hpp>
+
 #include <string>
+
+#include <boost/beast/core.hpp>
 
 namespace ceinms {
 
@@ -11,7 +13,6 @@ namespace ceinms {
 		protoData.SerializeToString(&msg);
 		sendMessage(msg, ws);
 		//	std::cout << "Sent: " << msg << std::endl;
-
 	}
 
 	template<typename U>
@@ -19,7 +20,7 @@ namespace ceinms {
 		ws.write(boost::asio::buffer(std::string(msg)));
 	}
 
-	template <typename T, typename U>
+	template<typename T, typename U>
 	void receiveMessage(T& protoData, U& ws) {
 		boost::beast::multi_buffer buffer;
 		ws.read(buffer);
@@ -29,4 +30,5 @@ namespace ceinms {
 		std::cout << "Received: " << sstream.str() << std::endl;
 	}
 }
+
 #endif

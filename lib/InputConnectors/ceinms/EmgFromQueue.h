@@ -1,18 +1,22 @@
 #ifndef ceinms_EmgsFromQueue_h
 #define ceinms_EmgsFromQueue_h
-#include <ceinms/EmgFromX.h>
-#include <rtb/concurrency/Concurrency.h>
-#include <ceinms/queues/EmgQueue.h>
-#include <ceinms/ExcitationGeneratorFromXml.h>
+
 #include <vector>
 #include <string>
-#include <rtb/Filter/StateSpaceFilter.h>
-#include <rtb/Filter/Filter.h>
-#include <ceinms/Mapper.h>
 #include <iostream>
 #include <iomanip>
-#include "Utilities.h"
 #include <fstream>
+
+#include <rtb/concurrency/Concurrency.h>
+
+#include <rtb/Filter/StateSpaceFilter.h>
+#include <rtb/Filter/Filter.h>
+
+#include <ceinms/EmgFromX.h>
+#include <ceinms/queues/EmgQueue.h>
+#include <ceinms/ExcitationGeneratorFromXml.h>
+#include <ceinms/Mapper.h>
+#include "Utilities.h"
 
 namespace ceinms {
 
@@ -20,9 +24,7 @@ namespace ceinms {
 		std::vector<double>& normalisationWeights);
 
     class EmgFromQueue : public ceinms::EmgFromX{
-
     public:
-
 		/*If not normalisation file is specified, then weights are calculated
 		automatically*/
 		template<typename NMSModelT>
@@ -65,7 +67,6 @@ namespace ceinms {
         std::vector<std::string> getOutputLabels() const { return excitationGenerator_.getExcitationsNames(); }
 
     private:
-
         ceinms::EmgQueue& inputEmgQueue_;
         std::vector<std::string> inputEmgNames_;
         std::vector<double> normalisationWeights_;
@@ -78,7 +79,6 @@ namespace ceinms {
         size_t nMuscles_;
 		bool autoWeightCalculation_;
     };
-
 
 	template<typename NMSModelT>
 	EmgFromQueue::EmgFromQueue(
@@ -100,12 +100,10 @@ namespace ceinms {
 			std::vector<double>(inputEmgNames.size(), 1.),
 			excitationsGeneratorFilename,
 			subject,
-			fc, fs)
-	{
+			fc, fs) {
+
 		autoWeightCalculation_ = true;
 	}
-
-
 
     template<typename NMSModelT>
     EmgFromQueue::EmgFromQueue(
@@ -162,13 +160,13 @@ namespace ceinms {
             std::exit(EXIT_FAILURE);
         }
 
-        const std::vector<double> hpB{
+        const std::vector<double> hpB {
             0.87518309243813475,
             -1.7503661848762695,
             0.87518309243813475
         };
 
-        const std::vector<double> hpA{
+        const std::vector<double> hpA {
             1,
             -1.734725768809275,
             0.76600660094326378
@@ -236,13 +234,13 @@ namespace ceinms {
         }
         nMuscles_ = musclesNames_.size();
 
-        const std::vector<double> hpB{
+        const std::vector<double> hpB {
             0.87518309243813475,
             -1.7503661848762695,
             0.87518309243813475
         };
 
-        const std::vector<double> hpA{
+        const std::vector<double> hpA {
             1,
             -1.734725768809275,
             0.76600660094326378

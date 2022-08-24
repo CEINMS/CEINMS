@@ -31,7 +31,9 @@
 
 #include <vector>
 #include <string>
+
 #include "rtb/concurrency/Concurrency.h"
+
 #include "ceinms/queues/EmgQueue.h"
 #include "ceinms/queues/LmtQueue.h"
 #include "ceinms/queues/MultipleMomentArmsQueues.h"
@@ -39,9 +41,9 @@
 #include "ceinms/queues/LogQueue.h"
 
 namespace ceinms {
-    template <typename Logger>
-    class ModelEvaluationBase {
 
+    template<typename Logger>
+    class ModelEvaluationBase {
     public:
         ModelEvaluationBase() = delete;
         ModelEvaluationBase(
@@ -56,20 +58,20 @@ namespace ceinms {
             bool showLog = true);
         virtual ~ModelEvaluationBase();
         virtual void operator()() = 0;
+
     protected:
+        void getEmgFromInputQueue(std::optional<EmgFrame>& emgFromQueue);
+        void getLmtFromInputQueue(std::optional<LmtFrame>& lmtFromQueue);
+        void getMomentArmsFromInputQueue(std::optional<MomentArmsFrame>& momentArmsFromQueue, unsigned int whichDof);
+        void getExternalTorquesFromInputQueue(std::optional<ExternalTorquesFrame>& externalTorquesFromQueue);
 
-        void getEmgFromInputQueue(EmgFrame& emgFromQueue);
-        void getLmtFromInputQueue(LmtFrame& lmtFromQueue);
-        void getMomentArmsFromInputQueue(MomentArmsFrame& momentArmsFromQueue, unsigned int whichDof);
-        void getExternalTorquesFromInputQueue(ExternalTorquesFrame& externalTorquesFromQueue);
-
-        EmgFrame getEmgFromInputQueue();
-        LmtFrame getLmtFromInputQueue();
-        MomentArmsFrame getMomentArmsFromInputQueue(unsigned int whichDof);
-        ExternalTorquesFrame getExternalTorquesFromInputQueue();
+        std::optional<EmgFrame> getEmgFromInputQueue();
+        std::optional<LmtFrame> getLmtFromInputQueue();
+        std::optional<MomentArmsFrame> getMomentArmsFromInputQueue(unsigned int whichDof);
+        std::optional<ExternalTorquesFrame> getExternalTorquesFromInputQueue();
 
         void doneWithSubscriptions();
-        bool externalTorquesAvailable() const;
+        //bool externalTorquesAvailable() const;
         void doneWithExecution();
         Logger logger;
         bool showLog_;

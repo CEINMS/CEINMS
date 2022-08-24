@@ -40,10 +40,8 @@
 namespace ceinms {
 
     class QueuesToJointReactionForces : public QueuesToXForces {
-
     public:
-
-        template <typename NMSmodelT>
+        template<typename NMSmodelT>
         QueuesToJointReactionForces(
             GeneralisedCoordinatesQueue& inputGeneralisedCoordinatesQueue,
             MultipleExternalForcesQueue& inputExternalForcesQueue,
@@ -58,17 +56,16 @@ namespace ceinms {
             const std::vector< std::string >& jointsToLog);
 
         virtual void operator()() override;
-        virtual ~QueuesToJointReactionForces() override {}
+        virtual ~QueuesToJointReactionForces() override { }
 
     private:
-        void sendEndOfData();
         GeneralisedCoordinatesQueue& inputGeneralisedCoordinatesQueue_;
         MuscleForcesQueue& inputMuscleForcesQueue_;
         EstimatedTorquesQueue& inputEstimatedTorquesQueue_;
         VecContactForcesQueue& outputJointReactionForcesQueue_;
     };
 
-    template <typename NMSmodelT>
+    template<typename NMSmodelT>
     QueuesToJointReactionForces::QueuesToJointReactionForces(
         GeneralisedCoordinatesQueue& inputGeneralisedCoordinatesQueue,
         MultipleExternalForcesQueue& inputExternalForcesQueue,
@@ -92,8 +89,7 @@ namespace ceinms {
         inputGeneralisedCoordinatesQueue_(inputGeneralisedCoordinatesQueue),
         inputMuscleForcesQueue_(inputMuscleForcesQueue),
         inputEstimatedTorquesQueue_(inputEstimatedTorquesQueue),
-        outputJointReactionForcesQueue_(outputJointReactionForcesQueue)
-    {}
+        outputJointReactionForcesQueue_(outputJointReactionForcesQueue) { }
 }
 
 #endif 

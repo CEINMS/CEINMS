@@ -28,9 +28,9 @@
 
 #ifndef ceinms_QueuesToIntersegmentalAndJointReactionForces_h
 #define ceinms_QueuesToIntersegmentalAndJointReactionForces_h
+
 #include "ceinms/QueuesToXForces.h"
 #include "ceinms/GeneralisedCoordinatesData.h"
-
 #include "ceinms/queues/VecContactForcesQueue.h"
 #include "ceinms/queues/MultipleExternalForcesQueue.h"
 #include "ceinms/queues/GeneralisedCoordinatesQueue.h"
@@ -40,9 +40,8 @@
 namespace ceinms {
 
     class QueuesToIntersegmentalAndJointReactionForces : public QueuesToXForces {
-
     public:
-        template <typename NMSmodelT>
+        template<typename NMSmodelT>
         QueuesToIntersegmentalAndJointReactionForces(
             GeneralisedCoordinatesQueue& inputGeneralisedCoordinatesQueue,
             MultipleExternalForcesQueue& inputExternalForcesQueue,
@@ -58,10 +57,9 @@ namespace ceinms {
             const std::vector< std::string >& jointsToLog);
 
         virtual void operator()() override;
-        virtual ~QueuesToIntersegmentalAndJointReactionForces() override {}
+        virtual ~QueuesToIntersegmentalAndJointReactionForces() override { }
 
     private:
-        void sendEndOfData();
         GeneralisedCoordinatesQueue& inputGeneralisedCoordinatesQueue_;
         MuscleForcesQueue& inputMuscleForcesQueue_;
         EstimatedTorquesQueue& inputEstimatedTorquesQueue_;
@@ -69,7 +67,7 @@ namespace ceinms {
         VecContactForcesQueue& outputIntersegmentalForcesQueue_;
     };
 
-    template <typename NMSmodelT>
+    template<typename NMSmodelT>
     QueuesToIntersegmentalAndJointReactionForces::QueuesToIntersegmentalAndJointReactionForces(
         GeneralisedCoordinatesQueue& inputGeneralisedCoordinatesQueue,
         MultipleExternalForcesQueue& inputExternalForcesQueue,
@@ -95,8 +93,7 @@ namespace ceinms {
         inputMuscleForcesQueue_(inputMuscleForcesQueue),
         inputEstimatedTorquesQueue_(inputEstimatedTorquesQueue),
         outputJointReactionForcesQueue_(outputJointReactionForcesQueue),
-        outputIntersegmentalForcesQueue_(outputIntersegmentalForcesQueue)
-    {}
+        outputIntersegmentalForcesQueue_(outputIntersegmentalForcesQueue) { }
 }
 
 #endif 

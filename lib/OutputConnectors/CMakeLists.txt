@@ -11,7 +11,7 @@ set(OutputConnectors_SOURCES
 	QueuesToKneeBalanceContactForces.cpp
     QueuesToInverseDynamics.cpp
     QueuesToStorageFiles.cpp
-#	websocket/QueuesToWebsocket.cpp
+	# websocket/QueuesToWebsocket.cpp
 )
 set(OutputConnectors_HEADERS
     ceinms/LoggerOnQueues.h
@@ -24,16 +24,14 @@ set(OutputConnectors_HEADERS
     ceinms/QueuesToInverseDynamics.h
     ceinms/QueuesToStorageFiles.h
     ceinms/QueueToStorageFile.h
-	#ceinms/websocket/QueuesToWebsocket.h
-	#ceinms/websocket/communication.h
+	# ceinms/websocket/QueuesToWebsocket.h
+	# ceinms/websocket/communication.h
     ceinms/QueueToDataTable.h
 )
-
-
 set(OutputConnectors_TEMPLATE_IMPLEMENTATION
     ceinms/QueueToStorageFile.cpp
     ceinms/QueueToDataTable.cpp
-	)
+)
 
 #find_package(protobuf CONFIG REQUIRED)
 #set(Protobuf_FILES websocket/protobuf/yabbi.proto)
@@ -50,7 +48,6 @@ set_source_files_properties( ${OutputConnectors_TEMPLATE_IMPLEMENTATION} PROPERT
 set_source_files_properties( ${QueuesToStorageFiles_TEMPLATE_IMPLEMENTATION} PROPERTIES HEADER_FILE_ONLY TRUE)
 #set_source_files_properties( ${Protobuf_FILES} PROPERTIES EXTERNAL_OBJECT TRUE)
 
-
 source_group("Header Files" FILES ${OutputConnectors_HEADERS} ${QueuesToStorageFiles_HEADERS} )
 source_group("Source Files" FILES ${OutputConnectors_TEMPLATE_IMPLEMENTATION} ${QueuesToStorageFiles_SOURCES}
 	${QueuesToStorageFiles_TEMPLATE_IMPLEMENTATION} )
@@ -58,17 +55,16 @@ source_group("Source Files" FILES ${OutputConnectors_TEMPLATE_IMPLEMENTATION} ${
 #source_group("Generated sources" FILES ${Proto_SRC})
 #source_group("Protobuffers" FILES ${Protobuf_FILES})
 
-
 # Define target
 add_library(OutputConnectors STATIC
-  ${OutputConnectors_SOURCES}
-  ${OutputConnectors_HEADERS}
-  ${OutputConnectors_TEMPLATE_IMPLEMENTATION}
-  ${QueuesToStorageFiles_TEMPLATE_IMPLEMENTATION}
-  ${QueuesToStorageFiles_SOURCES}
-  ${QueuesToStorageFiles_HEADERS}
- # ${Proto_HEADERS}
- # ${Proto_SRC}
+    ${OutputConnectors_SOURCES}
+    ${OutputConnectors_HEADERS}
+    ${OutputConnectors_TEMPLATE_IMPLEMENTATION}
+    ${QueuesToStorageFiles_TEMPLATE_IMPLEMENTATION}
+    ${QueuesToStorageFiles_SOURCES}
+    ${QueuesToStorageFiles_HEADERS}
+    # ${Proto_HEADERS}
+    # ${Proto_SRC}
 )
 #target_link_libraries(OutputConnectors JointContactModels ceinms_common ${Boost_LIBRARIES}
 #	protobuf::libprotoc protobuf::libprotobuf protobuf::libprotobuf-lite optimized ${OPENSIM_LIBRARIES})
@@ -76,24 +72,24 @@ target_link_libraries(OutputConnectors JointContactModels ceinms_common rtb::Con
 
 
 target_include_directories(OutputConnectors
-                                PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}
-                                        ${ceinms_common_INCLUDE_DIRS}
-                                        ${InputConnectors_INCLUDE_DIRS}
-                                        ${TrialData_INCLUDE_DIRS}
-										${JointContactModels_INCLUDE_DIRS}
-										${FileIO_INCLUDE_DIRS}
-										${GeneratedProtobuf_INCLUDE_DIRS}
-                                # PUBLIC  ${Boost_INCLUDE_DIRS}
+                            PRIVATE 
+                                ${CMAKE_CURRENT_SOURCE_DIR}
+                                ${ceinms_common_INCLUDE_DIRS}
+                                ${InputConnectors_INCLUDE_DIRS}
+                                ${TrialData_INCLUDE_DIRS}
+								${JointContactModels_INCLUDE_DIRS}
+								${FileIO_INCLUDE_DIRS}
+								${GeneratedProtobuf_INCLUDE_DIRS}
 )
 
 # Save path to include directory for "internal" usage
 set(OutputConnectors_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}" CACHE INTERNAL "Include directories for OutputConnectors library")
 
 # Install
-
 install(FILES ${OutputConnectors_HEADERS} ${OutputConnectors_TEMPLATE_IMPLEMENTATION} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/ceinms COMPONENT Development)
 install(TARGETS OutputConnectors
         EXPORT CEINMSTargets
         RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT Applications
         LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT Development
-        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT Development)
+        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT Development
+)

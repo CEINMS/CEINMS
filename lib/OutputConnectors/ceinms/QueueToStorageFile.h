@@ -30,16 +30,18 @@
 #define ceinms_QueueToStorageFile_h
 
 #include "rtb/concurrency/Concurrency.h"
+
 #include "ceinms/QueueData.h"
 #include "ceinms/FileLogger.h"
 
 namespace ceinms {
+    
     //we should change ne name of the file, to be QueueToFileLogger..
     template<typename DataType>
     class QueueToFileLogger {
     public:
-        using FrameType = QueueData < DataType > ;
-        using QueueType = rtb::Concurrency::Queue < FrameType > ;
+        using FrameType = QueueData <DataType> ;
+        using QueueType = rtb::Concurrency::Queue <FrameType> ;
         QueueToFileLogger() = delete;
         QueueToFileLogger(const QueueToFileLogger&) = delete;
         QueueToFileLogger& operator=(const QueueToFileLogger&) = delete;
@@ -63,7 +65,7 @@ namespace ceinms {
     };
 
     template <typename U>
-    using QueueToStorageFile = QueueToFileLogger < U > ;
+    using QueueToStorageFile = QueueToFileLogger <U> ;
 }
 
 #include "QueueToStorageFile.cpp"

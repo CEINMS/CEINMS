@@ -28,11 +28,14 @@
 
 #ifndef ceinms_GeneralisedCoordinatesFromStorageFile_h
 #define ceinms_GeneralisedCoordinatesFromStorageFile_h
-#include "ceinms/GeneralisedCoordinatesFromX.h"
+
 #include <OpenSim/OpenSim.h>
+
+#include "ceinms/GeneralisedCoordinatesFromX.h"
 #include "ceinms/Mapper.h"
 
 namespace ceinms {
+
     class GeneralisedCoordinatesFromStorageFile : public GeneralisedCoordinatesFromX {
     public:
         GeneralisedCoordinatesFromStorageFile(
@@ -52,6 +55,7 @@ namespace ceinms {
             const std::vector<std::string>& coordinatesToLog);
         virtual ~GeneralisedCoordinatesFromStorageFile() override {}
         virtual void operator()() override;
+        
     private:
         void updateKinematicsSplines(double fc);
         OpenSim::GCVSplineSet splines_;

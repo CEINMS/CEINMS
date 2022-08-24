@@ -28,44 +28,30 @@
 
 #include "ceinms/QueuesToInverseDynamics.h"
 #include "ceinms/GeneralisedCoordinatesData.h"
-#include "ceinms/EndOfData.h"
 
 namespace ceinms {
 
     void QueuesToInverseDynamics::operator()() {
-
         QueuesToXForces::initialiseContactModel();
         inputGeneralisedCoordinatesQueue_.subscribe();
         QueuesToXForces::doneWithSubscriptions();
 
-        bool runCondition(true);
-        while (runCondition) {
+        while (auto generalisedCoordinatesFrame{inputGeneralisedCoordinatesQueue_.pop()}) {
+            QueuesToXForces::setState(
+                            generalisedCoordinatesFrame.value().time,
+                            generalisedCoordinatesFrame.value().data.getQ(),
+                            generalisedCoordinatesFrame.value().data.getQd(),
+                            generalisedCoordinatesFrame.value().data.getQdd()
+                            );
 
-            GeneralisedCoordinatesFrame generalisedCoordinatesFrame(inputGeneralisedCoordinatesQueue_.pop());
-
-            if (EndOfData::isEod(generalisedCoordinatesFrame))
-                runCondition = false;
-            if (runCondition) {
-                QueuesToXForces::setState(
-                    generalisedCoordinatesFrame.time,
-                    generalisedCoordinatesFrame.data.getQ(),
-                    generalisedCoordinatesFrame.data.getQd(),
-                    generalisedCoordinatesFrame.data.getQdd()
-                    );
-
-                QueuesToXForces::calculateInverseDynamics();
-                std::vector<double> residualMobilityForces;
-                QueuesToXForces::getResidualMobilityForces(residualMobilityForces, onlyLogSubjectDofs_);
-                ExternalTorquesFrame externalTorquesFrame{ generalisedCoordinatesFrame.time, residualMobilityForces };
-                outputExternalTorquesQueue_.push(externalTorquesFrame);
-            }
+                        QueuesToXForces::calculateInverseDynamics();
+                        std::vector<double> residualMobilityForces;
+                        QueuesToXForces::getResidualMobilityForces(residualMobilityForces, onlyLogSubjectDofs_);
+                        ExternalTorquesFrame externalTorquesFrame{ generalisedCoordinatesFrame.value().time, residualMobilityForces };
+                        outputExternalTorquesQueue_.push(externalTorquesFrame);
         }
-        sendEndOfData();
+        outputExternalTorquesQueue_.close();
+
         QueuesToXForces::doneWithExecution();
-    }
-
-    void QueuesToInverseDynamics::sendEndOfData() {
-
-        outputExternalTorquesQueue_.push(EndOfData::get<ExternalTorquesFrame>());
     }
 }

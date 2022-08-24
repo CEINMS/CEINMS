@@ -32,13 +32,13 @@
 #include <vector>
 #include <list>
 #include <string>
+
 #include "ModelEvaluationBase.h"
 
 namespace ceinms {
 
     template <typename NMSmodelT, typename Logger>
-    class ModelEvaluationOffline : public ModelEvaluationBase < Logger > {
-
+    class ModelEvaluationOffline : public ModelEvaluationBase<Logger> {
     public:
         ModelEvaluationOffline() = delete;
         ModelEvaluationOffline(
@@ -53,7 +53,7 @@ namespace ceinms {
             const std::vector< std::string >& valuesToLog);
         ~ModelEvaluationOffline();
 
-        void setOutputDirectory(const std::string& outputDir);
+        //void setOutputDirectory(const std::string& outputDir);
         void operator()() override;
 
     private:

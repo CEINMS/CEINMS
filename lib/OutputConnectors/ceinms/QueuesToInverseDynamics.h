@@ -29,10 +29,10 @@
 #ifndef ceinms_QueuesToInverseDynamics_h
 #define ceinms_QueuesToInverseDynamics_h
 
+#include "rtb/concurrency/Concurrency.h"
+
 #include "ceinms/QueuesToXForces.h"
 #include "ceinms/GeneralisedCoordinatesData.h"
-
-#include "rtb/concurrency/Concurrency.h"
 #include "ceinms/queues/GeneralisedCoordinatesQueue.h"
 #include "ceinms/queues/MultipleExternalForcesQueue.h"
 #include "ceinms/queues/ExternalTorquesQueue.h"
@@ -41,9 +41,8 @@
 namespace ceinms{
 
     class QueuesToInverseDynamics : public QueuesToXForces {
-
     public:
-        template <typename NMSmodelT>
+        template<typename NMSmodelT>
         QueuesToInverseDynamics(
             GeneralisedCoordinatesQueue& inputGeneralisedCoordinatesQueue,
             MultipleExternalForcesQueue& inputExternalForcesQueue,
@@ -55,7 +54,7 @@ namespace ceinms{
             const std::string& externalLoadsXmlFilename,
             bool onlyLogSubjectDofs);
 
-        template <typename NMSmodelT>
+        template<typename NMSmodelT>
         QueuesToInverseDynamics(
             GeneralisedCoordinatesQueue& inputGeneralisedCoordinatesQueue,
             MultipleExternalForcesQueue& inputExternalForcesQueue,
@@ -68,16 +67,15 @@ namespace ceinms{
             bool onlyLogSubjectDofs);
 
         virtual void operator()() override;
-        virtual ~QueuesToInverseDynamics() override {}
+        virtual ~QueuesToInverseDynamics() override { }
 
     private:
-        void sendEndOfData();
         GeneralisedCoordinatesQueue& inputGeneralisedCoordinatesQueue_;
         ExternalTorquesQueue& outputExternalTorquesQueue_;
         bool onlyLogSubjectDofs_;
     };
 
-    template <typename NMSmodelT>
+    template<typename NMSmodelT>
     QueuesToInverseDynamics::QueuesToInverseDynamics(
         GeneralisedCoordinatesQueue& inputGeneralisedCoordinatesQueue,
         MultipleExternalForcesQueue& inputExternalForcesQueue,
@@ -99,7 +97,7 @@ namespace ceinms{
         onlyLogSubjectDofs_(onlyLogSubjectDofs) {
     }
 
-    template <typename NMSmodelT>
+    template<typename NMSmodelT>
     QueuesToInverseDynamics::QueuesToInverseDynamics(
         GeneralisedCoordinatesQueue& inputGeneralisedCoordinatesQueue,
         MultipleExternalForcesQueue& inputExternalForcesQueue,

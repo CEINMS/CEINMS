@@ -1,18 +1,18 @@
+#include "ceinms/websocket/communication.h"
+#include "ceinms/EndOfData.h"
+
 #include <boost/beast/core.hpp>
 #include <boost/beast/websocket.hpp>
 #include <boost/asio/ip/tcp.hpp>
 #include "ceinms/websocket/QueuesToWebsocket.h"
-#include "ceinms/websocket/communication.h"
-#include "ceinms/EndOfData.h"
 #include "yabbi.pb.h"
 using tcp = boost::asio::ip::tcp;               // from <boost/asio/ip/tcp.hpp>
 namespace websocket = boost::beast::websocket;  // from <boost/beast/websocket.hpp>
 
 namespace ceinms {
-	void QueuesToWebsocket::operator()() {
 
-		try
-		{		
+	void QueuesToWebsocket::operator()() {
+		try {		
 			auto const address = boost::asio::ip::make_address(address_);
 			auto const port = static_cast<unsigned short>(std::stoi(port_));
 
@@ -21,8 +21,7 @@ namespace ceinms {
 
 			// The acceptor receives incoming connections
 			tcp::acceptor acceptor{ ioc, {address, port} };
-			for (;;)
-			{
+			for (;;) {
 				// This will receive the new connection
 				tcp::socket socket{ ioc };
 
@@ -35,16 +34,14 @@ namespace ceinms {
 					std::move(socket), std::ref(inputPointCloud_), names_) }.detach();
 			}
 		}
-		catch (const std::exception& e)
-		{
+		catch (const std::exception& e) {
 			std::cout << "Error [QueuesToWebsocket::operator()()]: " << e.what() << std::endl;
 		}
-	
 	}
 	 
 	void QueuesToWebsocket::doSession(tcp::socket& socket,
-		ScalarVectorVectorQueue& inputPointCloud, const std::vector<std::string>& names)
-	{
+		ScalarVectorVectorQueue& inputPointCloud, const std::vector<std::string>& names) {
+
 		bool runCondition = true;
 		auto getDataFrameSet([&inputPointCloud, &names, &runCondition]() {
 			auto fillDataFrame([](const std::vector<double>& in, yabbi::DataFrame* out) {
@@ -77,7 +74,6 @@ namespace ceinms {
 			return availableChannels;
 		});
 
-
 		auto printDataFrameSet([](const yabbi::DataFrameSet& dataFrameSet) {
 			std::cout << "size: " << dataFrameSet.dataframe_size() << std::endl;
 			for (auto &d : dataFrameSet.dataframe()) {
@@ -91,8 +87,7 @@ namespace ceinms {
 			}
 		});
 
-		try
-		{
+		try {
 			// Construct the stream by moving in the socket
 			websocket::stream<tcp::socket> ws{ std::move(socket) };
 
@@ -102,21 +97,18 @@ namespace ceinms {
 			std::cout << "Handshake accepted" << std::endl;
 			inputPointCloud.subscribe();
 			// change this to a while there is data coming
-			while(runCondition)
-			{
+			while(runCondition) {
 				// Read a message
 				yabbi::ClientRequest clientRequest;
 				receiveMessage(clientRequest, ws);
 
 				switch (clientRequest.request()) {
-				case yabbi::ClientRequest_Request::ClientRequest_Request_CHANNELS:
-				{
+				case yabbi::ClientRequest_Request::ClientRequest_Request_CHANNELS: {
 					std::cout << "Requesting channels" << std::endl;
 					sendMessage(getAvailableChannels(), ws);
 					break;
 				}
-				case yabbi::ClientRequest_Request::ClientRequest_Request_DATA:
-				{
+				case yabbi::ClientRequest_Request::ClientRequest_Request_DATA: {
 					std::cout << "Requesting data" << std::endl;
 					int n = clientRequest.nframes();
 					for (int i(0); i < n; ++i) {
@@ -135,20 +127,16 @@ namespace ceinms {
 			}
 			std::cout << "Closing websocket" << std::endl;
 			ws.close("End of data");
-			
 		}
-		catch (boost::system::system_error const& se)
-		{
+		catch (boost::system::system_error const& se) {
 			// This indicates that the session was closed
 			if (se.code() != websocket::error::closed)
 				std::cout << "Error [QueuesToWebsocket::doSession]: " << se.code().message() << std::endl;
 		}
-		catch (std::exception const& e)
-		{
+		catch (std::exception const& e) {
 			std::cout << "Error [QueuesToWebsocket::doSession]: " << e.what() << std::endl;
 		}
 		std::cout << "Unsubscribing" << std::endl;
 		inputPointCloud.unsubscribe();
-
 	}
 }

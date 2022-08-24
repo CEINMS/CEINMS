@@ -26,8 +26,6 @@
  * limitations under the License.                                             *
  * -------------------------------------------------------------------------- */
 
-#include "ceinms/Utilities.h"
-
 #include <algorithm>
 #include <iostream>
 #include <filesystem>
@@ -39,7 +37,10 @@ using std::string;
 using std::cout;
 using std::endl;
 
+#include "ceinms/Utilities.h"
+
 namespace ceinms {
+    
     string findFile(const string& pattern, const string& directoryPath) {
         namespace fs = std::filesystem;
 
@@ -53,7 +54,7 @@ namespace ceinms {
         for (fs::directory_iterator it(directoryPath); it != fs::directory_iterator(); ++it)
             filenames.push_back((it->path().filename().string()));
 
-        auto pos = std::remove_if(std::begin(filenames), std::end(filenames), [&](std::string& s) { return s.find(pattern) == std::string::npos; });
+        auto pos = std::remove_if(std::begin(filenames), std::end(filenames), [&](string& s) { return s.find(pattern) == string::npos; });
 
         filenames.erase(pos, std::end(filenames));
 

@@ -26,8 +26,6 @@
  * limitations under the License.                                             *
  * -------------------------------------------------------------------------- */
 
-#include "ceinms/EmgFromFile.h"
-
 #include <string>
 using std::string;
 #include <vector>
@@ -37,15 +35,16 @@ using std::cout;
 using std::endl;
 #include <cstdlib>
 
+#include "ceinms/EmgFromFile.h"
+
 #define LOG
 
 namespace ceinms {
-    void EmgFromFile::operator()()
-    {
+
+    void EmgFromFile::operator()() {
         EmgFromX::doneWithSubscriptions();
 
-        while (emgData_.areStillData())
-        {
+        while (emgData_.areStillData()) {
             emgData_.readNextEmgData();
             EmgFromX::updateEmg(excitationMapper_.map(emgData_.getCurrentData()), emgData_.getCurrentTime());
         }
@@ -58,5 +57,5 @@ namespace ceinms {
         EmgFromX::doneWithExecution();
     }
 
-    EmgFromFile::~EmgFromFile(){}
+    EmgFromFile::~EmgFromFile() { }
 }

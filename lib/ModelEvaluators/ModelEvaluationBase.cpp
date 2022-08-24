@@ -32,7 +32,8 @@ using std::vector;
 using std::string;
 
 namespace ceinms {
-    template <typename Logger>
+
+    template<typename Logger>
     ModelEvaluationBase<Logger>::ModelEvaluationBase(
         EmgQueue& inputEmgQueue,
         LmtQueue& inputLmtQueue,
@@ -41,7 +42,7 @@ namespace ceinms {
         ScalarLogQueue& outputLogQueue,
         rtb::Concurrency::Latch& doneWithSubscriptions,
         rtb::Concurrency::Latch& doneWithExecution,
-        const std::vector<std::string>& valuesToLog,
+        const vector<string>& valuesToLog,
         bool showLog) :
 
         inputEmgQueue_(inputEmgQueue),
@@ -51,72 +52,68 @@ namespace ceinms {
         doneWithSubscriptions_(doneWithSubscriptions),
         doneWithExecution_(doneWithExecution),
         logger(outputLogQueue, valuesToLog),
-        showLog_(showLog)
-    { }
+        showLog_(showLog) { }
 
-    template <typename Logger>
+    template<typename Logger>
     void ModelEvaluationBase<Logger>::subscribeToQueues() {
-
         inputEmgQueue_.subscribe();
         inputLmtQueue_.subscribe();
         inputExternalTorqueQueue_.subscribe();
-
     }
 
-    template <typename Logger>
+    template<typename Logger>
     void ModelEvaluationBase<Logger>::doneWithSubscriptions() {
-
         subscribeToQueues();
         doneWithSubscriptions_.wait();
 		for (auto& it : inputMomentArmsQueues_)
 			(*it).subscribe();
     }
 
-    template <typename Logger>
-    void ModelEvaluationBase<Logger>::getEmgFromInputQueue(EmgFrame& emgs) {
+    template<typename Logger>
+    void ModelEvaluationBase<Logger>::getEmgFromInputQueue(std::optional<EmgFrame>& emgs) {
         emgs = inputEmgQueue_.pop();
     }
 
-    template <typename Logger>
-    void ModelEvaluationBase<Logger>::getLmtFromInputQueue(LmtFrame& lmts) {
+    template<typename Logger>
+    void ModelEvaluationBase<Logger>::getLmtFromInputQueue(std::optional<LmtFrame>& lmts) {
         lmts = inputLmtQueue_.pop();
     }
 
-    template <typename Logger>
-    void ModelEvaluationBase<Logger>::getMomentArmsFromInputQueue(MomentArmsFrame& momentArms, unsigned int whichDof) {
+    template<typename Logger>
+    void ModelEvaluationBase<Logger>::getMomentArmsFromInputQueue(std::optional<MomentArmsFrame>& momentArms, unsigned int whichDof) {
         momentArms = (*inputMomentArmsQueues_.at(whichDof)).pop();
     }
 
-    template <typename Logger>
-    void ModelEvaluationBase<Logger>::getExternalTorquesFromInputQueue(ExternalTorquesFrame& externalTorques) {
+    template<typename Logger>
+    void ModelEvaluationBase<Logger>::getExternalTorquesFromInputQueue(std::optional<ExternalTorquesFrame>& externalTorques) {
         externalTorques = inputExternalTorqueQueue_.pop();
     }
 
-    template <typename Logger>
-    EmgFrame ModelEvaluationBase<Logger>::getEmgFromInputQueue() {
+    template<typename Logger>
+    std::optional<EmgFrame> ModelEvaluationBase<Logger>::getEmgFromInputQueue() {
         return inputEmgQueue_.pop();
     }
 
-    template <typename Logger>
-    LmtFrame ModelEvaluationBase<Logger>::getLmtFromInputQueue() {
+    template<typename Logger>
+    std::optional<LmtFrame> ModelEvaluationBase<Logger>::getLmtFromInputQueue() {
         return inputLmtQueue_.pop();
     }
 
-    template <typename Logger>
-    MomentArmsFrame ModelEvaluationBase<Logger>::getMomentArmsFromInputQueue(unsigned int whichDof) {
+    template<typename Logger>
+    std::optional<MomentArmsFrame> ModelEvaluationBase<Logger>::getMomentArmsFromInputQueue(unsigned int whichDof) {
         return (*inputMomentArmsQueues_.at(whichDof)).pop();
     }
 
-    template <typename Logger>
-    ExternalTorquesFrame ModelEvaluationBase<Logger>::getExternalTorquesFromInputQueue(){
+    template<typename Logger>
+    std::optional<ExternalTorquesFrame> ModelEvaluationBase<Logger>::getExternalTorquesFromInputQueue() {
         return inputExternalTorqueQueue_.pop();
     }
 
-    template <typename Logger>
-    void ModelEvaluationBase<Logger>::doneWithExecution(){
+    template<typename Logger>
+    void ModelEvaluationBase<Logger>::doneWithExecution() {
         doneWithExecution_.wait();
     }
 
-    template <typename Logger>
+    template<typename Logger>
     ModelEvaluationBase<Logger>::~ModelEvaluationBase() { }
 }

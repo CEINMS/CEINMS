@@ -29,18 +29,18 @@
 #ifndef ceinms_ExternalTorquesFromFile_h
 #define ceinms_ExternalTorquesFromFile_h
 
+#include <string>
+#include <memory>
+
 #include "ExternalTorquesFromX.h"
 #include "Utilities.h"
 #include "ceinms/DataFromStorageFile.h"
 
-#include <string>
-#include <memory>
-
 namespace ceinms {
-    class ExternalTorquesFromStorageFile :public ExternalTorquesFromX
-    {
+
+    class ExternalTorquesFromStorageFile :public ExternalTorquesFromX {
     public:
-        template <typename NMSModelT>
+        template<typename NMSModelT>
         ExternalTorquesFromStorageFile(
             ExternalTorquesQueue& outputExternalTorques,
 			rtb::Concurrency::Latch& doneWithSubscriptions,
@@ -49,6 +49,7 @@ namespace ceinms {
             const std::string& dataDirectory);
         void operator()();
         ~ExternalTorquesFromStorageFile();
+
     private:
         bool externalTorquesFileExist(const std::string& fileName);
         std::string dataDirectory_;
@@ -57,7 +58,7 @@ namespace ceinms {
         bool externalTorquesAvailable_;
     };
 
-    template <typename NMSModelT>
+    template<typename NMSModelT>
     ExternalTorquesFromStorageFile::ExternalTorquesFromStorageFile(
         ExternalTorquesQueue& outputExternalTorques,
 		rtb::Concurrency::Latch& doneWithSubscriptions,
@@ -66,8 +67,7 @@ namespace ceinms {
         const std::string& externalTorqueFilename)
         :ExternalTorquesFromX(outputExternalTorques, doneWithSubscriptions, doneWithExecution, subject),
         externalTorquesDataFromFile_(nullptr),
-        externalTorquesAvailable_(false)
-    {
+        externalTorquesAvailable_(false) {
 
 #ifdef LOG
         std::cout << "\nExtTorque: starting externalTorqueProduce, reading from external torque data file" << std::endl;
@@ -75,13 +75,12 @@ namespace ceinms {
 
         externalTorquesAvailable_ = externalTorquesFileExist(externalTorqueFilename);
 
-        if (externalTorquesAvailable_)  {
+        if (externalTorquesAvailable_) {
 #ifdef LOG
             std::cout << "\n ExtTorque: external Torques available " << std::endl;
 #endif
             externalTorquesDataFromFile_.reset(new DataFromStorageFile(externalTorqueFilename));
-            if (externalTorquesDataFromFile_ == nullptr)
-            {
+            if (externalTorquesDataFromFile_ == nullptr) {
                 std::cout << "External Torque File ERROR: file \"" << externalTorqueFilename << "\" could not be open\n";
                 exit(EXIT_FAILURE);
             }
@@ -94,4 +93,5 @@ namespace ceinms {
         }
     }
 }
+
 #endif

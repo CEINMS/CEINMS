@@ -31,12 +31,12 @@
 
 #include <vector>
 #include <string>
+
 #include "ModelEvaluationBase.h"
 
 namespace ceinms {
     template <typename NMSmodelT, typename Logger>
-    class ModelEvaluationOnline : public ModelEvaluationBase < Logger > {
-
+    class ModelEvaluationOnline : public ModelEvaluationBase<Logger> {
     public:
         ModelEvaluationOnline() = delete;
         ModelEvaluationOnline(
@@ -48,17 +48,17 @@ namespace ceinms {
 			rtb::Concurrency::Latch& doneWithSubscriptions,
 			rtb::Concurrency::Latch& doneWithExecution,
             NMSmodelT& subject,
-            const std::vector< std::string >& valuesToLog,
+            const std::vector<std::string>& valuesToLog,
             bool showLog = true); // const std::string& outputDir = "./Output");
-        void setOutputDirectory(const std::string& outputDir);
-        //    void setSubject(NMSmodelT& subject);
+        //void setOutputDirectory(const std::string& outputDir);
+        //void setSubject(NMSmodelT& subject);
         void operator()() override;
 
     private:
         NMSmodelT& subject_;
         std::string outputDir_;
-        std::vector< std::string > dofNames_;
-        std::vector< std::string > dofNamesWithExtTorque_;
+        std::vector<std::string> dofNames_;
+        std::vector<std::string> dofNamesWithExtTorque_;
         unsigned noDof_;
         double globalEmDelay_;
     };

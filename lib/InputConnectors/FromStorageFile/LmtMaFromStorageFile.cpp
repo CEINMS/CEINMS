@@ -26,10 +26,6 @@
  * limitations under the License.                                             *
  * -------------------------------------------------------------------------- */
 
-#include "ceinms/LmtMaFromStorageFile.h"
-#include "ceinms/DataFromStorageFile.h"
-#include "ceinms/Utilities.h"
-
 #include <iostream>
 using std::cout;
 using std::endl;
@@ -41,19 +37,22 @@ using std::vector;
 #include <thread>
 #include <chrono>
 using namespace std::chrono_literals;
+
+#include "ceinms/LmtMaFromStorageFile.h"
+#include "ceinms/DataFromStorageFile.h"
+#include "ceinms/Utilities.h"
+
 #define LOG
 
 namespace ceinms {
-    void LmtMaFromStorageFile::operator()()
-    {
+
+    void LmtMaFromStorageFile::operator()() {
         // 1. wait - if required - for the required subscriptions to happen
         LmtMaFromX::doneWithSubscriptions();
 
         double time;
-        while (lmtData_.areStillData())
-        {
+        while (lmtData_.areStillData()) {
 
-    
        //     std::this_thread::sleep_for(5ms);
             lmtData_.readNextData();
             auto newLmtData = lmtData_.getCurrentData();
@@ -66,9 +65,7 @@ namespace ceinms {
 
 				LmtMaFromX::updateLmt(selectedLmtData, time);
 
-				for (unsigned int currentDof = 0; currentDof < dofNames_.size(); ++currentDof)
-				{
-
+				for (unsigned int currentDof = 0; currentDof < dofNames_.size(); ++currentDof) {
 					(*maDataStorageFiles_.at(currentDof)).readNextData();
 					auto newMaData = (*maDataStorageFiles_.at(currentDof)).getCurrentData();
 

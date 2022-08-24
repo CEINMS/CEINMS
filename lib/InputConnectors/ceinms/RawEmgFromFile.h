@@ -39,8 +39,8 @@
 #include "ceinms/DataFromStorageFile.h"
 
 namespace ceinms {
-    class RawEmgFromFile :public EmgFromX
-    {
+    
+    class RawEmgFromFile :public EmgFromX {
     public:
 		RawEmgFromFile(
             EmgQueue& outputRawEmgQueue,

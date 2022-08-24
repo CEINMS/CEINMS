@@ -27,11 +27,10 @@
  * -------------------------------------------------------------------------- */
 
 #include "ceinms/QueuesToStorageFiles.h"
-#include "ceinms/EndOfData.h"
 
 namespace ceinms {
-    void QueuesToStorageFiles::addLog(std::string valueName)
-    {
+
+    void QueuesToStorageFiles::addLog(std::string valueName) {
         std::string filename = valueName + ".sto";
         std::string outFilename = outputDir_ + filename;
 
@@ -45,9 +44,7 @@ namespace ceinms {
     }
 
     void QueuesToStorageFiles::operator()() {
-
         for (auto& it : valuesToWrite_) {
-
             auto q = inputLogQueue_.find(it);
             if (q == inputLogQueue_.end()) {
                 std::cout << it << " queue was not found\n";
@@ -71,12 +68,9 @@ namespace ceinms {
                 exit(EXIT_FAILURE);
             }
 
-            ScalarVectorFrame currentFrame;
-            std::vector< ScalarVectorFrame > dataToWrite;
-            currentFrame = currentQueue->second->pop();
-            while (!EndOfData::isEod(currentFrame)) {
-                dataToWrite.push_back(currentFrame);
-                currentFrame = currentQueue->second->pop();
+            std::vector<ScalarVectorFrame> dataToWrite;
+            while (auto currentFrame{currentQueue->second->pop()}) {
+                dataToWrite.push_back(currentFrame.value());
             }
 
             initFile(currentValue, dataToWrite);
@@ -91,10 +85,8 @@ namespace ceinms {
         }
     }
 
-    void QueuesToStorageFiles::initFile(const std::string& valueName, const std::vector<ScalarVectorFrame>& dataToWrite)
-    {
-        if (dataToWrite.size() < 1)
-        {
+    void QueuesToStorageFiles::initFile(const std::string& valueName, const std::vector<ScalarVectorFrame>& dataToWrite) {
+        if (dataToWrite.size() < 1) {
             std::cout << "No " << valueName << "data to write!" << std::endl;
             return;
         }

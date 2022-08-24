@@ -25,12 +25,15 @@
 * See the License for the specific language governing permissions and        *
 * limitations under the License.                                             *
 * -------------------------------------------------------------------------- */
-//#include "ceinms/QueueToStorageFile.h"
-#include "ceinms/QueuesSync.h"
-#include "rtb/concurrency/Concurrency.h"
+
 #include <iostream>
 #include <vector>
+
 #include <SimTKcommon.h>
+
+#include "rtb/concurrency/Concurrency.h"
+
+#include "ceinms/QueuesSync.h"
 
 namespace ceinms{
 
@@ -46,8 +49,7 @@ namespace ceinms{
         inputQueue_(inputQueue),
         subscriptionLatch_(subscriptionLatch),
         readyToWriteLatch_(readyToWriteLatch),
-        logger_(columnLabels, valueName + "." + extension, outputDir)
-    {
+        logger_(columnLabels, valueName + "." + extension, outputDir) {
 
         if (!logger_.printable()) {
            std:: cout << std::endl;
@@ -57,18 +59,12 @@ namespace ceinms{
 
     template<typename DataType>
     void QueueToFileLogger<DataType>::operator()() {
-
         inputQueue_.subscribe();
         subscriptionLatch_.wait();
         readyToWriteLatch_.wait();
 
-        bool runCondition(true);
-        while (runCondition) {
-            FrameType currentFrame = inputQueue_.pop();
-            if (QueuesSync::isEndOfData(currentFrame)) runCondition = false;
-            if (runCondition) {
-                logger_.logFrame(currentFrame);
-            }
+        while (auto currentFrame{inputQueue_.pop()}) {
+            logger_.logFrame(currentFrame.value());
         }
 
         logger_.print();

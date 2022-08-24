@@ -32,17 +32,16 @@ using std::endl;
 #include <vector>
 using std::vector;
 #include <string>
-//#include <boost/concept_check.hpp>
 using std::string;
 
 #include "ceinms/TimeCompare.h"
-#include "ceinms/EndOfData.h"
 
 #define LOG_FILES
 //#define LOG
 
 namespace ceinms {
-    template <typename NMSmodelT, typename Logger>
+
+    template<typename NMSmodelT, typename Logger>
     ModelEvaluationOnline<NMSmodelT, Logger>::ModelEvaluationOnline(
         EmgQueue& inputEmgQueue,
         LmtQueue& inputLmtQueue,
@@ -64,16 +63,15 @@ namespace ceinms {
         doneWithExecution,
         valuesToLog,
         showLog),
-        subject_(subject)
-    {
+        subject_(subject) {
+
         subject_.getDoFNames(dofNames_);
         noDof_ = dofNames_.size();
         globalEmDelay_ = subject.getGlobalEmDelay();
     }
 
-    template <typename NMSmodelT, typename Logger>
+    template<typename NMSmodelT, typename Logger>
     void ModelEvaluationOnline<NMSmodelT, Logger>::operator()() {
-
 
 #ifdef LOG
         cout << "starting consume" << endl;
@@ -89,33 +87,39 @@ namespace ceinms {
 
         ModelEvaluationBase<Logger>::doneWithSubscriptions();
         do {  // while(runCondition)
-
             // 1. read lmt Data
-            LmtFrame lmtFrameFromQueue;
+            std::optional<LmtFrame> lmtFrameFromQueue;
             ModelEvaluationBase<Logger>::getLmtFromInputQueue(lmtFrameFromQueue);
-            double lmtMaTime = lmtFrameFromQueue.time;
+            double lmtMaTime;
+            if (lmtFrameFromQueue)
+                lmtMaTime = lmtFrameFromQueue.value().time;
+            else
+                lmtMaTime = std::numeric_limits<double>::lowest();
 
             // update runCondition
-            runCondition = runCondition && !lmtFrameFromQueue.data.empty();
+            runCondition = runCondition && lmtFrameFromQueue;
 
             // 2. read moment arms data
-            vector< MomentArmsFrame > momentArmsFramesFromQueue;
+            vector<std::optional<MomentArmsFrame>> momentArmsFramesFromQueue;
             momentArmsFramesFromQueue.resize(noDof_);
             for (unsigned int i = 0; i < noDof_; ++i) {
                 ModelEvaluationBase<Logger>::getMomentArmsFromInputQueue((momentArmsFramesFromQueue.at(i)), i);
-                runCondition = runCondition && !momentArmsFramesFromQueue.at(i).data.empty();
+                runCondition = runCondition && momentArmsFramesFromQueue.at(i);
             }
 
             //if no external torques are available, the producer will send an EndOfData frame
             // 3. read external Torque
-            ExternalTorquesFrame externalTorquesFrameFromQueue;
-            externalTorquesFrameFromQueue.data.resize(noDof_);
+            std::optional<ExternalTorquesFrame> externalTorquesFrameFromQueue;
+            externalTorquesFrameFromQueue.value().data.resize(noDof_);
             if (externalTorquesRunCondition) {
                 while (TimeCompare::less(externalTorqueTime, lmtMaTime)) {
                     ModelEvaluationBase<Logger>::getExternalTorquesFromInputQueue(externalTorquesFrameFromQueue);
-                    if (EndOfData::isEod(externalTorquesFrameFromQueue))
+                    if (!externalTorquesFrameFromQueue) {
                         externalTorquesRunCondition = false;
-                    externalTorqueTime = externalTorquesFrameFromQueue.time;
+                    }
+                    else {
+                        externalTorqueTime = externalTorquesFrameFromQueue.value().time;
+                    }
                 }
             }
 
@@ -134,16 +138,16 @@ namespace ceinms {
             ** All of the above is subject to change, until we find a smarter way to do things
             */
             // 4. read emgs
-            EmgFrame emgFrameFromQueue;
-            emgFrameFromQueue.data.resize(subject_.getNoMuscles());
+            std::optional<EmgFrame> emgFrameFromQueue;
+            emgFrameFromQueue.value().data.resize(subject_.getNoMuscles());
             while (TimeCompare::less(emgTime, lmtMaTime) && runCondition) {
                 ModelEvaluationBase<Logger>::getEmgFromInputQueue(emgFrameFromQueue);
-                emgTime = emgFrameFromQueue.time + globalEmDelay_;
-                runCondition = runCondition && !emgFrameFromQueue.data.empty();
+                if (emgFrameFromQueue) emgTime = emgFrameFromQueue.value().time + globalEmDelay_;
+                runCondition = runCondition && emgFrameFromQueue;
                 if (!TimeCompare::less(emgTime, lmtMaTime)) firstLmtArrived = true;
                 if (runCondition && !firstLmtArrived) {
                     subject_.setTime(emgTime); //this shouldt affect anything anyway
-                    subject_.setEmgs(emgFrameFromQueue.data);
+                    subject_.setEmgs(emgFrameFromQueue.value().data);
                     subject_.updateActivations();
                     subject_.pushState();
                 }
@@ -152,10 +156,10 @@ namespace ceinms {
             //5. lmt, ma, emg, extTorques have been read correctly and I can push to the model
             if (runCondition) {
                 subject_.setTime(lmtMaTime);
-                subject_.setEmgs(emgFrameFromQueue.data);
-                subject_.setMuscleTendonLengths(lmtFrameFromQueue.data);
+                subject_.setEmgs(emgFrameFromQueue.value().data);
+                subject_.setMuscleTendonLengths(lmtFrameFromQueue.value().data);
                 for (unsigned int i = 0; i < noDof_; ++i)
-                    subject_.setMomentArms(momentArmsFramesFromQueue.at(i).data, i);
+                    subject_.setMomentArms(momentArmsFramesFromQueue.at(i).value().data, i);
                 subject_.updateState();
                 subject_.pushState();
 #ifdef LOG_FILES
@@ -189,7 +193,6 @@ namespace ceinms {
                 }
                 ModelEvaluationBase<Logger>::logger.log(lmtMaTime, data, "MusclesContribution");
 #endif
-
 
 #ifdef LOG
                 if (this->showLog_) {
@@ -239,26 +242,18 @@ namespace ceinms {
         } while (runCondition);
 
 #ifdef LOG_FILES
-        //:TODO: improve this... This is the end... so I'm just writing on the queue a time equal to 0
-        vector<double> endData;
-        double endTime = std::numeric_limits<double>::infinity();
-        ModelEvaluationBase<Logger>::logger.log(endTime, endData, "Activations");
-        ModelEvaluationBase<Logger>::logger.log(endTime, endData, "FibreLengths");
-        ModelEvaluationBase<Logger>::logger.log(endTime, endData, "NormFibreLengths");
-        ModelEvaluationBase<Logger>::logger.log(endTime, endData, "FibreVelocities");
-        ModelEvaluationBase<Logger>::logger.log(endTime, endData, "NormFibreVelocities");
-        ModelEvaluationBase<Logger>::logger.log(endTime, endData, "PennationAngles");
-        ModelEvaluationBase<Logger>::logger.log(endTime, endData, "MuscleForces");
-        ModelEvaluationBase<Logger>::logger.log(endTime, endData, "Torques");
-		ModelEvaluationBase<Logger>::logger.log(endTime, endData, "TendonLengths");
-		ModelEvaluationBase<Logger>::logger.log(endTime, endData, "NormTendonLengths");
-        ModelEvaluationBase<Logger>::logger.log(endTime, endData, "MusclesContribution");
+        // Replaced sending a time of infinity to signify the end with closing the queue using the newer verion of Concurrency
+        vector<string> queueNames{"Activations", "FibreLengths", "NormFibreLengths", "FibreVelocities",
+            "NormFibreVelocities", "PennationAngles", "MuscleForces", "Torques", "TendonLengths", 
+            "NormTendonLengths", "MusclesContribution"};
+        ModelEvaluationBase<Logger>::logger.close(queueNames);
+
 #endif
 
         ModelEvaluationBase<Logger>::doneWithExecution();
 
 #ifdef LOG
-        std::cout << "Joint moments RMSE\n";
+        cout << "Joint moments RMSE\n";
         vector<double> rmse(squaredDiffs.front().size(), 0);
 
         for (auto currentSquaredDiff : squaredDiffs) {

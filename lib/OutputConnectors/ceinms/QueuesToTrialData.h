@@ -32,15 +32,18 @@
 #include <iostream>
 #include <fstream>
 #include <filesystem>
-#include "ceinms/TrialData.h"
+
 #include "rtb/concurrency/Queue.h"
 #include "rtb/concurrency/Latch.h"
+
+#include "ceinms/TrialData.h"
 #include "ceinms/queues/EmgQueue.h"
 #include "ceinms/queues/LmtQueue.h"
 #include "ceinms/queues/ExternalTorquesQueue.h"
 #include "ceinms/queues/MultipleMomentArmsQueues.h"
 
 namespace ceinms {
+
     class QueuesToTrialData {
     public:
         QueuesToTrialData() = delete;
@@ -62,8 +65,7 @@ namespace ceinms {
             inputExternalTorqueQueue_(inputExternalTorqueQueue),
             inputMomentArmsQueues_(inputMomentArmsQueues),
             doneWithSubscriptions_(doneWithSubscriptions),
-            doneWithExecution_(doneWithExecution)
-        {
+            doneWithExecution_(doneWithExecution) {
            
             subject.getMuscleNames(muscleNames_);
             subject.getDoFNames(dofNames_);

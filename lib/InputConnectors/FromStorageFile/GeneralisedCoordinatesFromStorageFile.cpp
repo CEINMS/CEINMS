@@ -26,14 +26,17 @@
 * limitations under the License.                                             *
 * -------------------------------------------------------------------------- */
 
-#include "ceinms/GeneralisedCoordinatesFromStorageFile.h"
-#include "ceinms/GeneralisedCoordinatesData.h"
-#include "ceinms/ArrayConverter.h"
+
 #include <string>
 using std::string;
 #include <vector>
 using std::vector;
+
 #include <OpenSim/OpenSim.h>
+
+#include "ceinms/GeneralisedCoordinatesFromStorageFile.h"
+#include "ceinms/GeneralisedCoordinatesData.h"
+#include "ceinms/ArrayConverter.h"
 
 namespace ceinms {
 
@@ -74,7 +77,7 @@ namespace ceinms {
         doneWithExecution,
         osimModelFilename,
         kinematicsStorageFilename,
-        fc)  {
+        fc) {
 
         mapper_.setNames(coordinateNamesFromOsimModel_, coordinatesToLog);
     }
@@ -84,7 +87,6 @@ namespace ceinms {
 
         GeneralisedCoordinatesFromX::doneWithSubscriptions();
         for (auto t : timeColumn_) {
-
             GeneralisedCoordinatesData generalisedCoordinates(mapper_.getOutSize());
             OpenSim::Array<double> q;
             vector<double> stdQ;
@@ -110,7 +112,6 @@ namespace ceinms {
     }
 
     void GeneralisedCoordinatesFromStorageFile::updateKinematicsSplines(double fc) {
-
         //reinitialise because I modify the storage with padding and filtering..
         OpenSim::Storage kinematics(kinematicsStorageFilename_);
         if (fc > 0) {

@@ -31,15 +31,16 @@
 
 #include <string>
 #include <vector>
-#include "ceinms/ExternalForceData.h"
+
 #include "rtb/concurrency/Concurrency.h"
+
+#include "ceinms/ExternalForceData.h"
 #include "ceinms/queues/MultipleExternalForcesQueue.h"
 
 namespace ceinms {
-    class ExternalForcesFromX
-    {
-    public:
 
+    class ExternalForcesFromX {
+    public:
         ExternalForcesFromX(
             MultipleExternalForcesQueue& outputMultipleExternalForcesQueue,
             rtb::Concurrency::Latch& doneWithSubscriptions,
@@ -50,11 +51,12 @@ namespace ceinms {
         void sendEndOfData();
         void doneWithSubscriptions();
         void doneWithExecution();
+
     private:
         MultipleExternalForcesQueue& outputMultipleExternalForcesQueue_;
         rtb::Concurrency::Latch& doneWithSubscriptions_;
         rtb::Concurrency::Latch& doneWithExecution_;
     };
-
 }
+
 #endif

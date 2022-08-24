@@ -29,12 +29,15 @@
 #ifndef ceinms_ExternalForcesFromStorageFile_h
 #define ceinms_ExternalForcesFromStorageFile_h
 
+#include <string>
+
+#include <OpenSim/OpenSim.h>
+
+#include "rtb/concurrency/Concurrency.h"
+
 #include "ceinms/ExternalForcesFromX.h"
 #include "ceinms/queues/MultipleExternalForcesQueue.h"
-#include "rtb/concurrency/Concurrency.h"
 #include "ceinms/ExternalLoadProperties.h"
-#include <OpenSim/OpenSim.h>
-#include <string>
 
 namespace ceinms {
 
@@ -57,6 +60,7 @@ namespace ceinms {
 
         void operator()();
         void setPushFrequency(double f) { pushFrequency_ = f; }
+        
     private:
         SimTK::Vec3 getForce(const std::string& forceName, int timeIndex) const;
         SimTK::Vec3 getTorque(const std::string& forceName, int timeIndex) const;

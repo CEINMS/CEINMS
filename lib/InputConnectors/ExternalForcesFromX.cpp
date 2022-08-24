@@ -26,10 +26,10 @@
 * limitations under the License.                                             *
 * -------------------------------------------------------------------------- */
 
-#include "ceinms/ExternalForcesFromX.h"
 #include <vector>
 using std::vector;
-#include "ceinms/EndOfData.h"
+
+#include "ceinms/ExternalForcesFromX.h"
 
 namespace ceinms {
 
@@ -39,30 +39,22 @@ namespace ceinms {
 		rtb::Concurrency::Latch& doneWithExecution) :
         outputMultipleExternalForcesQueue_(outputMultipleExternalForcesQueue),
         doneWithSubscriptions_(doneWithSubscriptions),
-        doneWithExecution_(doneWithExecution)
-    { }
+        doneWithExecution_(doneWithExecution) { }
 
     void ExternalForcesFromX::updateExternalForces(const MultipleExternalForcesData& currentExternalForceData, double currentTime) {
-
         MultipleExternalForcesFrame frame{ currentTime, currentExternalForceData };
         outputMultipleExternalForcesQueue_.push(frame);
     }
 
     void ExternalForcesFromX::sendEndOfData() {
-
-        outputMultipleExternalForcesQueue_.push(EndOfData::get<MultipleExternalForcesFrame>());
+        outputMultipleExternalForcesQueue_.close();
     }
 
     void ExternalForcesFromX::doneWithSubscriptions() {
-
         doneWithSubscriptions_.wait();
     }
 
-
     void ExternalForcesFromX::doneWithExecution() {
-
         doneWithExecution_.wait();
     }
-
-
 }

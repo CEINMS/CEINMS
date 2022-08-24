@@ -28,14 +28,18 @@
 
 #ifndef ceinms_QueuesToXForces_h
 #define ceinms_QueuesToXForces_h
+
 #include <string>
 #include <vector>
 #include <memory>
 #include <future>
 #include <algorithm>
+
 #include <OpenSim/OpenSim.h>
-#include "ceinms/JointContactFromOpensim.h"
+
 #include "rtb/concurrency/Concurrency.h"
+
+#include "ceinms/JointContactFromOpensim.h"
 #include "ceinms/QueueData.h"
 #include "ceinms/ExternalForceData.h"
 #include "ceinms/queues/MultipleExternalForcesQueue.h"
@@ -45,7 +49,7 @@
 
 namespace OpenSim {
 
-    class ExternalForceFromQueue : public OpenSim::ExternalForce{
+    class ExternalForceFromQueue : public OpenSim::ExternalForce {
     public:
         ExternalForceFromQueue() = delete;
         ExternalForceFromQueue(ExternalForceFromQueue&) = delete;
@@ -60,11 +64,13 @@ namespace OpenSim {
         ExternalForceFromQueue(
             ceinms::SingleExternalForceQueue* externalForceQueue, SimTK::Xml::Element& aNode);
         virtual ~ExternalForceFromQueue();
+
     protected:
         virtual void computeForce(const SimTK::State& state,
             SimTK::Vector_<SimTK::SpatialVec>& bodyForces,
             SimTK::Vector& generalizedForces) const override;
         void extendConnectToModel(Model& model) override;
+
     private:
         bool isSubscribed;
         ceinms::ExternalForceData getExternalForceDataFromPastValues(double time) const;
@@ -85,7 +91,6 @@ namespace ceinms {
 
     class QueuesToXForces {
     public:
-
         template<typename NMSmodelT>
         QueuesToXForces(
             MultipleExternalForcesQueue& inputExternalForcesQueue,
@@ -128,9 +133,9 @@ namespace ceinms {
         static SimTK::Vector toSimTKVector(std::vector<double> v);
         static std::vector<double> fromSimTKVector(SimTK::Vector v);
         void distributeExternalForces();
-        void updateCeinmsToOpenSimDofMapping();
-        void updateCeinmsToOpenSimMuscleMapping();
-        void checkJointsToLogsExistInOpenSim();
+        //void updateCeinmsToOpenSimDofMapping();
+        //void updateCeinmsToOpenSimMuscleMapping();
+        //void checkJointsToLogsExistInOpenSim();
         void initialiseExternalForces();
         MultipleExternalForcesQueue& inputExternalForcesQueue_;
 		rtb::Concurrency::Latch splitForcesLatch_;
@@ -160,9 +165,8 @@ namespace ceinms {
         externalDoneWithExecutionLatch_(doneWithExecution),
         jointContactModel_(nullptr),
         splitForcesLatch_(2), osimModelFilename_(osimModelFilename),
-        jointsToLog_(jointsToLog)
+        jointsToLog_(jointsToLog) {
 
-    {
         subject.getDoFNames(dofNamesFromSubject_);
         subject.getMuscleNames(musclesNamesFromSubject_);
         externalForcesDataSetups_ = parseExternalLoadsXml(externalLoadsXmlFilename);
@@ -183,9 +187,8 @@ namespace ceinms {
         jointContactModel_(nullptr),
         splitForcesLatch_(2), osimModelFilename_(osimModelFilename),
         externalForcesDataSetups_(externalForceDataSetups),
-        jointsToLog_(jointsToLog)
-
-    {
+        jointsToLog_(jointsToLog) {
+            
         subject.getDoFNames(dofNamesFromSubject_);
         subject.getMuscleNames(musclesNamesFromSubject_);
     }

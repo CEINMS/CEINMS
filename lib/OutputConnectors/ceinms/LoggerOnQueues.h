@@ -31,17 +31,21 @@
 
 #include <vector>
 #include <string>
+
 #include "rtb/concurrency/Queue.h"
+
 #include "ceinms/queues/LogQueue.h"
 
 namespace ceinms {
+    
     class LoggerOnQueues {
     public:
         LoggerOnQueues() = delete;
         LoggerOnQueues(const LoggerOnQueues&) = delete;
         LoggerOnQueues& operator=(const LoggerOnQueues&) = delete;
         LoggerOnQueues(ScalarLogQueue& outputLogQueue, const std::vector< std::string > & valuesToLog);
-        void log(double time, const std::vector< double >& dataToLog, const std::string& queueID);
+        void log(double time, const ScalarVectorData& dataToLog, const std::string& queueID);
+        void close(const std::vector<std::string> queueNames);
 
     private:
         ScalarLogQueue& outputLogQueue_;

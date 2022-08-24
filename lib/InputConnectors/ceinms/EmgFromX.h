@@ -33,13 +33,14 @@
 #include <vector>
 
 #include "rtb/concurrency/Concurrency.h"
+
 #include "ceinms/queues/EmgQueue.h"
 
 namespace ceinms {
-    class EmgFromX
-    {
+
+    class EmgFromX {
     public:
-        template <typename NMSModelT>
+        template<typename NMSModelT>
         EmgFromX(EmgQueue& outputEmgQueue, rtb::Concurrency::Latch& doneWithSubscriptions, rtb::Concurrency::Latch& doneWithExecution, const NMSModelT& subject);
         EmgFromX(EmgQueue& outputEmgQueue, rtb::Concurrency::Latch& doneWithSubscriptions, rtb::Concurrency::Latch& doneWithExecution, const std::vector<std::string>& muscleNames);
         virtual ~EmgFromX();
@@ -48,21 +49,23 @@ namespace ceinms {
         void doneWithSubscriptions();
         void doneWithExecution();
         void sendEndOfData();
+
     protected:
         std::vector< std::string > musclesNames_;
+
     private:
         EmgQueue& outputEmgQueue_;
         rtb::Concurrency::Latch& doneWithSubscriptions_;
         rtb::Concurrency::Latch& doneWithExecution_;
     };
 
-    template <typename NMSModelT>
+    template<typename NMSModelT>
     EmgFromX::EmgFromX(EmgQueue& outputEmgQueue, rtb::Concurrency::Latch& doneWithSubscriptions, rtb::Concurrency::Latch& doneWithExecution, const NMSModelT& subject) :
         outputEmgQueue_(outputEmgQueue),
         doneWithSubscriptions_(doneWithSubscriptions),
-        doneWithExecution_(doneWithExecution)
-    {
+        doneWithExecution_(doneWithExecution) {
         subject.getMuscleNames(musclesNames_);
     }
 }
+
 #endif

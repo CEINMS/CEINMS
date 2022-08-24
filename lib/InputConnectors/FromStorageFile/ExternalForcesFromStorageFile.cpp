@@ -26,18 +26,20 @@
 * limitations under the License.                                             *
 * -------------------------------------------------------------------------- */
 
-#include "ceinms/ExternalForcesFromStorageFile.h"
-#include "ceinms/queues/MultipleExternalForcesQueue.h"
-#include "rtb/concurrency/Concurrency.h"
-#include "ceinms/ArrayConverter.h"
-
-#include <OpenSim/OpenSim.h>
-using OpenSim::Model;
 #include <string>
 using std::string;
 #include <vector>
 using std::vector;
 #include <iostream>
+
+#include <OpenSim/OpenSim.h>
+using OpenSim::Model;
+
+#include "rtb/concurrency/Concurrency.h"
+
+#include "ceinms/ExternalForcesFromStorageFile.h"
+#include "ceinms/queues/MultipleExternalForcesQueue.h"
+#include "ceinms/ArrayConverter.h"
 
 namespace ceinms {
 
@@ -48,8 +50,7 @@ namespace ceinms {
         const std::string& externalLoadsXmlFilename) :
         ExternalForcesFromX(outputMultipleExternalForcesQueue, doneWithSubscriptions, doneWithExecution),
         externalLoadProperties_(externalLoadsXmlFilename),
-        externalForcesStorage_(externalLoadProperties_.getDatafile()){
-    }
+        externalForcesStorage_(externalLoadProperties_.getDatafile()) { }
 
     ExternalForcesFromStorageFile::ExternalForcesFromStorageFile(
         MultipleExternalForcesQueue& outputMultipleExternalForcesQueue,
@@ -59,11 +60,9 @@ namespace ceinms {
         const std::string& grfFilename) :
         ExternalForcesFromX(outputMultipleExternalForcesQueue, doneWithSubscriptions, doneWithExecution),
         externalLoadProperties_(externalLoadsXmlFilename),
-        externalForcesStorage_(grfFilename)  {
-    }
+        externalForcesStorage_(grfFilename) { }
 
     SimTK::Vec3 ExternalForcesFromStorageFile::getForce(const std::string& forceName, int timeIndex) const {
-
         string forceIdentifier = externalLoadProperties_.getForceIdentifier(forceName);
         OpenSim::Array<double> data;
         OpenSim::Array<int> indexes(externalForcesStorage_.getColumnIndicesForIdentifier(forceIdentifier));
@@ -75,7 +74,6 @@ namespace ceinms {
     }
 
     SimTK::Vec3 ExternalForcesFromStorageFile::getTorque(const std::string& forceName, int timeIndex) const {
-
         string torqueIdentifier = externalLoadProperties_.getTorqueIdentifier(forceName);
         OpenSim::Array<double> data;
         OpenSim::Array<int> indexes(externalForcesStorage_.getColumnIndicesForIdentifier(torqueIdentifier));
@@ -87,7 +85,6 @@ namespace ceinms {
     }
 
     SimTK::Vec3 ExternalForcesFromStorageFile::getApplicationPoint(const std::string& forceName, int timeIndex) const {
-
         string pointIdentifier = externalLoadProperties_.getPointIdentifier(forceName);
         OpenSim::Array<double> data;
         OpenSim::Array<int> indexes(externalForcesStorage_.getColumnIndicesForIdentifier(pointIdentifier));
@@ -99,7 +96,6 @@ namespace ceinms {
     }
 
     void ExternalForcesFromStorageFile::operator()() {
-
         OpenSim::Array<string> tempLabels(externalForcesStorage_.getColumnLabels());
         vector<string> labels;
         ArrayConverter::toStdVector(tempLabels, labels);

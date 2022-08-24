@@ -31,12 +31,14 @@
 
 #include <vector>
 #include <string>
+
 #include "rtb/concurrency/Concurrency.h"
+
 #include "ceinms/queues/ExternalTorquesQueue.h"
 
 namespace ceinms {
-    class ExternalTorquesFromX
-    {
+
+    class ExternalTorquesFromX {
     public:
         template <typename NMSModelT>
         ExternalTorquesFromX(
@@ -53,14 +55,15 @@ namespace ceinms {
         void sendEndOfData();
 
     protected:
-        std::vector< std::string > dofNames_;
+        std::vector<std::string> dofNames_;
+
     private:
         ExternalTorquesQueue& outputExternalTorquesQueue_;
         rtb::Concurrency::Latch& doneWithSubscriptions_;
         rtb::Concurrency::Latch& doneWithExecution_;
     };
 
-    template <typename NMSModelT>
+    template<typename NMSModelT>
     ExternalTorquesFromX::ExternalTorquesFromX(
         ExternalTorquesQueue& outputExternalTorquesQueue,
         rtb::Concurrency::Latch& doneWithSubscriptions,
@@ -68,8 +71,8 @@ namespace ceinms {
         const NMSModelT& subject) :
         outputExternalTorquesQueue_(outputExternalTorquesQueue),
         doneWithSubscriptions_(doneWithSubscriptions),
-        doneWithExecution_(doneWithExecution)
-    {
+        doneWithExecution_(doneWithExecution) {
+            
         subject.getDoFNames(dofNames_);
     }
 }

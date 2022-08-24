@@ -28,31 +28,36 @@
 
 #ifndef ceinms_LmtMaFromMcbs_h
 #define ceinms_LmtMaFromMcbs_h
-#include <mcbs/Spline.h>
-#include <mcbs/SplineSetCreator.h>
 
-//#include <osimSpliner/SplineSet.h>
 #include <memory>
 #include <functional>
 #include <iostream>
 #include <vector>
 #include <string>
+#include <map>
+#include <algorithm>
+
+#include <OpenSim/OpenSim.h>
+
 #include "ceinms/LmtMaFromX.h"
-#include "rtb/concurrency/Concurrency.h"
 #include "ceinms/queues/GeneralisedCoordinatesQueue.h"
 #include "ceinms/queues/LmtQueue.h"
 #include "ceinms/queues/MultipleMomentArmsQueues.h"
-#include <map>
 #include "ceinms/Mapper.h"
-#include <OpenSim/OpenSim.h>
-#include <algorithm>
+
+#include "rtb/concurrency/Concurrency.h"
+
+#include <mcbs/Spline.h>
+#include <mcbs/SplineSetCreator.h>
+
+//#include <osimSpliner/SplineSet.h>
 
 namespace ceinms {
     
     class LmtMaFromMcbs : public LmtMaFromX {
     public:
 		//coeffDir contains dofAngles.cfg
-        template <typename NMSModelT>
+        template<typename NMSModelT>
         LmtMaFromMcbs(
             GeneralisedCoordinatesQueue& inputCoordinateQueue,
             LmtQueue& outputLmtQueue,
@@ -62,7 +67,7 @@ namespace ceinms {
             const NMSModelT& subject,
             const std::string& coeffDir);
 
-        template <typename NMSModelT>
+        template<typename NMSModelT>
         LmtMaFromMcbs(
             GeneralisedCoordinatesQueue& inputCoordinateQueue,
             LmtQueue& outputLmtQueue,
@@ -86,7 +91,7 @@ namespace ceinms {
         Mapper dofMapper_;
     };
 
-    template <typename NMSModelT>
+    template<typename NMSModelT>
     LmtMaFromMcbs::LmtMaFromMcbs(
         GeneralisedCoordinatesQueue& inputCoordinateQueue,
 		LmtQueue& outputLmtQueue,
@@ -119,7 +124,7 @@ namespace ceinms {
         // this object doesn't know opensim
     }
 
-    template <typename NMSModelT>
+    template<typename NMSModelT>
     LmtMaFromMcbs::LmtMaFromMcbs(
         GeneralisedCoordinatesQueue& inputCoordinateQueue,
 		LmtQueue& outputLmtQueue,
@@ -157,4 +162,5 @@ namespace ceinms {
         // this object doesn't know opensim
     }
 }
+
 #endif

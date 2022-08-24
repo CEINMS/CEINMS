@@ -26,10 +26,6 @@
  * limitations under the License.                                             *
  * -------------------------------------------------------------------------- */
 
-//#include "SimpleFileLogger.h"
-//#include "StorageLogger.h"
-#include "ceinms/TimeCompare.h"
-
 #include <thread>
 #include <chrono>
 #include <iostream>
@@ -40,13 +36,18 @@ using std::vector;
 #include <string>
 using std::string;
 
+#include "ceinms/TimeCompare.h"
 #include "ceinms/ModelEvaluationOffline.h"
 #include "ceinms/ModelEvaluationBase.h"
+//#include "SimpleFileLogger.h"
+//#include "StorageLogger.h"
+
 #define LOG_FILES
 #define Evaluation_LOG
 
 namespace ceinms {
-    template <typename NMSmodelT, typename Logger>
+
+    template<typename NMSmodelT, typename Logger>
     ModelEvaluationOffline<NMSmodelT, Logger>::ModelEvaluationOffline(
         EmgQueue& inputEmgQueue,
         LmtQueue& inputLmtQueue,
@@ -66,19 +67,17 @@ namespace ceinms {
         doneWithSubscriptions,
         doneWithExecution,
         valuesToLog),
-        subject_(subject)
-    {
+        subject_(subject) {
         subject_.getDoFNames(dofNames_);
         noDof_ = dofNames_.size();
         globalEmDelay_ = subject.getGlobalEmDelay();
     }
 
-    template <typename NMSmodelT, typename Logger>
+    template<typename NMSmodelT, typename Logger>
     void ModelEvaluationOffline<NMSmodelT, Logger>::readDataFromQueues() {
-
         bool runCondition = true;
         //read EMG data
-        do{
+        do {
             auto frame(ModelEvaluationBase<Logger>::getEmgFromInputQueue());
             if (!frame.data.empty())
                 emgFramesFromQueue_.push_back(frame);
@@ -87,7 +86,7 @@ namespace ceinms {
 
         runCondition = true;
         //read LMT data
-        do{
+        do {
             auto frame(ModelEvaluationBase<Logger>::getLmtFromInputQueue());
             if (!frame.data.empty())
                 lmtFramesFromQueue_.push_back(frame);
@@ -96,7 +95,7 @@ namespace ceinms {
 
         runCondition = true;
         //read external torques
-        do{
+        do {
             auto frame(ModelEvaluationBase<Logger>::getExternalTorquesFromInputQueue());
             if (!frame.data.empty())
                 externalTorquesFramesFromQueue_.push_back(frame);
@@ -105,7 +104,7 @@ namespace ceinms {
 
         runCondition = true;
         //read moment arms data
-        do{
+        do {
             vector< MomentArmsFrame > maFrame;
             for (unsigned i = 0; i < noDof_; ++i) {
                 auto currentMomentArms(ModelEvaluationBase<Logger>::getMomentArmsFromInputQueue(i));
@@ -118,9 +117,8 @@ namespace ceinms {
         } while (runCondition);
     }
 
-    template <typename NMSmodelT, typename Logger>
+    template<typename NMSmodelT, typename Logger>
     void ModelEvaluationOffline<NMSmodelT, Logger>::initOfflineCurve() {
-
         bool runCondition(true);
         auto lmtIt(lmtFramesFromQueue_.begin());
         for (auto emgIt : emgFramesFromQueue_) {
@@ -146,9 +144,8 @@ namespace ceinms {
         subject_.updateFibreLengthTraces();
     }
 
-    template <typename NMSmodelT, typename Logger>
+    template<typename NMSmodelT, typename Logger>
     void ModelEvaluationOffline<NMSmodelT, Logger>::operator()() {
-
         ModelEvaluationBase<Logger>::doneWithSubscriptions();
         vector<vector<double>> squaredDiffs;
 #ifdef LOG
@@ -163,7 +160,6 @@ namespace ceinms {
         bool firstLmtArrived(false);
 
         while (runCondition) {  // while(runCondition)
-
             // 1. read lmt Data
             LmtFrame lmtFrame(lmtFramesFromQueue_.front());
             lmtFramesFromQueue_.pop_front();
@@ -295,25 +291,17 @@ namespace ceinms {
         } //end while(runCondition)
 
 #ifdef LOG_FILES
-        //:TODO: improve this... This is the end... so I'm just writing on the queue a time equal to 0
-        vector<double> endData;
-        double endTime = std::numeric_limits<double>::infinity();
-        ModelEvaluationBase<Logger>::logger.log(endTime, endData, "Activations");
-        ModelEvaluationBase<Logger>::logger.log(endTime, endData, "FibreLengths");
-        ModelEvaluationBase<Logger>::logger.log(endTime, endData, "NormFibreLengths");
-        ModelEvaluationBase<Logger>::logger.log(endTime, endData, "FibreVelocities");
-        ModelEvaluationBase<Logger>::logger.log(endTime, endData, "NormFibreVelocities");
-        ModelEvaluationBase<Logger>::logger.log(endTime, endData, "PennationAngles");
-        ModelEvaluationBase<Logger>::logger.log(endTime, endData, "MuscleForces");
-		ModelEvaluationBase<Logger>::logger.log(endTime, endData, "TendonLengths");
-		ModelEvaluationBase<Logger>::logger.log(endTime, endData, "NormTendonLengths");
-        ModelEvaluationBase<Logger>::logger.log(endTime, endData, "Torques");
-        ModelEvaluationBase<Logger>::logger.log(endTime, endData, "MusclesContribution");
+        // Replaced sending a time of infinity to signify the end with closing the queue using the newer verion of Concurrency
+        vector<string> queueNames{ "Activations", "FibreLengths", "NormFibreLengths", "FibreVelocities",
+            "NormFibreVelocities", "PennationAngles", "MuscleForces","TendonLengths", "NormTendonLengths",
+            "Torques", "MusclesContribution" };
+        ModelEvaluationBase<Logger>::logger.close(queueNames);
+
 #endif
 
         ModelEvaluationBase<Logger>::doneWithExecution();
 #ifdef Evaluation_LOG
-        std::cout << "Joint moments RMSE\n";
+        cout << "Joint moments RMSE\n";
         vector<double> rmse(squaredDiffs.front().size(), 0);
 
         for (auto currentSquaredDiff : squaredDiffs) {
@@ -326,8 +314,6 @@ namespace ceinms {
 #endif
     }
 
-    template <typename NMSmodelT, typename Logger>
-    ModelEvaluationOffline<NMSmodelT, Logger>::~ModelEvaluationOffline()
-    {
-    }
+    template<typename NMSmodelT, typename Logger>
+    ModelEvaluationOffline<NMSmodelT, Logger>::~ModelEvaluationOffline() { }
 }

@@ -26,8 +26,6 @@
  * limitations under the License.                                             *
  * -------------------------------------------------------------------------- */
 
-#include "ceinms/ExternalTorquesFromX.h"
-#include "ceinms/EndOfData.h"
 #include <iostream>
 using std::cout;
 using std::endl;
@@ -37,9 +35,11 @@ using std::string;
 using std::vector;
 #include <cstdlib>
 
+#include "ceinms/ExternalTorquesFromX.h"
+
 namespace ceinms {
-    void ExternalTorquesFromX::updateExternalTorques(const ExternalTorquesData& currentExternalTorquesData, double currentTime)
-    {
+
+    void ExternalTorquesFromX::updateExternalTorques(const ExternalTorquesData& currentExternalTorquesData, double currentTime) {
         ExternalTorquesFrame externalTorquesFrameToPush;
         externalTorquesFrameToPush.data = currentExternalTorquesData;
         externalTorquesFrameToPush.time = currentTime;
@@ -47,18 +47,15 @@ namespace ceinms {
     }
 
     void ExternalTorquesFromX::doneWithSubscriptions() {
-
         doneWithSubscriptions_.wait();
     }
 
     void ExternalTorquesFromX::doneWithExecution() {
-
         doneWithExecution_.wait();
     }
 
     void ExternalTorquesFromX::sendEndOfData() {
-
-        outputExternalTorquesQueue_.push(EndOfData::get<ExternalTorquesFrame>());
+        outputExternalTorquesQueue_.close();
     }
 
     ExternalTorquesFromX::~ExternalTorquesFromX() { }
