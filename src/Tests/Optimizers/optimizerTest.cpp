@@ -26,14 +26,16 @@
  * limitations under the License.                                             *
  * -------------------------------------------------------------------------- */
 
-#include "ceinms/SimulatedAnnealing.h"
-#include "ceinms/AbstractOptimizerSystem.h"
-#include "ceinms/SimulatedAnnealingParameters.h"
+
 #include <vector>
 using std::vector;
 #include <iostream>
 using std::cout;
 using std::endl;
+
+#include "ceinms/SimulatedAnnealing.h"
+#include "ceinms/AbstractOptimizerSystem.h"
+#include "ceinms/SimulatedAnnealingParameters.h"
 using ceinms::Optimizers::AbstractOptimizerSystem;
 using ceinms::Optimizers::SimulatedAnnealing;
 
@@ -43,19 +45,19 @@ public:
     RosenbrockFunction(double a, double b);
     ~RosenbrockFunction() {}
     void evaluate();
-    void setParameters(const std::vector<double>& x) { parameters_ = x; }
-    std::vector<double> getParameters() const{ return parameters_; }
+    void setParameters(const vector<double>& x) { parameters_ = x; }
+    vector<double> getParameters() const{ return parameters_; }
     double getF() const { return f_; }
     size_t getNoParameters() const { return parameters_.size(); }
-    void getUpperLowerBounds(std::vector<double>& upperBounds, std::vector<double>& lowerBounds) const {
+    void getUpperLowerBounds(vector<double>& upperBounds, vector<double>& lowerBounds) const {
         upperBounds = upperBounds_;
         lowerBounds = lowerBounds_;
     }
 
 private:
-    std::vector<double> parameters_;
+    vector<double> parameters_;
     double a_, b_, f_;
-    std::vector<double> upperBounds_, lowerBounds_;
+    vector<double> upperBounds_, lowerBounds_;
 };
 
 RosenbrockFunction::RosenbrockFunction(double a, double b):
@@ -69,9 +71,7 @@ void RosenbrockFunction::evaluate() {
     cout << f_ << endl;
 }
 
-
 int main() {
-
     cout << "Testing Simulated Annealing with Rosenbrock function" << endl;
     RosenbrockFunction myFunction(1, 100);
     vector<double> startParameters({ 20, 20 });
@@ -91,6 +91,4 @@ int main() {
    // vector<double> x({ 1, 1 });
    // myFunction.evaluate(x);
     cout << "Found minimum: f(" << x.at(0) << ", " << x.at(1) << ") = " << myFunction.getF() << endl;
-
-
 }

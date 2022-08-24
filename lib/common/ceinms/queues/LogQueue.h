@@ -29,17 +29,18 @@
 #ifndef ceinms_LogQueue_h
 #define ceinms_LogQueue_h
 
-#include "ceinms/QueueData.h"
-#include "ceinms/queues/ScalarVectorQueue.h"
 #include <vector>
 #include <map>
 #include <memory>
 
+#include "ceinms/QueueData.h"
+#include "ceinms/queues/ScalarVectorQueue.h"
+
 namespace Concurrency {
+
     template<typename>
     class Queue;
 }
-
 
 namespace ceinms {
 
@@ -51,6 +52,5 @@ namespace ceinms {
 			scalarLogQueue.insert(std::make_pair(it, std::make_shared<ScalarVectorQueue>()));
 	}
 }
-
 
 #endif

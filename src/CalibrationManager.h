@@ -46,22 +46,22 @@ namespace ceinms {
         bool run();
 
     private:
-        template <typename NMSmodelT>
+        template<typename NMSmodelT>
         bool runOpenLoop();
         template <typename NMSmodelT>
         bool runHybrid();
-        template <typename NMSmodelT, template <typename> class OptimizerT>
+        template <typename NMSmodelT, template<typename> class OptimizerT>
         bool runMinimiseTorque(const CalibrationStep& currentCalibrationStep);
 
-        template <typename NMSmodelT>
+        template<typename NMSmodelT>
         static TrialData readTrialData(const std::string& inputDataFilename,
                                        NMSmodelT& mySubject,
                                        const std::string& trialId,
                                        const std::string& emgGeneratorFile);
         static void sortMaFilenames(const std::map<std::string,
                                     std::string>& maMap,
-                                    const std::vector< std::string >& dofNames,
-                                    std::vector< std::string >& maDataFilenames);
+                                    const std::vector<std::string>& dofNames,
+                                    std::vector<std::string>& maDataFilenames);
 
         template<typename NMSmodelT>
         static void writeXml(NMSmodelT& mySubject,

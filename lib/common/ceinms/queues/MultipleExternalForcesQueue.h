@@ -29,24 +29,23 @@
 #ifndef ceinms_MultipleExternalForcesQueue_h
 #define ceinms_MultipleExternalForcesQueue_h
 
-#include "ceinms/QueueData.h"
 #include <vector>
+
+#include "rtb/concurrency/Concurrency.h"
+
+#include "ceinms/QueueData.h"
 
 namespace Concurrency {
     template<typename>
     class Queue;
 }
 
-
 namespace ceinms {
-
     class ExternalForceData;
 
-    using MultipleExternalForcesData = std::vector < ExternalForceData > ;
-    using MultipleExternalForcesFrame = QueueData < MultipleExternalForcesData >;
-    using MultipleExternalForcesQueue = rtb::Concurrency::Queue < MultipleExternalForcesFrame >;
-
+    using MultipleExternalForcesData = std::vector<ExternalForceData>;
+    using MultipleExternalForcesFrame = QueueData<MultipleExternalForcesData>;
+    using MultipleExternalForcesQueue = rtb::Concurrency::Queue<MultipleExternalForcesFrame>;
 }
-
 
 #endif

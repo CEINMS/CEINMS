@@ -29,10 +29,12 @@
 #ifndef ceinms_SubjectXmlReader_h
 #define ceinms_SubjectXmlReader_h
 
-#include "subject.hxx"
 #include <string>
 
+#include "subject.hxx"
+
 namespace ceinms {
+    
     class SubjectXmlReader {
     public:
         SubjectXmlReader(const std::string& filename);

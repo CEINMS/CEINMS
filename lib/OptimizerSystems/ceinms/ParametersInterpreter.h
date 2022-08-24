@@ -29,18 +29,17 @@
 #ifndef ceinms_ParametersInterpreter_h
 #define ceinms_ParametersInterpreter_h
 
-#include "ceinms/Parameter.h"
-
 #include <list>
 #include <vector>
 #include <string>
 #include <map>
 
+#include "ceinms/Parameter.h"
+
 namespace ceinms {
     //should try to temove this template.. maybe in future..
-    template <typename NMSmodelT>
-    class ParametersInterpreter  {
-
+    template<typename NMSmodelT>
+    class ParametersInterpreter {
     public:
         using ParameterSet = Parameter::Set;
         ParametersInterpreter(NMSmodelT& subject, const ParameterSet& parameterSet, const std::vector<std::string>& dofsToCalibrate);
@@ -49,8 +48,8 @@ namespace ceinms {
         void setSubjectParameters(const std::vector<double>& x);
         void getUpperLowerBounds(std::vector<double>& upperBounds, std::vector<double>& lowerBounds) const;
         void setDofsToCalibrate(const std::vector<std::string> dofsToCalibrate);
-    private:
 
+    private:
         //modify
         typedef typename Parameter::MuscleGroups MuscleGroups;
         typedef std::vector< std::vector<unsigned> > MuscleGroupsIdx;
@@ -67,7 +66,6 @@ namespace ceinms {
             unsigned size;
         };
 
-
         typedef std::map<ParameterID, ParameterDetails> ParametersMap;
         void defineParameterDetails();
 
@@ -82,7 +80,6 @@ namespace ceinms {
         ParametersMap parameters_;
         std::vector<std::string> dofNames_;
         size_t noParameters_;
-
     };
 }
 

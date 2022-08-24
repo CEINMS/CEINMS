@@ -30,7 +30,9 @@
 using std::vector;
 
 namespace ceinms {
+
     namespace Hybrid {
+
         namespace StaticComputationMode {
 
             template<typename NMSmodelT>
@@ -43,16 +45,12 @@ namespace ceinms {
                     cout << forceDataT1_.at(i) << " ";
                 cout << endl;
 
-
                 subject_.getEmgs(emgDataT1_);
                 musclesToUpdate_.assign(subject_.getNoMuscles(), true);
-
             }
-
 
             template<typename NMSmodelT>
             void Default<NMSmodelT>::getMusclesToUpdate() {
-
                 musclesToUpdate_.clear();
                 vector<double> currentEMGs;
                 subject_.getEmgs(currentEMGs);
@@ -62,11 +60,8 @@ namespace ceinms {
                 emgDataT1_ = currentEMGs;
             }
 
-
-
             template<typename NMSmodelT>
-            void Default<NMSmodelT>::getTorques(vector< double >& torques) {
-
+            void Default<NMSmodelT>::getTorques(vector<double>& torques) {
                 getMusclesToUpdate();
                 subject_.updateState_HYBRID(musclesToUpdate_);
                 subject_.getTorques(torques);
@@ -75,7 +70,6 @@ namespace ceinms {
                 //             for (unsigned i = 0; i < torques.size(); ++i)
                 //                 std::cout << torques.at(i) << " ";
                 //             std::cout << std::endl;
-
 
                 /*        vector<double> currentEMGs;
 
@@ -86,7 +80,6 @@ namespace ceinms {
                       std::cout << std::endl;
                       */
             }
-
         }
     }
 }

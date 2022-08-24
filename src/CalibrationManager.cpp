@@ -56,7 +56,6 @@ using std::vector;
 #include "ceinms/LmtMaFromStorageFile.h"
 #include "ceinms/ObjectiveFunctionSetup.h"
 
-#include "rtb/concurrency/Concurrency.h"
 #include "ceinms/queues/EmgQueue.h"
 #include "ceinms/queues/LmtQueue.h"
 #include "ceinms/queues/ExternalTorquesQueue.h"
@@ -66,6 +65,8 @@ using std::vector;
 #include "ceinms/XmlWriter.h"
 #include "ceinms/FileUtils.h"
 
+#include "rtb/concurrency/Concurrency.h"
+
 namespace ceinms {
 
     CalibrationManager::CalibrationManager(const string& setupFilename) :
@@ -74,7 +75,7 @@ namespace ceinms {
         calibrationFile_(ceinmsCalibrationSetup_.getCalibrationFile()),
         calibrationXmlReader_(ceinmsCalibrationSetup_.getCalibrationFile()),
         calibratedSubjectFile_(ceinmsCalibrationSetup_.getOutputSubjectFile()),
-        emgGeneratorFile_(ceinmsCalibrationSetup_.getExcitationGeneratorFile()){
+        emgGeneratorFile_(ceinmsCalibrationSetup_.getExcitationGeneratorFile()) {
 
         SubjectXmlReader subjectReader(ceinmsCalibrationSetup_.getSubjectFile());
         hasContactModel_ = subjectReader.hasContactModel();
@@ -90,7 +91,7 @@ namespace ceinms {
         cout << calibrationXmlReader_ << endl;
     }
 
-    template <typename NMSmodelT>
+    template<typename NMSmodelT>
     bool CalibrationManager::runOpenLoop() {
         bool exitflag(false);
         NMSmodelT mySubject;
@@ -105,7 +106,7 @@ namespace ceinms {
 			updateTargetsFromModel(currentCalibrationStep.objFunctionsSetup_, mySubject);
             CompositeObjectiveFunction objectiveFunction =
                 CompositeObjectiveFunction::makeComposite(currentCalibrationStep.objFunctionsSetup_);
-            using MySystem = NMSmodelSystem < NMSmodelT, CompositeObjectiveFunction >;
+            using MySystem = NMSmodelSystem<NMSmodelT, CompositeObjectiveFunction>;
             MySystem system(mySubject, trials, objectiveFunction, currentCalibrationStep.parameterSet_);
             if (hasContactModel_) {
                 if (contactModelCfg_.getContactModelType() == ContactModelType::KneeBalance)
@@ -121,21 +122,20 @@ namespace ceinms {
         return exitflag;
     }
 
-    template <typename NMSmodelT>
+    template<typename NMSmodelT>
     bool  CalibrationManager::runHybrid() {
-        cout << "Cannot calibrate in hybrid mode. Verify you XML configuration file" << endl;
+        cout << "Cannot calibrate in hybrid mode. Verify your XML configuration file" << endl;
         return 1;
     }
 
     bool CalibrationManager::run() {
-
         bool exitFlag(0);
 
         NMSModelCfg::RunMode runMode = calibrationXmlReader_.getNMSmodelRunMode();
         switch (runMode) {
 
         case NMSModelCfg::OpenLoopExponentialActivationStiffTendonOffline:
-            exitFlag = runOpenLoop < NMSmodel<ExponentialActivation, StiffTendon, CurveMode::Offline>>();
+            exitFlag = runOpenLoop<NMSmodel<ExponentialActivation, StiffTendon, CurveMode::Offline>>();
             break;
 
         case NMSModelCfg::OpenLoopExponentialActivationElasticTendonBiSecOffline:
@@ -151,7 +151,7 @@ namespace ceinms {
             break;
 
         default:
-            cout << "Implementation not available yet. Verify you XML configuration file" << endl;
+            cout << "Implementation not available yet. Verify your XML configuration file" << endl;
             exitFlag = 1;
             break;
         }
@@ -160,7 +160,6 @@ namespace ceinms {
 
     template<typename NMSmodelT>
     TrialData CalibrationManager::readTrialData(const string& inputDataFilename, NMSmodelT& mySubject, const string& trialId, const string& emgGeneratorFile) {
-
         InputDataXmlReader dataLocations(inputDataFilename);
 
         EmgQueue emgQueue;
@@ -174,9 +173,9 @@ namespace ceinms {
         string emgFilename(dataLocations.getExcitationsFile());
         EmgFromFile emgProducer(emgQueue, doneWithSubscription, doneWithExecution, mySubject, emgFilename, emgGeneratorFile);
 
-        vector< string > dofNames;
+        vector<string> dofNames;
         mySubject.getDoFNames(dofNames);
-        vector< string > maFilename;
+        vector<string> maFilename;
         sortMaFilenames(dataLocations.getMaFiles(), dofNames, maFilename);
         LmtMaFromStorageFile lmtMaProducer(lmtQueue, momentArmsQueues, doneWithSubscription, doneWithExecution, mySubject, dataLocations.getLmtFile(), maFilename);
 
@@ -188,7 +187,7 @@ namespace ceinms {
         doneWithSubscription.setCount(4);
         doneWithExecution.setCount(4);
 
-        // 4. start the threads
+        // start the threads
         std::thread emgProdThread(std::ref(emgProducer));
         std::thread externalTorquesProdThread(std::ref(externalTorquesProducer));
         std::thread lmtMaProdThread(std::ref(lmtMaProducer));
@@ -199,9 +198,8 @@ namespace ceinms {
         externalTorquesProdThread.join();
         queuesToTrialDataThread.join();
 
-        if (!queuesToTrialData.getTrialData().isConsistent())
-        {
-            std::cout << "ERROR: No data was read for trial " << trialId << std::endl;
+        if (!queuesToTrialData.getTrialData().isConsistent()) {
+            cout << "ERROR: No data was read for trial " << trialId << endl;
             exit(EXIT_FAILURE);
         }
         
@@ -210,12 +208,11 @@ namespace ceinms {
         double stop = dataLocations.getStopTime();
         if (start > 0 && stop > 0 && start < stop) {
             trial.crop(start, stop);
-            std::cout << "Cropping trial: " << start << ", " << stop << endl;
+            cout << "Cropping trial: " << start << ", " << stop << endl;
         }
         if (mySubject.hasOpenSimModel())
             trial.setOpenSimData(mySubject.getOpenSimModelFilename(), dataLocations.getExternalLoadsFile(), dataLocations.getMotionFile());
         return trial;
-
     }
 
     template<typename NMSmodelT>
@@ -230,21 +227,18 @@ namespace ceinms {
         xmlWriter.write();
     }
 
-    void CalibrationManager::sortMaFilenames(const std::map<std::string,
-        std::string>& maMap,
-        const std::vector< std::string >& dofNames,
-        std::vector< std::string >& maDataFilenames) {
+    void CalibrationManager::sortMaFilenames(const std::map<string,
+        string>& maMap,
+        const vector<string>& dofNames,
+        vector<string>& maDataFilenames) {
 
         int currentDof = 0;
-        for (auto& it : dofNames)
-        {
-            try
-            {
+        for (auto& it : dofNames) {
+            try {
                 maDataFilenames.push_back(maMap.at(it));
             }
-            catch (std::out_of_range)
-            {
-                std::cerr << "Could not find moment arm file for " << it << " degree of freedom" << std::endl;
+            catch (std::out_of_range) {
+                std::cerr << "Could not find moment arm file for " << it << " degree of freedom" << endl;
                 exit(EXIT_FAILURE);
             }
         }

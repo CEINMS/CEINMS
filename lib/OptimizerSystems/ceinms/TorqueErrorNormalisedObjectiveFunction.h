@@ -28,8 +28,10 @@
 
 #ifndef ceinms_TorqueErrorNormalisedObjectiveFunction_h
 #define ceinms_TorqueErrorNormalisedObjectiveFunction_h
+
 #include <vector>
 #include <limits>
+
 #include "ceinms/TrialData.h"
 #include "Result.h"
 #include "ceinms/ObjectiveFunctionBase.h"

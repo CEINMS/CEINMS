@@ -27,6 +27,7 @@
  * -------------------------------------------------------------------------- */
 
 #include <limits>
+
 #include "ceinms/MuscleParameters.h"
 
 static const double dblLow(std::numeric_limits<double>::lowest());
@@ -38,13 +39,9 @@ namespace ceinms {
         optimalFiberLength_(dblLow), pennationAngle_(dblLow),
         tendonSlackLength_(dblLow), maxIsometricForce_(dblLow),
         strengthCoefficient_(dblLow), emDelay_(dblLow), damping_(dblLow),
-        activationScale_(dblLow)
-    {
-
-    }
+        activationScale_(dblLow) { }
 
     bool MuscleParameters::operator==(const MuscleParameters &other) const {
-
         return  c1_ == other.c1_                                    &&
                 c2_ == other.c2_                                    &&
                 shapeFactor_ == other.shapeFactor_                  &&
@@ -57,12 +54,7 @@ namespace ceinms {
                 maxContractionVelocity_ == other.maxContractionVelocity_ &&
                 emDelay_ == other.emDelay_                          &&
                 activationScale_ == other.activationScale_;
-
     }
 
-
-    MuscleParameters::~MuscleParameters()
-    {
-
-    }
+    MuscleParameters::~MuscleParameters() { }
 }

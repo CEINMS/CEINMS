@@ -28,17 +28,20 @@
 
 #ifndef ceinms_SimulationManager_h
 #define ceinms_SimulationManager_h
-#include "ceinms/SetupDataStructure.h"
-#include "ceinms/CeinmsSetupXmlReader.h"
-#include "ceinms/InputDataXmlReader.h"
-#include "ceinms/ExecutionXmlReader.h"
-#include "ceinms/ContactModelXmlReader.h"
+
 #include <string>
 #include <vector>
 #include <map>
 #include <iostream>
 
+#include "ceinms/SetupDataStructure.h"
+#include "ceinms/CeinmsSetupXmlReader.h"
+#include "ceinms/InputDataXmlReader.h"
+#include "ceinms/ExecutionXmlReader.h"
+#include "ceinms/ContactModelXmlReader.h"
+
 namespace ceinms {
+
     class SimulationManager {
 
     public:
@@ -46,22 +49,22 @@ namespace ceinms {
         bool run();
 
     private:
-        template <typename NMSmodelT, template <typename, typename> class ModelEvaluatorT, typename LoggerT>
+        template<typename NMSmodelT, template <typename, typename> class ModelEvaluatorT, typename LoggerT>
         bool runOpenLoop(bool useContactForces);
-        template <typename NMSmodelT, template <typename, typename> class ModelEvaluatorT, typename LoggerT>
+        template<typename NMSmodelT, template <typename, typename> class ModelEvaluatorT, typename LoggerT>
         bool runOpenLoopWithGenericContactModel();
-        template <typename NMSmodelT, template <typename, typename> class ModelEvaluatorT, typename LoggerT>
+        template<typename NMSmodelT, template <typename, typename> class ModelEvaluatorT, typename LoggerT>
         bool runOpenLoopWithKneeBalanceContactModel();
-        template <typename NMSmodelT, template <typename, typename> class ModelEvaluatorT, typename LoggerT>
+        template<typename NMSmodelT, template <typename, typename> class ModelEvaluatorT, typename LoggerT>
         bool runOpenLoop();
 
-        template <typename T>
+        template<typename T>
         bool runHybrid(bool useContactForces);
-        template <typename NMSmodelT>
+        template<typename NMSmodelT>
         bool runHybridWithGenericContactModel();
-        template <typename NMSmodelT>
+        template<typename NMSmodelT>
         bool runHybridWithKneeBalanceContactModel();
-        template <typename T>
+        template<typename T>
         bool runHybrid();
 
         CeinmsSetupXmlReader ceinmsSetup_;

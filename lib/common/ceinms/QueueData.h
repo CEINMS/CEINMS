@@ -29,12 +29,12 @@
 #ifndef ceinms_QueueData_h
 #define ceinms_QueueData_h
 
-#include <ostream> //
-#include <vector> //
+#include <ostream>
+#include <vector>
 
 namespace ceinms {
 
-    template <typename T>
+    template<typename T>
     struct QueueData;
 
     template<typename T>
@@ -49,8 +49,7 @@ namespace ceinms {
         T data;
 
         template<typename Archive>
-        inline void serialize(Archive& ar, const unsigned int version){
-
+        inline void serialize(Archive& ar, const unsigned int version) {
             ar & this->time;
             ar & this->data;
         }
@@ -67,11 +66,11 @@ namespace ceinms {
 
     template<typename T>
     std::ostream& operator<< (std::ostream& os, const std::vector<T>& data) {
-
         for (auto& v : data)
             os << v << " ";
         os << std::endl;
         return os;
     }
 }
+
 #endif

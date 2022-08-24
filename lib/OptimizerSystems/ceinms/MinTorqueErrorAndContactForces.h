@@ -28,14 +28,16 @@
 
 #ifndef ceinms_MinTorqueErrorAndContactForces_h
 #define ceinms_MinTorqueErrorAndContactForces_h
+
 #include <vector>
 #include <limits>
+#include <cmath>
+
 #include "ceinms/TrialData.h"
 #include "Result.h"
 #include "TorqueErrorNormalisedObjectiveFunction.h"
 #include "PeakObjectiveFunction.h"
 #include "PenaltyObjectiveFunction.h"
-#include <cmath>
 #include "ceinms/ObjectiveFunctionBase.h"
 
 namespace ceinms {
@@ -44,13 +46,14 @@ namespace ceinms {
     class MinTorqueErrorAndContactForces : public ObjectiveFunctionBase {
     public:
         MinTorqueErrorAndContactForces(const MinTorqueError& torqueErrorFun, const SumKneeContactForces& sumKneeContactFun);
-        //     MinTorqueErrorAndContactForces();
-//        void setDofsToCalibrate(const std::vector<std::string>& dofsToCalibrate) override;
+        // MinTorqueErrorAndContactForces();
+        // void setDofsToCalibrate(const std::vector<std::string>& dofsToCalibrate) override;
         void setTrials(const std::vector<TrialData>& trials) override;
         void calculate(const std::vector<Result>& results) override;
         double getValue() const override { return f_; }
         void printCosts() const override { minTorqueError_.printCosts(); sumKneeContactForces_.printCosts(); }
         bool calculateOpenSimData() const override { return false; }
+    
     private:
         MinTorqueError minTorqueError_;
         SumKneeContactForces sumKneeContactForces_;

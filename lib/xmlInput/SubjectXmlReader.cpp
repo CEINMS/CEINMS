@@ -39,9 +39,9 @@ using std::endl;
 using SubjectXsd::SubjectType;
 
 namespace ceinms {
-    SubjectXmlReader::SubjectXmlReader(const std::string& filename)
-    {
-        std::cout << "Reading subject file: " << filename << " ." << std::endl;
+
+    SubjectXmlReader::SubjectXmlReader(const string& filename) {
+        cout << "Reading subject file: " << filename << " ." << endl;
         try {
             subjectPointer_ = parseAndValidate<SubjectType>(filename, subject_schema, sizeof(subject_schema));
         }
@@ -57,18 +57,14 @@ namespace ceinms {
 
         if (dirSep != string::npos) // if '_fileName' contains path information...
             filepath_ = filename.substr(0, dirSep + 1); // include trailing slashes
-
     }
 
-    std::unique_ptr<SubjectType> SubjectXmlReader::getSubject()
-    {
+    std::unique_ptr<SubjectType> SubjectXmlReader::getSubject() {
         return std::move(subjectPointer_);
     }
 
-    std::string SubjectXmlReader::getOpenSimModelFile() const {
-    
-
-        std::string fileName(subjectPointer_->opensimModelFile().get());
+    string SubjectXmlReader::getOpenSimModelFile() const {
+        string fileName(subjectPointer_->opensimModelFile().get());
         if (fileName.empty())
             return "";
         FileUtils::trim(fileName);
@@ -78,20 +74,12 @@ namespace ceinms {
             return FileUtils::simplify(filepath_ + fileName);
     }
     
-    
-
     bool SubjectXmlReader::hasOpenSimModel() const {
-
         return subjectPointer_->opensimModelFile().present();
-
     }
 
-
-    
-    std::string SubjectXmlReader::getContactModelFile() const{
-
-
-        std::string fileName(subjectPointer_->contactModelFile().get());
+    string SubjectXmlReader::getContactModelFile() const {
+        string fileName(subjectPointer_->contactModelFile().get());
         FileUtils::trim(fileName);
         if (FileUtils::isAbsolute(fileName.c_str()))
             return fileName;
@@ -100,8 +88,6 @@ namespace ceinms {
     }
 
     bool SubjectXmlReader::hasContactModel() const {
-
         return subjectPointer_->contactModelFile().present();
     }
-    
 }

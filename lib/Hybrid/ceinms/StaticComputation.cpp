@@ -32,10 +32,10 @@ using std::vector;
 using std::string;
 #include <iostream>
 using std::cout;
-
 #include <stdlib.h>
 
 namespace ceinms {
+
     namespace Hybrid {
 
         //TODO:: ricordarsi di far iniziare i muscoli da predirre con il valore al tempo t1
@@ -64,10 +64,8 @@ namespace ceinms {
                 initialValueOfTrackedEMGs_.push_back(currentEMGData.at(muscleIndexWithEMGtoTrack_.at(i)));
         }
 
-
         template<typename NMSmodelT, typename StaticComputationMode>
         void StaticComputation<NMSmodelT, StaticComputationMode>::setExternalTorques(const vector<double>& externalTorques, const vector<string>& dofNames) {
-
             vector<string> dofNamesFromSubject;
             subject_.getDoFNames(dofNamesFromSubject);
             if (dofNamesFromSubject != dofNames)
@@ -79,46 +77,34 @@ namespace ceinms {
             externalTorques_ = externalTorques;
         }
 
-
         template<typename NMSmodelT, typename StaticComputationMode>
         void StaticComputation<NMSmodelT, StaticComputationMode>::getExternalTorques(vector<double>& externalTorques) const {
-
             externalTorques = externalTorques_;
         }
 
-
         template<typename NMSmodelT, typename StaticComputationMode>
         void StaticComputation<NMSmodelT, StaticComputationMode>::getTorques(vector<double>& torques) {
-
             computationMode_.getTorques(torques);
         }
 
-
         template<typename NMSmodelT, typename StaticComputationMode>
         void StaticComputation<NMSmodelT, StaticComputationMode>::getCurrentEMGs(vector<double>& emgValues) const {
-
             subject_.getEmgs(emgValues);
         }
 
-
         template<typename NMSmodelT, typename StaticComputationMode>
         void StaticComputation<NMSmodelT, StaticComputationMode>::getInitialValuesOfTrackedEMGs(vector<double>& emgValues) const {
-
             emgValues.assign(initialValueOfTrackedEMGs_.begin(), initialValueOfTrackedEMGs_.end());
         }
 
-
         template<typename NMSmodelT, typename StaticComputationMode>
         void StaticComputation<NMSmodelT, StaticComputationMode>::getAdjustedValuesOfTrackedEMGs(vector<double>& emgValues) const {
-
             emgValues.resize(muscleIndexWithEMGtoTrack_.size());
             vector<double> currentEMGData;
             subject_.getEmgs(currentEMGData);
 
             for (unsigned i = 0; i < muscleIndexWithEMGtoTrack_.size(); ++i)
                 emgValues.at(i) = currentEMGData.at(muscleIndexWithEMGtoTrack_.at(i));
-
         }
-
     }
 }

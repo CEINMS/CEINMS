@@ -30,8 +30,8 @@
 #define ceinms_PiecewiseActivation_h
 
 namespace ceinms {
-    class PiecewiseActivation {
 
+    class PiecewiseActivation {
     public:
         PiecewiseActivation();
         virtual ~PiecewiseActivation();

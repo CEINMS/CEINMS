@@ -28,9 +28,9 @@
 
 #ifndef ceinms_DataTable_h
 #define ceinms_DataTable_h
+
 #include <vector>
 #include <string>
-
 #include <ostream>
 
 //TODO: insert further checks, operators + and -
@@ -42,7 +42,6 @@ namespace ceinms {
 
     template<typename T>
     class DataTable {
-
     public:
         typedef typename std::vector<std::vector<T>>::iterator iterator;
         typedef typename std::vector<std::vector<T>>::const_iterator const_iterator;

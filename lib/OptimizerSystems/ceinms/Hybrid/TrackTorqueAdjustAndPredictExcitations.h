@@ -11,7 +11,6 @@
 namespace ceinms {
 
     class TrackTorqueAdjustAndPredictExcitations{
-
     public:
         template<typename NMSmodelT>
         TrackTorqueAdjustAndPredictExcitations(NMSmodelT& subject, const EmgInformedObjectiveFunctionSetup& setup);
@@ -23,6 +22,7 @@ namespace ceinms {
         void getObjectiveFunctionComponents(std::vector<double>& components) const;
         HybridWeightings getWeightings() const;
         void getObjectiveFunctionWeightings(std::vector<double>& weightings) const;
+
     private:
         HybridWeightings weightings_;
         std::vector<unsigned> indexesOfMusclesWithExcitationsToAdjust_;
@@ -40,20 +40,18 @@ namespace ceinms {
         double torqueError_;
         double excitationSum_;
         double excitationTrackingError_;
-
     };
 
     template<typename NMSmodelT>
     TrackTorqueAdjustAndPredictExcitations::TrackTorqueAdjustAndPredictExcitations(NMSmodelT& subject, const EmgInformedObjectiveFunctionSetup& setup) {
-
         std::vector<std::string> musclesToAdjust(setup.musclesToAdjust);
         std::vector<std::string> musclesToSynthesise(setup.musclesToSynthesise);
 
         //remove possible duplicate entries
         std::sort(std::begin(musclesToAdjust), std::end(musclesToAdjust));
         std::sort(std::begin(musclesToSynthesise), std::end(musclesToSynthesise));
-        std::unique(std::begin(musclesToAdjust), std::end(musclesToAdjust));
-        std::unique(std::begin(musclesToSynthesise), std::end(musclesToSynthesise));
+        static_cast<void>(std::unique(std::begin(musclesToAdjust), std::end(musclesToAdjust)));
+        static_cast<void>(std::unique(std::begin(musclesToSynthesise), std::end(musclesToSynthesise)));
         std::vector<std::string> duplicates;
         std::set_intersection(
             std::begin(musclesToAdjust),
@@ -74,7 +72,6 @@ namespace ceinms {
         subject.getMusclesIndexFromMusclesList(indexesOfMusclesWithExcitationsToAdjust_, musclesToAdjust);
         subject.getMusclesIndexFromMusclesList(indexesOfMusclesWithExcitationsToPredict_, musclesToSynthesise);
         
-
         //Get Dofs to track from setup
         std::cout << "Joint moments\n";
         std::vector<std::string> dofNames(subject.getDoFNames());

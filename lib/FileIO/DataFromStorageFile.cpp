@@ -40,9 +40,9 @@ using std::stringstream;
 #include "ceinms/DataFromStorageFile.h"
 
 namespace ceinms {
+
     DataFromStorageFile::DataFromStorageFile(const string& dataFilename)
-        :dataFile_(dataFilename.c_str())
-    {
+        :dataFile_(dataFilename.c_str()) {
         if (!dataFile_.is_open()) {
             cout << "ERROR: " << dataFilename << " could not be open\n";
             exit(EXIT_FAILURE);
@@ -52,22 +52,17 @@ namespace ceinms {
 
         string line;
         getline(dataFile_, line, '\n');
-        while (line != "endheader" && line != "endheader\r" && !dataFile_.eof())
-        {
-            if (size_t foundInfo = line.find("nRows=") != string::npos)
-            {
+        while (line != "endheader" && line != "endheader\r" && !dataFile_.eof()) {
+            if (size_t foundInfo = line.find("nRows=") != string::npos) {
                 noTimeSteps_ = atoi(line.substr(6).c_str());
             }
-            if (size_t foundInfo = line.find("datarows ") != string::npos)
-            {
+            if (size_t foundInfo = line.find("datarows ") != string::npos) {
                 noTimeSteps_ = atoi(line.substr(9).c_str());
             }
-            if (size_t foundInfo = line.find("nColumns=") != string::npos)
-            {
+            if (size_t foundInfo = line.find("nColumns=") != string::npos) {
                 noColumns_ = atoi(line.substr(9).c_str()) - 1; //nColumns includes the "time" column
             }
-            if (size_t foundInfo = line.find("datacolumns ") != string::npos)
-            {
+            if (size_t foundInfo = line.find("datacolumns ") != string::npos) {
                 noColumns_ = atoi(line.substr(12).c_str()) - 1; //nColumns includes the "time" column
             }
             getline((dataFile_), line, '\n');
@@ -99,11 +94,9 @@ namespace ceinms {
         currentData_.resize(noColumns_);
         currentDataTime_ = 0.;
         currentTimeStep_ = 0;
-
     }
 
-    void DataFromStorageFile::readNextData()  {
-
+    void DataFromStorageFile::readNextData() {
         // read time for the data currently stored in DataFromFile
         string line;
         getline(dataFile_, line, '\n');
@@ -121,8 +114,7 @@ namespace ceinms {
             currentData_.push_back(value);
         } while (!myStream.eof() && ++noReadColumns < noColumns_);
         //    cout << "\ndatafromfile check 2\n";
-        if (currentData_.size() != columnNames_.size())
-        {
+        if (currentData_.size() != columnNames_.size()) {
             cout << "\nERROR: in" << dataFileName_ << " at time step " << currentTimeStep_ << " you have " << currentData_.size() << " input.\nYou need " << columnNames_.size() << endl;
             exit(EXIT_FAILURE);
         }
@@ -138,8 +130,7 @@ namespace ceinms {
         ++currentTimeStep_;
     }
 
-    const vector<double>& DataFromStorageFile::getCurrentData() const
-    {
+    const vector<double>& DataFromStorageFile::getCurrentData() const {
         //  if(currentData_.size() == muscleNames_.size())
         return currentData_;
         /*  else
@@ -148,7 +139,6 @@ namespace ceinms {
           exit(EXIT_FAILURE);
           }*/
     }
-
 
     DataFromStorageFile::~DataFromStorageFile() {
         (dataFile_).close();

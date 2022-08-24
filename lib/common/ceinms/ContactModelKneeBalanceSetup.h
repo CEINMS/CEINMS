@@ -30,7 +30,6 @@
 #define ceinms_ContactModelKneeBalanceSetup_h
 #include <string>
 
-
 namespace ceinms {
     
     struct Condyle {

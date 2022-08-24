@@ -1,10 +1,12 @@
 #ifndef ceinms_ExternalForceProperties_h
 #define ceinms_ExternalForceProperties_h
+
 #include <string>
+
 #include <OpenSim/Common/osimCommon.h>
 
-
 namespace ceinms {
+
     class ExternalForceProperties {
     public:
         ExternalForceProperties(const std::string& xmlFilename);
@@ -30,4 +32,5 @@ namespace ceinms {
         std::string torque_identifier_;
     };
 }
+
 #endif

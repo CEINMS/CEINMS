@@ -26,19 +26,17 @@
  * limitations under the License.                                             *
  * -------------------------------------------------------------------------- */
 
-#include "ceinms/Parameter.h"
 #include <algorithm>
 #include <iostream>
 #include <string>
 using std::string;
 
+#include "ceinms/Parameter.h"
 
 namespace ceinms {
     void Parameter::setName(const string& name) {
-
         name_ = name;
     }
-
 
     bool Parameter::iequals(const std::string& stringA, const std::string& stringB) const {
         return std::equal(stringA.begin(),
@@ -51,9 +49,7 @@ namespace ceinms {
         );
     }
 
-
-    Parameter::ID Parameter::getID() const{
-
+    Parameter::ID Parameter::getID() const {
         ID id;
         if (Parameter::iequals(name_, "c1"))                     id = C1;
         else if (Parameter::iequals(name_, "c2"))                     id = C2;
@@ -71,36 +67,27 @@ namespace ceinms {
         else                                                     id = NotFound;
 
         return id;
-
     }
 
-
     void Parameter::setAssignment(Parameter::Assignment assignment) {
-
         assignment_ = assignment;
     }
 
 
     void Parameter::pushMuscleGroup(const Parameter::MuscleNames& group) {
-
         muscleGroups_.push_back(group);
     }
 
     void Parameter::setBoundariesType(Parameter::Boundaries boundaries) {
-
         boundariesType_ = boundaries;
     }
 
-
     void Parameter::setLowerAndUpperLimits(double lowerLimit, double upperLimit) {
-
         lowerLimit_ = lowerLimit;
         upperLimit_ = upperLimit;
     }
 
-
     std::ostream& operator<< (std::ostream& output, const Parameter& rhs) {
-
         output << " ---- Parameter: " << rhs.name_ << std::endl;
         switch (rhs.assignment_) {
         case Parameter::Global:

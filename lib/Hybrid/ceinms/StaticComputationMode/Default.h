@@ -32,16 +32,18 @@
 #include <vector>
 
 namespace ceinms{
+
     namespace Hybrid {
+
         namespace StaticComputationMode {
 
             template<typename NMSmodelT>
             class Default {
-
             public:
                 Default(NMSmodelT& subject);
                 void getTorques(std::vector<double>& torques);
                 void setTime(double time) { time_ = time; };
+
             private:
                 NMSmodelT& subject_;
                 void getMusclesToUpdate();
@@ -53,6 +55,6 @@ namespace ceinms{
         }
     }
 }
-#include "Default.cpp"
 
+#include "Default.cpp"
 #endif

@@ -33,6 +33,7 @@
 #include <map>
 #include <string>
 #include <iostream>
+
 #include "DataTable.h"
 
 namespace ceinms {
@@ -91,6 +92,7 @@ namespace ceinms {
         std::string getOpenSimModelFile() const { return openSimModelFile_; }
         std::string getExternalLoadFile() const { return externalLoadsFile_; }
         void crop(double startTime, double stopTime);
+
     private:
         std::string id_;
         std::vector<std::string> dofNames_, muscleNames_;
@@ -109,7 +111,6 @@ namespace ceinms {
         bool hasLmtMaData_;
         bool hasTorqueData_;
         bool hasOpenSimData_;
-
     };
 }
 

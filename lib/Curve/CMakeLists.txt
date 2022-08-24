@@ -1,11 +1,14 @@
 # Author: Elena Ceseracciu
 
 # List source files
-set(Curve_HEADERS   ceinms/Curve.h
-                    ceinms/CircularVector.h)
+set(Curve_HEADERS
+                ceinms/Curve.h
+                ceinms/CircularVector.h
+)
 set(Curve_TEMPLATE_IMPLEMENTATION
-                    ceinms/Curve.cpp
-                    ceinms/CircularVector.cpp)
+                ceinms/Curve.cpp
+                ceinms/CircularVector.cpp
+)
 
 set_source_files_properties( ${Curve_TEMPLATE_IMPLEMENTATION} PROPERTIES HEADER_FILE_ONLY TRUE)
 

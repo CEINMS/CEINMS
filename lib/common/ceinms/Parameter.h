@@ -33,8 +33,8 @@
 #include <list>
 
 namespace ceinms {
-    class Parameter {
 
+    class Parameter {
     public:
         enum Boundaries {
             Absolute,
@@ -66,7 +66,7 @@ namespace ceinms {
 
         typedef std::list<std::string> MuscleNames;
         typedef std::list<MuscleNames> MuscleGroups;
-        using Set = std::list < Parameter > ;
+        using Set = std::list<Parameter>;
 
         void setName(const std::string& name);
         bool iequals(const std::string& stringA, const std::string& stringB) const;
@@ -83,6 +83,7 @@ namespace ceinms {
         double getLowerLimit() const { return lowerLimit_; }
         double getUpperLimit() const { return upperLimit_; }
         friend std::ostream& operator<< (std::ostream& output, const Parameter& b);
+
     private:
         std::string name_;
         MuscleGroups muscleGroups_;
@@ -92,6 +93,5 @@ namespace ceinms {
         double upperLimit_;
     };
 }
-
 
 #endif

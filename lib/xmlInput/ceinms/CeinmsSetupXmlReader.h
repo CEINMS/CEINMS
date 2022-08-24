@@ -31,11 +31,12 @@
 
 #include <string>
 #include <map>
+
 #include "ceinmsSetup.hxx"
 
 namespace ceinms {
-    class CeinmsSetupXmlReader {
 
+    class CeinmsSetupXmlReader {
     public:
         CeinmsSetupXmlReader(const std::string& filename);
         std::string getSubjectFile(bool relative = false) const;

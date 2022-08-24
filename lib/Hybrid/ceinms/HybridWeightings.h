@@ -30,6 +30,7 @@
 #define ceinms_HybridWeightings_h
 
 namespace ceinms {
+    
     struct HybridWeightings {
         double alpha, beta, gamma;
     };

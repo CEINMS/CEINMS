@@ -89,10 +89,8 @@ namespace ceinms {
         time_ = orig.time_;
     }
 
-
     template<typename Activation, typename Tendon, CurveMode::Mode mode>
     MTU<Activation, Tendon, mode>& MTU<Activation, Tendon, mode>::operator=(const MTU<Activation, Tendon, mode>& orig) {
-
         id_ = orig.id_;
         emDelay_ = orig.emDelay_;
         activationDynamic_ = orig.activationDynamic_;
@@ -128,7 +126,6 @@ namespace ceinms {
         return *this;
     }
 
-
     template<typename Activation, typename Tendon, CurveMode::Mode mode>
     void MTU<Activation, Tendon, mode>::setParametersToComputeForces(double optimalFibreLength,
         double pennationAngle,
@@ -138,6 +135,7 @@ namespace ceinms {
         double maxIsometricForce,
         double strengthCoefficient,
         double maxContractionVelocity) {
+
         optimalFibreLength_ = optimalFibreLength;
         pennationAngle_ = pennationAngle;
         tendonSlackLength_ = tendonSlackLength;
@@ -158,10 +156,8 @@ namespace ceinms {
         resetState();
     }
 
-
     template<typename Activation, typename Tendon, CurveMode::Mode mode>
     void MTU<Activation, Tendon, mode>::setParametersToComputeActivation(double c1, double c2, double shapeFactor, double activationScale) {
-
         c1_ = c1;
         c2_ = c2;
         shapeFactor_ = shapeFactor;
@@ -172,10 +168,8 @@ namespace ceinms {
         resetState();
     }
 
-
     template<typename Activation, typename Tendon, CurveMode::Mode mode>
     void MTU<Activation, Tendon, mode>::resetState() {
-
         activationDynamic_.resetState();
         tendonDynamic_.resetState();
         fibreLengthTrace_.reset();
@@ -184,45 +178,35 @@ namespace ceinms {
         timeScale_ = 0.005;
     }
 
-
     template<typename Activation, typename Tendon, CurveMode::Mode mode>
     void MTU<Activation, Tendon, mode>::setTime(const double& time) {
-
         timeScale_ = time - time_;
         time_ = time;
         tendonDynamic_.setTime(time);
     }
 
-
     template<typename Activation, typename Tendon, CurveMode::Mode mode>
     void MTU<Activation, Tendon, mode>::setEmg(double emg) {
-
 		if (!activationDynamic_.setEmg(emg)) {
 			std::cout << "WARNING! Wrong excitation data provided for muscle " << getMuscleName() << 
 				", it should be between 0 and 1, but it is " << emg << std::endl;
 		}
     }
 
-
     template<typename Activation, typename Tendon, CurveMode::Mode mode>
     void MTU<Activation, Tendon, mode>::setMuscleTendonLength(double muscleTendonLength) {
-
         tendonDynamic_.setMuscleTendonLength(muscleTendonLength);
     }
 
-
     template<typename Activation, typename Tendon, CurveMode::Mode mode>
     void MTU<Activation, Tendon, mode>::updateActivation() {
-
         activationDynamic_.updateActivation();
         activation_ = activationDynamic_.getActivation();
         tendonDynamic_.setActivation(activation_);
     }
 
-
     template<typename Activation, typename Tendon, CurveMode::Mode mode>
     void MTU<Activation, Tendon, mode>::updateFibreLengthAndVelocity() {
-
         updateFibreLength();
         //add extra point to control the derivative
      //   fibreLengthTrace_.addPointNoUpdate(time_ + timeScale_, fibreLength_);
@@ -230,63 +214,48 @@ namespace ceinms {
      //   fibreLengthTrace_.removeLastPointNoUpdate();
     }
 
-
     template<typename Activation, typename Tendon, CurveMode::Mode mode>
     void MTU<Activation, Tendon, mode>::updateFibreLength() {
-
         tendonDynamic_.updateFibreLength();
         fibreLength_ = tendonDynamic_.getFibreLength();
   //      cout << fibreLengthTrace_.getNoElements() << std::endl;
         fibreLengthTrace_.addPointNoUpdate(time_, fibreLength_);
         //helps control the derivative
     //    cout << fibreLengthTrace_.getNoElements() << std::endl;
-
     }
-
 
     template<typename Activation, typename Tendon, CurveMode::Mode mode>
     void MTU<Activation, Tendon, mode>::updateFibreVelocity() {
-
         fibreLengthTrace_.refresh();
         fibreVelocity_ = fibreLengthTrace_.getFirstDerivative(time_);
   //      cout << fibreVelocity_ << endl;
     }
 
-
     template<typename Activation, typename Tendon, CurveMode::Mode mode>
     void MTU<Activation, Tendon, mode>::updateFibreLength_OFFLINEPREP() {
-
         updateFibreLength();
     }
 
-
     template<typename Activation, typename Tendon, CurveMode::Mode mode>
     void MTU<Activation, Tendon, mode>::updateFibreLengthAndVelocity_OFFLINE() {
-
         updateFibreLength_OFFLINE();
         updateFibreVelocity_OFFLINE();
     }
 
-
     template<typename Activation, typename Tendon, CurveMode::Mode mode>
     void MTU<Activation, Tendon, mode>::updateFibreLength_OFFLINE() {
-
         tendonDynamic_.updateFibreLength();
         fibreLength_ = tendonDynamic_.getFibreLength();
     }
 
-
     template<typename Activation, typename Tendon, CurveMode::Mode mode>
     void MTU<Activation, Tendon, mode>::updateFibreVelocity_OFFLINE() {
-
         fibreVelocity_ = fibreLengthTrace_.getFirstDerivative(time_);
   //      std::cout << id_ << " fibre velocity: " << fibreVelocity_ << std::endl;
     }
 
-
     template<typename Activation, typename Tendon, CurveMode::Mode mode>
     void MTU<Activation, Tendon, mode>::updateFibreLengthAndVelocity_HYBRID() {
-
         updateFibreLength_OFFLINE();
         fibreLengthTrace_.addPoint(time_, fibreLength_);
 //        fibreLengthTrace_.refresh();
@@ -294,17 +263,13 @@ namespace ceinms {
         fibreLengthTrace_.removeLastPointNoUpdate();
     }
 
-
     template<typename Activation, typename Tendon, CurveMode::Mode mode>
     void MTU<Activation, Tendon, mode>::updateFibreLengthsAndVelocities_END_OF_HYBRID_MINIMIZATION() {
-
         fibreLengthTrace_.removeLastPointNoUpdate();
     }
 
-
     template<typename Activation, typename Tendon, CurveMode::Mode mode>
     void MTU<Activation, Tendon, mode>::updateMuscleForce() {
-
         double optimalFiberLengthAtT = optimalFibreLength_*(percentageChange_*(1.0 - activation_) + 1);
         double normFiberLengthAtT = fibreLength_ / optimalFiberLengthAtT;
         double normFiberLength = fibreLength_ / optimalFibreLength_;
@@ -329,30 +294,23 @@ namespace ceinms {
             muscleForce_ = 0;
     }
 
-
     template<typename Activation, typename Tendon, CurveMode::Mode mode>
     void MTU<Activation, Tendon, mode>::pushState() {
-
         activationDynamic_.pushState();
         tendonDynamic_.pushState();
     }
 
-
     template<typename Activation, typename Tendon, CurveMode::Mode mode>
     void MTU<Activation, Tendon, mode>::resetFibreLengthTrace() {
-
         resetState();
     }
 
-
     template<typename Activation, typename Tendon, CurveMode::Mode mode>
     void MTU<Activation, Tendon, mode>::updateFibreLengthTrace() {
-
         fibreLengthTrace_.refresh();
         activationDynamic_.resetState();
         tendonDynamic_.resetState();
     }
-
 
     template<typename Activation, typename Tendon, CurveMode::Mode mode>
     void MTU<Activation, Tendon, mode>::setCurves(const CurveOffline& activeForceLengthCurve,
@@ -369,98 +327,76 @@ namespace ceinms {
         resetState();
     }
 
-
     template<typename Activation, typename Tendon, CurveMode::Mode mode>
     void MTU<Activation, Tendon, mode>::setActivation(double activation) {
-
         activation_ = activation;
     }
 
-
     template<typename Activation, typename Tendon, CurveMode::Mode mode>
     void MTU<Activation, Tendon, mode>::setShapeFactor(double shapeFactor) {
-
         shapeFactor_ = shapeFactor;
         activationDynamic_.setShapeFactor(shapeFactor_);
         resetState();
     }
 
-
     template<typename Activation, typename Tendon, CurveMode::Mode mode>
     void MTU<Activation, Tendon, mode>::setActivationScale(double activationScale) {
-
         activationScale_ = activationScale;
         activationDynamic_.setActivationScale(activationScale_);
         resetState();
     }
 
-
     template<typename Activation, typename Tendon, CurveMode::Mode mode>
     void MTU<Activation, Tendon, mode>::setC1(double c1) {
-
         c1_ = c1;
         activationDynamic_.setFilterParameters(c1_, c2_);
         resetState();
     }
 
-
     template<typename Activation, typename Tendon, CurveMode::Mode mode>
     void MTU<Activation, Tendon, mode>::setC2(double c2) {
-
         c2_ = c2;
         activationDynamic_.setFilterParameters(c1_, c2_);
         resetState();
     }
 
-
     template<typename Activation, typename Tendon, CurveMode::Mode mode>
     void MTU<Activation, Tendon, mode>::setStrengthCoefficient(double strengthCoefficient) {
-
         strengthCoefficient_ = strengthCoefficient;
         tendonDynamic_.setStrengthCoefficient(strengthCoefficient_);
         resetState();
     }
 
-
     template<typename Activation, typename Tendon, CurveMode::Mode mode>
     void MTU<Activation, Tendon, mode>::setTendonSlackLength(double tendonSlackLength) {
-
         tendonSlackLength_ = tendonSlackLength;
         tendonDynamic_.setTendonSlackLength(tendonSlackLength_);
         resetState();
     }
 
-
     template<typename Activation, typename Tendon, CurveMode::Mode mode>
     void MTU<Activation, Tendon, mode>::setOptimalFibreLength(double optimalFiberLength) {
-
         optimalFibreLength_ = optimalFiberLength;
         tendonDynamic_.setOptimalFibreLength(optimalFibreLength_);
         resetState();
     }
 
-
     template<typename Activation, typename Tendon, CurveMode::Mode mode>
     void MTU<Activation, Tendon, mode>::setPennationAngle(double pennationAngle) {
-
         pennationAngle_ = pennationAngle;
         tendonDynamic_.setPennationAngle(pennationAngle_);
         resetState();
     }
 
-
     template<typename Activation, typename Tendon, CurveMode::Mode mode>
     void MTU<Activation, Tendon, mode>::setMaxIsometricForce(double maxIsometricForce) {
-
         maxIsometricForce_ = maxIsometricForce;
         tendonDynamic_.setMaxIsometricForce(maxIsometricForce_);
         resetState();
     }
 
-
     template<typename Activation, typename Tendon, CurveMode::Mode mode>
     void MTU<Activation, Tendon, mode>::setMaxContractionVelocity(double maxContractionVelocity) {
-
         maxContractionVelocity_ = maxContractionVelocity;
         tendonDynamic_.setMaxContractionVelocity(maxContractionVelocity_);
         resetState();
@@ -475,14 +411,11 @@ namespace ceinms {
 
 	template<typename Activation, typename Tendon, CurveMode::Mode mode>
 	double MTU<Activation, Tendon, mode>::getNormTendonLength() const {
-		
 		return tendonDynamic_.getStrain(muscleForce_/(maxIsometricForce_*strengthCoefficient_));
 	}
 
-
     template<typename Activation, typename Tendon, CurveMode::Mode mode>
     double MTU<Activation, Tendon, mode>::getPenalty() const {
-
         double penalty(tendonDynamic_.getPenalty());
      //   double const normalisedFibreRatio(fabs(fibreLength_ / optimalFibreLength_ - 1.0));
      //   if (normalisedFibreRatio > 0.5)
@@ -496,23 +429,18 @@ namespace ceinms {
         return penalty;
     }
 
-
     template<typename Activation, typename Tendon, CurveMode::Mode mode>
     inline double MTU<Activation, Tendon, mode>::computePennationAngle(double optimalFiberLength) {
-
         return PennationAngle::compute(fibreLength_, optimalFiberLength, pennationAngle_);
-
     }
 
     template<typename Activation, typename Tendon, CurveMode::Mode mode>
     void MTU<Activation, Tendon, mode>::setTendonTolerance(double tolerance) {
-
         tendonDynamic_.setTolerance(tolerance);
     }
 
     template<typename Activation, typename Tendon, CurveMode::Mode mode>
-    std::ostream& operator<< (std::ostream& output, const MTU<Activation, Tendon, mode>& m)
-    {
+    std::ostream& operator<< (std::ostream& output, const MTU<Activation, Tendon, mode>& m) {
         output << "Name: " << m.id_ << endl;
         output << "emDelay: " << m.emDelay_ << endl;
         output << "C1: " << m.c1_ << " C2: " << m.c2_ << endl;
@@ -531,5 +459,4 @@ namespace ceinms {
         output << "strengthCoefficient: " << m.strengthCoefficient_ << endl;
         return output;
     }
-
 }

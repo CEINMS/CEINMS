@@ -3,10 +3,12 @@
 
 #include <vector>
 #include <string>
+
 #include "ceinms/TrialData.h"
 #include "ceinms/Result.h"
 
 namespace ceinms {
+
     class ObjectiveFunctionBase {
     public:
         virtual void setTrials(const std::vector<TrialData>& trials) = 0;
@@ -18,4 +20,5 @@ namespace ceinms {
         }
     };
 }
+
 #endif

@@ -26,30 +26,29 @@
  * limitations under the License.                                             *
  * -------------------------------------------------------------------------- */
 
-#include "ceinms/Parameter.h"
 #include <iostream>
 #include <vector>
 #include <algorithm>
 
+#include "ceinms/Parameter.h"
+
 namespace ceinms {
-    template <typename NMSmodelT>
+
+    template<typename NMSmodelT>
     ParametersInterpreter<NMSmodelT>::ParametersInterpreter(NMSmodelT& subject, const ParameterSet& parameterSet, const std::vector<std::string>& dofsToCalibrate) :
-        subject_(subject), parameterSet_(parameterSet), dofNames_(dofsToCalibrate)
-    {
+        subject_(subject), parameterSet_(parameterSet), dofNames_(dofsToCalibrate) {
+
         defineParameterDetails();
     }
 
-
     template<typename NMSmodelT>
     void ParametersInterpreter<NMSmodelT>::setDofsToCalibrate(const std::vector<std::string> dofsToCalibrate) {
-
         dofNames_ = dofsToCalibrate;
         defineParameterDetails();
     }
 
     template<typename NMSmodelT>
     void ParametersInterpreter<NMSmodelT>::defineParameterDetails() {
-
         for (ParameterSet::const_iterator it(parameterSet_.begin()); it != parameterSet_.end(); ++it) {
             //    std::cout << "Parameter " << it->getName() << std::endl;
             ParameterDetails parameterDetails;
@@ -81,14 +80,10 @@ namespace ceinms {
             noParameters_ += it->second.muscleGroups.size();
 
         //  std::cout << "Number of Parameters " << noParameters_ << std::endl;
-
     }
-
-
 
     template<typename NMSmodelT>
     std::vector<double> ParametersInterpreter<NMSmodelT>::getSubjectParameters() const{
-
         std::vector<double> x;
         for (typename ParametersMap::const_iterator it(parameters_.begin()); it != parameters_.end(); ++it) {
 
@@ -100,11 +95,8 @@ namespace ceinms {
         return x;
     }
 
-
     template<typename NMSmodelT>
     void ParametersInterpreter<NMSmodelT>::setSubjectParameters(const std::vector<double>& x) {
-
-
         unsigned count = 0;
         for (typename ParametersMap::const_iterator it(parameters_.begin()); it != parameters_.end(); ++it) {
 
@@ -119,15 +111,11 @@ namespace ceinms {
             setCoefficients(it->first, coefficients);
 
             count += noCoefficients;
-
         }
-
     }
-
 
     template<typename NMSmodelT>
     void ParametersInterpreter<NMSmodelT>::getUpperLowerBounds(std::vector<double>& upperBounds, std::vector<double>& lowerBounds) const {
-
         upperBounds.clear(); lowerBounds.clear();
         for (typename ParametersMap::const_iterator it(parameters_.begin()); it != parameters_.end(); ++it) {
             if (it->second.boundaryType == Parameter::RelativeToSubjectValue) {
@@ -148,28 +136,22 @@ namespace ceinms {
         }
     }
 
-
     template<typename NMSmodelT>
-    void ParametersInterpreter<NMSmodelT>::groupValues(const MuscleGroupsIdx& muscleGroupsIdx, const std::vector<double>& distributedValues, std::vector<double>& groupedValues) const{
-
+    void ParametersInterpreter<NMSmodelT>::groupValues(const MuscleGroupsIdx& muscleGroupsIdx, const std::vector<double>& distributedValues, std::vector<double>& groupedValues) const {
         groupedValues.clear();
         for (typename MuscleGroupsIdx::const_iterator it(muscleGroupsIdx.begin()); it != muscleGroupsIdx.end(); ++it)
             groupedValues.push_back(distributedValues.at(it->front()));
     }
 
-
     template<typename NMSmodelT>
     void ParametersInterpreter<NMSmodelT>::distributeValues(const MuscleGroupsIdx& muscleGroupsIdx, std::vector<double>& distributedValues, const std::vector<double>& groupedValues) {
-
         for (unsigned i = 0; i < muscleGroupsIdx.size(); ++i)
             for (std::vector<unsigned>::const_iterator it(muscleGroupsIdx.at(i).begin()); it != muscleGroupsIdx.at(i).end(); ++it)
                 distributedValues.at(*it) = groupedValues.at(i);
     }
 
-
     template<typename NMSmodelT>
     void ParametersInterpreter<NMSmodelT>::getMuscleGroupIndex(const MuscleGroups& muscleGroups, MuscleGroupsIdx& muscleGroupsIdx) {
-
         muscleGroupsIdx.clear();
         std::vector<std::string> muscleNames;
         subject_.getMuscleNames(muscleNames);
@@ -189,11 +171,9 @@ namespace ceinms {
         }
     }
 
-
     //NOTE: when using global o single parameters, only the calibrating dofs are considered
     template<typename NMSmodelT>
     void ParametersInterpreter<NMSmodelT>::getMuscleGroupIndex(ParameterAssignment parameterAssignment, MuscleGroupsIdx& muscleGroupsIdx) {
-
         muscleGroupsIdx.clear();
         std::vector<unsigned> musclesIndexList;
         subject_.getMusclesIndexFromDofs(musclesIndexList, dofNames_);
@@ -207,10 +187,8 @@ namespace ceinms {
             muscleGroupsIdx.push_back(musclesIndexList);
     }
 
-
     template<typename NMSmodelT>
     void ParametersInterpreter<NMSmodelT>::getCoefficients(ParameterID parameterID, std::vector<double>& coefficients) const {
-
         switch (parameterID) {
         case Parameter::C1:
             subject_.getC1Coefficients(coefficients);
@@ -250,10 +228,8 @@ namespace ceinms {
         }
     }
 
-
     template<typename NMSmodelT>
     void ParametersInterpreter<NMSmodelT>::setCoefficients(ParameterID parameterID, const std::vector<double>& coefficients) {
-
         switch (parameterID) {
         case Parameter::C1:
             subject_.setC1Coefficients(coefficients);

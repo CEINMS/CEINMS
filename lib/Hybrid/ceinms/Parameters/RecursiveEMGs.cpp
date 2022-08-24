@@ -34,7 +34,9 @@ using std::string;
 #include <iostream>
 
 namespace ceinms {
+
     namespace Hybrid {
+
         namespace Parameters {
 
             template<typename NMSmodelT>
@@ -44,7 +46,6 @@ namespace ceinms {
                 subject_(subject) {
 
                 if (!subject_.haveTheseMuscles(muscleNamesWithEMGtoTrack) || !subject_.haveTheseMuscles(muscleNamesWithEMGtoPredict)) {
-
                     std::cout << "Error in RecursiveEMGs_Hybrid: muscle name not found\n";
                     exit(EXIT_FAILURE);
                 }
@@ -64,20 +65,15 @@ namespace ceinms {
                 for (vector<unsigned>::const_iterator it = muscleIndexWithEMGtoOptimize_.begin(); it != muscleIndexWithEMGtoOptimize_.end(); ++it)
                     cout << *it << " ";
                 cout << endl;
-
             }
 
-
             template<typename NMSmodelT>
-            void RecursiveEMGs<NMSmodelT>::getStartingVectorParameters(std::vector<double>& x) {
-
+            void RecursiveEMGs<NMSmodelT>::getStartingVectorParameters(vector<double>& x) {
                 x.resize(noParameters_);
 
                 vector<double> currentEMGs, pastEMGs;
                 subject_.getEmgs(currentEMGs);
                 subject_.getPastEmgs(pastEMGs);
-
-
 
                 unsigned indexCt = 0;
                 for (unsigned i = 0; i < muscleIndexWithEMGtoTrack_.size(); ++i, ++indexCt)
@@ -89,13 +85,10 @@ namespace ceinms {
                 startingEmgValues_ = currentEMGs;
                 for (unsigned i = 0; i < muscleIndexWithEMGtoPredict_.size(); ++i)
                     startingEmgValues_.at(muscleIndexWithEMGtoPredict_.at(i)) = pastEMGs.at(muscleIndexWithEMGtoPredict_.at(i));
-
             }
-
 
             template<typename NMSmodelT>
             void RecursiveEMGs<NMSmodelT>::setUpperLowerBounds(vector<double>& upperBounds, vector<double>& lowerBounds) {
-
                 upperBounds.resize(noParameters_);
                 lowerBounds.resize(noParameters_);
 
@@ -105,10 +98,8 @@ namespace ceinms {
                 }
             }
 
-
             template<typename NMSmodelT>
             void RecursiveEMGs<NMSmodelT>::setVectorParameters(const vector<double>& x) {
-
                 vector<double> emgValues(startingEmgValues_);
                 for (unsigned i = 0; i < muscleIndexWithEMGtoOptimize_.size(); ++i)
                     emgValues.at(muscleIndexWithEMGtoOptimize_.at(i)) = x.at(i);
@@ -122,15 +113,12 @@ namespace ceinms {
                        */
             }
 
-
             template<typename NMSmodelT>
             std::ostream& operator<< (std::ostream& output, const RecursiveEMGs<NMSmodelT>& p) {
-
                 output << "Parameters operator<< Not Implemented " << std::endl;
 
                 return output;
             }
-
         }
     }
 }

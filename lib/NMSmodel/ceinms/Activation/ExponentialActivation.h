@@ -30,8 +30,8 @@
 #define ceinms_ExponentialActivation_h
 
 namespace ceinms {
-    class ExponentialActivation {
 
+    class ExponentialActivation {
     public:
         ExponentialActivation();
         virtual ~ExponentialActivation();

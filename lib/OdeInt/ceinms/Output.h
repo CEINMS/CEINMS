@@ -32,7 +32,6 @@
 #include <vector>
 
 struct Output {
-
     int kMax_;
     int nVar_;
     int nSave_;
@@ -76,18 +75,15 @@ struct Output {
                 ySave_.at(i).at(k) = tempMat.at(i).at(k);
     }
 
-    template <class Stepper>
+    template<class Stepper>
     void save_dense(Stepper& s, const double xout, const double h) {
-
         if (count_ == kMax_) resize();
         for (unsigned i = 0; i < nVar_;i++)
             ySave_.at(i).at(count_) = s.dense_out(i,xout,h);
         xSave_.at(count_++) = xout;
     }
 
-
     void save(double x, const std::vector<double> &y) {
-
         if (kMax_ <= 0) return;
         if (count_ == kMax_) resize();
         for (unsigned i = 0; i < nVar_; ++i)
@@ -95,10 +91,8 @@ struct Output {
         xSave_.at(count_++) = x;
     }
 
-
-    template <class Stepper>
+    template<class Stepper>
     void out(const int nStp, const double x, const std::vector<double>& y, Stepper& s, const double h) {
-
         if (!dense_)
             throw("dense output not set in Output!");
         if (nStp == -1) {
@@ -111,8 +105,6 @@ struct Output {
             }
         }
     }
-
 };
-
 
 #endif

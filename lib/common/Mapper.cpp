@@ -28,8 +28,9 @@
 
 #include <vector>
 #include <string>
-#include "ceinms/Mapper.h"
 #include <algorithm>
+
+#include "ceinms/Mapper.h"
 
 namespace ceinms {
 
@@ -37,15 +38,12 @@ namespace ceinms {
         inSize_(0),
         outSize_(0) {}
 
-
     Mapper::Mapper(const std::vector<std::string>& inNames, const std::vector<std::string>& outNames) {
-
         setNames(inNames, outNames);
     }
 
 
     void Mapper::setNames(const std::vector<std::string>& inNames, const std::vector<std::string>& outNames) {
-        
         inToOutMapping_.clear();
         inSize_ = inNames.size();
         outSize_ = outNames.size();
@@ -57,5 +55,4 @@ namespace ceinms {
             else inToOutMapping_.push_back(-1);
         }
     }
-
 }

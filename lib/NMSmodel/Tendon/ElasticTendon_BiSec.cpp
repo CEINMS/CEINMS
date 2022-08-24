@@ -33,9 +33,9 @@ using std::vector;
 #include <iostream>
 using std::cout;
 using std::endl;
-#include "ceinms/Tendon/ElasticTendon_BiSec.h"
 #include <functional>
-//#include <boost/concept_check.hpp>
+
+#include "ceinms/Tendon/ElasticTendon_BiSec.h"
 #include "ceinms/WDBsolver.h"
 #include "ceinms/MTUutils.h"
 
@@ -45,7 +45,6 @@ using std::endl;
 // template <typename T> int sgn(T val) {
 //     return (T(0) < val) - (val < T(0));
 // }
-
 
 namespace ceinms {
     ElasticTendon_BiSec::ElasticTendon_BiSec() :
@@ -65,7 +64,6 @@ namespace ceinms {
         timeScale_(0.005)
     { }
 
-
     ElasticTendon_BiSec::ElasticTendon_BiSec(std::string id) :
         optimalFibreLength_(.0),
         pennationAngle_(.0),
@@ -81,7 +79,6 @@ namespace ceinms {
         tolerance_(.000001),
         timeScale_(0.005),
         id_(id) { }
-
 
     ElasticTendon_BiSec::ElasticTendon_BiSec(double optimalFibreLength,
         double pennationAngle,
@@ -114,19 +111,14 @@ namespace ceinms {
         activation_(0.0),
         id_(""),
         tolerance_(.000001),
-        timeScale_(0.005)
-    {   }
-
+        timeScale_(0.005) {   }
 
     ElasticTendon_BiSec::ElasticTendon_BiSec(const ElasticTendon_BiSec& orig) {
-
         cout << "ElasticTendon_BiSec copy constructor. EXIT\n";
         exit(EXIT_FAILURE);
     }
 
-
     ElasticTendon_BiSec& ElasticTendon_BiSec::operator= (const ElasticTendon_BiSec& orig) {
-
         optimalFibreLength_ = orig.optimalFibreLength_;
         pennationAngle_ = orig.pennationAngle_;
         tendonSlackLength_ = orig.tendonSlackLength_;
@@ -150,7 +142,6 @@ namespace ceinms {
         return *this;
     }
 
-
     void ElasticTendon_BiSec::setParametersToComputeForces(double optimalFiberLength,
         double pennationAngle,
         double tendonSlackLength,
@@ -170,42 +161,30 @@ namespace ceinms {
         maxContractionVelocity_ = maxContractionVelocity;
     }
 
-
     void ElasticTendon_BiSec::setTime(const double& time) { 
-    
         timeScale_ = time - time_;
         time_ = time; 
-    
     }
 
     void ElasticTendon_BiSec::setMuscleTendonLength(double muscleTendonLength) {
-
         muscleTendonLength_ = muscleTendonLength;
     }
 
-
     void ElasticTendon_BiSec::setActivation(double activation) {
-
         activation_ = activation;
     }
 
-
-
     void ElasticTendon_BiSec::updateFibreLength() {
-
         const unsigned nIter = 100;
         tendonPenalty_ = .0;
         fibreLength_ = estimateFiberLengthBiSec(tolerance_, nIter);
         double pennationAngleAtT = PennationAngle::compute(fibreLength_, optimalFibreLength_, pennationAngle_);
         tendonLength_ = muscleTendonLength_ - fibreLength_*cos(pennationAngleAtT);
-
     }
-
 
     void ElasticTendon_BiSec::pushState() {
         fibreLengthTrace_.addPoint(time_, fibreLength_);
     }
-
 
     void ElasticTendon_BiSec::setCurves(const CurveOffline& activeForceLengthCurve,
         const CurveOffline& passiveForceLengthCurve,
@@ -225,54 +204,41 @@ namespace ceinms {
     }
 
     void ElasticTendon_BiSec::setStrengthCoefficient(double strengthCoefficient) {
-
         strengthCoefficient_ = strengthCoefficient;
         resetState();
     }
 
-
     void ElasticTendon_BiSec::setTendonSlackLength(double tendonSlackLength) {
-
         tendonSlackLength_ = tendonSlackLength;
         resetState();
     }
 
-
     void ElasticTendon_BiSec::setPennationAngle(double pennationAngle) {
-
         pennationAngle_ = pennationAngle;
         resetState();
     }
 
-
     void ElasticTendon_BiSec::setMaxIsometricForce(double maxIsometricForce) {
-
         maxIsometricForce_ = maxIsometricForce;
         resetState();
     }
 
-
     void ElasticTendon_BiSec::setOptimalFibreLength(double optimalFibreLength) {
-
         optimalFibreLength_ = optimalFibreLength;
         resetState();
     }
 
-
     void ElasticTendon_BiSec::setMaxContractionVelocity(double maxContractionVelocity) {
-
         maxContractionVelocity_ = maxContractionVelocity;
         resetState();
     }
 
     void ElasticTendon_BiSec::setDamping(double damping) {
-
         damping_ = damping;
         resetState();
     }
 
     void ElasticTendon_BiSec::resetState() {
-
         muscleTendonLength_ = 0.0;
         fibreLength_ = optimalFibreLength_;
         activation_ = 0.0;
@@ -281,9 +247,7 @@ namespace ceinms {
         fibreLengthTrace_.reset();
     }
 
-
     double ElasticTendon_BiSec::estimateFiberLengthBiSec(double tol, unsigned maxIterations) {
-
         //   cout << "------------------\n";
         //   cout << "Fibre Length for " << id_ << endl;
 
@@ -334,19 +298,13 @@ namespace ceinms {
         }
 
         return currentFibreLength;
-
-
     }
 
-
     double ElasticTendon_BiSec::operator()(double fl) {
-
         return evaluateForceError(fl);
     }
 
-
     double ElasticTendon_BiSec::evaluateForceError(double fiberLength) {
-
         double tendonForce = computeTendonForce(fiberLength);
         double muscleForce = computeMuscleForce(fiberLength);
         //   cout << "tendonForce " << tendonForce << endl;
@@ -354,9 +312,7 @@ namespace ceinms {
         return (tendonForce - muscleForce);
     }
 
-
     double ElasticTendon_BiSec::computeTendonForce(double fibreLength) {
-
         double pennationAngleAtT = PennationAngle::compute(fibreLength, optimalFibreLength_, pennationAngle_);
         double tendonLength = muscleTendonLength_ - fibreLength*cos(pennationAngleAtT);
         double tendonStrain = (tendonLength - tendonSlackLength_) / tendonSlackLength_;
@@ -374,9 +330,7 @@ namespace ceinms {
         return tendonForce;
     }
 
-
     double ElasticTendon_BiSec::computeMuscleForce(double fibreLength) {
-
         double optimalFiberLengthAtT = optimalFibreLength_ * (percentageChange_ *
             (1.0 - activation_) + 1);
 
@@ -407,9 +361,7 @@ namespace ceinms {
         return muscleForce;
     }
 
-
     double ElasticTendon_BiSec::getFibreLengthStiff() const {
-
         double first = optimalFibreLength_ * sin(pennationAngle_);
         double second = muscleTendonLength_ - tendonSlackLength_;
         return sqrt(first*first + second*second);
@@ -417,13 +369,9 @@ namespace ceinms {
 
     /*
     void ElasticTendon_BiSec::setMuscleTendonLength(double muscleTendonLength, double activation, double time) {
-
     muscleTendonLength_ = muscleTendonLength;
     activation_ = activation;
     updateFibreLength();
-
     }
     */
-
-
 }

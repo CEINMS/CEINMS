@@ -36,15 +36,15 @@
 #include <memory>
 #include <filesystem>
 #include <stdlib.h>
+
 #include "Logger.h"
 
 namespace ceinms {
+
     namespace Logger {
 
-        template <typename NMSmodelT>
+        template<typename NMSmodelT>
         class SimpleFileLogger {
-
-
 
         public:
             SimpleFileLogger(NMSmodelT& subject, const std::string& outputDir = "./Output/");
@@ -63,12 +63,11 @@ namespace ceinms {
             std::vector<LogID> fileTypes_;
         };
 
-
-        template <typename NMSmodelT>
+        template<typename NMSmodelT>
         SimpleFileLogger<NMSmodelT>::SimpleFileLogger(NMSmodelT& subject, const std::string& outputDir)
             :subject_(subject),
             outputDir_(outputDir),
-            separator_(","){
+            separator_(",") {
 
             outputDir_ += "/";
             std::filesystem::path dir(outputDir_);
@@ -82,10 +81,8 @@ namespace ceinms {
             else std::cout << "Using " + dir.string() + " as output directory\n";
         }
 
-
-        template <typename NMSmodelT>
+        template<typename NMSmodelT>
         void SimpleFileLogger<NMSmodelT>::addLog(LogID logID) {
-
             std::string filename;
             switch (logID) {
             case Activations:
@@ -136,13 +133,10 @@ namespace ceinms {
                 subject_.getMuscleNames(names);
 
             initFile(names, *outFiles_.back());
-
         }
 
-
-        template <typename NMSmodelT>
+        template<typename NMSmodelT>
         void SimpleFileLogger<NMSmodelT>::log(double time, LogID logID) {
-
             time_ = time;
             std::vector<double> data;
 
@@ -187,24 +181,19 @@ namespace ceinms {
 
         template <typename NMSmodelT>
         void SimpleFileLogger<NMSmodelT>::logDataVector(const std::vector<double>& data, std::ofstream& outFile) {
-
             outFile << time_ << separator_;
             for (unsigned i = 0; i < data.size() - 1; ++i)
                 outFile << data.at(i) << separator_;
             outFile << data.back() << std::endl;
         }
 
-
-        template <typename NMSmodelT>
+        template<typename NMSmodelT>
         void SimpleFileLogger<NMSmodelT>::initFile(const std::vector<std::string>& names, std::ofstream& outFile) {
-
             outFile << "Time" + separator_;
             for (unsigned int i = 0; i < names.size() - 1; ++i)
                 outFile << names.at(i) << separator_;
             outFile << names.back() << std::endl;
         }
-
-
     };
 }
 

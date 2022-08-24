@@ -32,8 +32,8 @@
 #include <vector>
 
 namespace ceinms {
-    struct ContactModelFromOpenSimSetup{
 
+    struct ContactModelFromOpenSimSetup{
         std::vector<std::string> joints;
     };
 }

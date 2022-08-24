@@ -23,4 +23,3 @@ target_link_libraries(Test_InverseDynamics
 	NMSmodel
 	${OPENSIMSIMBODY_LIBRARIES}
 )
-#target_link_libraries(Test_InverseDynamics  JointContactModels OutputConnectors InputConnectors xmlInput Concurrency NMSmodel debug ${OPENSIM_LIBRARIES_DEBUG})

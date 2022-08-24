@@ -1,5 +1,3 @@
-#include "ceinms/Mapper.h"
-using ceinms::Mapper;
 #include <vector>
 using std::vector;
 #include <string>
@@ -8,9 +6,10 @@ using std::string;
 using std::cout;
 using std::endl;
 
+#include "ceinms/Mapper.h"
+using ceinms::Mapper;
 
 int main() {
-
     //Map from a bigger group to a smaller group
     vector<string> namesIn = { "Apple", "Melon", "Orange", "Banana", "PineApple" };
     vector<string> namesOut = { "Melon", "Banana", "Orange", };

@@ -6,7 +6,7 @@
 namespace ceinms {
 
     CompositeObjectiveFunction::CompositeObjectiveFunction() :
-        f_(std::numeric_limits<double>::max()) {}
+        f_(std::numeric_limits<double>::max()) { }
 
     CompositeObjectiveFunction::CompositeObjectiveFunction(
         const std::vector<std::shared_ptr<ObjectiveFunctionBase>>& objectiveFunctions) :
@@ -16,13 +16,11 @@ namespace ceinms {
     }
 
     void CompositeObjectiveFunction::appendObjectiveFunction(std::shared_ptr<ObjectiveFunctionBase> objectiveFunction) {
-        
         objectiveFunctions_.emplace_back(objectiveFunction);
         objectiveFunctions_.back()->setTrials(trials_);
     }
     
     void CompositeObjectiveFunction::setTrials(const std::vector<TrialData>& trials) {
-        
         trials_ = trials;
         for (auto& it : objectiveFunctions_)
             it->setTrials(trials);
@@ -41,7 +39,6 @@ namespace ceinms {
     }
 
     void CompositeObjectiveFunction::printCosts() const {
-
         std::cout << "------------------------------------------------------------------------------\n";
         for (auto& it : objectiveFunctions_) {
             it->printCosts();
@@ -54,7 +51,6 @@ namespace ceinms {
     }
 
     bool CompositeObjectiveFunction::calculateOpenSimData() const {
-
         bool ans(false);
         for (auto& obj : objectiveFunctions_)
             ans |= obj->calculateOpenSimData();
@@ -92,5 +88,4 @@ namespace ceinms {
         }
         return objFunction;
     }
-
 }

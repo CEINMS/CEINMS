@@ -32,21 +32,19 @@
 #include <vector>
 #include <limits>
 #include <math.h>
-#include "StepperBase.h"
 #include <iostream>
 #include <stdlib.h>
 
-template<typename T>
-inline const T &max(const T &a, const T &b)
-        {return b > a ? (b) : (a);}
+#include "StepperBase.h"
 
 template<typename T>
-inline const T &min(const T &a, const T &b)
-        {return b > a ? (a) : (b);}
+inline const T &max(const T &a, const T &b) {return b > a ? (b) : (a);}
 
-template <typename D>
+template<typename T>
+inline const T &min(const T &a, const T &b) {return b > a ? (a) : (b);}
+
+template<typename D>
 class StepperDopr5 : public StepperBase {
-
 public:
     StepperDopr5(std::vector<double>& y, std::vector<double>& dydx, double& x,
                  const double aTol, const double rTol, bool dense);
@@ -58,7 +56,6 @@ public:
     void prepare_dense(const double h, D& derivs);
     double dense_out(const int i, const double x, const double h);
     double error();
-
 
 private:
     std::vector<double> k2_, k3_, k4_, k5_, k6_;
@@ -75,29 +72,27 @@ private:
     Controller con_;
 };
 
-
-template <class D>
+template<class D>
 StepperDopr5<D>::StepperDopr5(std::vector<double>& y, std::vector<double>& dydx, double& x,
                  const double aTol, const double rTol, bool dense) :
-StepperBase(y, dydx, x, aTol, rTol, dense),
-k2_(y.size()),
-k3_(y.size()),
-k4_(y.size()),
-k5_(y.size()),
-k6_(y.size()),
-rCont1_(y.size()),
-rCont2_(y.size()),
-rCont3_(y.size()),
-rCont4_(y.size()),
-rCont5_(y.size()),
-dydxNew_(y.size()) {
+                StepperBase(y, dydx, x, aTol, rTol, dense),
+                k2_(y.size()),
+                k3_(y.size()),
+                k4_(y.size()),
+                k5_(y.size()),
+                k6_(y.size()),
+                rCont1_(y.size()),
+                rCont2_(y.size()),
+                rCont3_(y.size()),
+                rCont4_(y.size()),
+                rCont5_(y.size()),
+                dydxNew_(y.size()) {
 
     EPS_ = std::numeric_limits<double>::epsilon();
 }
 
-template <class D>
+template<class D>
 void StepperDopr5<D>::step(const double hTry, D& derivs) {
-
     double h = hTry;
     double err;
 
@@ -119,12 +114,8 @@ void StepperDopr5<D>::step(const double hTry, D& derivs) {
     hNext_ = con_.hNext_;
 }
 
-
-
-template <class D>
+template<class D>
 void StepperDopr5<D>::dy(const double h, D& derivs) {
-
-
     const double c2=0.2,c3=0.3,c4=0.8,c5=8.0/9.0,a21=0.2,a31=3.0/40.0,
     a32=9.0/40.0,a41=44.0/45.0,a42=-56.0/15.0,a43=32.0/9.0,a51=19372.0/6561.0,
     a52=-25360.0/2187.0,a53=64448.0/6561.0,a54=-212.0/729.0,a61=9017.0/3168.0,
@@ -163,14 +154,10 @@ void StepperDopr5<D>::dy(const double h, D& derivs) {
 
     for(unsigned i = 0; i < n_; ++i)
         yErr_.at(i) = h*(e1*dydx_.at(i) + e3*k3_.at(i) + e4*k4_.at(i) + e5*k5_.at(i) + e6*k6_.at(i) + e7*dydxNew_.at(i));
-
 }
 
-
-template <class D>
+template<class D>
 void StepperDopr5<D>::prepare_dense(const double h, D& derivs) {
-
-
     std::vector<double> yTemp(n_);
     const double d1=-12715105075.0/11282082432.0,
                  d3=87487479700.0/32700410799.0, d4=-10690763975.0/1880347072.0,
@@ -188,19 +175,15 @@ void StepperDopr5<D>::prepare_dense(const double h, D& derivs) {
     }
 }
 
-
-template <class D>
+template<class D>
 double StepperDopr5<D>::dense_out(const int i, const double x, const double h) {
-
     double s = (x - xOld_)/h;
     double s1 = 1.0 - s;
     return rCont1_.at(i) + s*(rCont2_.at(i) + s1*(rCont3_.at(i) + s*(rCont4_.at(i) + s1*rCont5_.at(i))));
 }
 
-
-template <class D>
+template<class D>
 double StepperDopr5<D>::error() {
-
     double err = 0.0, sk;
     for (unsigned i = 0; i < n_ ; i++) {
         sk = aTol_ + rTol_*max(fabs(y_.at(i)), fabs(yOut_.at(i)));
@@ -209,14 +192,11 @@ double StepperDopr5<D>::error() {
     return sqrt(err/n_);
 }
 
+template<class D>
+StepperDopr5<D>::Controller::Controller() : reject_(false), errOld_(1.0e-4) { }
 
-template <class D>
-StepperDopr5<D>::Controller::Controller() : reject_(false), errOld_(1.0e-4) {}
-
-
-template <class D>
+template<class D>
 bool StepperDopr5<D>::Controller::success(const double err, double& h) {
-
     const double beta = 0.0;
     const double alpha = 0.2 - beta*0.75;
     const double safe = 0.9;
@@ -247,15 +227,5 @@ bool StepperDopr5<D>::Controller::success(const double err, double& h) {
         return false;
     }
 }
-
-
-
-
-
-
-
-
-
-
 
 #endif

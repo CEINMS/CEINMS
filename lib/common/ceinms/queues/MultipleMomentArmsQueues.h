@@ -29,21 +29,22 @@
 #ifndef ceinms_MultipleMomentArmsQueues_h
 #define ceinms_MultipleMomentArmsQueues_h
 
-#include "ceinms/QueueData.h"
-#include "ceinms/queues/ScalarVectorQueue.h"
 #include <memory>
 
+#include "ceinms/QueueData.h"
+#include "ceinms/queues/ScalarVectorQueue.h"
+
 namespace Concurrency {
+
     template<typename>
     class Queue;
 }
 
 namespace ceinms {
-
     using MomentArmsData = ScalarVectorData;
     using MomentArmsFrame = ScalarVectorFrame;
     using MomentArmsQueue = ScalarVectorQueue;
-    using MultipleMomentArmsQueues = std::vector < std::shared_ptr<MomentArmsQueue> > ;
+    using MultipleMomentArmsQueues = std::vector<std::shared_ptr<MomentArmsQueue>>;
 }
 
 #endif

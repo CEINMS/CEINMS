@@ -26,43 +26,39 @@
 * limitations under the License.                                             *
 * -------------------------------------------------------------------------- */
 
-#include "ceinms/MinTorqueErrorAndContactForces.h"
 #include <vector>
 using std::vector;
 #include <string>
 using std::string;
+
+#include "ceinms/MinTorqueErrorAndContactForces.h"
 
 namespace ceinms {
 
     MinTorqueErrorAndContactForces::MinTorqueErrorAndContactForces(const MinTorqueError& torqueErrorFun, const SumKneeContactForces& sumKneeContactFun) :
         minTorqueError_(torqueErrorFun),
         sumKneeContactForces_(sumKneeContactFun),
-        f_(std::numeric_limits<double>::max()) {}
+        f_(std::numeric_limits<double>::max()) { }
    
-    
     //MinTorqueErrorAndContactForces::MinTorqueErrorAndContactForces() : f_(std::numeric_limits<double>::max()) {}
 
     void MinTorqueErrorAndContactForces::setDofsToCalibrate(const vector<string>& dofsToCalibrate) {
-
         dofsToCalibrate_ = dofsToCalibrate;
         minTorqueError_.setDofsToCalibrate(dofsToCalibrate_);
         sumKneeContactForces_.setDofsToCalibrate(dofsToCalibrate_);
     }
 
     void MinTorqueErrorAndContactForces::setTrials(const vector<TrialData>& trials) {
-
         trials_ = trials;
         minTorqueError_.setTrials(trials_);
         sumKneeContactForces_.setTrials(trials_);
     }
 
     void MinTorqueErrorAndContactForces::calculate(const vector<Result>& results) {
-
         f_ = 0;
         minTorqueError_.calculate(results);
         f_ += minTorqueError_.getValue();
         sumKneeContactForces_.calculate(results);
         f_ += sumKneeContactForces_.getValue();
     }
-
 }

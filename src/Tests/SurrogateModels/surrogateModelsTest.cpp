@@ -1,7 +1,3 @@
-#include "ceinms/Curve.h"
-// #include "rtb/plsr/plsr.h"
-// #include "mcbs/Spline.h"
-#include <OpenSim/OpenSim.h>
 #include <string>
 using std::string;
 using std::vector;
@@ -11,6 +7,13 @@ using std::ifstream;
 using std::cout;
 using std::endl;
 #include <chrono>
+
+#include <OpenSim/OpenSim.h>
+
+// #include "rtb/plsr/plsr.h"
+// #include "mcbs/Spline.h"
+
+#include "ceinms/Curve.h"
 
 template<typename T>
 T getSurrogate(const SimTK::Matrix& X, const SimTK::Matrix& Y) {
@@ -26,17 +29,14 @@ rtb::Plsr getSurrogate<rtb::Plsr>(const SimTK::Matrix& X, const SimTK::Matrix& Y
 }
 
 SimTK::Matrix parseCSV(const std::string& filename) {
-
 	std::ifstream data(filename);
 	std::string line;
 	std::vector<std::vector<double>> parsedCsv;
-	while (std::getline(data, line))
-	{
+	while (std::getline(data, line)) {
 		std::stringstream lineStream(line);
 		std::string cell;
 		std::vector<double> parsedRow;
-		while (std::getline(lineStream, cell, ','))
-		{
+		while (std::getline(lineStream, cell, ',')) {
 			parsedRow.push_back(std::stod(cell));
 		}
 		parsedCsv.push_back(parsedRow);
@@ -52,7 +52,6 @@ SimTK::Matrix parseCSV(const std::string& filename) {
 };
 
 void printCSV(const SimTK::Matrix& m, const std::string& outputFilename) {
-
 	std::string sp(",");
 	std::ofstream oF(outputFilename);
 	for (int r(0); r < m.nrow(); ++r) {
@@ -70,7 +69,6 @@ void printCSV(const SimTK::Matrix& m, const std::string& outputFilename) {
 class CubicSplineSurrogate {
 public:
 	CubicSplineSurrogate(SimTK::Matrix X, SimTK::Matrix Y) {
-
 		if (X.ncol() != 1) {
 			std::cout << "CubicSplineSurrogate: only 1 independent variable allowed, but " << X.ncol() << " provided" << std::endl;
 			std::exit(EXIT_FAILURE);
@@ -103,7 +101,6 @@ public:
 		}
 	}
 
-
 	SimTK::Matrix project(const SimTK::Matrix& X) const {
 		SimTK::Matrix out(X.nrow(), nNodes_);
 		for (int iRow(0); iRow < X.nrow(); ++iRow) {
@@ -119,11 +116,9 @@ private:
 	std::vector<ceinms::Curve<ceinms::CurveMode::Offline>> splines_;
 };
 
-
 class BasisSplineSurrogate {
 public:
 	BasisSplineSurrogate(SimTK::Matrix X, SimTK::Matrix Y) {
-
 		if (X.ncol() != 1) {
 			std::cout << "CubicSplineSurrogate: only 1 independent variable allowed, but " << X.ncol() << " provided" << std::endl;
 			std::exit(EXIT_FAILURE);
@@ -161,7 +156,6 @@ public:
 		}
 	}
 
-
 	SimTK::Matrix project(const SimTK::Matrix& X) const {
 		SimTK::Matrix out(X.nrow(), nNodes_);
 		for (int iRow(0); iRow < X.nrow(); ++iRow) {
@@ -185,10 +179,8 @@ private:
 	std::vector<mcbs::Spline<1>> splines_;
 };
 
-
 template<typename Surrogate>
 void testNodes(const SimTK::Matrix& X, const SimTK::Matrix& Y, const string& name) {
-	
 	Surrogate surrogate(getSurrogate<Surrogate>(X, Y));
 	SimTK::Matrix YP = surrogate.project(X.getAsMatrixView());
 	printCSV(YP, string(BASE_DIR) + "/data/node_prediction_YP_" + name + ".csv");
@@ -208,7 +200,6 @@ void testProcessingTime(const SimTK::Matrix& X, const SimTK::Matrix& Y, const st
 	cout << "Evaluated " << n << " frames in " << elapsedTime << " ms\n"
 		"Average time per iteration " << elapsedTime / n << " ms\n" << endl;
 }
-
 
 template<typename Surrogate>
 void testFullRange(const SimTK::Matrix& X, const SimTK::Matrix& Y, const string& name) {

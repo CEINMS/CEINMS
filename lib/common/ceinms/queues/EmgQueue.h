@@ -30,6 +30,7 @@
 #define ceinms_EmgQueue_h
 
 #include <vector>
+
 #include "ceinms/queues/ScalarVectorQueue.h"
 
 namespace ceinms {

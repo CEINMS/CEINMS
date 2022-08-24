@@ -28,13 +28,15 @@
 
 #ifndef ceinms_ElasticTendon_BiSec_h
 #define ceinms_ElasticTendon_BiSec_h
+
 #include <string>
+
 #include "ceinms/Curve.h"
 
 namespace ceinms {
+
     //template <typename CurveMode::Mode mode>
     class ElasticTendon_BiSec {
-
     public:
         typedef Curve<CurveMode::Offline> CurveOffline;
         ElasticTendon_BiSec();
@@ -51,7 +53,7 @@ namespace ceinms {
             const CurveOffline& passiveForceLengthCurve,
             const CurveOffline& forceVelocityCurve,
             const CurveOffline& tendonForceStrainCurve);
-        virtual ~ElasticTendon_BiSec() {}
+        virtual ~ElasticTendon_BiSec() { }
         double operator()(double fl);
         ElasticTendon_BiSec(const ElasticTendon_BiSec& orig);
         ElasticTendon_BiSec& operator=(const ElasticTendon_BiSec& orig);
@@ -93,7 +95,6 @@ namespace ceinms {
 		}
 
         /*
-
         void setMuscleTendonLength(double muscleTendonLength, double activation, double time);
         void updateFiberLengthUsingNewActivation(double activation, double time);
         double getFiberLength() { return fibreLength_;}
@@ -105,6 +106,7 @@ namespace ceinms {
 
         void resetState();
         */
+
     private:
         double evaluateForceError(double fibreLength);
         double estimateFiberLengthBiSec(double tol, unsigned maxIterations);
@@ -136,7 +138,6 @@ namespace ceinms {
         double timeScale_;
         double tolerance_;
         std::string id_;
-
     };
 }
 

@@ -40,8 +40,9 @@ using std::stringstream;
 #include "ceinms/EMGDataFromFile.h"
 
 namespace ceinms {
-    template <typename EMGgenerator>
-    EMGDataFromFile<EMGgenerator>::EMGDataFromFile(const string& EMGDataFilename, const std::string& emgGeneratorFile)
+
+    template<typename EMGgenerator>
+    EMGDataFromFile<EMGgenerator>::EMGDataFromFile(const string& EMGDataFilename, const string& emgGeneratorFile)
         :EMGgenerator_(emgGeneratorFile) {
 
         exists_ = (EMGDataFilename.size() > 1);
@@ -55,22 +56,17 @@ namespace ceinms {
 
             string line;
             getline(EMGDataFile_, line, '\n');
-            while (line != "endheader" && line != "endheader\r" && !EMGDataFile_.eof())
-            {
-                if (size_t foundInfo = line.find("nRows=") != string::npos)
-                {
+            while (line != "endheader" && line != "endheader\r" && !EMGDataFile_.eof()) {
+                if (size_t foundInfo = line.find("nRows=") != string::npos) {
                     noTimeSteps_ = atoi(line.substr(6).c_str());
                 }
-                if (size_t foundInfo = line.find("datarows ") != string::npos)
-                {
+                if (size_t foundInfo = line.find("datarows ") != string::npos) {
                     noTimeSteps_ = atoi(line.substr(9).c_str());
                 }
-                if (size_t foundInfo = line.find("nColumns=") != string::npos)
-                {
+                if (size_t foundInfo = line.find("nColumns=") != string::npos) {
                     noMuscles_ = atoi(line.substr(9).c_str()) - 1; //nColumns includes the "time" column
                 }
-                if (size_t foundInfo = line.find("datacolumns ") != string::npos)
-                {
+                if (size_t foundInfo = line.find("datacolumns ") != string::npos) {
                     noMuscles_ = atoi(line.substr(12).c_str()) - 1; //nColumns includes the "time" column
                 }
                 getline((EMGDataFile_), line, '\n');
@@ -98,11 +94,11 @@ namespace ceinms {
             if (!EMGgenerator_.checkInputSignalsNames(muscleNames_)) {
                 vector<string> musclesNamesFromGenerator;
                 EMGgenerator_.getInputSignalsNames(musclesNamesFromGenerator);
-                std::cout << " generator names - file names\n";
+                cout << " generator names - file names\n";
                 for (unsigned i = 0; i < musclesNamesFromGenerator.size() && i < muscleNames_.size(); ++i) {
                     string genName(musclesNamesFromGenerator.at(i)), fileName(muscleNames_.at(i)), separator("  -  ");
                     if (genName != fileName) separator = "  <>  ";
-                    std::cout << genName << separator << fileName << std::endl;
+                    cout << genName << separator << fileName << endl;
                 }
                 cout << "The excitation generator is not able to generate excitations for your muscles.\nMuscle names are different between excitation generator and input file\n";
                 exit(EXIT_FAILURE);
@@ -117,12 +113,10 @@ namespace ceinms {
         currentDataTime_ = 0.;
         currentTimeStep_ = 0;
 
-
     }
 
-    template <typename EMGgenerator>
+    template<typename EMGgenerator>
     void EMGDataFromFile<EMGgenerator>::readNextEmgData()  {
-
         // first we build a vector of emg read from the file
         if (exists_) {
             string line;
@@ -141,7 +135,6 @@ namespace ceinms {
             // cout << "EMGDataFromFile: just read " << currentReadEMG_.size() << " values\n";
             EMGgenerator_.convert(currentReadEMG_, currentEMGData_);
         }
-
         else {
 
             currentDataTime_ = currentTimeStep_ / 1000.;
@@ -163,7 +156,7 @@ namespace ceinms {
         ++currentTimeStep_;
     }
 
-    template <typename EMGgenerator>
+    template<typename EMGgenerator>
     EMGDataFromFile<EMGgenerator>::~EMGDataFromFile() {
         EMGDataFile_.close();
     }

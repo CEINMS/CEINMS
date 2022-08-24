@@ -32,13 +32,13 @@
 #include <vector>
 #include <cmath>
 #include <limits>
+
 #include "CircularVector.h"
 
 namespace ceinms {
 
     template<typename T>
-    bool nearly_equal(T a, T b)
-    {
+    bool nearly_equal(T a, T b) {
         return std::nextafter(a, std::numeric_limits<T>::lowest()) <= b
             && std::nextafter(a, std::numeric_limits<T>::max()) >= b;
     }
@@ -50,19 +50,16 @@ namespace ceinms {
 
     template <int v>
     struct Int2Type {
-
         enum { value = v };
     };
 
     template <CurveMode::Mode mode, typename T, typename U>
     struct Select {
-
         typedef T Result;
     };
 
     template <typename T, typename U>
     struct Select < CurveMode::Online, T, U > {
-
         typedef U Result;
     };
 
@@ -74,7 +71,6 @@ namespace ceinms {
 
     template <CurveMode::Mode mode, CurveMode::Interpolation T = CurveMode::Cubic, size_t N = 15>
     class Curve {
-
     public:
 		typedef typename Select<mode, std::vector<double>, CircularVector<double, N> >::Result VectorType;
         Curve();
@@ -113,6 +109,7 @@ namespace ceinms {
         friend std::ostream& operator<< <>(std::ostream& output, const Curve& c);
         bool empty() { return b_.empty(); }
         std::size_t getNoElements() const { return x_.size(); }
+
     private:
         void computeCoefficients(Int2Type<CurveMode::Cubic>);
         void computeCoefficients(Int2Type<CurveMode::Linear>);
@@ -126,7 +123,6 @@ namespace ceinms {
         unsigned getAbscissaPoint(double xValue) const;
         unsigned getAbscissaPoint(double xValue, Int2Type<CurveMode::Online>) const;
         unsigned getAbscissaPoint(double xValue, Int2Type<CurveMode::Offline>) const;
-
 
         VectorType x_;
         VectorType y_;

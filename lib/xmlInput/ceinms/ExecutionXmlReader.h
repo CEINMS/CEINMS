@@ -31,12 +31,13 @@
 
 #include <string>
 #include <vector>
+
 #include "NMSmodelConfig.h"
 #include "execution.hxx"
 
 namespace ceinms {
-    class ExecutionXmlReader {
 
+    class ExecutionXmlReader {
     public:
         ExecutionXmlReader(const std::string& filename);
         NMSModelCfg::RunMode getRunMode() const;
@@ -48,6 +49,7 @@ namespace ceinms {
         void getDofSet(std::vector<std::string>& dofs) const;
         void print(const std::string& filename);
         bool isHybrid() const;
+        
     private:
         void readXml();
         double tolerance_;

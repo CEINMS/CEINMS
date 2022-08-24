@@ -1,10 +1,9 @@
 #include "ceinms/ExternalLoadProperties.h"
 
-
 namespace ceinms {
 
     ExternalLoadProperties::ExternalLoadProperties(const std::string& xmlFilename) :
-        xmlFilename_(xmlFilename){
+        xmlFilename_(xmlFilename) {
 
         SimTK::Xml::Document extLoadXml(xmlFilename);   //SimTK::Xml -> SimTK::Xml::Document
         parseXml(extLoadXml.getRootElement());
@@ -25,14 +24,12 @@ namespace ceinms {
     }
 
     void ExternalLoadProperties::parseXml(SimTK::Xml::Element elt) {
-
         SimTK::Xml::element_iterator eIt(elt.element_begin());
         if (eIt->getElementTag() == "ExternalLoads")
             parseExternalLoads(*eIt);
     }
 
     void ExternalLoadProperties::parseExternalLoads(SimTK::Xml::Element elt) {
-
         SimTK::Xml::attribute_iterator ap = elt.attribute_begin();
         if (ap->getName() == "name")
             name_ = ap->getValue();
@@ -57,17 +54,14 @@ namespace ceinms {
     }
 
     std::size_t ExternalLoadProperties::getExternalForcesSize() const{
-
         return externalForcesProperties_.size();
     }
 
     std::vector<ExternalForceProperties> ExternalLoadProperties::getExternalForces() const {
-
         return externalForcesProperties_;
     }
 
     std::vector<std::string> ExternalLoadProperties::getExternalForcesNames() const {
-
         std::vector<std::string> names;
         for (auto& e : externalForcesProperties_)
             names.emplace_back(e.getName());
@@ -79,22 +73,18 @@ namespace ceinms {
     }
 
     std::string ExternalLoadProperties::getDatafile() const {
-
         return datafile_;
     }
 
     std::string ExternalLoadProperties::getKinematicsFile() const {
-
         return external_loads_model_kinematics_file_;
     }
 
     double ExternalLoadProperties::getCutoffFrequency() const {
-
         return lowpass_cutoff_frequency_for_load_kinematics_;
     }
 
     std::string ExternalLoadProperties::getForceIdentifier(const std::string& forceName) const {
-
         std::string forceIdentifier;
         for (auto& e : externalForcesProperties_) {
             if (e.getName() == forceName)
@@ -104,7 +94,6 @@ namespace ceinms {
     }
 
     std::string ExternalLoadProperties::getPointIdentifier(const std::string& forceName) const {
-
         std::string pointIdentifier;
         for (auto& e : externalForcesProperties_) {
             if (e.getName() == forceName)
@@ -114,7 +103,6 @@ namespace ceinms {
     }
 
     std::string ExternalLoadProperties::getTorqueIdentifier(const std::string& forceName) const {
-
         std::string torqueIdentifier;
         for (auto& e : externalForcesProperties_) {
             if (e.getName() == forceName)

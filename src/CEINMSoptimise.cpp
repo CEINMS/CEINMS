@@ -26,11 +26,27 @@
 * limitations under the License.                                             *
 * -------------------------------------------------------------------------- */
 
+#include <ctime>
+#include <numeric>
+#include <algorithm>
+#include <string>
+using std::string;
+#include <iostream>
+using std::cout;
+using std::endl;
+#include <iomanip>
+#include <vector>
+using std::vector;
+#include <map>
+using std::map;
+#include <stdlib.h>
+#include <future>
+
 #include "ceinms/Utilities.h"
 #include "ceinms/FileUtils.h"
 #include "ceinms/CeinmsSetupXmlReader.h"
 #include "SimulationManager.h"
-#include <ctime>
+
 #include "ceinms/CeinmsSetupXmlReader.h"
 #include "ceinms/NMSmodel.h"
 
@@ -65,7 +81,6 @@
 #include "ceinms/QueuesToInverseDynamics.h"
 #include "ceinms/QueuesToKneeBalanceContactForces.h"
 
-#include "rtb/concurrency/Concurrency.h"
 #include "ceinms/queues/VecContactForcesQueue.h"
 #include "ceinms/queues/ScalarContactForcesQueue.h"
 #include "ceinms/queues/EmgQueue.h"
@@ -82,33 +97,9 @@
 #include "ceinms/SimulatedAnnealing.h"
 #include "ceinms/FileUtils.h"
 
-#include <numeric>
-#include <algorithm>
-#include <string>
-using std::string;
-#include <iostream>
-using std::cout;
-using std::endl;
-
-
-#include <iomanip>
-
-#include <string>
-using std::string;
-#include <iostream>
-using std::cout;
-using std::endl;
-#include <vector>
-using std::vector;
-#include <map>
-using std::map;
-#include <stdlib.h>
-#include <algorithm>
-
-#include <future>
+#include "rtb/concurrency/Concurrency.h"
 
 void printHeader() {
-
     cout << endl;
     cout << "+-+-+-+-+-+-+\n"
         << "|C|E|I|N|M|S|\n"
@@ -127,27 +118,22 @@ void printHeader() {
         string(CEINMS_MINOR_VERSION) + "." +
         string(CEINMS_PATCH_VERSION);
     cout << "\n" << progName << " version " << version << "\n";
-
 }
 
 void printAuthors() {
-
     cout << "Copyright (C) " << string(__DATE__) << endl;
     cout << "Claudio Pizzolato, Monica Reggiani, Massimo Sartori, David Lloyd\n";
     cout << "Software developers: Claudio Pizzolato, Elena Ceseracciu, Monica Reggiani\n";
 }
 
-void PrintUsage()
-{
+void PrintUsage() {
     string progName = "CEINMSoptimise";
     cout << "Option            Argument          Action / Notes\n";
     cout << "------            --------          --------------\n";
     cout << "-Help, -H                           Print the command-line options for " << progName << ".\n";
     cout << "-PrintSetup, -PS                    Generates a template Setup file\n";
     cout << "-Setup, -S        SetupFileName     Specify an xml setup file.\n";
-
 }
-
 
 template<typename NMSmodelT>
 ceinms::TrialData readTrialData(const string& inputDataFilename, NMSmodelT& mySubject, const string& emgGeneratorFile) {
@@ -164,9 +150,9 @@ ceinms::TrialData readTrialData(const string& inputDataFilename, NMSmodelT& mySu
     string emgFilename(dataLocations.getExcitationsFile());
     ceinms::EmgFromFile emgProducer(emgQueue, doneWithSubscription, doneWithExecution, mySubject, emgFilename, emgGeneratorFile);
 
-    vector< string > dofNames;
+    vector<string> dofNames;
     mySubject.getDoFNames(dofNames);
-    vector< string > maFilename;
+    vector<string> maFilename;
     ceinms::FileUtils::sortMaFilenames(dataLocations.getMaFiles(), dofNames, maFilename);
     ceinms::LmtMaFromStorageFile lmtMaProducer(lmtQueue, momentArmsQueues, doneWithSubscription, doneWithExecution, mySubject, dataLocations.getLmtFile(), maFilename);
 
@@ -178,7 +164,7 @@ ceinms::TrialData readTrialData(const string& inputDataFilename, NMSmodelT& mySu
     doneWithSubscription.setCount(4);
     doneWithExecution.setCount(4);
 
-    // 4. start the threads
+    // start the threads
     std::thread emgProdThread(std::ref(emgProducer));
     std::thread externalTorquesProdThread(std::ref(externalTorquesProducer));
     std::thread lmtMaProdThread(std::ref(lmtMaProducer));
@@ -189,9 +175,8 @@ ceinms::TrialData readTrialData(const string& inputDataFilename, NMSmodelT& mySu
     externalTorquesProdThread.join();
     queuesToTrialDataThread.join();
 
-    if (!queuesToTrialData.getTrialData().isConsistent())
-    {
-        std::cout << "ERROR: No data was read for trial "  << std::endl;
+    if (!queuesToTrialData.getTrialData().isConsistent()) {
+        cout << "ERROR: No data was read for trial "  << endl;
         exit(EXIT_FAILURE);
     }
 
@@ -206,7 +191,7 @@ ceinms::TrialData readTrialData(const string& inputDataFilename, NMSmodelT& mySu
 class HybridOptimisationManager {
 
 public:
-    HybridOptimisationManager(const std::string& setupFilename):
+    HybridOptimisationManager(const string& setupFilename):
         setupFilename_(setupFilename),
         ceinmsSetup_(setupFilename),
         dataLocations_(ceinmsSetup_.getInputDataFile()),
@@ -223,6 +208,7 @@ public:
             runOpenLoop();
         return true;
     }
+
 private:
     struct HybridErrors {
         double beta, gamma;
@@ -235,7 +221,6 @@ private:
     }
 
     bool runWeightingOptimisation() {
-
         using NMSmodelT = ceinms::NMSmodel<ceinms::ExponentialActivation, ceinms::ElasticTendon_BiSec, ceinms::CurveMode::Online>;
         NMSmodelT subject;
         setupSubject(subject, subjectFile_, executionCfg_.getTolerance());
@@ -269,9 +254,9 @@ private:
             setup.weightings.beta = beta;
             setup.weightings.gamma = gamma;
             ceinms::HybridEvaluator::evaluate(subject, trial, setup, musclesToUpdate, results);
-            std::vector<double> torqueErrors(results.errors.getColumn("TorqueError"));
+            vector<double> torqueErrors(results.errors.getColumn("TorqueError"));
             double torqueError = std::accumulate(torqueErrors.begin(), torqueErrors.end(), 0.) / torqueErrors.size();
-            std::vector<double> trackingError(results.errors.getColumn("ExcitationTrackingError"));
+            vector<double> trackingError(results.errors.getColumn("ExcitationTrackingError"));
             double trackError = std::accumulate(trackingError.begin(), trackingError.end(), 0.) / trackingError.size();
             HybridErrors errs;
             errs.beta = beta;
@@ -282,30 +267,30 @@ private:
         });
 
         auto runGrid([&](vector<double> betas, vector<double> gammas) {
-            std::vector<HybridErrors> values;
+            vector<HybridErrors> values;
             for (auto beta : betas)
                 for (auto gamma : gammas) {
                         values.emplace_back(f(beta, gamma, subject, trial));
-                 }
+                }
             return values;
         });
 
         auto runGridParallel([&](vector<double> betas, vector<double> gammas) {
             int threadCount = 0;
-            std::vector<std::future<HybridErrors>> futures;
+            vector<std::future<HybridErrors>> futures;
             for (auto beta : betas)
                 for (auto gamma : gammas) {
                     auto fut(std::async(std::launch::async, [=]() {
                         return f(beta, gamma, subject, trial); }
                     ));
                     futures.emplace_back(std::move(fut));
-                    std::cout << "Creating thread " << ++threadCount << "/" << gammas.size()*betas.size() << std::endl;
+                    cout << "Creating thread " << ++threadCount << "/" << gammas.size()*betas.size() << endl;
                 }
 
-            std::vector<HybridErrors> values;
+            vector<HybridErrors> values;
             for (auto& f : futures) {
                 f.wait();
-                std::cout << "Joining thread " << --threadCount << "/" << gammas.size()*betas.size() << std::endl;
+                cout << "Joining thread " << --threadCount << "/" << gammas.size()*betas.size() << endl;
                 values.emplace_back(f.get());
             }
             return values;
@@ -322,7 +307,7 @@ private:
         });
        
         double bmin = 1, bmax = 2, bdelta=1, gmin = 1, gmax = 5, gdelta=5;
-        std::vector<HybridErrors> values;
+        vector<HybridErrors> values;
         vector<double> betas = getVec(bmin, bmax,bdelta);
         vector<double> gammas = getVec(gmin, gmax,gdelta);
         values = runGridParallel(betas, gammas);
@@ -362,52 +347,48 @@ private:
         cout << "lowest\nbeta = " << lowest.beta << "\ngamma = " << lowest.gamma << endl;
         cout << "f = " << std::pow(lowest.torqueError / maxTorque, 2) + std::pow(lowest.trackError / maxTrack, 2) << endl;
         
-        std::cout << "Optimal values:\n"
+        cout << "Optimal values:\n"
             "alpha = " << 1 << "\n"
             "beta  = " << lowest.beta << "\n"
             "gamma  = " << lowest.gamma << "\n";
         
         executionCfg_.setHybridWeightings(1, lowest.beta, lowest.gamma);
-        std::string trialId(ceinmsSetup_.getInputDataFile(false));
+        string trialId(ceinmsSetup_.getInputDataFile(false));
         size_t endpos = trialId.find(".xml");
         size_t startpos = trialId.rfind("/") + 1;
         trialId = trialId.substr(startpos, endpos - startpos);
-        std::string newExecutionFilename(ceinmsSetup_.getExecutionFile(false));
+        string newExecutionFilename(ceinmsSetup_.getExecutionFile(false));
         std::size_t pos = newExecutionFilename.find(".xml");
-        if (pos != std::string::npos) {
+        if (pos != string::npos) {
             newExecutionFilename.insert(pos, "-optimised-"+trialId);
         }
         executionCfg_.print(newExecutionFilename);
         ceinmsSetup_.setExecutionFile(newExecutionFilename);
         
-        std::string newSetupFilename(setupFilename_);
+        string newSetupFilename(setupFilename_);
         pos = newSetupFilename.find(".xml");
-        if (pos != std::string::npos) {
+        if (pos != string::npos) {
             newSetupFilename.insert(pos, "-optimised");
         }
         ceinmsSetup_.print(newSetupFilename);
-        std::cout << "Running best solution\n";
+        cout << "Running best solution\n";
         ceinms::SimulationManager simulationManager(newSetupFilename);
         return simulationManager.run();
-      
     }
 
     ceinms::CeinmsSetupXmlReader ceinmsSetup_;
     ceinms::InputDataXmlReader dataLocations_;
     ceinms::ExecutionXmlReader executionCfg_;
     ceinms::ContactModelXmlReader contactModelCfg_;
-    std::string subjectFile_;
-    std::string executionFile_;
-    std::string inputData_;
-    std::string outputDirectory_;
-    std::string emgGeneratorFile_;
-    std::string setupFilename_;
-
+    string subjectFile_;
+    string executionFile_;
+    string inputData_;
+    string outputDirectory_;
+    string emgGeneratorFile_;
+    string setupFilename_;
 };
 
-
 int main(int argc, char** argv) {
-
     printHeader();
     printAuthors();
 
@@ -444,14 +425,12 @@ int main(int argc, char** argv) {
                 // Print a default setup file
             }
             else if ((option == "-PrintSetup") || (option == "-PS")) {
-                if (ceinms::CeinmsSetupXmlReader::writeTemplateCeinmsSetupFile("defaultCeinmsSetupFile.xml"))
-                {
-                    std::cout << "Wrote template setup file to defaultCeinmsSetupFile.xml" << std::endl;
+                if (ceinms::CeinmsSetupXmlReader::writeTemplateCeinmsSetupFile("defaultCeinmsSetupFile.xml")) {
+                    cout << "Wrote template setup file to defaultCeinmsSetupFile.xml" << endl;
                     return 0;
                 }
-                else
-                {
-                    std::cout << "An error occurred while writing template setup file to defaultCeinmsSetupFile.xml" << std::endl;
+                else {
+                    cout << "An error occurred while writing template setup file to defaultCeinmsSetupFile.xml" << endl;
                     return -1;
                 }
             }
@@ -462,7 +441,6 @@ int main(int argc, char** argv) {
             }
         }
     }
-
 
     HybridOptimisationManager simulation(setupFileName);
     bool flag = simulation.run();

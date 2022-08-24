@@ -28,19 +28,15 @@
 
 #include <string>
 using std::string;
-
 #include <iostream>
 using std::cout;
 using std::endl;
-
 #include <ctime>
 #include <chrono>
 
 #include "CalibrationManager.h"
 
-
 void printHeader() {
-
     cout << endl;
     cout << "+-+-+-+-+-+-+\n"
         << "|C|E|I|N|M|S|\n"
@@ -59,30 +55,24 @@ void printHeader() {
         string(CEINMS_MINOR_VERSION) + "." +
         string(CEINMS_PATCH_VERSION);
     cout << "\n" << progName << " version " << version << "\n";
-
-    }
+}
 
 void printAuthors() {
-
     cout << "Copyright (C) " << string(__DATE__ )<< endl;
     cout << "Claudio Pizzolato, Monica Reggiani, Massimo Sartori, David Lloyd\n";
     cout << "Software developers: Claudio Pizzolato, Monica Reggiani\n";
 }
 
-void PrintUsage()
-{
+void PrintUsage() {
     string progName = "CEINMScalibrate";
     cout << "Option            Argument          Action / Notes\n";
     cout << "------            --------          --------------\n";
     cout << "-Help, -H                           Print the command-line options for " << progName << ".\n";
     cout << "-PrintSetup, -PS                    Generates a template Setup file\n";
     cout << "-Setup, -S        SetupFileName     Specify an xml setup file.\n";
-
 }
 
-
-int main(int argc, char** argv){
-
+int main(int argc, char** argv) {
     printHeader();
     printAuthors();
 
@@ -104,25 +94,22 @@ int main(int argc, char** argv){
                 return 0;
             }
             else if ((option == "-S") || (option == "-Setup")) {
-                if (argv[i + 1] == 0){
+                if (argv[i + 1] == 0) {
                     cout << "No setup file specified!" << endl;
                     PrintUsage();
                     return -1;
                 }
                 setupFileName = argv[i + 1];
-                break;
-
-                // Print a default setup file
+                break; 
             }
+            // Print a default setup file
             else if ((option == "-PrintSetup") || (option == "-PS")) {
-                if (ceinms::CeinmsCalibrationSetupXmlReader::writeTemplateCeinmsCalibrationSetupFile("defaultCeinmsCalibrationSetupFile.xml"))
-                {
-                    std::cout << "Wrote template setup file to defaultCeinmsCalibrationSetupFile.xml" << std::endl;
+                if (ceinms::CeinmsCalibrationSetupXmlReader::writeTemplateCeinmsCalibrationSetupFile("defaultCeinmsCalibrationSetupFile.xml")) {
+                    cout << "Wrote template setup file to defaultCeinmsCalibrationSetupFile.xml" << endl;
                     return 0;
                 }
-                else
-                {
-                    std::cout << "An error occurred while writing template setup file to defaultCeinmsSetupFIle.xml" << std::endl;
+                else {
+                    cout << "An error occurred while writing template setup file to defaultCeinmsSetupFIle.xml" << endl;
                     return -1;
                 }
             }
@@ -138,7 +125,7 @@ int main(int argc, char** argv){
     auto timeBegin = std::chrono::high_resolution_clock::now();
     bool exitflag = calibrationManager.run();
     auto timeEnd = std::chrono::high_resolution_clock::now();
-    std::cout << "Calibration time: " << std::chrono::duration_cast<std::chrono::minutes>(timeEnd - timeBegin).count() << "minutes" << std::endl;
+    cout << "Calibration time: " << std::chrono::duration_cast<std::chrono::minutes>(timeEnd - timeBegin).count() << "minutes" << endl;
 
     std::exit(exitflag);
 }

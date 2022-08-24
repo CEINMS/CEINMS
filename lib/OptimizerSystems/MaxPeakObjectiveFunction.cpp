@@ -26,24 +26,23 @@
 * limitations under the License.                                             *
 * -------------------------------------------------------------------------- */
 
-#include "ceinms/MaxPeakObjectiveFunction.h"
 #include <vector>
-#include <cmath>
 using std::vector;
+#include <cmath>
+
+#include "ceinms/MaxPeakObjectiveFunction.h"
 
 namespace ceinms {
 
     MaxPeakObjectiveFunction::MaxPeakObjectiveFunction(const ObjectiveFunctionSetup& setup) :
         f_(std::numeric_limits<double>::max()),
-        setup_(setup)
-    {
-    }
+        setup_(setup) { }
 
     void MaxPeakObjectiveFunction::setSetup(const ObjectiveFunctionSetup& setup) {
         setup_ = setup;
     }
 
-    void MaxPeakObjectiveFunction::calculate(const std::vector<Result>& results) {
+    void MaxPeakObjectiveFunction::calculate(const vector<Result>& results) {
         currentMax_.clear();
         f_ = 0;
         for (auto& r : results) {
@@ -70,7 +69,7 @@ namespace ceinms {
         f_ /= (results.size()*setup_.getTargetNames().size());
     }
 
-    vector<double> MaxPeakObjectiveFunction::calculate(const DataTable<double>& result) const{
+    vector<double> MaxPeakObjectiveFunction::calculate(const DataTable<double>& result) const {
         vector<double> trialMax;
         for (auto& target : setup_.getTargetNames()) {
             //this is not very efficient, as it makes a copy of the column
@@ -83,7 +82,6 @@ namespace ceinms {
         }
         return trialMax;
     }
-
 
     vector<double> MaxPeakObjectiveFunction::calculate(const DataTable<SimTK::Vec3>& result) const {
         vector<double> trialMax;
@@ -102,7 +100,6 @@ namespace ceinms {
     }
 
 	bool MaxPeakObjectiveFunction::calculateOpenSimData() const {
-
 		return setup_.getCalibrationTargetType() == CalibrationTargetType::GenericContactForce;
 	}
 

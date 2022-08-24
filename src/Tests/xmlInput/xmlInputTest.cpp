@@ -26,6 +26,14 @@
  * limitations under the License.                                             *
  * -------------------------------------------------------------------------- */
 
+#include <sstream>
+#include <iostream>
+using std::cout;
+using std::endl;
+#include <string>
+using std::string;
+#include <filesystem>
+
 #include "ceinms/NMSmodel.h"
 #include "ceinms/Activation/ExponentialActivation.h"
 #include "ceinms/Tendon/ElasticTendon_BiSec.h"
@@ -34,19 +42,8 @@
 #include "ceinms/ExecutionXmlReader.h"
 #include "ceinms/XmlWriter.h"
 #include "ceinms/CalibrationXmlReader.h"
-#include <sstream>
-#include <iostream>
-using std::cout;
-using std::endl;
-#include <string>
-using std::string;
-#include "boost/filesystem.hpp"
-using boost::filesystem::absolute;
-using boost::filesystem::canonical;
-using boost::filesystem::path;
 
-void testContactModels(std::string filename) {
-    
+void testContactModels(string filename) {
     ceinms::ContactModelXmlReader contactModelReader(filename);
     switch (contactModelReader.getContactModelType()) {
     case ceinms::ContactModelType::OpenSim:
@@ -64,17 +61,15 @@ void testContactModels(std::string filename) {
     }
 }
 
-
-void testExecutionXmlReader(std::string filename) {
-      
-    auto print([](std::vector<std::string> v) {
+void testExecutionXmlReader(string filename) {
+    auto print([](std::vector<string> v) {
         for (auto& e : v) {
             cout << e << " ";
         }
         cout << "\n";
     });
     ceinms::ExecutionXmlReader executionReader(filename);
-    std::vector<std::string> v;
+    std::vector<string> v;
     executionReader.getDofSet(v);
     cout << "DofSet\n";
     print(v);
@@ -89,8 +84,7 @@ void testExecutionXmlReader(std::string filename) {
     v.clear();
 }
 
-void testSubjectXmlFile(std::string inFilename, string outFilename) {
-
+void testSubjectXmlFile(string inFilename, string outFilename) {
 	ceinms::NMSmodel<ceinms::ExponentialActivation, ceinms::ElasticTendon_BiSec, ceinms::CurveMode::Offline> subject1, subject2;
 	ceinms::setupSubject(subject1, inFilename);
 	ceinms::XmlWriter writer(inFilename);
@@ -108,14 +102,13 @@ void testSubjectXmlFile(std::string inFilename, string outFilename) {
 	cout << subject1;
 }
 
-void testCalibrationXmlReader(std::string filename) {
-
+void testCalibrationXmlReader(string filename) {
     ceinms::CalibrationXmlReader reader(filename);
     cout << reader;
 }
 
 int main() {
-    boost::filesystem::path dir = path(BASE_DIR) /= "TestData";
+    std::filesystem::path dir = std::filesystem::path(BASE_DIR) /= "TestData";
     testContactModels((dir / "contactModelKnee.xml").string());
     testExecutionXmlReader((dir / "executionHybrid.xml").string());
 	testSubjectXmlFile((dir / "subject.xml").string(), (dir / "outSubject.xml").string());

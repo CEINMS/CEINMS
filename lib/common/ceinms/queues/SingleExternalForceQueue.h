@@ -29,21 +29,21 @@
 #ifndef ceinms_SingleExternalForcesQueue_h
 #define ceinms_SingleExternalForcesQueue_h
 
+#include "rtb/concurrency/Concurrency.h"
+
 #include "ceinms/QueueData.h"
 
 namespace Concurrency {
+
     template<typename>
     class Queue;
 }
 
-
 namespace ceinms {
 
     class ExternalForceData;
-    using SingleExternalForceFrame = QueueData < ExternalForceData>;
-    using SingleExternalForceQueue = rtb::Concurrency::Queue < SingleExternalForceFrame >;
-
+    using SingleExternalForceFrame = QueueData<ExternalForceData>;
+    using SingleExternalForceQueue = rtb::Concurrency::Queue<SingleExternalForceFrame>;
 }
-
 
 #endif

@@ -26,16 +26,12 @@
  * limitations under the License.                                             *
  * -------------------------------------------------------------------------- */
 
-#include "ceinms/Tendon/ElasticTendon.h"
-#include "ceinms/Tendon/StiffTendon.h"
-#include "ceinms/Odeint.h"
-#include "ceinms/StepperDopr5.h"
+
 #include <iostream>
 using std::cout;
 using std::endl;
 #include <string>
 using std::string;
-
 #include <cmath>
 using std::sin;
 using std::cos;
@@ -43,10 +39,14 @@ using std::cos;
 using std::vector;
 #include "float.h"
 
+#include "ceinms/Tendon/ElasticTendon.h"
+#include "ceinms/Tendon/StiffTendon.h"
+#include "ceinms/Odeint.h"
+#include "ceinms/StepperDopr5.h"
 #include "ceinms/Curve.h"
 #include "ceinms/MTUutils.h"
-#define DEBUG
 
+#define DEBUG
 
 namespace ceinms {
     LDFM::LDFM(double optimalFiberLength,
@@ -82,18 +82,14 @@ namespace ceinms {
         tendonLength_(.0),
         tendonVelocity_(.0),
         tendonStiffness_(.0),
-        optimalFiberLengthAtT_(.0)
-    { }
+        optimalFiberLengthAtT_(.0) { }
 
 
     double LDFM::computePennationAngle() const {
-
         return PennationAngle::compute(fiberLength_, optimalFiberLengthAtT_, pennationAngle_);
     }
 
-
     void LDFM::setInitConditions(double muscleTendonLength, double muscleTendonVelocity, double activation) {
-
         activation_ = activation;
         muscleTendonLength_ = muscleTendonLength;
         muscleTendonVelocity_ = muscleTendonVelocity;
@@ -132,12 +128,9 @@ namespace ceinms {
                     fiberLength_ = muscleThick;
             }
         }
-
     }
 
-
     double LDFM::estimateFiberLength() {
-
         double errorForce = DBL_MAX;
         double errorForceOld = DBL_MAX;
         bool runCondition = true;
@@ -147,7 +140,6 @@ namespace ceinms {
         double fiberLengthTmp = .0, fiberLengthOld = .0;
 
         do {
-
             /* force = maxisoforce * (flcurve+pflcurve) * velocity * pennation
             * calculate active force (af) then passive force (pf) */
 
@@ -247,9 +239,7 @@ namespace ceinms {
         return fiberLength_;
     }
 
-
     void LDFM::updateInitConditions() {
-
         double beta = 1;
         if ((fiberStiffness_ + tendonStiffness_) != 0)
             beta = fiberStiffness_ / (fiberStiffness_ + tendonStiffness_);
@@ -258,9 +248,7 @@ namespace ceinms {
         fiberVelocity_ = (1.0 - beta) * cf * muscleTendonVelocity_;
     }
 
-
     void LDFM::computeMuscleTendonForce() {
-
         double normFiberLength = fiberLength_ / optimalFiberLengthAtT_;
 
         //:TODO: THIS IS WRONG! timeScale_?  0.1 should be timeScale_
@@ -274,12 +262,9 @@ namespace ceinms {
         double pennationAngleAtT = computePennationAngle();
         muscleTendonForce_ = maxIsometricForce_ * strengthCoefficient_ *
             (fa * fv * activation_ + fp + damping_ * normFiberVelocity) * cos(pennationAngleAtT);
-
     }
 
-
     double LDFM::oldEstimation(double muscleTendonLength, double muscleTendonVelocity, double activation) {
-
         const double relTolerance = 1e-3;
         int i, j, count;
         double fiber_stiffness, mthick, tmpfiber_length, min_tendon_stiffness;
@@ -297,52 +282,37 @@ namespace ceinms {
             tendonLength_ = tendonSlackLength_ / optimalFiberLength_;
         }
 
-
         /* now calculate musculotendon velocity; initial guess of velocity distribution
-
-    * puts all velocity in muscle */
+        * puts all velocity in muscle */
 
         fiberVelocity_ = muscleTendonVelocity_;
         tendonVelocity_ = 0.0;
 
 
         /* Make first guess of muscle and tendon lengths. Make muscle length
-
         * lmo so that the LDFEM iterative method just moves down one side of
-
         * the force length curve (i.e. the part of the curve you use is monotonic).
-
         * And if you are including passive muscle force, you start in the middle
-
         * of the combined force-length curve.
-
         */
-
-
 
         mthick = optimalFiberLength_ * sin(pennationAngle_);
 
-        if (muscleTendonLength_ < tendonSlackLength_)
-        {
+        if (muscleTendonLength_ < tendonSlackLength_) {
             fiberLength_ = mthick;
             tendonLength_ = muscleTendonLength_;
         }
-        else
-        {
+        else {
             fiberLength_ = optimalFiberLength_;
             cf = cos(computePennationAngle());
             tendonLength_ = muscleTendonLength_ - fiberLength_*cf;
 
-
             /* Check to make sure tendon is not shorter than its slack length. If it is,
-
             * set the length to its slack length and re-compute muscle length.
-
             */
 
 
-            if (tendonLength_ < tendonSlackLength_)
-            {
+            if (tendonLength_ < tendonSlackLength_) {
 
                 tendonLength_ = tendonSlackLength_;
                 cf = cos(atan(mthick / muscleTendonLength_ - tendonLength_));
@@ -353,26 +323,22 @@ namespace ceinms {
         }
 
         /* the LDFEM (Loan Dynamic Force Estimation Method) loop is done twice. The
-    * first time through, the tendon velocity is assumed to be zero, so all of
-    * the velocity is `in' the muscle. The muscle force is then found iteratively
-    * for this situation. This is done by guessing the length of the muscle and
-    * of the tendon, and calculating their respective forces. If the forces
-    * match (are within MAXIMUMERROR of each other), stop; else change the length
-    * guesses based on the error and try again. Once the muscle force is know
-    * a better estimate of its velocity can be made. The slope of the force-length
-    * curve at this length is compared to the slope of the tendon force-leng
-    * curve, and the velocities are guessed again.
-    */
+        * first time through, the tendon velocity is assumed to be zero, so all of
+        * the velocity is `in' the muscle. The muscle force is then found iteratively
+        * for this situation. This is done by guessing the length of the muscle and
+        * of the tendon, and calculating their respective forces. If the forces
+        * match (are within MAXIMUMERROR of each other), stop; else change the length
+        * guesses based on the error and try again. Once the muscle force is know
+        * a better estimate of its velocity can be made. The slope of the force-length
+        * curve at this length is compared to the slope of the tendon force-leng
+        * curve, and the velocities are guessed again.
+        */
 
         mthick = optimalFiberLength_  * sin(pennationAngle_);
 
-
-        for (j = 0; j < 2; j++)
-        {
+        for (j = 0; j < 2; j++) {
             count = 0;
-            while (1)
-            {
-
+            while (1) {
                 count++;
 
                 /* force = maxisoforce * (flcurve+pflcurve) * velocity * pennation
@@ -403,22 +369,18 @@ namespace ceinms {
                 /* If the error force is less than or equal to a certain percentage
                 * of the muscle's max isometric force, then you're done.
                 */
-                if (count > 1)
-                {
+                if (count > 1) {
                     if (fabs(errorforce) <= relTolerance*(maxIsometricForce_*strengthCoefficient_))
                         break;
-
                 }
 
-                if ((errorforce * olderrorforce) < 0)
-                {
+                if ((errorforce * olderrorforce) < 0) {
                     percent = fabs(errorforce) / (fabs(errorforce) + fabs(olderrorforce));
                     tmpfiber_length = oldfiber_length;
                     oldfiber_length = fiberLength_;
                     fiberLength_ += percent * (tmpfiber_length - fiberLength_);
                 }
-                else /* estimate stiffness of the tendon and muscle */
-                {
+                else /* estimate stiffness of the tendon and muscle */ {
 
                     tendon_stiffness = (maxIsometricForce_) / (tendonSlackLength_)*tendonForceStrainCurve_.getFirstDerivative(tendonstrain);
 
@@ -473,31 +435,29 @@ namespace ceinms {
                 * set the length to its slack length and re-compute muscle length.
                 */
 
-                if (tendonLength_ < tendonSlackLength_)
-                {
+                if (tendonLength_ < tendonSlackLength_) {
 
                     tendonLength_ = tendonSlackLength_;
                     cf = cos(atan(mthick / (muscleTendonLength_ - tendonLength_)));
                     fiberLength_ = (muscleTendonLength_ - tendonLength_) / cf;
                 }
-                if (count >= 100)
-                {
+                if (count >= 100) {
                     force = 0.0;
                     break;
                 }
             }
             /* if the first iteration, adjust the guess of muscle and tendon
-                * velocity now that you know the (quasi) real lengths.
-                * The total musculotendon velocity is distributed between the fibers
-                * and tendon based on their relative stiffnesses (the stiffer componen
-                * gets less velocity). The velocity equation for a pennate muscles is:
-                *    Vmt = Vtend + Vfibers / cos(pennation)
-                * Using the fiber and tendon stiffnesses to distribute velocity:
-                *    Vtend = Vmt * (fiber_stiffness / (fiber_stiffness + tendon_stiffness))
-                * Then plugging the second equation into the first:
-                *    Vfibers = (1-B) * cos(pennation) * Vmt,
-                * where B = (fiber_stiffness / (fiber_stiffness + tendon_stiffness)
-                */
+            * velocity now that you know the (quasi) real lengths.
+            * The total musculotendon velocity is distributed between the fibers
+            * and tendon based on their relative stiffnesses (the stiffer componen
+            * gets less velocity). The velocity equation for a pennate muscles is:
+            *    Vmt = Vtend + Vfibers / cos(pennation)
+            * Using the fiber and tendon stiffnesses to distribute velocity:
+            *    Vtend = Vmt * (fiber_stiffness / (fiber_stiffness + tendon_stiffness))
+            * Then plugging the second equation into the first:
+            *    Vfibers = (1-B) * cos(pennation) * Vmt,
+            * where B = (fiber_stiffness / (fiber_stiffness + tendon_stiffness)
+            */
 
             if (j == 1)
                 break;
@@ -505,14 +465,10 @@ namespace ceinms {
             beta = fiber_stiffness / (fiber_stiffness + tendon_stiffness);
             tendonVelocity_ = muscleTendonVelocity_ * beta;
             fiberVelocity_ = (1.0 - beta) * cf * muscleTendonVelocity_;
-
-
         }
         return fiberLength_;
-
     }
     //*************//
-
 
     template <CurveMode::Mode mode>
     ElasticTendon<mode>::ElasticTendon() :
@@ -538,9 +494,7 @@ namespace ceinms {
         nLmt_(0),
         lmtTime_(.0),
         lmtTimeT1_(.0),
-        id_("")
-    {  }
-
+        id_("") { }
 
     template <CurveMode::Mode mode>
     ElasticTendon<mode>::ElasticTendon(std::string id) :
@@ -566,9 +520,7 @@ namespace ceinms {
         nLmt_(0),
         lmtTime_(.0),
         lmtTimeT1_(.0),
-        id_(id)
-    { }
-
+        id_(id) { }
 
     template <CurveMode::Mode mode>
     ElasticTendon<mode>::ElasticTendon(double optimalFiberLength,
@@ -611,23 +563,17 @@ namespace ceinms {
         nLmt_(0),
         lmtTime_(.0),
         lmtTimeT1_(.0),
-        id_("")
-    {   }
+        id_("") { }
 
 
     template <CurveMode::Mode mode>
-    ElasticTendon<mode>::ElasticTendon(const ElasticTendon<mode>& orig)
-    {
-
+    ElasticTendon<mode>::ElasticTendon(const ElasticTendon<mode>& orig) {
         cout << "ElasticTendon copy constructor. EXIT\n";
         exit(EXIT_FAILURE);
     }
 
-
     template <CurveMode::Mode mode>
-    ElasticTendon<mode>& ElasticTendon<mode>::operator= (const ElasticTendon<mode>& orig)
-    {
-
+    ElasticTendon<mode>& ElasticTendon<mode>::operator= (const ElasticTendon<mode>& orig) {
         optimalFiberLength_ = orig.optimalFiberLength_;
         pennationAngle_ = orig.pennationAngle_;
         tendonSlackLength_ = orig.tendonSlackLength_;
@@ -660,7 +606,6 @@ namespace ceinms {
         return *this;
     }
 
-
     template <CurveMode::Mode mode>
     void ElasticTendon<mode>::setParametersToComputeForces(double optimalFiberLength,
         double pennationAngle,
@@ -681,13 +626,11 @@ namespace ceinms {
         maxContractionVelocity_ = maxContractionVelocity;
     }
 
-
     template <CurveMode::Mode mode>
     void ElasticTendon<mode>::setCurves(const CurveOffline& activeForceLengthCurve,
         const CurveOffline& passiveForceLengthCurve,
         const CurveOffline& forceVelocityCurve,
         const CurveOffline& tendonForceStrainCurve) {
-
 
         activeForceLengthCurve_ = activeForceLengthCurve;
         passiveForceLengthCurve_ = passiveForceLengthCurve;
@@ -696,60 +639,44 @@ namespace ceinms {
 		tendonStrainForceCurve_.resetPointsWith(tendonForceStrainCurve_.getYNodes(), tendonForceStrainCurve_.getXNodes());
     };
 
-
-
     template <CurveMode::Mode mode>
     void ElasticTendon<mode>::setStrengthCoefficient(double strengthCoefficient) {
-
         strengthCoefficient_ = strengthCoefficient;
         resetState();
-
     }
-
 
     template <CurveMode::Mode mode>
     void ElasticTendon<mode>::setTendonSlackLength(double tendonSlackLength) {
-
         tendonSlackLength_ = tendonSlackLength;
         resetState();
-
     }
-
 
     template <CurveMode::Mode mode>
     void ElasticTendon<mode>::setPennationAngle(double pennationAngle) {
-
         pennationAngle_ = pennationAngle;
         resetState();
     }
 
     template <CurveMode::Mode mode>
     void ElasticTendon<mode>::setDamping(double damping) {
-
         damping_ = damping;
         resetState();
     }
 
-
     template <CurveMode::Mode mode>
     void ElasticTendon<mode>::setMaxIsometricForce(double maxIsometricForce) {
-
         maxIsometricForce_ = maxIsometricForce;
         resetState();
     }
 
-
     template <CurveMode::Mode mode>
     void ElasticTendon<mode>::setMaxContractionVelocity(double maxContractionVelocity) {
-
         maxContractionVelocity_ = maxContractionVelocity;
         resetState();
     }
 
-
     template <CurveMode::Mode mode>
     void ElasticTendon<mode>::resetState() {
-
         muscleTendonLength_ = 0.0;
         muscleTendonLengthT1_ = 0.0;
         muscleTendonVelocity_ = 0.0;
@@ -766,11 +693,8 @@ namespace ceinms {
         muscleTendonLengthTrace_.reset();
     }
 
-
     template <CurveMode::Mode mode>
     double ElasticTendon<mode>::getInitialFiberLength(double time) {
-
-
         //   muscleTendonVelocity_ = (muscleTendonLength_ - muscleTendonLengthT1_)/timescale_;
 
         LDFM ldfm(optimalFiberLength_,
@@ -783,8 +707,6 @@ namespace ceinms {
             activeForceLengthCurve_,
             passiveForceLengthCurve_,
             forceVelocityCurve_);
-
-
 
         ldfm.setInitConditions(muscleTendonLength_, muscleTendonVelocity_, activation_);
 
@@ -799,8 +721,6 @@ namespace ceinms {
         * curve at this length is compared to the slope of the tendon force-length
         * curve, and the velocities are guessed again.
         */
-
-
 
         /* if the first iteration, adjust the guess of muscle and tendon
         * velocity now that you know the (quasi) real lengths.
@@ -820,18 +740,13 @@ namespace ceinms {
         return fiberLength_;
     }
 
-
     template <CurveMode::Mode mode>
     void ElasticTendon<mode>::setMuscleTendonLength(double muscleTendonLength, double activation, double time) {
-
-
-
         lmtTimeT1_ = lmtTime_;
         lmtTime_ = time;
         timescale_ = lmtTime_ - lmtTimeT1_;
         activationT1_ = activation_;
         activation_ = activation;
-
 
         muscleTendonLengthT1_ = muscleTendonLength_;
         muscleTendonLength_ = muscleTendonLength;
@@ -843,7 +758,6 @@ namespace ceinms {
 
         fiberLengthT1_ = fiberLength_;
 
-
         //we need the first two values of lmt for getting the initial muscleTendonVelocity value
         //TODO if nLmt_ == 0 do nothing or something like that, verify which one is better
         if (nLmt_ < 3)
@@ -854,10 +768,8 @@ namespace ceinms {
         ++nLmt_;
     }
 
-
     template <CurveMode::Mode mode>
     void ElasticTendon<mode>::updateFiberLengthUsingNewActivation(double activation, double time) {
-
         activation_ = activation;
 
         //we need the first two values of lmt for getting the initial muscleTendonVelocity value
@@ -869,14 +781,10 @@ namespace ceinms {
             fiberLength_ = getFiberLengthRKF();
 
         ++nLmt_;
-
     }
-
 
     template <CurveMode::Mode mode>
     double ElasticTendon<mode>::getFiberLengthRKF() {
-
-
         const int nvar = 1;
         double atol = 1.0e-3, rtol = atol, h1 = 0.01, hmin = 0.0, x1 = lmtTimeT1_, x2 = lmtTime_;
         vector<double> ystart(nvar);
@@ -891,9 +799,7 @@ namespace ceinms {
         //    cout << "rk " << out.ySave_.at(0).at(1);
 
         return out.ySave_.at(0).at(1);
-
     }
-
 
     template <CurveMode::Mode mode>
     void ElasticTendon<mode>::operator() (double x, const std::vector<double>& y, std::vector<double>& dydx) {
@@ -909,16 +815,11 @@ namespace ceinms {
         double muscleTendonVelocityAtT = (delta *(muscleTendonVelocity_ - muscleTendonVelocityT1_) / timescale_) + muscleTendonVelocityT1_;
 
         dydx.at(0) = computeFiberVelocityAtT(muscleTendonLengthAtT, activationAtT, muscleTendonVelocityAtT, y.at(0), timescale_);
-
     }
-
-
 
     //this is the function to integrate
     template <CurveMode::Mode mode>
     double ElasticTendon<mode>::computeFiberVelocityAtT(double muscleTendonLengthAtT, double activationAtT, double muscleTendonVelocityAtT, double fiberLength, double lmtTimescale) {
-
-
         double optimalFiberLengthAtT = optimalFiberLength_ * (percentageChange_ * (1.0 - activationAtT) + 1.0);
         double normFiberLength = fiberLength / optimalFiberLengthAtT;
         double pennationAngleAtT = ceinms::PennationAngle::compute(fiberLength, optimalFiberLength_, pennationAngle_);
@@ -955,11 +856,8 @@ namespace ceinms {
 
             //        normFiberVelocity = 100;
         }
-
-
         else if (fabs(ca) < 0.1) {
-            if (fabs(normTendonForce) < 0.1)  // 0.01 means close to zero, could be changed
-            {
+            if (fabs(normTendonForce) < 0.1)  /* 0.01 means close to zero, could be changed */ {
 #ifdef DEBUG
                 //              if(id_ == "gaslat_r")
                 cout << id_ << " computeFiberVelocityAtT@Z2 \n";
@@ -998,13 +896,10 @@ namespace ceinms {
             cout << (normFiberVelocity * optimalFiberLengthAtT / lmtTimescale) << endl;}*/
 #endif
         return (normFiberVelocity * optimalFiberLengthAtT / lmtTimescale);
-
     }
-
 
     template <CurveMode::Mode mode>
     double ElasticTendon<mode>::computeNormFiberVelocity(double activation, double activeForce, double velocityDependentForce) {
-
         double b, c, fiberVelocity;
 
         double kv = 0.25, slope_k = 0.13, fmax = 1.8;

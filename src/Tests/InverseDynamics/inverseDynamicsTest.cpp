@@ -26,7 +26,21 @@
 * limitations under the License.                                             *
 * -------------------------------------------------------------------------- */
 
+#include <iostream>
+using std::cout;
+using std::endl;
+#include <vector>
+#include <memory>
+#include <string>
+using std::string;
+#include <filesystem>
+
+#include <OpenSim/OpenSim.h>
+using OpenSim::Array;
+using OpenSim::Storage;
+
 #include "rtb/concurrency/Concurrency.h"
+
 #include "ceinms/queues/GeneralisedCoordinatesQueue.h"
 #include "ceinms/queues/MultipleExternalForcesQueue.h"
 #include "ceinms/queues/ExternalTorquesQueue.h"
@@ -40,23 +54,9 @@
 #include "ceinms/GeneralisedCoordinatesFromStorageFile.h"
 #include "ceinms/ExternalForcesFromStorageFile.h"
 #include "ceinms/QueueToStorageFile.h"
-#include <iostream>
-using std::cout;
-using std::endl;
-#include <OpenSim/OpenSim.h>
-using OpenSim::Array;
-using OpenSim::Storage;
-#include <vector>
-#include <memory>
-#include <string>
-using std::string;
-#include <boost/filesystem.hpp>
-using boost::filesystem::path;
-using boost::filesystem::canonical;
 using namespace ceinms;
 
 double calculateRMSE(Array<double> arr1, Array<double> arr2) {
-
     double sum(0);
     size_t sizeArr(std::min(arr1.size(), arr2.size()));
     for (unsigned i(0); i < sizeArr; ++i)
@@ -65,7 +65,6 @@ double calculateRMSE(Array<double> arr1, Array<double> arr2) {
 }
 
 void printTable(vector<string> names, vector<double> errors) {
-
     cout << endl;
     cout << std::setw(40) << "Dof" << std::setw(20) << "RMSE" << endl;
     cout << "          " << std::setfill('-') << std::setw(50) << '-' << endl;
@@ -75,7 +74,6 @@ void printTable(vector<string> names, vector<double> errors) {
 }
 
 void compareSto(const string& f1, const string& f2) {
-
     Storage sto1(f1.c_str());
     Storage sto2(f2.c_str());
     vector<double> errors;
@@ -100,11 +98,10 @@ void compareSto(const string& f1, const string& f2) {
 }
 
 int main() {
-
-    path dataDir(canonical(BASE_DIR) / "Data");
-    path inputDir(dataDir / "input");
-    path outputDir(dataDir / "output");
-    path outputReferenceDir(dataDir / "outputReference");
+    std::filesystem::path dataDir(std::filesystem::canonical(BASE_DIR) / "Data");
+    std::filesystem::path inputDir(dataDir / "input");
+    std::filesystem::path outputDir(dataDir / "output");
+    std::filesystem::path outputReferenceDir(dataDir / "outputReference");
 
     string osimModelFilename((inputDir / "model.osim").string());
     string kinematicsStorageFilename((inputDir / "ik.mot").string());

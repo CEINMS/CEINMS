@@ -29,11 +29,13 @@
 #ifndef ceinms_GeneralisedCoordinatesQueue_h
 #define ceinms_GeneralisedCoordinatesQueue_h
 
-#include "ceinms/QueueData.h"
-#include "ceinms/GeneralisedCoordinatesData.h"
 #include <rtb/concurrency/Queue.h>
 
+#include "ceinms/QueueData.h"
+#include "ceinms/GeneralisedCoordinatesData.h"
+
 namespace Concurrency {
+
     template<typename>
     class Queue;
 }
@@ -42,7 +44,6 @@ namespace ceinms {
 
     using GeneralisedCoordinatesFrame = QueueData < GeneralisedCoordinatesData >;
     using GeneralisedCoordinatesQueue = rtb::Concurrency::Queue < GeneralisedCoordinatesFrame >;
-
 }
 
 #endif

@@ -26,6 +26,9 @@
  * limitations under the License.                                             *
  * -------------------------------------------------------------------------- */
 
+#include <iostream>
+#include <stdlib.h>
+
 #include "HybridWeightings.h"
 #include "StaticComputation.h"
 #include "StaticComputationMode/Default.h"
@@ -33,14 +36,11 @@
 #include "ObjectiveFunction/MinTorqueTrackEMGs.h"
 #include "SimulatedAnnealingBase.h"
 
-#include <iostream>
-#include <stdlib.h>
-
 namespace ceinms {
+
     namespace Hybrid {
 
-
-        template <typename NMSmodelT>
+        template<typename NMSmodelT>
         ErrorMinimizerAnnealing<NMSmodelT>::ErrorMinimizerAnnealing(NMSmodelT& subject)
             :subject_(subject) {
 
@@ -54,21 +54,16 @@ namespace ceinms {
 
         template<typename NMSmodelT>
         void ErrorMinimizerAnnealing<NMSmodelT>::setMusclesNamesWithEmgToTrack(const vector<string>& musclesNamesWithEmgToTrack) {
-
             musclesNamesWithEmgToTrack_.assign(musclesNamesWithEmgToTrack.begin(), musclesNamesWithEmgToTrack.end());
         }
 
-
         template<typename NMSmodelT>
         void ErrorMinimizerAnnealing<NMSmodelT>::setMusclesNamesWithEmgToPredict(const vector<string>& musclesNamesWithEmgToPredict) {
-
             musclesNamesWithEmgToPredict_.assign(musclesNamesWithEmgToPredict.begin(), musclesNamesWithEmgToPredict.end());
         }
 
-
         template<typename NMSmodelT>
         void ErrorMinimizerAnnealing<NMSmodelT>::setSingleExternalTorque(double externalTorque, const string& whichDof) {
-
             vector<string>::const_iterator it = subjectDofNames_.begin();
             while (*it != whichDof && it != subjectDofNames_.end())
                 ++it;
@@ -81,21 +76,16 @@ namespace ceinms {
                 std::cout << "ErrorMinimizer::setSingleExternalTorque ERROR\n" << whichDof << " not found in the subject\n";
                 exit(EXIT_FAILURE);
             }
-
         }
-
 
         template<typename NMSmodelT>
         void ErrorMinimizerAnnealing<NMSmodelT>::setAllExternalTorques(vector<double> externalTorques, const vector<string>& dofs) {
-
             currentExternalTorques_ = externalTorques;
             currentDofNames_ = dofs;
         }
 
-
         template<typename NMSmodelT>
         void ErrorMinimizerAnnealing<NMSmodelT>::setAnnealingParameters(unsigned nt, unsigned ns, double rt, double t, unsigned maxNoEval, double epsilon, unsigned noEpsilon) {
-
             nt_ = nt;
             ns_ = ns;
             rt_ = rt;
@@ -104,7 +94,6 @@ namespace ceinms {
             epsilon_ = epsilon;
             noEpsilon_ = noEpsilon;
         }
-
 
         template <typename NMSmodelT>
         void ErrorMinimizerAnnealing<NMSmodelT>::minimize() {
@@ -148,6 +137,5 @@ namespace ceinms {
             cout << endl;
             subject_.updateState_END_OF_HYBRID_MINIMIZATION();
         }
-
     };
 }

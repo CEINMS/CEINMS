@@ -30,6 +30,7 @@
 #define ceinms_ExternalTorquesQueue_h
 
 #include <vector>
+
 #include "ceinms/queues/ScalarVectorQueue.h"
 
 namespace ceinms {

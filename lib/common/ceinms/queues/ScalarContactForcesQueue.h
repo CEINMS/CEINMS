@@ -30,10 +30,12 @@
 #define ceinms_ScalarContactForcesQueue_h
 
 #include <vector>
+
 #include "ceinms/QueueData.h"
 #include "ceinms/queues/ScalarVectorQueue.h"
 
 namespace Concurrency {
+
     template<typename>
     class Queue;
 }
@@ -41,7 +43,7 @@ namespace Concurrency {
 namespace ceinms {
 
     using ScalarContactForcesFrame = ScalarVectorFrame;
-    using ScalarContactForcesQueue = rtb::Concurrency::Queue < ScalarContactForcesFrame > ;
+    using ScalarContactForcesQueue = rtb::Concurrency::Queue<ScalarContactForcesFrame>;
 }
 
 #endif

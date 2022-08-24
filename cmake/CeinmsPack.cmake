@@ -1,7 +1,15 @@
 
 if (WIN32)
 
-find_file(xerces_dll NAMES "xerces-c_3_1.dll" PATHS "C:/xerces-c-3.1.3_32r/bin" PATH)
+find_file(xerces_dll
+    NAMES
+        "xerces-c_3_1.dll"
+        "xerces-c_3_1_vc100.dll"
+    PATHS
+        "C:/xerces-c-3.1.3_32r/bin"
+        "C:/Program Files (x86)/CodeSynthesis XSD 4.0/bin64"
+        # Add path for linux
+    PATH)
 install(PROGRAMS ${xerces_dll} DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT ThirdParty)
 install(PROGRAMS ${OPENSIM_LIBRARIES} DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT ThirdParty)
 message("OpenSim libraries in CPack  ${OPENSIM_LIBRARIES}")

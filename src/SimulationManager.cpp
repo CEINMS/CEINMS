@@ -26,6 +26,15 @@
  * limitations under the License.                                             *
  * -------------------------------------------------------------------------- */
 
+#include <string>
+using std::string;
+#include <iostream>
+using std::cout;
+using std::endl;
+#include <algorithm>
+using std::end;
+using std::begin;
+
 #include "ceinms/CeinmsSetupXmlReader.h"
 #include "ceinms/NMSmodel.h"
 
@@ -59,7 +68,6 @@
 #include "ceinms/QueuesToInverseDynamics.h"
 #include "ceinms/QueuesToKneeBalanceContactForces.h"
 
-#include "rtb/concurrency/Concurrency.h"
 #include "ceinms/queues/VecContactForcesQueue.h"
 #include "ceinms/queues/ScalarContactForcesQueue.h"
 #include "ceinms/queues/EmgQueue.h"
@@ -77,32 +85,19 @@
 #include "ceinms/BatchEvaluator.h"
 #include "ceinms/FileUtils.h"
 
-#include <string>
-using std::string;
-
-#include <iostream>
-using std::cout;
-using std::endl;
-#include <algorithm>
-using std::end;
-using std::begin;
-
-
+#include "rtb/concurrency/Concurrency.h"
 
 double rmse(const std::vector<double>& v1, const std::vector<double>& v2) {
-
     double sum = 0;
     for (int i(0); i < v1.size(); ++i) {
         sum += (v1[i] - v2[i])*(v1[i] - v2[i]);
     }
     sum /= v1.size();
     return std::sqrt(sum);
-
 }
 
 template<typename NMSmodelT>
 ceinms::TrialData readTrialData(ceinms::InputDataXmlReader dataLocations, NMSmodelT& mySubject, const string& emgGeneratorFile) {
-
     ceinms::EmgQueue emgQueue;
     ceinms::LmtQueue lmtQueue;
     ceinms::ExternalTorquesQueue externalTorqueQueue;
@@ -114,9 +109,9 @@ ceinms::TrialData readTrialData(ceinms::InputDataXmlReader dataLocations, NMSmod
     string emgFilename(dataLocations.getExcitationsFile());
     ceinms::EmgFromFile emgProducer(emgQueue, doneWithSubscription, doneWithExecution, mySubject, emgFilename, emgGeneratorFile);
 
-    vector< string > dofNames;
+    vector<string> dofNames;
     mySubject.getDoFNames(dofNames);
-    vector< string > maFilename;
+    vector<string> maFilename;
     ceinms::FileUtils::sortMaFilenames(dataLocations.getMaFiles(), dofNames, maFilename);
     ceinms::LmtMaFromStorageFile lmtMaProducer(lmtQueue, momentArmsQueues, doneWithSubscription, doneWithExecution, mySubject, dataLocations.getLmtFile(), maFilename);
 
@@ -128,7 +123,7 @@ ceinms::TrialData readTrialData(ceinms::InputDataXmlReader dataLocations, NMSmod
     doneWithSubscription.setCount(4);
     doneWithExecution.setCount(4);
 
-    // 4. start the threads
+    // start the threads
     std::thread emgProdThread(std::ref(emgProducer));
     std::thread externalTorquesProdThread(std::ref(externalTorquesProducer));
     std::thread lmtMaProdThread(std::ref(lmtMaProducer));
@@ -139,9 +134,8 @@ ceinms::TrialData readTrialData(ceinms::InputDataXmlReader dataLocations, NMSmod
     externalTorquesProdThread.join();
     queuesToTrialDataThread.join();
 
-    if (!queuesToTrialData.getTrialData().isConsistent())
-    {
-        std::cout << "ERROR: No data was read for trial " << std::endl;
+    if (!queuesToTrialData.getTrialData().isConsistent()) {
+        cout << "ERROR: No data was read for trial " << endl;
         exit(EXIT_FAILURE);
     }
 
@@ -151,9 +145,6 @@ ceinms::TrialData readTrialData(ceinms::InputDataXmlReader dataLocations, NMSmod
     return trial;
 }
 
-
-
-
 namespace ceinms {
 
     SimulationManager::SimulationManager(const string& setupFilename) :
@@ -162,8 +153,7 @@ namespace ceinms {
         executionCfg_(ceinmsSetup_.getExecutionFile()),
         subjectFile_(ceinmsSetup_.getSubjectFile()),
         outputDirectory_(ceinmsSetup_.getOutputDirectory()),
-        emgGeneratorFile_(ceinmsSetup_.getExcitationGeneratorFile())
-    {
+        emgGeneratorFile_(ceinmsSetup_.getExcitationGeneratorFile()) {
 
         SubjectXmlReader subjectReader(ceinmsSetup_.getSubjectFile());
         hasContactModel_ = subjectReader.hasContactModel();
@@ -172,13 +162,13 @@ namespace ceinms {
             cout << "found" << endl;
             contactModelCfg_.setXmlInputFile(subjectReader.getContactModelFile());
         }
-        else
+        else {
             cout << " not found" << endl;
+        }
     }
 
-    template <typename NMSmodelT, template <typename, typename> class ModelEvaluatorT, typename LoggerT>
+    template<typename NMSmodelT, template <typename, typename> class ModelEvaluatorT, typename LoggerT>
     bool SimulationManager::runOpenLoop(bool useContactForces) {
-
         if (useContactForces) {
             switch (contactModelCfg_.getContactModelType()) {
             case ContactModelType::OpenSim:
@@ -189,14 +179,14 @@ namespace ceinms {
                 break;
             }
         }
-        else
+        else {
             runOpenLoop< NMSmodelT, ModelEvaluatorT, LoggerT >();
+        }
         return true;
     }
 
-    template <typename NMSmodelT, template <typename, typename> class ModelEvaluatorT, typename LoggerT>
+    template<typename NMSmodelT, template <typename, typename> class ModelEvaluatorT, typename LoggerT>
     bool SimulationManager::runOpenLoopWithKneeBalanceContactModel() {
-
         //Create queues for input data
         EmgQueue emgQueue;
         LmtQueue lmtQueue;
@@ -218,9 +208,9 @@ namespace ceinms {
         string emgFilename(dataLocations_.getExcitationsFile());
         EmgFromFile emgProducer(emgQueue, doneWithSubscriptionsLatch, doneWithExecutionLatch, mySubject, emgFilename, emgGeneratorFile_);
 
-        vector< string > dofNames;
+        vector<string> dofNames;
         mySubject.getDoFNames(dofNames);
-        vector< string > maFilename;
+        vector<string> maFilename;
         ceinms::FileUtils::sortMaFilenames(dataLocations_.getMaFiles(), dofNames, maFilename);
         LmtMaFromStorageFile lmtMaProducer(lmtQueue, momentArmsQueues, doneWithSubscriptionsLatch, doneWithExecutionLatch, mySubject, dataLocations_.getLmtFile(), maFilename);
 		lmtMaProducer.setStartStopTimes(dataLocations_.getStartTime(), dataLocations_.getStopTime());
@@ -268,7 +258,7 @@ namespace ceinms {
             contactModelCfg_.getContactModelSetupKneeBalance(),
             mySubject);
 
-        const vector<string> contactForcesNames{
+        const vector<string> contactForcesNames {
             contactModelCfg_.getContactModelSetupKneeBalance().condyle1.name + "_force",
             contactModelCfg_.getContactModelSetupKneeBalance().condyle2.name + "_force",
         };
@@ -305,9 +295,9 @@ namespace ceinms {
         return 0;
     }
 
-    template <typename NMSmodelT, template <typename, typename> class ModelEvaluatorT, typename LoggerT>
+    template<typename NMSmodelT, template <typename, typename> class ModelEvaluatorT, typename LoggerT>
     bool SimulationManager::runOpenLoopWithGenericContactModel() {
-        std::cout << "runOpenLoopWithGenericContactModel" << endl;
+        cout << "runOpenLoopWithGenericContactModel" << endl;
         //Create queues for input data
         EmgQueue emgQueue;
         LmtQueue lmtQueue;
@@ -327,25 +317,25 @@ namespace ceinms {
 
         NMSmodelT mySubject;
         setupSubject(mySubject, subjectFile_, executionCfg_.getTolerance());
-        std::string osimModelFilename = mySubject.getOpenSimModelFilename();
+        string osimModelFilename = mySubject.getOpenSimModelFilename();
         try {
             OpenSim::Model testModel(osimModelFilename);
-            std::cout << "Found valid OpenSim model: " << osimModelFilename << std::endl;
+            cout << "Found valid OpenSim model: " << osimModelFilename << endl;
         }
-        catch (...)
-        {
-            std::cout << "OpenSim model not valid: " << osimModelFilename << std::endl;
+        catch (...) {
+            cout << "OpenSim model not valid: " << osimModelFilename << endl;
             exit(EXIT_FAILURE);
 
         }
+
         // 2. define the thread connecting with the input sources
-        std::cout << "-- define the threads connecting with the input sources" << endl;
+        cout << "-- define the threads connecting with the input sources" << endl;
         string emgFilename(dataLocations_.getExcitationsFile());
         EmgFromFile emgProducer(emgQueue, doneWithSubscriptionsLatch, doneWithExecutionLatch, mySubject, emgFilename, emgGeneratorFile_);
 
-        vector< string > dofNames;
+        vector<string> dofNames;
         mySubject.getDoFNames(dofNames);
-        vector< string > maFilename;
+        vector<string> maFilename;
         ceinms::FileUtils::sortMaFilenames(dataLocations_.getMaFiles(), dofNames, maFilename);
         LmtMaFromStorageFile lmtMaProducer(lmtQueue, momentArmsQueues, doneWithSubscriptionsLatch, doneWithExecutionLatch, mySubject, dataLocations_.getLmtFile(), maFilename);
 		lmtMaProducer.setStartStopTimes(dataLocations_.getStartTime(), dataLocations_.getStopTime());
@@ -409,6 +399,7 @@ namespace ceinms {
             osimModelFilename,
             dataLocations_.getMotionFile(),
             8);
+
        //2 create external forces produces
         cout << "-- Initialise external forces produces" << endl;
         ExternalForcesFromStorageFile externalForcesFromStorageFile(
@@ -436,9 +427,9 @@ namespace ceinms {
                 outputDirectory_);
                 */
         OpenSim::Model osimModel(osimModelFilename);
-        OpenSim::Array<std::string> osimCoordNames;
+        OpenSim::Array<string> osimCoordNames;
         osimModel.getCoordinateSet().getNames(osimCoordNames);
-        std::vector<std::string> coordNames;
+        std::vector<string> coordNames;
         ArrayConverter::toStdVector(osimCoordNames, coordNames);
         //QueueToStorageFile<ExternalTorquesData> externalTorquesLogger(
         //    torquesFromIDQueue,
@@ -485,7 +476,7 @@ namespace ceinms {
         queuesToStorageFilesThread.join();
         contactForcesEstimatorThread.join();
         generalisedCoordinateThread.join();
-        externalForcesThread.join();      //NEED TO UNCOMMENT
+        externalForcesThread.join();
         contactForcesLoggerThread.join();
         //intersegmentalForcesLoggerThread.join();
         //inverseDynamicsSolverThread.join();
@@ -494,9 +485,8 @@ namespace ceinms {
         return 0;
     }
 
-    template <typename NMSmodelT, template <typename, typename> class ModelEvaluatorT, typename LoggerT>
+    template<typename NMSmodelT, template <typename, typename> class ModelEvaluatorT, typename LoggerT>
     bool SimulationManager::runOpenLoop() {
-
         //Create queues for input data
         EmgQueue emgQueue;
         LmtQueue lmtQueue;
@@ -517,9 +507,9 @@ namespace ceinms {
         string emgFilename(dataLocations_.getExcitationsFile());
         EmgFromFile emgProducer(emgQueue, doneWithSubscriptionsLatch, doneWithExecutionLatch, mySubject, emgFilename, emgGeneratorFile_);
 
-        vector< string > dofNames;
+        vector<string> dofNames;
         mySubject.getDoFNames(dofNames);
-        vector< string > maFilename;
+        vector<string> maFilename;
         ceinms::FileUtils::sortMaFilenames(dataLocations_.getMaFiles(), dofNames, maFilename);
         LmtMaFromStorageFile lmtMaProducer(lmtQueue, momentArmsQueues, doneWithSubscriptionsLatch, doneWithExecutionLatch, mySubject, dataLocations_.getLmtFile(), maFilename);
 		lmtMaProducer.setStartStopTimes(dataLocations_.getStartTime(), dataLocations_.getStopTime());
@@ -538,6 +528,7 @@ namespace ceinms {
 			"TendonLengths",
 			"NormTendonLengths",
             "MusclesContribution" };
+
         // 2b. define the thread consuming the output sources
         vector<string> valuesToWrite = dataToLog;
 		ceinms::initialiseQueue(logQueue, valuesToWrite);
@@ -575,10 +566,8 @@ namespace ceinms {
         return 0;
     }
 
-
-    template <typename NMSmodelT>
+    template<typename NMSmodelT>
     bool SimulationManager::runHybrid(bool useContactForces) {
-
         if (useContactForces) {
             switch (contactModelCfg_.getContactModelType()) {
             case ContactModelType::OpenSim:
@@ -589,11 +578,11 @@ namespace ceinms {
                 break;
             }
         }
-        else
+        else {
             runHybrid<NMSmodelT>();
+        }
         return true;
     }
-
 
     template <typename NMSmodelT>
     bool SimulationManager::runHybridWithGenericContactModel() {
@@ -617,24 +606,24 @@ namespace ceinms {
         NMSmodelT mySubject;
         setupSubject(mySubject, subjectFile_, executionCfg_.getTolerance());
         
-        std::string osimModelFilename = mySubject.getOpenSimModelFilename();
+        string osimModelFilename = mySubject.getOpenSimModelFilename();
         try {
             OpenSim::Model testModel(osimModelFilename);
-            std::cout << "Found valid OpenSim model: " << osimModelFilename << std::endl;
+            cout << "Found valid OpenSim model: " << osimModelFilename << endl;
         }
-        catch (...)
-        {
-            std::cout << "OpenSim model not valid: " << osimModelFilename << std::endl;
+        catch (...) {
+            cout << "OpenSim model not valid: " << osimModelFilename << endl;
             exit(EXIT_FAILURE);
 
         }
+
         // 2. define the thread connecting with the input sources
         string emgFilename(dataLocations_.getExcitationsFile());
         EmgFromFile emgProducer(emgQueue, doneWithSubscriptionsLatch, doneWithExecutionLatch, mySubject, emgFilename, emgGeneratorFile_);
 
-        vector< string > dofNames;
+        vector<string> dofNames;
         mySubject.getDoFNames(dofNames);
-        vector< string > maFilename;
+        vector<string> maFilename;
         ceinms::FileUtils::sortMaFilenames(dataLocations_.getMaFiles(), dofNames, maFilename);
         LmtMaFromStorageFile lmtMaProducer(lmtQueue, momentArmsQueues, doneWithSubscriptionsLatch, doneWithExecutionLatch, mySubject, dataLocations_.getLmtFile(), maFilename);
 		lmtMaProducer.setStartStopTimes(dataLocations_.getStartTime(), dataLocations_.getStopTime());
@@ -653,6 +642,7 @@ namespace ceinms {
 			"NormTendonLengths",
             "AdjustedEmgs",
             "MusclesContribution" };
+
         // 2b. define the thread consuming the output sources
 		dataToLog.push_back("ObjectiveFunctionComponentsAndWeightings");
         vector<string> valuesToWrite = dataToLog;
@@ -682,7 +672,6 @@ namespace ceinms {
             mySubject,
             errorMinimizer,
             valuesToWrite);
-
 
         // 4. start contact model stuff
         cout << "-- initialise contact model" << endl;
@@ -717,6 +706,7 @@ namespace ceinms {
 			"ObjectiveFunctionComponentsAndWeightings",
 			outputDirectory_
 		);
+
         //2 create external forces produces
         cout << "-- Initialise external forces produces" << endl;
         ExternalForcesFromStorageFile externalForcesFromStorageFile(
@@ -736,9 +726,9 @@ namespace ceinms {
             outputDirectory_);
 
         OpenSim::Model osimModel(osimModelFilename);
-        OpenSim::Array<std::string> osimCoordNames;
+        OpenSim::Array<string> osimCoordNames;
         osimModel.getCoordinateSet().getNames(osimCoordNames);
-        std::vector<std::string> coordNames;
+        std::vector<string> coordNames;
         ArrayConverter::toStdVector(osimCoordNames, coordNames);
 
         doneWithSubscriptionsLatch.setCount(10);
@@ -757,7 +747,6 @@ namespace ceinms {
         std::thread contactForcesLoggerThread(std::ref(contactForcesLogger));
 		std::thread hybridErrorLoggerThread(std::ref(hybridErrorLogger));
 
-
         emgProdThread.join();
         lmtMaProdThread.join();
         externalTorquesProdThread.join();
@@ -770,12 +759,11 @@ namespace ceinms {
 		hybridErrorLoggerThread.join();
 
         return 0;
-
     }
 
-	template <typename NMSmodelT>
+	template<typename NMSmodelT>
 	bool SimulationManager::runHybridWithKneeBalanceContactModel() {
-		std::cout << "runHybridWithKneeBalanceContactModel" << endl;
+		cout << "runHybridWithKneeBalanceContactModel" << endl;
 		//Create queues for input data
 		EmgQueue emgQueue;
 		LmtQueue lmtQueue;
@@ -797,9 +785,9 @@ namespace ceinms {
 		string emgFilename(dataLocations_.getExcitationsFile());
 		EmgFromFile emgProducer(emgQueue, doneWithSubscriptionsLatch, doneWithExecutionLatch, mySubject, emgFilename, emgGeneratorFile_);
 
-		vector< string > dofNames;
+		vector<string> dofNames;
 		mySubject.getDoFNames(dofNames);
-		vector< string > maFilename;
+		vector<string> maFilename;
 		ceinms::FileUtils::sortMaFilenames(dataLocations_.getMaFiles(), dofNames, maFilename);
 		LmtMaFromStorageFile lmtMaProducer(
 			lmtQueue,
@@ -848,7 +836,6 @@ namespace ceinms {
 			setup.dofsToTrack = mySubject.getDoFNames();
 		NMSmodelFrameOptimisation<NMSmodelT> errorMinimizer(mySubject, setup);
 
-
 		ModelEvaluationHybrid<NMSmodelT, NMSmodelFrameOptimisation<NMSmodelT>, LoggerOnQueues> simulator(
 			emgQueue,
 			lmtQueue,
@@ -867,8 +854,7 @@ namespace ceinms {
 			doneWithExecutionLatch,
 			{ "TorqueError", "SumExcitation", "ExcitationTrackingError", "alpha", "beta", "gamma" },
 			"ObjectiveFunctionComponentsAndWeightings",
-			outputDirectory_
-		);
+			outputDirectory_);
 
 		ScalarContactForcesQueue outputContactForcesQueue;
 		//5. define contact forces estimator
@@ -918,10 +904,8 @@ namespace ceinms {
 		return 0;
 	}
 		
-
-    template <typename NMSmodelT>
+    template<typename NMSmodelT>
     bool SimulationManager::runHybrid() {
-
         //Create queues for input data
         EmgQueue emgQueue;
         LmtQueue lmtQueue;
@@ -943,9 +927,9 @@ namespace ceinms {
         string emgFilename(dataLocations_.getExcitationsFile());
         EmgFromFile emgProducer(emgQueue, doneWithSubscriptionsLatch, doneWithExecutionLatch, mySubject, emgFilename, emgGeneratorFile_);
 
-        vector< string > dofNames;
+        vector<string> dofNames;
         mySubject.getDoFNames(dofNames);
-        vector< string > maFilename;
+        vector<string> maFilename;
         ceinms::FileUtils::sortMaFilenames(dataLocations_.getMaFiles(), dofNames, maFilename);
         LmtMaFromStorageFile lmtMaProducer(lmtQueue, momentArmsQueues, doneWithSubscriptionsLatch, doneWithExecutionLatch, mySubject, dataLocations_.getLmtFile(), maFilename);
 		lmtMaProducer.setStartStopTimes(dataLocations_.getStartTime(), dataLocations_.getStopTime());
@@ -964,6 +948,7 @@ namespace ceinms {
 			"NormTendonLengths",
             "AdjustedEmgs",
             "MusclesContribution"};
+        
         // 2b. define the thread consuming the output sources
 		dataToLog.push_back("ObjectiveFunctionComponentsAndWeightings");
 		vector<string> valuesToWrite = dataToLog;
@@ -984,7 +969,6 @@ namespace ceinms {
      
         NMSmodelFrameOptimisation<NMSmodelT> errorMinimizer(mySubject, setup);
 
-
         ModelEvaluationHybrid<NMSmodelT, NMSmodelFrameOptimisation<NMSmodelT>, LoggerOnQueues> simulator(
             emgQueue,
             lmtQueue,
@@ -1003,8 +987,7 @@ namespace ceinms {
             doneWithExecutionLatch,
             { "TorqueError", "SumExcitation", "ExcitationTrackingError", "alpha", "beta", "gamma" },
             "ObjectiveFunctionComponentsAndWeightings",
-            outputDirectory_
-        );
+            outputDirectory_);
 
         doneWithSubscriptionsLatch.setCount(6);
         doneWithExecutionLatch.setCount(6);
@@ -1027,7 +1010,6 @@ namespace ceinms {
     }
 
     bool SimulationManager::run() {
-
         bool exitFlag(0);
 
         NMSModelCfg::RunMode runMode = executionCfg_.getRunMode();
@@ -1073,5 +1055,4 @@ namespace ceinms {
 
         return exitFlag;
     }
-
 }

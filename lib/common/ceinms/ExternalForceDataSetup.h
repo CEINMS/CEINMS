@@ -28,14 +28,15 @@
 
 #ifndef ceinms_ExternalForceDataSetup_h
 #define ceinms_ExternalForceDataSetup_h
+
 #include <string>
 #include <vector>
+
 #include <OpenSim/OpenSim.h>
 
 namespace ceinms {
 
     struct ExternalForceDataSetup {
-
         std::string name;
         std::string forceIdentifier;
         std::string pointIdentifier;

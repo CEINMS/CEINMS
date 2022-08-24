@@ -35,7 +35,8 @@ class StepperBase {
 public:
     StepperBase(std::vector<double>& y, std::vector<double>& dydx, double& x, const double aTol,
                 const double rTol, bool dense) : x_(x), y_(y), dydx_(dydx), aTol_(aTol),
-    rTol_(rTol), dense_(dense), n_(y.size()) ,nEqn_(y.size()), yOut_(y.size()),yErr_(y.size()) {}
+                rTol_(rTol), dense_(dense), n_(y.size()) ,nEqn_(y.size()), yOut_(y.size()),
+                yErr_(y.size()) { }
 
     double& x_;
     double xOld_;

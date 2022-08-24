@@ -28,15 +28,16 @@
 
 #ifndef ceinms_CircularVector_h
 #define ceinms_CircularVector_h
+
 #include <array>
 #include <iostream>
 
 namespace ceinms {
+
     template<typename T, size_t N = 15>
     class CircularVector {
-
     public:
-        using container_type = std::array < T, N > ;
+        using container_type = std::array <T, N> ;
         CircularVector();
         CircularVector(const CircularVector& rhs);
         CircularVector& operator=(const CircularVector& rhs);
@@ -59,17 +60,16 @@ namespace ceinms {
         unsigned getMaxsize() const { return N; }
         unsigned size() const;
         bool empty() const;
+
     private:
         bool isFull();
         bool isEmpty();
         container_type v_;
         unsigned beg_, count_;
-
     };
 
     template<typename T, size_t N>
     std::ostream& operator<< (std::ostream & out, const  CircularVector<T, N>& rhs) {
-
         out << "{";
         if (!rhs.empty()) {
             for (size_t i(0); i < rhs.size() - 1; ++i)

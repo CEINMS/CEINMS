@@ -35,7 +35,7 @@
 
 #include "HybridWeightings.h"
 
-//this is an old implementation, has to be sobstituted by the new one.. one day
+//this is an old implementation, has to be substituted by the new one.. one day
 namespace ceinms {
     // This is implementation is from the paper
     // Global Optimization of Statistical Functions with Simulated Annealing
@@ -45,15 +45,12 @@ namespace ceinms {
     template<typename NMSmodelT, typename Parameters, typename ObjectiveFunction, typename StaticComputationT>
     class SimulatedAnnealingBase;
 
-
     template<typename NMSmodelT, typename Parameters, typename ObjectiveFunction, typename StaticComputationT>
     std::ostream& operator<< (std::ostream&, const SimulatedAnnealingBase<NMSmodelT, Parameters, ObjectiveFunction, StaticComputationT>& sa);
 
     template<typename NMSmodelT, typename Parameters, typename ObjectiveFunction, typename StaticComputationT>
     class SimulatedAnnealingBase {
-
     public:
-
         SimulatedAnnealingBase() {}
         SimulatedAnnealingBase(unsigned nt, unsigned ns, double rt, double t, unsigned maxNoEval);
         SimulatedAnnealingBase(NMSmodelT& mySubject,
@@ -91,10 +88,8 @@ namespace ceinms {
         double              rt_;
         double              t_;
         unsigned            maxNoEval_;
-
     };
-
 }
-#include "SimulatedAnnealingBase.cpp"
 
+#include "SimulatedAnnealingBase.cpp"
 #endif

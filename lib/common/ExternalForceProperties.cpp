@@ -3,12 +3,10 @@
 namespace ceinms {
 
     ExternalForceProperties::ExternalForceProperties(const SimTK::Xml::Element& element) {
-
         parseElement(element);
     }
 
     void ExternalForceProperties::parseElement(SimTK::Xml::Element elt) {
-
         SimTK::Xml::attribute_iterator ap = elt.attribute_begin();
         if (ap->getName() == "name")
             name_ = ap->getValue();
@@ -56,7 +54,6 @@ namespace ceinms {
     }
 
     void ExternalForceProperties::print() {
-
         std::cout
             << "applied_to_body: " << applied_to_body_ << std::endl
             << "force_expressed_in_body: " << force_expressed_in_body_ << std::endl

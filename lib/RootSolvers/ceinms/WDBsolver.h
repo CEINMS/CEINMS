@@ -32,19 +32,17 @@
 #include <limits>
 #include <math.h>
 
-template <typename T> int sgn(T val) {
+template<typename T> int sgn(T val) {
     return (T(0) < val) - (val < T(0));
 }
 
-template <typename T>
+template<typename T>
 T sign(const T& a, const T& b) {
-
-        return sgn(b)*fabs(a);
+    return sgn(b)*fabs(a);
 }
 
-template <typename T>
+template<typename T>
 double wdbSolve(T &func, double x1, double x2, double tol) {
-
     const int ITMAX = 100;
     const double EPS = std::numeric_limits<double>::epsilon();
 
@@ -108,6 +106,5 @@ double wdbSolve(T &func, double x1, double x2, double tol) {
     }
     throw("Maximum number of iterations exceeded in zbrent");
 }
-
 
 #endif

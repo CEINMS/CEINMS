@@ -28,14 +28,15 @@
 
 #ifndef ceinms_ElasticTendon_h
 #define ceinms_ElasticTendon_h
-#include "ceinms/Curve.h"
+
 #include <string>
 
+#include "ceinms/Curve.h"
 
 // class for the initial fiber legth computation. #Revised#
 namespace ceinms {
-    class LDFM {
 
+    class LDFM {
     public:
         typedef Curve<CurveMode::Offline> CurveOffline;
         LDFM()  {}
@@ -52,7 +53,6 @@ namespace ceinms {
             const CurveOffline& tendonForceStrainCurve);
         virtual ~LDFM() {}
 
-
         void   setInitConditions(double muscleTendonLength, double muscleTendonVelocity, double activation);
         double estimateFiberLength();
         double oldEstimation(double muscleTendonLength, double muscleTendonVelocity, double activation);
@@ -61,7 +61,6 @@ namespace ceinms {
         void   updateInitConditions();
         void computeMuscleTendonForce();
         double computePennationAngle() const;
-
 
         //** parameters from MTU
         double optimalFiberLength_;
@@ -77,13 +76,11 @@ namespace ceinms {
         CurveOffline tendonForceStrainCurve_;
         //**
 
-
         //** initial condition parameters
         double activation_;
         double muscleTendonLength_;
         double muscleTendonVelocity_;
         //**
-
 
         //** variables used for the LDFM method
         double muscleTendonForce_;
@@ -97,10 +94,8 @@ namespace ceinms {
         //**
     };
 
-
     template <CurveMode::Mode mode>
     class ElasticTendon {
-
     public:
         typedef Curve<CurveMode::Offline> CurveOffline;
         typedef Curve<mode> CurveT;
@@ -117,8 +112,7 @@ namespace ceinms {
             const CurveOffline& activeForceLengthCurve,
             const CurveOffline& passiveForceLengthCurve,
             const CurveOffline& forceVelocityCurve,
-            const CurveOffline& tendonForceStrainCurve
-            );
+            const CurveOffline& tendonForceStrainCurve);
         virtual ~ElasticTendon();
 
         ElasticTendon(const ElasticTendon& orig);
@@ -148,7 +142,7 @@ namespace ceinms {
             const CurveOffline& tendonForceStrainCurve);
 
         void resetState();
-        void setTolerance(double tolerance = 0.0){};
+        void setTolerance(double tolerance = 0.0) { };
 		double getStrain(double force) const {
 			return tendonStrainForceCurve_.getValue(force);
 		}

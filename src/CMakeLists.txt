@@ -1,6 +1,6 @@
 ## Authors: Monica Reggiani, Claudio Pizzolato
 
-#add_subdirectory(Tests)
+add_subdirectory(Tests)
 #add_subdirectory(real-time)
 
 include_directories(

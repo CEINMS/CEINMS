@@ -30,6 +30,7 @@
 #define ceinms_NMSModelCfg_h
 
 namespace ceinms {
+
     namespace NMSModelCfg {
 
         const unsigned OpenLoop = 1000;
@@ -46,7 +47,6 @@ namespace ceinms {
         const unsigned Offline = 2;
 
         const unsigned Nop = 0;
-
 
         enum RunMode{
 

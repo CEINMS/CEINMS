@@ -26,7 +26,6 @@ target_link_libraries(Test_JointContactModelFastExecution
 	NMSmodel
 	${OPENSIMSIMBODY_LIBRARIES}
 )
-#target_link_libraries(Test_JointContactModelFastExecution  JointContactModels OptimizationSystems OutputConnectors InputConnectors  xmlInput TrialData NMSmodel debug ${OPENSIM_LIBRARIES_DEBUG})
 
 add_executable(Test_JointContactModelQueues jointContactModelQueueTest.cpp)
 target_link_libraries(Test_JointContactModelQueues
@@ -38,4 +37,3 @@ target_link_libraries(Test_JointContactModelQueues
 	NMSmodel
 	${OPENSIMSIMBODY_LIBRARIES}
 )
-#target_link_libraries(Test_JointContactModelQueues  JointContactModels OutputConnectors InputConnectors xmlInput Concurrency NMSmodel debug ${OPENSIM_LIBRARIES_DEBUG})

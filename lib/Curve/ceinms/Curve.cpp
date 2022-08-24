@@ -26,15 +26,16 @@
  * limitations under the License.                                             *
  * -------------------------------------------------------------------------- */
 
-#include "Curve.h"
+#include <algorithm>
 #include <iostream>
 #include <vector>
 using std::vector;
 
-#include <algorithm>
+#include "Curve.h"
 
 namespace ceinms {
     //const static int pointsNumber = 17;
+
     template <CurveMode::Mode mode, CurveMode::Interpolation T, size_t N>
     Curve<mode, T, N>::Curve() {
         // make a local copy of the points
@@ -43,7 +44,6 @@ namespace ceinms {
         b_.resize(0);
         c_.resize(0);
         d_.resize(0);
-
     }
 
     /* CALC_SPLINE_COEEFICIENTS: this routine takes an array of x and y values,
@@ -55,13 +55,11 @@ namespace ceinms {
 
     template <CurveMode::Mode mode, CurveMode::Interpolation T, size_t N>
     Curve<mode, T, N>::Curve(const vector<double>& x, const vector<double> &y) {
-
         x_ = x;
         y_ = y;
 
         computeCoefficients(Int2Type<T>());
     }
-
 
     template <CurveMode::Mode mode, CurveMode::Interpolation T, size_t N>
     Curve<mode, T, N>::Curve(const Curve<mode, T, N>& orig) {
@@ -71,7 +69,6 @@ namespace ceinms {
         c_ = orig.c_;
         d_ = orig.d_;
     };
-
 
     template <CurveMode::Mode mode, CurveMode::Interpolation T, size_t N>
     Curve<mode, T, N>& Curve<mode, T, N>::operator=(const Curve<mode, T, N>& orig) {
@@ -83,17 +80,14 @@ namespace ceinms {
         return *this;
     }
 
-
     template <CurveMode::Mode mode, CurveMode::Interpolation T, size_t N>
     void Curve<mode, T, N>::reset() {
-
         x_.clear();
         y_.clear();
         b_.resize(0);
         c_.resize(0);
         d_.resize(0);
     }
-
 
     template <CurveMode::Mode mode, CurveMode::Interpolation T, size_t N>
     void Curve<mode, T, N>::resetPointsWith(const vector<double>& x, const vector<double> &y) {
@@ -104,31 +98,24 @@ namespace ceinms {
         computeCoefficients(Int2Type<T>());
     }
 
-
     template <CurveMode::Mode mode, CurveMode::Interpolation T, size_t N>
-    void Curve<mode, T, N>::removeLastPoint()
-    {
+    void Curve<mode, T, N>::removeLastPoint() {
         x_.pop_back();
         y_.pop_back();
 
         computeCoefficients(Int2Type<T>());
     }
 
-
     template <CurveMode::Mode mode, CurveMode::Interpolation T, size_t N>
     void Curve<mode, T, N>::removeLastPointNoUpdate() {
-
         x_.pop_back();
         y_.pop_back();
 
     }
 
-
     template <CurveMode::Mode mode, CurveMode::Interpolation T, size_t N>
     bool Curve<mode, T, N>::addPoint(double x, double y)  {
-
-        if (x_.empty() || x > x_.back())
-        {
+        if (x_.empty() || x > x_.back()) {
             x_.push_back(x);
             y_.push_back(y);
 
@@ -138,12 +125,9 @@ namespace ceinms {
         else return false;
     }
 
-
     template <CurveMode::Mode mode, CurveMode::Interpolation T, size_t N>
-    bool Curve<mode, T, N>::addPointNoUpdate(double x, double y)
-    {
-        if (x_.empty() || x > x_.back())
-        {
+    bool Curve<mode, T, N>::addPointNoUpdate(double x, double y) {
+        if (x_.empty() || x > x_.back()) {
             x_.push_back(x);
             y_.push_back(y);
             return true;
@@ -151,17 +135,13 @@ namespace ceinms {
         else return false;
     }
 
-
     template <CurveMode::Mode mode, CurveMode::Interpolation T, size_t N>
-    void Curve<mode, T, N>::refresh()
-    {
+    void Curve<mode, T, N>::refresh() {
         computeCoefficients(Int2Type<T>());
     }
 
-
     template <CurveMode::Mode mode, CurveMode::Interpolation T, size_t N>
     void Curve<mode, T, N>::computeCoefficients(Int2Type<CurveMode::Linear>) {
-
         unsigned n = x_.size();
         b_.resize(n, .0);
         c_.resize(n, .0);
@@ -176,15 +156,12 @@ namespace ceinms {
 
     template <CurveMode::Mode mode, CurveMode::Interpolation T, size_t N>
     void Curve<mode, T, N>::computeCoefficients(Int2Type<CurveMode::Cubic>) {
-
         unsigned n = x_.size();
         int nm1 = n - 1;
-
 
         b_.resize(n);
         c_.resize(n);
         d_.resize(n);
-
 
         if (n > 2) {
             // setup tridiagonal system:
@@ -243,7 +220,6 @@ namespace ceinms {
 
             c_.at(nm1) *= 3.0;
             d_.at(nm1) = d_.at(nm1 - 1);
-
         }
 
         if (n == 2) {
@@ -255,15 +231,11 @@ namespace ceinms {
             d_.at(1) = 0.;
         }
 
-
         // do nothing if size < 2
-
     }
 
-
     template <CurveMode::Mode mode, CurveMode::Interpolation T, size_t N>
-    unsigned Curve<mode, T, N>::getAbscissaPoint(double xValue) const{
-
+    unsigned Curve<mode, T, N>::getAbscissaPoint(double xValue) const {
         const unsigned n = x_.size();
         unsigned k = 0;
         if (n == 2)
@@ -277,11 +249,9 @@ namespace ceinms {
         return k;
     }
 
-
     //the circular vector does't have iterators.. so in the meantime we fix it like this
     template <CurveMode::Mode mode, CurveMode::Interpolation T, size_t N>
     unsigned Curve<mode, T, N>::getAbscissaPoint(double xValue, Int2Type<CurveMode::Online>) const {
-
         unsigned i = 0;
         unsigned j = x_.size();
         unsigned k = 0;
@@ -297,17 +267,13 @@ namespace ceinms {
         return k;
     }
 
-
     template <CurveMode::Mode mode, CurveMode::Interpolation T, size_t N>
     unsigned Curve<mode, T, N>::getAbscissaPoint(double xValue, Int2Type<CurveMode::Offline>) const {
-
         return std::distance(x_.begin(), std::lower_bound(x_.begin(), x_.end(), xValue)) - 1;
     }
 
-
     template <CurveMode::Mode mode, CurveMode::Interpolation T, size_t N>
     double Curve<mode, T, N>::getValue(double xValue) const {
-
         unsigned n = x_.size();
         double yValue(.0);
         if (xValue < x_.at(0))
@@ -330,23 +296,18 @@ namespace ceinms {
     */
     template <CurveMode::Mode mode, CurveMode::Interpolation T, size_t N>
     double Curve<mode, T, N>::getValue(double xalue, unsigned abscissaPoint, Int2Type<CurveMode::Cubic>) const {
-
         const unsigned k(abscissaPoint);
         double dx = xalue - x_.at(k);
         double result(y_.at(k) + dx * (b_.at(k) + dx * (c_.at(k) + dx * d_.at(k))));
         return result;
     }
 
-
     template <CurveMode::Mode mode, CurveMode::Interpolation T, size_t N>
     double Curve<mode, T, N>::getValue(double xalue, unsigned abscissaPoint, Int2Type<CurveMode::Linear>) const {
-
         const unsigned k(abscissaPoint);
         double dx = xalue - x_.at(k);
         return b_.at(k)*dx + y_.at(k);
-
     }
-
 
     /*******************************************************************************/
     /* INTERPOLATE_SPLINE: given a spline function and an x-value, this routine
@@ -355,11 +316,8 @@ namespace ceinms {
     * can return the zeroth, first, or second derivative of the spline
     * at that x-value.
     */
-
     template <CurveMode::Mode mode, CurveMode::Interpolation T, size_t N>
     double Curve<mode, T, N>::getFirstDerivative(double xValue) const  {
-
-
         int n = x_.size();
         double yValue(.0);
         if (n <= 0) return yValue;
@@ -371,34 +329,24 @@ namespace ceinms {
             yValue = .0;
         else yValue = getFirstDerivative(xValue, getAbscissaPoint(xValue), Int2Type<T>());
         return yValue;
-
     }
-
 
     template <CurveMode::Mode mode, CurveMode::Interpolation T, size_t N>
     double Curve<mode, T, N>::getFirstDerivative(double xValue, unsigned abscissaPoint, Int2Type<CurveMode::Cubic>) const {
-
         unsigned k(abscissaPoint);
         double dx = xValue - x_.at(k);
         if (nearly_equal(dx, 0.)) return b_.at(k);
         return (b_.at(k) + dx * (2.0 * c_.at(k) + 3.0 * dx * d_.at(k)));
-
     }
-
 
     template <CurveMode::Mode mode, CurveMode::Interpolation T, size_t N>
     double Curve<mode, T, N>::getFirstDerivative(double xValue, unsigned abscissaPoint, Int2Type<CurveMode::Linear>) const {
-
         return b_.at(abscissaPoint);
     }
 
-
     template <CurveMode::Mode mode, CurveMode::Interpolation T, size_t N>
     double Curve<mode, T, N>::getSecondDerivative(double xValue) const  {
-
-
         int n = x_.size();
-
 
         // Now see if the abscissa is out of range of the function
 
@@ -407,7 +355,6 @@ namespace ceinms {
 
         if (xValue > x_.at(n - 1))
             return b_.at(n - 1);
-
 
         if (n == 1)
             return 0;
@@ -435,13 +382,10 @@ namespace ceinms {
         }
         double dx = xValue - x_.at(k);
         return (2.0 * c_.at(k) + 6.0 * dx * d_.at(k));
-
     }
 
-
     template <CurveMode::Mode mode, CurveMode::Interpolation T, size_t N>
-    std::ostream& operator<< (std::ostream& output, const Curve<mode, T, N>& c)
-    {
+    std::ostream& operator<< (std::ostream& output, const Curve<mode, T, N>& c) {
         for (unsigned i = 0; i < c.x_.size(); ++i)
             output << c.x_.at(i) << " ";
         output << std::endl;

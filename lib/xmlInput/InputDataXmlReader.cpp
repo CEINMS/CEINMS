@@ -26,7 +26,7 @@
  * limitations under the License.                                             *
  * -------------------------------------------------------------------------- */
 
-#include "ceinms/InputDataXmlReader.h"
+
 #include <string>
 using std::string;
 #include <map>
@@ -35,16 +35,16 @@ using std::map;
 using std::cout;
 using std::endl;
 #include <limits>
-#include "inputData-schema.hxx"
 
+#include "ceinms/InputDataXmlReader.h"
+#include "inputData-schema.hxx"
 #include "validation.h"
 #include "ceinms/FileUtils.h"
 using InputDataXsd::InputDataType;
 
 namespace ceinms {
-    InputDataXmlReader::InputDataXmlReader(const string& filename)
-    {
 
+    InputDataXmlReader::InputDataXmlReader(const string& filename) {
         try {
             std::unique_ptr<InputDataType> inputDataPointer(parseAndValidate<InputDataType>(filename, inputData_schema, sizeof(inputData_schema)));
             inputDataPointer_ = std::move(inputDataPointer);
@@ -67,14 +67,13 @@ namespace ceinms {
     }
 
     void InputDataXmlReader::readXml() {
-
         try {
-            std::string& myLmtFile(*(inputDataPointer_->muscleTendonLengthFile().begin()));
+            string& myLmtFile(*(inputDataPointer_->muscleTendonLengthFile().begin()));
             if (inputDataPointer_->excitationsFile().size() > 0)
-                std::string& myEmgFile(*(inputDataPointer_->excitationsFile().begin()));
-            //TODO std::string& myMomentArmDir(*(inputDataPointer_->momentArmsFDirectory().begin()));
+                string& myEmgFile(*(inputDataPointer_->excitationsFile().begin()));
+            //TODO string& myMomentArmDir(*(inputDataPointer_->momentArmsFDirectory().begin()));
             if (inputDataPointer_->externalTorquesFile().size() > 0)
-                std::string& myExtTorqueFile(*(inputDataPointer_->externalTorquesFile().begin()));
+                string& myExtTorqueFile(*(inputDataPointer_->externalTorquesFile().begin()));
         }
         catch (const xml_schema::exception& e) {
             cout << e << endl;
@@ -82,9 +81,8 @@ namespace ceinms {
         }
     }
 
-    std::string InputDataXmlReader::getLmtFile()
-    {
-        std::string fileName(*(inputDataPointer_->muscleTendonLengthFile().begin()));
+    string InputDataXmlReader::getLmtFile() {
+        string fileName(*(inputDataPointer_->muscleTendonLengthFile().begin()));
         FileUtils::trim(fileName);
         if (FileUtils::isAbsolute(fileName.c_str()))
             return fileName;
@@ -92,12 +90,11 @@ namespace ceinms {
             return FileUtils::simplify(filepath_ + fileName);
     }
 
-    std::map<std::string, std::string> InputDataXmlReader::getMaFiles()
-    {
+    map<string, string> InputDataXmlReader::getMaFiles() {
         map<string, string> result;
         for (auto it : inputDataPointer_->momentArmsFiles().begin()->momentArmsFile())
         {
-            std::string pathToMaFile = it.c_str();
+            string pathToMaFile = it.c_str();
             FileUtils::trim(pathToMaFile);
             if (!FileUtils::isAbsolute(pathToMaFile.c_str()))
                 pathToMaFile = FileUtils::simplify(filepath_ + pathToMaFile);
@@ -107,11 +104,10 @@ namespace ceinms {
         return result;
     }
 
-    std::string InputDataXmlReader::getExcitationsFile(bool relative)
-    {
+    string InputDataXmlReader::getExcitationsFile(bool relative) {
         if (inputDataPointer_->excitationsFile().size() < 1)
             return "";
-        std::string fileName(*(inputDataPointer_->excitationsFile().begin()));
+        string fileName(*(inputDataPointer_->excitationsFile().begin()));
         FileUtils::trim(fileName);
         if (!FileUtils::isAbsolute(fileName.c_str()))
             if (relative)
@@ -121,11 +117,10 @@ namespace ceinms {
         return fileName;
     }
 
-    std::string InputDataXmlReader::getExternalTorqueFile(bool relative)
-    {
+    string InputDataXmlReader::getExternalTorqueFile(bool relative) {
         if (inputDataPointer_->externalTorquesFile().size() < 1)
             return "";
-        std::string fileName(*(inputDataPointer_->externalTorquesFile().begin()));
+        string fileName(*(inputDataPointer_->externalTorquesFile().begin()));
         FileUtils::trim(fileName);
         if (!FileUtils::isAbsolute(fileName.c_str()))
             if (relative)
@@ -135,13 +130,11 @@ namespace ceinms {
         return fileName;
     }
 
-    std::string InputDataXmlReader::getMotionFile(bool relative) const {
-    
-
+    string InputDataXmlReader::getMotionFile(bool relative) const {
         try {
             if (inputDataPointer_->motionFile().size() < 1)
                 return "";
-            std::string fileName(*(inputDataPointer_->motionFile().begin()));
+            string fileName(*(inputDataPointer_->motionFile().begin()));
             FileUtils::trim(fileName);
             if (!FileUtils::isAbsolute(fileName.c_str()))
                 if (relative)
@@ -152,18 +145,16 @@ namespace ceinms {
         }
         catch (...)
         {
-            std::cout << "No OpenSim motion file associated to the trial\n";
+            cout << "No OpenSim motion file associated to the trial\n";
             return "";
         }
     }
 
-
-    std::string InputDataXmlReader::getExternalLoadsFile(bool relative) const {
-    
+    string InputDataXmlReader::getExternalLoadsFile(bool relative) const {
         try {
             if (inputDataPointer_->externalLoadsFile().size() < 1)
                 return "";
-            std::string fileName(*(inputDataPointer_->externalLoadsFile().begin()));
+            string fileName(*(inputDataPointer_->externalLoadsFile().begin()));
             FileUtils::trim(fileName);
             if (!FileUtils::isAbsolute(fileName.c_str()))
                 if (relative)
@@ -174,20 +165,18 @@ namespace ceinms {
         }
         catch (...)
         {
-            std::cout << "No OpenSim external load file associated to the trial\n";
+            cout << "No OpenSim external load file associated to the trial\n";
             return "";
         }
     }
 
-    double  InputDataXmlReader::getStartTime() const {
-
+    double InputDataXmlReader::getStartTime() const {
         if (inputDataPointer_->startStopTime().size() > 0) 
             return inputDataPointer_->startStopTime().begin()->at(0);
         return std::numeric_limits<double>::lowest();
     }
 
-    double  InputDataXmlReader::getStopTime() const {
-
+    double InputDataXmlReader::getStopTime() const {
         if (inputDataPointer_->startStopTime().size() > 0)
             return inputDataPointer_->startStopTime().begin()->at(1);
         return std::numeric_limits<double>::max();

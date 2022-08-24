@@ -55,7 +55,9 @@ using std::stringstream;
 //  currentData_ = orig.currentData_;
 //  currentTimeStep_ = orig.currentTimeStep_;
 //}
+
 namespace ceinms {
+
     DataFromFile::DataFromFile(const string& dataFilename)
         :dataFile_(dataFilename.c_str()) {
         if (!dataFile_.is_open()) {
@@ -90,7 +92,6 @@ namespace ceinms {
             muscleNames_.push_back(nextMuscleName);
         } while (!myStream.eof() && ++noReadMuscles < noMuscles_);
 
-
         if (noMuscles_ != muscleNames_.size()) {
             cout << "\nSomething is wrong in " << dataFileName_ << endl << noMuscles_ << " muscles should be in the file "
                 << "and we have : " << muscleNames_.size() << endl;
@@ -102,11 +103,9 @@ namespace ceinms {
         currentData_.resize(noMuscles_);
         currentDataTime_ = 0.;
         currentTimeStep_ = 0;
-
     }
 
-    void DataFromFile::readNextData()  {
-
+    void DataFromFile::readNextData() {
         // read time for the data currently stored in DataFromFile
         string line;
         getline(dataFile_, line, '\n');
@@ -140,8 +139,7 @@ namespace ceinms {
         ++currentTimeStep_;
     }
 
-    const vector<double>& DataFromFile::getCurrentData() const
-    {
+    const vector<double>& DataFromFile::getCurrentData() const {
         //  if(currentData_.size() == muscleNames_.size())
         return currentData_;
         /*  else
@@ -150,7 +148,6 @@ namespace ceinms {
           exit(EXIT_FAILURE);
           }*/
     }
-
 
     DataFromFile::~DataFromFile() {
         dataFile_.close();

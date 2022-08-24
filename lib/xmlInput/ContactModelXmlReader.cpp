@@ -26,7 +26,7 @@
 * limitations under the License.                                             *
 * -------------------------------------------------------------------------- */
 
-#include "ceinms/ContactModelXmlReader.h"
+
 #include <string>
 using std::string;
 #include <iostream>
@@ -35,22 +35,21 @@ using std::endl;
 #include <list>
 using std::list;
 
+#include "ceinms/ContactModelXmlReader.h"
 #include "ceinms/FileUtils.h"
 #include "contactModel-schema.hxx"
 #include "validation.h"
 
 namespace ceinms {
 
-    ContactModelXmlReader::ContactModelXmlReader() {}
+    ContactModelXmlReader::ContactModelXmlReader() { }
 
     ContactModelXmlReader::ContactModelXmlReader(const string& filename) :
     filename_(filename) {
-
         init();
     }
 
-    void  ContactModelXmlReader::init() {
-
+    void ContactModelXmlReader::init() {
         try {
             std::unique_ptr<ContactModelXsd::ContactModelType> contactModelPointer(parseAndValidate<ContactModelXsd::ContactModelType>(filename_, contactModel_schema, sizeof(contactModel_schema)));
             contactModelPointer_ = std::move(contactModelPointer);
@@ -72,22 +71,17 @@ namespace ceinms {
         readXml();
     }
 
-
-    void ContactModelXmlReader::setXmlInputFile(const std::string& filename) {
-
+    void ContactModelXmlReader::setXmlInputFile(const string& filename) {
         filename_ = filename;
         init();
     }
 
 
     ContactModelType ContactModelXmlReader::getContactModelType() const {
-
         return contactModelType_;
     }
 
-
-    void ContactModelXmlReader::checkFile(const std::string& filename) const {
-
+    void ContactModelXmlReader::checkFile(const string& filename) const {
         if (!FileUtils::fileExists(filename)) {
             cout << "File: " << filename << " does not exist.\nExit.";
             std::exit(EXIT_FAILURE);
@@ -128,7 +122,6 @@ namespace ceinms {
     }
 
     string ContactModelXmlReader::getCompleteFilename(string filename) const {
-
         FileUtils::trim(filename);
         if (FileUtils::isAbsolute(filename.c_str()))
             return filename;
@@ -136,17 +129,11 @@ namespace ceinms {
             return  FileUtils::simplify(filepath_ + filename);
     }
 
-
     ContactModelFromOpenSimSetup ContactModelXmlReader::getContactModelSetupOsim() const {
-        
         return setupOsim_;
-
     }
-
 
     ContactModelKneeBalanceSetup ContactModelXmlReader::getContactModelSetupKneeBalance() const {
-
         return setupKneeBalance_;
     }
-
 }

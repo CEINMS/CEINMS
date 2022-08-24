@@ -1,12 +1,15 @@
 #ifndef ceinms_ExternalLoadProperties_h
 #define ceinms_ExternalLoadProperties_h
 
-#include "ceinms/ExternalForceProperties.h"
-#include <Simbody.h>
 #include <string>
 #include <vector>
 
+#include <Simbody.h>
+
+#include "ceinms/ExternalForceProperties.h"
+
 namespace ceinms {
+    
     class ExternalLoadProperties {
     public:
         ExternalLoadProperties(const std::string& xmlFilename);

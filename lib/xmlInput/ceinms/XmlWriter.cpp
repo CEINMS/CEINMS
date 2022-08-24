@@ -26,37 +26,33 @@
  * limitations under the License.                                             *
  * -------------------------------------------------------------------------- */
 
-
 #include <string>
 using std::string;
+#include <fstream>
+#include <iostream>
+#include <list>
+
 #include "subject.hxx"
 using SubjectXsd::CalibrationInfoType;
 using SubjectXsd::CalibratedType;
 using SubjectXsd::SubjectType;
 #include "ceinms/SubjectXmlReader.h"
-#include <fstream>
-#include <iostream>
-#include <list>
 
 namespace ceinms {
+
     //TODO: it should re-parse all the info from the subject, instead of re-writing the oldXml
     XmlWriter::XmlWriter(const string& startXmlFile)
-        :outFilename_("calibratedSubject.xml"), startXmlFile_(startXmlFile)
-    {
+        :outFilename_("calibratedSubject.xml"), startXmlFile_(startXmlFile) {
+
         SubjectXmlReader sxr(startXmlFile);
         subjectPointer_ = sxr.getSubject();
-
     }
 
-
     void XmlWriter::setOutputFilename(const string& outFilename) {
-
         outFilename_ = outFilename;
     }
 
-
     void XmlWriter::addCalibrationInfo(const std::string& calibrationXmlFilename) {
-
         CalibrationInfoType::uncalibrated_optional& uncalibratedOpt(subjectPointer_->calibrationInfo().uncalibrated());
         if (uncalibratedOpt.present()) {
             uncalibratedOpt.reset();
@@ -73,11 +69,8 @@ namespace ceinms {
         }
     }
 
-
-    template <typename NMSmodelT>
+    template<typename NMSmodelT>
     void XmlWriter::setParameters(NMSmodelT& subject) {
-
-
         SubjectType::mtuDefault_type& mtuDefault(subjectPointer_->mtuDefault());
         SubjectType::mtuSet_type& mtuSet(subjectPointer_->mtuSet());
         MTUSetType::mtu_sequence& mtuSequence(mtuSet.mtu());
@@ -104,13 +97,9 @@ namespace ceinms {
             (*i).maxIsometricForce(currentMuscle.getMaxIsometricForce());
             (*i).strengthCoefficient(currentMuscle.getStrengthCoefficient());
         }
-
-
     }
 
-
     void XmlWriter::write() {
-
         xml_schema::namespace_infomap map;
         map[""].name = "";
         map[""].schema = "subject.xsd";
@@ -118,5 +107,4 @@ namespace ceinms {
         std::ofstream ofs(outFilename_.c_str());
         subject(ofs, *subjectPointer_, map);
     }
-
 }

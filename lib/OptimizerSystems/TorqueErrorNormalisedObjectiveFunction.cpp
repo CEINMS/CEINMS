@@ -26,13 +26,14 @@
  * limitations under the License.                                             *
  * -------------------------------------------------------------------------- */
 
-#include "ceinms/TorqueErrorNormalisedObjectiveFunction.h"
 #include <algorithm>
 using std::begin;
 using std::end;
 using std::find;
 #include <vector>
 using std::vector;
+
+#include "ceinms/TorqueErrorNormalisedObjectiveFunction.h"
 
 namespace ceinms {
 
@@ -51,8 +52,7 @@ namespace ceinms {
         updDofsToCalibrateIdx();
     }
 
-    void TorqueErrorNormalisedObjectiveFunction::setTrials(const std::vector<TrialData>& trials) {
-
+    void TorqueErrorNormalisedObjectiveFunction::setTrials(const vector<TrialData>& trials) {
         trials_ = trials;
         computeVariance();
         updDofsToCalibrateIdx();
@@ -66,15 +66,14 @@ namespace ceinms {
             for (auto& dof : dofsToCalibrate_){
                 auto it(find(begin(dofNames), end(dofNames), dof));
                 if (it != end(dofNames))
-                    indeces.emplace_back(std::distance(begin(dofNames), it));
+                    indeces.emplace_back((unsigned) std::distance(begin(dofNames), it));
             }
             dofsToCalibrateIdx_.emplace_back(indeces);
         }
     }
 
     void TorqueErrorNormalisedObjectiveFunction::computeVariance() {
-
-        auto getVariance([](const std::vector<double>& v) {
+        auto getVariance([](const vector<double>& v) {
             double ans(0);
             for (auto& e : v)
                 ans += e;
@@ -91,28 +90,26 @@ namespace ceinms {
         //trialDataVariance: first dimension is the trial, second dimension is the DoF
         for (auto& trial : trials_) {
             auto dofNamesFromTrial = trial.getDofNames();
-            std::vector<double> trialVariance(trial.getNoDofs(), .0);
+            vector<double> trialVariance(trial.getNoDofs(), .0);
             for (auto& name : dofsToCalibrate_) {
-                auto i(std::distance(dofNamesFromTrial.begin(), (std::find(dofNamesFromTrial.begin(), dofNamesFromTrial.end(), name))));
+                auto i(std::distance(dofNamesFromTrial.begin(), (find(dofNamesFromTrial.begin(), dofNamesFromTrial.end(), name))));
                 trialVariance.at(i) = getVariance(trial.getTorqueData().getColumn(i));
             //    if (trialVariance.at(i) < 1) trialVariance.at(i) = 1;   //don't penalize if the variance in low
 				trialVariance.at(i) = 1.;   //don't penalize if the variance in low
 
 			}
-//            torqueVariance_.emplace_back(trialVariance);
             torqueVariance_.emplace_back(trialVariance);
-
 		}
     }
 
-    void TorqueErrorNormalisedObjectiveFunction::calculate(const std::vector<Result>& results) {
+    void TorqueErrorNormalisedObjectiveFunction::calculate(const vector<Result>& results) {
         //reset f
         f_ = 0;
 		//Hardcoded. As the model needs to settle down at the beginning of the trial, we don`t want
 		//the errors at the begining of the trials to affect the calibration..
 		const int skipRows = 10;
-        using TrialDataIt = std::vector<TrialData>::const_iterator;
-        using ResultIt = std::vector<Result>::const_iterator;
+        using TrialDataIt = vector<TrialData>::const_iterator;
+        using ResultIt = vector<Result>::const_iterator;
 
         trialCosts_.clear();
         auto tIt(trials_.cbegin());
@@ -142,16 +139,15 @@ namespace ceinms {
     }
 
     void TorqueErrorNormalisedObjectiveFunction::printCosts() const {
-
         std::cout << setup_;
         std::cout << " - Value: " << getValue() << std::endl;
         std::cout << " -- Root Mean Square Errors\n";
         for (size_t trialIndex(0); trialIndex < trials_.size(); ++trialIndex) {
             std::cout <<" --- Trial #" << trialIndex+1 << std::endl;
             for (auto& dofIdx : dofsToCalibrateIdx_.at(trialIndex)) {
-                        double val = sqrt(trialCosts_.at(trialIndex).torqueError.at(dofIdx) / 
-                            trials_.at(trialIndex).getTorqueData().getNRows());
-                        std::cout << " ---- " << trials_.at(trialIndex).getDofNames().at(dofIdx)  << ": " << val << " Nm" << std::endl;
+                double val = sqrt(trialCosts_.at(trialIndex).torqueError.at(dofIdx) / 
+                    trials_.at(trialIndex).getTorqueData().getNRows());
+                std::cout << " ---- " << trials_.at(trialIndex).getDofNames().at(dofIdx)  << ": " << val << " Nm" << std::endl;
             }
         }
     }

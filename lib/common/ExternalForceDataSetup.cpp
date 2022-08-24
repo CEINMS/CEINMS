@@ -3,7 +3,6 @@
 namespace ceinms {
 
     std::vector<ExternalForceDataSetup> parseExternalLoadsXml(const std::string& xmlFilename) {
-
         OpenSim::XMLDocument document(xmlFilename);
         SimTK::Xml::Element root = document.getRootDataElement();
         SimTK::Xml::element_iterator extForceElementIter = root.element_begin("objects")->element_begin("ExternalForce");

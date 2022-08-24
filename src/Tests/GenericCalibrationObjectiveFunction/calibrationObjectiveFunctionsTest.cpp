@@ -1,3 +1,11 @@
+#include <vector>
+using std::vector;
+#include <string>
+using std::string;
+#include <iostream>
+using std::cout;
+using std::endl;
+
 #include "ceinms/TorqueErrorNormalisedObjectiveFunction.h"
 #include "ceinms/MaxPeakObjectiveFunction.h"
 #include "ceinms/PenaltyObjectiveFunction.h"
@@ -8,14 +16,6 @@
 #include "ceinms/SumGenericContactForces.h"
 #include "ceinms/ContactModelKneeBalance.h"
 #include "ceinms/ContactModelKneeBalanceSetup.h"
-#include <vector>
-using std::vector;
-#include <string>
-using std::string;
-#include <iostream>
-using std::cout;
-using std::endl;
-
 using namespace ceinms;
 
 vector<double> multiply(vector<double> values, double c) {
@@ -25,16 +25,15 @@ vector<double> multiply(vector<double> values, double c) {
     return values;
 }
 
-std::vector<std::string> getDofNames() {
+vector<string> getDofNames() {
     return { "dof1", "dof2", "dof3", "dof4", "mdof", "ldof" };
 }
 
-std::vector<std::string> getMtuNames() {
+vector<string> getMtuNames() {
     return{ "mtu1", "mtu2", "mtu3" };
 }
 
-
-std::vector<std::string> getCondyleNames() {
+vector<string> getCondyleNames() {
     return { "medial_condyle", "lateral_condyle" };
 }
 
@@ -44,7 +43,6 @@ bool equals(double a, double b, double tol = 0.001) {
 
 /* Trial data is the experimental input data.*/
 TrialData getTrialData() {
-
     vector<double> torqueRow{ 10, 20, 30, 40, 20, 20 };
     DataTable<double> torqueData(3, 6);
     torqueData.setLabels(getDofNames());
@@ -57,7 +55,6 @@ TrialData getTrialData() {
 }
 
 DataTable<double> getContactForces() {
-
     DataTable<double> contactForces(3,2);
     contactForces.setLabels(getCondyleNames());
     contactForces.setRow(0, { 1000, 2000 });
@@ -67,7 +64,6 @@ DataTable<double> getContactForces() {
 }
 
 DataTable<SimTK::Vec3> getGenericContactForces() {
-
     DataTable<SimTK::Vec3> contactForces(3, 2);
     contactForces.setLabels(getCondyleNames());
     contactForces.setRow(0, { {1,2,3}, {4,5,6} });
@@ -77,7 +73,6 @@ DataTable<SimTK::Vec3> getGenericContactForces() {
 }
 
 DataTable<double> getNormalisedFibreLengths() {
-
     DataTable<double> normFibreLengths(3, 3);
     normFibreLengths.setLabels(getMtuNames());
     normFibreLengths.setRow(0, { 1, 1.3, 0.4 });
@@ -87,7 +82,6 @@ DataTable<double> getNormalisedFibreLengths() {
 }
 
 bool testTorqueErrorNormalised() {
-
     // Generate 3 trials
     TrialData trial1(getTrialData());
     TrialData trial2(getTrialData());
@@ -124,7 +118,6 @@ bool testTorqueErrorNormalised() {
 }
 
 bool testMaxPeak() {
-
     // Generate 3 trials
     TrialData trial1(getTrialData());
     TrialData trial2(getTrialData());
@@ -184,9 +177,7 @@ bool testMaxPeak() {
     return isValid;
 }
 
-
 bool testPenaltyObjectiveFunction() {
-
     // Generate 3 trials
     TrialData trial1(getTrialData());
     TrialData trial2(getTrialData());
@@ -211,9 +202,7 @@ bool testPenaltyObjectiveFunction() {
     return isValid;
 }
 
-
 bool testCompositeFuntion() {
-
     // Generate 3 trials
     TrialData trial1(getTrialData());
     TrialData trial2(getTrialData());
@@ -261,9 +250,7 @@ bool testCompositeFuntion() {
     return isValid;
 }
 
-
 int main() {
-
     bool isValid = true;
     isValid &= testTorqueErrorNormalised();
     isValid &= testMaxPeak();

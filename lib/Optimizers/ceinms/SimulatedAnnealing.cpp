@@ -29,19 +29,18 @@
 #include <iostream>
 using std::cout;
 using std::endl;
-
 #include <math.h>
 #include <time.h>
 #include <vector>
 using std::vector;
 #include <string>
 using std::string;
-#include <time.h>
 #include <limits>
 
 //#define LOG_SIMULATED_ANNEALING
 
 namespace ceinms {
+
     namespace Optimizers {
 
         template<typename OptimizerSystem>
@@ -57,8 +56,7 @@ namespace ceinms {
             fLatest_(simulatedAnnealingParameters.noEpsilon, std::numeric_limits<double>::max()),
             f_(std::numeric_limits<double>::max()),
             fp_(std::numeric_limits<double>::max()),
-            fOpt_(std::numeric_limits<double>::max())
-        {
+            fOpt_(std::numeric_limits<double>::max()) {
 
             noParameters_ = optimizerSystem_.getNoParameters();
             x_ = optimizerSystem_.getParameters();
@@ -78,7 +76,6 @@ namespace ceinms {
 
         template<typename OptimizerSystem>
         void SimulatedAnnealing<OptimizerSystem>::checkBounds(int k) {
-
             if ((xp_.at(k) < lowerBounds_.at(k)) ||
                 (xp_.at(k) > upperBounds_.at(k)))
                 xp_.at(k) = lowerBounds_.at(k) + ((upperBounds_.at(k) - lowerBounds_.at(k)) * rand() / RAND_MAX);
@@ -86,14 +83,12 @@ namespace ceinms {
 
         template<typename OptimizerSystem>
         bool SimulatedAnnealing<OptimizerSystem>::optimize() {
-
             int noEval = 0;
             for (int i = 0; i < noParameters_; ++i)
                 noAccepted_.at(i) = 0;
             // DO UNTIL convergence or maxNoEvaluation
             bool terminate = false;
             while ((!terminate) && (noEval < maxNoEval_)) {
-
                 // DO Nt times
                 for (int i = 0; i < nt_; ++i) {
 
@@ -222,15 +217,14 @@ namespace ceinms {
             return 0;
         }
 
-        template <typename OptimizerSystem>
+        template<typename OptimizerSystem>
         double SimulatedAnnealing<OptimizerSystem>::computeMetropolisCriteria(double t) const {
             double p = (f_ - fp_);
             return exp(p / t);
         }
 
-        template <typename OptimizerSystem>
+        template<typename OptimizerSystem>
         bool SimulatedAnnealing<OptimizerSystem>::doTerminate() {
-
             fLatest_.at(0) = f_;
 
             for (unsigned int a = 0; a < nEpsilon_; ++a) {

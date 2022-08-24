@@ -1,3 +1,20 @@
+#include <string>
+using std::string;
+#include <vector>
+using std::vector;
+#include <iostream>
+using std::cout;
+using std::endl;
+#include <random>
+#include <filesystem>
+
+#include <OpenSim/OpenSim.h>
+using OpenSim::Storage;
+using OpenSim::CoordinateActuator;
+#include <OpenSim/Tools/InverseDynamicsTool.h>
+
+#include "rtb/concurrency/Concurrency.h"
+
 #include "ceinms/JointContactFromOpensim.h"
 #include "ceinms/ArrayConverter.h"
 #include "ceinms/ContactModelXmlReader.h"
@@ -5,7 +22,6 @@
 #include "ceinms/QueuesToIntersegmentalForces.h"
 #include "ceinms/QueuesToJointReactionForces.h"
 #include "ceinms/LoggerOnQueues.h"
-#include "rtb/concurrency/Concurrency.h"
 #include "ceinms/FileUtils.h"
 #include "ceinms/NMSmodel.h"
 #include "ceinms/Activation/ExponentialActivation.h"
@@ -18,31 +34,10 @@
 #include "ceinms/QueueToStorageFile.h"
 #include "ceinms/QueueToDataTable.h"
 #include "ceinms/BatchOpenSimEvaluator.h"
-#include <boost/filesystem.hpp>
 using namespace ceinms;
-
-#include <OpenSim/OpenSim.h>
-using OpenSim::Storage;
-using OpenSim::CoordinateActuator;
-#include <OpenSim/Tools/InverseDynamicsTool.h>
-
-#include <string>
-using std::string;
-#include <vector>
-using std::vector;
-#include <iostream>
-using std::cout;
-using std::endl;
-#include <random>
-
-#include <boost/filesystem.hpp>
-using boost::filesystem::absolute;
-using boost::filesystem::path;
-using boost::filesystem::canonical;
 
 template<typename T>
 void printDataTable(const DataTable<T>& table, const string& outputDir, const string& filename) {
-
     FileLogger<vector<T>> logger(table.getLabels(), filename, outputDir);
     for (size_t r(0); r < table.getNRows(); ++r) {
         QueueData<vector<T>> data;
@@ -91,8 +86,7 @@ private:
 };
 
 KriggGenericCF::KriggGenericCF(const string& modelFilename, const string& kinematicsFilename, const string& externalLoadsXmlFilename) :
-    model_(modelFilename), kinematicsData_(kinematicsFilename)
-{
+    model_(modelFilename), kinematicsData_(kinematicsFilename) {
 
     nForces_ = model_.getForceSet().getSize();
     nDofs_ = model_.getCoordinateSet().getSize();
@@ -119,9 +113,7 @@ KriggGenericCF::KriggGenericCF(const string& modelFilename, const string& kinema
     calculateUnitaryContributionOfMuscleToContactForces();
 }
 
-
 void KriggGenericCF::calculateMomentArms() {
-   
     OpenSim::Array<std::string> muscles;
     model_.getMuscles().getNames(muscles);
     std::unique_ptr<OpenSim::MuscleAnalysis> muscleTendonLengthAnalysis(new OpenSim::MuscleAnalysis(&model_));
@@ -176,7 +168,6 @@ void KriggGenericCF::calculateMomentArms() {
 }
 
 void KriggGenericCF::calculateIntersegmentalForces() {
-
     //forces will be at 0 by default
     Result result(nForces_, nDofs_, nFrames_, nFrames_);
     result.setMuscleNames(muscleNames_);
@@ -189,7 +180,6 @@ void KriggGenericCF::calculateIntersegmentalForces() {
 }
 
 void KriggGenericCF::calculateUnitaryContributionOfMuscleToContactForces() {
-
     Result result(nForces_, nDofs_, nFrames_, nFrames_);
     result.setMuscleNames(muscleNames_);
     result.setDofNames(dofNames_);
@@ -211,15 +201,13 @@ void KriggGenericCF::calculateUnitaryContributionOfMuscleToContactForces() {
             std::make_pair(muscleNames_[i], evaluator_.getResults()[0].jointReactionForces - intersegmentalForces_)
         );
 
-        path dataPath(path(FileUtils::simplify(BASE_DIR)) / "Data");
-        path outputPath(dataPath / "output");
+        std::filesystem::path dataPath(std::filesystem::path(FileUtils::simplify(BASE_DIR)) / "Data");
+        std::filesystem::path outputPath(dataPath / "output");
         printDataTable(unitaryContributionOfMuscleToContactForces_[muscleNames_[i]], outputPath.string(), "contribution_" + muscleNames_[i] + ".csv");
     }
 }
 
-
 DataTable<SimTK::Vec3> KriggGenericCF::getReactionForces(const DataTable<double>& muscleForces) const {
-
     DataTable<SimTK::Vec3> reactionForces = intersegmentalForces_;
     for (int i(0); i < muscleNames_.size(); ++i) {
         auto column(muscleForces.getColumn(i));
@@ -232,7 +220,6 @@ DataTable<SimTK::Vec3> KriggGenericCF::getReactionForces(const DataTable<double>
     }
     return reactionForces;
 }
-
 
 vector<string> KriggGenericCF::getMuscleNames() const {
     return muscleNames_;
@@ -286,8 +273,8 @@ void calculateIntersegmentaForcesWithOpensim(
 
     auto setupAnalTool([&](OpenSim::AnalyzeTool& analTool, const SimTK::State& modelState) {
         //      analTool.setCoordinatesFileName(kinematicsFilename);
-        path p(externalLoadsFilename);
-        path baseDir(p.parent_path());
+        std::filesystem::path p(externalLoadsFilename);
+        std::filesystem::path baseDir(p.parent_path());
         OpenSim::ExternalLoads externalLoads(model, externalLoadsFilename);
         auto forcesFilename = externalLoads.getDataFileName();
         if (!FileUtils::isAbsolute(forcesFilename.c_str())) {
@@ -341,7 +328,6 @@ void calculateIntersegmentaForcesWithOpensim(
     jreact->printResults("", outputDir);
 }
 
-
 void calculateReactionForcesWithOpensim(
     std::string modelFilename,
     const OpenSim::Storage& kinematics,
@@ -369,8 +355,8 @@ void calculateReactionForcesWithOpensim(
 
     auto setupAnalTool([&](OpenSim::AnalyzeTool& analTool, const SimTK::State& modelState) {
         //      analTool.setCoordinatesFileName(kinematicsFilename);
-        path p(externalLoadsFilename);
-        path baseDir(p.parent_path());
+        std::filesystem::path p(externalLoadsFilename);
+        std::filesystem::path baseDir(p.parent_path());
         OpenSim::ExternalLoads externalLoads(model, externalLoadsFilename);
         auto forcesFilename = externalLoads.getDataFileName();
         if (!FileUtils::isAbsolute(forcesFilename.c_str())) {
@@ -483,7 +469,6 @@ void calculateIntersegmentaForcesWithCEINMS(
     loggerThr.join();
 }
 
-
 template<typename T>
 class DataTableToQueue {
 public:
@@ -511,7 +496,6 @@ public:
     }
 
 private:
-
     rtb::Concurrency::Queue<QueueData<T>>& outputQueue_;
     rtb::Concurrency::Latch& doneWithSubscriptions_;
     rtb::Concurrency::Latch& doneWithExecution_;
@@ -608,12 +592,10 @@ void calculateReactionForcesWithCEINMS(
     muscleForceThr.join();
 }
 
-
 int main() {
-
-    path dataPath(path(FileUtils::simplify(BASE_DIR)) / "Data");
-    path inputPath(dataPath / "input");
-    path outputPath(dataPath / "output");
+    std::filesystem:: dataPath(std::filesystem::path(FileUtils::simplify(BASE_DIR)) / "Data");
+    std::filesystem::path inputPath(dataPath / "input");
+    std::filesystem::path outputPath(dataPath / "output");
     cout << "Data path " << dataPath << endl;
     string outputDir(outputPath.string());
     string osimModelFilename((inputPath / "model.osim").string());
@@ -630,7 +612,6 @@ int main() {
         kinematics.lowpassIIR(fc);
         kinematics.crop(first, last);
     }
-
 
     KriggGenericCF krigg(osimModelFilename, kinematicsStorageFilename, externalLoadsXmlFilename);
     cout << "Number of muscles in Krigg model: " << krigg.getMusclesSize() << endl;

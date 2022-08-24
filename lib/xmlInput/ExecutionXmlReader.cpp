@@ -26,20 +26,23 @@
  * limitations under the License.                                             *
  * -------------------------------------------------------------------------- */
 
-#include "ceinms/ExecutionXmlReader.h"
 #include <string>
 using std::string;
 #include <iostream>
 using std::cout;
 using std::endl;
+
+#include "ceinms/ExecutionXmlReader.h"
 #include "execution-schema.hxx"
 #include "validation.h"
 using ExecutionXsd::ExecutionType;
 using ExecutionXsd::HybridType;
 
 namespace ceinms {
+
     ExecutionXmlReader::ExecutionXmlReader(const string& filename)
         :runMode_(0), tolerance_(1e-6) {
+
         try {
             std::unique_ptr<ExecutionType> executionPointer(parseAndValidate<ExecutionType>(filename, execution_schema, sizeof(execution_schema)));
             executionPointer_ = std::move(executionPointer);
@@ -52,7 +55,6 @@ namespace ceinms {
     }
 
     void ExecutionXmlReader::readXml() {
-
         try {
             ExecutionType::NMSmodel_type& myModel(executionPointer_->NMSmodel());
             ExecutionType::NMSmodel_type::activation_type& myActivation(myModel.activation());
@@ -107,8 +109,7 @@ namespace ceinms {
         }
     }
 		   
-    void ExecutionXmlReader::getMusclesToSynthesise(std::vector<std::string>& musclesToSynthesise) const {
-
+    void ExecutionXmlReader::getMusclesToSynthesise(std::vector<string>& musclesToSynthesise) const {
         ExecutionType::NMSmodel_type& myModel(executionPointer_->NMSmodel());
         ExecutionType::NMSmodel_type::type_type& myType(myModel.type());
         ExecutionType::NMSmodel_type::type_type::hybrid_optional& myHybOpt(myType.hybrid());
@@ -122,9 +123,7 @@ namespace ceinms {
             musclesToSynthesise.push_back(e);
     }
 
-
-    void ExecutionXmlReader::getMusclesToAdjust(std::vector<std::string>& musclesToAdjust) const {
-
+    void ExecutionXmlReader::getMusclesToAdjust(std::vector<string>& musclesToAdjust) const {
         ExecutionType::NMSmodel_type& myModel(executionPointer_->NMSmodel());
         ExecutionType::NMSmodel_type::type_type& myType(myModel.type());
         ExecutionType::NMSmodel_type::type_type::hybrid_optional& myHybOpt(myType.hybrid());
@@ -140,7 +139,6 @@ namespace ceinms {
     }
 
     void ExecutionXmlReader::getHybridWeightings(double& alpha, double& beta, double& gamma) const {
-
         ExecutionType::NMSmodel_type& myModel(executionPointer_->NMSmodel());
         ExecutionType::NMSmodel_type::type_type& myType(myModel.type());
         ExecutionType::NMSmodel_type::type_type::hybrid_optional& myHybOpt(myType.hybrid());
@@ -166,8 +164,7 @@ namespace ceinms {
 
     }
 
-    void ExecutionXmlReader::getDofSet(std::vector<std::string>& dofs) const {
-      
+    void ExecutionXmlReader::getDofSet(std::vector<string>& dofs) const {
         ExecutionType::NMSmodel_type& myModel(executionPointer_->NMSmodel());
         ExecutionType::NMSmodel_type::type_type& myType(myModel.type());
         ExecutionType::NMSmodel_type::type_type::hybrid_optional& myHybOpt(myType.hybrid());
@@ -186,9 +183,7 @@ namespace ceinms {
         return myHybOpt.present();
     }
 
-
-    void ExecutionXmlReader::print(const std::string& filename) {
-
+    void ExecutionXmlReader::print(const string& filename) {
         xml_schema::namespace_infomap map;
         map[""].name = "";
         map[""].schema = "execution.xsd";
@@ -198,8 +193,6 @@ namespace ceinms {
     }
 
     NMSModelCfg::RunMode ExecutionXmlReader::getRunMode() const {
-
         return static_cast<NMSModelCfg::RunMode>(runMode_);
-
     }
 }

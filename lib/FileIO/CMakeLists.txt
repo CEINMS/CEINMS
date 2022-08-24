@@ -7,7 +7,6 @@ set(FileIO_SOURCES
   DataFromStorageFile.cpp
   EMGDataFromFile.cpp
 )
-
 set(FileIO_HEADERS
   ceinms/ExcitationGeneratorFromXml.h
   ceinms/DataFromFile.h

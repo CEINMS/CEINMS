@@ -29,13 +29,13 @@
 #include <iostream>
 using std::cout;
 using std::endl;
-
 #include <math.h>
 #include <vector>
 using std::vector;
 #include <string>
 using std::string;
 #include <cstdlib>
+
 #include "HybridWeightings.h"
 
 namespace ceinms {
@@ -49,8 +49,6 @@ namespace ceinms {
     srand(1.);
     }*/
 
-
-
     template<typename NMSmodelT, typename Parameters, typename ObjectiveFunction, typename StaticComputationT>
     SimulatedAnnealingBase<NMSmodelT, Parameters, ObjectiveFunction, StaticComputationT>::SimulatedAnnealingBase(
         NMSmodelT& mySubject,
@@ -59,8 +57,7 @@ namespace ceinms {
         const HybridWeightings hybridParameters,
         StaticComputationT& staticComputation) :
         parameters_(mySubject, muscleNamesWithEMGtoTrack, muscleNamesWithEMGtoPredict),
-        objectiveFunction_(staticComputation, 1e-4, 8, hybridParameters)
-    {
+        objectiveFunction_(staticComputation, 1e-4, 8, hybridParameters) {
 
         noParameters_ = parameters_.getNoParameters();
         x_.resize(noParameters_);
@@ -81,13 +78,10 @@ namespace ceinms {
         maxNoEval_ = 200000000;
 
         srand(1.);
-
     }
-
 
     template<typename NMSmodelT, typename Parameters, typename ObjectiveFunction, typename StaticComputationT>
     void SimulatedAnnealingBase<NMSmodelT, Parameters, ObjectiveFunction, StaticComputationT>::setAnnealingParameters(unsigned nt, unsigned ns, double rt, double t, unsigned maxNoEval, double epsilon, unsigned noEpsilon) {
-
         nt_ = nt;
         ns_ = ns;
         rt_ = rt;
@@ -97,20 +91,15 @@ namespace ceinms {
         objectiveFunction_.setNoEpsilon(noEpsilon);
     }
 
-
     template<typename NMSmodelT, typename Parameters, typename ObjectiveFunction, typename StaticComputationT>
     void SimulatedAnnealingBase<NMSmodelT, Parameters, ObjectiveFunction, StaticComputationT>::checkBounds(int k) {
-
         if ((xp_.at(k) < lowerBounds_.at(k)) ||
             (xp_.at(k) > upperBounds_.at(k)))
             xp_.at(k) = lowerBounds_.at(k) + ((upperBounds_.at(k) - lowerBounds_.at(k)) * rand() / RAND_MAX);
-
-
     }
 
     template<typename NMSmodelT, typename Parameters, typename ObjectiveFunction, typename StaticComputationT>
     void SimulatedAnnealingBase<NMSmodelT, Parameters, ObjectiveFunction, StaticComputationT>::optimize() {
-
         int noEval = 0;
         for (int i = 0; i < noParameters_; ++i)
             noAccepted_.at(i) = 0;
@@ -264,18 +253,14 @@ namespace ceinms {
         objectiveFunction_.printFs();
     }
 
-
     template<typename NMSmodelT, typename Parameters, typename ObjectiveFunction, typename StaticComputationT>
     void SimulatedAnnealingBase<NMSmodelT, Parameters, ObjectiveFunction, StaticComputationT>::getXopt(vector<double>& xOpt) const {
-
         xOpt = xOpt_;
     }
 
-
     template<typename NMSmodelT, typename Parameters, typename ObjectiveFunction, typename StaticComputationT>
     std::ostream& operator<< (std::ostream& output,
-        const SimulatedAnnealingBase<NMSmodelT, Parameters, ObjectiveFunction, StaticComputationT>& sa)
-    {
+        const SimulatedAnnealingBase<NMSmodelT, Parameters, ObjectiveFunction, StaticComputationT>& sa) {
         output << "NT:        " << sa.nt_ << endl;
         output << "NS:        " << sa.ns_ << endl;
         output << "RT:        " << sa.rt_ << endl;
@@ -299,5 +284,4 @@ namespace ceinms {
 
         return output;
     }
-
 }

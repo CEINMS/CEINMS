@@ -36,12 +36,11 @@
 #include "Output.h"
 
 inline float sign(const double &a, const double &b)
-        {return b >= 0 ? (a >= 0 ? a : -a) : (a >= 0 ? -a : a);}
+    {return b >= 0 ? (a >= 0 ? a : -a) : (a >= 0 ? -a : a);}
 
 
 template<typename Stepper>
 class Odeint {
-
 public:
     Odeint(std::vector<double>& yStart, const double x1, const double x2,
            const double aTol, const double rTol, const double h1,
@@ -65,27 +64,24 @@ private:
     double x_, h_;
 };
 
-
-
-
 template<typename Stepper>
 Odeint<Stepper>::Odeint(std::vector<double>& yStart, const double x1, const double x2,
                         const double aTol, const double rTol, const double h1,
                         const double hMin, Output& out, typename Stepper::Dtype &derivs):
-nvar_(yStart.size()),
-y_(yStart.size()),
-dydx_(yStart.size()),
-yStart_(yStart),
-x_(x1),
-nok_(0),
-nbad_(0),
-x1_(x1),
-x2_(x2),
-hMin_(hMin),
-dense_(out.dense_),
-out_(out),
-derivs_(derivs),
-s_(y_, dydx_, x_, aTol, rTol, out.dense_) {
+                        nvar_(yStart.size()),
+                        y_(yStart.size()),
+                        dydx_(yStart.size()),
+                        yStart_(yStart),
+                        x_(x1),
+                        nok_(0),
+                        nbad_(0),
+                        x1_(x1),
+                        x2_(x2),
+                        hMin_(hMin),
+                        dense_(out.dense_),
+                        out_(out),
+                        derivs_(derivs),
+                        s_(y_, dydx_, x_, aTol, rTol, out.dense_) {
 
     EPS_ = std::numeric_limits<double>::epsilon();
     h_ = sign(h1, x2-x1);
@@ -93,11 +89,8 @@ s_(y_, dydx_, x_, aTol, rTol, out.dense_) {
     out_.init(s_.nEqn_, x1_, x2_);
 }
 
-
-
 template<class Stepper>
 void Odeint<Stepper>::integrate() {
-
     derivs_(x_, y_, dydx_);
     if (dense_)
         out_.out(-1, x_, y_, s_, h_);

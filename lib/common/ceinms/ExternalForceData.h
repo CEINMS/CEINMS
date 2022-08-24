@@ -28,11 +28,14 @@
 
 #ifndef ceinms_ExternalForceData_h
 #define ceinms_ExternalForceData_h
+
 #include <ostream>
 #include <utility>
+
 #include <OpenSim/OpenSim.h>
 
 namespace ceinms {
+
     class ExternalForceData {
     public:
         ExternalForceData();
@@ -67,6 +70,7 @@ namespace ceinms {
         unsigned getTorqueBodyIndex() const;
 
         void print(std::ostream& os) const;
+        
     private:
         unsigned targetBody_;                     //target reference system indicesed to body
         std::pair<unsigned, SimTK::Vec3> point_;  //reference system index and point vector

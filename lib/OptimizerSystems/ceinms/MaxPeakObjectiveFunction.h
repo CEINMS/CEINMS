@@ -28,8 +28,10 @@
 
 #ifndef ceinms_MaxPeakObjectiveFunction_h
 #define ceinms_MaxPeakObjectiveFunction_h
+
 #include <vector>
 #include <string>
+
 #include "ceinms/TrialData.h"
 #include "Result.h"
 #include "ceinms/ObjectiveFunctionSetup.h"
@@ -51,6 +53,7 @@ namespace ceinms {
         double getValue() const override { return f_; }
         void printCosts() const override;
 		bool calculateOpenSimData() const override;
+        
     private:
         std::vector<double> calculate(const DataTable<double>& result) const;
         std::vector<double> calculate(const DataTable<SimTK::Vec3>& result) const;

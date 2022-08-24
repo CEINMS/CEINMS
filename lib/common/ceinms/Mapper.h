@@ -36,7 +36,6 @@
 namespace ceinms {
 
     class Mapper {
-
     public:
         Mapper();
         Mapper(const std::vector<std::string>& inNames, const std::vector<std::string>& outNames);
@@ -53,7 +52,6 @@ namespace ceinms {
         std::vector<int> inToOutMapping_; //using int because in case in > out, we can use -1 as not-map token
         void updateMapping();
     };
-
 
     template<typename T>
     std::vector<T> Mapper::map(const std::vector<T>& in, T defaultValue) const {
@@ -73,7 +71,6 @@ namespace ceinms {
         return out;
     }
 
-
     template<typename T>
     std::vector<T> Mapper::map(const std::vector<T>& in, std::vector<T> defaultVector) const {
         if (in.size() != inSize_) {
@@ -91,10 +88,7 @@ namespace ceinms {
                 defaultVector.at(mapIdx) = in.at(i);
         }
         return defaultVector;
-
-
     }
-
 }
 
 #endif

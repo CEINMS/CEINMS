@@ -1,22 +1,18 @@
-#include "ceinms/Hybrid/TrackTorqueAdjustAndPredictExcitations.h"
 #include <iostream>
+
+#include "ceinms/Hybrid/TrackTorqueAdjustAndPredictExcitations.h"
 
 namespace ceinms {
 
     void TrackTorqueAdjustAndPredictExcitations::setExternalTorques(const std::vector<double>& externalTorques) {
-
         externalTorques_ = externalTorques;
     }
 
     void TrackTorqueAdjustAndPredictExcitations::setMeasuredExcitations(const std::vector<double>& measuredExcitations) {
-
         measuredExcitations_ = measuredExcitations;
     }
 
-
-    void TrackTorqueAdjustAndPredictExcitations::calculate(const std::vector<double>& predictedTorques, const std::vector<double>& predictedExcitations){
-
-
+    void TrackTorqueAdjustAndPredictExcitations::calculate(const std::vector<double>& predictedTorques, const std::vector<double>& predictedExcitations) {
         torqueError_ = 0.;
         for (auto i : indexesOfTorquesToMinimise_) {
             double diff(predictedTorques.at(i) - externalTorques_.at(i));
@@ -36,9 +32,9 @@ namespace ceinms {
         }
 
         // Normalise by the number of dofs and muscles is disables
-//        torqueError_ /= nDofs_;
-//        excitationSum_ /= nSynth_;
-//        excitationTrackingError_ /= nAdj_;
+    //    torqueError_ /= nDofs_;
+    //    excitationSum_ /= nSynth_;
+    //    excitationTrackingError_ /= nAdj_;
         f_ = 
             weightings_.alpha*torqueError_ + 
             weightings_.beta*excitationSum_ + 
@@ -47,7 +43,6 @@ namespace ceinms {
     }
 
     double TrackTorqueAdjustAndPredictExcitations::getValue() const {
-
         return f_;
     }
 

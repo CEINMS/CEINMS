@@ -52,26 +52,19 @@ using SubjectXsd::DoFSetType;
 using SubjectXsd::DoFType;
 using SubjectXsd::CurveType;
 
-
-
-
 //TODO: most of this stuff should be moved in SubjectXmlReader
 namespace ceinms {
 
     template<typename NMSmodelT>
-    SetupDataStructure<NMSmodelT>::SetupDataStructure(const string& configurationFile)        
-    {
+    SetupDataStructure<NMSmodelT>::SetupDataStructure(const string& configurationFile) {
         SubjectXmlReader sxr(configurationFile);
         if (sxr.hasOpenSimModel())
             osimModel_ = sxr.getOpenSimModelFile();
         subjectPointer_ = sxr.getSubject();
-
     }
-
 
     template<typename NMSmodelT>
     void SetupDataStructure<NMSmodelT>::createCurves() {
-
         SubjectType::mtuDefault_type& mtuDefault(subjectPointer_->mtuDefault());
         MTUDefaultType::curve_sequence& curveSequence(mtuDefault.curve());
         for (MTUDefaultType::curve_iterator i = curveSequence.begin(); i != curveSequence.end(); ++i) {
@@ -102,18 +95,14 @@ namespace ceinms {
 			if (curveName == "forceVelocity")      defaultForceVelocityCurve_.resetPointsWith(x, y);
 			if (curveName == "tendonForceStrain")  defaultTendonForceStrain_.resetPointsWith(x, y);
         }
-
     }
-
 
     template<typename NMSmodelT>
     void SetupDataStructure<NMSmodelT>::createMuscles(NMSmodelT& mySubject) const {
-
 		SubjectType::mtuDefault_type& mtuDefault(subjectPointer_->mtuDefault());
 		SubjectType::mtuSet_type& mtuSet(subjectPointer_->mtuSet());
 		MTUSetType::mtu_sequence& mtuSequence(mtuSet.mtu());
 		for (auto& muscleIt : mtuSequence) {
-
 			CurveOffline forceVelocityCurve = defaultForceVelocityCurve_;
 			CurveOffline activeForceLengthCurve = defaultActiveForceLengthCurve_;
 			CurveOffline passiveForceLengthCurve = defaultPassiveForceLengthCurve_;
@@ -188,23 +177,20 @@ namespace ceinms {
 
     template<typename NMSmodelT>
     void SetupDataStructure<NMSmodelT>::setExtraInfo(NMSmodelT& mySubject) const {
-
         if (!osimModel_.empty()) {
             mySubject.setOpenSimModelFilename(osimModel_);
-            std::cout << "Found OpenSim model associated to the subject: " << osimModel_ << std::endl;
+            cout << "Found OpenSim model associated to the subject: " << osimModel_ << endl;
         }
         else
-            std::cout << "No OpenSim model associated to the subject" << std::endl;
+            cout << "No OpenSim model associated to the subject" << endl;
     }
 
     template<typename NMSmodelT>
     void SetupDataStructure<NMSmodelT>::createDoFs(NMSmodelT& mySubject) const {
-
         SubjectType::dofSet_type& dofSet(subjectPointer_->dofSet());
         DoFSetType::dof_sequence& dofSequence(dofSet.dof());
         DoFSetType::dof_iterator i;
         for (i = dofSequence.begin(); i != dofSequence.end(); ++i) {
-
             string dofName = (*i).name();
             DoFT newDoF(dofName);
 

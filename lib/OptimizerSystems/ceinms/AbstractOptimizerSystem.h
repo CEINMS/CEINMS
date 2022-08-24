@@ -28,9 +28,11 @@
 
 #ifndef ceinms_Optimizers_AbstractOptimizerSystem_h
 #define ceinms_Optimizers_AbstractOptimizerSystem_h
+
 #include <vector>
 
 namespace ceinms {
+    
     namespace Optimizers {
 
         class AbstractOptimizerSystem {

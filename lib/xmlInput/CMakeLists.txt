@@ -11,7 +11,6 @@ target_link_libraries(xsdbin ${XERCES_LIBRARIES})
 target_include_directories(xsdbin PRIVATE ${XERCES_INCLUDE_DIR})
 
 macro (schema_to_bin xsdfile)
-
   get_filename_component(xsd_name_we ${xsdfile} NAME_WE)
   add_custom_command(
     OUTPUT ${xsd_name_we}-schema.cxx ${xsd_name_we}-schema.hxx
@@ -68,7 +67,6 @@ set(schemas_GENERATED_SOURCES
     ${CMAKE_CURRENT_BINARY_DIR}/ceinmsSetup-schema.cxx
     ${CMAKE_CURRENT_BINARY_DIR}/ceinmsCalibrationSetup-schema.cxx
     ${CMAKE_CURRENT_BINARY_DIR}/contactModel-schema.cxx
-
 )
 
 set(xmlInput_HEADERS

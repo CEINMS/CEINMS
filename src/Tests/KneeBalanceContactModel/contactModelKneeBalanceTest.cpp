@@ -1,7 +1,3 @@
-#include "ceinms/ContactModelKneeBalance.h"
-using ceinms::ContactModelKneeBalance;
-#include "ceinms/ContactModelKneeBalanceSetup.h"
-using ceinms::ContactModelKneeBalanceSetup;
 #include <vector>
 using std::vector;
 #include <string>
@@ -10,10 +6,12 @@ using std::string;
 using std::cout;
 using std::endl;
 
+#include "ceinms/ContactModelKneeBalance.h"
+using ceinms::ContactModelKneeBalance;
+#include "ceinms/ContactModelKneeBalanceSetup.h"
+using ceinms::ContactModelKneeBalanceSetup;
 
 int main() {
-
-
     ContactModelKneeBalanceSetup setup;
     setup.intercondyleDistance = 0.1;
     setup.condyle1.dof = "medial_condyle_dof";
@@ -52,5 +50,4 @@ int main() {
     }
 
     return 0;
-
 }

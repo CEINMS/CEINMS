@@ -10,8 +10,7 @@
 find_path(XERCES_INCLUDE_DIR /xercesc/util/XercesVersion.hpp
             PATHS   "${XERCES_DIR}"
                     "C:/Program Files (x86)/CodeSynthesis XSD 4.0"
-                    "C:/Program Files (x86)/CodeSynthesis XSD 4.0"
-					"C:/xerces-c-3.1.3_32r"
+					          "C:/xerces-c-3.1.3_32r"
                     $ENV{XERCES_ROOT}
             PATH_SUFFIXES include)
 

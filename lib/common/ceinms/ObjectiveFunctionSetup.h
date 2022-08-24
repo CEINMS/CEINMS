@@ -28,6 +28,7 @@
 
 #ifndef ceinms_ObjectiveFunctionSetup_h
 #define ceinms_ObjectiveFunctionSetup_h
+
 #include <string>
 #include <vector>
 #include <memory>
@@ -35,7 +36,6 @@
 #include <iostream>
 
 namespace ceinms {
-
  
     enum class CalibrationObjectiveFunction {
         TorqueError,
@@ -63,7 +63,6 @@ namespace ceinms {
     */
     class ObjectiveFunctionSetup {
     public:
-       
         ObjectiveFunctionSetup() : 
             weight_(1.), 
             exponent_(1.), 
@@ -128,8 +127,6 @@ namespace ceinms {
             return os;
         }
 
-		
-
     protected:
         virtual void print(std::ostream& os) const {
             using ObjFunMap = std::map<CalibrationObjectiveFunction, std::string>;
@@ -174,8 +171,7 @@ namespace ceinms {
         double weight_, exponent_;
     };
 
-
-	//This is used to sobtitute the keyword `all` with the actual names of the targets
+	//This is used to substitute the keyword `all` with the actual names of the targets
 		//return true if successfully updated the targets names
 	template<typename NMSmodelT>
 	bool updateTargetsFromModel(ObjectiveFunctionSetup& objFunctionSetup, NMSmodelT& model) {
@@ -247,10 +243,10 @@ namespace ceinms {
             ObjectiveFunctionSetup::print(os);
             os << " - Range: " << xL_ << ", " << xR_ << "\n";
         }
+
     private:
         double xL_, xR_;
     };
-
-
 }
+
 #endif

@@ -40,6 +40,7 @@
  * write here the structure of the file
  */
 namespace ceinms {
+
     class DataFromStorageFile {
     public:
         DataFromStorageFile() = delete;
@@ -53,6 +54,7 @@ namespace ceinms {
         ~DataFromStorageFile();
         DataFromStorageFile(const DataFromStorageFile& orig) = delete;
         DataFromStorageFile& operator=(const DataFromStorageFile& orig) = delete;
+
     private:
         std::string dataFileName_;
         std::ifstream dataFile_;
@@ -64,4 +66,5 @@ namespace ceinms {
         std::vector<double> currentData_;
     };
 }
+
 #endif

@@ -32,12 +32,14 @@ using std::cout;
 using std::endl;
 #include <vector>
 using std::vector;
-
 #include <math.h>
+
 #include "ceinms/HybridWeightings.h"
 
 namespace ceinms {
+
     namespace Hybrid {
+
         namespace ObjectiveFunction {
 
             template<typename StaticComputationT>
@@ -53,13 +55,10 @@ namespace ceinms {
                 fLatest_.resize(nEpsilon_);
                 for (unsigned int a = 0; a < nEpsilon_; ++a)
                     fLatest_.at(a) = DBL_MAX;
-
             }
-
 
             template<typename StaticComputationT>
             void MinTorqueTrackEMGs<StaticComputationT>::evalFp() {
-
                 //1)
                 //calculate first term of objective function: Least Squares Fitting
 
@@ -104,43 +103,32 @@ namespace ceinms {
                       cout << "sumEMG_ " << emgSum << endl; */
             }
 
-
             template<typename StaticComputationT>
             bool MinTorqueTrackEMGs<StaticComputationT>::isFacceptable() {
-
                 if (fp_ > f_)
                     return false;
                 return true;
             }
 
-
             template<typename StaticComputationT>
             void MinTorqueTrackEMGs<StaticComputationT>::updateF() {
-
                 f_ = fp_;
             }
 
-
-
             template<typename StaticComputationT>
             bool MinTorqueTrackEMGs<StaticComputationT>::isFoptAcceptable() {
-
                 if (fp_ > fOpt_)
                     return false;
                 return true;
             }
 
-
             template<typename StaticComputationT>
             void MinTorqueTrackEMGs<StaticComputationT>::updateFopt() {
-
                 fOpt_ = fp_;
             }
 
-
             template<typename StaticComputationT>
             void MinTorqueTrackEMGs<StaticComputationT>::printFs() {
-
                 cout << "fp_: ";
                 cout << fp_ << " ";
                 cout << endl;
@@ -152,7 +140,6 @@ namespace ceinms {
                 cout << endl;
             }
 
-
             template<typename StaticComputationT>
             double MinTorqueTrackEMGs<StaticComputationT>::computeMetropolisCriteria(const double t) {
 
@@ -161,10 +148,8 @@ namespace ceinms {
                 return exp(p / t);
             }
 
-
             template<typename StaticComputationT>
             bool MinTorqueTrackEMGs<StaticComputationT>::terminate() {
-
                 fLatest_.at(0) = f_;
                 for (unsigned int a = 0; a < nEpsilon_; ++a) {
                     if (fabs(fLatest_.at(a) - fOpt_) > epsilon_)
@@ -173,15 +158,12 @@ namespace ceinms {
                 return true;
             }
 
-
-
             template<typename StaticComputationT>
             void MinTorqueTrackEMGs<StaticComputationT>::updateFandFlatest() {
                 for (unsigned int a = 1; a < nEpsilon_; ++a)
                     fLatest_.at(nEpsilon_ - a) = fLatest_.at(nEpsilon_ - a - 1);
                 f_ = fOpt_;
             }
-
         }
     }
 }

@@ -30,19 +30,21 @@
 #define ceinms_MuscleForcesQueue_h
 
 #include <vector>
+
+#include "rtb/concurrency/Concurrency.h"
+
 #include "ceinms/QueueData.h"
 
 namespace Concurrency {
+
     template<typename>
     class Queue;
 }
 
 namespace ceinms {
 
-    using MuscleForcesFrame = QueueData < std::vector<double> >;
-    using MuscleForcesQueue = rtb::Concurrency::Queue < MuscleForcesFrame >;
-
+    using MuscleForcesFrame = QueueData<std::vector<double>>;
+    using MuscleForcesQueue = rtb::Concurrency::Queue<MuscleForcesFrame>;
 }
-
 
 #endif

@@ -1,4 +1,5 @@
 ## Authors: Monica Reggiani, Claudio Pizzolato
+
 add_subdirectory(common)
 add_subdirectory(xmlInput)
 add_subdirectory(FileIO)

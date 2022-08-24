@@ -29,14 +29,17 @@
 #ifndef ceinms_Hybrid_Parameters_RecursiveEMGs_h
 #define ceinms_Hybrid_Parameters_RecursiveEMGs_h
 
-#include "ceinms/NMSmodel.h"
-
 #include <vector>
 #include <string>
 
+#include "ceinms/NMSmodel.h"
+
 namespace ceinms {
+
     namespace Hybrid {
+
         namespace Parameters {
+
             template<typename NMSmodelT>
             class RecursiveEMGs;
 
@@ -44,10 +47,8 @@ namespace ceinms {
             std::ostream& operator<< (std::ostream& output,
                 const RecursiveEMGs<NMSmodelT>& p);
 
-
             template<typename NMSmodelT>
             class RecursiveEMGs{
-
             public:
                 RecursiveEMGs(NMSmodelT& subject,
                     const std::vector< std::string >& muscleNamesWithEMGtoTrack,
@@ -74,5 +75,4 @@ namespace ceinms {
 }
 
 #include "RecursiveEMGs.cpp"
-
 #endif

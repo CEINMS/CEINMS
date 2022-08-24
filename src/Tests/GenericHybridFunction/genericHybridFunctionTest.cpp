@@ -1,26 +1,25 @@
-#include "ceinms/NMSmodel.h"
-#include "ceinms/Activation/ExponentialActivation.h"
-#include "ceinms/Tendon/ElasticTendon_BiSec.h"
-#include "ceinms/Curve.h"
 #include <functional>
 #include <cmath>
 #include <algorithm>
 #include <numeric>
 #include <memory>
 
+#include "ceinms/NMSmodel.h"
+#include "ceinms/Activation/ExponentialActivation.h"
+#include "ceinms/Tendon/ElasticTendon_BiSec.h"
+#include "ceinms/Curve.h"
 using namespace ceinms;
+
 using ExternalDataMap = std::map<std::string, std::vector<double>>;
 using ExternalDataMapPtr = std::shared_ptr<ExternalDataMap>;
 
 struct ObjectiveFunctionComponent {
-
     std::string type_; //"torque", "force", "excitation" 
     double weight_;
     double exponent_;
     std::string action_; //"none", "difference"
     std::vector<std::string> sources_; //names.. such as 
 };
-
 
 template<typename NMSmodelT>
 std::function<double(NMSmodelT&, ExternalDataMapPtr)> getFunction(
@@ -89,14 +88,12 @@ public:
         for(auto& fun)
 
     }
+
 private:
     std::vector<ObjectiveFunctionComponent> components_;
 };
 
-
 int main() {
-
-
     NMSmodel<ExponentialActivation, ElasticTendon_BiSec, CurveMode::Online> model;
     MTU<ExponentialActivation, ElasticTendon_BiSec, CurveMode::Online> mtu1("mtu1");
     MTU<ExponentialActivation, ElasticTendon_BiSec, CurveMode::Online> mtu2("mtu2");

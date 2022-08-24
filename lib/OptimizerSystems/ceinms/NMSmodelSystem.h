@@ -29,25 +29,26 @@
 #ifndef ceinms_NMSmodelSystem_h
 #define ceinms_NMSmodelSystem_h
 
-#include "AbstractOptimizerSystem.h"
+#include <memory>
+#include <vector>
 
+#include "AbstractOptimizerSystem.h"
 #include "ParametersInterpreter.h" //TODO: rename this class
 #include "ceinms/TrialData.h"
 #include "ceinms/BatchEvaluator.h"
 #include "ceinms/BatchOpenSimEvaluator.h"
 #include "ceinms/BatchContactModelEvaluator.h"
-#include <memory>
-#include <vector>
 
 namespace ceinms {
-    template <typename NMSmodelT, typename ObjectiveFunctionT>
-    class NMSmodelSystem : public Optimizers::AbstractOptimizerSystem  {
+
+    template<typename NMSmodelT, typename ObjectiveFunctionT>
+    class NMSmodelSystem : public Optimizers::AbstractOptimizerSystem {
     public:
         NMSmodelSystem(NMSmodelT& subject, 
             const std::vector<TrialData>& trialData, 
             const ObjectiveFunctionT& objectiveFunction, 
             const Parameter::Set& parameterSet);
-        virtual ~NMSmodelSystem() {}
+        virtual ~NMSmodelSystem() { }
         //    void setDofsToCalibrate(const std::vector<std::string>& dofsToCalibrate);
         void setContactModelSetup(const ContactModelKneeBalanceSetup& setup);
         void evaluate();

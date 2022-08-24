@@ -26,6 +26,15 @@
  * limitations under the License.                                             *
  * -------------------------------------------------------------------------- */
 
+#include <vector>
+using std::vector;
+#include <string>
+using std::string;
+#include <algorithm>
+using std::find;
+#include <iostream>
+#include <stdlib.h>
+
 #include "ceinms/ExcitationGeneratorFromXml.h"
 #include "excitationGenerator.hxx"
 using ExcitationGeneratorXsd::excitationGenerator;
@@ -33,21 +42,11 @@ using ExcitationGeneratorXsd::ExcitationListType;
 using ExcitationGeneratorXsd::ExcitationType;
 
 #include "ceinms/ExcitationGeneratorXmlReader.h"
-#include <vector>
-using std::vector;
-#include <string>
-using std::string;
-
-#include <algorithm>
-using std::find;
-#include <iostream>
-#include <stdlib.h>
 
 namespace ceinms {
-    ExcitationGeneratorFromXml::ExcitationGeneratorFromXml(const std::string& xmlFilename) {
 
+    ExcitationGeneratorFromXml::ExcitationGeneratorFromXml(const string& xmlFilename) {
         try {
-
             ExcitationGeneratorXmlReader sxr(xmlFilename);
             std::unique_ptr<excitationGenerator> generatorPtr = sxr.getExcitationGenerator();
 
@@ -56,18 +55,15 @@ namespace ceinms {
                 inputSignalsNames_.push_back(*it);
 
             ExcitationListType::excitation_sequence& excitations(generatorPtr->mapping().excitation());
-            for (auto it : excitations)
-            {
+            for (auto it : excitations) {
                 excitationsNames_.push_back(it.id());
                 ExcitationType::input_sequence inputSequence(it.input());
-                std::vector<Component> excitationComponentsVector/*(inputSequence.size())*/;
-                for (auto inputIt : inputSequence)
-                {
+                vector<Component> excitationComponentsVector/*(inputSequence.size())*/;
+                for (auto inputIt : inputSequence) {
                     Component currentComponent;
                     currentComponent.weight = inputIt.weight();
-                    std::vector<std::string>::iterator positionInInputSignalsList = std::find(inputSignalsNames_.begin(), inputSignalsNames_.end(), inputIt.data());
-                    if (positionInInputSignalsList == inputSignalsNames_.end())
-                    {
+                    vector<string>::iterator positionInInputSignalsList = find(inputSignalsNames_.begin(), inputSignalsNames_.end(), inputIt.data());
+                    if (positionInInputSignalsList == inputSignalsNames_.end()) {
                         std::cout << "Excitation generator: could not find " << inputIt.data() << " input signal" << std::endl;
                         exit(EXIT_FAILURE);
                     }
@@ -85,12 +81,9 @@ namespace ceinms {
             std::cout << e << std::endl;
             exit(EXIT_FAILURE);
         }
-
     }
 
-
-    void ExcitationGeneratorFromXml::convert(const std::vector< double >& inputSignals, std::vector< double >& excitations) const {
-
+    void ExcitationGeneratorFromXml::convert(const vector<double>& inputSignals, vector<double>& excitations) const {
         if (inputSignals.size() != noInputSignals_) {
             std::cout << "I need " << noInputSignals_ << " input signals for excitation generation, but I got " << inputSignals.size() << " muscles!\n";
             exit(EXIT_FAILURE);
@@ -104,7 +97,6 @@ namespace ceinms {
         excitations.clear();
         excitations.resize(noExcitations_);
         for (unsigned i = 0; i < noExcitations_; ++i) {
-
             double result = 0;
             for (auto inputIt : weights_.at(i))
                 result += inputIt.weight * inputSignals.at(inputIt.index);
@@ -112,5 +104,4 @@ namespace ceinms {
             excitations.at(i) = result;
         }
     }
-
 }

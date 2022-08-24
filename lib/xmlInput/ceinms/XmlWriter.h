@@ -28,12 +28,14 @@
 
 #ifndef ceinms_XmlWrite_h
 #define ceinms_XmlWriter_h
+
 #include <string>
+
 #include "subject.hxx"
 
 namespace ceinms {
-    class XmlWriter {
 
+    class XmlWriter {
     public:
         // XmlWriter();
         XmlWriter(const std::string& oldXmlFile);
@@ -51,5 +53,6 @@ namespace ceinms {
         std::unique_ptr<SubjectXsd::SubjectType> subjectPointer_;
     };
 }
+
 #include "XmlWriter.cpp"
 #endif

@@ -26,10 +26,9 @@
 * limitations under the License.                                             *
 * -------------------------------------------------------------------------- */
 
-#include "ceinms/SumGenericContactForces.h"
 #include <vector>
-#include <cmath>
 using std::vector;
+#include <cmath>
 #include <string>
 using std::string;
 #include <iostream>
@@ -38,46 +37,40 @@ using std::endl;
 #include <algorithm>
 #include <numeric>
 
+#include "ceinms/SumGenericContactForces.h"
+
 namespace ceinms {
 
 
     SumGenericContactForces::SumGenericContactForces() : 
         f_(std::numeric_limits<double>::max()),
         weight_(1.),
-        exponent_(1.)
-    {    }
+        exponent_(1.) { }
 
 
     SumGenericContactForces::SumGenericContactForces(const ObjectiveFunctionSetup& setup) :
-        SumGenericContactForces()
-    {
+        SumGenericContactForces() {
         setSetup(setup);
-
     }
 
     void SumGenericContactForces::setSetup(const ObjectiveFunctionSetup& setup) {
-
         weight_ = setup.weight;
         exponent_ = setup.exponent;
         barrierListSetup_ = setup.barrierListSetup;
-
     }
 
-    void SumGenericContactForces::setJointContactForcesNames(const std::vector<std::string>& contactForcesNames) {
-
+    void SumGenericContactForces::setJointContactForcesNames(const vector<string>& contactForcesNames) {
         barrierFunc_.initialize(barrierListSetup_, contactForcesNames);
         contactForcesNames_ = contactForcesNames;
     }
 
-
     void SumGenericContactForces::calculate(const vector<Result>& results) {
         maxContactForces_.clear();
         for (auto& r : results) {
-
-            std::vector<double> maxContactForcesForCurrentResult;
+            vector<double> maxContactForcesForCurrentResult;
             for (auto& joint : contactForcesNames_) {
                 auto column(r.jointReactionForces.getColumn(joint));
-                std::vector<double> magnitude;
+                vector<double> magnitude;
                 std::transform(column.cbegin(), column.cend(), std::back_inserter(magnitude), [](const SimTK::Vec3& v) {
                     return v.norm();
                 });
@@ -98,7 +91,6 @@ namespace ceinms {
     }
 
     void SumGenericContactForces::printCosts() const {
-
         cout << "Peak contact forces:" << endl;
         for (int i(0); i < maxContactForces_.size(); ++i) {
             cout << "Trial# " << i+1 << endl;
@@ -106,7 +98,7 @@ namespace ceinms {
                 cout << contactForcesNames_.at(j) << " " << maxContactForces_.at(i).at(j) << " N" << endl;
             }
         }
-        std::cout << "Fobj = " << getValue() << std::endl;
+        cout << "Fobj = " << getValue() << endl;
     }
 }
   

@@ -26,7 +26,7 @@
  * limitations under the License.                                             *
  * -------------------------------------------------------------------------- */
 
-#include "ceinms/CalibrationXmlReader.h"
+
 
 #include <string>
 using std::string;
@@ -34,15 +34,18 @@ using std::string;
 using std::cout;
 using std::endl;
 #include <ostream>
-#include "calibration.hxx"
-#include "calibration-schema.hxx"
-#include "validation.h"
-#include "ceinms/FileUtils.h"
 #include <vector>
 using std::vector;
+
+#include "ceinms/CalibrationXmlReader.h"
+#include "ceinms/FileUtils.h"
+#include "calibration.hxx"
+#include "validation.h"
+#include "calibration-schema.hxx"
 using namespace CalibrationXsd;
 
 namespace ceinms {
+
     CalibrationXmlReader::CalibrationXmlReader(const string& filename)
         :runMode_(0), optimizationAlgorithm_(0), tolerance_(1e-6) {
 
@@ -67,19 +70,15 @@ namespace ceinms {
         readXml();
     }
 
-
     void CalibrationXmlReader::readXml() {
-        
         readNMSmodelCfg();
         readOptimizationAlgorithmCfg();
         readCalibrationStepsCfg();
         readCalibrationTrialList();
     }
 
-
     void CalibrationXmlReader::readNMSmodelCfg() {
-
-        std::cout << "readNMSmodelCfg\n";
+        cout << "readNMSmodelCfg\n";
         try {
             CalibrationType::NMSmodel_type& myModel(calibrationPointer_->NMSmodel());
             CalibrationType::NMSmodel_type::activation_type& myActivation(myModel.activation());
@@ -125,12 +124,9 @@ namespace ceinms {
             cout << e << endl;
             exit(EXIT_FAILURE);
         }
-
     }
 
-
     void CalibrationXmlReader::readOptimizationAlgorithmCfg(){
-
         CalibrationType::algorithm_type& myAlgorithm(calibrationPointer_->algorithm());
 
         // siman is the only choice
@@ -144,12 +140,9 @@ namespace ceinms {
         simanParameters_.NT = mySiman.NT();
         simanParameters_.epsilon = mySiman.epsilon();
         simanParameters_.maxNoEval = mySiman.maxNoEval();
-
     }
 
-
     void CalibrationXmlReader::readCalibrationStepsCfg() {
-
         CalibrationType::calibrationSteps_type& myCalibrationSteps(calibrationPointer_->calibrationSteps());
         CalibrationType::calibrationSteps_type::step_sequence& stepSequence(myCalibrationSteps.step());
         CalibrationType::calibrationSteps_type::step_iterator stepIt = stepSequence.begin();
@@ -159,10 +152,8 @@ namespace ceinms {
         }
     }
 
-
     CalibrationStep CalibrationXmlReader::readStep(const StepType& step) {
-
-        using TargetTypeMap = std::map<std::string, CalibrationTargetType>;
+        using TargetTypeMap = std::map<string, CalibrationTargetType>;
 
         TargetTypeMap targetType = {
             { "muscleForce", CalibrationTargetType::MuscleForce},
@@ -239,9 +230,7 @@ namespace ceinms {
         return calibrationStep;
     }
 
-
     Parameter CalibrationXmlReader::readParameter(const ParameterType& parameterType) {
-
         Parameter parameter;
         parameter.setName(parameterType.name());
         const ParameterType::muscleGroups_optional& myMuscleGroupsOpt(parameterType.muscleGroups());
@@ -285,14 +274,12 @@ namespace ceinms {
         return parameter;
     }
 
-
     void CalibrationXmlReader::readCalibrationTrialList() {
-
         CalibrationType::trialSet_type& myTrialSet(calibrationPointer_->trialSet());
         TrialSetType::iterator it = myTrialSet.begin();
         for (it; it != myTrialSet.end(); ++it)
         {
-            std::string fileName = (*it);
+            string fileName = (*it);
             FileUtils::trim(fileName);
             if (FileUtils::isAbsolute(fileName.c_str()))
                 calibrationTrials_.push_back(fileName);
@@ -301,16 +288,11 @@ namespace ceinms {
         }
     }
 
-
-
     NMSModelCfg::RunMode CalibrationXmlReader::getNMSmodelRunMode() const {
-
         return static_cast<NMSModelCfg::RunMode>(runMode_);
     }
 
-
     bool CalibrationXmlReader::popNextCalibrationStep(CalibrationStep& calibrationStep) {
-
         if (calibrationSteps_.empty())
             return 0;
 
@@ -319,40 +301,31 @@ namespace ceinms {
         return 1;
     }
 
-
     CalibrationCfg::OptimizationAlgorithm CalibrationXmlReader::getOptimizationAlgorithm() const {
-
         return static_cast<CalibrationCfg::OptimizationAlgorithm>(optimizationAlgorithm_);
     }
 
-
     void CalibrationXmlReader::getOptimizationAlgorithmParameters(SimulatedAnnealingParameters& parameters) const {
-
         parameters = simanParameters_;
     }
 
-
-
     void CalibrationXmlReader::getCalibrationTrials(std::list<string>& trials) const {
-
         trials = calibrationTrials_;
     }
 
-
     std::ostream& operator<< (std::ostream& output, const CalibrationXmlReader& rhs) {
-
         output << "Calibration configuration\n";
         output << " - Algorithm\n";
         switch (rhs.optimizationAlgorithm_) {
         case CalibrationCfg::Siman:
             output << " -- Simulated Annealing\n";
-            output << " --- noEpsilon " << rhs.simanParameters_.noEpsilon << std::endl;
-            output << " --- NS " << rhs.simanParameters_.NS << std::endl;
-            output << " --- NT " << rhs.simanParameters_.NT << std::endl;
-            output << " --- maxNoEval " << rhs.simanParameters_.maxNoEval << std::endl;
-            output << " --- rt " << rhs.simanParameters_.rt << std::endl;
-            output << " --- T " << rhs.simanParameters_.T << std::endl;
-            output << " --- epsilon " << rhs.simanParameters_.epsilon << std::endl;
+            output << " --- noEpsilon " << rhs.simanParameters_.noEpsilon << endl;
+            output << " --- NS " << rhs.simanParameters_.NS << endl;
+            output << " --- NT " << rhs.simanParameters_.NT << endl;
+            output << " --- maxNoEval " << rhs.simanParameters_.maxNoEval << endl;
+            output << " --- rt " << rhs.simanParameters_.rt << endl;
+            output << " --- T " << rhs.simanParameters_.T << endl;
+            output << " --- epsilon " << rhs.simanParameters_.epsilon << endl;
             break;
         default:
             output << " -- Not Found\n";
@@ -366,9 +339,9 @@ namespace ceinms {
                 output << *objfElement;
         }
         output << " - Trials\n";
-        for (std::list<std::string>::const_iterator tIt = rhs.calibrationTrials_.begin(); tIt != rhs.calibrationTrials_.end(); ++tIt)
-            output << " -- " << *tIt << std::endl;
-        output << std::endl;
+        for (std::list<string>::const_iterator tIt = rhs.calibrationTrials_.begin(); tIt != rhs.calibrationTrials_.end(); ++tIt)
+            output << " -- " << *tIt << endl;
+        output << endl;
         return output;
     }
 }

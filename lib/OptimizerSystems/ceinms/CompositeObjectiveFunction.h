@@ -5,6 +5,7 @@
 #include <vector>
 #include <string>
 #include <memory>
+
 #include "ceinms/Result.h"
 #include "ceinms/TrialData.h"
 #include "ceinms/ObjectiveFunctionBase.h"
@@ -24,13 +25,13 @@ namespace ceinms {
         bool calculateOpenSimData() const override; 
         static CompositeObjectiveFunction makeComposite(
             ObjectiveFunctionSetupList objectiveFunctions);
+
     private:
         std::vector<std::shared_ptr<ObjectiveFunctionBase>> objectiveFunctions_;
         double f_;
         std::vector<TrialData> trials_;
         std::vector<std::string> dofsToCalibrate_;
     };
-
 }
 
 #endif

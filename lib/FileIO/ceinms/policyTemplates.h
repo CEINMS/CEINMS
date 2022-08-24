@@ -32,10 +32,10 @@
 #include "EMGDataFromFile.h"
 #include "ExcitationGeneratorFromXml.h"
 
-
 namespace ceinms {
+
     template
-    class EMGDataFromFile < ExcitationGeneratorFromXml > ;
+    class EMGDataFromFile<ExcitationGeneratorFromXml>;
 }
 
 #endif

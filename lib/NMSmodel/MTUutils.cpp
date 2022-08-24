@@ -26,14 +26,15 @@
  * limitations under the License.                                             *
  * -------------------------------------------------------------------------- */
 
-#include "ceinms/MTUutils.h"
 #include <cmath>
 
+#include "ceinms/MTUutils.h"
+
 namespace ceinms {
+
     namespace PennationAngle {
 
         double compute(double fibreLength, double optimalFibreLength, double pennationAngle) {
-
             double value(optimalFibreLength*std::sin(pennationAngle) / fibreLength);
             if (value <= 0.0)
                 return .0;

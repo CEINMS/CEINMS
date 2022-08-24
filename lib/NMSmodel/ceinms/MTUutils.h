@@ -42,4 +42,5 @@ namespace ceinms {
 inline double radians(double d) {
     return d * M_PI / 180;
 }
+
 #endif

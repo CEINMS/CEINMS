@@ -6,34 +6,31 @@ project(JointContactModels)
 set(JointContactModels_HEADERS 
     ceinms/JointContactFromOpensim.h                            
     ceinms/ContactModelKneeBalance.h
-    )
-
-set(JointContactModels_TEMPLATE_IMPLEMENTATION
-
-							)
-                            
+)
 set(JointContactModels_SOURCES 
     JointContactFromOpensim.cpp
     ContactModelKneeBalance.cpp
 )
 
+set(JointContactModels_TEMPLATE_IMPLEMENTATION)
+                        
 set_source_files_properties( ${JointContactModels_TEMPLATE_IMPLEMENTATION} PROPERTIES HEADER_FILE_ONLY TRUE)
 
 source_group("Header Files" FILES ${JointContactModels_HEADERS})
 source_group("Source Files" FILES ${JointContactModels_TEMPLATE_IMPLEMENTATION} ${JointContactModels_SOURCES})
 
 add_library(JointContactModels STATIC ${JointContactModels_HEADERS} ${JointContactModels_TEMPLATE_IMPLEMENTATION} ${JointContactModels_SOURCES} )
-target_include_directories( JointContactModels
+target_include_directories(JointContactModels
                             PRIVATE 
-                            #       ${OPENSIMSIMBODY_INCLUDE_DIRS}      
-                             #      ${SIMTK_INCLUDE_DIRS}
-                            #       ${NMSmodel_INCLUDE_DIRS}
-                             #      ${Curve_INCLUDE_DIRS}
-                              #     ${FileIO_INCLUDE_DIRS}
-                                   ${ceinms_common_INCLUDE_DIRS}
-								#	${Optimizers_INCLUDE_DIRS}
-								#	${TrialData_INCLUDE_DIRS}
-                                    )
+                                # ${OPENSIMSIMBODY_INCLUDE_DIRS}      
+                                # ${SIMTK_INCLUDE_DIRS}
+                                # ${NMSmodel_INCLUDE_DIRS}
+                                # ${Curve_INCLUDE_DIRS}
+                                # ${FileIO_INCLUDE_DIRS}
+                                ${ceinms_common_INCLUDE_DIRS}
+								# ${Optimizers_INCLUDE_DIRS}
+								# ${TrialData_INCLUDE_DIRS}
+)
 
 target_link_libraries(JointContactModels ${OpenSim_LIBRARIES})
 #target_link_libraries(JointContactModels debug ${OPENSIM_LIBRARIES_DEBUG})
@@ -48,4 +45,5 @@ install(TARGETS JointContactModels
         EXPORT CEINMSTargets
         RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT Applications
         LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT Development
-        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT Development)
+        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT Development
+)

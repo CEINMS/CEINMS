@@ -38,8 +38,8 @@ using std::endl;
 using ExcitationGeneratorXsd::excitationGenerator;
 
 namespace ceinms {
-    ExcitationGeneratorXmlReader::ExcitationGeneratorXmlReader(const string& filename)
-    {
+
+    ExcitationGeneratorXmlReader::ExcitationGeneratorXmlReader(const string& filename) {
         try {
             excitationGenPointer_ = parseAndValidate<excitationGenerator>(filename, excitationGenerator_schema, sizeof(excitationGenerator_schema));
         }
@@ -49,8 +49,7 @@ namespace ceinms {
         }
     }
 
-    std::unique_ptr< excitationGenerator > ExcitationGeneratorXmlReader::getExcitationGenerator()
-    {
+    std::unique_ptr< excitationGenerator > ExcitationGeneratorXmlReader::getExcitationGenerator() {
         return std::move(excitationGenPointer_);
     }
 }

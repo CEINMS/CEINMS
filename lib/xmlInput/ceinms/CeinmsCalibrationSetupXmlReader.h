@@ -31,11 +31,12 @@
 
 #include <string>
 #include <map>
+
 #include "ceinmsCalibrationSetup.hxx"
 
 namespace ceinms {
-    class CeinmsCalibrationSetupXmlReader {
 
+    class CeinmsCalibrationSetupXmlReader {
     public:
         CeinmsCalibrationSetupXmlReader(const std::string& filename);
         std::string getSubjectFile();

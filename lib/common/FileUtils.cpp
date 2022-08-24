@@ -29,28 +29,23 @@
 #include <string>
 #include <filesystem>
 #include <iostream>
-#include "ceinms/FileUtils.h"
 #include <fstream>
 #include <sstream>
 #include <algorithm>
 
+#include "ceinms/FileUtils.h"
+
 namespace ceinms {
-	
 
     namespace FileUtils {
 
-
-        void sortMaFilenames(const std::map<std::string, std::string>& maMap, const std::vector< std::string >& dofNames, std::vector< std::string >& maDataFilenames)
-        {
+        void sortMaFilenames(const std::map<std::string, std::string>& maMap, const std::vector<std::string>& dofNames, std::vector<std::string>& maDataFilenames) {
             int currentDof = 0;
-            for (auto& it : dofNames)
-            {
-                try
-                {
+            for (auto& it : dofNames) {
+                try {
                     maDataFilenames.push_back(maMap.at(it));
                 }
-                catch (std::out_of_range)
-                {
+                catch (std::out_of_range) {
                     std::cerr << "Could not find moment arm file for " << it << " degree of freedom" << std::endl;
                     exit(EXIT_FAILURE);
                 }
@@ -73,7 +68,6 @@ namespace ceinms {
             return foundFile;
         }
 
-
         bool isAbsolute(const char *path) {
             if (path[0] == '/' || path[0] == '\\') {
                 return true;
@@ -88,10 +82,8 @@ namespace ceinms {
         }
 
         bool fileExists(const std::string& filename) {
-
             return std::filesystem::exists(filename);
         }
-
 
         std::string simplify(const std::string& filename) {
             std::string fullpath = filename;
@@ -105,7 +97,6 @@ namespace ceinms {
             }
             catch (std::exception& e) {
                 std::cout << e.what();
-
             }
             return fullpath;
         }
@@ -122,15 +113,13 @@ namespace ceinms {
             return fullpath;
         }
 
-        void trim(std::string& fileName)
-        {
+        void trim(std::string& fileName) {
             char* t = " \t\n\r\f\v/";
             fileName.erase(0, fileName.find_first_not_of(t));
             fileName.erase(fileName.find_last_not_of(t) + 1);
         }
 
         std::string getFilePath(const std::string& filename) {
-
             // save the location of input filename
             std::string::size_type dirSep = filename.rfind('/'); // Unix/Mac dir separator
             std::string filepath("");

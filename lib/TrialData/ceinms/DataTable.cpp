@@ -32,52 +32,46 @@
 #include <iterator>
 #include <fstream>
 #include <iostream>
+
 #include "DataTable.h"
 
 namespace ceinms {
 
-    template <typename T>
+    template<typename T>
     DataTable<T>::DataTable() :
         nRows_(0), nCols_(0) {}
 
-    template <typename T>
+    template<typename T>
     DataTable<T>::DataTable(size_t nRows, size_t nCols) :
         nRows_(nRows), nCols_(nCols), data_(std::vector<std::vector<T>>(nRows, std::vector<T>(nCols, T{ 0 }))), time_(nRows, 0) {
     }
 
-    template <typename T>
+    template<typename T>
     void DataTable<T>::setTime(double time, std::size_t row) {
-
         time_.at(row) = time;
     }
 
-    template <typename T>
+    template<typename T>
     void DataTable<T>::setTimeColumn(const std::vector<double>& timeColumn) {
-
         if (timeColumn.size() != nRows_)
             throw std::invalid_argument("pushRow: Wrong size of timeColumn");
         time_ = timeColumn;
     }
 
-
-    template <typename T>
+    template<typename T>
     void DataTable<T>::setLabels(const std::vector<std::string>& labels) {
-
         if (!data_.empty() && labels.size() != nCols_)
             throw std::invalid_argument("setLabels: wrong number of labels.");
         labels_ = labels;
     }
 
-
-    template <typename T>
+    template<typename T>
     void DataTable<T>::set(T value, size_t row, size_t col) {
-
         data_.at(row).at(col) = value;
     }
 
-    template <typename T>
+    template<typename T>
     void DataTable<T>::setColumn(size_t col, const std::vector<T>& values) {
-
         if (col > nCols_)
             throw std::invalid_argument("setColumn: index out of bounds.");
 
@@ -89,10 +83,8 @@ namespace ceinms {
         }
     }
 
-
-    template <typename T>
+    template<typename T>
     void DataTable<T>::setColumn(const std::string& columnName, const std::vector<T>& values) {
-
         auto it = std::find(labels_.begin(), labels_.end(), columnName);
         if (it == labels_.end()) {
             throw std::invalid_argument("setColumn: columnName does not exist.");
@@ -100,23 +92,18 @@ namespace ceinms {
         setColumn(std::distance(values.begin(), it), values);
     }
 
-
-    template <typename T>
+    template<typename T>
     const T& DataTable<T>::at(size_t row, size_t col) const {
-
         return data_.at(row).at(col);
     }
 
-    template <typename T>
+    template<typename T>
     T& DataTable<T>::at(size_t row, size_t col) {
-
         return data_.at(row).at(col);
     }
 
-
-    template <typename T>
+    template<typename T>
     void DataTable<T>::pushRow(double time, const std::vector<T>& values){
-
         if (values.size() != nCols_ && !data_.empty())
             throw std::invalid_argument("pushRow: Wrong size of values");
 
@@ -126,25 +113,20 @@ namespace ceinms {
         time_.emplace_back(time);
     }
 
-
-    template <typename T>
+    template<typename T>
     void DataTable<T>::setRow(size_t row, const std::vector<T>& values) {
-
         if (values.size() != nCols_)
             throw std::invalid_argument("setRow: Wrong size of values");
         data_.at(row) = values;
-
     }
 
-    template <typename T>
+    template<typename T>
     const std::vector<T>& DataTable<T>::getRow(size_t row) const {
-
         return data_.at(row);
     }
 
-    template <typename T>
+    template<typename T>
     std::vector<T> DataTable<T>::getColumn(size_t col) const {
-
         std::vector<T> column;
         column.reserve(nRows_);
         for (auto& row : data_)
@@ -152,9 +134,8 @@ namespace ceinms {
         return column;
     }
 
-    template <typename T>
+    template<typename T>
     std::vector<T> DataTable<T>::getColumn(const std::string& columnName) const {
-
         int idx(getColumnIndex(columnName));
         if (idx != -1)
             return getColumn(static_cast<size_t>(idx));
@@ -163,17 +144,15 @@ namespace ceinms {
 
     /* Return -1 if not found*/
     template<typename T>
-    int DataTable<T>::getColumnIndex(const std::string & columnName) const
-    {
+    int DataTable<T>::getColumnIndex(const std::string & columnName) const {
         auto it = std::find(labels_.cbegin(), labels_.cend(), columnName);
         if (it != labels_.cend())
             return std::distance(labels_.cbegin(), it);
         return -1;
     }
 
-    template <typename T>
+    template<typename T>
     DataTable<T>  DataTable<T>::sum(const DataTable<T>& lhs, const DataTable<T>& rhs) {
-
         if (lhs.getNColumns() != rhs.getNColumns() || lhs.getNColumns() != rhs.getNColumns())
             throw std::invalid_argument("lhs and rhs differ in size");  //check just on data size.. ignore labels and time column
 
@@ -188,7 +167,7 @@ namespace ceinms {
         return ans;
     }
 
-    template <typename T>
+    template<typename T>
     std::vector<double> DataTable<T>::accumulateColumns() const {
         std::vector<double> accum(nRows_, 0.);
         for (std::size_t row(0); row < nRows_; ++row) {
@@ -199,9 +178,8 @@ namespace ceinms {
         return accum;
     }
 
-    template <typename T>
+    template<typename T>
     DataTable<T> DataTable<T>::subtract(const DataTable<T>& lhs, const DataTable<T>& rhs) {
-
         if (lhs.getNColumns() != rhs.getNColumns() || lhs.getNColumns() != rhs.getNColumns())
             throw std::invalid_argument("lhs and rhs differ in size");  //check just on data size.. ignore labels and time column
 
@@ -217,10 +195,8 @@ namespace ceinms {
         return ans;
     }
 
-
-    template <typename T>
-    DataTable<T>  DataTable<T>::multiplyByElement(const DataTable<T>& lhs, const DataTable<T>& rhs) {
-
+    template<typename T>
+    DataTable<T> DataTable<T>::multiplyByElement(const DataTable<T>& lhs, const DataTable<T>& rhs) {
         if (lhs.getNColumns() != rhs.getNColumns() || lhs.getNColumns() != rhs.getNColumns())
             throw std::invalid_argument("lhs and rhs differ in size");  //check just on data size.. ignore labels and time column
 
@@ -233,10 +209,8 @@ namespace ceinms {
         return ans;
     }
 
-
-    template <typename T>
-    DataTable<T>  DataTable<T>::multiplyByScalar(const DataTable<T>& lhs, T scalar) {
-
+    template<typename T>
+    DataTable<T> DataTable<T>::multiplyByScalar(const DataTable<T>& lhs, T scalar) {
         DataTable<T> ans(lhs.getNRows(), lhs.getNColumns());
         for (size_t r(0); r < lhs.nRows_; ++r)
             for (size_t c(0); c < lhs.nCols_; ++c)
@@ -253,7 +227,6 @@ namespace ceinms {
             time_ == rhs.time_   &&
             nCols_ == rhs.nCols_  &&
             nRows_ == rhs.nRows_);
-
     }
 	
 	template<typename T>
@@ -282,7 +255,6 @@ namespace ceinms {
 
     template<typename T>
     void DataTable<T>::print(const std::string& filename) {
-
         std::ofstream f(filename);
         if (!f.is_open()) {
             std::cout << "Cannot print DataTable to file " << filename << std::endl;
@@ -293,7 +265,6 @@ namespace ceinms {
 
     template<typename T>
     std::ostream& operator<< (std::ostream & out, const DataTable<T> & rhs) {
-
         out << "DataTable " << rhs.nRows_ << "x" << rhs.nCols_ << std::endl;
         out << "Time" << "\t";
         for (auto &l : rhs.labels_)
@@ -304,11 +275,9 @@ namespace ceinms {
             for (auto &e : rhs.data_.at(i))
                 out << e << "\t";
             out << std::endl;
-
         }
         return out;
     }
-
 
     template<typename T>
     bool operator==(const DataTable<T>& lhs, const DataTable<T>& rhs) {
@@ -319,7 +288,6 @@ namespace ceinms {
     DataTable<T> operator+ (const DataTable<T>& lhs, const DataTable<T>& rhs) {
         return DataTable<T>::sum(lhs, rhs);
     }
-
 
     template<typename T>
     DataTable<T> operator- (const DataTable<T>& lhs, const DataTable<T>& rhs) {
@@ -340,5 +308,4 @@ namespace ceinms {
     DataTable<T> operator* (T scalar, const DataTable<T>& rhs) {
         return DataTable<T>::multiplyByScalar(rhs, scalar);
     }
-
 }

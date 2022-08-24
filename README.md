@@ -11,10 +11,10 @@ Dependencies
 ------------
 * Cross-platform building: [CMake](http://www.cmake.org/) 3.8 or later
 * Compiler: [Visual Studio](http://www.visualstudio.com) 2019 or later (Windows only), [gcc](http://gcc.gnu.org/) 8 or later (typically on Linux), or [Clang](http://clang.llvm.org/) 5 or later (typically on Mac, possibly through Xcode)
-* XML parsing: [CodeSynthesis XSD](https://www.codesynthesis.com/products/xsd/) 4.0 or later
+* XML parsing: [CodeSynthesis XSD](https://www.codesynthesis.com/products/xsd/) 4.0
 * Musculoskeletal modelling: [OpenSim](https://github.com/opensim-org/opensim-core) 4.0 or later
 * Signal filtering: [Filter](https://github.com/RealTimeBiomechanics/Filter)
-* Thread synchronisation: [Concurrency](https://github.com/RealTimeBiomechanics/Concurrency/tree/master)
+* Thread synchronisation: [Concurrency](https://github.com/RealTimeBiomechanics/Concurrency)
 
 
 Building from source
@@ -34,16 +34,16 @@ Building from source
             cmake -G "Visual Studio 16 2019" ..
             cmake --build . --config Release --target install
             ```
-            After installation, create a Windows environment variable names `Filter_DIR` which points at the installation directory.
-        * [Concurrency](https://github.com/RealTimeBiomechanics/Concurrency/tree/master):
-            Download the code from the master branch (not develop) and from the directory run:
+            After installation, create a Windows environment variable named `Filter_DIR` which points at the installation directory.
+        * [Concurrency](https://github.com/RealTimeBiomechanics/Concurrency):
+            Download the code from the develop (default) branch and from the directory run:
             ```bash
             mkdir build
             cd build
             cmake -G "Visual Studio 16 2019" ..
             cmake --build . --config Release --target install
             ```
-            After installation, create a Windows environment variable names `Concurrency_DIR` which points at the installation directory. 
+            After installation, create a Windows environment variable named `Concurrency_DIR` which points at the installation directory. 
     * Method 2: Run the included "install_dependencies" script on Windows to automatically search for the dependencies and install them if not found 
 2. Download the CEINMS code
 3. Configure and generate the project files using CMake
@@ -52,7 +52,6 @@ Building from source
     * In the field labelled "Where to build the binaries:" enter a directory where you want the code to be built
     * Click Configure, specify Visual Studio 16 2019 as the project generator and click finish
     * After CMake has finished configuring you can set the install directory in the "CMAKE_INSTALL_PREFIX" field and check that the dependencies (Concurrency, Filter, OpenSim, Simbody, Xerces and XSD) were successfully located. If a dependency is not found automatically then enter the correct directory where it was installed into the corresponding field
-        * If xerces_dll is not found, enter the path to it in the field (it should still build without it but could cause an install error)
     * Click Configure again, all fields should change from red back to white, then click generate
     * Click on Open Project to open the generated project in Visual Studio
 4. In Visual Studio set the Solution Configuration from the dropdown box at the top (e.g. RelWithDebInfo) then build ALL_BUILD
@@ -78,8 +77,8 @@ Building from source
         cmake --build . -j2
         make install
         ```
-    * [Concurrency](https://github.com/RealTimeBiomechanics/Concurrency/tree/master):
-        Download the code from the master branch (not develop) and from the directory run:
+    * [Concurrency](https://github.com/RealTimeBiomechanics/Concurrency):
+        Download the code from the develop (default) branch and from the directory run:
         ```bash
         mkdir build
         cd build
@@ -89,22 +88,32 @@ Building from source
         ```
 2. Download the CEINMS code
 3. Configure and generate the project files using CMake
-    * Open the CMake GUI
-    * In the field labelled "Where is the source code:" enter the directory where the CEINMS source code is located
-    * In the field labelled "Where to build the binaries:" enter a directory where you want the code to be built
-    * Click Configure, specify Unix Makefiles as the project generator and click finish
-    * After CMake has finished configuring you can set the install directory in the "CMAKE_INSTALL_PREFIX" field, the build type in the "CMAKE_BUILD_TYPE" field and check that the dependencies were successfully located. If a dependency is not found automatically then enter the correct directory where it was installed into the corresponding field
-    * Click Configure again, all fields should change from red back to white, then click generate
+    * Method 1:
+        * From the directory where you downloaded CEINMS to run: 
+            ```bash
+            mkdir build
+            cd build
+            cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_INSTALL_PREFIX="~/CEINMS/install" ..
+            ```
+            * Set BUILD_TYPE to your desired build type and INSTALL_PREFIX to the desired install directory
+            * This requires the dependencies to be easily located (e.g. adding the locations to path)
+    * Method 2:
+        * Open the CMake GUI
+        * In the field labelled "Where is the source code:" enter the directory where the CEINMS source code is located
+        * In the field labelled "Where to build the binaries:" enter a directory where you want the code to be built
+        * Click Configure, specify Unix Makefiles as the project generator and click finish
+        * After CMake has finished configuring you can set the install directory in the "CMAKE_INSTALL_PREFIX" field, the build type in the "CMAKE_BUILD_TYPE" field and check that the dependencies were successfully located. If a dependency is not found automatically then enter the correct directory where it was installed into the corresponding field
+        * Click Configure again, all fields should change from red back to white, then click generate
 4. Open a terminal in the build directory and run the following commands to build and install to the specified location:
         ```bash
         make -j8
         make install -j8
         ```
-    * If you have an error finding a library when runnign CEINMS from the install location, ensure the dependency library was correctly added to the path
+    * If you have an error finding a library when running CEINMS from the install location, ensure the dependency library was correctly added to the path
     * You can add the chosen install directory to the path if you wish to run CEINMS from the terminal outside of the install directory
         e.g.
         ```bash
-        $ echo 'export PATH=~CEINMS-install/bin:$PATH' >> ~/.bashrc
+        $ echo 'export PATH=~CEINMS/install/bin:$PATH' >> ~/.bashrc
         ```
 
 

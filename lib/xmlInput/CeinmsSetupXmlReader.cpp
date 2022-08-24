@@ -35,16 +35,15 @@ using std::cout;
 using std::endl;
 #include <fstream>
 
+#include "ceinms/FileUtils.h"
 #include "ceinms/CeinmsSetupXmlReader.h"
 #include "validation.h"
 #include "ceinmsSetup-schema.hxx"
 using CeinmsSetupXsd::CeinmsType;
-#include "ceinms/FileUtils.h"
 
 namespace ceinms {
-    CeinmsSetupXmlReader::CeinmsSetupXmlReader(const string& filename)
-    {
 
+    CeinmsSetupXmlReader::CeinmsSetupXmlReader(const string& filename) {
         try {
             std::unique_ptr<CeinmsType> ceinmsDataPointer(parseAndValidate<CeinmsType>(filename, ceinmsSetup_schema, sizeof(ceinmsSetup_schema)));
             ceinmsSetupPointer_ = std::move(ceinmsDataPointer);
@@ -67,7 +66,6 @@ namespace ceinms {
     }
 
     void CeinmsSetupXmlReader::readXml() {
-
         try {
             std::string& mySubjectFile(*(ceinmsSetupPointer_->subjectFile().begin()));
             std::string& myInputDataFile(*(ceinmsSetupPointer_->inputDataFile().begin()));
@@ -82,8 +80,7 @@ namespace ceinms {
         }
     }
 
-    std::string CeinmsSetupXmlReader::getSubjectFile(bool relative) const
-    {
+    std::string CeinmsSetupXmlReader::getSubjectFile(bool relative) const {
         std::string fileName(*(ceinmsSetupPointer_->subjectFile().begin()));
         FileUtils::trim(fileName);
         if (!FileUtils::isAbsolute(fileName.c_str()))
@@ -94,8 +91,7 @@ namespace ceinms {
         return fileName;
     }
 
-    std::string CeinmsSetupXmlReader::getInputDataFile(bool relative) const
-    {
+    std::string CeinmsSetupXmlReader::getInputDataFile(bool relative) const {
         std::string fileName(*(ceinmsSetupPointer_->inputDataFile().begin()));
         FileUtils::trim(fileName);
         if (!FileUtils::isAbsolute(fileName.c_str()))
@@ -106,8 +102,7 @@ namespace ceinms {
         return fileName;
     }
 
-    std::string CeinmsSetupXmlReader::getExecutionFile(bool relative) const
-    {
+    std::string CeinmsSetupXmlReader::getExecutionFile(bool relative) const {
         std::string fileName(*(ceinmsSetupPointer_->executionFile().begin()));
         FileUtils::trim(fileName);
         if (!FileUtils::isAbsolute(fileName.c_str()))
@@ -118,8 +113,7 @@ namespace ceinms {
         return fileName;
     }
 
-    std::string CeinmsSetupXmlReader::getExcitationGeneratorFile(bool relative) const
-    {
+    std::string CeinmsSetupXmlReader::getExcitationGeneratorFile(bool relative) const {
         std::string fileName(*(ceinmsSetupPointer_->excitationGeneratorFile().begin()));
         FileUtils::trim(fileName);
         if (!FileUtils::isAbsolute(fileName.c_str()))
@@ -130,8 +124,7 @@ namespace ceinms {
         return fileName;
     }
 
-    std::string CeinmsSetupXmlReader::getOutputDirectory(bool relative) const
-    {
+    std::string CeinmsSetupXmlReader::getOutputDirectory(bool relative) const {
         std::string fileName(*(ceinmsSetupPointer_->outputDirectory().begin()));
         FileUtils::trim(fileName);
         if (!FileUtils::isAbsolute(fileName.c_str()))
@@ -143,7 +136,6 @@ namespace ceinms {
     }
 
     void CeinmsSetupXmlReader::setExecutionFile(const std::string& filename) {
-
         ceinmsSetupPointer_->executionFile().clear();
         ceinmsSetupPointer_->executionFile() .push_back(filename);
     }
@@ -164,8 +156,8 @@ namespace ceinms {
         return !(ceinmsSetupPointer_->contactModelFile().empty());
     }
     */
-    bool CeinmsSetupXmlReader::writeTemplateCeinmsSetupFile(const string& templateFile)
-    {
+
+    bool CeinmsSetupXmlReader::writeTemplateCeinmsSetupFile(const string& templateFile) {
         std::ofstream templateFileStream(templateFile);
         if (!templateFileStream.is_open())
             return false;
@@ -181,7 +173,6 @@ namespace ceinms {
     }
 
     void CeinmsSetupXmlReader::print(const std::string& filename) {
-
         xml_schema::namespace_infomap map;
         map[""].name = "";
         map[""].schema = "ceinmsSetup.xsd";

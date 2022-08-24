@@ -1,6 +1,7 @@
-#include "ceinms/PenaltyObjectiveFunction.h"
 #include <limits>
 #include <locale>
+
+#include "ceinms/PenaltyObjectiveFunction.h"
 
 namespace ceinms {
 
@@ -11,11 +12,9 @@ namespace ceinms {
             setup.getMinValue(),
             setup.getMaxValue(),
             setup.getWeight(),
-            setup.getExponent()){
-    }
+            setup.getExponent()) { }
 
     void PenaltyObjectiveFunction::calculate(const std::vector<Result>& results) {
-
         f_ = 0;
         for (auto& r : results) {
             if (setup_.getCalibrationTargetType() == CalibrationTargetType::Activation)
@@ -40,18 +39,15 @@ namespace ceinms {
     }
 
     void PenaltyObjectiveFunction::printCosts() const {
-
         std::cout << setup_;
         std::cout << " - Value: " << getValue() << std::endl;
     }
 
-	bool PenaltyObjectiveFunction::calculateOpenSimData() const
-	{
+	bool PenaltyObjectiveFunction::calculateOpenSimData() const {
 		return setup_.getCalibrationTargetType() == CalibrationTargetType::GenericContactForce;
 	}
 
     double PenaltyObjectiveFunction::calculatePenalty(const DataTable<double>& data) {
-
 		double penalty = 0;
         for (auto& target : setup_.getTargetNames()) {
             double currentPenalty = 0;
@@ -68,7 +64,6 @@ namespace ceinms {
     }
 
     double PenaltyObjectiveFunction::calculatePenalty(const DataTable<SimTK::Vec3>& data) {
-
         double penalty = 0;
         for (auto& target : setup_.getTargetNames()) {
             double currentPenalty = 0;

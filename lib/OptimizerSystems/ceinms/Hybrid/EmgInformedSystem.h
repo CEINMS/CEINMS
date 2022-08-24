@@ -2,13 +2,13 @@
 #define ceinms_EmgInformedSystem_h
 
 #include <vector>
+
 #include "ceinms/AbstractOptimizerSystem.h"
 
 namespace ceinms {
     
     template<typename NMSmodelT, typename ObjectiveFunctionT, typename ParametersInterpreterT>
     class EmgInformedSystem : public Optimizers::AbstractOptimizerSystem {
-
     public:
         EmgInformedSystem(NMSmodelT& subject, ObjectiveFunctionT& objectiveFunction, const typename ParametersInterpreterT::ParameterSet& parameterSet);
         void evaluate() override;
@@ -18,6 +18,7 @@ namespace ceinms {
         std::vector<double> getParameters() const;
         double getF() const override;
         std::size_t getNoParameters() const override { return nParameters_; }
+
     private:
         std::size_t nParameters_;
         ObjectiveFunctionT& objectiveFunction_;
@@ -25,9 +26,7 @@ namespace ceinms {
         NMSmodelT& subject_;
         double f_;
     };
-    
 }
 
 #include "ceinms/Hybrid/EmgInformedSystem.cpp"
-
 #endif

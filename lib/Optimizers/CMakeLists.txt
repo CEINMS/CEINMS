@@ -3,9 +3,10 @@
 project(Optimizers)
 
 # List source files
-set(Optimizers_HEADERS  ceinms/AbstractOptimizer.h
-                        ceinms/SimulatedAnnealing.h
-                        )
+set(Optimizers_HEADERS
+    ceinms/AbstractOptimizer.h
+    ceinms/SimulatedAnnealing.h
+)
 
 set(Optimizers_TEMPLATE_IMPLEMENTATION ceinms/SimulatedAnnealing.cpp)
 
@@ -17,8 +18,7 @@ source_group("Template implementation Files" FILES ${Optimizers_TEMPLATE_IMPLEME
 add_library(Optimizers STATIC ${Optimizers_HEADERS} ${Optimizers_TEMPLATE_IMPLEMENTATION})
 
 # target_link_libraries(Calibration xmlInput FileIO)
-target_include_directories( Optimizers
-                             PRIVATE ceinms ${ceinms_common_INCLUDE_DIRS})
+target_include_directories(Optimizers PRIVATE ceinms ${ceinms_common_INCLUDE_DIRS})
 
 # Save path to include directory for "internal" usage
 set(Optimizers_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}" ${ceinms_common_INCLUDE_DIRS} CACHE INTERNAL "Include directories for Optimizers library")

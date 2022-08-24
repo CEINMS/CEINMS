@@ -1,11 +1,3 @@
-#include "ceinms/MinTorqueErrorAndContactForces.h"
-#include "ceinms/MinTorqueError.h"
-#include "ceinms/SumKneeContactForces.h"
-#include "ceinms/ObjectiveFunctionSetup.h"
-#include "ceinms/TrialData.h"
-#include "ceinms/Result.h"
-#include "ceinms/Barrier.h"
-
 #include <vector>
 using std::vector;
 #include <string>
@@ -14,6 +6,13 @@ using std::string;
 using std::cout;
 using std::endl;
 
+#include "ceinms/MinTorqueErrorAndContactForces.h"
+#include "ceinms/MinTorqueError.h"
+#include "ceinms/SumKneeContactForces.h"
+#include "ceinms/ObjectiveFunctionSetup.h"
+#include "ceinms/TrialData.h"
+#include "ceinms/Result.h"
+#include "ceinms/Barrier.h"
 using namespace ceinms;
 
 vector<double> multiply(vector<double> values, double c) {
@@ -24,7 +23,6 @@ vector<double> multiply(vector<double> values, double c) {
 }
 
 int main() {
-
     ObjectiveFunctionSetup objectiveFunctionSetup;
     objectiveFunctionSetup.exponent = 2;
     objectiveFunctionSetup.weight = 1;
@@ -60,5 +58,4 @@ int main() {
     cout << "f_ " << minTorqueErrorAndContactForces.getValue() << endl;
 
     return 0;
-
 }

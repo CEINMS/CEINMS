@@ -30,11 +30,11 @@
 #define ceinms_SimulatedAnnealingParameters_h
 
 namespace ceinms {
-    struct SimulatedAnnealingParameters {
 
+    struct SimulatedAnnealingParameters {
         unsigned noEpsilon, NS, NT, maxNoEval;
         double rt, T, epsilon;
-
     };
 }
+
 #endif

@@ -32,6 +32,7 @@
 #include <vector>
 #include <list>
 #include <string>
+
 #include "MTU.h"
 #include "ceinms/Curve.h"
 
@@ -42,13 +43,13 @@ namespace ceinms {
 
     template<typename Activation, typename Tendon, CurveMode::Mode mode>
     std::ostream& operator<< (std::ostream& output, const DoF<Activation, Tendon, mode>& dof);
+
     /** This class associates muscles to the corrisponding degree of freedom
      *  and compute the torque
      */
     template<typename Activation, typename Tendon, CurveMode::Mode mode>
     class DoF {
     public:
-
         typedef MTU<Activation, Tendon, mode> MTUtype;
         typedef typename std::vector< MTU<Activation, Tendon, mode> >::iterator vectorMTUitr;
         DoF();
@@ -65,6 +66,7 @@ namespace ceinms {
         bool compareMusclesNames(const std::vector<std::string>& muscleNames) const;
         void getMusclesNamesOnDof(std::vector<std::string>& musclesNames) const;
         void updateTorque();
+
     private:
         void updateMusclesContribution();
         std::string id_;
@@ -74,6 +76,6 @@ namespace ceinms {
         double torque_;
     };
 }
-#include "DoF.cpp"
 
+#include "DoF.cpp"
 #endif

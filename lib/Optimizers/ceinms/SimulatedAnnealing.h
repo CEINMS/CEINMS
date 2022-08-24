@@ -29,15 +29,17 @@
 #ifndef ceinms_Optimizers_SimulatedAnnealing_h
 #define ceinms_Optimizers_SimulatedAnnealing_h
 
-#include "AbstractOptimizer.h"
-#include "ceinms/SimulatedAnnealingParameters.h"
 #include <vector>
 
+#include "AbstractOptimizer.h"
+#include "ceinms/SimulatedAnnealingParameters.h"
+
 namespace ceinms {
+
     namespace Optimizers {
 
         template<typename OptimizerSystem>
-        class SimulatedAnnealing : public AbstractOptimizer  {
+        class SimulatedAnnealing : public AbstractOptimizer {
         public:
             SimulatedAnnealing(OptimizerSystem& optimizerSystem, SimulatedAnnealingParameters simulatedAnnealingParameters);
             ~SimulatedAnnealing() {};
@@ -71,8 +73,6 @@ namespace ceinms {
             double                  epsilon_;
             unsigned                nEpsilon_;
         };
-
-
     }
 }
 

@@ -33,13 +33,13 @@
 #include <iostream>
 #include <vector>
 
-
 /**
  * \brief This class read from a file either lmt or ma data
  * You should have a file that includes
  * write here the structure of the file
  */
 namespace ceinms {
+
     class DataFromFile {
     public:
         DataFromFile() { std::cout << "You should not be there\n"; }
@@ -51,6 +51,7 @@ namespace ceinms {
         inline double getCurrentTime() const { return currentDataTime_; }
         const std::vector<double>& getCurrentData() const;
         ~DataFromFile();
+        
     private:
         DataFromFile(const DataFromFile& orig) {};
         DataFromFile& operator=(const DataFromFile& orig) {};

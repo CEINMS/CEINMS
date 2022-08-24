@@ -29,16 +29,16 @@
 #ifndef ceinms_ExcitationGeneratorXmlReader_h
 #define ceinms_ExcitationGeneratorXmlReader_h
 
-#include "excitationGenerator.hxx"
 #include <string>
+#include "excitationGenerator.hxx"
 
 namespace ceinms {
     class ExcitationGeneratorXmlReader {
-
     public:
         ExcitationGeneratorXmlReader(const std::string& filename);
         std::unique_ptr<ExcitationGeneratorXsd::excitationGenerator> getExcitationGenerator();
         friend std::ostream& operator<< (std::ostream& output, const ExcitationGeneratorXmlReader& b);
+        
     private:
         std::unique_ptr<ExcitationGeneratorXsd::excitationGenerator> excitationGenPointer_;
     };

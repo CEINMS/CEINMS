@@ -28,6 +28,7 @@
 
 #ifndef ceinms_FileLogger_h
 #define ceinms_FileLogger_h
+
 #include <filesystem>
 #include <vector>
 #include <list>
@@ -35,24 +36,26 @@
 #include <string>
 #include <fstream>
 #include <iostream>
-#include <SimTKcommon.h>
+
 #include "ceinms/ExternalForceData.h"
 #include "ceinms/queues/MultipleExternalForcesQueue.h"
 #include "ceinms/GeneralisedCoordinatesData.h"
 
+#include <SimTKcommon.h>
 
 namespace ceinms {
+
     template<typename DataType>
     class FileLogger {
     public:
-        using FrameType = QueueData < DataType > ;
-        using QueueType = Concurrency::Queue < FrameType > ;
+        using FrameType = QueueData<DataType> ;
+        using QueueType = Concurrency::Queue<FrameType> ;
         FileLogger(
             const std::vector<std::string>& columnLabels,
             const std::string& filename,
             const std::string& outputDir = "./Output/",
             const std::string& separator = "\t"
-            );
+        );
         void logFrame(const FrameType& frame);
         void setFilename(const std::string& filename);
         void setOutputDir(const std::string& outputDir);
@@ -61,6 +64,7 @@ namespace ceinms {
         void clearData();
         bool print();
         bool printable();
+
     private:
         bool createFile();
         void initFile();
@@ -88,40 +92,33 @@ namespace ceinms {
 
     template<typename DataType>
     void FileLogger<DataType>::logFrame(const FrameType& frame) {
-
         dataToWrite_.push_back(frame);
     }
 
     template<typename DataType>
     void FileLogger<DataType>::setFilename(const std::string& filename) {
-
         filename_ = filename;
     }
 
     template<typename DataType>
     void FileLogger<DataType>::setOutputDir(const std::string& outputDir) {
-
         outputDir_ = outputDir;
     }
 
     template<typename DataType>
     void FileLogger<DataType>::setColumnLabels(const std::vector<std::string>& columnLabels) {
-
         columnLabels_ = columnLabels;
     }
 
     template<typename DataType>
     void FileLogger<DataType>::clearData() {
-
         dataToWrite_.clear();
     }
 
     //return true if printed successfully
     template<typename DataType>
     bool FileLogger<DataType>::print() {
-
-        if (dataToWrite_.size() < 1)
-        {
+        if (dataToWrite_.size() < 1) {
             std::cout << "No data to write in " << filename_ << std::endl;
             return false;
         }
@@ -136,7 +133,6 @@ namespace ceinms {
 
     template<typename DataType>
     bool FileLogger<DataType>::printable() {
-
         if (createFile()) {
             outFile_->close();
             return true;
@@ -146,7 +142,6 @@ namespace ceinms {
 
     template<typename DataType>
     bool FileLogger<DataType>::createFile() {
-
         bool success(true);
         std::filesystem::path dir(outputDir_);
         if (!std::filesystem::exists(dir)) {
@@ -162,7 +157,7 @@ namespace ceinms {
 
         outFile_.reset(new std::ofstream(outFilename.c_str()));
 
-        if (!(outFile_->is_open()))  {
+        if (!(outFile_->is_open())) {
             std::cout << "ERROR: " + filename_ + " cannot be opened!\n";
             success = false;
         }
@@ -171,7 +166,6 @@ namespace ceinms {
 
     template<typename DataType>
     void FileLogger<DataType>::initFile() {
-
         *outFile_ << "CEINMS output" << std::endl;
         *outFile_ << "datacolumns " << dataToWrite_.back().data.size() + 1 << std::endl;
         *outFile_ << "datarows " << dataToWrite_.size() << std::endl;
@@ -183,9 +177,7 @@ namespace ceinms {
     }
 
     template<>
-    void FileLogger<std::vector<SimTK::Vec3>>::initFile()
-    {
-
+    void FileLogger<std::vector<SimTK::Vec3>>::initFile() {
         *outFile_ << "CEINMS output" << std::endl;
         *outFile_ << "datacolumns " << dataToWrite_.back().data.size() * 3 + 1 << std::endl;
         *outFile_ << "datarows " << dataToWrite_.size() << std::endl;
@@ -197,8 +189,7 @@ namespace ceinms {
     }
 
     template<>
-    void FileLogger<GeneralisedCoordinatesData>::initFile()
-    {
+    void FileLogger<GeneralisedCoordinatesData>::initFile() {
         *outFile_ << "CEINMS output" << std::endl;
         *outFile_ << "datacolumns " << dataToWrite_.back().data.getNCoordinates() * 3 + 1 << std::endl;
         *outFile_ << "datarows " << dataToWrite_.size() << std::endl;
@@ -210,8 +201,7 @@ namespace ceinms {
     }
 
     template<>
-    void FileLogger<MultipleExternalForcesData>::initFile()
-    {
+    void FileLogger<MultipleExternalForcesData>::initFile() {
         *outFile_ << "CEINMS output" << std::endl;
         *outFile_ << "datacolumns " << dataToWrite_.back().data.size() * 12 + 1 << std::endl;
         *outFile_ << "datarows " << dataToWrite_.size() << std::endl;
@@ -237,7 +227,6 @@ namespace ceinms {
 
     template<typename DataType>
     void FileLogger<DataType>::writeToFile() {
-
         for (auto& dataIt : dataToWrite_) {
             *outFile_ << dataIt.time << sp_;
             for (auto& sampleIt : dataIt.data)
@@ -248,7 +237,6 @@ namespace ceinms {
 
     template<>
     void FileLogger<std::vector<SimTK::Vec3>>::writeToFile() {
-
         for (auto& dataIt : dataToWrite_) {
             *outFile_ << dataIt.time << sp_;
             for (auto& sampleIt : dataIt.data)
@@ -261,7 +249,6 @@ namespace ceinms {
 
     template<>
     void FileLogger<GeneralisedCoordinatesData>::writeToFile() {
-
         for (auto& dataIt : dataToWrite_) {
             *outFile_ << dataIt.time << sp_;
             auto q(dataIt.data.getQ());
@@ -279,7 +266,6 @@ namespace ceinms {
 
     template<>
     void FileLogger<MultipleExternalForcesData>::writeToFile() {
-
         for (auto& dataIt : dataToWrite_) {
             *outFile_ << dataIt.time << sp_;
             for (auto& v : dataIt.data) {
@@ -305,4 +291,5 @@ namespace ceinms {
         }
     }
 }
+
 #endif

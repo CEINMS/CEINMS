@@ -26,16 +26,15 @@
  * limitations under the License.                                             *
  * -------------------------------------------------------------------------- */
 
-#include "ceinms/Curve.h"
-using namespace ceinms;
 #include <vector>
 #include <fstream>
 #include <string>
 #include <cmath>
 
+#include "ceinms/Curve.h"
+using namespace ceinms;
 
 std::vector<double> getRange(double min, double max, unsigned nPoints) {
-
     std::vector<double> x;
     double dx = (max - min) / static_cast<double>(nPoints-1);
     for (unsigned i(0); i < nPoints; ++i)
@@ -43,11 +42,8 @@ std::vector<double> getRange(double min, double max, unsigned nPoints) {
     return x;
 }
 
-
-
 template <typename T>
 void printCurve(const T& curve, const std::string& filename, double startX, double endX, unsigned nPoints = 1000) {
-
     std::ofstream oF(filename);
     double increment((endX - startX) / static_cast<double>(nPoints));
     for (unsigned i(0); i <= nPoints; ++i) {
@@ -55,13 +51,10 @@ void printCurve(const T& curve, const std::string& filename, double startX, doub
         oF << x << "," << curve.getValue(x) << std::endl;
     }
     oF.close();
-
 }
-
 
 template <typename T>
 void printCurveDerivative(const T& curve, const std::string& filename, double startX, double endX, unsigned nPoints = 1000) {
-
     std::ofstream oF(filename);
     double increment((endX - startX) / static_cast<double>(nPoints));
     for (unsigned i(0); i <= nPoints; ++i) {
@@ -69,13 +62,10 @@ void printCurveDerivative(const T& curve, const std::string& filename, double st
         oF << x << "," << curve.getFirstDerivative(x) << std::endl;
     }
     oF.close();
-
 }
-
 
 template <typename T, typename U>
 void compareCurve(const T& curve, U&& function, const std::string& filename, double startX, double endX, unsigned nPoints = 1000) {
-
     std::ofstream oF(filename);
     oF << "x,y1,y2\n";
     auto xVals = getRange(startX, endX, nPoints);
@@ -84,24 +74,18 @@ void compareCurve(const T& curve, U&& function, const std::string& filename, dou
         oF << x << "," << curve.getValue(x) << "," << function(x) << std::endl;
 
     oF.close();
-
 }
-
 
 template<typename Lambda, typename CurveT>
 void createCurve(std::vector<double> xPoints, Lambda&& function, CurveT& curve){
-
     curve.reset();
     for (auto x : xPoints) {
         curve.addPointNoUpdate(x, std::forward<Lambda>(function)(x));
     }
     curve.refresh();
-
 }
 
-
 void testOriginalMuscleCurves() {
-
     Curve<CurveMode::Mode::Offline, CurveMode::Interpolation::Cubic> activeForceLength, passiveForceLength, forceVelocity, tendonForceLength;
 
     std::vector<double> afX{ -5, 0, 0.401, 0.402, 0.4035, 0.52725, 0.62875, 0.71875, 0.86125, 1.045, 1.2175, 1.43875, 1.61875, 1.62, 1.621, 2.2, 5 };
@@ -125,9 +109,7 @@ void testOriginalMuscleCurves() {
     printCurve(tendonForceLength, "tflc_original.csv", -0.2, 0.5);
 }
 
-
 void testMillardMuscleCurves() {
-
     Curve<CurveMode::Mode::Offline, CurveMode::Interpolation::Cubic> activeForceLength, passiveForceLength, forceVelocity, tendonForceLength;
 
     std::vector<double> afX{ 0.1441, 0.1841, 0.2241, 0.2641, 0.3041, 0.3441, 0.3841, 0.4241, 0.4641, 0.5041, 0.5441, 0.5841, 0.6241, 0.6641, 0.7041, 0.7441, 0.7841, 0.8241, 0.8641, 0.9041, 0.9441, 0.9841, 1.0241, 1.0641, 1.1041, 1.1441, 1.1841, 1.2241, 1.2641, 1.3041, 1.3441, 1.3841, 1.4241, 1.4641, 1.5041, 1.5441, 1.5841,1.6241, 1.6641, 1.7041, 1.7441, 1.7841, 1.8241, 1.8641, 1.9041, 1.9441, 1.9841, 2.0241, 2.0641, 2.1041 };
@@ -151,9 +133,7 @@ void testMillardMuscleCurves() {
     printCurve(tendonForceLength, "tflc_Millard.csv", -0.2, 0.5);
 }
 
-
 void testCircularVector() {
-
     CircularVector<double, 10> cv10;
     std::cout << "Circular vector size 10" << std::endl;
     std::cout << "1 - store numbers from 0 to 9" << std::endl;
@@ -195,16 +175,9 @@ void testCircularVector() {
     std::cout << "9 - ask for size" << std::endl
               << "    size should be equal 7" << std::endl;
     std::cout << cv10.size() << std::endl;
-
 }
 
-
-
-
-
-
 int main() {
-
     using MyCurve = Curve < CurveMode::Mode::Online, CurveMode::Interpolation::Cubic, 3 > ;
     std::vector<double> x(getRange(-M_PI, M_PI, 10));
 
@@ -214,7 +187,6 @@ int main() {
     createCurve(getRange(-M_PI, M_PI, 100), sinFun, sinCurve);
     compareCurve(sinCurve, sinFun,  "sin.txt", -4, 4);
     printCurveDerivative(sinCurve, "sinD.txt", -4, 4);
-
 
     std::ofstream oF("lastPointDerivative.txt");
     oF << "x,y\'_curve,y\'\n";
@@ -241,5 +213,4 @@ int main() {
     testMillardMuscleCurves();
 
     return 0;
-
 }

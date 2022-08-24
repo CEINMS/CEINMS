@@ -28,12 +28,14 @@
 
 #ifndef ceinms_StiffTendon_h
 #define ceinms_StiffTendon_h
-#include "ceinms/Curve.h"
+
 #include <string>
 
-namespace ceinms {
-    class StiffTendon {
+#include "ceinms/Curve.h"
 
+namespace ceinms {
+    
+    class StiffTendon {
     public:
         typedef Curve<CurveMode::Offline> CurveOffline;
         StiffTendon();
@@ -51,7 +53,6 @@ namespace ceinms {
             const CurveOffline& forceVelocityCurve,
             const CurveOffline& tendonForceStrainCurve);
         virtual ~StiffTendon();
-
 
         void setParametersToComputeForces(double optimalFibreLength,
             double pennationAngle,
@@ -95,7 +96,6 @@ namespace ceinms {
         double muscleTendonLength_;
 
         std::string id_;
-
     };
 }
 

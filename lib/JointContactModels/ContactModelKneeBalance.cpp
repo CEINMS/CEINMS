@@ -26,26 +26,27 @@
 * limitations under the License.                                             *
 * -------------------------------------------------------------------------- */
 
-#include "ceinms/ContactModelKneeBalance.h"
 #include <vector>
 using std::vector;
 #include <string>
 using std::string;
 
+#include "ceinms/ContactModelKneeBalance.h"
+
 namespace ceinms {
 
     ContactModelKneeBalance::ContactModelKneeBalance() :
         fromSubjectTorquesToCondyleOppositeTorque_(2),
-        condyleNames_(2), contactForces_(2), condyleDofs_(2){}
+        condyleNames_(2), contactForces_(2), condyleDofs_(2) { }
 
     ContactModelKneeBalance::ContactModelKneeBalance(const ContactModelKneeBalanceSetup& setup, const vector<string>& dofNamesFromSubject) :
         fromSubjectTorquesToCondyleOppositeTorque_(2),
         condyleNames_(2), contactForces_(2), condyleDofs_(2) {
+
         initialize(setup, dofNamesFromSubject);
     }
 
     void ContactModelKneeBalance::initialize(const ContactModelKneeBalanceSetup& setup, const vector<string>& dofNamesFromSubject) {
-
         intercondyleDistance_ = setup.intercondyleDistance;
         condyleNames_.at(0) = setup.condyle1.name;
         condyleNames_.at(1) = setup.condyle2.name;
@@ -56,18 +57,14 @@ namespace ceinms {
         //for each condyle you have to use the opposite external and estimated moments
         fromSubjectTorquesToCondyleOppositeTorque_.at(0).setNames(dofNamesFromSubject, { condyleDofs_.at(1) });
         fromSubjectTorquesToCondyleOppositeTorque_.at(1).setNames(dofNamesFromSubject, { condyleDofs_.at(0) });
-
     }
 
     //externalTorques and estimatedTorques ,ust have the same length and be in the same order
     void ContactModelKneeBalance::setTorques(const vector<double>& externalTorques, const vector<double>& estimatedTorques) {
-
         calculateContactForces(externalTorques, estimatedTorques);
-
     }
 
     void ContactModelKneeBalance::calculateContactForces(const vector<double>& externalTorques, const vector<double>& estimatedTorques) {
-
         contactForces_.at(0) =  calculateSingleForce(
             fromSubjectTorquesToCondyleOppositeTorque_.at(0).map(externalTorques).front(),
             fromSubjectTorquesToCondyleOppositeTorque_.at(0).map(estimatedTorques).front());
@@ -75,14 +72,10 @@ namespace ceinms {
         contactForces_.at(1) = calculateSingleForce(
             fromSubjectTorquesToCondyleOppositeTorque_.at(1).map(externalTorques).front(),
             fromSubjectTorquesToCondyleOppositeTorque_.at(1).map(estimatedTorques).front());
-        
     }
 
     double ContactModelKneeBalance::calculateSingleForce(double externalTorque, double estimatedTorque) const {
-
         //to remove abs after isb and proberly fix the problem with the reference system
         return abs((estimatedTorque - externalTorque) / intercondyleDistance_);
-    }
-
-    
+    }   
 }

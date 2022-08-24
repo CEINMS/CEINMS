@@ -26,11 +26,15 @@
  * limitations under the License.                                             *
  * -------------------------------------------------------------------------- */
 
+#include <string>
+using std::string;
+#include <vector>
+using std::vector;
+
+#include <OpenSim/OpenSim.h>
+
 #include "ceinms/TrialData.h"
 #include "ceinms/ArrayConverter.h"
-#include <OpenSim/OpenSim.h>
-using std::string;
-using std::vector;
 
 namespace ceinms {
 
@@ -38,15 +42,13 @@ namespace ceinms {
         hasEmgData_(false),
         hasLmtMaData_(false),
         hasTorqueData_(false),
-        hasOpenSimData_(false)
-        {}
+        hasOpenSimData_(false) { }
 
     TrialData::TrialData(
-        const std::vector<std::string>& dofNames,
-        const std::vector<std::string>& muscleNames,
-        const std::string& id):
-        TrialData()
-    {
+        const vector<string>& dofNames,
+        const vector<string>& muscleNames,
+        const string& id):
+        TrialData() {
         setProperties(dofNames, muscleNames, id);
     }
 
@@ -58,19 +60,17 @@ namespace ceinms {
         const vector<string>& dofNames,
         const vector<string>& muscleNames,
         const string& id) :
-        TrialData(dofNames, muscleNames, id)
-    {  
+        TrialData(dofNames, muscleNames, id) {  
     
         setEmgData(emgData);
         setLmtMaData(lmtData, maData);
-        setTorqueData(torqueData);
-        
+        setTorqueData(torqueData); 
     }
 
     void TrialData::setProperties(
-        const std::vector<std::string>& dofNames,
-        const std::vector<std::string>& muscleNames,
-        const std::string& id) {
+        const vector<string>& dofNames,
+        const vector<string>& muscleNames,
+        const string& id) {
 
         dofNames_ = dofNames;
         muscleNames_ = muscleNames;
@@ -78,9 +78,7 @@ namespace ceinms {
         noDoF_ = dofNames.size();
     }
 
-
     void TrialData::setEmgData(const DataTable<double>& emgData) {
-
         if (getNoMuscles() != emgData.getNColumns()) {
             std::cout << "Warning in TrialData::setEmgData: wrong number of columns and/or muscles \n";
         }
@@ -89,8 +87,7 @@ namespace ceinms {
         hasEmgData_ = true;
     }
 
-    void TrialData::setLmtMaData(const DataTable<double>& lmtData, const std::vector<DataTable<double>>& maData) {
-
+    void TrialData::setLmtMaData(const DataTable<double>& lmtData, const vector<DataTable<double>>& maData) {
         if (getNoMuscles() != lmtData.getNColumns())
             std::cout << "Warning in TrialData::setLmtMaData: wrong number of columns and/or muscles\n";
     
@@ -100,11 +97,9 @@ namespace ceinms {
         lmtData_ = lmtData;
         maData_ = maData;
         hasLmtMaData_ = true;
-
     }
 
     void TrialData::setTorqueData(const DataTable<double>& torqueData) {
-
         if (getNoDofs() != torqueData.getNColumns())
             std::cout << "Warning in TrialData::setLmtMaData: wrong number of columns and/or dofs\n";
 
@@ -141,15 +136,15 @@ namespace ceinms {
         //Functions must correspond to model coordinates and their order for the solver
         OpenSim::Array<string> coordinateNamesOS;
         model.getCoordinateSet().getNames(coordinateNamesOS);
-        for (size_t i(0); i < coordinateNamesOS.getSize(); ++i){
-            if (kinematicsSplines.contains(coordinateNamesOS.get(i))){
+        for (size_t i(0); i < coordinateNamesOS.getSize(); ++i) {
+            if (kinematicsSplines.contains(coordinateNamesOS.get(i))) {
                 kinematicsSplines.insert(i, kinematicsSplines.get(coordinateNamesOS.get(i)));
             }
-            else{
+            else {
                 kinematicsSplines.insert(i, OpenSim::Constant(model.getCoordinateSet().get(i).getDefaultValue()));
             }
         }
-        if (kinematicsSplines.getSize() > coordinateNamesOS.getSize()){
+        if (kinematicsSplines.getSize() > coordinateNamesOS.getSize()) {
             kinematicsSplines.setSize(coordinateNamesOS.getSize());
         }
 
@@ -181,8 +176,8 @@ namespace ceinms {
 
         }
     }
-    void TrialData::crop(double startTime, double stopTime) {
 
+    void TrialData::crop(double startTime, double stopTime) {
         if (hasEmgData_) {
             emgData_.crop(startTime, stopTime);
         }
@@ -202,6 +197,5 @@ namespace ceinms {
             qd_.crop(startTime, stopTime);
             qdd_.crop(startTime, stopTime);
         }
-
     }
 }

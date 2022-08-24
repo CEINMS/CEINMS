@@ -35,7 +35,8 @@
 #include <string>
 
 namespace ceinms {
-    template <typename EMGgenerator>
+
+    template<typename EMGgenerator>
     class EMGDataFromFile {
     public:
         EMGDataFromFile() = delete;// { std::cout << "You should not be there\n"; }
@@ -48,6 +49,7 @@ namespace ceinms {
         const std::vector<double>& getCurrentData() const { return currentEMGData_; }
         int getNoTimeSteps() const { return noTimeSteps_; }
         ~EMGDataFromFile();
+        
     private:
         std::ifstream EMGDataFile_;
         bool exists_;

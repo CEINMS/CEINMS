@@ -48,6 +48,7 @@ namespace ceinms {
         OpenLoopEvaluator() = delete;
         template<typename NMSmodelT>
         static void evaluate(NMSmodelT&& subject, const TrialData& trialData, const std::vector<unsigned> musclesToUpdate, Result& previousResult);
+    
     private:
         template<typename NMSmodelT>
         static void initFiberLengthTraceCurves(NMSmodelT&& subject, const TrialData& trialData, const std::vector<unsigned>& musclesToUpdate, Result& previousResult);
@@ -65,9 +66,7 @@ namespace ceinms {
             Result& previousResult);
     };
 
-
-    class BatchEvaluator{
-
+    class BatchEvaluator {
     public:
         using EvaluationResult = Result; //just to expose it
         BatchEvaluator(const std::vector<TrialData>& trials);
@@ -81,7 +80,6 @@ namespace ceinms {
         std::vector<Result> getResults() const {
             return results_;
         }
-
 
     private:
         void updMusclesToUpdate();

@@ -27,16 +27,18 @@
 * -------------------------------------------------------------------------- */
 #ifndef ceinms_Barrier_h
 #define ceinms_Barrier_h
+
 #include <cmath>
+
 namespace ceinms{
 
     class Barrier {
     public:
         Barrier() :
-            xL_(.0), xR_(.0), weight_(.0), exponent_(1) {}
+            xL_(.0), xR_(.0), weight_(.0), exponent_(1) { }
 
         Barrier(double xL, double xR, double weight, double exponent) :
-            xL_(xL), xR_(xR), weight_(weight), exponent_(exponent) {}
+            xL_(xL), xR_(xR), weight_(weight), exponent_(exponent) { }
         
         void setParameters(double xL, double xR, double weight, double exponent) {
             xL_ = xL;
@@ -65,7 +67,6 @@ namespace ceinms{
                 penalty = weight_*std::pow((x - xR_), exponent_);
             return penalty;
         }
-
     };
 }
 

@@ -26,62 +26,46 @@
  * limitations under the License.                                             *
  * -------------------------------------------------------------------------- */
 
-#include "ceinms/Activation/PiecewiseActivation.h"
 #include <cmath>
 
+#include "ceinms/Activation/PiecewiseActivation.h"
 
 namespace ceinms {
     PiecewiseActivation::PiecewiseActivation() :
         beta1_(0.0), beta2_(0.0), alpha_(0.0), shapeFactor_(0.0),
         emg_(0.0), noOfEmg_(0), pastEmgT1_(0.0), pastEmgT2_(0.0), neuralActivation_(0.0),
         neuralActivationT1_(0.0), neuralActivationT2_(0.0), activation_(0.0),
-        a_(0.0), b_(0.0), Xo_(0.0), m_(0.0), c_(0.0), activationScale_(1.)
-
-    {
-
-    }
-
+        a_(0.0), b_(0.0), Xo_(0.0), m_(0.0), c_(0.0), activationScale_(1.) { }
 
     void PiecewiseActivation::setFilterParameters(double c1, double c2) {
-
         beta1_ = c1 + c2;
         beta2_ = c1 * c2;
         alpha_ = 1 + beta1_ + beta2_;
-
     }
 
-
     void PiecewiseActivation::setShapeFactor(double shapeFactor) {
-
         shapeFactor_ = shapeFactor;
         updateActivationParameters();
     }
 
     void PiecewiseActivation::setActivationScale(double activationScale) {
-
         activationScale_ = activationScale;
     }
 
-
     bool PiecewiseActivation::setEmg(double emg) {
-
         emg_ = emg;
-        if (emg_ > 1)
-        {
+        if (emg_ > 1) {
             emg_ = 1;
             return false;
         }
-        if (emg_ < 0)
-        {
+        if (emg_ < 0) {
             emg_ = 0;
             return false;
         }
         return true;
     }
 
-
     void PiecewiseActivation::updateActivationParameters() {
-
         double A = shapeFactor_;
         double Xo = 0.3085 - 0.7071*A;            // cos(45°)=0.7071
         double Yo = 0.3085 + 0.7071*A;
@@ -92,7 +76,6 @@ namespace ceinms {
         double m = (1.0 - Yo) / (1.0 - Xo);
         double c = Yo - m*Xo;
         double a, b, f, fprime, p, expVal;
-
 
         // int temp = 0; //remember to remove it
         while (count < iter) {
@@ -119,9 +102,7 @@ namespace ceinms {
         b_ = b;
     }
 
-
     void PiecewiseActivation::updateActivation() {
-
         if (noOfEmg_ == 2) {
             neuralActivationT1_ = (pastEmgT2_ + pastEmgT1_) / 2;
             neuralActivationT2_ = neuralActivationT1_;
@@ -140,12 +121,9 @@ namespace ceinms {
         }
         else // linear region
             activation_ = activationScale_*m_* neuralActivation_ + c_;
-
     }
 
-
     void PiecewiseActivation::pushState() {
-
         neuralActivationT2_ = neuralActivationT1_;
         neuralActivationT1_ = neuralActivation_;
         pastEmgT2_ = pastEmgT1_;
@@ -153,9 +131,7 @@ namespace ceinms {
         noOfEmg_++;
     }
 
-
     void PiecewiseActivation::resetState() {
-
         emg_ = .0;
         activation_ = .0;
         neuralActivation_ = .0;
@@ -166,9 +142,5 @@ namespace ceinms {
         noOfEmg_ = 0;
     }
 
-    PiecewiseActivation::~PiecewiseActivation()
-    {
-
-    }
-
+    PiecewiseActivation::~PiecewiseActivation() { }
 }

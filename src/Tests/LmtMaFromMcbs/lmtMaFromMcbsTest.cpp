@@ -37,8 +37,11 @@ using std::string;
 using std::cout;
 using std::endl;
 #include <sstream>
-#include "boost/filesystem.hpp"
-using boost::filesystem::path;
+#include <filesystem>
+
+#include <OpenSim/OpenSim.h>
+using namespace OpenSim;
+
 #include "ceinms/LmtMaFromMcbs.h"
 #include "ceinms/NMSmodel.h"
 #include "ceinms/Activation/ExponentialActivation.h"
@@ -54,11 +57,8 @@ using boost::filesystem::path;
 #include "ceinms/queues/MultipleMomentArmsQueues.h"
 #include "ceinms/queues/GeneralisedCoordinatesQueue.h"
 using namespace ceinms;
-#include <OpenSim/OpenSim.h>
-using namespace OpenSim;
 
 double calculateRMSE(Array<double> arr1, Array<double> arr2) {
-
     double sum(0);
     size_t sizeArr(std::min(arr1.size(), arr2.size()));
     for (unsigned i(0); i < sizeArr; ++i)
@@ -67,7 +67,6 @@ double calculateRMSE(Array<double> arr1, Array<double> arr2) {
 }
 
 void printTable(vector<string> names, vector<double> errors) {
-
     cout << endl;
     cout << std::setw(20) << "Muscle" << std::setw(20) << "RMSE" << endl;
     cout << "          " << std::setfill('-') << std::setw(30) << '-' << endl;
@@ -77,7 +76,6 @@ void printTable(vector<string> names, vector<double> errors) {
 }
 
 void compareSto(const string& f1, const string& f2) {
-
     Storage sto1(f1.c_str());
     Storage sto2(f2.c_str());
     vector<double> errors;
@@ -101,9 +99,8 @@ void compareSto(const string& f1, const string& f2) {
     printTable(names, errors);
 }
 
-int main(){
-
-    path testDataDir = path(BASE_DIR) /= "TestData";
+int main() {
+    std::filesystem::path testDataDir = std::filesystem::path(BASE_DIR) /= "TestData";
     string ikFilename((testDataDir / "MotionData" / "InverseKinematics" / "ik.mot").string());
     string osimModelFilename((testDataDir / "Subject" / "scaled.osim").string());
     string subjectFilename((testDataDir / "Subject" / "uncalibrated.xml").string());
@@ -173,7 +170,6 @@ int main(){
         it->join();
 
     //now compare results with muscle analysis data
-
     compareSto(outputDir + "/_Mcbs_Length.sto", maDir + "/_MuscleAnalysis_Length.sto");
     for (auto& dof : dofNames)
         compareSto(

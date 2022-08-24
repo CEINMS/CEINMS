@@ -28,15 +28,16 @@
 
 #ifndef ceinms_ContactModelKneeBalance_h
 #define ceinms_ContactModelKneeBalance_h
-#include "ceinms/ContactModelKneeBalanceSetup.h"
-#include "ceinms/Mapper.h"
+
 #include <vector>
 #include <string>
+
+#include "ceinms/ContactModelKneeBalanceSetup.h"
+#include "ceinms/Mapper.h"
 
 namespace ceinms {
 
     class ContactModelKneeBalance {
-
     public:
         ContactModelKneeBalance();
 

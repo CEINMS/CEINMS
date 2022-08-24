@@ -11,7 +11,6 @@ set(Tendon_HEADERS
   ceinms/Tendon/ElasticTendon_BiSec.h
   ceinms/Tendon/StiffTendon.h
 )
-
 set(Activation_SOURCES
   Activation/ExponentialActivation.cpp
   Activation/PiecewiseActivation.cpp
@@ -20,19 +19,25 @@ set(Activation_HEADERS
   ceinms/Activation/ExponentialActivation.h
   ceinms/Activation/PiecewiseActivation.h
 )
-
-set(NMS_SOURCES NMSmodel.cpp MuscleParameters.cpp MTUutils.cpp)
-set(NMS_HEADERS ceinms/NMSmodel.h
-                ceinms/MuscleParameters.h
-                ceinms/MTU.h
-                ceinms/DoF.h
-                ceinms/SetupDataStructure.h
-                ceinms/NMSmodelPolicyTemplates.h
-                ceinms/MTUutils.h)
-
-set(NMS_TEMPLATE_IMPLEMENTATION ceinms/MTU.cpp
-                                ceinms/DoF.cpp
-                                ceinms/SetupDataStructure.cpp)
+set(NMS_SOURCES 
+  NMSmodel.cpp
+  MuscleParameters.cpp
+  MTUutils.cpp
+)
+set(NMS_HEADERS
+  ceinms/NMSmodel.h
+  ceinms/MuscleParameters.h
+  ceinms/MTU.h
+  ceinms/DoF.h
+  ceinms/SetupDataStructure.h
+  ceinms/NMSmodelPolicyTemplates.h
+  ceinms/MTUutils.h
+)
+set(NMS_TEMPLATE_IMPLEMENTATION
+  ceinms/MTU.cpp
+  ceinms/DoF.cpp
+  ceinms/SetupDataStructure.cpp
+)
 
 set_source_files_properties( ${NMS_TEMPLATE_IMPLEMENTATION} PROPERTIES HEADER_FILE_ONLY TRUE)
 
@@ -54,14 +59,16 @@ add_library(NMSmodel STATIC
   ${Activation_SOURCES}
   ${Activation_HEADERS}
 )
-target_include_directories(NMSmodel PRIVATE ${Curve_INCLUDE_DIRS}
-                                            ${CMAKE_CURRENT_SOURCE_DIR}
-                                            ${OdeInt_INCLUDE_DIRS}
-                                            ${RootSolvers_INCLUDE_DIRS}
-                                            ${xmlInput_INCLUDE_DIRS}
-                                            ${ceinms_common_INCLUDE_DIRS}
-                                            ${FileIO_INCLUDE_DIRS}
-                                    )
+target_include_directories(NMSmodel
+  PRIVATE
+    ${Curve_INCLUDE_DIRS}
+    ${CMAKE_CURRENT_SOURCE_DIR}
+    ${OdeInt_INCLUDE_DIRS}
+    ${RootSolvers_INCLUDE_DIRS}
+    ${xmlInput_INCLUDE_DIRS}
+    ${ceinms_common_INCLUDE_DIRS}
+    ${FileIO_INCLUDE_DIRS}
+)
 target_link_libraries(NMSmodel xmlInput)
 # Save path to include directory for "internal" usage
 set(NMSmodel_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}" CACHE INTERNAL "Include directory for NMSmodel library")
@@ -74,5 +81,5 @@ install(TARGETS NMSmodel
         EXPORT CEINMSTargets
         RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT Applications
         LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT Development
-        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT Development)
-
+        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT Development
+)

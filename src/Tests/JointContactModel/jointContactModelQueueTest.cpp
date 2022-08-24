@@ -26,32 +26,32 @@
 * limitations under the License.                                             *
 * -------------------------------------------------------------------------- */
 
-#include "ceinms/QueuesToIntersegmentalForces.h"
-#include "ceinms/QueuesToJointReactionForces.h"
+#include <vector>
+#include <memory>
+#include <filesystem>
+
+#include <OpenSim/OpenSim.h>
+using namespace OpenSim;
+
 #include "rtb/concurrency/Concurrency.h"
-using namespace ceinms;
 using rtb::Concurrency::Queue;
 using rtb::Concurrency::Latch;
+
+#include "ceinms/QueuesToIntersegmentalForces.h"
+#include "ceinms/QueuesToJointReactionForces.h"
 #include "ceinms/FileUtils.h"
 #include "ceinms/NMSmodel.h"
 #include "ceinms/Activation/ExponentialActivation.h"
 #include "ceinms/Tendon/ElasticTendon_BiSec.h"
 #include "ceinms/Curve.h"
-#include <OpenSim/OpenSim.h>
-#include <vector>
-#include <memory>
 #include "ceinms/ArrayConverter.h"
 #include "ceinms/GeneralisedCoordinatesData.h"
 #include "ceinms/GeneralisedCoordinatesFromStorageFile.h"
 #include "ceinms/ExternalForcesFromStorageFile.h"
 #include "ceinms/QueueToStorageFile.h"
-#include <boost/filesystem.hpp>
-using boost::filesystem::path;
-using boost::filesystem::canonical;
-using namespace OpenSim;
+using namespace ceinms;
 
 OpenSim::GCVSplineSet getKinematicsSplines(std::string modelFilename, Storage& kinematics, double fc) {
-
     OpenSim::Model model(modelFilename);
     if (fc > 0) {
         kinematics.pad(kinematics.getSize() / 2.);
@@ -83,7 +83,6 @@ OpenSim::GCVSplineSet getKinematicsSplines(std::string modelFilename, Storage& k
 
 //this is already done internally in JointContactFromOpensim, so we just do it for the test
 void addCoordinateActuators(OpenSim::Model& model, double control, bool removeMuscles) {
-
     const OpenSim::CoordinateSet& cs = model.getCoordinateSet();
     if (removeMuscles)
         model.updForceSet().setSize(0); //remove all actuators from the model
@@ -100,7 +99,6 @@ void addCoordinateActuators(OpenSim::Model& model, double control, bool removeMu
 }
 
 void calculateIntersegmentaForcesWithCEINMS(std::string osimModelFilename, std::string kinematicsStorageFilename, std::string externalLoadsXmlFilename, std::string outputDir) {
-
     GeneralisedCoordinatesQueue generalisedCoordinateQueue;
     MultipleExternalForcesQueue multipleExternalForcesQueue;
     VecContactForcesQueue contactForcesQueue;
@@ -159,7 +157,6 @@ void calculateIntersegmentaForcesWithCEINMS(std::string osimModelFilename, std::
 }
 
 void  calculateIntersegmentaForcesWithOpensim(std::string modelFilename, const OpenSim::Storage& kinematics, const string& externalLoadsFilename, const vector<double>& timeColumn, std::string outputDir) {
-
     OpenSim::Model model(modelFilename);
     double firstTime = timeColumn.front();
     double lastTime = timeColumn.back();
@@ -169,8 +166,8 @@ void  calculateIntersegmentaForcesWithOpensim(std::string modelFilename, const O
 
     auto setupAnalTool([&](OpenSim::AnalyzeTool& analTool, const SimTK::State& modelState){
         //      analTool.setCoordinatesFileName(kinematicsFilename);
-        path p(externalLoadsFilename);
-        path baseDir(p.parent_path());
+        std::filesystem::path p(externalLoadsFilename);
+        std::filesystem::path baseDir(p.parent_path());
         OpenSim::ExternalLoads externalLoads(model, externalLoadsFilename);
         auto forcesFilename = externalLoads.getDataFileName();
         if (!FileUtils::isAbsolute(forcesFilename.c_str())) {
@@ -221,7 +218,6 @@ void  calculateIntersegmentaForcesWithOpensim(std::string modelFilename, const O
 }
 
 int main() {
-
     //need to finish this validation..
     path dataPath(canonical(BASE_DIR) / "Data");
     path inputPath(dataPath / "input");

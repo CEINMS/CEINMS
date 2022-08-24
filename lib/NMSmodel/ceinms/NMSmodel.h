@@ -34,6 +34,7 @@
 #include <string>
 #include <iostream>
 #include <stdlib.h>
+
 #include "MTU.h"
 #include "DoF.h"
 #include "MuscleParameters.h"
@@ -47,10 +48,8 @@ namespace ceinms {
     std::ostream& operator<< (std::ostream& output, const NMSmodel<Activation, Tendon, mode>& b);
 
     template <typename Activation, typename Tendon, CurveMode::Mode mode>
-    class NMSmodel
-    {
+    class NMSmodel {
     public:
-
         typedef Activation ActivationT;
         typedef Tendon TendonT;
         typedef MTU<Activation, Tendon, mode> MTUtype;

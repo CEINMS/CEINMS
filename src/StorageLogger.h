@@ -36,12 +36,14 @@
 #include <memory>
 #include <filesystem>
 #include <stdlib.h>
+
 #include "Logger.h"
 
 namespace ceinms {
+
     namespace Logger {
 
-        template <typename NMSmodelT>
+        template<typename NMSmodelT>
         class StorageLogger {
 
         public:
@@ -63,10 +65,9 @@ namespace ceinms {
             std::vector<LogID> fileTypes_;
         };
 
-
-        template <typename NMSmodelT>
+        template<typename NMSmodelT>
         StorageLogger<NMSmodelT>::StorageLogger(NMSmodelT& subject, const std::string& outputDir)
-            :subject_(subject), outputDir_(outputDir), separator_("\t"){
+            :subject_(subject), outputDir_(outputDir), separator_("\t") {
 
             outputDir_ += "/";
             std::filesystem::path dir(outputDir_);
@@ -80,10 +81,8 @@ namespace ceinms {
             else std::cout << "Using " + dir.string() + " as output directory\n";
         }
 
-
-        template <typename NMSmodelT>
+        template<typename NMSmodelT>
         void StorageLogger<NMSmodelT>::addLog(LogID logID) {
-
             std::string filename;
             switch (logID) {
             case Activations:
@@ -120,10 +119,8 @@ namespace ceinms {
             fileTypes_.push_back(logID);
         }
 
-
-        template <typename NMSmodelT>
+        template<typename NMSmodelT>
         void StorageLogger<NMSmodelT>::log(double time, LogID logID) {
-
             time_ = time;
             std::vector<double> data;
 
@@ -155,8 +152,7 @@ namespace ceinms {
             logDataVector(data, dst);
         }
 
-
-        template <typename NMSmodelT>
+        template<typename NMSmodelT>
         void StorageLogger<NMSmodelT>::logDataVector(const std::vector<double>& data, unsigned int index) {
 
             dataToWrite_.at(index).push_back(data);
@@ -166,7 +162,6 @@ namespace ceinms {
 
         template <typename NMSmodelT>
         void StorageLogger<NMSmodelT>::initFile(unsigned int index) {
-
             std::ofstream& outFile = *outFiles_.at(index);
             outFile << "CEINMS output" << std::endl;
             outFile << "datacolumns " << dataToWrite_.at(index).back().size() << std::endl;
@@ -185,16 +180,12 @@ namespace ceinms {
             outFile << names.back() << std::endl;
         }
 
-        template <typename NMSmodelT>
+        template<typename NMSmodelT>
         StorageLogger<NMSmodelT>::~StorageLogger() {
-
-            for (size_t iFile = 0; iFile < outFiles_.size() && iFile < dataToWrite_.size(); ++iFile)
-            {
-
+            for (size_t iFile = 0; iFile < outFiles_.size() && iFile < dataToWrite_.size(); ++iFile) {
                 initFile(iFile);
 
-                for (size_t iSample = 0; iSample < dataToWrite_.at(iFile).size(); ++iSample)
-                {
+                for (size_t iSample = 0; iSample < dataToWrite_.at(iFile).size(); ++iSample) {
                     std::vector<double>& data = dataToWrite_.at(iFile).at(iSample);
                     for (unsigned i = 0; i < data.size() - 1; ++i)
                         *(outFiles_.at(iFile)) << data.at(i) << separator_;
@@ -202,9 +193,8 @@ namespace ceinms {
                 }
                 outFiles_.at(iFile)->close();
             }
-
         }
-
     };
 }
+
 #endif

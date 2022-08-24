@@ -30,9 +30,11 @@
 #define ceinms_Hybrid_StaticComputation_h
 
 #include <vector>
+
 #include "ceinms/NMSmodel.h"
 
 namespace ceinms {
+
     namespace Hybrid {
 
         template<typename NMSmodelT, typename StaticComputationMode>
@@ -43,7 +45,6 @@ namespace ceinms {
 
         template<typename NMSmodelT, typename StaticComputationMode>
         class StaticComputation {
-
         public:
             StaticComputation(NMSmodelT& subject,
                 const std::vector<std::string>& muscleNamesWithEMGtoTrack,
@@ -57,7 +58,6 @@ namespace ceinms {
             void getCurrentEMGs(std::vector<double>& emgValues) const;
 
         private:
-
             NMSmodelT& subject_;
             StaticComputationMode computationMode_;
             double time_;
@@ -67,11 +67,9 @@ namespace ceinms {
             std::vector<unsigned> muscleIndexWithEMGtoTrack_;
             std::vector<unsigned> muscleIndexWithEMGtoPredict_;
             std::vector<unsigned> muscleIndexWithEMGtoOptimize_;
-
-
         };
     }
 }
-#include "StaticComputation.cpp"
 
+#include "StaticComputation.cpp"
 #endif

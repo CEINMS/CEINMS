@@ -22,6 +22,7 @@ include(GNUInstallDirs)
 
 if(WIN32)
     set(CMAKE_CXX_FLAGS "/EHsc")# -std=c++11 -fpermissive")
+    set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} /wd4996")  # Silence warnings caused by OpenSim
 endif()
 if(UNIX AND NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Debug CACHE STRING "Choose the type of build, options are: None Debug Release RelWithDebInfo MinSizeRel." FORCE)

@@ -29,17 +29,18 @@
 #ifndef ceinms_Hybrid_ObjectiveFunction_MinTorqueTrackEMGs_h
 #define ceinms_Hybrid_ObjectiveFunction_MinTorqueTrackEMGs_h
 
-#include "ceinms/HybridWeightings.h"
-
 #include <vector>
 
+#include "ceinms/HybridWeightings.h"
+
 namespace ceinms {
+
     namespace Hybrid {
+
         namespace ObjectiveFunction {
 
             template<typename StaticComputationT>
             class MinTorqueTrackEMGs {
-
             public:
                 MinTorqueTrackEMGs(StaticComputationT& staticComputation,
                     double epsilon, double nEpsilon, HybridWeightings hybridParameters);

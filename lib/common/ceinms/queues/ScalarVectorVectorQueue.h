@@ -30,9 +30,11 @@
 #define ceinms_ScalarVectorVectorQueue_h
 
 #include <vector>
+
 #include "ceinms/QueueData.h"
 
 namespace Concurrency {
+	
 	template<typename>
 	class Queue;
 }

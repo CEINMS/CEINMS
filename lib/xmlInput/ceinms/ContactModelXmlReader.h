@@ -28,18 +28,20 @@
 
 #ifndef ceinms_ContactModelXmlReader_h
 #define ceinms_ContactModelXmlReader_h
-#include "contactModel.hxx"
+
 #include <string>
 #include <vector>
+
+#include "contactModel.hxx"
 #include "ceinms/ContactModelFromOpenSimSetup.h"
 #include "ceinms/ContactModelKneeBalanceSetup.h"
 
 namespace ceinms {
+
     //in future we could have different sources..
     enum class ContactModelType { OpenSim, KneeBalance };
 
     class ContactModelXmlReader {
-
     public:
         ContactModelXmlReader();
         ContactModelXmlReader(const std::string& filename);
@@ -60,7 +62,6 @@ namespace ceinms {
         std::string filepath_;
         std::string filename_;
     };
-
 }
 
 #endif

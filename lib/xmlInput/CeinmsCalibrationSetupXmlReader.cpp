@@ -34,17 +34,15 @@ using std::map;
 using std::cout;
 using std::endl;
 
+#include "ceinms/FileUtils.h"
 #include "ceinms/CeinmsCalibrationSetupXmlReader.h"
 #include "validation.h"
 #include "ceinmsCalibrationSetup-schema.hxx"
 using CeinmsCalibrationSetupXsd::CeinmsCalibrationType;
 
-#include "ceinms/FileUtils.h"
-
 namespace ceinms {
-    CeinmsCalibrationSetupXmlReader::CeinmsCalibrationSetupXmlReader(const string& filename)
-    {
 
+    CeinmsCalibrationSetupXmlReader::CeinmsCalibrationSetupXmlReader(const string& filename) {
         try {
             std::unique_ptr<CeinmsCalibrationType> ceinmsCalibrationDataPointer(parseAndValidate<CeinmsCalibrationType>(filename, ceinmsCalibrationSetup_schema, sizeof(ceinmsCalibrationSetup_schema)));
             ceinmsCalibrationSetupPointer_ = std::move(ceinmsCalibrationDataPointer);
@@ -67,12 +65,11 @@ namespace ceinms {
     }
 
     void CeinmsCalibrationSetupXmlReader::readXml() {
-
         try {
-            std::string& mySubjectFile(*(ceinmsCalibrationSetupPointer_->subjectFile().begin()));
-            std::string& myCalibrationExecutionFile(*(ceinmsCalibrationSetupPointer_->calibrationFile().begin()));
-            std::string& myEmgGeneratorFile(*(ceinmsCalibrationSetupPointer_->excitationGeneratorFile().begin()));
-            std::string& myOutputSubjectFile(*(ceinmsCalibrationSetupPointer_->outputSubjectFile().begin()));
+            string& mySubjectFile(*(ceinmsCalibrationSetupPointer_->subjectFile().begin()));
+            string& myCalibrationExecutionFile(*(ceinmsCalibrationSetupPointer_->calibrationFile().begin()));
+            string& myEmgGeneratorFile(*(ceinmsCalibrationSetupPointer_->excitationGeneratorFile().begin()));
+            string& myOutputSubjectFile(*(ceinmsCalibrationSetupPointer_->outputSubjectFile().begin()));
 
         }
         catch (const xml_schema::exception& e) {
@@ -81,9 +78,8 @@ namespace ceinms {
         }
     }
 
-    std::string CeinmsCalibrationSetupXmlReader::getSubjectFile()
-    {
-        std::string fileName(*(ceinmsCalibrationSetupPointer_->subjectFile().begin()));
+    string CeinmsCalibrationSetupXmlReader::getSubjectFile() {
+        string fileName(*(ceinmsCalibrationSetupPointer_->subjectFile().begin()));
         FileUtils::trim(fileName);
         if (FileUtils::isAbsolute(fileName.c_str()))
             return fileName;
@@ -91,9 +87,8 @@ namespace ceinms {
             return  FileUtils::simplify(filepath_ + fileName);
     }
 
-    std::string CeinmsCalibrationSetupXmlReader::getCalibrationFile()
-    {
-        std::string fileName(*(ceinmsCalibrationSetupPointer_->calibrationFile().begin()));
+    string CeinmsCalibrationSetupXmlReader::getCalibrationFile() {
+        string fileName(*(ceinmsCalibrationSetupPointer_->calibrationFile().begin()));
         FileUtils::trim(fileName);
         if (FileUtils::isAbsolute(fileName.c_str()))
             return fileName;
@@ -101,9 +96,8 @@ namespace ceinms {
             return  FileUtils::simplify(filepath_ + fileName);
     }
 
-    std::string CeinmsCalibrationSetupXmlReader::getExcitationGeneratorFile()
-    {
-        std::string fileName(*(ceinmsCalibrationSetupPointer_->excitationGeneratorFile().begin()));
+    string CeinmsCalibrationSetupXmlReader::getExcitationGeneratorFile() {
+        string fileName(*(ceinmsCalibrationSetupPointer_->excitationGeneratorFile().begin()));
         FileUtils::trim(fileName);
         if (FileUtils::isAbsolute(fileName.c_str()))
             return fileName;
@@ -111,9 +105,8 @@ namespace ceinms {
             return  FileUtils::simplify(filepath_ + fileName);
     }
 
-    std::string CeinmsCalibrationSetupXmlReader::getOutputSubjectFile()
-    {
-        std::string fileName(*(ceinmsCalibrationSetupPointer_->outputSubjectFile().begin()));
+    string CeinmsCalibrationSetupXmlReader::getOutputSubjectFile() {
+        string fileName(*(ceinmsCalibrationSetupPointer_->outputSubjectFile().begin()));
         FileUtils::trim(fileName);
         if (FileUtils::isAbsolute(fileName.c_str()))
             return fileName;
@@ -122,9 +115,9 @@ namespace ceinms {
     }
 
     /*
-    std::string CeinmsCalibrationSetupXmlReader::getContactModelFile() {
+    string CeinmsCalibrationSetupXmlReader::getContactModelFile() {
 
-        std::string fileName(*(ceinmsCalibrationSetupPointer_->contactModelFile().begin()));
+        string fileName(*(ceinmsCalibrationSetupPointer_->contactModelFile().begin()));
         FileUtils::trim(fileName);
         if (FileUtils::isAbsolute(fileName.c_str()))
             return fileName;
@@ -138,8 +131,7 @@ namespace ceinms {
     }
     */
 
-    bool CeinmsCalibrationSetupXmlReader::writeTemplateCeinmsCalibrationSetupFile(const std::string& templateFile)
-    {
+    bool CeinmsCalibrationSetupXmlReader::writeTemplateCeinmsCalibrationSetupFile(const string& templateFile) {
         std::ofstream templateFileStream(templateFile);
         if (!templateFileStream.is_open())
             return false;

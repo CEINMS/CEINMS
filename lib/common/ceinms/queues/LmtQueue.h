@@ -30,6 +30,7 @@
 #define ceinms_LmtQueue_h
 
 #include <vector>
+
 #include "ceinms/queues/ScalarVectorQueue.h"
 
 namespace ceinms {

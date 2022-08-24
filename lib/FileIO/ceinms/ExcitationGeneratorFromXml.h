@@ -33,10 +33,9 @@
 #include <vector>
 
 namespace ceinms {
-    class ExcitationGeneratorFromXml{
 
-        struct Component
-        {
+    class ExcitationGeneratorFromXml {
+        struct Component {
             unsigned index; //index of this component in the inputSignals list
             double weight;
         };
@@ -63,4 +62,5 @@ namespace ceinms {
 
     };
 }
+
 #endif

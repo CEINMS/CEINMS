@@ -29,15 +29,17 @@
 #ifndef ceinms_SetupDataStructure_h
 #define ceinms_SetupDataStructure_h
 
-#include "subject.hxx" // TODO: we should find a way to only include this from xmlInput
-#include "ceinms/Curve.h"
-#include "ceinms/SubjectXmlReader.h"
 #include <cmath>
 #include <string>
 
+#include "subject.hxx" // TODO: we should find a way to only include this from xmlInput
+#include "ceinms/Curve.h"
+#include "ceinms/SubjectXmlReader.h"
+
 namespace ceinms {
+
     template<typename NMSmodelT>
-    class SetupDataStructure{
+    class SetupDataStructure {
     public:
         typedef typename NMSmodelT::MTUtype MTUT;
         typedef typename NMSmodelT::DoFtype DoFT;
@@ -49,6 +51,7 @@ namespace ceinms {
         void  createDoFs(NMSmodelT& mySubject) const;
         void  setExtraInfo(NMSmodelT& mySubject) const;
   //      static void  writeXMLCalibratedFile(NMSmodelT& mySubject, const std::string& XMLfilename);
+
     private:
         // Create the body structure from the Input
         std::unique_ptr<SubjectXsd::SubjectType> subjectPointer_;
@@ -62,7 +65,6 @@ namespace ceinms {
     //non-member non-friend functions are the best!
     template <typename NMSmodelT>
     void setupSubject(NMSmodelT& mySubject, std::string subjectFile, double tolerance = 1e-6) {
-
         SetupDataStructure<NMSmodelT> setupData(subjectFile);
         setupData.createCurves();
         setupData.createMuscles(mySubject);
@@ -70,7 +72,6 @@ namespace ceinms {
         setupData.setExtraInfo(mySubject);
         mySubject.setTendonTolerance(tolerance);
     }
-
 }
 
 #include "SetupDataStructure.cpp"

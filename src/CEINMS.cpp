@@ -26,14 +26,8 @@
  * limitations under the License.                                             *
  * -------------------------------------------------------------------------- */
 
-#include "ceinms/Utilities.h"
-#include "ceinms/FileUtils.h"
-#include "ceinms/CeinmsSetupXmlReader.h"
-#include "SimulationManager.h"
 #include <ctime>
-
 #include <iomanip>
-
 #include <string>
 using std::string;
 #include <iostream>
@@ -45,9 +39,12 @@ using std::vector;
 using std::map;
 #include <stdlib.h>
 
+#include "ceinms/Utilities.h"
+#include "ceinms/FileUtils.h"
+#include "ceinms/CeinmsSetupXmlReader.h"
+#include "SimulationManager.h"
 
 void printHeader() {
-
     cout << endl;
     cout << "+-+-+-+-+-+-+\n"
          << "|C|E|I|N|M|S|\n"
@@ -66,17 +63,15 @@ void printHeader() {
         string(CEINMS_MINOR_VERSION) + "." +
         string(CEINMS_PATCH_VERSION);
     cout << "\n" << progName << " version " << version << "\n";
-    }
+}
 
 void printAuthors() {
-
     cout << "Copyright (C) " << string(__DATE__) << endl;
     cout << "Claudio Pizzolato, Monica Reggiani, Massimo Sartori, David Lloyd\n";
     cout << "Software developers: Claudio Pizzolato, Elena Ceseracciu, Monica Reggiani\n";
 }
 
-void PrintUsage()
-{
+void PrintUsage() {
     string progName = "CEINMS";
     cout << "Option            Argument          Action / Notes\n";
     cout << "------            --------          --------------\n";
@@ -86,9 +81,7 @@ void PrintUsage()
 
 }
 
-
 int main(int argc, char** argv) {
-
     printHeader();
     printAuthors();
 
@@ -114,25 +107,22 @@ int main(int argc, char** argv) {
                 return 0;
             }
             else if ((option == "-S") || (option == "-Setup")) {
-                if (argv[i + 1] == 0){
+                if (argv[i + 1] == 0) {
                     cout << "No setup file specified!" << endl;
                     PrintUsage();
                     return -1;
                 }
                 setupFileName = argv[i + 1];
-                break;
-
-                // Print a default setup file
+                break;           
             }
+            // Print a default setup file
             else if ((option == "-PrintSetup") || (option == "-PS")) {
-                if (ceinms::CeinmsSetupXmlReader::writeTemplateCeinmsSetupFile("defaultCeinmsSetupFile.xml"))
-                {
-                    std::cout << "Wrote template setup file to defaultCeinmsSetupFile.xml" << std::endl;
+                if (ceinms::CeinmsSetupXmlReader::writeTemplateCeinmsSetupFile("defaultCeinmsSetupFile.xml")) {
+                    cout << "Wrote template setup file to defaultCeinmsSetupFile.xml" << endl;
                     return 0;
                 }
-                else
-                {
-                    std::cout << "An error occurred while writing template setup file to defaultCeinmsSetupFile.xml" << std::endl;
+                else {
+                    cout << "An error occurred while writing template setup file to defaultCeinmsSetupFile.xml" << endl;
                     return -1;
                 }
             }

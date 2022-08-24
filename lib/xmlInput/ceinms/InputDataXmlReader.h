@@ -31,9 +31,11 @@
 
 #include <string>
 #include <map>
+
 #include "inputData.hxx"
 
 namespace ceinms {
+
     class InputDataXmlReader {
     public:
         InputDataXmlReader(const std::string& filename);
@@ -45,6 +47,7 @@ namespace ceinms {
         std::string getExternalLoadsFile(bool relative = false) const;
         double getStartTime() const;
         double getStopTime() const;
+        
     private:
         void readXml();
         std::string filepath_;

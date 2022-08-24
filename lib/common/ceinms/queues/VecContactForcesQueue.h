@@ -30,19 +30,22 @@
 #define ceinms_VecContactForcesQueue_h
 
 #include <vector>
+
 #include <SimTKcommon.h>
+
 #include "ceinms/QueueData.h"
 
 namespace Concurrency {
+
     template<typename>
     class Queue;
 }
 
 namespace ceinms {
 
-    using VecContactForcesData = std::vector < SimTK::Vec3 > ;
-    using VecContactForcesFrame = QueueData < VecContactForcesData > ;
-    using VecContactForcesQueue = rtb::Concurrency::Queue < VecContactForcesFrame > ;
+    using VecContactForcesData = std::vector<SimTK::Vec3>;
+    using VecContactForcesFrame = QueueData<VecContactForcesData>;
+    using VecContactForcesQueue = rtb::Concurrency::Queue<VecContactForcesFrame>;
 }
 
 #endif

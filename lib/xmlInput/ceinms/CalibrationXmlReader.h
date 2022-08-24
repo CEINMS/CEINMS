@@ -34,6 +34,7 @@
 #include <map>
 #include <list>
 #include <string>
+
 #include "NMSmodelConfig.h"
 #include "CalibrationCfg.h"
 #include "calibration.hxx"
@@ -51,7 +52,6 @@ namespace ceinms {
     };
 
     class CalibrationXmlReader {
-
     public:
         CalibrationXmlReader(const std::string& filename);
         NMSModelCfg::RunMode getNMSmodelRunMode() const;

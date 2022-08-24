@@ -26,18 +26,17 @@
  * limitations under the License.                                             *
  * -------------------------------------------------------------------------- */
 
-#include "ceinms/DataTable.h"
 #include <iostream>
 using std::cout;
 using std::endl;
 
+#include "ceinms/DataTable.h"
 using ceinms::DataTable;
 
 int main() {
-
     cout << "Default initializer" << endl;
     DataTable<double> t1;
-    std::cout << t1;
+    cout << t1;
     t1.setLabels({ "l1", "l2", "l3"});
     cout << "Set labels" << endl;
     cout << t1;
@@ -58,7 +57,7 @@ int main() {
 
     cout << "Dimension initializer" << endl;
     DataTable<double> table(3, 4);
-    std::cout << table;
+    cout << table;
 
     cout << endl << "-------------" << endl;
     cout << "Sum with different row numbers" << endl;
@@ -85,12 +84,12 @@ int main() {
     t3.crop(-1, 120);
 
     auto it = t3.begin();
-    std::cout << it->size() << endl;
-    std::cout << t3.getRow(0).size() << endl;
+    cout << it->size() << endl;
+    cout << t3.getRow(0).size() << endl;
 
 
-		// Test cropping gata table
-		cout << "Testing table cropping" << endl;
+	// Test cropping gata table
+	cout << "Testing table cropping" << endl;
 	DataTable<double> t4;
 	for (int i(0); i < 1000; ++i) {
 		t4.pushRow(i*0.1, { i * 10., i * 20. });

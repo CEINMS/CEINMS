@@ -30,9 +30,11 @@
 #define ceinms_Result_h
 
 #include <OpenSim/OpenSim.h>
+
 #include "ceinms/DataTable.h"
 
 namespace ceinms {
+
     class Result{
     public:
         DataTable<double> forces, torques, activations, emgs, penalties, errors, scalarContactForces,
@@ -47,7 +49,7 @@ namespace ceinms {
             scalarContactForces(nLmtMaFrames, 4),
             normalisedFibreLengths(nLmtMaFrames, nMTUs),
             normalisedFibreVelocities(nLmtMaFrames, nMTUs),
-            errors(nLmtMaFrames, 6){
+            errors(nLmtMaFrames, 6) {
 
             errors.setLabels({ "TorqueError", "SumExcitation", "ExcitationTrackingError", "alpha", "beta", "gamma" });
         }
@@ -75,4 +77,5 @@ namespace ceinms {
         }
     };
 }
+
 #endif

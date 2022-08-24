@@ -28,11 +28,14 @@
 
 #ifndef ceinms_SumGenericContactForces_h
 #define ceinms_SumGenericContactForces_h
+
 #include <vector>
 #include <string>
 #include <memory>
-#include "ceinms/ObjectiveFunctionBase.h"
+
 #include <OpenSim/OpenSim.h>
+
+#include "ceinms/ObjectiveFunctionBase.h"
 #include "ceinms/TrialData.h"
 #include "Result.h"
 #include "ceinms/Mapper.h"
@@ -45,21 +48,22 @@ namespace ceinms {
         SumGenericContactForces();
         SumGenericContactForces(const ObjectiveFunctionSetup& setup);
         //this is to respect the interface
-//        void setDofsToCalibrate(const std::vector<std::string>& dofsToCalibrate) override {};
+        // void setDofsToCalibrate(const std::vector<std::string>& dofsToCalibrate) override {};
         void setTrials(const std::vector<TrialData>& trials) override { dim_ = trials.size(); }
         void calculate(const std::vector<Result>& results) override;
         double getValue() const override { return f_; }
         void setSetup(const ObjectiveFunctionSetup& setup);
         //the contact model is associated to the subject, oly a contact model per calibration
         void setJointContactForcesNames(const std::vector<std::string>& contactForcesNames);
-   //     void setBarrierParameters(double xL, double xR, double weight, double exponent);
+        // void setBarrierParameters(double xL, double xR, double weight, double exponent);
         void printCosts() const override;
         bool calculateOpenSimData() const override { return true; }
+        
     private:
         std::size_t dim_;
         double f_, weight_, exponent_;
- //       BarrierFunction barrierFunc_;
- //       BarrierListSetup barrierListSetup_;
+        // BarrierFunction barrierFunc_;
+        // BarrierListSetup barrierListSetup_;
         std::vector<std::string> contactForcesNames_;
         std::vector<std::vector<double>> maxContactForces_; //1st -> trial, 2nd-> joint
     };

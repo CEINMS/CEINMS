@@ -1,20 +1,21 @@
-#include "ceinms/BatchOpenSimEvaluator.h"
+#include <string>
 using std::string;
+#include <vector>
 using std::vector;
+
+#include "ceinms/BatchOpenSimEvaluator.h"
 #include "ceinms/Mapper.h"
 #include "ceinms/ArrayConverter.h"
 
 namespace ceinms {
 
-   BatchOpenSimEvaluator::BatchOpenSimEvaluator() {}
+    BatchOpenSimEvaluator::BatchOpenSimEvaluator() { }
 
-   BatchOpenSimEvaluator::BatchOpenSimEvaluator(
-        const std::vector<TrialData>& osimTrialData) {
+    BatchOpenSimEvaluator::BatchOpenSimEvaluator(const vector<TrialData>& osimTrialData) {
         // setOpenSimTrialData(osimTrialData);
     }
 
-    void BatchOpenSimEvaluator::setOpenSimTrialData(const std::vector<TrialData>& osimTrialData) {
-
+    void BatchOpenSimEvaluator::setOpenSimTrialData(const vector<TrialData>& osimTrialData) {
         osimTrialData_ = osimTrialData;
         for (auto& e : osimTrialData) {
             std::cout << e.getExternalLoadFile() << std::endl << std::flush;
@@ -23,8 +24,7 @@ namespace ceinms {
         }
     }
 
-    void BatchOpenSimEvaluator::evaluate(const std::vector<Result>& resultsFromCeinms) {
-        
+    void BatchOpenSimEvaluator::evaluate(const vector<Result>& resultsFromCeinms) {
         openSimResults_ = resultsFromCeinms;
        
         for (int i(0); i < resultsFromCeinms.size(); ++i) {
@@ -33,23 +33,22 @@ namespace ceinms {
     }
 
     DataTable<SimTK::Vec3> BatchOpenSimEvaluator::evaluate(std::unique_ptr<JointContactFromOpensim>& jointContactModel, const Result& resultFromCeinms, const TrialData& osimTrialData) {
-       //map muscles and torques from resultsFromCeinms to a mapper.. so it's possible to put them in the correct order
+        //map muscles and torques from resultsFromCeinms to a mapper.. so it's possible to put them in the correct order
       
-      vector<string> inputMuscleNames(resultFromCeinms.forces.getLabels());
-      vector<string> outputMuslceNames;
-      jointContactModel->getMuscleNamesFromOsimModel(outputMuslceNames);
+        vector<string> inputMuscleNames(resultFromCeinms.forces.getLabels());
+        vector<string> outputMuslceNames;
+        jointContactModel->getMuscleNamesFromOsimModel(outputMuslceNames);
       
-      Mapper muscleMapper(inputMuscleNames, outputMuslceNames);
+        Mapper muscleMapper(inputMuscleNames, outputMuslceNames);
       
-      vector<string> inputDofNames(resultFromCeinms.torques.getLabels());
-      vector<string> outputDofNames;
-      jointContactModel->getCoordinateNamesFromOsimModel(outputDofNames);
-      Mapper dofMapper(inputDofNames, outputDofNames);
+        vector<string> inputDofNames(resultFromCeinms.torques.getLabels());
+        vector<string> outputDofNames;
+        jointContactModel->getCoordinateNamesFromOsimModel(outputDofNames);
+        Mapper dofMapper(inputDofNames, outputDofNames);
       
-      DataTable<SimTK::Vec3> jointReactionForces;
-      std::size_t nTimeSteps(resultFromCeinms.forces.getNRows());
-       for (std::size_t iRow(0); iRow < nTimeSteps; ++iRow) {
-      
+        DataTable<SimTK::Vec3> jointReactionForces;
+        std::size_t nTimeSteps(resultFromCeinms.forces.getNRows());
+        for (std::size_t iRow(0); iRow < nTimeSteps; ++iRow) {
            auto time(resultFromCeinms.forces.getTime(iRow));
            auto muscleForces(muscleMapper.map(resultFromCeinms.forces.getRow(iRow)));
            auto predictedTorques(dofMapper.map(resultFromCeinms.torques.getRow(iRow)));
@@ -65,18 +64,14 @@ namespace ceinms {
            SimTK::Vector_<SimTK::Vec3> reactionTorques;
            jointContactModel->getAllReactionForces(reactionForces, reactionTorques);
            jointReactionForces.pushRow(time, ArrayConverter::fromSimTKVector(reactionForces));
-      
-       }
-        std::vector<std::string> jointNames;
+        }
+        vector<string> jointNames;
         jointContactModel->getJointNamesFromOsimModel(jointNames);
         jointReactionForces.setLabels(jointNames);
-       return jointReactionForces;
+        return jointReactionForces;
     }
 
-
-   std::vector<Result> BatchOpenSimEvaluator::getResults() const {
-       return openSimResults_;
-   }
-
-
+    vector<Result> BatchOpenSimEvaluator::getResults() const {
+        return openSimResults_;
+    }
 }

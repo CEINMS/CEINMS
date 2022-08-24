@@ -30,7 +30,9 @@
 #define ceinms_Logger_h
 
 namespace ceinms {
+
     namespace Logger {
+        
         enum LogID{
             Activations,
             FibreLengths,

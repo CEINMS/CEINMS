@@ -32,11 +32,11 @@
 #include "HybridWeightings.h"
 
 namespace ceinms{
+
     namespace Hybrid {
 
         template<typename NMSmodelT>
         class ErrorMinimizerAnnealing {
-
         public:
             ErrorMinimizerAnnealing(NMSmodelT& subject);
             void setMusclesNamesWithEmgToTrack(const std::vector<std::string>& musclesNamesWithEmgToTrack);
@@ -47,6 +47,7 @@ namespace ceinms{
             void setWeightings(HybridWeightings weightings) { weightings_ = weightings; }
             void setAnnealingParameters(unsigned nt, unsigned ns, double rt, double t, unsigned maxNoEval, double epsilon, unsigned noEpsilon);
             void minimize();
+
         private:
             HybridWeightings weightings_;
             NMSmodelT& subject_;
@@ -67,6 +68,6 @@ namespace ceinms{
         };
     }
 }
-#include "ErrorMinimizerAnnealing.cpp"
 
+#include "ErrorMinimizerAnnealing.cpp"
 #endif

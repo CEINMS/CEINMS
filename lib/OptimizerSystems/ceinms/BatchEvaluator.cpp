@@ -28,10 +28,10 @@
 
 #include <future>
 #include <thread>
+#include <vector>
 
 #include "ceinms/TimeCompare.h"
 #include "ceinms/Result.h"
-#include <vector>
 
 namespace ceinms {
 
@@ -54,12 +54,10 @@ namespace ceinms {
         //I need to resize them, otherwise I get an error at the first execution, because they are different in length
         subjectParametersT1_.resize(nMusclesInSubject);
         subjectParameters_.resize(nMusclesInSubject);
-
     }
 
     template<typename NMSmodelT>
     void BatchEvaluator::evaluate(NMSmodelT& subject) {
-
         subject.getMusclesParameters(subjectParameters_);
         updMusclesToUpdate();
         subjectParametersT1_ = subjectParameters_; //for next evaluation
@@ -72,7 +70,6 @@ namespace ceinms {
 
     template<typename NMSmodelT>
     void BatchEvaluator::evaluateParallel(NMSmodelT& subject, std::vector<NMSmodelT>& mockSubjects) {
-
         subject.getMusclesParameters(subjectParameters_);
         updMusclesToUpdate();
         subjectParametersT1_ = subjectParameters_; //for next evaluation
@@ -88,12 +85,10 @@ namespace ceinms {
 
         for (auto& f : futures)
             f.wait();
-
     }
 
     template<typename NMSmodelT>
     void BatchEvaluator::evaluateParallel(NMSmodelT& subject) {
-
         subject.getMusclesParameters(subjectParameters_);
         updMusclesToUpdate();
         subjectParametersT1_ = subjectParameters_; //for next evaluation
@@ -109,7 +104,6 @@ namespace ceinms {
             f.wait();
     }
 
-
     void BatchEvaluator::updMusclesToUpdate() {
         musclesToUpdate_.clear();
         for (unsigned int i = 0; i < subjectParameters_.size(); ++i)
@@ -119,7 +113,6 @@ namespace ceinms {
 
     template<typename NMSmodelT>
     void OpenLoopEvaluator::evaluate(NMSmodelT&& subject, const TrialData& trialData, const std::vector<unsigned> musclesToUpdate, Result& previousResult) {
-
         const double emDelay(subject.getGlobalEmDelay());
         //ct trial index
         initFiberLengthTraceCurves(subject, trialData, musclesToUpdate, previousResult);
@@ -192,10 +185,8 @@ namespace ceinms {
         }
     }
 
-
     template<typename NMSmodelT>
     void OpenLoopEvaluator::initFiberLengthTraceCurves(NMSmodelT&& subject, const TrialData& trialData, const std::vector<unsigned>& musclesToUpdate, Result& previousResult) {
-
         const double emDelay(subject.getGlobalEmDelay());
         unsigned lmtMaIndex(0); // k is the index for lmt and ma data
         double lmtTime = trialData.getLmtData().getStartTime();
@@ -334,7 +325,7 @@ namespace ceinms {
                     previousResult.activations.at(emgIndex, it) = currentActivations.at(it);
                     previousResult.activations.setTime(emgTime, emgIndex);
                 }
-             }
+            }
         }
     }
 }

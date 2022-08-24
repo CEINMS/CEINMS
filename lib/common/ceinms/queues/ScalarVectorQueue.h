@@ -30,15 +30,16 @@
 #define ceinms_ScalarVectorQueue_h
 
 #include <vector>
-#include "ceinms/QueueData.h"
+
 #include "rtb/concurrency/Queue.h"
 
+#include "ceinms/QueueData.h"
 
 namespace ceinms {
 
-    using ScalarVectorData = std::vector < double > ;
-    using ScalarVectorFrame = QueueData < ScalarVectorData > ;
-    using ScalarVectorQueue = rtb::Concurrency::Queue < ScalarVectorFrame > ;
+    using ScalarVectorData = std::vector<double>;
+    using ScalarVectorFrame = QueueData<ScalarVectorData>;
+    using ScalarVectorQueue = rtb::Concurrency::Queue<ScalarVectorFrame>;
 }
 
 #endif

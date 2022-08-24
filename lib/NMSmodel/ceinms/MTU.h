@@ -41,11 +41,8 @@ namespace ceinms {
     template<typename Activation, typename Tendon, CurveMode::Mode mode>
     std::ostream& operator<<  (std::ostream& output, const MTU<Activation, Tendon, mode>& m);
 
-
-
     template<typename Activation, typename Tendon, CurveMode::Mode mode>
     class MTU {
-
         typedef Curve<mode> CurveT;
         typedef Curve<CurveMode::Offline> CurveOffline;
 
@@ -134,6 +131,7 @@ namespace ceinms {
 
 		template<typename T>
 		friend class SetupDataStructure;
+
     private:
         void updateFibreLength();
         void updateFibreLength_OFFLINE();

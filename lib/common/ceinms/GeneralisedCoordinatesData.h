@@ -30,9 +30,10 @@
 #define ceinms_GeneralisedCoordinatesData_h
 
 #include <vector>
-//#include "rtosim/GeneralisedCoordinatesData.h"
-//TODO: add checks for different vecotr sizes and stuff
+
+//TODO: add checks for different vector sizes and stuff
 namespace ceinms {
+
     class GeneralisedCoordinatesData {
     private:
         size_t nCoordinates_;
@@ -47,8 +48,7 @@ namespace ceinms {
             nCoordinates_(nCoordinates),
             q_(nCoordinates, .0),
             qd_(nCoordinates, .0),
-            qdd_(nCoordinates, .0)
-        {}
+            qdd_(nCoordinates, .0) {}
 
         size_t getNCoordinates() const { return nCoordinates_; }
 
@@ -70,7 +70,6 @@ namespace ceinms {
         void getQd(std::vector<double>& qd) const { qd = qd_; }
         void getQdd(std::vector<double>& qdd) const { qdd = qdd_; }
     };
-	
-	//using GeneralisedCoordinatesData = rtosim::GeneralisedCoordinatesData;
 }
+
 #endif
