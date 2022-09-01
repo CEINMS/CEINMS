@@ -5,3 +5,5 @@ include_directories(
 
 add_executable(Test_Optimizers optimizerTest.cpp)
 #target_link_libraries(OptimizersTest Optimizers)
+
+set_target_properties(Test_Optimizers PROPERTIES FOLDER "Tests")

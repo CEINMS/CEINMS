@@ -15,3 +15,5 @@ target_link_libraries(Test_CalibrationObjectiveFunctions
     TrialData
     ${OPENSIM_LIBRARIES}
 )
+
+set_target_properties(Test_CalibrationObjectiveFunctions PROPERTIES FOLDER "Tests")

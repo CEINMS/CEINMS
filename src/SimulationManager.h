@@ -43,7 +43,6 @@
 namespace ceinms {
 
     class SimulationManager {
-
     public:
         SimulationManager(const std::string& setupFilename);
         bool run();

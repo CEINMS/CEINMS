@@ -15,20 +15,31 @@ include_directories(
 
 add_definitions(/DBASE_DIR="${CMAKE_CURRENT_LIST_DIR}")
 
-add_executable(Test_JointContactModelFastExecution jointContactModelFastExecutionTest.cpp)
-target_link_libraries(Test_JointContactModelFastExecution
-	JointContactModels
-	OptimizationSystems
-	OutputConnectors
-	InputConnectors
-	xmlInput
-	TrialData
-	NMSmodel
-	${OPENSIMSIMBODY_LIBRARIES}
-)
+#add_executable(Test_JointContactModelFastExecution jointContactModelFastExecutionTest.cpp)
+#target_link_libraries(Test_JointContactModelFastExecution
+#	JointContactModels
+#	OptimizationSystems
+#	OutputConnectors
+#	InputConnectors
+#	xmlInput
+#	TrialData
+#	NMSmodel
+#	${OPENSIMSIMBODY_LIBRARIES}
+#)
 
-add_executable(Test_JointContactModelQueues jointContactModelQueueTest.cpp)
-target_link_libraries(Test_JointContactModelQueues
+#add_executable(Test_JointContactModelQueues jointContactModelQueueTest.cpp)
+#target_link_libraries(Test_JointContactModelQueues
+#	JointContactModels
+#	OutputConnectors
+#	InputConnectors
+#	xmlInput
+#	rtb::Concurrency
+#	NMSmodel
+#	${OPENSIMSIMBODY_LIBRARIES}
+#)
+
+add_executable(Test_JointContactModel jointContactFromOpensimTest.cpp)
+target_link_libraries(Test_JointContactModel
 	JointContactModels
 	OutputConnectors
 	InputConnectors
@@ -37,3 +48,5 @@ target_link_libraries(Test_JointContactModelQueues
 	NMSmodel
 	${OPENSIMSIMBODY_LIBRARIES}
 )
+
+set_target_properties(Test_JointContactModel PROPERTIES FOLDER "Tests")

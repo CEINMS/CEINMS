@@ -7,3 +7,5 @@ include_directories(
 
 add_executable(Test_GenericHybridFunction genericHybridFunctionTest.cpp)
 TARGET_LINK_LIBRARIES(Test_GenericHybridFunction NMSmodel)
+
+set_target_properties(Test_GenericHybridFunction PROPERTIES FOLDER "Tests")

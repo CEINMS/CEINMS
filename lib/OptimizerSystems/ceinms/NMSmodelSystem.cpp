@@ -116,7 +116,6 @@ namespace ceinms {
         }
         
         if (hasContactModel_) {
-
             batchContactModelEvaluator_.evaluate(results);
             batchContactModelEvaluator_.updateResults(results);
         }

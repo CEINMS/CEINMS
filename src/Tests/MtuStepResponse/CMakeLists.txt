@@ -7,3 +7,5 @@ include_directories(
 
 add_executable(Test_MtuStepResponse mtuStepResponseTest.cpp)
 TARGET_LINK_LIBRARIES(Test_MtuStepResponse NMSmodel)
+
+set_target_properties(Test_MtuStepResponse PROPERTIES FOLDER "Tests")

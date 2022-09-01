@@ -28,19 +28,19 @@
 
 #ifndef Ceinms_CalibrationManager_h
 #define Ceinms_CalibrationManager_h
+
 #include <string>
 #include <list>
+
 #include "ceinms/CeinmsCalibrationSetupXmlReader.h"
 #include "ceinms/CalibrationXmlReader.h"
 #include "ceinms/InputDataXmlReader.h"
 #include "ceinms/ContactModelXmlReader.h"
 #include "ceinms/TrialData.h"
 
-
 namespace ceinms {
 
     class CalibrationManager {
-
     public:
         CalibrationManager(const std::string& setupFilename);
         bool run();

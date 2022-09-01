@@ -3,3 +3,5 @@ include_directories(
 )
 
 add_executable(Test_Curve curveTest.cpp)
+
+set_target_properties(Test_Curve PROPERTIES FOLDER "Tests")

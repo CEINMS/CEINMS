@@ -23,3 +23,5 @@ target_link_libraries(Test_InverseDynamics
 	NMSmodel
 	${OPENSIMSIMBODY_LIBRARIES}
 )
+
+set_target_properties(Test_InverseDynamics PROPERTIES FOLDER "Tests")

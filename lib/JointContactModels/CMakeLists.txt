@@ -32,7 +32,10 @@ target_include_directories(JointContactModels
 								# ${TrialData_INCLUDE_DIRS}
 )
 
-target_link_libraries(JointContactModels ${OpenSim_LIBRARIES})
+target_link_libraries(JointContactModels 
+    ${OpenSim_LIBRARIES}
+    ceinms_common
+)
 #target_link_libraries(JointContactModels debug ${OPENSIM_LIBRARIES_DEBUG})
 
 # Save path to include directory for "internal" usage
@@ -47,3 +50,5 @@ install(TARGETS JointContactModels
         LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT Development
         ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT Development
 )
+
+set_target_properties(JointContactModels PROPERTIES FOLDER "Libraries")

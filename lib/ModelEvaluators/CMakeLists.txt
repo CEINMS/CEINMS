@@ -46,4 +46,5 @@ install(FILES ${ModelEvaluators_HEADERS} ${ModelEvaluators_TEMPLATE_IMPLEMENTATI
 #        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
 #        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
 # )
-        
+
+set_target_properties(ModelEvaluators PROPERTIES FOLDER "Libraries")

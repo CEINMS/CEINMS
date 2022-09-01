@@ -3,3 +3,5 @@ include_directories(
 )
 
 add_executable(Test_DataTable dataTableTest.cpp)
+
+set_target_properties(Test_DataTable PROPERTIES FOLDER "Tests")

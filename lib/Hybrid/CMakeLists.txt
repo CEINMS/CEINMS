@@ -56,3 +56,5 @@ install(FILES ${Hybrid_HEADERS} ${Hybrid_TEMPLATE_IMPLEMENTATIONS} DESTINATION $
 install(FILES ${Hybrid_Parameters_HEADERS} ${Hybrid_Parameters_TEMPLATE_IMPLEMENTATIONS} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/ceinms/Parameters COMPONENT Development)
 install(FILES ${Hybrid_StaticComp_HEADERS} ${Hybrid_StaticComp_TEMPLATE_IMPLEMENTATIONS} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/ceinms/StaticComp COMPONENT Development)
 install(FILES ${Hybrid_ObjFunc_HEADERS} ${Hybrid_ObjFunc_TEMPLATE_IMPLEMENTATIONS} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/ceinms/ObjFunc COMPONENT Development)
+
+set_target_properties(Hybrid PROPERTIES FOLDER "Libraries")

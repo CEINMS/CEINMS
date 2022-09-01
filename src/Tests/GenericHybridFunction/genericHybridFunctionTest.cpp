@@ -85,8 +85,7 @@ public:
 
     template<typename NMSmodelT>
     double getValue(const NMSmodelT, ExternalDataMapPtr externalData) {
-        for(auto& fun)
-
+        //for(auto& fun)
     }
 
 private:

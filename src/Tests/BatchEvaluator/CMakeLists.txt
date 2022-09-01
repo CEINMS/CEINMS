@@ -20,3 +20,5 @@ TARGET_LINK_LIBRARIES(Test_BatchEvaluator
     OptimizationSystems
 	TrialData
 )
+
+set_target_properties(Test_BatchEvaluator PROPERTIES FOLDER "Tests")

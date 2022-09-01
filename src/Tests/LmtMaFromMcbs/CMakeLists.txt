@@ -55,3 +55,6 @@ set(N_DOFS 4)
 #				WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}
 #)
 #message("${ov}")
+
+set_target_properties(Test_LmtMaFromMcbs PROPERTIES FOLDER "Tests")
+set_target_properties(Test_LmtMaFromMcbsAndOsim PROPERTIES FOLDER "Tests")

@@ -93,3 +93,5 @@ install(TARGETS OutputConnectors
         LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT Development
         ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT Development
 )
+
+set_target_properties(OutputConnectors PROPERTIES FOLDER "Libraries")

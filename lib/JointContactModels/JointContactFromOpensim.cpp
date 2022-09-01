@@ -90,7 +90,8 @@ namespace ceinms {
     }
 
     JointContactFromOpensim::JointContactFromOpensim(const string& modelFilename, string externalLoadXmlFilename) :
-    model_(modelFilename) {
+        model_(modelFilename) {
+            
         OpenSim::Model modelCopy(modelFilename);
         modelCopy.initSystem();
         nCoordinates_ = modelCopy.getNumCoordinates();
@@ -100,17 +101,9 @@ namespace ceinms {
         rTorquesInG_.resize(nBodies_);
         qdd_.resize(nCoordinates_);
 
-        //not sure if the model take ownership of the extLoads or not...
         OpenSim::ExternalLoads* extLoads(new OpenSim::ExternalLoads(externalLoadXmlFilename, 1));
-       // OpenSim::ExternalLoads extLoads(model_, externalLoadXmlFilename);
 
         string baseDir(FileUtils::getFilePath(externalLoadXmlFilename));
-        //I have commented out the following 5 lines to work in OpenSim 4.2+ (Dropped support for seperate Kinematics for applications of External Loads.)
-        //string extLoadModelKinematicsFilename = extLoads->getExternalLoadsModelKinematicsFileName();
-        //if (!FileUtils::isAbsolute(extLoadModelKinematicsFilename.c_str())) {
-        //    extLoadModelKinematicsFilename = FileUtils::simplify(baseDir + '/' + extLoadModelKinematicsFilename);
-        //    extLoads->setExternalLoadsModelKinematicsFileName(extLoadModelKinematicsFilename);
-        //}
 
         string dataFilename = extLoads->getDataFileName();
         if (!FileUtils::isAbsolute(dataFilename.c_str())) {
@@ -124,7 +117,6 @@ namespace ceinms {
             model_.addForce(&extLoads->get(i));
         }
 
-     //   OpenSim::Array<string> muscleNames;
         model_.getMuscles().getNames(muscleActuatorNames_);
         for (unsigned i(0); i < nMuscles_; ++i)
             muscleActuators_.push_back((dynamic_cast<OpenSim::Muscle*>(&model_.updForceSet().get(muscleActuatorNames_.get(i)))));
@@ -153,7 +145,7 @@ namespace ceinms {
         model_.getForceSet().getNames(names);
         for (int i(0); i < names.size(); ++i)
             cout << names[i] << endl;
-      }
+    }
 
     void JointContactFromOpensim::setTime(double time) {
         state_.updTime() = time;

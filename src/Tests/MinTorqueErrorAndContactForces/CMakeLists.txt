@@ -12,3 +12,5 @@ target_link_libraries(Test_MinTorqueErrorAndContactForces
     JointContactModels
     OptimizationSystems
 )
+
+set_target_properties(Test_MinTorqueErrorAndContactForces PROPERTIES FOLDER "Tests")

@@ -83,3 +83,5 @@ install(TARGETS NMSmodel
         LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT Development
         ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT Development
 )
+
+set_target_properties(NMSmodel PROPERTIES FOLDER "Libraries")

@@ -35,31 +35,26 @@ using std::endl;
 using std::end;
 using std::begin;
 
+#include "rtb/concurrency/Concurrency.h"
+
 #include "ceinms/CeinmsSetupXmlReader.h"
 #include "ceinms/NMSmodel.h"
-
 #include "ceinms/Tendon/StiffTendon.h"
 #include "ceinms/Tendon/ElasticTendon.h"
 #include "ceinms/Tendon/ElasticTendon_BiSec.h"
-
 #include "ceinms/Activation/ExponentialActivation.h"
 #include "ceinms/Activation/PiecewiseActivation.h"
 #include "ceinms/Curve.h"
-
 #include "ceinms/EmgFromFile.h"
 #include "ceinms/LmtMaFromStorageFile.h"
 #include "ceinms/ExternalTorquesFromStorageFile.h"
 #include "ceinms/GeneralisedCoordinatesFromStorageFile.h"
 #include "ceinms/ExternalForcesFromStorageFile.h"
-
 #include "ceinms/ModelEvaluationOnline.h"
 #include "ceinms/ModelEvaluationOffline.h"
 #include "ceinms/ModelEvaluationHybrid.h"
-
-//Hybrid optimiser
 #include "ceinms/ErrorMinimizerAnnealing.h"
 #include "ceinms/HybridWeightings.h"
-
 #include "ceinms/LoggerOnQueues.h"
 #include "ceinms/QueueToStorageFile.h"
 #include "ceinms/QueuesToStorageFiles.h"
@@ -67,7 +62,6 @@ using std::begin;
 #include "ceinms/QueuesToIntersegmentalAndJointReactionForces.h"
 #include "ceinms/QueuesToInverseDynamics.h"
 #include "ceinms/QueuesToKneeBalanceContactForces.h"
-
 #include "ceinms/queues/VecContactForcesQueue.h"
 #include "ceinms/queues/ScalarContactForcesQueue.h"
 #include "ceinms/queues/EmgQueue.h"
@@ -77,15 +71,11 @@ using std::begin;
 #include "ceinms/queues/LogQueue.h"
 #include "ceinms/QueueToStorageFile.h"
 #include "ceinms/ArrayConverter.h"
-
 #include "ceinms/Hybrid/NMSmodelFrameOptimisation.h"
 #include "ceinms/TrialData.h"
 #include "ceinms/QueuesToTrialData.h"
-
 #include "ceinms/BatchEvaluator.h"
 #include "ceinms/FileUtils.h"
-
-#include "rtb/concurrency/Concurrency.h"
 
 double rmse(const std::vector<double>& v1, const std::vector<double>& v2) {
     double sum = 0;
@@ -172,10 +162,10 @@ namespace ceinms {
         if (useContactForces) {
             switch (contactModelCfg_.getContactModelType()) {
             case ContactModelType::OpenSim:
-                runOpenLoopWithGenericContactModel < NMSmodelT, ModelEvaluatorT, LoggerT >();
+                runOpenLoopWithGenericContactModel<NMSmodelT, ModelEvaluatorT, LoggerT>();
                 break;
             case ContactModelType::KneeBalance:
-                runOpenLoopWithKneeBalanceContactModel < NMSmodelT, ModelEvaluatorT, LoggerT >();
+                runOpenLoopWithKneeBalanceContactModel<NMSmodelT, ModelEvaluatorT, LoggerT>();
                 break;
             }
         }
@@ -1016,7 +1006,7 @@ namespace ceinms {
         switch (runMode) {
 
         case NMSModelCfg::OpenLoopExponentialActivationStiffTendonOnline:
-            exitFlag = runOpenLoop < NMSmodel<ExponentialActivation, StiffTendon, CurveMode::Online>, ModelEvaluationOnline, LoggerOnQueues >(hasContactModel_);
+            exitFlag = runOpenLoop<NMSmodel<ExponentialActivation, StiffTendon, CurveMode::Online>, ModelEvaluationOnline, LoggerOnQueues>(hasContactModel_);
             break;
 
         case NMSModelCfg::OpenLoopExponentialActivationElasticTendonBiSecOnline:
@@ -1048,7 +1038,7 @@ namespace ceinms {
             break;
 
         default:
-            cout << "Implementation not available yet. Verify you XML configuration file" << endl;
+            cout << "Implementation not available yet. Verify your XML configuration file" << endl;
             exitFlag = 1;
             break;
         } //end switch

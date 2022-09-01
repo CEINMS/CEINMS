@@ -23,3 +23,5 @@ TARGET_LINK_LIBRARIES(Test_OptimizationSystems
     ceinms_common
 	TrialData
 )
+
+set_target_properties(Test_OptimizationSystems PROPERTIES FOLDER "Tests")

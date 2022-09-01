@@ -13,3 +13,5 @@ target_link_libraries(Test_XmlInput
 	ceinms_common
 	NMSmodel
 )
+
+set_target_properties(Test_XmlInput PROPERTIES FOLDER "Tests")

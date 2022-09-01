@@ -177,3 +177,6 @@ install(TARGETS xmlInput
         ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT Development
         # INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR} # only available from CMake 2.8.12
 )
+
+set_target_properties(xmlInput PROPERTIES FOLDER "Libraries")
+set_target_properties(xsdbin PROPERTIES FOLDER "Libraries")

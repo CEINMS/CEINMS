@@ -40,6 +40,8 @@ set(CMAKE_VERBOSE_MAKEFILE OFF)
 
 set(CMAKE_CXX_STANDARD 17)
 
+set_property(GLOBAL PROPERTY USE_FOLDERS ON)
+
 set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
 include(CeinmsPack)
 
@@ -60,6 +62,7 @@ endif(MSVC)
 
 option(CEINMS_VERBOSE_DEBUG "Print debug messages" OFF)
 option(CEINMS_VERBOSE_DEEP_DEBUG "Print LOTS of debug messages" OFF)
+option(BUILD_TESTING "Build the tests" ON)
 if (CEINMS_VERBOSE_DEBUG)
     add_definitions(/DDEBUG)
 endif()

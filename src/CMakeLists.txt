@@ -82,3 +82,7 @@ install(TARGETS CEINMS CEINMScalibrate CEINMSoptimise
       LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT Development
       ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT Development
 )
+
+set_target_properties(CEINMS PROPERTIES FOLDER "Executables")
+set_target_properties(CEINMScalibrate PROPERTIES FOLDER "Executables")
+set_target_properties(CEINMSoptimise PROPERTIES FOLDER "Executables")

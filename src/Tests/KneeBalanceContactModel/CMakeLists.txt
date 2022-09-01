@@ -8,3 +8,5 @@ target_link_libraries(Test_ContactModelKneeBalance
     ceinms_common
     JointContactModels
 )
+
+set_target_properties(Test_ContactModelKneeBalance PROPERTIES FOLDER "Tests")

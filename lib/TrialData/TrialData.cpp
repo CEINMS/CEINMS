@@ -119,7 +119,6 @@ namespace ceinms {
     }
 
     void TrialData::updateKinematicData(const string& motionFile, double fc) {
-
         OpenSim::Model model(openSimModelFile_);
         model.initSystem();
         OpenSim::Storage kinematics(motionFile);

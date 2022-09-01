@@ -9,3 +9,5 @@ TARGET_LINK_LIBRARIES(Test_Websocket
 	OutputConnectors
 	ceinms_common
 )
+
+set_target_properties(Test_Websocket PROPERTIES FOLDER "Tests")

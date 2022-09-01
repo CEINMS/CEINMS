@@ -12,7 +12,7 @@ namespace ceinms {
     BatchOpenSimEvaluator::BatchOpenSimEvaluator() { }
 
     BatchOpenSimEvaluator::BatchOpenSimEvaluator(const vector<TrialData>& osimTrialData) {
-        // setOpenSimTrialData(osimTrialData);
+        setOpenSimTrialData(osimTrialData);
     }
 
     void BatchOpenSimEvaluator::setOpenSimTrialData(const vector<TrialData>& osimTrialData) {

@@ -78,3 +78,5 @@ install(TARGETS InputConnectors
         LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT Development
         ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT Development
 )
+
+set_target_properties(InputConnectors PROPERTIES FOLDER "Libraries")

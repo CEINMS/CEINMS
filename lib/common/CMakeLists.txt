@@ -75,3 +75,5 @@ install(TARGETS ceinms_common
         ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT Development
         #INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}# only available from CMake 2.8.12
 )
+
+set_target_properties(ceinms_common PROPERTIES FOLDER "Libraries")
