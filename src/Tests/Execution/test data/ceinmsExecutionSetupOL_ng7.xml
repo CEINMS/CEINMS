@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<ceinms xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="ceinmsSetup.xsd">
+
+  <subjectFile>DM_calibrated_ankleDOF.xml</subjectFile>
+
+  <inputDataFile>input/OvergroundGaitTrials_DM_ngait_og7.xml</inputDataFile>
+
+  <executionFile>executionOL_elastic.xml</executionFile>
+
+  <excitationGeneratorFile>excitationGenerator_sixthGC_ankleDOF.xml</excitationGeneratorFile>
+
+  <outputDirectory>output</outputDirectory>
+
+</ceinms>

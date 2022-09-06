@@ -110,7 +110,7 @@ namespace ceinms {
             //if no external torques are available, the producer will send an EndOfData frame
             // 3. read external Torque
             std::optional<ExternalTorquesFrame> externalTorquesFrameFromQueue;
-            externalTorquesFrameFromQueue.value().data.resize(noDof_);
+            //externalTorquesFrameFromQueue.value().data.resize(noDof_);
             if (externalTorquesRunCondition) {
                 while (TimeCompare::less(externalTorqueTime, lmtMaTime)) {
                     ModelEvaluationBase<Logger>::getExternalTorquesFromInputQueue(externalTorquesFrameFromQueue);
@@ -139,7 +139,7 @@ namespace ceinms {
             */
             // 4. read emgs
             std::optional<EmgFrame> emgFrameFromQueue;
-            emgFrameFromQueue.value().data.resize(subject_.getNoMuscles());
+            //emgFrameFromQueue.value().data.resize(subject_.getNoMuscles());
             while (TimeCompare::less(emgTime, lmtMaTime) && runCondition) {
                 ModelEvaluationBase<Logger>::getEmgFromInputQueue(emgFrameFromQueue);
                 if (emgFrameFromQueue) emgTime = emgFrameFromQueue.value().time + globalEmDelay_;

@@ -34,33 +34,48 @@ using std::endl;
 using ceinms::DataTable;
 
 int main() {
-    cout << "Default initializer" << endl;
+    // Test the default data table initializer
+    cout << "1 - Default initializer" << endl
+         << "    (should create a data table with zero columns and rows)" << endl;
     DataTable<double> t1;
-    cout << t1;
+    cout << t1 << endl;
+
+    // Test setting the column labels
+    cout << "2 - Set labels" << endl
+         << "    (the columns should be labeled: 'Time   l1  l2  l3')" << endl;
     t1.setLabels({ "l1", "l2", "l3"});
-    cout << "Set labels" << endl;
-    cout << t1;
+    cout << t1 << endl;
+
+    // Test pushing data into rows
+    cout << "3 - Pushed row" << endl
+         << "    (the table should now contain 3 rows of data)" << endl;
     t1.pushRow(1, { 1, 2, 3 });
     t1.pushRow(2, { 1, 2, 4 });
-    cout << "Pushed row" << endl;
+    t1.pushRow(3, { 4, 2, 4 });
     cout << t1;
     cout << "Element (1,2): " << t1.at(1, 2) << endl;
-    cout << "Element (1,2)+1: " << ++t1.at(1, 2) << endl;
-    t1.pushRow(3, { 4, 2, 4 });
+    cout << "Element (1,2)+1: " << ++t1.at(1, 2) << endl << endl;
 
+    // Test subtracting 2 data tables containing the same row values
+    cout << "4 - Subtraction" << endl
+         << "    (data table should be 3 rows of zeros (both tables contain the same values))" << endl;
     auto t2(t1);
-    cout << "Subtraction" << endl;
-    cout << t2-t1;
+    cout << t2-t1 << endl;
 
+    // Test adding 2 data tables containing the same row values
+    cout << "5 - Sum" << endl
+         << "    (the elements of the two tables should be summed (both tables contain the same values))" << endl;
     cout << "Sum" << endl;
-    cout << t1+t2;
+    cout << t1+t2 << endl;
 
-    cout << "Dimension initializer" << endl;
+    // Test initializing a new table to provided dimensions
+    cout << "6 - Dimension initializer" << endl
+         << "    (a new table should be created with 3 row and 4 columns of zeros)" << endl;
     DataTable<double> table(3, 4);
-    cout << table;
+    cout << table << endl;
 
-    cout << endl << "-------------" << endl;
-    cout << "Sum with different row numbers" << endl;
+    // Test adding 2 data tables containing different row values
+    cout << "7 - Sum with different row values" << endl;
     t2.pushRow(4, { 7, 7, 7 });
     t2.setRow(1, { 3, 3, 3 });
     cout << "Table 1:" << endl;
@@ -69,33 +84,21 @@ int main() {
     cout << "Table 2:" << endl;
     cout << t2 << endl;
 
-    cout << "Table 1 minus Table 2:" << endl;
-    cout << t1 - t2;
+    cout << "7a - Table 1 minus Table 2" << endl;
+    cout << t1 - t2 << endl;
 
-    cout << "Table 2 minus Table 1:" << endl;
-    cout << t2 - t1;
+    cout << "7b - Table 2 minus Table 1" << endl;
+    cout << t2 - t1 << endl;
 
-    DataTable<double> t3;
-    for(int i(0); i < 100; ++i)
-        t3.pushRow(static_cast<double>(i), { 4, 2, 4 });
-
-    t3.crop(10, 80);
-    t3.crop(11, 120);
-    t3.crop(-1, 120);
-
-    auto it = t3.begin();
-    cout << it->size() << endl;
-    cout << t3.getRow(0).size() << endl;
-
-
-	// Test cropping gata table
-	cout << "Testing table cropping" << endl;
-	DataTable<double> t4;
+	// Test cropping data table
+	cout << "8 - Testing table cropping" << endl
+         << "    (the table should be cropped to display from between Time = 10.01 and 13.07)" << endl;
+	DataTable<double> t3;
 	for (int i(0); i < 1000; ++i) {
-		t4.pushRow(i*0.1, { i * 10., i * 20. });
+		t3.pushRow(i*0.1, { i * 10., i * 20. });
 	}
-	t4.crop(10.01, 13.07);
-	cout << t4;
+	t3.crop(10.01, 13.07);
+	cout << t3;
 
     return 0;
 }

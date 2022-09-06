@@ -6,7 +6,6 @@ include_directories(
     ${TrialData_INCLUDE_DIRS}
     ${SIMTK_INCLUDE_DIRS}
 )
-
 add_executable(Test_CalibrationObjectiveFunctions calibrationObjectiveFunctionsTest.cpp)
 target_link_libraries(Test_CalibrationObjectiveFunctions
     ceinms_common
@@ -15,5 +14,5 @@ target_link_libraries(Test_CalibrationObjectiveFunctions
     TrialData
     ${OPENSIM_LIBRARIES}
 )
-
 set_target_properties(Test_CalibrationObjectiveFunctions PROPERTIES FOLDER "Tests")
+add_test(NAME TestCalibrationObjectiveFunctions COMMAND Test_CalibrationObjectiveFunctions)

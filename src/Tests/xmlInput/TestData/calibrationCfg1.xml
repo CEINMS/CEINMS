@@ -35,12 +35,12 @@
                     <weight>1</weight>
                     <exponent>1</exponent>
                 </torqueErrorNormalised>
-                <maxPeak>
+                <!-- <maxPeak>
                     <targets>cf1 cf2</targets>
                     <targetsType>contactForce</targetsType>
                     <weight>10</weight>
                     <exponent>1</exponent>
-                </maxPeak>
+                </maxPeak> -->
                 <penalty>
                     <targets>all</targets>
                     <targetsType>normalisedFibreLength</targetsType>

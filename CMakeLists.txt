@@ -10,8 +10,8 @@ endif()
 cmake_minimum_required (VERSION 3.8) # "target_include_directories" command  and VS12 generator are missing in previous versions
 project(CEINMS)
 set(CEINMS_MAJOR_VERSION 0)
-set(CEINMS_MINOR_VERSION 21)
-set(CEINMS_PATCH_VERSION 1)
+set(CEINMS_MINOR_VERSION 22)
+set(CEINMS_PATCH_VERSION 0)
 
 add_definitions(/DCEINMS_MAJOR_VERSION="${CEINMS_MAJOR_VERSION}")
 add_definitions(/DCEINMS_MINOR_VERSION="${CEINMS_MINOR_VERSION}")
@@ -62,13 +62,18 @@ endif(MSVC)
 
 option(CEINMS_VERBOSE_DEBUG "Print debug messages" OFF)
 option(CEINMS_VERBOSE_DEEP_DEBUG "Print LOTS of debug messages" OFF)
-option(BUILD_TESTING "Build the tests" ON)
+
 if (CEINMS_VERBOSE_DEBUG)
     add_definitions(/DDEBUG)
 endif()
 
 if (CEINMS_VERBOSE_DEEP_DEBUG)
     add_definitions(/DDEEP_DEBUG)
+endif()
+
+option(BUILD_TESTING "Build the tests" ON)
+if (BUILD_TESTING)
+    enable_testing()
 endif()
 
 add_definitions(/D_USE_MATH_DEFINES)

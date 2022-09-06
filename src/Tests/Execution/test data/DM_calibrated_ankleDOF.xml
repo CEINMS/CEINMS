@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<subject xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="subject.xsd">
+  <mtuDefault>
+    <emDelay>0.015</emDelay>
+    <percentageChange>0.15</percentageChange>
+    <damping>0.1</damping>
+    <curve>
+      <name>activeForceLength</name>
+      <xPoints>-5 0 0.401 0.402 0.4035 0.52725 0.62875 0.71875 0.86125 1.045 1.2175 1.43875 1.61875 1.62 1.621 2.2 5</xPoints>
+      <yPoints>0 0 0 0 0 0.226667 0.636667 0.856667 0.95 0.993333 0.77 0.246667 0 0 0 0 0</yPoints>
+    </curve>
+    <curve>
+      <name>passiveForceLength</name>
+      <xPoints>-5 0.998 0.999 1 1.1 1.2 1.3 1.4 1.5 1.6 1.601 1.602 5</xPoints>
+      <yPoints>0 0 0 0 0.035 0.12 0.26 0.55 1.17 2 2 2 2</yPoints>
+    </curve>
+    <curve>
+      <name>forceVelocity</name>
+      <xPoints>-10 -1 -0.6 -0.3 -0.1 0 0.1 0.3 0.6 0.8 10</xPoints>
+      <yPoints>0 0 0.08 0.2 0.55 1 1.4 1.6 1.7 1.75 1.75</yPoints>
+    </curve>
+    <curve>
+      <name>tendonForceStrain</name>
+      <xPoints>-10 -0.002 -0.001 0 0.00131 0.00281 0.00431 0.00581 0.00731 0.00881 0.0103 0.0118 0.0123 9.2 9.201 9.202 20</xPoints>
+      <yPoints>0 0 0 0 0.0108 0.0257 0.0435 0.0652 0.0915 0.123 0.161 0.208 0.227 345 345 345 345</yPoints>
+    </curve>
+  </mtuDefault>
+  <mtuSet>
+    <mtu>
+      <name>lat_gas_r</name>
+      <c1>-0.949999987607262</c1>
+      <c2>-0.925767782530744</c2>
+      <shapeFactor>-0.00100008770213533</shapeFactor>
+      <optimalFibreLength>0.072765056146444</optimalFibreLength>
+      <pennationAngle unit="rad">0.13962634</pennationAngle>
+      <tendonSlackLength>0.432042519988549</tendonSlackLength>
+      <maxContractionVelocity>10</maxContractionVelocity>
+      <maxIsometricForce>683</maxIsometricForce>
+      <strengthCoefficient>1.09549196604511</strengthCoefficient>
+    </mtu>
+    <mtu>
+      <name>med_gas_r</name>
+      <c1>-0.949999987607262</c1>
+      <c2>-0.925767782530744</c2>
+      <shapeFactor>-0.00100008770213533</shapeFactor>
+      <optimalFibreLength>0.0651063640357527</optimalFibreLength>
+      <pennationAngle unit="rad">0.29670597</pennationAngle>
+      <tendonSlackLength>0.407815769487421</tendonSlackLength>
+      <maxContractionVelocity>10</maxContractionVelocity>
+      <maxIsometricForce>1558</maxIsometricForce>
+      <strengthCoefficient>1.09549196604511</strengthCoefficient>
+    </mtu>
+    <mtu>
+      <name>per_brev_r</name>
+      <c1>-0.949999987607262</c1>
+      <c2>-0.925767782530744</c2>
+      <shapeFactor>-0.00100008770213533</shapeFactor>
+      <optimalFibreLength>0.0567547707755096</optimalFibreLength>
+      <pennationAngle unit="rad">0.08726646</pennationAngle>
+      <tendonSlackLength>0.182750433670898</tendonSlackLength>
+      <maxContractionVelocity>10</maxContractionVelocity>
+      <maxIsometricForce>435</maxIsometricForce>
+      <strengthCoefficient>2.92547243703387</strengthCoefficient>
+    </mtu>
+    <mtu>
+      <name>per_long_r</name>
+      <c1>-0.949999987607262</c1>
+      <c2>-0.925767782530744</c2>
+      <shapeFactor>-0.00100008770213533</shapeFactor>
+      <optimalFibreLength>0.0502291158679773</optimalFibreLength>
+      <pennationAngle unit="rad">0.17453293</pennationAngle>
+      <tendonSlackLength>0.379209405228185</tendonSlackLength>
+      <maxContractionVelocity>10</maxContractionVelocity>
+      <maxIsometricForce>943</maxIsometricForce>
+      <strengthCoefficient>2.92547243703387</strengthCoefficient>
+    </mtu>
+    <mtu>
+      <name>per_tert_r</name>
+      <c1>-0.949999987607262</c1>
+      <c2>-0.925767782530744</c2>
+      <shapeFactor>-0.00100008770213533</shapeFactor>
+      <optimalFibreLength>0.0810401541164143</optimalFibreLength>
+      <pennationAngle unit="rad">0.2268928</pennationAngle>
+      <tendonSlackLength>0.102582469102228</tendonSlackLength>
+      <maxContractionVelocity>10</maxContractionVelocity>
+      <maxIsometricForce>180</maxIsometricForce>
+      <strengthCoefficient>1.60364394241065</strengthCoefficient>
+    </mtu>
+    <mtu>
+      <name>soleus_r</name>
+      <c1>-0.949999987607262</c1>
+      <c2>-0.925767782530744</c2>
+      <shapeFactor>-0.00100008770213533</shapeFactor>
+      <optimalFibreLength>0.0568685177013556</optimalFibreLength>
+      <pennationAngle unit="rad">0.43633231</pennationAngle>
+      <tendonSlackLength>0.284342414625902</tendonSlackLength>
+      <maxContractionVelocity>10</maxContractionVelocity>
+      <maxIsometricForce>3549</maxIsometricForce>
+      <strengthCoefficient>0.500000036002532</strengthCoefficient>
+    </mtu>
+    <mtu>
+      <name>tib_ant_r</name>
+      <c1>-0.949999987607262</c1>
+      <c2>-0.925767782530744</c2>
+      <shapeFactor>-0.00100008770213533</shapeFactor>
+      <optimalFibreLength>0.111223501483972</optimalFibreLength>
+      <pennationAngle unit="rad">0.08726646</pennationAngle>
+      <tendonSlackLength>0.253090220643488</tendonSlackLength>
+      <maxContractionVelocity>10</maxContractionVelocity>
+      <maxIsometricForce>905</maxIsometricForce>
+      <strengthCoefficient>1.60364394241065</strengthCoefficient>
+    </mtu>
+  </mtuSet>
+  <dofSet>
+    <dof>
+      <name>ankle_angle_r</name>
+      <mtuNameSet>lat_gas_r med_gas_r per_brev_r per_long_r per_tert_r soleus_r tib_ant_r</mtuNameSet>
+    </dof>
+  </dofSet>
+  <calibrationInfo>
+    <calibrated>
+      <startSubjectFile>c:/Users/Alice Mantoan/Documents/REG/CEINMS/TestData/ElaboratedData/sixthGC/ceinms/calibration/Setup/Rstance1/../../uncalibrated/DM_uncalibrated_ankle.xml</startSubjectFile>
+      <calibrationSequence>c:/Users/Alice Mantoan/Documents/REG/CEINMS/TestData/ElaboratedData/sixthGC/ceinms/calibration/Setup/Rstance1/../../Cfg/Rstance1/calibrationCfg_ankle.xml</calibrationSequence>
+    </calibrated>
+  </calibrationInfo>
+</subject>

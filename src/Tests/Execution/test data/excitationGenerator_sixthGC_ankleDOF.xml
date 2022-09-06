@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<excitationGenerator xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="excitationGenerator.xsd">
+
+<inputSignals type="EMG">bifemlh_r lat_gas_r med_gas_r grac_r per_long_r rect_fem_r sar_r semimem_r soleus_r tib_ant_r vas_lat_r vas_med_r</inputSignals>
+<mapping>	
+    <excitation id="lat_gas_r">
+        <input weight="1">lat_gas_r</input>
+    </excitation>
+    <excitation id="med_gas_r">
+        <input weight="1">med_gas_r</input>
+    </excitation>
+    <excitation id="per_brev_r">
+        <input weight="1">per_long_r</input>
+    </excitation>
+    <excitation id="per_long_r">
+        <input weight="1">per_long_r</input>
+    </excitation>	
+    <excitation id="per_tert_r">
+        <input weight="1">tib_ant_r</input>
+    </excitation>
+    <excitation id="soleus_r">
+        <input weight="1">soleus_r</input>
+    </excitation>
+    <excitation id="tib_ant_r">
+        <input weight="1">tib_ant_r</input>
+    </excitation>
+    
+ </mapping>
+
+
+</excitationGenerator>

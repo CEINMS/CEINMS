@@ -25,7 +25,6 @@ private:
             penalty = weight_*std::pow((x - xR_), exponent_);
         return penalty;
     }
-
 };
 
 int main() {

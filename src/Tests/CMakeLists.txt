@@ -1,16 +1,17 @@
 if(BUILD_TESTING)
     # Working
-    add_subdirectory(JointContactModel)                     # add more info/explanation
-    add_subdirectory(Barrier)                               # add more info/explanation
-    add_subdirectory(Curve)   
-    add_subdirectory(DataTable)                             # add more info/explanation
-    add_subdirectory(GenericCalibrationObjectiveFunction)   # add more info/explanation
-    add_subdirectory(GenericHybridFunction)                 # add more info/explanation
-    add_subdirectory(KneeBalanceContactModel)               # add more info/explanation
-    add_subdirectory(Mapper)                                # add more info/explanation
-    add_subdirectory(MtuStepResponse)                       # add more info/explanation
-    add_subdirectory(Optimizers)                            # add more info/explanation
-    add_subdirectory(xmlInput)                              # add more info/explanation
+    add_subdirectory(Execution) 
+    add_subdirectory(Barrier)
+    add_subdirectory(Curve)
+    add_subdirectory(DataTable)
+    add_subdirectory(GenericCalibrationObjectiveFunction)   # Need to fix the TorqueErrorNormalised test
+    add_subdirectory(GenericHybridFunction)
+    add_subdirectory(JointContactModel)
+    add_subdirectory(KneeBalanceContactModel)
+    add_subdirectory(Mapper)
+    add_subdirectory(MtuStepResponse)
+    add_subdirectory(Optimizers)
+    add_subdirectory(xmlInput)
 
     # Need to be written     
     # add_subdirectory(BatchEvaluator)                      # needs to be written

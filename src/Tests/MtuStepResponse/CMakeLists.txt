@@ -4,8 +4,7 @@ include_directories(
     ${NMSmodel_INCLUDE_DIRS}
     ${FileIO_INCLUDE_DIRS}
 )
-
 add_executable(Test_MtuStepResponse mtuStepResponseTest.cpp)
 TARGET_LINK_LIBRARIES(Test_MtuStepResponse NMSmodel)
-
 set_target_properties(Test_MtuStepResponse PROPERTIES FOLDER "Tests")
+add_test(NAME TestMtuStepResponse COMMAND Test_MtuStepResponse)

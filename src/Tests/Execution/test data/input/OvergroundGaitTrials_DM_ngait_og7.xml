@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<inputData xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="inputData.xsd">
+   <muscleTendonLengthFile>_MuscleAnalysis_Length.sto</muscleTendonLengthFile>
+   <excitationsFile>emg.mot</excitationsFile>
+   <momentArmsFiles>
+      <momentArmsFile dofName="knee_angle_r">_MuscleAnalysis_MomentArm_knee_angle_r.sto</momentArmsFile>
+      <momentArmsFile dofName="ankle_angle_r">_MuscleAnalysis_MomentArm_ankle_angle_r.sto</momentArmsFile>
+   </momentArmsFiles>
+   <externalTorquesFile>inverse_dynamics.sto</externalTorquesFile>
+</inputData>

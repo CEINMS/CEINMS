@@ -4,8 +4,7 @@ include_directories(
     ${NMSmodel_INCLUDE_DIRS}
     ${FileIO_INCLUDE_DIRS}
 )
-
 add_executable(Test_GenericHybridFunction genericHybridFunctionTest.cpp)
 TARGET_LINK_LIBRARIES(Test_GenericHybridFunction NMSmodel)
-
 set_target_properties(Test_GenericHybridFunction PROPERTIES FOLDER "Tests")
+add_test(NAME TestGenericHybridFunction COMMAND Test_GenericHybridFunction)
