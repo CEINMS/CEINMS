@@ -56,7 +56,8 @@ Building from source
     * Click Configure again, all fields should change from red back to white, then click generate
     * Click on Open Project to open the generated project in Visual Studio
 4. In Visual Studio set the Solution Configuration from the dropdown box at the top (e.g. RelWithDebInfo) then build ALL_BUILD
-    * Once the build has finished you can build Install to install the CEINMS files to the directory that you specified
+    * You can run tests to ensure CEINMS is working as intended by building RUN_TESTS
+    * You can build INSTALL to install the CEINMS files to the directory that you specified
 
 
 ### Linux:
@@ -90,7 +91,7 @@ Building from source
 2. Download the CEINMS code
 3. Configure and generate the project files using CMake
     * Method 1:
-        * From the directory where you downloaded CEINMS to run: 
+        * From the directory where you downloaded CEINMS run: 
             ```bash
             mkdir build
             cd build
@@ -106,9 +107,13 @@ Building from source
         * After CMake has finished configuring you can set the install directory in the "CMAKE_INSTALL_PREFIX" field, the build type in the "CMAKE_BUILD_TYPE" field and check that the dependencies were successfully located. If a dependency is not found automatically then enter the correct directory where it was installed into the corresponding field
         * Click Configure again, all fields should change from red back to white, then click generate
 4. Open a terminal in the build directory and run the following commands to build and install to the specified location:
+    ```bash
+    make -j8
+    make install -j8
+    ```
+    * You can run tests to ensure CEINMS is working by running the folling command before installing:
         ```bash
-        make -j8
-        make install -j8
+        ctest -j8
         ```
     * If you have an error finding a library when running CEINMS from the install location, ensure the dependency library was correctly added to the path
     * You can add the chosen install directory to the path if you wish to run CEINMS from the terminal outside of the install directory

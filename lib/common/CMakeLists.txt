@@ -16,7 +16,6 @@ set(Common_HEADERS
                 ceinms/Mapper.h
                 ceinms/QueuesSync.h
 				ceinms/ObjectiveFunctionSetup.h
-                # ceinms/EndOfData.h
                 ceinms/ExternalForceProperties.h
                 ceinms/ExternalLoadProperties.h
 				ceinms/EmgInformedObjectiveFunctionSetup.h
