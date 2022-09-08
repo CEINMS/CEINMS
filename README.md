@@ -21,31 +21,28 @@ Building from source
 -------
 ### Windows:
 1. Get the dependencies
-    * Method 1: Obtain them individually
-        * [CMake](https://cmake.org/download/): Follow the instruction on the website
-        * [Visual Studio](http://www.visualstudio.com): Follow the instruction on the website
-        * [CodeSynthesis XSD](https://www.codesynthesis.com/products/xsd/download.xhtml): Download and run the .msi package which includes the precompiled Xerces-C++ libraries that are needed
-        * [OpenSim](https://github.com/opensim-org/opensim-core): The instructions for building OpenSim from source are provided in the README on GitHub
-        * [Filter](https://github.com/RealTimeBiomechanics/Filter):
-            Download the code and from the directory run:
-            ```bash
-            mkdir build
-            cd build
-            cmake -G "Visual Studio 16 2019" ..
-            cmake --build . --config Release --target install
-            ```
-            After installation, create a Windows environment variable named `Filter_DIR` which points at the installation directory.
-        * [Concurrency](https://github.com/RealTimeBiomechanics/Concurrency):
-            Download the code from the develop (default) branch and from the directory run:
-            ```bash
-            mkdir build
-            cd build
-            cmake -G "Visual Studio 16 2019" ..
-            cmake --build . --config Release --target install
-            ```
-            After installation, create a Windows environment variable named `Concurrency_DIR` which points at the installation directory. 
-    * Method 2: Run the included "install_dependencies_Windows" script on Windows to automatically search for the dependencies and install them if not found
-        * Please note that this method is still a work in progress
+    * [CMake](https://cmake.org/download/): Follow the instruction on the website
+    * [Visual Studio](http://www.visualstudio.com): Follow the instruction on the website
+    * [CodeSynthesis XSD](https://www.codesynthesis.com/products/xsd/download.xhtml): Download and run the .msi package which includes the precompiled Xerces-C++ libraries that are needed
+    * [OpenSim](https://github.com/opensim-org/opensim-core): The instructions for building OpenSim from source are provided in the README on GitHub
+    * [Filter](https://github.com/RealTimeBiomechanics/Filter):
+        Download the code and from the directory run:
+        ```bash
+        mkdir build
+        cd build
+        cmake -G "Visual Studio 16 2019" ..
+        cmake --build . --config Release --target install
+        ```
+        After installation, create a Windows environment variable named `Filter_DIR` which points at the installation directory.
+    * [Concurrency](https://github.com/RealTimeBiomechanics/Concurrency):
+        Download the code from the develop (default) branch and from the directory run:
+        ```bash
+        mkdir build
+        cd build
+        cmake -G "Visual Studio 16 2019" ..
+        cmake --build . --config Release --target install
+        ```
+        After installation, create a Windows environment variable named `Concurrency_DIR` which points at the installation directory. 
 2. Download the CEINMS code
 3. Configure and generate the project files using CMake
     * Open the CMake GUI

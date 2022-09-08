@@ -17,7 +17,6 @@ source_group("Template implementation Files" FILES ${Optimizers_TEMPLATE_IMPLEME
 
 add_library(Optimizers STATIC ${Optimizers_HEADERS} ${Optimizers_TEMPLATE_IMPLEMENTATION})
 
-# target_link_libraries(Calibration xmlInput FileIO)
 target_include_directories(Optimizers PRIVATE ceinms ${ceinms_common_INCLUDE_DIRS})
 
 # Save path to include directory for "internal" usage

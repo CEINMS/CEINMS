@@ -28,7 +28,6 @@ set(InputConnectors_SOURCES
   ExternalForcesFromX.cpp
   GeneralisedCoordinatesFromX.cpp 
   EmgFromQueue.cpp
-  #LmtMaFromMcbs.cpp
 )
 set(InputConnectors_HEADERS
   ceinms/EmgFromX.h
@@ -36,7 +35,6 @@ set(InputConnectors_HEADERS
   ceinms/LmtMaFromX.h
   ceinms/ExternalForcesFromX.h
   ceinms/GeneralisedCoordinatesFromX.h
- # ceinms/LmtMaFromMcbs.h
 )
 
 set(InputConnectors_TEMPLATE_IMPLEMENTATIONS)

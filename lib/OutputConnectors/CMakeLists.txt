@@ -11,7 +11,6 @@ set(OutputConnectors_SOURCES
 	QueuesToKneeBalanceContactForces.cpp
     QueuesToInverseDynamics.cpp
     QueuesToStorageFiles.cpp
-	# websocket/QueuesToWebsocket.cpp
 )
 set(OutputConnectors_HEADERS
     ceinms/LoggerOnQueues.h
@@ -24,8 +23,6 @@ set(OutputConnectors_HEADERS
     ceinms/QueuesToInverseDynamics.h
     ceinms/QueuesToStorageFiles.h
     ceinms/QueueToStorageFile.h
-	# ceinms/websocket/QueuesToWebsocket.h
-	# ceinms/websocket/communication.h
     ceinms/QueueToDataTable.h
 )
 set(OutputConnectors_TEMPLATE_IMPLEMENTATION
@@ -33,27 +30,12 @@ set(OutputConnectors_TEMPLATE_IMPLEMENTATION
     ceinms/QueueToDataTable.cpp
 )
 
-#find_package(protobuf CONFIG REQUIRED)
-#set(Protobuf_FILES websocket/protobuf/yabbi.proto)
-#set_source_files_properties(${Proto_SRC} ${Proto_HEADERS} PROPERTIES GENERATED TRUE)
-#protobuf_generate_cpp(Proto_SRC Proto_HEADERS ${Protobuf_FILES})
-#if(${CMAKE_VERBOSE_MAKEFILE})
-#	message(STATUS "Proto_SRC=${Proto_SRC}")
-#	message(STATUS "Proto_HEADERS=${Proto_HEADERS}")
-#endif()
-#set(GeneratedProtobuf_INCLUDE_DIRS ${CMAKE_CURRENT_BINARY_DIR}
-#    CACHE INTERNAL "Path to generated protobuf files.")
-
 set_source_files_properties( ${OutputConnectors_TEMPLATE_IMPLEMENTATION} PROPERTIES HEADER_FILE_ONLY TRUE)
 set_source_files_properties( ${QueuesToStorageFiles_TEMPLATE_IMPLEMENTATION} PROPERTIES HEADER_FILE_ONLY TRUE)
-#set_source_files_properties( ${Protobuf_FILES} PROPERTIES EXTERNAL_OBJECT TRUE)
 
 source_group("Header Files" FILES ${OutputConnectors_HEADERS} ${QueuesToStorageFiles_HEADERS} )
 source_group("Source Files" FILES ${OutputConnectors_TEMPLATE_IMPLEMENTATION} ${QueuesToStorageFiles_SOURCES}
 	${QueuesToStorageFiles_TEMPLATE_IMPLEMENTATION} )
-#source_group("Generated headers" FILES ${Proto_HEADERS})
-#source_group("Generated sources" FILES ${Proto_SRC})
-#source_group("Protobuffers" FILES ${Protobuf_FILES})
 
 # Define target
 add_library(OutputConnectors STATIC
@@ -63,11 +45,8 @@ add_library(OutputConnectors STATIC
     ${QueuesToStorageFiles_TEMPLATE_IMPLEMENTATION}
     ${QueuesToStorageFiles_SOURCES}
     ${QueuesToStorageFiles_HEADERS}
-    # ${Proto_HEADERS}
-    # ${Proto_SRC}
 )
-#target_link_libraries(OutputConnectors JointContactModels ceinms_common ${Boost_LIBRARIES}
-#	protobuf::libprotoc protobuf::libprotobuf protobuf::libprotobuf-lite optimized ${OPENSIM_LIBRARIES})
+
 target_link_libraries(OutputConnectors JointContactModels ceinms_common rtb::Concurrency ${OpenSim_LIBRARIES})
 
 

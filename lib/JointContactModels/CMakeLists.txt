@@ -20,27 +20,15 @@ source_group("Header Files" FILES ${JointContactModels_HEADERS})
 source_group("Source Files" FILES ${JointContactModels_TEMPLATE_IMPLEMENTATION} ${JointContactModels_SOURCES})
 
 add_library(JointContactModels STATIC ${JointContactModels_HEADERS} ${JointContactModels_TEMPLATE_IMPLEMENTATION} ${JointContactModels_SOURCES} )
-target_include_directories(JointContactModels
-                            PRIVATE 
-                                # ${OPENSIMSIMBODY_INCLUDE_DIRS}      
-                                # ${SIMTK_INCLUDE_DIRS}
-                                # ${NMSmodel_INCLUDE_DIRS}
-                                # ${Curve_INCLUDE_DIRS}
-                                # ${FileIO_INCLUDE_DIRS}
-                                ${ceinms_common_INCLUDE_DIRS}
-								# ${Optimizers_INCLUDE_DIRS}
-								# ${TrialData_INCLUDE_DIRS}
-)
+target_include_directories(JointContactModels PRIVATE ${ceinms_common_INCLUDE_DIRS})
 
 target_link_libraries(JointContactModels 
     ${OpenSim_LIBRARIES}
     ceinms_common
 )
-#target_link_libraries(JointContactModels debug ${OPENSIM_LIBRARIES_DEBUG})
 
 # Save path to include directory for "internal" usage
 set(JointContactModels_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}" CACHE INTERNAL "Include directory for JointContactModels library")
-#mark_as_advanced(JointContactModels_INCLUDE_DIRS)
 
 # Install
 install(FILES ${JointContactModels_HEADERS} ${JointContactModels_TEMPLATE_IMPLEMENTATION} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/ceinms COMPONENT Development)

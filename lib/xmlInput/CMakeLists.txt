@@ -1,10 +1,3 @@
-#INCLUDE_DIRECTORIES(~/Programs/xsd/libxsd/
-#~/Programs/xerces-c-3.1.1/include/
-#)
-
-#include_directories(${XSD_INCLUDE_DIR})
-#xsd_schema(subject.xml)
-
 ## Create xsdbin executable
 add_executable(xsdbin xsdbin.cxx)
 target_link_libraries(xsdbin ${XERCES_LIBRARIES})
@@ -175,7 +168,6 @@ install(TARGETS xmlInput
         RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT Applications
         LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT Development
         ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT Development
-        # INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR} # only available from CMake 2.8.12
 )
 
 set_target_properties(xmlInput PROPERTIES FOLDER "Libraries")

@@ -94,4 +94,3 @@ if(BUILD_SPHINX_MANUAL_HTML OR BUILD_SPHINX_MANUAL_LATEX)
 
     endif()
 endif()
-

@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
-<contactModel xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="contactModel.xsd">
-<fromOpenSim>
-  <osimModel>modelName.osim</osimModel>
-  <motion>ik.mot</motion>
-  <externalLoads>externalLoads.xml</externalLoads>
-  <joints>ankle_angle</joints>
-</fromOpenSim>
-</contactModel>

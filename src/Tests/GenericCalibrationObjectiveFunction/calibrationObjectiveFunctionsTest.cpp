@@ -13,7 +13,6 @@ using std::endl;
 #include "ceinms/TrialData.h"
 #include "ceinms/Result.h"
 #include "ceinms/CompositeObjectiveFunction.h"
-#include "ceinms/SumGenericContactForces.h"
 #include "ceinms/ContactModelKneeBalance.h"
 #include "ceinms/ContactModelKneeBalanceSetup.h"
 using namespace ceinms;

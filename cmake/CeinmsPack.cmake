@@ -8,13 +8,11 @@ find_file(xerces_dll
     PATHS
         "C:/xerces-c-3.1.3_32r/bin"
         "C:/Program Files (x86)/CodeSynthesis XSD 4.0/bin64"
-        # Add path for linux
     PATH)
 install(PROGRAMS ${xerces_dll} DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT ThirdParty)
 install(PROGRAMS ${OPENSIM_LIBRARIES} DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT ThirdParty)
 message("OpenSim libraries in CPack  ${OPENSIM_LIBRARIES}")
 
-#list(APPEND CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS ${xerces_dll})
 include(InstallRequiredSystemLibraries)
 endif()
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Calibrated EMG-Informed NeuroMusculoSkeletal modeling")
@@ -26,7 +24,6 @@ set(CPACK_PACKAGE_VERSION_MAJOR ${CEINMS_MAJOR_VERSION})
 set(CPACK_PACKAGE_VERSION_MINOR ${CEINMS_MINOR_VERSION})
 set(CPACK_PACKAGE_VERSION_PATCH ${CEINMS_PATCH_VERSION})
 set(CPACK_PACKAGE_INSTALL_DIRECTORY "CEINMS ${CEINMS_MAJOR_VERSION}.${CEINMS_MINOR_VERSION}")
-#set(CPACK_PACKAGE_ICON "${CMAKE_SOURCE_DIR}/docs/static/ceinms-favicon.ico")
 
 set(CPACK_COMPONENTS_ALL Applications ThirdParty Unspecified)
 set(CPACK_COMPONENT_UNSPECIFIED_DISPLAY_NAME "Additional files")

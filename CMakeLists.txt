@@ -7,7 +7,7 @@ if(DEFINED ENV{VCPKG_ROOT} AND NOT DEFINED CMAKE_TOOLCHAIN_FILE)
   )
 endif()
 
-cmake_minimum_required (VERSION 3.8) # "target_include_directories" command  and VS12 generator are missing in previous versions
+cmake_minimum_required (VERSION 3.8)
 project(CEINMS)
 set(CEINMS_MAJOR_VERSION 0)
 set(CEINMS_MINOR_VERSION 22)
@@ -21,14 +21,11 @@ add_definitions(/DCEINMS_PATCH_VERSION="${CEINMS_PATCH_VERSION}")
 include(GNUInstallDirs)
 
 if(WIN32)
-    set(CMAKE_CXX_FLAGS "/EHsc")# -std=c++11 -fpermissive")
-    set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} /wd4996")  # Silence warnings caused by OpenSim
+    set(CMAKE_CXX_FLAGS "/EHsc")
+    set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} /wd4996")  # Silence some warnings caused by OpenSim
 endif()
 if(UNIX AND NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Debug CACHE STRING "Choose the type of build, options are: None Debug Release RelWithDebInfo MinSizeRel." FORCE)
-#	set(CMAKE_CXX_FLAGS "-O3")
-#	set(CMAKE_EXE_LINKER_FLAGS "-O3")
-#	set(CMAKE_SHARED_LINKER_FLAGS "-O3")
 endif()
 
 if(UNIX)
@@ -81,6 +78,7 @@ add_definitions(/D_USE_MATH_DEFINES)
 add_subdirectory(lib)
 add_subdirectory(src)
 add_subdirectory(docs)
+
 # Create CEINMSConfig.cmake etc.
 set(ConfigPackageLocation ${CMAKE_INSTALL_LIBDIR}/CEINMS)
 install(EXPORT CEINMSTargets

@@ -5,4 +5,4 @@ set_and_check(CEINMS_INCLUDE_DIRS @PACKAGE_CMAKE_INSTALL_INCLUDEDIR@)
 
 include("${CMAKE_CURRENT_LIST_DIR}/CEINMSTargets.cmake")
 
-#TODO: need to find dependencies (Boost, Opensim, XERCES...)
+#TODO: need to find dependencies (Opensim, ...)
