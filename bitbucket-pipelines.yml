@@ -1,0 +1,18 @@
+# Specify to use the Docker image pre-configured with the CEINMS dependencies
+image: 
+  name: matthewhambly/ceinms-environment:latest
+
+pipelines:
+  default:
+    - step:
+        name: Build and Test
+        script:
+          # Create and move into build directory
+          - mkdir build
+          - cd build
+          # Configure using CMake
+          - cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo ..
+          # Build project
+          - make -j2
+          # Run the tests
+          - ctest -j2

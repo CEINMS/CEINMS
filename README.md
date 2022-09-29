@@ -64,8 +64,8 @@ Building from source
         $ sudo apt-get install cmake-gui
         ```
     * [gcc](http://gcc.gnu.org/): Ensure version 8 or later
-    * [CodeSynthesis XSD](https://www.codesynthesis.com/products/xsd/download.xhtml): Download 64 bot .rpm file and extract it to obtain the precompiled files
-        * You will also need to obtain [Xerces](https://www.codesynthesis.com/products/xsd/download.xhtml) by downloading (e.g. xerces-c-3.1.1.tar.gz from https://archive.apache.org/dist/xerces/c/3/sources/), extracting and building following the provided instructions
+    * [CodeSynthesis XSD](https://www.codesynthesis.com/products/xsd/download.xhtml): Download 64 bit .rpm file and extract it to obtain the precompiled files
+        * You will also need to obtain [Xerces](https://xerces.apache.org/xerces-c/download.cgi) by downloading (e.g. xerces-c-3.1.1.tar.gz from https://archive.apache.org/dist/xerces/c/3/sources/), extracting and building following the provided instructions
     * [OpenSim](https://github.com/opensim-org/opensim-core): The instructions for building OpenSim from source are provided in the README on GitHub
     * [Filter](https://github.com/RealTimeBiomechanics/Filter):
         Download the code and from the directory run:
