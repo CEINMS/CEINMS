@@ -125,7 +125,8 @@
       <!-- minimizeTorqueError is kept only for compatibility purposes-->
       <xs:element name="minimizeTorqueError" minOccurs="0" maxOccurs="1" type="DeprecatedObjectiveFunctionElementType"/>
       <xs:element name="torqueErrorNormalised" minOccurs="0" maxOccurs="unbounded" type="TorqueErrorObjectiveFunctionElementType"/>
-      <xs:element name="maxPeak" minOccurs="0" maxOccurs="unbounded" type="GenericObjectiveFunctionElementType"/> 
+      <xs:element name="maxSumPeak" minOccurs="0" maxOccurs="unbounded" type="GenericObjectiveFunctionElementType"/>
+	  <xs:element name="maxPeak" minOccurs="0" maxOccurs="unbounded" type="GenericObjectiveFunctionElementType"/> 
       <xs:element name="penalty" minOccurs="0" maxOccurs="unbounded" type="PenaltyObjectiveFunctionElementType"/>
     </xs:sequence>
   </xs:complexType>
