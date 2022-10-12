@@ -41,6 +41,7 @@ namespace ceinms {
         TorqueError,
         TorqueErrorNormalised,
         MaxPeak,
+        MaxSumPeak,
         MaxPeakGenericContactForces,
         Penalty,
         None
@@ -132,6 +133,7 @@ namespace ceinms {
             using ObjFunMap = std::map<CalibrationObjectiveFunction, std::string>;
 
             ObjFunMap objFunMap = {
+                { CalibrationObjectiveFunction::MaxSumPeak,"MaxSumPeak" },
                 { CalibrationObjectiveFunction::MaxPeak,"MaxPeak" },
                 { CalibrationObjectiveFunction::MaxPeakGenericContactForces,"MaxPeakGenericContactForces" },
                 { CalibrationObjectiveFunction::Penalty,"Penalty" },

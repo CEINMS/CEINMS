@@ -209,6 +209,18 @@ namespace ceinms {
             calibrationStep.objFunctionsSetup_.push_back(obf);
         }
 
+        for (auto& objElement : myObjFuc.maxSumPeak()) {
+            vector<string> targets;
+            for (auto& t : objElement.targets())
+                targets.push_back(t);
+
+            std::shared_ptr<ObjectiveFunctionSetup> obf(
+                new ObjectiveFunctionSetup(
+                    CalibrationObjectiveFunction::MaxSumPeak,
+                    targetType[objElement.targetsType()],
+                    targets, objElement.weight().get(), objElement.exponent().get()));
+            calibrationStep.objFunctionsSetup_.push_back(obf);
+        }
         for (auto& objElement : myObjFuc.penalty()) {
             vector<string> targets;
             for (auto& t : objElement.targets())

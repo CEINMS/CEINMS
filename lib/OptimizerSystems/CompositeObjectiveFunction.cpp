@@ -1,6 +1,7 @@
 #include "ceinms/CompositeObjectiveFunction.h"
 #include "ceinms/TorqueErrorNormalisedObjectiveFunction.h"
 #include "ceinms/MaxPeakObjectiveFunction.h"
+#include "ceinms/MaxSumPeakObjectiveFunction.h"
 #include "ceinms/PenaltyObjectiveFunction.h"
 
 namespace ceinms {
@@ -78,6 +79,12 @@ namespace ceinms {
             //          std::shared_ptr<SumGenericContactForces> obj(new SumGenericContactForces(*e));
             //          objFunction.appendObjectiveFunction(obj);
             //      }
+
+            else if (e->getCalibrationObjectiveFunction()
+                == CalibrationObjectiveFunction::MaxSumPeak) {
+                std::shared_ptr<MaxSumPeakObjectiveFunction> obj(new MaxSumPeakObjectiveFunction(*e));
+                objFunction.appendObjectiveFunction(obj);
+            }
             else if (e->getCalibrationObjectiveFunction()
                 == CalibrationObjectiveFunction::Penalty) {
                 std::shared_ptr<PenaltyObjectiveFunction> obj(
