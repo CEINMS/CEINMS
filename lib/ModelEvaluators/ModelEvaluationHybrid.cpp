@@ -85,36 +85,50 @@ namespace ceinms {
         double emgTime = std::numeric_limits<double>::lowest();
         bool runCondition = true;
         bool firstLmtArrived(false);
+
+        std::vector<double> lmtData;
+        std::vector<std::vector<double>> momentArmsData;
+        std::vector<double> externalTorqueData;
+        std::vector<double> emgData;
+
         do {  // while(runCondition)
             // 1. read lmt Data
             std::optional<LmtFrame> lmtFrameFromQueue;
             ModelEvaluationBase<Logger>::getLmtFromInputQueue(lmtFrameFromQueue);
             double lmtMaTime;
-            if (lmtFrameFromQueue) 
+            if (lmtFrameFromQueue) {
                 lmtMaTime = lmtFrameFromQueue.value().time;
-            else
+                lmtData = lmtFrameFromQueue.value().data;
+            }
+            else {
                 lmtMaTime = std::numeric_limits<double>::lowest();
-
-            // update runCondition
-            runCondition = runCondition && lmtFrameFromQueue;
+                runCondition = false;
+            }
 
             // 2. read moment arms data
             vector<std::optional<MomentArmsFrame>> momentArmsFrameFromQueue;
             momentArmsFrameFromQueue.resize(noDof_);
+            momentArmsData.resize(noDof_);
             for (unsigned int i = 0; i < noDof_; ++i) {
                 ModelEvaluationBase<Logger>::getMomentArmsFromInputQueue((momentArmsFrameFromQueue.at(i)), i);
-                runCondition = runCondition && momentArmsFrameFromQueue.at(i);
+                if (momentArmsFrameFromQueue.at(i)) {
+                    momentArmsData.at(i) = momentArmsFrameFromQueue.at(i).value().data;
+                }
+                else {
+                    runCondition = false;
+                }
             }
 
             // 3. read external Torque
             std::optional<ExternalTorquesFrame> externalTorquesFrameFromQueue;
             while (TimeCompare::less(externalTorqueTime, lmtMaTime) && runCondition) {
                 ModelEvaluationBase<Logger>::getExternalTorquesFromInputQueue(externalTorquesFrameFromQueue);
-                if (!externalTorquesFrameFromQueue) {
-                    runCondition = false;
+                if (externalTorquesFrameFromQueue) {
+                    externalTorqueTime = externalTorquesFrameFromQueue.value().time;
+                    externalTorqueData = externalTorquesFrameFromQueue.value().data;
                 }
                 else {
-                    externalTorqueTime = externalTorquesFrameFromQueue.value().time;
+                    runCondition = false;
                 }
             }
 
@@ -122,8 +136,13 @@ namespace ceinms {
             std::optional<EmgFrame> emgFrameFromQueue;
             while (TimeCompare::less(emgTime, lmtMaTime) && runCondition) {
                 ModelEvaluationBase<Logger>::getEmgFromInputQueue(emgFrameFromQueue);
-                if (emgFrameFromQueue) emgTime = emgFrameFromQueue.value().time + globalEmDelay_;
-                runCondition = runCondition && emgFrameFromQueue;
+                if (emgFrameFromQueue) {
+                    emgTime = emgFrameFromQueue.value().time + globalEmDelay_;
+                    emgData = emgFrameFromQueue.value().data;
+                }
+                else {
+                    runCondition = false;
+                }
                 if (!TimeCompare::less(emgTime, lmtMaTime)) firstLmtArrived = true;
                 if (!firstLmtArrived && runCondition) {
                     subject_.setTime(emgTime);
@@ -134,12 +153,12 @@ namespace ceinms {
             //5. lmt, ma, emg, extTorques have been read correctly and I can push to the model
             if (runCondition) {
                 subject_.setTime(lmtMaTime);
-                subject_.setEmgs(emgFrameFromQueue.value().data);
-                subject_.setMuscleTendonLengths(lmtFrameFromQueue.value().data);
+                subject_.setEmgs(emgData);
+                subject_.setMuscleTendonLengths(lmtData);
                 for (unsigned int i = 0; i < noDof_; ++i)
-                    subject_.setMomentArms(momentArmsFrameFromQueue.at(i).value().data, i);
+                    subject_.setMomentArms(momentArmsData.at(i), i);
 
-                torqueErrorMinimizer_.setExternalTorques(externalTorquesFrameFromQueue.value().data);
+                torqueErrorMinimizer_.setExternalTorques(externalTorqueData);
                 torqueErrorMinimizer_.optimise();
                 subject_.updateState();
                 subject_.pushState();
