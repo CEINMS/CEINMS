@@ -60,15 +60,15 @@ namespace ceinms {
         virtual void operator()() = 0;
 
     protected:
-        void getEmgFromInputQueue(std::optional<EmgFrame>& emgFromQueue);
-        void getLmtFromInputQueue(std::optional<LmtFrame>& lmtFromQueue);
-        void getMomentArmsFromInputQueue(std::optional<MomentArmsFrame>& momentArmsFromQueue, unsigned int whichDof);
-        void getExternalTorquesFromInputQueue(std::optional<ExternalTorquesFrame>& externalTorquesFromQueue);
+        void getEmgFromInputQueue(EmgFrame& emgFromQueue);
+        void getLmtFromInputQueue(LmtFrame& lmtFromQueue);
+        void getMomentArmsFromInputQueue(MomentArmsFrame& momentArmsFromQueue, unsigned int whichDof);
+        void getExternalTorquesFromInputQueue(ExternalTorquesFrame& externalTorquesFromQueue);
 
-        std::optional<EmgFrame> getEmgFromInputQueue();
-        std::optional<LmtFrame> getLmtFromInputQueue();
-        std::optional<MomentArmsFrame> getMomentArmsFromInputQueue(unsigned int whichDof);
-        std::optional<ExternalTorquesFrame> getExternalTorquesFromInputQueue();
+        EmgFrame getEmgFromInputQueue();
+        LmtFrame getLmtFromInputQueue();
+        MomentArmsFrame getMomentArmsFromInputQueue(unsigned int whichDof);
+        ExternalTorquesFrame getExternalTorquesFromInputQueue();
 
         void doneWithSubscriptions();
         //bool externalTorquesAvailable() const;

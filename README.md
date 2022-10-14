@@ -50,6 +50,7 @@ Building from source
     * In the field labelled "Where to build the binaries:" enter a directory where you want the code to be built
     * Click Configure, specify Visual Studio 16 2019 as the project generator and click finish
     * After CMake has finished configuring you can set the install directory in the "CMAKE_INSTALL_PREFIX" field and check that the dependencies (Concurrency, Filter, OpenSim, Simbody, Xerces and XSD) were successfully located. If a dependency is not found automatically then enter the correct directory where it was installed into the corresponding field
+        * You can also choose whether CEINMS outputs information to the terminal during execution using the CEINMS_TERMINAL_LOGGING variable (NOTE: Enabling this can increase execution time and is therefore off by default). 
     * Click Configure again, all fields should change from red back to white, then click generate
     * Click on Open Project to open the generated project in Visual Studio
 4. In Visual Studio set the Solution Configuration from the dropdown box at the top (e.g. RelWithDebInfo) then build ALL_BUILD
@@ -102,6 +103,7 @@ Building from source
         * In the field labelled "Where to build the binaries:" enter a directory where you want the code to be built
         * Click Configure, specify Unix Makefiles as the project generator and click finish
         * After CMake has finished configuring you can set the install directory in the "CMAKE_INSTALL_PREFIX" field, the build type in the "CMAKE_BUILD_TYPE" field and check that the dependencies were successfully located. If a dependency is not found automatically then enter the correct directory where it was installed into the corresponding field
+            * You can also choose whether CEINMS outputs information to the terminal during execution using the CEINMS_TERMINAL_LOGGING variable (NOTE: Enabling this can increase execution time and is therefore off by default). 
         * Click Configure again, all fields should change from red back to white, then click generate
 4. Open a terminal in the build directory and run the following commands to build and install to the specified location:
     ```bash

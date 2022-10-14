@@ -39,7 +39,6 @@ using std::string;
 //#include "StorageLogger.h"
 
 #define LOG_FILES
-#define LOG
 
 namespace ceinms {
 
@@ -93,12 +92,12 @@ namespace ceinms {
 
         do {  // while(runCondition)
             // 1. read lmt Data
-            std::optional<LmtFrame> lmtFrameFromQueue;
+            LmtFrame lmtFrameFromQueue;
             ModelEvaluationBase<Logger>::getLmtFromInputQueue(lmtFrameFromQueue);
             double lmtMaTime;
-            if (lmtFrameFromQueue) {
-                lmtMaTime = lmtFrameFromQueue.value().time;
-                lmtData = lmtFrameFromQueue.value().data;
+            if (!lmtFrameFromQueue.data.empty()) {
+                lmtMaTime = lmtFrameFromQueue.time;
+                lmtData = lmtFrameFromQueue.data;
             }
             else {
                 lmtMaTime = std::numeric_limits<double>::lowest();
@@ -106,13 +105,13 @@ namespace ceinms {
             }
 
             // 2. read moment arms data
-            vector<std::optional<MomentArmsFrame>> momentArmsFrameFromQueue;
+            vector<MomentArmsFrame> momentArmsFrameFromQueue;
             momentArmsFrameFromQueue.resize(noDof_);
             momentArmsData.resize(noDof_);
             for (unsigned int i = 0; i < noDof_; ++i) {
                 ModelEvaluationBase<Logger>::getMomentArmsFromInputQueue((momentArmsFrameFromQueue.at(i)), i);
-                if (momentArmsFrameFromQueue.at(i)) {
-                    momentArmsData.at(i) = momentArmsFrameFromQueue.at(i).value().data;
+                if (!momentArmsFrameFromQueue.at(i).data.empty()) {
+                    momentArmsData.at(i) = momentArmsFrameFromQueue.at(i).data;
                 }
                 else {
                     runCondition = false;
@@ -120,12 +119,12 @@ namespace ceinms {
             }
 
             // 3. read external Torque
-            std::optional<ExternalTorquesFrame> externalTorquesFrameFromQueue;
+            ExternalTorquesFrame externalTorquesFrameFromQueue;
             while (TimeCompare::less(externalTorqueTime, lmtMaTime) && runCondition) {
                 ModelEvaluationBase<Logger>::getExternalTorquesFromInputQueue(externalTorquesFrameFromQueue);
-                if (externalTorquesFrameFromQueue) {
-                    externalTorqueTime = externalTorquesFrameFromQueue.value().time;
-                    externalTorqueData = externalTorquesFrameFromQueue.value().data;
+                if (!externalTorquesFrameFromQueue.data.empty()) {
+                    externalTorqueTime = externalTorquesFrameFromQueue.time;
+                    externalTorqueData = externalTorquesFrameFromQueue.data;
                 }
                 else {
                     runCondition = false;
@@ -133,12 +132,12 @@ namespace ceinms {
             }
 
             // 4. read emgs
-            std::optional<EmgFrame> emgFrameFromQueue;
+            EmgFrame emgFrameFromQueue;
             while (TimeCompare::less(emgTime, lmtMaTime) && runCondition) {
                 ModelEvaluationBase<Logger>::getEmgFromInputQueue(emgFrameFromQueue);
-                if (emgFrameFromQueue) {
-                    emgTime = emgFrameFromQueue.value().time + globalEmDelay_;
-                    emgData = emgFrameFromQueue.value().data;
+                if (!emgFrameFromQueue.data.empty()) {
+                    emgTime = emgFrameFromQueue.time + globalEmDelay_;
+                    emgData = emgFrameFromQueue.data;
                 }
                 else {
                     runCondition = false;
@@ -146,7 +145,7 @@ namespace ceinms {
                 if (!TimeCompare::less(emgTime, lmtMaTime)) firstLmtArrived = true;
                 if (!firstLmtArrived && runCondition) {
                     subject_.setTime(emgTime);
-                    subject_.setEmgs(emgFrameFromQueue.value().data);
+                    subject_.setEmgs(emgFrameFromQueue.data);
                 }
             }
 
@@ -211,17 +210,17 @@ namespace ceinms {
                     cout << it << "\t";
 
                 cout << endl << "LmtTime: " << lmtMaTime << endl << "Lmt" << endl;
-                for (auto& it : lmtFrameFromQueue.value().data)
+                for (auto& it : lmtFrameFromQueue.data)
                     cout << it << "\t";
 
                 for (unsigned int j = 0; j < dofNames_.size(); ++j) {
                     cout << endl << "MomentArms on: " << dofNames_.at(j) << endl;
-                    for (auto& it : momentArmsFrameFromQueue.at(j).value().data)
+                    for (auto& it : momentArmsFrameFromQueue.at(j).data)
                         cout << it << "\t";
                 }
                 cout << endl;
                 cout << "External Torques: ";
-                for (auto& it : externalTorquesFrameFromQueue.value().data)
+                for (auto& it : externalTorquesFrameFromQueue.data)
                     cout << it << " ";
                 cout << endl;
 

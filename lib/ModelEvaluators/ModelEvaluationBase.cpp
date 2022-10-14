@@ -70,43 +70,75 @@ namespace ceinms {
     }
 
     template<typename Logger>
-    void ModelEvaluationBase<Logger>::getEmgFromInputQueue(std::optional<EmgFrame>& emgs) {
-        emgs = inputEmgQueue_.pop();
+    void ModelEvaluationBase<Logger>::getEmgFromInputQueue(EmgFrame& emgs) {
+        std::optional<EmgFrame> EmgFrameFromQueue = inputEmgQueue_.pop();
+        if (EmgFrameFromQueue) {
+            emgs = EmgFrameFromQueue.value();
+        }
     }
 
     template<typename Logger>
-    void ModelEvaluationBase<Logger>::getLmtFromInputQueue(std::optional<LmtFrame>& lmts) {
-        lmts = inputLmtQueue_.pop();
+    void ModelEvaluationBase<Logger>::getLmtFromInputQueue(LmtFrame& lmts) {
+        std::optional<LmtFrame> lmtsFromQueue = inputLmtQueue_.pop();
+        if (lmtsFromQueue) {
+            lmts = lmtsFromQueue.value();
+        }
     }
 
     template<typename Logger>
-    void ModelEvaluationBase<Logger>::getMomentArmsFromInputQueue(std::optional<MomentArmsFrame>& momentArms, unsigned int whichDof) {
-        momentArms = (*inputMomentArmsQueues_.at(whichDof)).pop();
+    void ModelEvaluationBase<Logger>::getMomentArmsFromInputQueue(MomentArmsFrame& momentArms, unsigned int whichDof) {
+        std::optional<MomentArmsFrame> momentArmsFromQueue = (*inputMomentArmsQueues_.at(whichDof)).pop();
+        if (momentArmsFromQueue) {
+            momentArms = momentArmsFromQueue.value();
+        }
     }
 
     template<typename Logger>
-    void ModelEvaluationBase<Logger>::getExternalTorquesFromInputQueue(std::optional<ExternalTorquesFrame>& externalTorques) {
-        externalTorques = inputExternalTorqueQueue_.pop();
+    void ModelEvaluationBase<Logger>::getExternalTorquesFromInputQueue(ExternalTorquesFrame& externalTorques) {
+        std::optional<ExternalTorquesFrame> externalTorquesFromQueue = inputExternalTorqueQueue_.pop();
+        if (externalTorquesFromQueue) {
+            externalTorques = externalTorquesFromQueue.value();
+        }
     }
 
     template<typename Logger>
-    std::optional<EmgFrame> ModelEvaluationBase<Logger>::getEmgFromInputQueue() {
-        return inputEmgQueue_.pop();
+    EmgFrame ModelEvaluationBase<Logger>::getEmgFromInputQueue() {
+        std::optional<EmgFrame> EmgFrameFromQueue = inputEmgQueue_.pop();
+        EmgFrame emgs;
+        if (EmgFrameFromQueue) {
+            emgs = EmgFrameFromQueue.value();
+        }
+        return emgs;
     }
 
     template<typename Logger>
-    std::optional<LmtFrame> ModelEvaluationBase<Logger>::getLmtFromInputQueue() {
-        return inputLmtQueue_.pop();
+    LmtFrame ModelEvaluationBase<Logger>::getLmtFromInputQueue() {
+        std::optional<LmtFrame> lmtsFromQueue = inputLmtQueue_.pop();
+        LmtFrame lmts;
+        if (lmtsFromQueue) {
+            lmts = lmtsFromQueue.value();
+        }
+        return lmts;
     }
 
     template<typename Logger>
-    std::optional<MomentArmsFrame> ModelEvaluationBase<Logger>::getMomentArmsFromInputQueue(unsigned int whichDof) {
-        return (*inputMomentArmsQueues_.at(whichDof)).pop();
+    MomentArmsFrame ModelEvaluationBase<Logger>::getMomentArmsFromInputQueue(unsigned int whichDof) {
+        std::optional<MomentArmsFrame> momentArmsFromQueue = (*inputMomentArmsQueues_.at(whichDof)).pop();
+        MomentArmsFrame momentArms;
+        if (momentArmsFromQueue) {
+            momentArms = momentArmsFromQueue.value();
+        }
+        return momentArms;
     }
 
     template<typename Logger>
-    std::optional<ExternalTorquesFrame> ModelEvaluationBase<Logger>::getExternalTorquesFromInputQueue() {
-        return inputExternalTorqueQueue_.pop();
+    ExternalTorquesFrame ModelEvaluationBase<Logger>::getExternalTorquesFromInputQueue() {
+        std::optional<ExternalTorquesFrame> externalTorquesFromQueue = inputExternalTorqueQueue_.pop();
+        ExternalTorquesFrame externalTorques;
+        if (externalTorquesFromQueue) {
+            externalTorques = externalTorquesFromQueue.value();
+        }
+        return externalTorques;
     }
 
     template<typename Logger>

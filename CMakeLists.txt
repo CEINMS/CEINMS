@@ -73,6 +73,11 @@ if (BUILD_TESTING)
     enable_testing()
 endif()
 
+option(CEINMS_TERMINAL_LOGGING "Log information to terminal during execution (runs slower)" OFF)
+if (CEINMS_TERMINAL_LOGGING)
+    add_definitions(/DLOG)
+endif()
+
 add_definitions(/D_USE_MATH_DEFINES)
 
 add_subdirectory(lib)
