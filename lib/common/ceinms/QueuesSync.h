@@ -32,6 +32,10 @@
 #include <tuple>
 #include <limits>
 
+#include "ceinms/queues/GeneralisedCoordinatesQueue.h"
+#include "ceinms/queues/EstimatedTorquesQueue.h"
+#include "ceinms/queues/MuscleForcesQueue.h"
+
 namespace ceinms {
 
     namespace QueuesSync {
@@ -46,10 +50,17 @@ namespace ceinms {
         }
 
         template<typename A1, typename... Args>
-        auto sync(A1& queue1, Args&... queues) -> decltype(std::make_tuple(queue1.pop(), queues.pop()...)) {
+        auto sync(A1& queue1, Args&... queues) -> decltype(std::make_tuple(queue1.pop().value(), queues.pop().value()...)) {
             auto frame1(queue1.pop());
-            return std::make_tuple(frame1, syncToTime(frame1.value().time, queues)...);
+            if (frame1.has_value()) {
+                return std::make_tuple(frame1.value(), syncToTime(frame1.value().time, queues)...);
+            }
+            else {
+                return std::make_tuple(frame1.value(), syncToTime(frame1.value().time, queues)...);
+            }
         }
+
+        std::tuple<MuscleForcesFrame, GeneralisedCoordinatesFrame, EstimatedTorquesFrame> syncJointReactionForces(MuscleForcesQueue& inputMuscleForcesQueue, GeneralisedCoordinatesQueue& inputGeneralisedCoordinatesQueue, EstimatedTorquesQueue& inputEstimatedTorquesQueue);
     }
 }
 

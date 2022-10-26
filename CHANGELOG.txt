@@ -1,3 +1,11 @@
+CEINMS 0.30.0
+--------------
+* Moved to C++17 and removed Boost as a dependency
+* Updated to use CodeSynthesis XSD 4.0
+* Updated to use OpenSim 4.0 or later
+* Updated to use newest version of Concurrency with improved handling of end of queue data
+* Added MaxSumPeak objective function for calibration
+
 CEINMS 0.11.0
 --------------
 * Add CEINMSoptimise executable to automatically estimate alpha, beta, gamma weightings for the EMG-assisted execution

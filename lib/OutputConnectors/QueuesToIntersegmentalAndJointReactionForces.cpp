@@ -41,32 +41,32 @@ namespace ceinms {
         bool runCondition(true);
         while (runCondition) {
             auto frames(QueuesSync::sync(inputGeneralisedCoordinatesQueue_, inputMuscleForcesQueue_, inputEstimatedTorquesQueue_));
-            std::optional<GeneralisedCoordinatesFrame> generalisedCoordinatesFrame;
-            std::optional<MuscleForcesFrame> muscleForcesFrame;
-            std::optional<EstimatedTorquesFrame> estimatedTorquesFrame;
+            GeneralisedCoordinatesFrame generalisedCoordinatesFrame;
+            MuscleForcesFrame muscleForcesFrame;
+            EstimatedTorquesFrame estimatedTorquesFrame;
             std::tie(generalisedCoordinatesFrame, muscleForcesFrame, estimatedTorquesFrame) = frames;
 
-            if (!generalisedCoordinatesFrame ||
-                !muscleForcesFrame ||
-                !estimatedTorquesFrame)
+            if (!generalisedCoordinatesFrame.data.getNCoordinates() ||
+                muscleForcesFrame.data.empty() ||
+                estimatedTorquesFrame.data.empty())
                 runCondition = false;
             if (runCondition) {
                 QueuesToXForces::setState(
-                    generalisedCoordinatesFrame.value().time,
-                    generalisedCoordinatesFrame.value().data.getQ(),
-                    generalisedCoordinatesFrame.value().data.getQd(),
-                    generalisedCoordinatesFrame.value().data.getQdd()
+                    generalisedCoordinatesFrame.time,
+                    generalisedCoordinatesFrame.data.getQ(),
+                    generalisedCoordinatesFrame.data.getQd(),
+                    generalisedCoordinatesFrame.data.getQdd()
                     );
 
-                QueuesToXForces::calculateJointReactionForces(muscleForcesFrame.value().data, estimatedTorquesFrame.value().data);
+                QueuesToXForces::calculateJointReactionForces(muscleForcesFrame.data, estimatedTorquesFrame.data);
                 VecContactForcesFrame jrForces;
-                jrForces.time = generalisedCoordinatesFrame.value().time;
+                jrForces.time = generalisedCoordinatesFrame.time;
                 QueuesToXForces::getJointReactionForcesInG(jrForces.data);
                 outputJointReactionForcesQueue_.push(jrForces);
 
                 QueuesToXForces::calculateIntersegmentalForces();
                 VecContactForcesFrame intForces;
-                intForces.time = generalisedCoordinatesFrame.value().time;
+                intForces.time = generalisedCoordinatesFrame.time;
                 QueuesToXForces::getIntersegmentalForcesInG(intForces.data);
                 outputIntersegmentalForcesQueue_.push(intForces);
 
