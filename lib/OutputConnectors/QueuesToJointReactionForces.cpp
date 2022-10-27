@@ -46,7 +46,7 @@ namespace ceinms {
         QueuesToXForces::doneWithSubscriptions();
         bool runCondition(true);
         while (runCondition) {
-            auto frames(QueuesSync::syncJointReactionForces(inputMuscleForcesQueue_, inputGeneralisedCoordinatesQueue_,inputEstimatedTorquesQueue_));
+            auto frames(QueuesSync::sync(inputMuscleForcesQueue_, inputGeneralisedCoordinatesQueue_,inputEstimatedTorquesQueue_));
             GeneralisedCoordinatesFrame generalisedCoordinatesFrame;
             MuscleForcesFrame muscleForcesFrame;
             EstimatedTorquesFrame estimatedTorquesFrame;

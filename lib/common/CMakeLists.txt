@@ -47,7 +47,6 @@ set(Common_SOURCES
                 ExternalForceDataSetup.cpp
                 ExternalForceProperties.cpp
                 ExternalLoadProperties.cpp
-                QueuesSync.cpp
 )
 
 set(Common_TEMPLATE_IMPLEMENTATION)

@@ -113,9 +113,6 @@ namespace ceinms {
 
     void GeneralisedCoordinatesFromStorageFile::updateKinematicsSplines(double fc) {
         //reinitialise because I modify the storage with padding and filtering..
-        //std::vector<std::string> kinematicsStorageFilenameVector;
-        //kinematicsStorageFilenameVector.push_back(kinematicsStorageFilename_);
-        //OpenSim::updatePre40KinematicsFilesFor40MotionType(model_,kinematicsStorageFilenameVector,"");
         OpenSim::Storage kinematics(kinematicsStorageFilename_);
 
         if (fc > 0) {

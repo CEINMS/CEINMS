@@ -132,7 +132,7 @@ namespace OpenSim {
             }
             else {
                 //apply the grf and moments from the force plate directly to the body
-                //transformedPosition = pointExpressedInBody_->getMassCenter();
+                transformedPosition.setToZero();
                 torquesToApply = forceData.getMoments();
             }
 
