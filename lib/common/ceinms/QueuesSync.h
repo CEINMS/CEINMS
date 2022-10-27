@@ -32,6 +32,10 @@
 #include <tuple>
 #include <limits>
 
+#include "ceinms/queues/GeneralisedCoordinatesQueue.h"
+#include "ceinms/queues/EstimatedTorquesQueue.h"
+#include "ceinms/queues/MuscleForcesQueue.h"
+
 namespace ceinms {
 
     namespace QueuesSync {
@@ -39,16 +43,20 @@ namespace ceinms {
         template<typename T>
         typename T::type syncToTime(double t, T& queue) {
             typename T::type frame;
+            auto endFrame = frame;
+            endFrame.time = std::numeric_limits<double>::max();
             do {
-                frame = queue.pop().value();
+                frame = queue.pop().value_or(endFrame);
             } while (frame.time < t);
             return frame;
         }
 
         template<typename A1, typename... Args>
-        auto sync(A1& queue1, Args&... queues) -> decltype(std::make_tuple(queue1.pop(), queues.pop()...)) {
+        auto sync(A1& queue1, Args&... queues) -> decltype(std::make_tuple(queue1.pop().value(), queues.pop().value()...)) {
             auto frame1(queue1.pop());
-            return std::make_tuple(frame1, syncToTime(frame1.value().time, queues)...);
+            if(frame1.has_value())
+                return std::make_tuple(frame1.value(), syncToTime(frame1.value().time, queues)...);
+            return std::make_tuple(decltype(queue1.pop().value()){}, decltype(queues.pop().value()){}...);
         }
     }
 }

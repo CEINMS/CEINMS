@@ -23,5 +23,20 @@ target_link_libraries(Test_JointContactModel
 	NMSmodel
 	${OPENSIMSIMBODY_LIBRARIES}
 )
+
+add_executable(Test_JointContactModelQueues jointContactModelQueueTest.cpp)
+target_link_libraries(Test_JointContactModelQueues
+	JointContactModels
+	OutputConnectors
+	InputConnectors
+	xmlInput
+	rtb::Concurrency
+	NMSmodel
+	${OPENSIMSIMBODY_LIBRARIES}
+)
+
 set_target_properties(Test_JointContactModel PROPERTIES FOLDER "Tests")
 add_test(NAME TestJointContactModel COMMAND Test_JointContactModel)
+
+set_target_properties(Test_JointContactModelQueues PROPERTIES FOLDER "Tests")
+add_test(NAME Test_JointContactModelQueues COMMAND Test_JointContactModel)

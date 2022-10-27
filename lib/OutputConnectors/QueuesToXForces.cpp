@@ -132,7 +132,7 @@ namespace OpenSim {
             }
             else {
                 //apply the grf and moments from the force plate directly to the body
-                transformedPosition = pointExpressedInBody_->getMassCenter();
+                transformedPosition.setToZero();
                 torquesToApply = forceData.getMoments();
             }
 
@@ -148,13 +148,28 @@ namespace OpenSim {
             externalForceQueue_->subscribe();
             isSubscribed = true;
         }
-        Super::connectToModel(model);
+        Super::extendConnectToModel(model);
         const string& appliedToBodyName = get_applied_to_body();
         const string& forceExpressedInBodyName = get_force_expressed_in_body();
+        const string& pointExpressedInBodyName = get_point_expressed_in_body();
 
         appliedToBody_ = &_model->updBodySet().get(appliedToBodyName);
-        forceExpressedInBody_ = &_model->updBodySet().get(forceExpressedInBodyName);
-        pointExpressedInBody_ = &_model->updBodySet().get(get_point_expressed_in_body());
+        //forceExpressedInBody_ = &_model->updBodySet().get(forceExpressedInBodyName);
+        //pointExpressedInBody_ = &_model->updBodySet().get(get_point_expressed_in_body());
+        if (forceExpressedInBodyName == "ground") {
+            forceExpressedInBody_ = &_model->getGround();
+        }
+        else {
+            forceExpressedInBody_ = &_model->updBodySet().get(forceExpressedInBodyName);
+        }
+        if (pointExpressedInBodyName == "ground") {
+            pointExpressedInBody_ = &_model->getGround();
+        }
+        else {
+            pointExpressedInBody_ = &_model->updBodySet().get(pointExpressedInBodyName);
+        }
+        
+        
     }
 
     ExternalForceFromQueue::~ExternalForceFromQueue() {

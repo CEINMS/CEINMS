@@ -172,7 +172,7 @@ namespace ceinms {
         else {
             runOpenLoop< NMSmodelT, ModelEvaluatorT, LoggerT >();
         }
-        return true;
+        return 0;
     }
 
     template<typename NMSmodelT, template <typename, typename> class ModelEvaluatorT, typename LoggerT>
@@ -571,7 +571,7 @@ namespace ceinms {
         else {
             runHybrid<NMSmodelT>();
         }
-        return true;
+        return 0;
     }
 
     template <typename NMSmodelT>
@@ -730,9 +730,9 @@ namespace ceinms {
         std::thread lmtMaProdThread(std::ref(lmtMaProducer));
         std::thread simulatorThread(std::ref(simulator));
         std::thread queuesToStorageFilesThread(std::ref(queuesToStorageFiles));
-
-        std::thread contactForcesEstimatorThread(std::ref(jointReactionForcesEstimator));
         std::thread generalisedCoordinateThread(std::ref(generalisedCoordinateFromStorageFile));
+        std::thread contactForcesEstimatorThread(std::ref(jointReactionForcesEstimator));
+        
         std::thread externalForcesThread(std::ref(externalForcesFromStorageFile));
         std::thread contactForcesLoggerThread(std::ref(contactForcesLogger));
 		std::thread hybridErrorLoggerThread(std::ref(hybridErrorLogger));
@@ -742,8 +742,9 @@ namespace ceinms {
         externalTorquesProdThread.join();
         simulatorThread.join();
         queuesToStorageFilesThread.join();
-        contactForcesEstimatorThread.join();
+        
         generalisedCoordinateThread.join();
+        contactForcesEstimatorThread.join();
         externalForcesThread.join();
         contactForcesLoggerThread.join();
 		hybridErrorLoggerThread.join();
