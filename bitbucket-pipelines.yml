@@ -15,4 +15,4 @@ pipelines:
           # Build project
           - make -j2
           # Run the tests
-          - ctest -j2
+          - ctest

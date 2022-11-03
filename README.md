@@ -12,7 +12,7 @@ Dependencies
 * Cross-platform building: [CMake](http://www.cmake.org/) 3.8 or later
 * Compiler: [Visual Studio](http://www.visualstudio.com) 2019 or later (Windows only), [gcc](http://gcc.gnu.org/) 8 or later (typically on Linux), or [Clang](http://clang.llvm.org/) 5 or later (typically on Mac, possibly through Xcode)
 * XML parsing: [CodeSynthesis XSD](https://www.codesynthesis.com/products/xsd/) 4.0
-* Musculoskeletal modelling: [OpenSim](https://github.com/opensim-org/opensim-core) 4.0 or later
+* Musculoskeletal modelling: [OpenSim](https://simtk.org/projects/opensim/) 4.0 or later
 * Signal filtering: [Filter](https://github.com/RealTimeBiomechanics/Filter)
 * Thread synchronisation: [Concurrency](https://github.com/RealTimeBiomechanics/Concurrency)
 
@@ -24,7 +24,8 @@ Building from source
     * [CMake](https://cmake.org/download/): Follow the instruction on the website
     * [Visual Studio](http://www.visualstudio.com): Follow the instruction on the website
     * [CodeSynthesis XSD](https://www.codesynthesis.com/products/xsd/download.xhtml): Download and run the .msi package which includes the precompiled Xerces-C++ libraries that are needed
-    * [OpenSim](https://github.com/opensim-org/opensim-core): The instructions for building OpenSim from source are provided in the README on GitHub
+    * [OpenSim](https://simtk.org/projects/opensim/): The instructions for building OpenSim from source are provided in the [README](https://github.com/opensim-org/opensim-core) on GitHub
+        * If you have multiple versions of OpenSim installed, ensure that your PATH is pointing to the correct version directory
     * [Filter](https://github.com/RealTimeBiomechanics/Filter):
         Download the code and from the directory run:
         ```bash
@@ -55,7 +56,7 @@ Building from source
     * Click on Open Project to open the generated project in Visual Studio
 4. In Visual Studio set the Solution Configuration from the dropdown box at the top (e.g. RelWithDebInfo) then build ALL_BUILD
     * You can run tests to ensure CEINMS is working as intended by building RUN_TESTS
-    * You can build INSTALL to install the CEINMS files to the directory that you specified
+    * Build the INSTALL target to install the CEINMS files to the directory that you specified, and you can add the CEINMS install directory to your path to run the CEINMS executables from any directory
 
 
 ### Linux:
@@ -64,7 +65,7 @@ Building from source
         ```
         $ sudo apt-get install cmake-gui
         ```
-    * [gcc](http://gcc.gnu.org/): Ensure version 8 or later
+    * [gcc](http://gcc.gnu.org/): Version 8 or later
     * [CodeSynthesis XSD](https://www.codesynthesis.com/products/xsd/download.xhtml): Download 64 bit .rpm file and extract it to obtain the precompiled files
         * You will also need to obtain [Xerces](https://xerces.apache.org/xerces-c/download.cgi) by downloading (e.g. xerces-c-3.1.1.tar.gz from https://archive.apache.org/dist/xerces/c/3/sources/), extracting and building following the provided instructions
     * [OpenSim](https://github.com/opensim-org/opensim-core): The instructions for building OpenSim from source are provided in the README on GitHub

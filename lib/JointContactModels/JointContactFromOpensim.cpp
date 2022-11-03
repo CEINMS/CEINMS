@@ -84,9 +84,9 @@ namespace ceinms {
 
         state_ = model_.initSystem();
         for (auto c : coordinateActuators_)
-            c->setOverrideActuation(state_, true);
+            c->overrideActuation(state_, true);
         for (auto m : muscleActuators_)
-            m->setOverrideActuation(state_, true);
+            m->overrideActuation(state_, true);
     }
 
     JointContactFromOpensim::JointContactFromOpensim(const string& modelFilename, string externalLoadXmlFilename) :
@@ -272,7 +272,7 @@ namespace ceinms {
 
     void JointContactFromOpensim::setMuscleForcesToActuators(const SimTK::Vector& muscleForces) {
         for (size_t i(0); i < muscleActuators_.size(); ++i) {
-            muscleActuators_.at(i)->setOverrideActuation(state_, true);
+            muscleActuators_.at(i)->overrideActuation(state_, true);
             muscleActuators_.at(i)->setOverrideActuation(state_, muscleForces[i]);
         }
     }
@@ -288,7 +288,6 @@ namespace ceinms {
         }
         model_.getMultibodySystem().realize(state_, SimTK::Stage::Acceleration);
         model_.getSimbodyEngine().computeReactions(state_, rForcesInG_, rTorquesInG_);
-
     }
 
     //if appliedMobilityForces is 0 then it is the ID
