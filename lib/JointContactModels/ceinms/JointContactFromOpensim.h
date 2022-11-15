@@ -119,6 +119,7 @@ namespace ceinms {
     void JointContactFromOpensim::setQdd(const T& qdd) {
         for (size_t i(0); i < nCoordinates_; ++i) {
             qdd_[i] = qdd[i];
+            state_.updUDot()[i] = qdd[i];
         }
     }
 }

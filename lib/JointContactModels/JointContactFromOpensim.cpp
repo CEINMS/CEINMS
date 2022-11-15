@@ -26,7 +26,6 @@
 * limitations under the License.                                             *
 * -------------------------------------------------------------------------- */
 
-
 #include <vector>
 using std::vector;
 #include <string>
@@ -56,16 +55,14 @@ namespace ceinms {
         rTorquesInG_.resize(nBodies_);
 
         qdd_.resize(nCoordinates_);
-
+        
         //1. add extForces to the model, hopefully I won't have problems with queues and opensim
-        for (auto &force : externalForces) {
+        for (auto &force : externalForces)
             model_.addForce(force);
-        }
 
-        OpenSim::Array<string> muscleNames;
-        model_.getMuscles().getNames(muscleNames);
+        model_.getMuscles().getNames(muscleActuatorNames_);
         for (unsigned i(0); i < nMuscles_; ++i)
-            muscleActuators_.push_back((const_cast<OpenSim::Muscle*>(&model_.updForceSet().getMuscles().get(muscleNames.get(i)))));
+            muscleActuators_.push_back((const_cast<OpenSim::Muscle*>(&model_.updForceSet().getMuscles().get(muscleActuatorNames_.get(i)))));
 
         const OpenSim::CoordinateSet& cs = model_.getCoordinateSet();
         for (unsigned i(0); i < nCoordinates_; ++i) {
@@ -198,16 +195,11 @@ namespace ceinms {
     void JointContactFromOpensim::getReactionForceInChild(const SimTK::Vector_<SimTK::Vec3>& rForcesInG, const string& jointName, SimTK::Vec3& forceOnChildInChild) const {
         const OpenSim::Joint& joint(model_.getJointSet().get(jointName));
         unsigned idx(model_.getJointSet().getIndex(joint.getName()));
-        model_.getSimbodyEngine().transform(state_,
-            model_.getGround(),
-            rForcesInG.get(idx),
-            joint.getChildFrame(),
-            forceOnChildInChild);
+        forceOnChildInChild = model_.getGround().expressVectorInAnotherFrame(state_, rForcesInG.get(idx), joint.getChildFrame());
     }
 
     void JointContactFromOpensim::getReactionForceInG(const SimTK::Vector_<SimTK::Vec3>& rForcesInG, const string& jointName, SimTK::Vec3& forceOnChildInG)  const {
-        const OpenSim::Joint& joint(model_.getJointSet().get(jointName));
-        unsigned idx(model_.getJointSet().getIndex(joint.getName()));
+        unsigned idx(model_.getJointSet().getIndex(jointName));
         //for some reason everything is shifted by 1.. this is a temporary patch.. to find a more robust solution
         forceOnChildInG = rForcesInG.get(idx + 1);
     }
@@ -258,11 +250,8 @@ namespace ceinms {
      }
 
     void JointContactFromOpensim::disableMuscleActuators() {
-        for (int i(0); i < muscleActuators_.size(); ++i)
-            muscleActuators_.at(i)->setAppliesForce(state_, false);
-            
-        // for (auto& m : muscleActuators_)
-        //    m->setDisabled(state_, true);
+        for (auto& m : muscleActuators_)
+            m->setAppliesForce(state_, false);
     }
 
     void JointContactFromOpensim::enableMuscleActuators() {
@@ -286,14 +275,13 @@ namespace ceinms {
             coordinateActuators_.at(i)->overrideActuation(state_, true);
             coordinateActuators_.at(i)->setOverrideActuation(state_, residualMobilityForces.get(i));
         }
-        model_.getMultibodySystem().realize(state_, SimTK::Stage::Acceleration);
         model_.getSimbodyEngine().computeReactions(state_, rForcesInG_, rTorquesInG_);
     }
 
     //if appliedMobilityForces is 0 then it is the ID
     void JointContactFromOpensim::calculateResidualMobilityForces(const SimTK::Vector& appliedMobilityForces) {
         //realize the system, so all the forces as gravitational, inertial, and external forces are applied
-        model_.getMultibodySystem().realize(state_, SimTK::Stage::Dynamics);
+        model_.realizeDynamics(state_);
         SimTK::Vector_<SimTK::SpatialVec> appliedBodyForces(model_.getMultibodySystem().getRigidBodyForces(state_, SimTK::Stage::Dynamics));
         residualMobilityForces_ = idSolver_->solve(state_, qdd_, appliedMobilityForces, appliedBodyForces);
     }

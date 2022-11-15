@@ -88,22 +88,26 @@ namespace OpenSim {
 
     ceinms::ExternalForceData ExternalForceFromQueue::getExternalForceDataFromQueue(double time) const {
         std::optional<SingleExternalForceFrame> forceFrame;
-        while (time > lastTime_ && runCondition_){
+        SingleExternalForceFrame tempForceFrame;
+        while (time > lastTime_ && runCondition_) {
             forceFrame = externalForceQueue_->pop();
-            if (forceFrame) {
+            
+            if (!forceFrame) {
                 runCondition_ = false;
-                forceFrame.value().data.setForceVector(Vec3(0.));
-                forceFrame.value().data.setApplicationPoint(Vec3(0.));
-                forceFrame.value().data.setTorque(Vec3(0.));
+                tempForceFrame.data.setForceVector(Vec3(0.));
+                tempForceFrame.data.setApplicationPoint(Vec3(0.));
+                tempForceFrame.data.setTorque(Vec3(0.));
+            } else {
+                tempForceFrame = forceFrame.value();
             }
             if (runCondition_) {
-                pastExternalForceFrames_.push_back(forceFrame.value());
-                lastTime_ = forceFrame.value().time;
+                pastExternalForceFrames_.push_back(tempForceFrame);
+                lastTime_ = tempForceFrame.time;
                 if (pastExternalForceFrames_.size() > MaxStorageLength_)
                     pastExternalForceFrames_.pop_front();
             }
         }
-        return forceFrame.value().data;
+        return tempForceFrame.data;
     }
 
     void ExternalForceFromQueue::computeForce(
@@ -120,56 +124,47 @@ namespace OpenSim {
                 forceData = getExternalForceDataFromQueue(time);
 
             Vec3 torquesToApply(0.);
-
-            const SimbodyEngine& engine = getModel().getSimbodyEngine();
             Vec3 transformedForce, transformedPosition, transformedTorque;
-            engine.transform(state, *forceExpressedInBody_, forceData.getForce(), getModel().getGround(), transformedForce);    //Using getModel.getGround() instead of engine.getGroundBody()
+            transformedForce = forceExpressedInBody_->expressVectorInGround(state, forceData.getForce());
 
             if (forceData.getUseApplicationPoint()) {
                 //use COP + GRF + fre torque
                 torquesToApply = forceData.getTorque();
-                engine.transformPosition(state, *pointExpressedInBody_, forceData.getApplicationPoint(), *appliedToBody_, transformedPosition);
+                transformedPosition = pointExpressedInBody_->findStationLocationInAnotherFrame(state, forceData.getApplicationPoint(), *appliedToBody_);
             }
             else {
                 //apply the grf and moments from the force plate directly to the body
                 transformedPosition.setToZero();
                 torquesToApply = forceData.getMoments();
             }
-
+            
             ExternalForce::applyForceToPoint(state, *appliedToBody_, transformedPosition, transformedForce, bodyForces);
 
-            engine.transform(state, *forceExpressedInBody_, torquesToApply, getModel().getGround(), transformedTorque);    //Using getModel.getGround() instead of engine.getGroundBody()
+            transformedTorque = forceExpressedInBody_->expressVectorInGround(state, torquesToApply);
             ExternalForce::applyTorque(state, *appliedToBody_, transformedTorque, bodyForces);
         }
     }
 
     void ExternalForceFromQueue::extendConnectToModel(Model& model) {
+        Super::extendConnectToModel(model);
         if (!isSubscribed) {
             externalForceQueue_->subscribe();
             isSubscribed = true;
         }
-        Super::extendConnectToModel(model);
+        
         const string& appliedToBodyName = get_applied_to_body();
         const string& forceExpressedInBodyName = get_force_expressed_in_body();
         const string& pointExpressedInBodyName = get_point_expressed_in_body();
 
-        appliedToBody_ = &_model->updBodySet().get(appliedToBodyName);
-        //forceExpressedInBody_ = &_model->updBodySet().get(forceExpressedInBodyName);
-        //pointExpressedInBody_ = &_model->updBodySet().get(get_point_expressed_in_body());
-        if (forceExpressedInBodyName == "ground") {
+        appliedToBody_ = &_model->getBodySet().get(appliedToBodyName);
+        if (forceExpressedInBodyName == "ground")
             forceExpressedInBody_ = &_model->getGround();
-        }
-        else {
-            forceExpressedInBody_ = &_model->updBodySet().get(forceExpressedInBodyName);
-        }
-        if (pointExpressedInBodyName == "ground") {
+        else
+            forceExpressedInBody_ = &_model->getBodySet().get(forceExpressedInBodyName);
+        if (pointExpressedInBodyName == "ground")
             pointExpressedInBody_ = &_model->getGround();
-        }
-        else {
-            pointExpressedInBody_ = &_model->updBodySet().get(pointExpressedInBodyName);
-        }
-        
-        
+        else
+            pointExpressedInBody_ = &_model->getBodySet().get(pointExpressedInBodyName);
     }
 
     ExternalForceFromQueue::~ExternalForceFromQueue() {
@@ -205,7 +200,6 @@ namespace ceinms {
 
     void QueuesToXForces::initialiseExternalForces() {
         for (auto& it : externalForcesDataSetups_) {
-
             singleExternalForceQueues_.emplace_back(new SingleExternalForceQueue());
             extForces_.push_back(new OpenSim::ExternalForceFromQueue(
                 singleExternalForceQueues_.back(),
@@ -216,6 +210,8 @@ namespace ceinms {
                 it.forceExpressedInBodyName,
                 it.pointExpressedInBodyName));
         }
+        for (auto i(0); i < extForces_.size(); i++)
+            extForces_[i]->setName(externalForcesDataSetups_[i].name);
     }
 
     void QueuesToXForces::distributeExternalForces() {

@@ -123,6 +123,11 @@ Building from source
         ```
 
 
+Notes
+---------------
+* Inverse kinematics MOT files generated using an OpenSim version below 4.0 have some coordinates incorrectly labelled as being Rotational rather than Coupled. Therefore, it is recommended to process your CEINMS input data using OpenSim 4.0+ to avoid potential issues. Alternatively, newer versions of OpenSim provide a function (updatePre40KinematicsFilesFor40MotionType()) that you can use to update inverse kinmatics MOT files from pre v4.0 to v4.0+, however using this function on v4.0+ files will cause your data to be altered incorrectly.
+
+
 Acknowledgments
 ---------------
 * Australian National Health and Medical Research Council (628850)

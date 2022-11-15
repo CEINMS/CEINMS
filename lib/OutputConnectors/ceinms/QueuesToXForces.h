@@ -80,9 +80,7 @@ namespace OpenSim {
         mutable std::list<ceinms::QueueData<ceinms::ExternalForceData> > pastExternalForceFrames_;
         static const unsigned MaxStorageLength_ = 1000;
         mutable double lastTime_;
-        SimTK::ReferencePtr<const Body> appliedToBody_;
-        //SimTK::ReferencePtr<const Body> forceExpressedInBody_;
-        //SimTK::ReferencePtr<const Body> pointExpressedInBody_;
+        SimTK::ReferencePtr<const PhysicalFrame> appliedToBody_;
         SimTK::ReferencePtr<const PhysicalFrame> forceExpressedInBody_;
         SimTK::ReferencePtr<const PhysicalFrame> pointExpressedInBody_;
         mutable bool runCondition_;
