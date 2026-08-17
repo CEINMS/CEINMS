@@ -82,22 +82,39 @@ namespace ceinms {
         bool runCondition(true);
         bool firstLmtArrived(false);
         bool externalTorquesRunCondition(true); //we first assume there are ext forces
- //       cout << subject_ << endl;
+
+        std::vector<double> lmtData;
+        std::vector<std::vector<double>> momentArmsData(noDof_);
+        std::vector<double> externalTorqueData;
+        std::vector<double> emgData;
 
         ModelEvaluationBase<Logger>::doneWithSubscriptions();
         do {  // while(runCondition)
             // 1. read lmt Data
+            //LmtFrame lmtFrameFromQueue;
+            //ModelEvaluationBase<Logger>::getLmtFromInputQueue(lmtFrameFromQueue);
+            //double lmtMaTime = lmtFrameFromQueue.time;
+            //runCondition = runCondition && !lmtFrameFromQueue.data.empty();
             LmtFrame lmtFrameFromQueue;
             ModelEvaluationBase<Logger>::getLmtFromInputQueue(lmtFrameFromQueue);
-            double lmtMaTime = lmtFrameFromQueue.time;
-            runCondition = runCondition && !lmtFrameFromQueue.data.empty();
+            double lmtMaTime;
+            if (!lmtFrameFromQueue.data.empty()) {
+                lmtMaTime = lmtFrameFromQueue.time;
+                lmtData = lmtFrameFromQueue.data;
+            } 
+            else {
+                lmtMaTime = std::numeric_limits<double>::lowest();
+                runCondition = false;
+            }
 
             // 2. read moment arms data
-            vector<MomentArmsFrame> momentArmsFramesFromQueue;
-            momentArmsFramesFromQueue.resize(noDof_);
+            vector<MomentArmsFrame> momentArmsFrameFromQueue(noDof_);
             for (unsigned int i = 0; i < noDof_; ++i) {
-                ModelEvaluationBase<Logger>::getMomentArmsFromInputQueue((momentArmsFramesFromQueue.at(i)), i);
-                runCondition = runCondition && !momentArmsFramesFromQueue.at(i).data.empty();
+                ModelEvaluationBase<Logger>::getMomentArmsFromInputQueue((momentArmsFrameFromQueue.at(i)), i);
+                if (!momentArmsFrameFromQueue.at(i).data.empty())
+                    momentArmsData.at(i) = momentArmsFrameFromQueue.at(i).data;
+                else
+                    runCondition = false;
             }
 
             //if no external torques are available, the producer will send an EndOfData frame
@@ -105,9 +122,12 @@ namespace ceinms {
             ExternalTorquesFrame externalTorquesFrameFromQueue;
             while (TimeCompare::less(externalTorqueTime, lmtMaTime) && externalTorquesRunCondition) {
                 ModelEvaluationBase<Logger>::getExternalTorquesFromInputQueue(externalTorquesFrameFromQueue);
-                if (externalTorquesFrameFromQueue.data.empty())
+                if (!externalTorquesFrameFromQueue.data.empty()) {
+                    externalTorqueTime = externalTorquesFrameFromQueue.time;
+                    externalTorqueData = externalTorquesFrameFromQueue.data;
+                } else {
                     externalTorquesRunCondition = false;
-                externalTorqueTime = externalTorquesFrameFromQueue.time;
+                }
             }
 
             /* Note about firstLmtArrived: all the emgs before the first frame of lmt are
@@ -126,28 +146,32 @@ namespace ceinms {
             */
 
             // 4. read emgs
+            //EmgFrame emgFrameFromQueue;           
             EmgFrame emgFrameFromQueue;
-            emgFrameFromQueue.data.resize(subject_.getNoMuscles());
             while (TimeCompare::less(emgTime, lmtMaTime) && runCondition) {
                 ModelEvaluationBase<Logger>::getEmgFromInputQueue(emgFrameFromQueue);
-                emgTime = emgFrameFromQueue.time + globalEmDelay_;
-                runCondition = runCondition && !emgFrameFromQueue.data.empty();
+                if (!emgFrameFromQueue.data.empty()) {
+                    emgTime = emgFrameFromQueue.time + globalEmDelay_;
+                    emgData = emgFrameFromQueue.data;
+                } 
+                else {
+                    runCondition = false;
+                }
                 if (!TimeCompare::less(emgTime, lmtMaTime)) firstLmtArrived = true;
-                if (runCondition && !firstLmtArrived) {
+                if (!firstLmtArrived && runCondition) {
                     subject_.setTime(emgTime);
                     subject_.setEmgs(emgFrameFromQueue.data);
-                    subject_.updateActivations();
-                    subject_.pushState();
                 }
             }
 
             //5. lmt, ma, emg, extTorques have been read correctly and I can push to the model
             if (runCondition) {
+                //std::cout << lmtMaTime << std::endl;
                 subject_.setTime(lmtMaTime);
-                subject_.setEmgs(emgFrameFromQueue.data);
-                subject_.setMuscleTendonLengths(lmtFrameFromQueue.data);
+                subject_.setEmgs(emgData);
+                subject_.setMuscleTendonLengths(lmtData);
                 for (unsigned int i = 0; i < noDof_; ++i)
-                    subject_.setMomentArms(momentArmsFramesFromQueue.at(i).data, i);
+                    subject_.setMomentArms(momentArmsData.at(i), i);
                 subject_.updateState();
                 subject_.pushState();
 #ifdef LOG_FILES
