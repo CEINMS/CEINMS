@@ -13,6 +13,12 @@
         <xs:element maxOccurs="1" name="executionFile" type="xs:string"/>
         <xs:element maxOccurs="1" name="excitationGeneratorFile" type="xs:string"/>
         <xs:element maxOccurs="1" name="outputDirectory" type="xs:string"/>
+		<xs:element maxOccurs="1" name="betaMin" type="xs:double"/>
+		<xs:element maxOccurs="1" name="betaMax" type="xs:double"/>
+		<xs:element maxOccurs="1" name="betaDelta" type="xs:double"/>
+        <xs:element maxOccurs="1" name="gammaMin" type="xs:double"/>
+        <xs:element maxOccurs="1" name="gammaMax" type="xs:double"/>
+        <xs:element maxOccurs="1" name="gammaDelta" type="xs:double"/>
       </xs:choice>
     </xs:sequence>
   </xs:complexType>

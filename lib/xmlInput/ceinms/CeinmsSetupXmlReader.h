@@ -45,6 +45,12 @@ namespace ceinms {
         void setExecutionFile(const std::string& filename);
         std::string getExcitationGeneratorFile(bool relative = false) const;
         std::string getOutputDirectory(bool relative = false) const;
+        double getBetaMin() const;
+        double getBetaMax() const;
+        double getBetaDelta() const;
+        double getGammaMin() const;
+        double getGammaMax() const;
+        double getGammaDelta() const;
     //    std::string getContactModelFile();
     //    bool hasContactModel();
         static bool writeTemplateCeinmsSetupFile(const std::string& templateFile);

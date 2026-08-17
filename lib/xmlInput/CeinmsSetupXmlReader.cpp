@@ -135,6 +135,36 @@ namespace ceinms {
         return fileName;
     }
 
+    double CeinmsSetupXmlReader::getBetaMin() const {
+        auto value = *ceinmsSetupPointer_->betaMin().begin();
+        return value;
+    }
+
+    double CeinmsSetupXmlReader::getBetaMax() const {
+        auto value = *ceinmsSetupPointer_->betaMax().begin();
+        return value;
+    }
+
+    double CeinmsSetupXmlReader::getBetaDelta() const {
+        auto value = *ceinmsSetupPointer_->betaDelta().begin();
+        return value;
+    }
+
+    double CeinmsSetupXmlReader::getGammaMin() const {
+        auto value = *ceinmsSetupPointer_->gammaMin().begin();
+        return value;
+    }
+
+    double CeinmsSetupXmlReader::getGammaMax() const {
+        auto value = *ceinmsSetupPointer_->gammaMax().begin();
+        return value;
+    }
+
+    double CeinmsSetupXmlReader::getGammaDelta() const {
+        auto value = *ceinmsSetupPointer_->gammaDelta().begin();
+        return value;
+    }
+
     void CeinmsSetupXmlReader::setExecutionFile(const std::string& filename) {
         ceinmsSetupPointer_->executionFile().clear();
         ceinmsSetupPointer_->executionFile() .push_back(filename);

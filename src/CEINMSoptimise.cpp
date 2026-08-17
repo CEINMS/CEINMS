@@ -123,7 +123,7 @@ void printHeader() {
 void printAuthors() {
     cout << "Copyright (C) " << string(__DATE__) << endl;
     cout << "Claudio Pizzolato, Monica Reggiani, Massimo Sartori, David Lloyd\n";
-    cout << "Software developers: Claudio Pizzolato, Elena Ceseracciu, Monica Reggiani\n";
+    cout << "Software developers: Claudio Pizzolato, Elena Ceseracciu, Monica Reggiani, Matthew Hambly\n";
 }
 
 void PrintUsage() {
@@ -186,8 +186,6 @@ ceinms::TrialData readTrialData(const string& inputDataFilename, NMSmodelT& mySu
     return trial;
 }
 
-
-
 class HybridOptimisationManager {
 
 public:
@@ -198,7 +196,14 @@ public:
         executionCfg_(ceinmsSetup_.getExecutionFile()),
         subjectFile_(ceinmsSetup_.getSubjectFile()),
         outputDirectory_(ceinmsSetup_.getOutputDirectory()),
-        emgGeneratorFile_(ceinmsSetup_.getExcitationGeneratorFile()) {    
+        emgGeneratorFile_(ceinmsSetup_.getExcitationGeneratorFile()) {  
+
+        bmin_ = ceinmsSetup_.getBetaMin();
+        bmax_ = ceinmsSetup_.getBetaMax();
+        bdelta_ = ceinmsSetup_.getBetaDelta();
+        gmin_ = ceinmsSetup_.getGammaMin();
+        gmax_ = ceinmsSetup_.getGammaMax();
+        gdelta_ = ceinmsSetup_.getGammaDelta();
     }
 
     bool run() {
@@ -306,7 +311,7 @@ private:
             return v;
         });
        
-        double bmin = 1, bmax = 2, bdelta=1, gmin = 1, gmax = 5, gdelta=5;
+        double bmin = bmin_, bmax = bmax_, bdelta = bdelta_, gmin = gmin_, gmax = gmax_, gdelta = gdelta_;
         vector<HybridErrors> values;
         vector<double> betas = getVec(bmin, bmax,bdelta);
         vector<double> gammas = getVec(gmin, gmax,gdelta);
@@ -386,6 +391,12 @@ private:
     string outputDirectory_;
     string emgGeneratorFile_;
     string setupFilename_;
+    double bmin_ = 1;
+    double bmax_ = 2;
+    double bdelta_ = 1;
+    double gmin_ = 1;
+    double gmax_ = 5;
+    double gdelta_ = 5;
 };
 
 int main(int argc, char** argv) {
