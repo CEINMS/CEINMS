@@ -69,7 +69,7 @@ namespace ceinms {
         std::vector<double> accumulateColumns() const;
 
         std::string getLabel(size_t col) const { return labels_.at(col); }
-        T get(size_t row, size_t col) const { return data_.at(row, col); }
+        T get(size_t row, size_t col) const { return data_.at(row).at(col); }
         double getTime(size_t row) const { return time_.at(row); }
         void setTime(double time, std::size_t row);
         T getStartTime() const { return time_.front(); }
