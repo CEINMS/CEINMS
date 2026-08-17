@@ -117,6 +117,9 @@ namespace ceinms {
 		double getNormFiberVelocity() const { return normFibreVelocity_; }
         double getPennationAngleAtT() const { return pennationAngleAtT_; };
         double getMuscleForce() const { return muscleForce_; }
+        double getMuscleForcePassive() const { return muscleForcePassive_; };
+        double getMuscleForceActive() const { return muscleForceActive_; };
+        double getMuscleForceDamping() const { return muscleForceDamping_; };
         double getPercentageChange() const { return percentageChange_; }
         double getDamping() const { return damping_; }
         void   setDamping(double damping);
@@ -162,6 +165,9 @@ namespace ceinms {
         double pennationAngleAtT_;
         CurveT  fibreLengthTrace_;
         double muscleForce_;    /**< \f$F^{mt}\f$ */
+        double muscleForcePassive_;
+        double muscleForceActive_;
+        double muscleForceDamping_;
 
         // parameters
         double optimalFibreLength_;  /**< \f$l_0^m\f$ */

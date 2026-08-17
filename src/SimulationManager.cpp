@@ -214,6 +214,9 @@ namespace ceinms {
             "NormFibreVelocities",
             "PennationAngles",
             "MuscleForces",
+            "MuscleForcesPassive",
+            "MuscleForcesActive",
+            "MuscleForcesDamping",
             "Torques",
 			"TendonLengths",
 			"NormTendonLengths",
@@ -266,6 +269,7 @@ namespace ceinms {
         doneWithExecutionLatch.setCount(7);
 
         // 4. start the threads
+        auto t0 = std::chrono::high_resolution_clock::now();// Start timer for measuring time taken to run
         std::thread emgProdThread(std::ref(emgProducer));
         std::thread externalTorquesProdThread(std::ref(externalTorquesProducer));
         std::thread lmtMaProdThread(std::ref(lmtMaProducer));
@@ -281,6 +285,8 @@ namespace ceinms {
         queuesToStorageFilesThread.join();
         kneeContactModelThread.join();
         kneeContactModelLoggerThread.join();
+        auto t1 = std::chrono::high_resolution_clock::now(); // Stop timer 
+        std::cout << "Execution time taken: " << std::chrono::duration_cast<std::chrono::nanoseconds>(t1 - t0).count() / 1.e9 << " s" << std::endl << std::endl;
 
         return 0;
     }
@@ -340,6 +346,9 @@ namespace ceinms {
             "NormFibreVelocities",
             "PennationAngles",
             "MuscleForces",
+            "MuscleForcesPassive",
+            "MuscleForcesActive",
+            "MuscleForcesDamping",
             "Torques",
 			"TendonLengths",
 			"NormTendonLengths",
@@ -444,6 +453,7 @@ namespace ceinms {
         doneWithSubscriptionsLatch.setCount(9);
         doneWithExecutionLatch.setCount(9);
 
+        auto t0 = std::chrono::high_resolution_clock::now();// Start timer for measuring time taken to run
         cout << "-- Launch threads" << endl;
         std::thread contactForcesEstimatorThread(std::ref(jointReactionForcesEstimator));
         std::thread generalisedCoordinateThread(std::ref(generalisedCoordinateFromStorageFile));
@@ -472,6 +482,8 @@ namespace ceinms {
         //inverseDynamicsSolverThread.join();
         //externalTorquesLoggerThread.join();
         cout << "-- Closing" << endl;
+        auto t1 = std::chrono::high_resolution_clock::now(); // Stop timer 
+        std::cout << "Execution time taken: " << std::chrono::duration_cast<std::chrono::nanoseconds>(t1 - t0).count() / 1.e9 << " s" << std::endl << std::endl;
         return 0;
     }
 
@@ -514,6 +526,9 @@ namespace ceinms {
             "NormFibreVelocities",
             "PennationAngles",
             "MuscleForces",
+            "MuscleForcesPassive",
+            "MuscleForcesActive",
+            "MuscleForcesDamping",
             "Torques",
 			"TendonLengths",
 			"NormTendonLengths",
@@ -541,6 +556,7 @@ namespace ceinms {
         doneWithExecutionLatch.setCount(5);
 
         // 4. start the threads
+        auto t0 = std::chrono::high_resolution_clock::now();// Start timer for measuring time taken to run
         std::thread emgProdThread(std::ref(emgProducer));
         std::thread externalTorquesProdThread(std::ref(externalTorquesProducer));
         std::thread lmtMaProdThread(std::ref(lmtMaProducer));
@@ -552,6 +568,8 @@ namespace ceinms {
         externalTorquesProdThread.join();
         simulatorThread.join();
         queuesToStorageFilesThread.join();
+        auto t1 = std::chrono::high_resolution_clock::now(); // Stop timer 
+        std::cout << "Execution time taken: " << std::chrono::duration_cast<std::chrono::nanoseconds>(t1 - t0).count() / 1.e9 << " s" << std::endl << std::endl;
 
         return 0;
     }
@@ -627,6 +645,9 @@ namespace ceinms {
             "NormFibreVelocities",
             "PennationAngles",
             "MuscleForces",
+            "MuscleForcesPassive",
+            "MuscleForcesActive",
+            "MuscleForcesDamping",
             "Torques",
 			"TendonLengths",
 			"NormTendonLengths",
@@ -725,6 +746,7 @@ namespace ceinms {
         doneWithExecutionLatch.setCount(10);
 
         // 5. start the threads
+        auto t0 = std::chrono::high_resolution_clock::now();// Start timer for measuring time taken to run
         std::thread emgProdThread(std::ref(emgProducer));
         std::thread externalTorquesProdThread(std::ref(externalTorquesProducer));
         std::thread lmtMaProdThread(std::ref(lmtMaProducer));
@@ -748,6 +770,8 @@ namespace ceinms {
         externalForcesThread.join();
         contactForcesLoggerThread.join();
 		hybridErrorLoggerThread.join();
+        auto t1 = std::chrono::high_resolution_clock::now(); // Stop timer 
+        std::cout << "Execution time taken: " << std::chrono::duration_cast<std::chrono::nanoseconds>(t1 - t0).count() / 1.e9 << " s" << std::endl << std::endl;
 
         return 0;
     }
@@ -803,6 +827,9 @@ namespace ceinms {
 			"NormFibreVelocities",
 			"PennationAngles",
 			"MuscleForces",
+            "MuscleForcesPassive",
+            "MuscleForcesActive",
+            "MuscleForcesDamping",
 			"Torques",
 			"TendonLengths",
 			"NormTendonLengths",
@@ -875,6 +902,7 @@ namespace ceinms {
 		doneWithExecutionLatch.setCount(8);
 
 		// 5. start the threads
+        auto t0 = std::chrono::high_resolution_clock::now();// Start timer for measuring time taken to run
 		std::thread emgProdThread(std::ref(emgProducer));
 		std::thread externalTorquesProdThread(std::ref(externalTorquesProducer));
 		std::thread lmtMaProdThread(std::ref(lmtMaProducer));
@@ -891,6 +919,8 @@ namespace ceinms {
 		hybridErrorLoggerThread.join();
 		kneeContactModelThread.join();
 		kneeContactModelLoggerThread.join();
+        auto t1 = std::chrono::high_resolution_clock::now(); // Stop timer 
+        std::cout << "Execution time taken: " << std::chrono::duration_cast<std::chrono::nanoseconds>(t1 - t0).count() / 1.e9 << " s" << std::endl << std::endl;
 
 		return 0;
 	}
@@ -934,6 +964,9 @@ namespace ceinms {
             "NormFibreVelocities",
             "PennationAngles",
             "MuscleForces",
+            "MuscleForcesPassive",
+            "MuscleForcesActive",
+            "MuscleForcesDamping",
             "Torques",
 			"TendonLengths",
 			"NormTendonLengths",
@@ -984,6 +1017,7 @@ namespace ceinms {
         doneWithExecutionLatch.setCount(6);
 
         // 5. start the threads
+        auto t0 = std::chrono::high_resolution_clock::now();// Start timer for measuring time taken to run
         std::thread emgProdThread(std::ref(emgProducer));
         std::thread externalTorquesProdThread(std::ref(externalTorquesProducer));
         std::thread lmtMaProdThread(std::ref(lmtMaProducer));
@@ -996,6 +1030,8 @@ namespace ceinms {
         simulatorThread.join();
         queuesToStorageFilesThread.join();
         hybridErrorLoggerThread.join();
+        auto t1 = std::chrono::high_resolution_clock::now(); // Stop timer 
+        std::cout << "Execution time taken: " << std::chrono::duration_cast<std::chrono::nanoseconds>(t1 - t0).count() / 1.e9 << " s" << std::endl << std::endl;
 
         return 0;
     }

@@ -42,7 +42,8 @@ namespace ceinms {
         optimalFibreLength_(0.), pennationAngle_(0.), tendonSlackLength_(0.),
         percentageChange_(0.), fibreLength_(0.), pennationAngleAtT_(0.),
         fibreVelocity_(0.), damping_(0.), maxIsometricForce_(0.), time_(.0), timeScale_(0.),
-        strengthCoefficient_(0.), muscleForce_(0.), maxContractionVelocity_(0.), activationScale_(1.)  { }
+        strengthCoefficient_(0.), muscleForce_(0.), muscleForcePassive_(0.), muscleForceActive_(0.),
+        muscleForceDamping_(0.), maxContractionVelocity_(0.), activationScale_(1.)  { }
 
     template<typename Activation, typename Tendon, CurveMode::Mode mode>
     MTU<Activation, Tendon, mode>::MTU(std::string id)
@@ -50,7 +51,8 @@ namespace ceinms {
         optimalFibreLength_(0.), pennationAngle_(0.), tendonSlackLength_(0.),
         percentageChange_(0.), fibreLength_(0.), pennationAngleAtT_(0.),
         fibreVelocity_(0.), damping_(0.), maxIsometricForce_(0.), time_(.0), timeScale_(0.),
-        strengthCoefficient_(0.), muscleForce_(0.), maxContractionVelocity_(0.), activationScale_(1.), tendonDynamic_(id)  { }
+        strengthCoefficient_(0.), muscleForce_(0.), muscleForcePassive_(0.), muscleForceActive_(0.),
+        muscleForceDamping_(0.), maxContractionVelocity_(0.), activationScale_(1.), tendonDynamic_(id)  { }
 
     template<typename Activation, typename Tendon, CurveMode::Mode mode>
     MTU<Activation, Tendon, mode>::MTU(const MTU<Activation, Tendon, mode>& orig) {
@@ -70,6 +72,9 @@ namespace ceinms {
         fibreLength_ = orig.fibreLength_;
         fibreLengthTrace_ = orig.fibreLengthTrace_;
         muscleForce_ = orig.muscleForce_;
+        muscleForcePassive_ = orig.muscleForcePassive_;
+        muscleForceActive_ = orig.muscleForceActive_;
+        muscleForceDamping_ = orig.muscleForceDamping_;
         pennationAngleAtT_ = orig.pennationAngleAtT_;
 
         optimalFibreLength_ = orig.optimalFibreLength_;
@@ -106,6 +111,9 @@ namespace ceinms {
         fibreLength_ = orig.fibreLength_;
         fibreLengthTrace_ = orig.fibreLengthTrace_;
         muscleForce_ = orig.muscleForce_;
+        muscleForcePassive_ = orig.muscleForcePassive_;
+        muscleForceActive_ = orig.muscleForceActive_;
+        muscleForceDamping_ = orig.muscleForceDamping_;
         pennationAngleAtT_ = orig.pennationAngleAtT_;
 
         optimalFibreLength_ = orig.optimalFibreLength_;
@@ -286,6 +294,9 @@ namespace ceinms {
         double pennationAngleAtT = computePennationAngle(optimalFibreLength_); 
         normFibreVelocity_ = normFiberVelocity;
         pennationAngleAtT_ = pennationAngleAtT; //for logging
+        muscleForcePassive_ = maxIsometricForce_ * strengthCoefficient_ * fp;
+        muscleForceActive_ = maxIsometricForce_ * strengthCoefficient_ * fa * fv * activation_;
+        muscleForceDamping_ = maxIsometricForce_ * strengthCoefficient_ * damping_ * normFiberVelocity;
         muscleForce_ = maxIsometricForce_*strengthCoefficient_*
             (fa*fv*activation_ + fp + damping_*normFiberVelocity)*
             cos(pennationAngleAtT);
