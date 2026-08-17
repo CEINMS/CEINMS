@@ -79,7 +79,20 @@ namespace ceinms {
             exponent_(exponent),
             objectiveFunction_(objectiveFunction),
             targetType_(targetType),
-            targetNames_(targetNames){}
+            targetNames_(targetNames) {}
+
+        ObjectiveFunctionSetup(
+            CalibrationObjectiveFunction objectiveFunction,
+            CalibrationTargetType targetType,
+            std::vector<std::string> targetNames,
+            std::vector<std::string> targetNamesRef,
+            double weight, double exponent) :
+            weight_(weight),
+            exponent_(exponent),
+            objectiveFunction_(objectiveFunction),
+            targetType_(targetType),
+            targetNames_(targetNames),
+            targetNamesRef_(targetNamesRef) {}
 
         virtual void setWeight(double weight) {
             weight_ = weight;
@@ -103,6 +116,14 @@ namespace ceinms {
             targetNames_ = { targetNames };
         }
 
+        virtual void setTargetNamesRef(std::vector<std::string> targetNames) {
+            targetNamesRef_ = targetNames;
+        }
+
+        virtual void setTargetNamesRef(std::string targetNames) {
+            targetNamesRef_ = { targetNames };
+        }
+
         virtual double getWeight() const {
             return weight_;
         }
@@ -121,6 +142,10 @@ namespace ceinms {
 
         virtual  std::vector<std::string> getTargetNames() const {
             return targetNames_;
+        }
+
+        virtual  std::vector<std::string> getTargetNamesRef() const {
+            return targetNamesRef_;
         }
 
         friend std::ostream& operator<< (std::ostream& os, const ObjectiveFunctionSetup& obj) {
@@ -170,6 +195,7 @@ namespace ceinms {
         CalibrationObjectiveFunction objectiveFunction_;
         CalibrationTargetType targetType_;
         std::vector<std::string> targetNames_;
+        std::vector<std::string> targetNamesRef_;
         double weight_, exponent_;
     };
 
@@ -188,6 +214,10 @@ namespace ceinms {
 		case CalibrationTargetType::NormalisedFibreLength:
 		case CalibrationTargetType::NormalisedFibreVelocity:
 			objFunctionSetup.setTargetNames(model.getMuscleNames());
+            if (objFunctionSetup.getTargetNamesRef().size() > 0) {
+                if (objFunctionSetup.getTargetNamesRef()[0] == "all")
+                        objFunctionSetup.setTargetNamesRef(model.getDoFNames());
+            }
 			break;
 		case CalibrationTargetType::Torque:
 			objFunctionSetup.setTargetNames(model.getDoFNames());

@@ -101,6 +101,7 @@
   <xs:complexType name="GenericObjectiveFunctionElementType">
    <xs:sequence>
      <xs:element name="targets" minOccurs="1" maxOccurs="1" type="TokenListType"/>
+	 <xs:element name="dofs"  minOccurs="0" maxOccurs="1" type="TokenListType"/>
      <xs:element name="targetsType" minOccurs="1" maxOccurs="1" type="CalibrationTargetType"/>
      <xs:element name="weight" minOccurs="0" maxOccurs="1" type="xs:double"  default="1"/>
      <xs:element name="exponent" minOccurs="0" maxOccurs="1" type="xs:double"  default="1"/>
