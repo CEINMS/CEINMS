@@ -57,7 +57,7 @@ namespace ceinms {
     std::vector<T> Mapper::map(const std::vector<T>& in, T defaultValue) const {
 
         if (in.size() != inSize_) {
-            std::cout << "Mapper: provided " << in.size() << " values, espected " << inSize_ << std::endl;
+            std::cout << "Mapper: provided " << in.size() << " values, expected " << inSize_ << std::endl;
             std::exit(EXIT_FAILURE);
         }
         //this is flawed, since it works with double, but may have problems with other types..

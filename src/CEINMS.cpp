@@ -68,7 +68,7 @@ void printHeader() {
 void printAuthors() {
     cout << "Copyright (C) " << string(__DATE__) << endl;
     cout << "Claudio Pizzolato, Monica Reggiani, Massimo Sartori, David Lloyd\n";
-    cout << "Software developers: Claudio Pizzolato, Elena Ceseracciu, Monica Reggiani\n";
+    cout << "Software developers: Claudio Pizzolato, Elena Ceseracciu, Monica Reggiani, Matthew Hambly\n";
 }
 
 void PrintUsage() {

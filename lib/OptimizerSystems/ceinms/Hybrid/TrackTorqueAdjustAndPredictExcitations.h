@@ -104,7 +104,7 @@ namespace ceinms {
         for (auto m : muscleNames) {
             std::cout << m << " -> ";
             if (std::find(begin(musclesToSynthesise), end(musclesToSynthesise), m) != musclesToSynthesise.end())
-                std::cout << " Synthetising\n";
+                std::cout << " Synthesising\n";
             else if (std::find(begin(musclesToAdjust), end(musclesToAdjust), m) != musclesToAdjust.end())
                 std::cout << " Adjusting\n";
             else

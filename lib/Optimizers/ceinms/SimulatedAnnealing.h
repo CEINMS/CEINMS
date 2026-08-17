@@ -45,6 +45,7 @@ namespace ceinms {
             ~SimulatedAnnealing() {};
             bool optimize();
             std::vector<double> getOptimizedParameters() const { return xOpt_; }
+            unsigned getNoEval() { return noEval_; }
 
         private:
             void checkBounds(int k);
@@ -72,6 +73,7 @@ namespace ceinms {
             unsigned                maxNoEval_;
             double                  epsilon_;
             unsigned                nEpsilon_;
+            unsigned                noEval_;
         };
     }
 }

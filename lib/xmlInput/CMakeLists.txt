@@ -11,7 +11,7 @@ macro (schema_to_bin xsdfile)
     ${xsdfile}
     MAIN_DEPENDENCY ${xsdfile}
     DEPENDS xsdbin
-    COMMENT Generating binary representation for ${xsdfile}
+    COMMENT "Generating binary representation for ${xsdfile}"
     VERBATIM
   )
 endmacro()

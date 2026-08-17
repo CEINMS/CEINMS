@@ -94,9 +94,7 @@ namespace ceinms {
             for (auto& name : dofsToCalibrate_) {
                 auto i(std::distance(dofNamesFromTrial.begin(), (find(dofNamesFromTrial.begin(), dofNamesFromTrial.end(), name))));
                 trialVariance.at(i) = getVariance(trial.getTorqueData().getColumn(i));
-            //    if (trialVariance.at(i) < 1) trialVariance.at(i) = 1;   //don't penalize if the variance in low
-				trialVariance.at(i) = 1.;   //don't penalize if the variance in low
-
+                if (trialVariance.at(i) < 1.) trialVariance.at(i) = 1.;   //don't penalize if the variance in low
 			}
             torqueVariance_.emplace_back(trialVariance);
 		}
@@ -131,9 +129,9 @@ namespace ceinms {
         }
         for (size_t trialIndex(0); trialIndex < trials_.size(); ++trialIndex) {
             for (auto& dofIdx : dofsToCalibrateIdx_.at(trialIndex))
-                f_ += std::sqrt(trialCosts_.at(trialIndex).torqueError.at(dofIdx) / 
-					torqueVariance_.at(trialIndex).at(dofIdx)/ results.at(trialIndex).torques.getNRows()) +
-                trialCosts_.at(trialIndex).penalty / results.at(trialIndex).torques.getNRows();
+                f_ += std::sqrt(trialCosts_.at(trialIndex).torqueError.at(dofIdx) /
+                    torqueVariance_.at(trialIndex).at(dofIdx) / results.at(trialIndex).torques.getNRows()) +
+                    trialCosts_.at(trialIndex).penalty / results.at(trialIndex).torques.getNRows();
         }
         f_ *= setup_.getWeight();
     }
