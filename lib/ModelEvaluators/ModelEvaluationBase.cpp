@@ -71,12 +71,9 @@ namespace ceinms {
 
     template<typename Logger>
     void ModelEvaluationBase<Logger>::getEmgFromInputQueue(EmgFrame& emgs) {
-        // NOTE: I have added this check here for now, because it was hanging in .pop() when end of data was reached
-        if (inputEmgQueue_.messagesToRead() >= 1) {
-            std::optional<EmgFrame> EmgFrameFromQueue = inputEmgQueue_.pop();
-            if (EmgFrameFromQueue) {
-                emgs = EmgFrameFromQueue.value();
-            }
+        std::optional<EmgFrame> EmgFrameFromQueue = inputEmgQueue_.pop();
+        if (EmgFrameFromQueue) {
+            emgs = EmgFrameFromQueue.value();
         }
     }
 
