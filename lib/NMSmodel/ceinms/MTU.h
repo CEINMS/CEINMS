@@ -51,7 +51,7 @@ namespace ceinms {
         MTU(std::string id);
         MTU(const MTU& orig);
         MTU& operator=(const MTU& orig);
-        virtual ~MTU() {};
+        virtual ~MTU();
 
         void setParametersToComputeForces(double optimalFiberLength,
             double pennationAngle,
@@ -185,6 +185,14 @@ namespace ceinms {
 
         double timeScale_;
         double time_;
+
+        // EMG out-of-[0,1]-range tracking: clips beyond kEmgOutOfRangeTolerance_
+        // of the bound are counted (and the worst deviation kept) instead of
+        // warning on every occurrence, to avoid spamming the terminal.
+        static constexpr double kEmgOutOfRangeTolerance_ = 0.01;
+        unsigned long emgOutOfRangeCount_;
+        double emgOutOfRangeWorst_;
+        double emgOutOfRangeWorstDeviation_;
     };
 }
 

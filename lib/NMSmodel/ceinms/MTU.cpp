@@ -43,7 +43,8 @@ namespace ceinms {
         percentageChange_(0.), fibreLength_(0.), pennationAngleAtT_(0.),
         fibreVelocity_(0.), damping_(0.), maxIsometricForce_(0.), time_(.0), timeScale_(0.),
         strengthCoefficient_(0.), muscleForce_(0.), muscleForcePassive_(0.), muscleForceActive_(0.),
-        muscleForceDamping_(0.), maxContractionVelocity_(0.), activationScale_(1.)  { }
+        muscleForceDamping_(0.), maxContractionVelocity_(0.), activationScale_(1.),
+        emgOutOfRangeCount_(0), emgOutOfRangeWorst_(0.), emgOutOfRangeWorstDeviation_(0.)  { }
 
     template<typename Activation, typename Tendon, CurveMode::Mode mode>
     MTU<Activation, Tendon, mode>::MTU(std::string id)
@@ -52,7 +53,8 @@ namespace ceinms {
         percentageChange_(0.), fibreLength_(0.), pennationAngleAtT_(0.),
         fibreVelocity_(0.), damping_(0.), maxIsometricForce_(0.), time_(.0), timeScale_(0.),
         strengthCoefficient_(0.), muscleForce_(0.), muscleForcePassive_(0.), muscleForceActive_(0.),
-        muscleForceDamping_(0.), maxContractionVelocity_(0.), activationScale_(1.), tendonDynamic_(id)  { }
+        muscleForceDamping_(0.), maxContractionVelocity_(0.), activationScale_(1.), tendonDynamic_(id),
+        emgOutOfRangeCount_(0), emgOutOfRangeWorst_(0.), emgOutOfRangeWorstDeviation_(0.)  { }
 
     template<typename Activation, typename Tendon, CurveMode::Mode mode>
     MTU<Activation, Tendon, mode>::MTU(const MTU<Activation, Tendon, mode>& orig) {
@@ -92,6 +94,10 @@ namespace ceinms {
 
         timeScale_ = orig.timeScale_;
         time_ = orig.time_;
+
+        emgOutOfRangeCount_ = orig.emgOutOfRangeCount_;
+        emgOutOfRangeWorst_ = orig.emgOutOfRangeWorst_;
+        emgOutOfRangeWorstDeviation_ = orig.emgOutOfRangeWorstDeviation_;
     }
 
     template<typename Activation, typename Tendon, CurveMode::Mode mode>
@@ -131,7 +137,20 @@ namespace ceinms {
 
         timeScale_ = orig.timeScale_;
         time_ = orig.time_;
+
+        emgOutOfRangeCount_ = orig.emgOutOfRangeCount_;
+        emgOutOfRangeWorst_ = orig.emgOutOfRangeWorst_;
+        emgOutOfRangeWorstDeviation_ = orig.emgOutOfRangeWorstDeviation_;
         return *this;
+    }
+
+    template<typename Activation, typename Tendon, CurveMode::Mode mode>
+    MTU<Activation, Tendon, mode>::~MTU() {
+        if (emgOutOfRangeCount_ > 0) {
+            cout << "WARNING! Muscle " << id_ << " received excitation data outside [0,1] range (beyond a tolerance of "
+                << kEmgOutOfRangeTolerance_ << ") on " << emgOutOfRangeCount_
+                << " occasion(s), worst value: " << emgOutOfRangeWorst_ << endl;
+        }
     }
 
     template<typename Activation, typename Tendon, CurveMode::Mode mode>
@@ -195,10 +214,16 @@ namespace ceinms {
 
     template<typename Activation, typename Tendon, CurveMode::Mode mode>
     void MTU<Activation, Tendon, mode>::setEmg(double emg) {
-		if (!activationDynamic_.setEmg(emg)) {
-			std::cout << "WARNING! Wrong excitation data provided for muscle " << getMuscleName() << 
-				", it should be between 0 and 1, but it is " << emg << std::endl;
-		}
+        if (!activationDynamic_.setEmg(emg)) {
+            double deviation = emg < 0 ? -emg : emg - 1;
+            if (deviation > kEmgOutOfRangeTolerance_) {
+                if (emgOutOfRangeCount_ == 0 || deviation > emgOutOfRangeWorstDeviation_) {
+                    emgOutOfRangeWorstDeviation_ = deviation;
+                    emgOutOfRangeWorst_ = emg;
+                }
+                ++emgOutOfRangeCount_;
+            }
+        }
     }
 
     template<typename Activation, typename Tendon, CurveMode::Mode mode>
