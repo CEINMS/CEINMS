@@ -185,6 +185,12 @@ namespace ceinms {
                 ModelEvaluationBase<Logger>::logger.log(emgTime, data, "MuscleForcesActive");
                 subject_.getMuscleForcesDamping(data);
                 ModelEvaluationBase<Logger>::logger.log(emgTime, data, "MuscleForcesDamping");
+                subject_.getMTUVelocities(data);
+                ModelEvaluationBase<Logger>::logger.log(emgTime, data, "MTUVelocities");
+                subject_.getMTUPowers(data);
+                ModelEvaluationBase<Logger>::logger.log(emgTime, data, "MTUPowers");
+                subject_.getFiberPowers(data);
+                ModelEvaluationBase<Logger>::logger.log(emgTime, data, "FibrePowers");
                 subject_.getTorques(data);
                 ModelEvaluationBase<Logger>::logger.log(emgTime, data, "Torques");
 				subject_.getTendonLengths(data);
@@ -248,6 +254,7 @@ namespace ceinms {
         // Replaced sending a time of infinity to signify the end with closing the queue using the newer verion of Concurrency
         vector<string> queueNames{ "Activations", "FibreLengths", "NormFibreLengths", "FibreVelocities",
             "NormFibreVelocities", "PennationAngles", "MuscleForces", "MuscleForcesPassive", "MuscleForcesActive", "MuscleForcesDamping",
+            "MTUVelocities", "MTUPowers", "FibrePowers",
             "Torques", "AdjustedEmgs", "MusclesContribution", "TendonLengths", "NormTendonLengths", "ObjectiveFunctionComponentsAndWeightings" };
         ModelEvaluationBase<Logger>::logger.close(queueNames);
 

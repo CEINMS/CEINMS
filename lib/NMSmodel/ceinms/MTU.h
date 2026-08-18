@@ -120,6 +120,9 @@ namespace ceinms {
         double getMuscleForcePassive() const { return muscleForcePassive_; };
         double getMuscleForceActive() const { return muscleForceActive_; };
         double getMuscleForceDamping() const { return muscleForceDamping_; };
+        double getMTUVelocity() const { return mtuVelocity_; }
+        double getMTUPower() const { return mtuPower_; }
+        double getFiberPower() const { return fiberPower_; }
         double getPercentageChange() const { return percentageChange_; }
         double getDamping() const { return damping_; }
         void   setDamping(double damping);
@@ -140,6 +143,8 @@ namespace ceinms {
         void updateFibreLength_OFFLINE();
         void updateFibreVelocity();
         void updateFibreVelocity_OFFLINE();
+        void updateMtuVelocity();
+        void updateMtuVelocity_OFFLINE();
         void updateLastFibreVelocityValue(double time);
         void resetState();
 
@@ -168,6 +173,11 @@ namespace ceinms {
         double muscleForcePassive_;
         double muscleForceActive_;
         double muscleForceDamping_;
+        double muscleTendonLength_;  /**< \f$l^{mt}\f$ raw LMT input, stored for differentiation */
+        CurveT  mtuLengthTrace_;
+        double mtuVelocity_;    /**< \f$v^{mt}\f$ d(LMT)/dt */
+        double mtuPower_;
+        double fiberPower_;
 
         // parameters
         double optimalFibreLength_;  /**< \f$l_0^m\f$ */

@@ -556,6 +556,33 @@ namespace ceinms {
             muscleForcesDamping.emplace_back(muscleIt->getMuscleForceDamping());
     }
 
+    template<typename Activation, typename Tendon, CurveMode::Mode mode>
+    void NMSmodel<Activation, Tendon, mode>::getMTUVelocities(vector<double>& mtuVelocities) const {
+        mtuVelocities.clear();
+        mtuVelocities.reserve(muscles_.size());
+        vectorMTUconstItr muscleIt = muscles_.begin();
+        for (muscleIt = muscles_.begin(); muscleIt != muscles_.end(); ++muscleIt)
+            mtuVelocities.emplace_back(muscleIt->getMTUVelocity());
+    }
+
+    template<typename Activation, typename Tendon, CurveMode::Mode mode>
+    void NMSmodel<Activation, Tendon, mode>::getMTUPowers(vector<double>& mtuPowers) const {
+        mtuPowers.clear();
+        mtuPowers.reserve(muscles_.size());
+        vectorMTUconstItr muscleIt = muscles_.begin();
+        for (muscleIt = muscles_.begin(); muscleIt != muscles_.end(); ++muscleIt)
+            mtuPowers.emplace_back(muscleIt->getMTUPower());
+    }
+
+    template<typename Activation, typename Tendon, CurveMode::Mode mode>
+    void NMSmodel<Activation, Tendon, mode>::getFiberPowers(vector<double>& fiberPowers) const {
+        fiberPowers.clear();
+        fiberPowers.reserve(muscles_.size());
+        vectorMTUconstItr muscleIt = muscles_.begin();
+        for (muscleIt = muscles_.begin(); muscleIt != muscles_.end(); ++muscleIt)
+            fiberPowers.emplace_back(muscleIt->getFiberPower());
+    }
+
 	template<typename Activation, typename Tendon, CurveMode::Mode mode>
 	void NMSmodel<Activation, Tendon, mode>::getTendonLengths(vector<double>& tendonLengths) const {
 		tendonLengths.clear();
