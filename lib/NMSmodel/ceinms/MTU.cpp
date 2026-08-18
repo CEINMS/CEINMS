@@ -351,14 +351,18 @@ namespace ceinms {
         muscleForcePassive_ = maxIsometricForce_ * strengthCoefficient_ * fp;
         muscleForceActive_ = maxIsometricForce_ * strengthCoefficient_ * fa * fv * activation_;
         muscleForceDamping_ = maxIsometricForce_ * strengthCoefficient_ * damping_ * normFiberVelocity;
-        muscleForce_ = maxIsometricForce_*strengthCoefficient_*
-            (fa*fv*activation_ + fp + damping_*normFiberVelocity)*
-            cos(pennationAngleAtT);
+        //Force along the fibre, i.e. without the pennation angle. muscleForce_
+        //resolves it along the tendon, so it is the MTU force.
+        double fibreForce = maxIsometricForce_*strengthCoefficient_*
+            (fa*fv*activation_ + fp + damping_*normFiberVelocity);
         //clamp muscle force
-        if (muscleForce_ < 0)
-            muscleForce_ = 0;
+        if (fibreForce < 0)
+            fibreForce = 0;
+        muscleForce_ = fibreForce * cos(pennationAngleAtT);
+        //MTU power uses the MTU force with the whole-musculotendon velocity;
+        //fibre power uses the force along the fibre with the fibre velocity.
         mtuPower_ = -muscleForce_ * mtuVelocity_;
-        fiberPower_ = -muscleForce_ * fibreVelocity_;
+        fiberPower_ = -fibreForce * fibreVelocity_;
     }
 
     template<typename Activation, typename Tendon, CurveMode::Mode mode>
