@@ -11,6 +11,7 @@ namespace ceinms {
 
     class ObjectiveFunctionBase {
     public:
+        virtual ~ObjectiveFunctionBase() = default;
         virtual void setTrials(const std::vector<TrialData>& trials) = 0;
         virtual void calculate(const std::vector<Result>& results) = 0;
         virtual double getValue() const = 0;

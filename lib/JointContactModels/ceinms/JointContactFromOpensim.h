@@ -111,8 +111,9 @@ namespace ceinms {
         OpenSim::Array<std::string> muscleActuatorNames_;
         std::vector<OpenSim::Muscle*> muscleActuators_;
         std::vector<OpenSim::CoordinateActuator*> coordinateActuators_;
-        //need to use raw ptr because OpenSim
-        OpenSim::InverseDynamicsSolver* idSolver_;
+        //Not owned by the model, so this owns it -- the raw pointer this used to
+        //be was never deleted.
+        std::unique_ptr<OpenSim::InverseDynamicsSolver> idSolver_;
     };
 
     template<typename T>

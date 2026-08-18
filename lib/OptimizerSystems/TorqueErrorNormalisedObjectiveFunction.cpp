@@ -74,6 +74,7 @@ namespace ceinms {
 
     void TorqueErrorNormalisedObjectiveFunction::computeVariance() {
         auto getVariance([](const vector<double>& v) {
+            if (v.size() < 2) return 0.;   //the sample variance below divides by size()-1
             double ans(0);
             for (auto& e : v)
                 ans += e;
@@ -92,7 +93,11 @@ namespace ceinms {
             auto dofNamesFromTrial = trial.getDofNames();
             vector<double> trialVariance(trial.getNoDofs(), .0);
             for (auto& name : dofsToCalibrate_) {
-                auto i(std::distance(dofNamesFromTrial.begin(), (find(dofNamesFromTrial.begin(), dofNamesFromTrial.end(), name))));
+                auto it(find(dofNamesFromTrial.begin(), dofNamesFromTrial.end(), name));
+                //Skip DoFs the trial doesn't have, as updDofsToCalibrateIdx() does.
+                //Without this, distance() yields the past-the-end index and at() throws.
+                if (it == dofNamesFromTrial.end()) continue;
+                auto i(std::distance(dofNamesFromTrial.begin(), it));
                 trialVariance.at(i) = getVariance(trial.getTorqueData().getColumn(i));
                 if (trialVariance.at(i) < 1.) trialVariance.at(i) = 1.;   //don't penalize if the variance in low
 			}

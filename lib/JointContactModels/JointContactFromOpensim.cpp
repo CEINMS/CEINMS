@@ -43,8 +43,7 @@ using std::endl;
 namespace ceinms {
 
     JointContactFromOpensim::JointContactFromOpensim(const string& modelFilename, vector<OpenSim::Force*> externalForces) :
-        model_(modelFilename),
-        idSolver_(nullptr) {
+        model_(modelFilename) {
 
         OpenSim::Model modelCopy(modelFilename);
         modelCopy.initSystem();
@@ -80,7 +79,7 @@ namespace ceinms {
             coordinateActuators_.push_back(dynamic_cast<OpenSim::CoordinateActuator*>(&(model_.updForceSet().get(actuatorName))));
         }
 
-        idSolver_ = new OpenSim::InverseDynamicsSolver(model_);
+        idSolver_.reset(new OpenSim::InverseDynamicsSolver(model_));
 
         state_ = model_.initSystem();
         for (auto c : coordinateActuators_)
@@ -135,7 +134,7 @@ namespace ceinms {
             model_.addForce(actuator);
             coordinateActuators_.push_back(dynamic_cast<OpenSim::CoordinateActuator*>(&(model_.updForceSet().get(actuatorName))));
         }
-        idSolver_ = new OpenSim::InverseDynamicsSolver(model_);
+        idSolver_.reset(new OpenSim::InverseDynamicsSolver(model_));
 
         state_ = model_.initSystem();
         for (auto c : coordinateActuators_)
@@ -218,7 +217,13 @@ namespace ceinms {
 
     void JointContactFromOpensim::getReactionForceInChild(const SimTK::Vector_<SimTK::Vec3>& rForcesInG, const string& jointName, SimTK::Vec3& forceOnChildInChild) const {
         const OpenSim::Joint& joint(model_.getJointSet().get(jointName));
-        unsigned idx(model_.getJointSet().getIndex(joint.getName()));
+        //getIndex() returns -1 when the name is absent; assigning that to an
+        //unsigned would index far past the end of rForcesInG.
+        const int idx(model_.getJointSet().getIndex(joint.getName()));
+        if (idx < 0) {
+            cout << "Error: joint " << jointName << " not found in the OpenSim model" << endl;
+            std::exit(EXIT_FAILURE);
+        }
         forceOnChildInChild = model_.getGround().expressVectorInAnotherFrame(state_, rForcesInG.get(idx), joint.getChildFrame());
     }
 
@@ -228,7 +233,11 @@ namespace ceinms {
         // by plain JointSet order (rForces[i] <-> joints[i]), NOT by
         // MobilizedBodyIndex -- so the lookup here must use the same plain
         // JointSet index, matching getReactionForceInChild() below.
-        unsigned idx(model_.getJointSet().getIndex(jointName));
+        const int idx(model_.getJointSet().getIndex(jointName));
+        if (idx < 0) {
+            cout << "Error: joint " << jointName << " not found in the OpenSim model" << endl;
+            std::exit(EXIT_FAILURE);
+        }
         forceOnChildInG = rForcesInG.get(idx);
     }
 
@@ -341,7 +350,5 @@ namespace ceinms {
     }
 
     JointContactFromOpensim::~JointContactFromOpensim() {
-        // if (idSolver_ != nullptr)
-        //     delete idSolver_;
     }
 }

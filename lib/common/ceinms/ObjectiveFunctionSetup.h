@@ -94,6 +94,8 @@ namespace ceinms {
             targetNames_(targetNames),
             targetNamesRef_(targetNamesRef) {}
 
+        virtual ~ObjectiveFunctionSetup() = default;
+
         virtual void setWeight(double weight) {
             weight_ = weight;
         }
