@@ -110,15 +110,16 @@ ceinms::DataTable<double> loadDataFromFile(std::filesystem::path filepath) {
     forceData.resize(columnNames.size());
     while (std::getline(dataFile, line)) {  // Read data line by line
         std::stringstream ss(line); //Create a stringstream from the current line
+        std::string token;
         int columnIndex(0);
-        while (ss >> val) {
+        while (std::getline(ss, token, ',')) {
+            val = std::stod(token); // std::stod (unlike operator>>) also parses "inf"/"nan"
             if (columnIndex == 0) {
                 timeData.push_back(val);
             }
             else {
                 forceData[columnIndex - 1].push_back(val);
             }
-            if (ss.peek() == ',') ss.ignore();
             columnIndex++;
         }
     }
@@ -225,7 +226,6 @@ int main() {
     std::vector<std::string> jointNames;
     jointContactModel.getJointNamesFromOsimModel(jointNames);
     jointReactionTorques.setLabels(jointNames);
-    jointNames.erase(jointNames.begin());
     jointReactionForces.setLabels(jointNames);
     residualMobilityForces.setLabels(coordinateNames);
     

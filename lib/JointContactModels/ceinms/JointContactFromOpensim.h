@@ -77,6 +77,7 @@ namespace ceinms {
         SimTK::Vector getMobilityForces() const { return residualMobilityForces_; }
 
     private:
+        void buildQIndexMap();
         void disableMuscleActuators();
         void enableMuscleActuators();
         void calculateReactions();
@@ -89,6 +90,19 @@ namespace ceinms {
         OpenSim::Model model_;
         SimTK::State state_;
         std::size_t nCoordinates_, nBodies_, nMuscles_;
+        // Maps CoordinateSet (file/subject-DOF) order to the coordinate's true
+        // index in the SimTK::State q/u/udot vectors. Simbody assigns these by
+        // multibody-tree order, which does not generally match CoordinateSet
+        // order for models where bodies aren't declared in tree order (e.g.
+        // interleaved left/right chains) -- the same phenomenon that requires
+        // getMobilizedBodyIndex() instead of a JointSet-order index elsewhere
+        // in this class.
+        std::vector<int> qIndexMap_;
+        // Same idea, for the state's u/udot vectors -- numerically identical
+        // to qIndexMap_ for ordinary (non-quaternion) mobilizers, but kept
+        // separate since Q and U index spaces aren't guaranteed to coincide
+        // in general.
+        std::vector<int> uIndexMap_;
         SimTK::Vector residualMobilityForces_;
         SimTK::Vector_<SimTK::Vec3> rForcesInG_, rTorquesInG_;
         SimTK::Vector_<SimTK::Vec3> intForcesInG_, jrForcesInG_;;
@@ -104,14 +118,14 @@ namespace ceinms {
     template<typename T>
     void JointContactFromOpensim::setQ(const T& q) {
         for (size_t i(0); i < nCoordinates_; ++i) {
-            state_.updQ()[i] = q[i];
+            state_.updQ()[qIndexMap_[i]] = q[i];
         }
     }
 
     template<typename T>
     void JointContactFromOpensim::setQd(const T& qd) {
         for (size_t i(0); i < nCoordinates_; ++i) {
-            state_.updU()[i] = qd[i];
+            state_.updU()[uIndexMap_[i]] = qd[i];
         }
     }
 
@@ -119,7 +133,7 @@ namespace ceinms {
     void JointContactFromOpensim::setQdd(const T& qdd) {
         for (size_t i(0); i < nCoordinates_; ++i) {
             qdd_[i] = qdd[i];
-            state_.updUDot()[i] = qdd[i];
+            state_.updUDot()[uIndexMap_[i]] = qdd[i];
         }
     }
 }

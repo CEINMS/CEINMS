@@ -51,11 +51,14 @@ namespace ceinms {
         nCoordinates_ = modelCopy.getNumCoordinates();
         nBodies_ = modelCopy.getNumBodies();
         nMuscles_ = modelCopy.getMuscles().getSize();
-        rForcesInG_.resize(nBodies_);
-        rTorquesInG_.resize(nBodies_);
+        // computeReactions() asserts its output vectors are sized exactly to
+        // the number of joints (its output is indexed by JointSet order, not
+        // by body count -- see getReactionForceInG()).
+        rForcesInG_.resize(modelCopy.getNumJoints());
+        rTorquesInG_.resize(modelCopy.getNumJoints());
 
         qdd_.resize(nCoordinates_);
-        
+
         //1. add extForces to the model, hopefully I won't have problems with queues and opensim
         for (auto &force : externalForces)
             model_.addForce(force);
@@ -84,6 +87,8 @@ namespace ceinms {
             c->overrideActuation(state_, true);
         for (auto m : muscleActuators_)
             m->overrideActuation(state_, true);
+
+        buildQIndexMap();
     }
 
     JointContactFromOpensim::JointContactFromOpensim(const string& modelFilename, string externalLoadXmlFilename) :
@@ -94,8 +99,8 @@ namespace ceinms {
         nCoordinates_ = modelCopy.getNumCoordinates();
         nBodies_ = modelCopy.getNumBodies();
         nMuscles_ = modelCopy.getMuscles().getSize();
-        rForcesInG_.resize(nBodies_);
-        rTorquesInG_.resize(nBodies_);
+        rForcesInG_.resize(modelCopy.getNumJoints());
+        rTorquesInG_.resize(modelCopy.getNumJoints());
         qdd_.resize(nCoordinates_);
 
         OpenSim::ExternalLoads* extLoads(new OpenSim::ExternalLoads(externalLoadXmlFilename, 1));
@@ -138,10 +143,29 @@ namespace ceinms {
         for (auto m : muscleActuators_)
             m->overrideActuation(state_, true);
 
+        buildQIndexMap();
+
         OpenSim::Array<string> names;
         model_.getForceSet().getNames(names);
         for (int i(0); i < names.size(); ++i)
             cout << names[i] << endl;
+    }
+
+    void JointContactFromOpensim::buildQIndexMap() {
+        // CoordinateSet order (file/subject-DOF order) does not generally
+        // match a coordinate's actual index in the state's q/u/udot vectors,
+        // which Simbody assigns by multibody-tree order. Resolve each
+        // coordinate's true index once, via its owning MobilizedBody, rather
+        // than assuming CoordinateSet index i lands at state vector index i.
+        const OpenSim::CoordinateSet& cs = model_.getCoordinateSet();
+        qIndexMap_.resize(nCoordinates_);
+        uIndexMap_.resize(nCoordinates_);
+        for (unsigned i(0); i < nCoordinates_; ++i) {
+            const OpenSim::Coordinate& c = cs.get(i);
+            const SimTK::MobilizedBody& mb = model_.getMatterSubsystem().getMobilizedBody(c.getBodyIndex());
+            qIndexMap_[i] = (int)mb.getFirstQIndex(state_) + c.getMobilizerQIndex();
+            uIndexMap_[i] = (int)mb.getFirstUIndex(state_) + c.getMobilizerQIndex();
+        }
     }
 
     void JointContactFromOpensim::setTime(double time) {
@@ -199,9 +223,13 @@ namespace ceinms {
     }
 
     void JointContactFromOpensim::getReactionForceInG(const SimTK::Vector_<SimTK::Vec3>& rForcesInG, const string& jointName, SimTK::Vec3& forceOnChildInG)  const {
+        // OpenSim::SimbodyEngine::computeReactions() already resolves each
+        // joint's MobilizedBodyIndex internally and writes its output indexed
+        // by plain JointSet order (rForces[i] <-> joints[i]), NOT by
+        // MobilizedBodyIndex -- so the lookup here must use the same plain
+        // JointSet index, matching getReactionForceInChild() below.
         unsigned idx(model_.getJointSet().getIndex(jointName));
-        //for some reason everything is shifted by 1.. this is a temporary patch.. to find a more robust solution
-        forceOnChildInG = rForcesInG.get(idx + 1);
+        forceOnChildInG = rForcesInG.get(idx);
     }
 
     string JointContactFromOpensim::getJointNameOnDof(const string& dofName) {
@@ -283,16 +311,33 @@ namespace ceinms {
         //realize the system, so all the forces as gravitational, inertial, and external forces are applied
         model_.realizeDynamics(state_);
         SimTK::Vector_<SimTK::SpatialVec> appliedBodyForces(model_.getMultibodySystem().getRigidBodyForces(state_, SimTK::Stage::Dynamics));
-        residualMobilityForces_ = idSolver_->solve(state_, qdd_, appliedMobilityForces, appliedBodyForces);
+
+        // qdd_ and appliedMobilityForces are in CoordinateSet order; the
+        // solver needs them in the state's true global u/udot order.
+        SimTK::Vector qddGlobal(state_.getNU(), 0.0);
+        SimTK::Vector appliedMobilityForcesGlobal(state_.getNU(), 0.0);
+        for (unsigned i(0); i < nCoordinates_; ++i) {
+            qddGlobal[uIndexMap_[i]] = qdd_[i];
+            appliedMobilityForcesGlobal[uIndexMap_[i]] = appliedMobilityForces[i];
+        }
+
+        SimTK::Vector residualGlobal(idSolver_->solve(state_, qddGlobal, appliedMobilityForcesGlobal, appliedBodyForces));
+
+        residualMobilityForces_.resize(nCoordinates_);
+        for (unsigned i(0); i < nCoordinates_; ++i)
+            residualMobilityForces_[i] = residualGlobal[uIndexMap_[i]];
     }
 
     void JointContactFromOpensim::getAllReactionForces(SimTK::Vector_<SimTK::Vec3>& reactionForces, SimTK::Vector_<SimTK::Vec3>& reactionTorques) const {
-        reactionForces.clear();
-        reactionForces.resize(rForcesInG_.size() - 1);
-        for (int i(1); i < rForcesInG_.size(); ++i)
-            reactionForces[i - 1] = rForcesInG_[i];
-
-        reactionTorques = rTorquesInG_;
+        // rForcesInG_/rTorquesInG_ are already indexed by plain JointSet
+        // order (see getReactionForceInG()), so this is a direct copy.
+        const OpenSim::JointSet& joints(model_.getJointSet());
+        reactionForces.resize(joints.getSize());
+        reactionTorques.resize(joints.getSize());
+        for (int i(0); i < joints.getSize(); ++i) {
+            reactionForces[i] = rForcesInG_.get(i);
+            reactionTorques[i] = rTorquesInG_.get(i);
+        }
     }
 
     JointContactFromOpensim::~JointContactFromOpensim() {
