@@ -90,11 +90,19 @@ namespace ceinms {
         outputDir_ += "/";
         std::filesystem::path dir(outputDir_);
         if (!std::filesystem::exists(dir)) {
-            if (!std::filesystem::create_directories(dir)) {
-                std::cout << "Error: Cannot create the output directory " + outputDir_ << std::endl;
+            // create_directories() reports whether it created the final path component.
+            // outputDir_ ends in a separator, so that component is empty and it returns false
+            // even when it did create the directory. The run then aborted having already made
+            // the directory, which is why running again worked. Check for the directory instead
+            // of trusting the return value.
+            std::error_code ec;
+            std::filesystem::create_directories(dir, ec);
+            if (!std::filesystem::exists(dir)) {
+                std::cout << "Error: Cannot create the output directory " + outputDir_
+                    << ": " << ec.message() << std::endl;
                 exit(EXIT_FAILURE);
             }
-            std::cout << "Created output directory " + dir.string() << std::endl;
+            else std::cout << "Created output directory " + dir.string() << std::endl;
         }
         else std::cout << "Using " + dir.string() + " as output directory\n";
 
