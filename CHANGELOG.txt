@@ -1,3 +1,49 @@
+CEINMS 0.31.0
+--------------
+* Fixed joint contact and reaction forces, which had been wrong since the OpenSim
+  3.3 to 4 migration. Simbody's internal body and coordinate ordering does not
+  generally match the order joints and coordinates are declared in the model file,
+  and both the reaction force lookup and the kinematics written into the state were
+  assuming that it did
+* The OpenSim libraries are now installed alongside the CEINMS executables, so an
+  installed CEINMS always uses the OpenSim version it was built against, whatever
+  else is on the PATH. Mixing versions previously made CEINMS exit on startup with
+  no error message. Note that CEINMS must still be rebuilt to change OpenSim version
+* Added fibre and MTU power output
+* Added output of force components (e.g., passive and active)
+* Added an optional reference DOF group to the MaxSumPeak objective function
+* Added options for selecting beta and gamma ranges in CEINMSoptimise
+* Fixed CEINMSoptimise crashing on startup when the setup file did not declare the
+  beta and gamma ranges. These elements are optional, and are absent from every setup
+  file not written specifically for CEINMSoptimise, including the one -PrintSetup
+  generates
+* Fixed the CEINMSoptimise grid search never evaluating its upper bounds, which with
+  the built-in ranges reduced the first pass to the single point beta=1 gamma=1, and
+  returning an empty grid when the step was larger than the range
+* CEINMSoptimise now exits with code 0 on success, instead of reporting failure to the
+  calling script after a completed run
+* Fixed execution aborting the first time it had to create the output directory. The
+  directory was created but no results were written, so the run had to be repeated
+* Fixed online execution hanging or crashing at the end of the data
+* Fixed a race condition that could silently truncate EMG data during online execution
+* Fixed a race condition that could drop early moment-arm frames when execution started
+* Fixed the torque error not being normalised, and the internal torque-data flag never
+  being set, which affected data cropping
+* External torque columns are now matched by their _moment or _force suffix
+* Out-of-range EMG warnings are now summarised rather than printed for every frame
+* The hybrid weighting grid search now leaves one core free instead of using all of them
+* Fixed Curve returning a point's abscissa instead of its ordinate for a single-point
+  curve, and reading past the end of an empty curve
+* Fixed a crash during calibration when a DoF being calibrated is not present in one of
+  the trials, and a division by zero when normalising the torque error of a column with
+  a single sample
+* Fixed joint reaction and intersegmental force lookups indexing out of range when
+  given a joint name that is not in the OpenSim model
+* Fixed the elastic tendon producing NaN when two consecutive musculotendon length
+  samples share a timestamp
+* Fixed DataTable<T>::get(row, col) not compiling
+* Building now requires CMake 3.16 or later
+
 CEINMS 0.30.0
 --------------
 * Moved to C++17 and removed Boost as a dependency
