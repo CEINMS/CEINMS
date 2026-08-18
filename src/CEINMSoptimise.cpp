@@ -41,6 +41,8 @@ using std::vector;
 using std::map;
 #include <stdlib.h>
 #include <future>
+#include <utility>
+#include <thread>
 
 #include "ceinms/Utilities.h"
 #include "ceinms/FileUtils.h"
@@ -281,22 +283,31 @@ private:
         });
 
         auto runGridParallel([&](vector<double> betas, vector<double> gammas) {
-            int threadCount = 0;
-            vector<std::future<HybridErrors>> futures;
+            vector<std::pair<double, double>> gridPoints;
             for (auto beta : betas)
-                for (auto gamma : gammas) {
-                    auto fut(std::async(std::launch::async, [=]() {
-                        return f(beta, gamma, subject, trial); }
-                    ));
-                    futures.emplace_back(std::move(fut));
-                    cout << "Creating thread " << ++threadCount << "/" << gammas.size()*betas.size() << endl;
-                }
+                for (auto gamma : gammas)
+                    gridPoints.emplace_back(beta, gamma);
+
+            const unsigned maxConcurrentThreads = std::max(1u, std::thread::hardware_concurrency() > 1 ? std::thread::hardware_concurrency() - 1 : 1u);
 
             vector<HybridErrors> values;
-            for (auto& f : futures) {
-                f.wait();
-                cout << "Joining thread " << --threadCount << "/" << gammas.size()*betas.size() << endl;
-                values.emplace_back(f.get());
+            values.reserve(gridPoints.size());
+            size_t submitted = 0;
+            while (submitted < gridPoints.size()) {
+                size_t batchSize = std::min<size_t>(maxConcurrentThreads, gridPoints.size() - submitted);
+                vector<std::future<HybridErrors>> futures;
+                for (size_t i = 0; i < batchSize; ++i) {
+                    double beta = gridPoints[submitted + i].first;
+                    double gamma = gridPoints[submitted + i].second;
+                    futures.emplace_back(std::async(std::launch::async, [=]() {
+                        return f(beta, gamma, subject, trial); }
+                    ));
+                }
+                for (auto& fut : futures) {
+                    values.emplace_back(fut.get());
+                }
+                submitted += batchSize;
+                cout << "Completed " << submitted << "/" << gridPoints.size() << " grid points (using up to " << maxConcurrentThreads << " threads)" << endl;
             }
             return values;
         });
