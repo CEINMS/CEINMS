@@ -135,34 +135,39 @@ namespace ceinms {
         return fileName;
     }
 
-    double CeinmsSetupXmlReader::getBetaMin() const {
-        auto value = *ceinmsSetupPointer_->betaMin().begin();
-        return value;
+    //The beta and gamma grid-search bounds are optional elements of the setup
+    //file (see ceinmsSetup.xsd) and are absent from every setup file that was
+    //not written for CEINMSoptimise, including the one -PrintSetup generates.
+    //Dereferencing begin() on an empty sequence is undefined, so each getter
+    //takes the value the caller wants to fall back on.
+    double CeinmsSetupXmlReader::getBetaMin(double defaultValue) const {
+        if (ceinmsSetupPointer_->betaMin().empty()) return defaultValue;
+        return *ceinmsSetupPointer_->betaMin().begin();
     }
 
-    double CeinmsSetupXmlReader::getBetaMax() const {
-        auto value = *ceinmsSetupPointer_->betaMax().begin();
-        return value;
+    double CeinmsSetupXmlReader::getBetaMax(double defaultValue) const {
+        if (ceinmsSetupPointer_->betaMax().empty()) return defaultValue;
+        return *ceinmsSetupPointer_->betaMax().begin();
     }
 
-    double CeinmsSetupXmlReader::getBetaDelta() const {
-        auto value = *ceinmsSetupPointer_->betaDelta().begin();
-        return value;
+    double CeinmsSetupXmlReader::getBetaDelta(double defaultValue) const {
+        if (ceinmsSetupPointer_->betaDelta().empty()) return defaultValue;
+        return *ceinmsSetupPointer_->betaDelta().begin();
     }
 
-    double CeinmsSetupXmlReader::getGammaMin() const {
-        auto value = *ceinmsSetupPointer_->gammaMin().begin();
-        return value;
+    double CeinmsSetupXmlReader::getGammaMin(double defaultValue) const {
+        if (ceinmsSetupPointer_->gammaMin().empty()) return defaultValue;
+        return *ceinmsSetupPointer_->gammaMin().begin();
     }
 
-    double CeinmsSetupXmlReader::getGammaMax() const {
-        auto value = *ceinmsSetupPointer_->gammaMax().begin();
-        return value;
+    double CeinmsSetupXmlReader::getGammaMax(double defaultValue) const {
+        if (ceinmsSetupPointer_->gammaMax().empty()) return defaultValue;
+        return *ceinmsSetupPointer_->gammaMax().begin();
     }
 
-    double CeinmsSetupXmlReader::getGammaDelta() const {
-        auto value = *ceinmsSetupPointer_->gammaDelta().begin();
-        return value;
+    double CeinmsSetupXmlReader::getGammaDelta(double defaultValue) const {
+        if (ceinmsSetupPointer_->gammaDelta().empty()) return defaultValue;
+        return *ceinmsSetupPointer_->gammaDelta().begin();
     }
 
     void CeinmsSetupXmlReader::setExecutionFile(const std::string& filename) {

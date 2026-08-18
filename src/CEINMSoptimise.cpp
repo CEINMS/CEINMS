@@ -200,20 +200,22 @@ public:
         outputDirectory_(ceinmsSetup_.getOutputDirectory()),
         emgGeneratorFile_(ceinmsSetup_.getExcitationGeneratorFile()) {  
 
-        bmin_ = ceinmsSetup_.getBetaMin();
-        bmax_ = ceinmsSetup_.getBetaMax();
-        bdelta_ = ceinmsSetup_.getBetaDelta();
-        gmin_ = ceinmsSetup_.getGammaMin();
-        gmax_ = ceinmsSetup_.getGammaMax();
-        gdelta_ = ceinmsSetup_.getGammaDelta();
+        //These are optional in the setup file; keep the defaults below when absent
+        bmin_ = ceinmsSetup_.getBetaMin(bmin_);
+        bmax_ = ceinmsSetup_.getBetaMax(bmax_);
+        bdelta_ = ceinmsSetup_.getBetaDelta(bdelta_);
+        gmin_ = ceinmsSetup_.getGammaMin(gmin_);
+        gmax_ = ceinmsSetup_.getGammaMax(gmax_);
+        gdelta_ = ceinmsSetup_.getGammaDelta(gdelta_);
     }
 
     bool run() {
+        //Both return SimulationManager::run()'s exit code (0 on success), so
+        //propagate it. Returning true unconditionally made every successful run
+        //exit with code 1, which reads as a failure to any calling script.
         if (executionCfg_.isHybrid())
-            runWeightingOptimisation();
-        else
-            runOpenLoop();
-        return true;
+            return runWeightingOptimisation();
+        return runOpenLoop();
     }
 
 private:
@@ -313,12 +315,19 @@ private:
         });
 
 
+        //Walks min..max inclusive. nsteps counts intervals, so the loop runs to
+        //nsteps to include max itself rather than stopping one step short. A
+        //degenerate range still yields a single point: an empty grid would leave
+        //the min_element/max_element calls below dereferencing end().
         auto getVec([](double min, double max, double interval) {
             vector<double> v;
-            int nsteps = round((max - min) / interval);
-            for (int i(0); i < nsteps; ++i) {
-                v.push_back(min+i*interval);
+            if (!(interval > 0.) || !(max > min)) {
+                v.push_back(min);
+                return v;
             }
+            const int nsteps = static_cast<int>(round((max - min) / interval));
+            for (int i(0); i <= nsteps; ++i)
+                v.push_back(std::min(min + i * interval, max));
             return v;
         });
        
@@ -371,7 +380,10 @@ private:
         executionCfg_.setHybridWeightings(1, lowest.beta, lowest.gamma);
         string trialId(ceinmsSetup_.getInputDataFile(false));
         size_t endpos = trialId.find(".xml");
-        size_t startpos = trialId.rfind("/") + 1;
+        //Look for both separators: a Windows path would otherwise keep its
+        //directory components in the generated output filename.
+        size_t seppos = trialId.find_last_of("/\\");
+        size_t startpos = (seppos == string::npos) ? 0 : seppos + 1;
         trialId = trialId.substr(startpos, endpos - startpos);
         string newExecutionFilename(ceinmsSetup_.getExecutionFile(false));
         std::size_t pos = newExecutionFilename.find(".xml");
