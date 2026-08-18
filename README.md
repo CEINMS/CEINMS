@@ -9,10 +9,13 @@ Read more about CEINMS at the [CEINMS project page](https://simtk.org/home/ceinm
 
 Dependencies
 ------------
-* Cross-platform building: [CMake](http://www.cmake.org/) 3.8 or later
+* Cross-platform building: [CMake](http://www.cmake.org/) 3.16 or later
 * Compiler: [Visual Studio](http://www.visualstudio.com) 2019 or later (Windows only), [gcc](http://gcc.gnu.org/) 8 or later (typically on Linux), or [Clang](http://clang.llvm.org/) 5 or later (typically on Mac, possibly through Xcode)
 * XML parsing: [CodeSynthesis XSD](https://www.codesynthesis.com/products/xsd/) 4.0
 * Musculoskeletal modelling: [OpenSim](https://simtk.org/projects/opensim/) 4.0 or later
+    * **CEINMS must be built against the same OpenSim version it is run with.** OpenSim ships identically named libraries (`osimSimulation.dll`, `osimCommon.dll`, ...) in every release, with no version information recorded in them, so on Windows the loader simply uses whichever copy appears first on your PATH. If that copy is not the one CEINMS was compiled against, CEINMS exits immediately on startup with no error message (exit code `0xC0000139`, `STATUS_ENTRYPOINT_NOT_FOUND`) — the failure happens while the process is loading, before any CEINMS code runs, so it cannot report anything more helpful. This is easy to hit if several OpenSim versions are installed.
+    * Building the `install` target, or producing a package with CPack, copies the OpenSim libraries in beside the CEINMS executables. Windows searches an executable's own directory before PATH, so the installed copy always finds the right libraries regardless of what else is installed. **Prefer running the installed CEINMS over the one in the build tree**, which has no such protection. A consequence is that an installed CEINMS is tied to the OpenSim it was built against; to change OpenSim version, reconfigure and rebuild.
+    * Known to work with OpenSim 4.0-4.5. OpenSim 4.6 moved force computation onto a new `ForceProducer` base class and has not been validated with CEINMS yet.
 * Signal filtering: [Filter](https://github.com/RealTimeBiomechanics/Filter)
 * Thread synchronisation: [Concurrency](https://github.com/RealTimeBiomechanics/Concurrency)
 
