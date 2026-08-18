@@ -114,7 +114,7 @@ namespace ceinms {
         }
 
         void trim(std::string& fileName) {
-            char* t = " \t\n\r\f\v/";
+            const char* t = " \t\n\r\f\v/";
             fileName.erase(0, fileName.find_first_not_of(t));
             fileName.erase(fileName.find_last_not_of(t) + 1);
         }

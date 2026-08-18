@@ -53,8 +53,8 @@ namespace ceinms {
         ~DataFromFile();
         
     private:
-        DataFromFile(const DataFromFile& orig) {};
-        DataFromFile& operator=(const DataFromFile& orig) {};
+        DataFromFile(const DataFromFile& orig) = delete;
+        DataFromFile& operator=(const DataFromFile& orig) = delete;
         std::string dataFileName_;
         std::ifstream dataFile_;
         unsigned int noMuscles_;

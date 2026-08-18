@@ -132,9 +132,9 @@ int main(int argc, char** argv) {
     }
 
     ceinms::CalibrationManager calibrationManager(setupFileName);
-    auto timeBegin = std::chrono::high_resolution_clock::now();
+    auto timeBegin = std::chrono::steady_clock::now();
     bool exitflag = calibrationManager.run();
-    auto timeEnd = std::chrono::high_resolution_clock::now();
+    auto timeEnd = std::chrono::steady_clock::now();
     cout << "Calibration time: ";
     printComputationTime(timeBegin, timeEnd);
 
