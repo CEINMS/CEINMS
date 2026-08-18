@@ -156,6 +156,20 @@ namespace ceinms {
         // which Simbody assigns by multibody-tree order. Resolve each
         // coordinate's true index once, via its owning MobilizedBody, rather
         // than assuming CoordinateSet index i lands at state vector index i.
+        // Both maps below add a coordinate's MobilizerQIndex to its mobilized
+        // body's first Q and first U index, which is only valid while the two
+        // index spaces line up. OpenSim keeps Euler angles enabled so that
+        // getMobilizerQIndex() is meaningful, and then nq == nu; a quaternion
+        // mobilizer would break that and silently shift every coordinate after
+        // it, producing wrong reaction forces with no other symptom. Fail loudly
+        // instead.
+        if (state_.getNQ() != state_.getNU()) {
+            cout << "Error: this model uses quaternion mobilizers (nq = " << state_.getNQ()
+                 << ", nu = " << state_.getNU() << "). CEINMS cannot map coordinates to the "
+                 "state vectors for joint contact and reaction forces in that case." << endl;
+            std::exit(EXIT_FAILURE);
+        }
+
         const OpenSim::CoordinateSet& cs = model_.getCoordinateSet();
         qIndexMap_.resize(nCoordinates_);
         uIndexMap_.resize(nCoordinates_);
