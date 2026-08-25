@@ -276,12 +276,13 @@ namespace ceinms {
     double Curve<mode, T, N>::getValue(double xValue) const {
         unsigned n = x_.size();
         double yValue(.0);
+        if (n == 0) return yValue;    //as getFirstDerivative does, rather than throwing from at(0)
         if (xValue < x_.at(0))
             yValue = y_.at(0);
         else if (xValue > x_.at(n - 1))
             yValue = y_.at(n - 1);
         else if (n == 1)
-            yValue = x_.at(0);
+            yValue = y_.at(0);        //the ordinate of the single point, not its abscissa
         else
             yValue = getValue(xValue, getAbscissaPoint(xValue), Int2Type<T>());
 
@@ -347,6 +348,8 @@ namespace ceinms {
     template <CurveMode::Mode mode, CurveMode::Interpolation T, size_t N>
     double Curve<mode, T, N>::getSecondDerivative(double xValue) const  {
         int n = x_.size();
+
+        if (n <= 0) return .0;    //as getFirstDerivative does, rather than throwing from at(0)
 
         // Now see if the abscissa is out of range of the function
 

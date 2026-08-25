@@ -60,7 +60,7 @@ void printHeader() {
 void printAuthors() {
     cout << "Copyright (C) " << string(__DATE__ )<< endl;
     cout << "Claudio Pizzolato, Monica Reggiani, Massimo Sartori, David Lloyd\n";
-    cout << "Software developers: Claudio Pizzolato, Monica Reggiani\n";
+    cout << "Software developers: Claudio Pizzolato, Monica Reggiani, Matthew Hambly\n";
 }
 
 void PrintUsage() {
@@ -70,6 +70,16 @@ void PrintUsage() {
     cout << "-Help, -H                           Print the command-line options for " << progName << ".\n";
     cout << "-PrintSetup, -PS                    Generates a template Setup file\n";
     cout << "-Setup, -S        SetupFileName     Specify an xml setup file.\n";
+}
+
+void printComputationTime(std::chrono::steady_clock::time_point startTime,
+    std::chrono::steady_clock::time_point endTime) {
+    auto duration = std::chrono::duration_cast<std::chrono::seconds>(endTime - startTime);
+    if (duration.count() / 60 > 0)
+        std::cout << duration.count() / 60 << " minute" << (duration.count() / 60 > 1 ? "s" : "")
+        << " ";
+    std::cout << duration.count() % 60 << " second" << (duration.count() % 60 > 1 ? "s" : "");
+    std::cout << std::endl;
 }
 
 int main(int argc, char** argv) {
@@ -122,10 +132,11 @@ int main(int argc, char** argv) {
     }
 
     ceinms::CalibrationManager calibrationManager(setupFileName);
-    auto timeBegin = std::chrono::high_resolution_clock::now();
+    auto timeBegin = std::chrono::steady_clock::now();
     bool exitflag = calibrationManager.run();
-    auto timeEnd = std::chrono::high_resolution_clock::now();
-    cout << "Calibration time: " << std::chrono::duration_cast<std::chrono::minutes>(timeEnd - timeBegin).count() << "minutes" << endl;
+    auto timeEnd = std::chrono::steady_clock::now();
+    cout << "Calibration time: ";
+    printComputationTime(timeBegin, timeEnd);
 
     std::exit(exitflag);
 }

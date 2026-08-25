@@ -87,9 +87,39 @@ namespace ceinms {
             std::vector<std::string> columnNamesInStorageFile = externalTorquesDataFromFile_->getColumnNames();
             std::vector<std::string> torqueNamesToFind;
             for (auto& it : dofNames_)
-                torqueNamesToFind.push_back(it + "_moment");
+                torqueNamesToFind.push_back(it);            
+            //for (auto& it : dofNames_)
+            //    torqueNamesToFind.push_back(it + "_moment");
 
-            dofPosInStorage_ = findMapping(torqueNamesToFind, columnNamesInStorageFile);
+            auto findMappingNew = [](const std::vector<std::string>& subset,
+                const std::vector<std::string>& set) {
+                    std::vector<std::size_t> mapping;
+
+                    for (const auto& it : subset) {
+                        std::string moment = it + "_moment";
+                        std::string force = it + "_force";
+
+                        auto posIt = std::find(set.begin(), set.end(), moment);
+
+                        if (posIt == set.end()) {
+                            posIt = std::find(set.begin(), set.end(), force);
+                        }
+
+                        if (posIt == set.end()) {
+                            std::cout << "ERROR: " << it
+                                << " (with _moment/_force) not found in file\n";
+                            exit(EXIT_FAILURE);
+                        }
+
+                        std::size_t pos = std::distance(set.begin(), posIt);
+                        mapping.push_back(pos);
+                    }
+
+                    return mapping;
+            };
+
+            dofPosInStorage_ = findMappingNew(torqueNamesToFind, columnNamesInStorageFile);
+            //dofPosInStorage_ = findMapping(torqueNamesToFind, columnNamesInStorageFile);
         }
     }
 }

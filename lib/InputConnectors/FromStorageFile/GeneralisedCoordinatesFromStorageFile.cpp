@@ -114,13 +114,12 @@ namespace ceinms {
     void GeneralisedCoordinatesFromStorageFile::updateKinematicsSplines(double fc) {
         //reinitialise because I modify the storage with padding and filtering..
         OpenSim::Storage kinematics(kinematicsStorageFilename_);
-
+        model_.initSystem();
         if (fc > 0) {
             kinematics.pad(kinematics.getSize() / 2.);
             kinematics.lowpassIIR(fc);
         }
-        if (kinematics.isInDegrees()){   
-            model_.initSystem();
+        if (kinematics.isInDegrees()){      
             model_.getSimbodyEngine().convertDegreesToRadians(kinematics);
         }
         // Create differentiable splines of the coordinate data

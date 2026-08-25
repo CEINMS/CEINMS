@@ -147,6 +147,12 @@ namespace ceinms {
         void getNormFiberVelocities(std::vector<double>& normFiberVelocities) const;
         void getPennationAnglesAtT(std::vector<double>& pennationAnglesAtT) const; //instant pennationangle
         void getMuscleForces(std::vector<double>& muscleForces) const;
+        void getMuscleForcesPassive(std::vector<double>& muscleForcesPassive) const;
+        void getMuscleForcesActive(std::vector<double>& muscleForcesActive) const;
+        void getMuscleForcesDamping(std::vector<double>& muscleForcesDamping) const;
+        void getMTUVelocities(std::vector<double>& mtuVelocities) const;
+        void getMTUPowers(std::vector<double>& mtuPowers) const;
+        void getFiberPowers(std::vector<double>& fiberPowers) const;
 		void getTendonLengths(std::vector<double>& tendonLengths) const;
 		void getNormTendonLengths(std::vector<double>& normTendonLengths) const;
         void getTorques(std::vector<double>& torques) const;

@@ -7,11 +7,13 @@ if(DEFINED ENV{VCPKG_ROOT} AND NOT DEFINED CMAKE_TOOLCHAIN_FILE)
   )
 endif()
 
-cmake_minimum_required (VERSION 3.8)
+# 3.16 or later: CeinmsPack uses file(GET_RUNTIME_DEPENDENCIES) to package the
+# OpenSim runtime libraries, which was introduced in CMake 3.16.
+cmake_minimum_required (VERSION 3.16)
 project(CEINMS)
-set(CEINMS_MAJOR_VERSION 0)
-set(CEINMS_MINOR_VERSION 30)
-set(CEINMS_PATCH_VERSION 1)
+set(CEINMS_MAJOR_VERSION 1)
+set(CEINMS_MINOR_VERSION 0)
+set(CEINMS_PATCH_VERSION 0)
 
 add_definitions(/DCEINMS_MAJOR_VERSION="${CEINMS_MAJOR_VERSION}")
 add_definitions(/DCEINMS_MINOR_VERSION="${CEINMS_MINOR_VERSION}")
@@ -40,7 +42,6 @@ set(CMAKE_CXX_STANDARD 17)
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
-include(CeinmsPack)
 
 find_package(XSD REQUIRED)
 find_package(XERCES REQUIRED)
@@ -83,6 +84,13 @@ add_definitions(/D_USE_MATH_DEFINES)
 add_subdirectory(lib)
 add_subdirectory(src)
 add_subdirectory(docs)
+
+# NOTE: must come *after* find_package(OpenSim) -- CeinmsPack packages the
+# OpenSim runtime libraries next to the CEINMS executables and needs
+# OpenSim_BIN_DIR to locate them. It used to be included before find_package(),
+# where that variable was still empty, so it silently packaged nothing.
+# Kept after the add_subdirectory() calls so CPack sees the whole project.
+include(CeinmsPack)
 
 # Create CEINMSConfig.cmake etc.
 set(ConfigPackageLocation ${CMAKE_INSTALL_LIBDIR}/CEINMS)

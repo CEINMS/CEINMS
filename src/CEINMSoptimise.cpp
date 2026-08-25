@@ -41,6 +41,8 @@ using std::vector;
 using std::map;
 #include <stdlib.h>
 #include <future>
+#include <utility>
+#include <thread>
 
 #include "ceinms/Utilities.h"
 #include "ceinms/FileUtils.h"
@@ -123,7 +125,7 @@ void printHeader() {
 void printAuthors() {
     cout << "Copyright (C) " << string(__DATE__) << endl;
     cout << "Claudio Pizzolato, Monica Reggiani, Massimo Sartori, David Lloyd\n";
-    cout << "Software developers: Claudio Pizzolato, Elena Ceseracciu, Monica Reggiani\n";
+    cout << "Software developers: Claudio Pizzolato, Elena Ceseracciu, Monica Reggiani, Matthew Hambly\n";
 }
 
 void PrintUsage() {
@@ -186,8 +188,6 @@ ceinms::TrialData readTrialData(const string& inputDataFilename, NMSmodelT& mySu
     return trial;
 }
 
-
-
 class HybridOptimisationManager {
 
 public:
@@ -198,15 +198,24 @@ public:
         executionCfg_(ceinmsSetup_.getExecutionFile()),
         subjectFile_(ceinmsSetup_.getSubjectFile()),
         outputDirectory_(ceinmsSetup_.getOutputDirectory()),
-        emgGeneratorFile_(ceinmsSetup_.getExcitationGeneratorFile()) {    
+        emgGeneratorFile_(ceinmsSetup_.getExcitationGeneratorFile()) {  
+
+        //These are optional in the setup file; keep the defaults below when absent
+        bmin_ = ceinmsSetup_.getBetaMin(bmin_);
+        bmax_ = ceinmsSetup_.getBetaMax(bmax_);
+        bdelta_ = ceinmsSetup_.getBetaDelta(bdelta_);
+        gmin_ = ceinmsSetup_.getGammaMin(gmin_);
+        gmax_ = ceinmsSetup_.getGammaMax(gmax_);
+        gdelta_ = ceinmsSetup_.getGammaDelta(gdelta_);
     }
 
     bool run() {
+        //Both return SimulationManager::run()'s exit code (0 on success), so
+        //propagate it. Returning true unconditionally made every successful run
+        //exit with code 1, which reads as a failure to any calling script.
         if (executionCfg_.isHybrid())
-            runWeightingOptimisation();
-        else
-            runOpenLoop();
-        return true;
+            return runWeightingOptimisation();
+        return runOpenLoop();
     }
 
 private:
@@ -276,37 +285,53 @@ private:
         });
 
         auto runGridParallel([&](vector<double> betas, vector<double> gammas) {
-            int threadCount = 0;
-            vector<std::future<HybridErrors>> futures;
+            vector<std::pair<double, double>> gridPoints;
             for (auto beta : betas)
-                for (auto gamma : gammas) {
-                    auto fut(std::async(std::launch::async, [=]() {
-                        return f(beta, gamma, subject, trial); }
-                    ));
-                    futures.emplace_back(std::move(fut));
-                    cout << "Creating thread " << ++threadCount << "/" << gammas.size()*betas.size() << endl;
-                }
+                for (auto gamma : gammas)
+                    gridPoints.emplace_back(beta, gamma);
+
+            const unsigned maxConcurrentThreads = std::max(1u, std::thread::hardware_concurrency() > 1 ? std::thread::hardware_concurrency() - 1 : 1u);
 
             vector<HybridErrors> values;
-            for (auto& f : futures) {
-                f.wait();
-                cout << "Joining thread " << --threadCount << "/" << gammas.size()*betas.size() << endl;
-                values.emplace_back(f.get());
+            values.reserve(gridPoints.size());
+            size_t submitted = 0;
+            while (submitted < gridPoints.size()) {
+                size_t batchSize = std::min<size_t>(maxConcurrentThreads, gridPoints.size() - submitted);
+                vector<std::future<HybridErrors>> futures;
+                for (size_t i = 0; i < batchSize; ++i) {
+                    double beta = gridPoints[submitted + i].first;
+                    double gamma = gridPoints[submitted + i].second;
+                    futures.emplace_back(std::async(std::launch::async, [=]() {
+                        return f(beta, gamma, subject, trial); }
+                    ));
+                }
+                for (auto& fut : futures) {
+                    values.emplace_back(fut.get());
+                }
+                submitted += batchSize;
+                cout << "Completed " << submitted << "/" << gridPoints.size() << " grid points (using up to " << maxConcurrentThreads << " threads)" << endl;
             }
             return values;
         });
 
 
+        //Walks min..max inclusive. nsteps counts intervals, so the loop runs to
+        //nsteps to include max itself rather than stopping one step short. A
+        //degenerate range still yields a single point: an empty grid would leave
+        //the min_element/max_element calls below dereferencing end().
         auto getVec([](double min, double max, double interval) {
             vector<double> v;
-            int nsteps = round((max - min) / interval);
-            for (int i(0); i < nsteps; ++i) {
-                v.push_back(min+i*interval);
+            if (!(interval > 0.) || !(max > min)) {
+                v.push_back(min);
+                return v;
             }
+            const int nsteps = static_cast<int>(round((max - min) / interval));
+            for (int i(0); i <= nsteps; ++i)
+                v.push_back(std::min(min + i * interval, max));
             return v;
         });
        
-        double bmin = 1, bmax = 2, bdelta=1, gmin = 1, gmax = 5, gdelta=5;
+        double bmin = bmin_, bmax = bmax_, bdelta = bdelta_, gmin = gmin_, gmax = gmax_, gdelta = gdelta_;
         vector<HybridErrors> values;
         vector<double> betas = getVec(bmin, bmax,bdelta);
         vector<double> gammas = getVec(gmin, gmax,gdelta);
@@ -355,7 +380,10 @@ private:
         executionCfg_.setHybridWeightings(1, lowest.beta, lowest.gamma);
         string trialId(ceinmsSetup_.getInputDataFile(false));
         size_t endpos = trialId.find(".xml");
-        size_t startpos = trialId.rfind("/") + 1;
+        //Look for both separators: a Windows path would otherwise keep its
+        //directory components in the generated output filename.
+        size_t seppos = trialId.find_last_of("/\\");
+        size_t startpos = (seppos == string::npos) ? 0 : seppos + 1;
         trialId = trialId.substr(startpos, endpos - startpos);
         string newExecutionFilename(ceinmsSetup_.getExecutionFile(false));
         std::size_t pos = newExecutionFilename.find(".xml");
@@ -386,6 +414,12 @@ private:
     string outputDirectory_;
     string emgGeneratorFile_;
     string setupFilename_;
+    double bmin_ = 1;
+    double bmax_ = 2;
+    double bdelta_ = 1;
+    double gmin_ = 1;
+    double gmax_ = 5;
+    double gdelta_ = 5;
 };
 
 int main(int argc, char** argv) {

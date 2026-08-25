@@ -104,7 +104,7 @@ namespace ceinms {
             std::cout << "Warning in TrialData::setLmtMaData: wrong number of columns and/or dofs\n";
 
         torqueData_ = torqueData;
-        hasTorqueData_;
+        hasTorqueData_ = true;
     }
 
     void TrialData::setOpenSimData(

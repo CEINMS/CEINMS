@@ -60,14 +60,31 @@ namespace ceinms {
                 max = calculate(r.normalisedFibreLengths);
             else if (setup_.getCalibrationTargetType() == CalibrationTargetType::NormalisedFibreVelocity)
                 max = calculate(r.normalisedFibreVelocities);
-            
-            f_ = setup_.getWeight() * std::pow(max, setup_.getExponent());
+
+            if (setup_.getTargetNamesRef()[0] != "none") {
+                auto torques = r.torques;
+
+                double trialMax;
+                vector<double> columnsSum(torques.getNRows(), 0.);
+                for (auto& target : setup_.getTargetNamesRef()) {
+                    //this is not very efficient, as it makes a copy of the column
+                    if (torques.getColumnIndex(target) != -1) {
+                        auto col(torques.getColumn(target));
+                        for (int i(0); i < columnsSum.size(); ++i) {
+                            columnsSum.at(i) += col.at(i);
+                        }
+                    }
+                }
+                trialMax = *std::max_element(columnsSum.begin(), columnsSum.end());
+                max /= trialMax;
+            }
+            f_ += setup_.getWeight() * std::pow(max, setup_.getExponent());
             currentMax_.push_back(max);
         }
         // normalise the weight of the objective function
         // so that the weight of the function doesn't need to change when changing the
         // number of calibrating trials
-        f_ /= (results.size() * setup_.getTargetNames().size());
+        f_ /= (results.size() * setup_.getTargetNames().size());        
     }
 
     double MaxSumPeakObjectiveFunction::calculate(const DataTable<double>& result) const {
@@ -83,6 +100,7 @@ namespace ceinms {
                 }
             }        
         }
+
         trialMax = *std::max_element(columnsSum.begin(), columnsSum.end());
 
         return trialMax;

@@ -59,14 +59,14 @@ namespace ceinms {
         inputEmgQueue_.subscribe();
         inputLmtQueue_.subscribe();
         inputExternalTorqueQueue_.subscribe();
+        for (auto& it : inputMomentArmsQueues_)
+            (*it).subscribe();
     }
 
     template<typename Logger>
     void ModelEvaluationBase<Logger>::doneWithSubscriptions() {
         subscribeToQueues();
         doneWithSubscriptions_.wait();
-		for (auto& it : inputMomentArmsQueues_)
-			(*it).subscribe();
     }
 
     template<typename Logger>

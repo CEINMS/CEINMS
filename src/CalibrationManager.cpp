@@ -102,6 +102,8 @@ namespace ceinms {
         }
 
         CalibrationStep currentCalibrationStep;
+        unsigned noEval = 0;
+        auto timeBegin = std::chrono::high_resolution_clock::now();
         while (calibrationXmlReader_.popNextCalibrationStep(currentCalibrationStep)) {
 			updateTargetsFromModel(currentCalibrationStep.objFunctionsSetup_, mySubject);
             CompositeObjectiveFunction objectiveFunction =
@@ -116,9 +118,19 @@ namespace ceinms {
             calibrationXmlReader_.getOptimizationAlgorithmParameters(simanParameters);
             Optimizers::SimulatedAnnealing<MySystem> optimizer(system, simanParameters);
             exitflag = optimizer.optimize();
-
+            noEval = optimizer.getNoEval();
         }//end while
+        auto timeEnd = std::chrono::high_resolution_clock::now();
         writeXml(mySubject, uncalibratedSubjectFile_, calibrationFile_, calibratedSubjectFile_);
+
+        //std::filesystem::path filePath(calibratedSubjectFile_);
+        //std::string outputPath = filePath.parent_path().string() + "/TimeAndIterations.csv";
+        //double timeTaken = std::chrono::duration_cast<std::chrono::seconds>(timeEnd - timeBegin).count();
+        //std::ofstream timeFile(outputPath);
+        //timeFile << "calibration time (s),number of iterations,\n";
+        //timeFile << timeTaken << "," << noEval << ",\n";
+        //timeFile.close();
+
         return exitflag;
     }
 

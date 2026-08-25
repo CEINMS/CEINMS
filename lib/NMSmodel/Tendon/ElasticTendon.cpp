@@ -810,9 +810,17 @@ namespace ceinms {
         //double lmtTimescale = lmtTime_ - lmtTimeT1_; //should be equal to timescale_
 
         //**the following can be done with a spline
-        double muscleTendonLengthAtT = (delta *(muscleTendonLength_ - muscleTendonLengthT1_) / timescale_) + muscleTendonLengthT1_;
-        double activationAtT = (delta *(activation_ - activationT1_) / timescale_) + activationT1_;
-        double muscleTendonVelocityAtT = (delta *(muscleTendonVelocity_ - muscleTendonVelocityT1_) / timescale_) + muscleTendonVelocityT1_;
+        //timescale_ is lmtTime_ - lmtTimeT1_, which is zero when two consecutive
+        //lmt samples carry the same timestamp. delta is zero then too, so the
+        //interpolation below would be 0/0; fall back to the values at T1.
+        double muscleTendonLengthAtT = muscleTendonLengthT1_;
+        double activationAtT = activationT1_;
+        double muscleTendonVelocityAtT = muscleTendonVelocityT1_;
+        if (timescale_ > 0.) {
+            muscleTendonLengthAtT = (delta *(muscleTendonLength_ - muscleTendonLengthT1_) / timescale_) + muscleTendonLengthT1_;
+            activationAtT = (delta *(activation_ - activationT1_) / timescale_) + activationT1_;
+            muscleTendonVelocityAtT = (delta *(muscleTendonVelocity_ - muscleTendonVelocityT1_) / timescale_) + muscleTendonVelocityT1_;
+        }
 
         dydx.at(0) = computeFiberVelocityAtT(muscleTendonLengthAtT, activationAtT, muscleTendonVelocityAtT, y.at(0), timescale_);
     }

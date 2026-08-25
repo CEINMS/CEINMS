@@ -46,8 +46,10 @@ namespace ceinms {
             std::optional<ExternalTorquesFrame> externalTorquesFrame;
             std::optional<EstimatedTorquesFrame> estimatedTorquesFrame;
             std::tie(externalTorquesFrame, estimatedTorquesFrame) = frames;
-            if (!externalTorquesFrame ||
-                !estimatedTorquesFrame)
+            if (!externalTorquesFrame || !estimatedTorquesFrame)
+                runCondition = false;
+            // NOTE: I have added this extra check because it was recieving an empty frame at the end of the trial
+            if (externalTorquesFrame.value().data.empty() || estimatedTorquesFrame.value().data.empty())
                 runCondition = false;
             if (runCondition) {
                 kneeContactModel_.setTorques(externalTorquesFrame.value().data, estimatedTorquesFrame.value().data);

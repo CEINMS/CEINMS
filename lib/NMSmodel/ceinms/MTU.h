@@ -51,7 +51,7 @@ namespace ceinms {
         MTU(std::string id);
         MTU(const MTU& orig);
         MTU& operator=(const MTU& orig);
-        virtual ~MTU() {};
+        virtual ~MTU();
 
         void setParametersToComputeForces(double optimalFiberLength,
             double pennationAngle,
@@ -117,6 +117,12 @@ namespace ceinms {
 		double getNormFiberVelocity() const { return normFibreVelocity_; }
         double getPennationAngleAtT() const { return pennationAngleAtT_; };
         double getMuscleForce() const { return muscleForce_; }
+        double getMuscleForcePassive() const { return muscleForcePassive_; };
+        double getMuscleForceActive() const { return muscleForceActive_; };
+        double getMuscleForceDamping() const { return muscleForceDamping_; };
+        double getMTUVelocity() const { return mtuVelocity_; }
+        double getMTUPower() const { return mtuPower_; }
+        double getFiberPower() const { return fiberPower_; }
         double getPercentageChange() const { return percentageChange_; }
         double getDamping() const { return damping_; }
         void   setDamping(double damping);
@@ -137,6 +143,8 @@ namespace ceinms {
         void updateFibreLength_OFFLINE();
         void updateFibreVelocity();
         void updateFibreVelocity_OFFLINE();
+        void updateMtuVelocity();
+        void updateMtuVelocity_OFFLINE();
         void updateLastFibreVelocityValue(double time);
         void resetState();
 
@@ -162,6 +170,14 @@ namespace ceinms {
         double pennationAngleAtT_;
         CurveT  fibreLengthTrace_;
         double muscleForce_;    /**< \f$F^{mt}\f$ */
+        double muscleForcePassive_;
+        double muscleForceActive_;
+        double muscleForceDamping_;
+        double muscleTendonLength_;  /**< \f$l^{mt}\f$ raw LMT input, stored for differentiation */
+        CurveT  mtuLengthTrace_;
+        double mtuVelocity_;    /**< \f$v^{mt}\f$ d(LMT)/dt */
+        double mtuPower_;
+        double fiberPower_;
 
         // parameters
         double optimalFibreLength_;  /**< \f$l_0^m\f$ */
@@ -179,6 +195,14 @@ namespace ceinms {
 
         double timeScale_;
         double time_;
+
+        // EMG out-of-[0,1]-range tracking: clips beyond kEmgOutOfRangeTolerance_
+        // of the bound are counted (and the worst deviation kept) instead of
+        // warning on every occurrence, to avoid spamming the terminal.
+        static constexpr double kEmgOutOfRangeTolerance_ = 0.01;
+        unsigned long emgOutOfRangeCount_;
+        double emgOutOfRangeWorst_;
+        double emgOutOfRangeWorstDeviation_;
     };
 }
 

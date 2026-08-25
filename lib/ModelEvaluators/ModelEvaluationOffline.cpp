@@ -220,6 +220,18 @@ namespace ceinms {
             ModelEvaluationBase<Logger>::logger.log(lmtMaTime, data, "PennationAngles");
             subject_.getMuscleForces(data);
             ModelEvaluationBase<Logger>::logger.log(lmtMaTime, data, "MuscleForces");
+            subject_.getMuscleForcesPassive(data);
+            ModelEvaluationBase<Logger>::logger.log(lmtMaTime, data, "MuscleForcesPassive");
+            subject_.getMuscleForcesActive(data);
+            ModelEvaluationBase<Logger>::logger.log(lmtMaTime, data, "MuscleForcesActive");
+            subject_.getMuscleForcesDamping(data);
+            ModelEvaluationBase<Logger>::logger.log(lmtMaTime, data, "MuscleForcesDamping");
+            subject_.getMTUVelocities(data);
+            ModelEvaluationBase<Logger>::logger.log(lmtMaTime, data, "MTUVelocities");
+            subject_.getMTUPowers(data);
+            ModelEvaluationBase<Logger>::logger.log(lmtMaTime, data, "MTUPowers");
+            subject_.getFiberPowers(data);
+            ModelEvaluationBase<Logger>::logger.log(lmtMaTime, data, "FibrePowers");
 			subject_.getTendonLengths(data);
 			ModelEvaluationBase<Logger>::logger.log(lmtMaTime, data, "TendonLengths");
 			subject_.getNormTendonLengths(data);
@@ -293,8 +305,9 @@ namespace ceinms {
 #ifdef LOG_FILES
         // Replaced sending a time of infinity to signify the end with closing the queue using the newer verion of Concurrency
         vector<string> queueNames{ "Activations", "FibreLengths", "NormFibreLengths", "FibreVelocities",
-            "NormFibreVelocities", "PennationAngles", "MuscleForces","TendonLengths", "NormTendonLengths",
-            "Torques", "MusclesContribution" };
+            "NormFibreVelocities", "PennationAngles", "MuscleForces", "MuscleForcesPassive", "MuscleForcesActive", "MuscleForcesDamping",
+            "MTUVelocities", "MTUPowers", "FibrePowers",
+            "TendonLengths", "NormTendonLengths", "Torques", "MusclesContribution" };
         ModelEvaluationBase<Logger>::logger.close(queueNames);
 
 #endif

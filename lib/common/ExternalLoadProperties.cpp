@@ -5,7 +5,7 @@ namespace ceinms {
     ExternalLoadProperties::ExternalLoadProperties(const std::string& xmlFilename) :
         xmlFilename_(xmlFilename) {
 
-        SimTK::Xml::Document extLoadXml(xmlFilename);   //SimTK::Xml -> SimTK::Xml::Document
+        SimTK::Xml::Document extLoadXml(xmlFilename);
         parseXml(extLoadXml.getRootElement());
 
         if (!SimTK::Pathname::fileExists(datafile_)) {
