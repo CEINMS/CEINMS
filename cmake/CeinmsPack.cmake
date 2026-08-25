@@ -1,15 +1,40 @@
 
 if (WIN32)
 
-find_file(xerces_dll
+# Ship the Xerces runtime that matches the import library FindXERCES resolved,
+# by deriving its location from XERCES_LIBRARY rather than searching by name.
+# Searching by name also picks up the PATH, and CodeSynthesis installs a 32-bit
+# copy in bin/ alongside the 64-bit one in bin64/ -- so the 32-bit DLL was being
+# packaged into the x64 installer, and the installed CEINMS died at startup with
+# STATUS_INVALID_IMAGE_FORMAT (0xC000007B) before main() ran.
+get_filename_component(_xerces_vcdir "${XERCES_LIBRARY}" DIRECTORY)   # <root>/lib64/vc-10.0
+get_filename_component(_xerces_libdir "${_xerces_vcdir}" DIRECTORY)   # <root>/lib64
+get_filename_component(_xerces_root "${_xerces_libdir}" DIRECTORY)    # <root>
+get_filename_component(_xerces_vctag "${_xerces_vcdir}" NAME)         # vc-10.0
+string(REPLACE "vc-" "vc" _xerces_vctag "${_xerces_vctag}")
+string(REPLACE "." "" _xerces_vctag "${_xerces_vctag}")               # vc100
+if(CMAKE_SIZEOF_VOID_P EQUAL 8)
+    set(_xerces_bindir "${_xerces_root}/bin64")
+else()
+    set(_xerces_bindir "${_xerces_root}/bin")
+endif()
+# Deliberately a fresh cache variable: an existing build tree may still hold the
+# wrong DLL under the old name.
+find_file(CEINMS_XERCES_DLL
     NAMES
+        "xerces-c_3_1_${_xerces_vctag}.dll"
         "xerces-c_3_1.dll"
-        "xerces-c_3_1_vc100.dll"
     PATHS
-        "C:/xerces-c-3.1.3_32r/bin"
-        "C:/Program Files (x86)/CodeSynthesis XSD 4.0/bin64"
-    PATH)
-install(PROGRAMS ${xerces_dll} DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT ThirdParty)
+        "${_xerces_bindir}"
+    NO_DEFAULT_PATH)
+if(CEINMS_XERCES_DLL)
+    message(STATUS "Packaging Xerces runtime ${CEINMS_XERCES_DLL}")
+    install(PROGRAMS ${CEINMS_XERCES_DLL} DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT ThirdParty)
+else()
+    message(WARNING
+        "Could not find the Xerces runtime DLL in ${_xerces_bindir} -- it will not be "
+        "packaged, and the installed CEINMS will not start unless Xerces is on the PATH.")
+endif()
 
 # Package the OpenSim runtime DLLs next to the CEINMS executables.
 #
@@ -66,7 +91,15 @@ else()
             RESOLVED_DEPENDENCIES_VAR _ceinms_resolved
             UNRESOLVED_DEPENDENCIES_VAR _ceinms_unresolved
             DIRECTORIES \"${OpenSim_BIN_DIR}\"
+            # Exclude the MSVC runtime. OpenSim ships its own copy (14.29 with
+            # OpenSim 4.3), which is older than the toolset CEINMS is built with, and
+            # every component installs into the same bin directory -- so letting it
+            # through means it can overwrite the correct redistributable that
+            # InstallRequiredSystemLibraries provides below, and CEINMS then fails to
+            # start with a missing entry point. CMake regexes are case sensitive.
             PRE_EXCLUDE_REGEXES \"^api-ms-\" \"^ext-ms-\"
+                \"^[Mm][Ss][Vv][Cc][Pp][0-9]\" \"^[Vv][Cc][Rr][Uu][Nn][Tt][Ii][Mm][Ee][0-9]\"
+                \"^[Cc][Oo][Nn][Cc][Rr][Tt][0-9]\"
             POST_EXCLUDE_REGEXES \".*/[Ss][Yy][Ss][Tt][Ee][Mm]32/.*\" \".*/[Ww][Ii][Nn][Dd][Oo][Ww][Ss]/.*\")
         foreach(_dep IN LISTS _ceinms_resolved)
             file(INSTALL
