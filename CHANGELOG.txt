@@ -42,6 +42,11 @@ CEINMS 1.0.0
 * Fixed the elastic tendon producing NaN when two consecutive musculotendon length
   samples share a timestamp
 * Fixed DataTable<T>::get(row, col) not compiling
+* The Windows installer no longer offers to add CEINMS to the PATH or to create a
+  desktop icon. Neither worked: the PATH option cannot rewrite a PATH longer than
+  the installer framework's string limit, which most machines exceed, and the
+  desktop checkbox never created a shortcut. The README explains how to add the
+  install directory to PATH by hand
 * Fixed the Windows installer packaging a 32-bit Xerces library into the 64-bit
   application, which left the installed CEINMS unable to start
 * Fixed the Windows installer shipping two conflicting copies of the Microsoft C++

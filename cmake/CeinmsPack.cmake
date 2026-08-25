@@ -166,7 +166,33 @@ else()
             ${CPACK_PACKAGE_VERSION}")
 endif()
 
-set(CPACK_NSIS_MODIFY_PATH ON)
+# Neither option on the page this draws actually worked, so do not offer them.
+#
+# The PATH option reads the existing PATH into an NSIS variable before appending
+# to it, and a standard NSIS build caps strings at 1024 characters
+# (NSIS_MAX_STRLEN). A PATH longer than that reads back empty, and CPack then
+# refuses to continue rather than writing back a truncated PATH and destroying
+# it. Machine PATHs well over 1024 characters are common, so for many users the
+# option could only ever report failure. Making it work needs the NSIS large
+# strings build on whatever machine packages CEINMS, which is not something the
+# installer can guarantee.
+#
+# The "Create CEINMS Desktop Icon" checkbox on the same page never created
+# anything: it only writes a registry value, and the shortcut itself would come
+# from CPACK_PACKAGE_EXECUTABLES / CPACK_CREATE_DESKTOP_LINKS, which are not set.
+# CEINMS is a command line tool that needs a setup file argument, so a shortcut
+# to the bare executable would only flash a usage message and close.
+#
+# CPack generates both controls on one page and offers no way to drop just one,
+# so turning this off removes the page entirely. The README explains how to add
+# the install directory to PATH by hand.
+# Leaving this unset is what disables the page. Note that CPack's NSIS template
+# emits the options page and the AddToPath code unconditionally and then gates
+# both at run time on StrCmp "@CPACK_NSIS_MODIFY_PATH@" "ON", so any value other
+# than exactly ON disables them. That also means the generated project.nsi still
+# contains all of it -- searching the script is not a valid way to check whether
+# the options are active; look at the substituted StrCmp instead.
+unset(CPACK_NSIS_MODIFY_PATH)
 set(CPACK_NSIS_ENABLE_UNINSTALL_BEFORE_INSTALL ON)
 
 include(CPack)

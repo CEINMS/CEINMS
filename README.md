@@ -13,6 +13,8 @@ Prebuilt Windows installers and the user guide are available from the Downloads 
 
 The installer places the OpenSim libraries that CEINMS was built against next to the CEINMS executables, so no separate OpenSim installation is needed to run it. You will still need OpenSim to prepare CEINMS input data, such as inverse kinematics, inverse dynamics and muscle analysis results.
 
+CEINMS is run from a terminal, so it is usually convenient to add the `bin` directory of the installation (by default `C:\Program Files\CEINMS 1.0\bin`) to your `PATH`. On Windows this is under Settings > System > About > Advanced system settings > Environment Variables. The installer does not offer to do this for you, because Windows PATH values are frequently longer than the installer framework can safely rewrite.
+
 To build CEINMS yourself instead, for example on Linux or against a different OpenSim version, see [Building from source](#building-from-source) below.
 
 
