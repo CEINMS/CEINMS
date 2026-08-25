@@ -4,7 +4,16 @@ The Calibrated EMG-Informed NMS Modelling Toolbox (CEINMS) permits to estimate m
 
 CEINMS allows automatically identification of a number of parameters that determine the way musculotendon units activate and contract, which vary non-linearly across individuals. This is done via an optimization-based calibration procedure that adjusts the internal parameters to best reflect the anatomy and physiology of an individual.
 
-Read more about CEINMS at the [CEINMS project page](https://simtk.org/home/ceinms)
+Read more about CEINMS at the [CEINMS project page](https://simtk.org/projects/ceinms)
+
+
+Installation
+------------
+Prebuilt Windows installers and the user guide are available from the Downloads section of the [CEINMS project page on SimTK](https://simtk.org/projects/ceinms).
+
+The installer places the OpenSim libraries that CEINMS was built against next to the CEINMS executables, so no separate OpenSim installation is needed to run it. You will still need OpenSim to prepare CEINMS input data, such as inverse kinematics, inverse dynamics and muscle analysis results.
+
+To build CEINMS yourself instead, for example on Linux or against a different OpenSim version, see [Building from source](#building-from-source) below.
 
 
 Dependencies
@@ -26,6 +35,7 @@ Building from source
 1. Get the dependencies
     * [CMake](https://cmake.org/download/): Follow the instruction on the website
     * [Visual Studio](http://www.visualstudio.com): Follow the instruction on the website
+        * The `-G` generator name in the commands below must match the version you installed (`Visual Studio 17 2022`, `Visual Studio 16 2019`, and so on); `cmake --help` lists the generators available on your machine
     * [CodeSynthesis XSD](https://www.codesynthesis.com/products/xsd/download.xhtml): Download and run the .msi package which includes the precompiled Xerces-C++ libraries that are needed
     * [OpenSim](https://simtk.org/projects/opensim/): The instructions for building OpenSim from source are provided in the [README](https://github.com/opensim-org/opensim-core) on GitHub
         * If you have multiple versions of OpenSim installed, ensure that your PATH is pointing to the correct version directory
@@ -34,7 +44,7 @@ Building from source
         ```bash
         mkdir build
         cd build
-        cmake -G "Visual Studio 16 2019" ..
+        cmake -G "Visual Studio 17 2022" ..
         cmake --build . --config Release --target install
         ```
         After installation, create a Windows environment variable named `Filter_DIR` which points at the installation directory.
@@ -43,7 +53,7 @@ Building from source
         ```bash
         mkdir build
         cd build
-        cmake -G "Visual Studio 16 2019" ..
+        cmake -G "Visual Studio 17 2022" ..
         cmake --build . --config Release --target install
         ```
         After installation, create a Windows environment variable named `Concurrency_DIR` which points at the installation directory. 
@@ -52,7 +62,7 @@ Building from source
     * Open the CMake GUI
     * In the field labelled "Where is the source code:" enter the directory where the CEINMS source code is located
     * In the field labelled "Where to build the binaries:" enter a directory where you want the code to be built
-    * Click Configure, specify Visual Studio 16 2019 as the project generator and click finish
+    * Click Configure, specify the generator matching your Visual Studio version (e.g. Visual Studio 17 2022) and click finish
     * After CMake has finished configuring you can set the install directory in the "CMAKE_INSTALL_PREFIX" field and check that the dependencies (Concurrency, Filter, OpenSim, Simbody, Xerces and XSD) were successfully located. If a dependency is not found automatically then enter the correct directory where it was installed into the corresponding field
         * You can also choose whether CEINMS outputs information to the terminal during execution using the CEINMS_TERMINAL_LOGGING variable (NOTE: Enabling this can increase execution time and is therefore off by default). 
     * Click Configure again, all fields should change from red back to white, then click generate
@@ -114,7 +124,7 @@ Building from source
     make -j8
     make install -j8
     ```
-    * You can run tests to ensure CEINMS is working by running the folling command before installing:
+    * You can run tests to ensure CEINMS is working by running the following command before installing:
         ```bash
         ctest -j8
         ```

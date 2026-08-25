@@ -1,4 +1,4 @@
-CEINMS 0.31.0
+CEINMS 1.0.0
 --------------
 * Fixed joint contact and reaction forces, which had been wrong since the OpenSim
   3.3 to 4 migration. Simbody's internal body and coordinate ordering does not
@@ -42,6 +42,10 @@ CEINMS 0.31.0
 * Fixed the elastic tendon producing NaN when two consecutive musculotendon length
   samples share a timestamp
 * Fixed DataTable<T>::get(row, col) not compiling
+* Fixed the Windows installer packaging a 32-bit Xerces library into the 64-bit
+  application, which left the installed CEINMS unable to start
+* Fixed the Windows installer shipping two conflicting copies of the Microsoft C++
+  runtime, one of them older than the compiler CEINMS was built with
 * Building now requires CMake 3.16 or later
 
 CEINMS 0.30.0

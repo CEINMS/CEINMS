@@ -11,8 +11,8 @@ endif()
 # OpenSim runtime libraries, which was introduced in CMake 3.16.
 cmake_minimum_required (VERSION 3.16)
 project(CEINMS)
-set(CEINMS_MAJOR_VERSION 0)
-set(CEINMS_MINOR_VERSION 31)
+set(CEINMS_MAJOR_VERSION 1)
+set(CEINMS_MINOR_VERSION 0)
 set(CEINMS_PATCH_VERSION 0)
 
 add_definitions(/DCEINMS_MAJOR_VERSION="${CEINMS_MAJOR_VERSION}")
