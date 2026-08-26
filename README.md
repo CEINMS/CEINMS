@@ -1,5 +1,7 @@
 CEINMS
 ======
+[![Build and Test](https://github.com/CEINMS/CEINMS/actions/workflows/build.yml/badge.svg?branch=main)](https://github.com/CEINMS/CEINMS/actions/workflows/build.yml)
+
 The Calibrated EMG-Informed NMS Modelling Toolbox (CEINMS) permits to estimate muscle forces inside a human body during static and dynamic tasks. CEINMS implements all the transformations that take place from the onset of muscle excitation to the generation of muscle forces and resulting joint moments.
 
 CEINMS allows automatically identification of a number of parameters that determine the way musculotendon units activate and contract, which vary non-linearly across individuals. This is done via an optimization-based calibration procedure that adjusts the internal parameters to best reflect the anatomy and physiology of an individual.
