@@ -1,0 +1,28 @@
+# Builds and tests CEINMS on Linux, using the same image the Bitbucket pipeline used
+# so the dependencies (OpenSim, XSD/Xerces, Filter, Concurrency) come preinstalled.
+name: Build and Test
+
+on:
+  push:
+    branches: [main]
+    tags: ['*']
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    name: Linux (RelWithDebInfo)
+    runs-on: ubuntu-latest
+    container: matthewhambly/ceinms-environment:latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure
+        run: cmake -B build -DCMAKE_BUILD_TYPE=RelWithDebInfo
+
+      - name: Build
+        run: cmake --build build -j2
+
+      - name: Test
+        run: ctest --test-dir build --output-on-failure
