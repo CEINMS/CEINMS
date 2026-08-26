@@ -9,6 +9,15 @@ on:
   pull_request:
     branches: [main]
 
+env:
+  # OpenSim is installed under /opensim/opensim_install in the image, which is not on
+  # CMake's default search path, so find_package(OpenSim REQUIRED) fails without these
+  # being passed explicitly. Simbody comes with it and needs the same treatment.
+  OPENSIM_CMAKE_DIR: /opensim/opensim_install/lib/cmake/OpenSim
+  SIMBODY_CMAKE_DIR: /opensim/opensim_install/lib/cmake/simbody
+  # Needed to resolve the OpenSim shared libraries when the test binaries run.
+  LD_LIBRARY_PATH: /usr/local/lib:/opensim/opensim_install/lib
+
 jobs:
   build:
     name: Linux (RelWithDebInfo)
@@ -30,7 +39,10 @@ jobs:
         run: |
           mkdir build
           cd build
-          cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo ..
+          cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+                -DOpenSim_DIR="$OPENSIM_CMAKE_DIR" \
+                -DSimbody_DIR="$SIMBODY_CMAKE_DIR" \
+                ..
 
       - name: Build
         working-directory: build
@@ -38,4 +50,4 @@ jobs:
 
       - name: Test
         working-directory: build
-        run: ctest --output-on-failure
+        run: ctest -j2 --output-on-failure
