@@ -18,11 +18,24 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # Report the toolchain first: when a build fails inside a prebuilt image it is
+      # usually the image that moved, and this is the cheapest way to see that.
+      - name: Toolchain versions
+        run: cmake --version && c++ --version
+
+      # Deliberately the same commands the Bitbucket pipeline used, rather than the
+      # newer cmake -B / ctest --test-dir spellings, which need CMake 3.13 and 3.20
+      # respectively and would silently tie CI to a newer CMake than the image has.
       - name: Configure
-        run: cmake -B build -DCMAKE_BUILD_TYPE=RelWithDebInfo
+        run: |
+          mkdir build
+          cd build
+          cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo ..
 
       - name: Build
-        run: cmake --build build -j2
+        working-directory: build
+        run: make -j2
 
       - name: Test
-        run: ctest --test-dir build --output-on-failure
+        working-directory: build
+        run: ctest --output-on-failure
